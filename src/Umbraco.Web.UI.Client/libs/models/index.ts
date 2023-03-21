@@ -1,6 +1,5 @@
 import type {
 	ContentTreeItemResponseModel,
-	DictionaryItemTranslationModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
 	PackageManifestResponseModel,
@@ -21,13 +20,6 @@ export interface Entity {
 	type: string;
 	hasChildren: boolean;
 	parentKey: string | null;
-}
-
-export interface ContentDetails extends ContentTreeItemResponseModel {
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	//data: Array<ContentPropertyData>;
-	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
 export interface UserEntity extends Entity {
@@ -106,12 +98,6 @@ export interface MemberGroupDetails extends EntityTreeItemResponseModel {
 
 export interface MemberDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
-}
-
-// Dictionary
-export interface DictionaryDetails extends EntityTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	translations: DictionaryItemTranslationModel[];
 }
 
 // Document Blueprint
