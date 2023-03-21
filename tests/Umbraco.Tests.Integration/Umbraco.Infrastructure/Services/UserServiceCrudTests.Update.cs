@@ -125,4 +125,65 @@ public partial class UserServiceCrudTests
         Assert.AreEqual(userName, updatedUser.Username);
         Assert.AreEqual(email, updatedUser.Email);
     }
+
+    [Test]
+    public async Task Cannot_Change_Email_To_Duplicate_Email_On_Update()
+    {
+        var userService = CreateUserService();
+
+        var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var email = "thiswillbe@duplicate.com";
+        var createModel = new UserCreateModel
+        {
+            Email = email,
+            UserName = email,
+            Name = "Test Mc. Gee",
+            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+        };
+
+        var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
+
+        Assert.IsTrue(createExisting.Success);
+
+        var (updateModel, _) = await CreateUserForUpdate(userService);
+
+        updateModel.Email = email;
+        updateModel.UserName = email;
+
+        var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        Assert.IsFalse(updateAttempt.Success);
+        Assert.AreEqual(UserOperationStatus.DuplicateEmail, updateAttempt.Status);
+    }
+
+    [Test]
+    [TestCase("TestUser", "test@user.com", "TestUser", "another@email.com")]
+    [TestCase("test@email.com", "test@email.com", "test@email.com", "different@email.com")]
+    [TestCase("SomeName", "test@email.com", "test@email.com", "different@email.com")]
+    public async Task Cannot_Change_User_Name_To_Duplicate_UserName(string existingUserName, string existingEmail, string updateUserName, string updateEmail)
+    {
+        // We also ensure that your username cannot be the same as another users email.
+        var userService = CreateUserService(new SecuritySettings { UsernameIsEmail = false });
+        var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+
+        var createModel = new UserCreateModel
+        {
+            Email = existingEmail,
+            UserName = existingUserName,
+            Name = "Test Mc. Gee",
+            UserGroups = new SortedSet<IUserGroup> { userGroup! }
+        };
+
+        var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
+        Assert.IsTrue(createExisting.Success);
+
+        var (updateModel, _) = await CreateUserForUpdate(userService);
+
+        updateModel.Email = updateEmail;
+        updateModel.UserName = updateUserName;
+
+        var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+        Assert.IsFalse(updateAttempt.Success);
+        Assert.AreEqual(UserOperationStatus.DuplicateUserName, updateAttempt.Status);
+    }
 }
