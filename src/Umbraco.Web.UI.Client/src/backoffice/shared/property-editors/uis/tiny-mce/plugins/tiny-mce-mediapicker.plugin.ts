@@ -105,8 +105,8 @@ export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 		const modalHandler = this.#modalContext?.open(UMB_MEDIA_PICKER_MODAL_TOKEN, {
 			selection: currentTarget.udi ? [...currentTarget.udi] : [],
 			multiple: false,
-			startNodeId,
-			startNodeIsVirtual,
+			// startNodeId,
+			// startNodeIsVirtual,
 		});
 
 		if (!modalHandler) return;

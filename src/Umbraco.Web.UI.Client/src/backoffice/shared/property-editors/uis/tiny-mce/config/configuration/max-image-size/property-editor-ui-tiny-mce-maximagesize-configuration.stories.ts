@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
-import { umbDataTypeData } from 'src/core/mocks/data/data-type.data';
+import { umbDataTypeData } from '../../../../../../../../core/mocks/data/data-type.data';
 
 import './property-editor-ui-tiny-mce-maximagesize-configuration.element';
 
@@ -17,5 +17,5 @@ export const AAAOverview = ({ value }: any) =>
 		.value=${value}></umb-property-editor-ui-tiny-mce-maximagesize-configuration>`;
 AAAOverview.storyName = 'Overview';
 AAAOverview.args = {
-	value: dataTypeData?.data?.find((x) => x.alias === 'maxImageSize')?.value,
+	value: dataTypeData?.values?.find((x) => x.alias === 'maxImageSize')?.value,
 };

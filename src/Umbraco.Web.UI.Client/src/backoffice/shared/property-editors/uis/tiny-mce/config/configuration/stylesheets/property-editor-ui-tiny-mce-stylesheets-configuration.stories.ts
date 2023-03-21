@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
-import { umbDataTypeData } from 'src/core/mocks/data/data-type.data';
+import { umbDataTypeData } from '../../../../../../../../core/mocks/data/data-type.data';
 
 import './property-editor-ui-tiny-mce-stylesheets-configuration.element';
 
@@ -16,5 +16,5 @@ export const AAAOverview = ({ value }: any) =>
 	html`<umb-property-editor-ui-tiny-mce-stylesheets-configuration .value=${value}></umb-property-editor-ui-tiny-mce-stylesheets-configuration>`;
 AAAOverview.storyName = 'Overview';
 AAAOverview.args = {
-	value: dataTypeData?.data?.find(x => x.alias === 'stylesheets')?.value ?? []
+	value: dataTypeData?.values?.find(x => x.alias === 'stylesheets')?.value ?? []
 }
