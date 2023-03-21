@@ -35,7 +35,7 @@ public class CreateLanguageController : LanguageControllerBase
     {
         ILanguage created = _umbracoMapper.Map<ILanguage>(createLanguageRequestModel)!;
 
-        Attempt<ILanguage, LanguageOperationStatus> result = await _languageService.CreateAsync(created, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<ILanguage, LanguageOperationStatus> result = await _languageService.CreateAsync(created, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByIsoCodeLanguageController>(controller => nameof(controller.ByIsoCode), new { isoCode = result.Result.IsoCode })

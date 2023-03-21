@@ -27,7 +27,6 @@ internal class UserService : RepositoryService, IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IRuntimeState _runtimeState;
     private readonly IUserGroupRepository _userGroupRepository;
-    private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
     private readonly IUserRepository _userRepository;
 
     public UserService(
@@ -37,14 +36,12 @@ internal class UserService : RepositoryService, IUserService
         IRuntimeState runtimeState,
         IUserRepository userRepository,
         IUserGroupRepository userGroupRepository,
-        IOptions<GlobalSettings> globalSettings,
-        IUserGroupAuthorizationService userGroupAuthorizationService)
+        IOptions<GlobalSettings> globalSettings)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _runtimeState = runtimeState;
         _userRepository = userRepository;
         _userGroupRepository = userGroupRepository;
-        _userGroupAuthorizationService = userGroupAuthorizationService;
         _globalSettings = globalSettings.Value;
         _logger = loggerFactory.CreateLogger<UserService>();
     }

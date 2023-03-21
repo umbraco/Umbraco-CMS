@@ -32,7 +32,7 @@ public class CreateMediaController : MediaControllerBase
     public async Task<IActionResult> Create(CreateMediaRequestModel createRequestModel)
     {
         MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(createRequestModel);
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.CreateAsync(model, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyMediaController>(controller => nameof(controller.ByKey), result.Result!.Key)

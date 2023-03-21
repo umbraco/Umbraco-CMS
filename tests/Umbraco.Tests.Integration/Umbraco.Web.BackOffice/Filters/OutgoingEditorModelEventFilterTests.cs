@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -88,8 +89,8 @@ public class OutgoingEditorModelEventFilterTests : UmbracoTestServerTestBase
             .WithIsDefault(false)
             .Build();
 
-        await languageService.CreateAsync(dkLang);
-        await languageService.CreateAsync(sweLang);
+        await languageService.CreateAsync(dkLang, Constants.Security.SuperUserKey);
+        await languageService.CreateAsync(sweLang, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithoutIdentity()

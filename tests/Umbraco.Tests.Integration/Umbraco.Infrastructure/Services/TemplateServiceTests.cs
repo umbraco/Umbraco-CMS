@@ -23,18 +23,18 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Template_Then_Assign_Child()
     {
-        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Child", "child", "test");
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Child", "child", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(TemplateOperationStatus.Success, result.Status);
         var child = result.Result;
 
-        result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(TemplateOperationStatus.Success, result.Status);
         var parent = result.Result;
 
         child.Content = "Layout = \"Parent.cshtml\";";
-        result = await TemplateService.UpdateAsync(child);
+        result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(TemplateOperationStatus.Success, result.Status);
 
@@ -47,11 +47,11 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Template_With_Child_Then_Unassign()
     {
-        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var parent = result.Result;
 
-        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";");
+        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var child = result.Result;
 
@@ -60,7 +60,7 @@ public class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("parent", child.MasterTemplateAlias);
 
         child.Content = "test";
-        result = await TemplateService.UpdateAsync(child);
+        result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         child = await TemplateService.GetAsync(child.Key);
@@ -71,13 +71,13 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_Template_With_Child_Then_Reassign()
     {
-        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
-        result = await TemplateService.CreateAsync("Parent2", "parent2", "test");
+        result = await TemplateService.CreateAsync("Parent2", "parent2", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
-        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";");
+        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var child = result.Result;
 
@@ -86,7 +86,7 @@ public class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("parent", child.MasterTemplateAlias);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
-        result = await TemplateService.UpdateAsync(child);
+        result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         child = await TemplateService.GetAsync(child.Key);
@@ -97,23 +97,23 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Child_Template_Paths_Are_Updated_When_Reassigning_Master()
     {
-        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var parent = result.Result;
 
-        result = await TemplateService.CreateAsync("Parent2", "parent2", "test");
+        result = await TemplateService.CreateAsync("Parent2", "parent2", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var parent2 = result.Result;
 
-        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";");
+        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var child = result.Result;
 
-        result = await TemplateService.CreateAsync("Child1", "child1", "Layout = \"Child.cshtml\";");
+        result = await TemplateService.CreateAsync("Child1", "child1", "Layout = \"Child.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var childOfChild1 = result.Result;
 
-        result = await TemplateService.CreateAsync("Child2", "child2", "Layout = \"Child.cshtml\";");
+        result = await TemplateService.CreateAsync("Child2", "child2", "Layout = \"Child.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var childOfChild2 = result.Result;
 
@@ -123,7 +123,7 @@ public class TemplateServiceTests : UmbracoIntegrationTest
         Assert.AreEqual($"{parent.Path},{child.Id},{childOfChild2.Id}", childOfChild2.Path);
 
         child.Content = "Layout = \"Parent2.cshtml\";";
-        result = await TemplateService.UpdateAsync(child);
+        result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         childOfChild1 = await TemplateService.GetAsync(childOfChild1.Key);
@@ -141,15 +141,15 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Query_Template_Children()
     {
-        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var parent = result.Result;
 
-        result = await TemplateService.CreateAsync("Child1", "child1", "Layout = \"Parent.cshtml\";");
+        result = await TemplateService.CreateAsync("Child1", "child1", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var child1 = result.Result;
 
-        result = await TemplateService.CreateAsync("Child2", "child2", "Layout = \"Parent.cshtml\";");
+        result = await TemplateService.CreateAsync("Child2", "child2", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var child2 = result.Result;
 
@@ -163,13 +163,13 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Update_Template()
     {
-        var result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        var result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var parent = result.Result;
         parent.Name = "Parent Updated";
 
-        result = await TemplateService.UpdateAsync(parent);
+        result = await TemplateService.UpdateAsync(parent, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
 
@@ -182,12 +182,12 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Delete_Template()
     {
-        var result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        var result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var parent = result.Result;
 
-        result = await TemplateService.DeleteAsync(parent.Key);
+        result = await TemplateService.DeleteAsync(parent.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         parent = await TemplateService.GetAsync(parent.Key);
@@ -197,16 +197,16 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Deleting_Master_Template_Also_Deletes_Children()
     {
-        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        Attempt<ITemplate, TemplateOperationStatus> result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var parent = result.Result;
 
-        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";");
+        result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         var child = result.Result;
         Assert.AreEqual("parent", child.MasterTemplateAlias);
 
-        result = await TemplateService.DeleteAsync(parent.Key);
+        result = await TemplateService.DeleteAsync(parent.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         child = await TemplateService.GetAsync(child.Key);
@@ -216,17 +216,17 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Update_Non_Existing_Template()
     {
-        var result = await TemplateService.CreateAsync("Parent", "parent", "test");
+        var result = await TemplateService.CreateAsync("Parent", "parent", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var parent = result.Result;
 
-        result = await TemplateService.DeleteAsync("parent");
+        result = await TemplateService.DeleteAsync("parent", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         parent.Name = "Parent Updated";
 
-        result = await TemplateService.UpdateAsync(parent);
+        result = await TemplateService.UpdateAsync(parent, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.TemplateNotFound, result.Status);
     }
@@ -234,7 +234,7 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Create_Child_Template_Without_Master_Template()
     {
-        var result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";");
+        var result = await TemplateService.CreateAsync("Child", "child", "Layout = \"Parent.cshtml\";", Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.MasterTemplateNotFound, result.Status);
     }
@@ -242,13 +242,13 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Update_Child_Template_Without_Master_Template()
     {
-        var result = await TemplateService.CreateAsync("Child", "child", "test");
+        var result = await TemplateService.CreateAsync("Child", "child", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var child = result.Result;
         child.Content = "Layout = \"Parent.cshtml\";";
 
-        result = await TemplateService.UpdateAsync(child);
+        result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.MasterTemplateNotFound, result.Status);
     }
@@ -257,7 +257,7 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     public async Task Cannot_Create_Template_With_Invalid_Alias()
     {
         var invalidAlias = new string('a', 256);
-        var result = await TemplateService.CreateAsync("Child", invalidAlias, "test");
+        var result = await TemplateService.CreateAsync("Child", invalidAlias, "test", Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.InvalidAlias, result.Status);
     }
@@ -265,14 +265,14 @@ public class TemplateServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Cannot_Update_Template_With_Invalid_Alias()
     {
-        var result = await TemplateService.CreateAsync("Child", "child", "test");
+        var result = await TemplateService.CreateAsync("Child", "child", "test", Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
 
         var child = result.Result;
         var invalidAlias = new string('a', 256);
         child.Alias = invalidAlias;
 
-        result = await TemplateService.UpdateAsync(child);
+        result = await TemplateService.UpdateAsync(child, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.InvalidAlias, result.Status);
     }

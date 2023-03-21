@@ -90,12 +90,12 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithCultureName("Norwegian Bokmål (Norway)")
             .Build();
-        await languageService.CreateAsync(languageNbNo);
+        await languageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
 
         var languageEnGb = new LanguageBuilder()
             .WithCultureInfo("en-GB")
             .Build();
-        await languageService.CreateAsync(languageEnGb);
+        await languageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
 
         var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
         var languageItemsElement = newPackageXml.Elements("Languages").First();
@@ -297,12 +297,12 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             .WithCultureInfo("nb-NO")
             .WithCultureName("Norwegian")
             .Build();
-        await languageService.CreateAsync(languageNbNo);
+        await languageService.CreateAsync(languageNbNo, Constants.Security.SuperUserKey);
 
         var languageEnGb = new LanguageBuilder()
             .WithCultureInfo("en-GB")
             .Build();
-        await languageService.CreateAsync(languageEnGb);
+        await languageService.CreateAsync(languageEnGb, Constants.Security.SuperUserKey);
 
         var parentKey = Guid.Parse("28f2e02a-8c66-4fcd-85e3-8524d551c0d3");
         var parentItem = new DictionaryItem("Parent") { Key = parentKey };
@@ -312,7 +312,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             new DictionaryTranslation(languageEnGb, "ParentValue")
         };
         parentItem.Translations = parentTranslations;
-        var result = await dictionaryItemService.CreateAsync(parentItem);
+        var result = await dictionaryItemService.CreateAsync(parentItem, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(parentKey, result.Result.Key);
 
@@ -325,7 +325,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             new DictionaryTranslation(languageEnGb, "ChildValue")
         };
         childItem.Translations = childTranslations;
-        result = await dictionaryItemService.CreateAsync(childItem);
+        result = await dictionaryItemService.CreateAsync(childItem, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(childKey, result.Result.Key);
     }

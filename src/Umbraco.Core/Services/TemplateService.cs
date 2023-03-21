@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -17,6 +19,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly ITemplateContentParserService _templateContentParserService;
+    private readonly IUserService _userService;
 
     public TemplateService(
         ICoreScopeProvider provider,
@@ -25,18 +28,41 @@ public class TemplateService : RepositoryService, ITemplateService
         IShortStringHelper shortStringHelper,
         ITemplateRepository templateRepository,
         IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService)
+        ITemplateContentParserService templateContentParserService,
+        IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
         _templateRepository = templateRepository;
         _auditRepository = auditRepository;
         _templateContentParserService = templateContentParserService;
+        _userService = userService;
+    }
+
+    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in v15")]
+    public TemplateService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IShortStringHelper shortStringHelper,
+        ITemplateRepository templateRepository,
+        IAuditRepository auditRepository,
+        ITemplateContentParserService templateContentParserService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            shortStringHelper,
+            templateRepository,
+            auditRepository,
+            templateContentParserService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+    {
     }
 
     /// <inheritdoc />
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
-        string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
+        string contentTypeAlias, string? contentTypeName, Guid userKey)
     {
         ITemplate template = new Template(_shortStringHelper, contentTypeName,
 
@@ -74,7 +100,8 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
 
-            Audit(AuditType.New, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(AuditType.New, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
         }
 
@@ -86,17 +113,17 @@ public class TemplateService : RepositoryService, ITemplateService
         string name,
         string alias,
         string? content,
-        int userId = Constants.Security.SuperUserId)
-        => await CreateAsync(new Template(_shortStringHelper, name, alias) { Content = content }, userId);
+        Guid userKey)
+        => await CreateAsync(new Template(_shortStringHelper, name, alias) { Content = content }, userKey);
 
     /// <inheritdoc />
-    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey)
     {
         try
         {
             // file might already be on disk, if so grab the content to avoid overwriting
             template.Content = GetViewContent(template.Alias) ?? template.Content;
-            return await SaveAsync(template, AuditType.New, userId);
+            return await SaveAsync(template, AuditType.New, userKey);
         }
         catch (PathTooLongException ex)
         {
@@ -161,17 +188,17 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ITemplate, TemplateOperationStatus>> UpdateAsync(ITemplate template, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ITemplate, TemplateOperationStatus>> UpdateAsync(ITemplate template, Guid userKey)
         => await SaveAsync(
             template,
             AuditType.Save,
-            userId,
+            userKey,
             // fail the attempt if the template does not exist within the scope
             () => _templateRepository.Exists(template.Id)
                 ? TemplateOperationStatus.Success
                 : TemplateOperationStatus.TemplateNotFound);
 
-    private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(ITemplate template, AuditType auditType, int userId = Constants.Security.SuperUserId, Func<TemplateOperationStatus>? scopeValidator = null)
+    private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(ITemplate template, AuditType auditType, Guid userKey, Func<TemplateOperationStatus>? scopeValidator = null)
     {
         if (IsValidAlias(template.Alias) == false)
         {
@@ -197,7 +224,7 @@ public class TemplateService : RepositoryService, ITemplateService
                 return Attempt.FailWithStatus(TemplateOperationStatus.MasterTemplateNotFound, template);
             }
 
-            await SetMasterTemplateAsync(template, masterTemplate);
+            await SetMasterTemplateAsync(template, masterTemplate, userKey);
 
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new TemplateSavingNotification(template, eventMessages);
@@ -212,19 +239,20 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingNotification));
 
-            Audit(auditType, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(auditType, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template);
         }
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(string alias, int userId = Constants.Security.SuperUserId)
-        => await DeleteAsync(() => Task.FromResult(_templateRepository.Get(alias)), userId);
+    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(string alias, Guid userKey)
+        => await DeleteAsync(() => Task.FromResult(_templateRepository.Get(alias)), userKey);
 
     /// <inheritdoc />
-    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Guid key, int userId = Constants.Security.SuperUserId)
-        => await DeleteAsync(async () => await GetAsync(key), userId);
+    public async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Guid key, Guid userKey)
+        => await DeleteAsync(async () => await GetAsync(key), userKey);
 
     /// <inheritdoc />
     public async Task<Stream> GetFileContentStreamAsync(string filepath)
@@ -256,7 +284,7 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    private async Task SetMasterTemplateAsync(ITemplate template, ITemplate? masterTemplate)
+    private async Task SetMasterTemplateAsync(ITemplate template, ITemplate? masterTemplate, Guid userKey)
     {
         if (template.MasterTemplateAlias == masterTemplate?.Alias)
         {
@@ -299,7 +327,7 @@ public class TemplateService : RepositoryService, ITemplateService
                         childTemplate.Path = masterTemplate.Path + "," + template.Id + "," + childTemplatePath;
 
                         //Save the children with the updated path
-                        await UpdateAsync(childTemplate);
+                        await UpdateAsync(childTemplate, userKey);
                     }
                 }
             }
@@ -334,7 +362,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private void Audit(AuditType type, int userId, int objectId, string? entityType) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
 
-    private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, int userId)
+    private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, Guid userKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -358,7 +386,8 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateDeletedNotification(template, eventMessages).WithStateFrom(deletingNotification));
 
-            Audit(AuditType.Delete, userId, template.Id, UmbracoObjectTypes.Template.GetName());
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(AuditType.Delete, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.Success, template);
         }

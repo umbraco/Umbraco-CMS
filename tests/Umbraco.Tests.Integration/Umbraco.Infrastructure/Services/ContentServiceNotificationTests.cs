@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -65,7 +66,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     [Test]
     public async Task Saving_Culture()
     {
-        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"));
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)
@@ -176,7 +177,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     [Test]
     public async Task Publishing_Culture()
     {
-        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"));
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)
@@ -336,7 +337,7 @@ public class ContentServiceNotificationTests : UmbracoIntegrationTest
     [Test]
     public async Task Unpublishing_Culture()
     {
-        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"));
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
 
         _contentType.Variations = ContentVariation.Culture;
         foreach (var propertyType in _contentType.PropertyTypes)

@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
@@ -11,7 +12,7 @@ public partial class ContentEditingServiceTests
     {
         var content = await (variant ? CreateVariantContent() : CreateInvariantContent());
 
-        var result = await ContentEditingService.DeleteAsync(content.Key);
+        var result = await ContentEditingService.DeleteAsync(content.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
 
@@ -23,7 +24,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_Delete_Non_Existing()
     {
-        var result = await ContentEditingService.DeleteAsync(Guid.NewGuid());
+        var result = await ContentEditingService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
     }

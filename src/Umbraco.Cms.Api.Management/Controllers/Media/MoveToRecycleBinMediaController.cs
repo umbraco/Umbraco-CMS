@@ -26,7 +26,7 @@ public class MoveToRecycleBinMediaController : MediaControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MoveToRecycleBin(Guid key)
     {
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveToRecycleBinAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveToRecycleBinAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : ContentEditingOperationStatusResult(result.Status);

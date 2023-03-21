@@ -19,6 +19,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
     private readonly PackageDataInstallation _packageDataInstallation;
     private readonly ILogger<DictionaryItemImportService> _logger;
     private readonly ITemporaryFileService _temporaryFileService;
+    private readonly IUserService _userService;
     private readonly IScopeProvider _scopeProvider;
 
     public DictionaryItemImportService(
@@ -26,16 +27,18 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         PackageDataInstallation packageDataInstallation,
         ILogger<DictionaryItemImportService> logger,
         ITemporaryFileService temporaryFileService,
+        IUserService userService,
         IScopeProvider scopeProvider)
     {
         _dictionaryItemService = dictionaryItemService;
         _packageDataInstallation = packageDataInstallation;
         _logger = logger;
         _temporaryFileService = temporaryFileService;
+        _userService = userService;
         _scopeProvider = scopeProvider;
     }
 
-    public async Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(Guid fileKey, Guid? parentKey, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(Guid fileKey, Guid? parentKey, Guid userKey)
     {
         using var scope = _scopeProvider.CreateScope();
         _temporaryFileService.EnlistDeleteIfScopeCompletes(fileKey, _scopeProvider);
@@ -67,7 +70,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
 
         // import the UDT file
-        (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) importResult = ImportUdtFile(loadResult.Document, userId, parentKey, temporaryFile);
+        (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) importResult = ImportUdtFile(loadResult.Document, userKey, parentKey, temporaryFile);
 
         scope.Complete();
 
@@ -94,7 +97,7 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
         }
     }
 
-    private (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) ImportUdtFile(XDocument udtFileContent, int userId, Guid? parentKey, TemporaryFileModel temporaryFileModel)
+    private (IDictionaryItem? DictionaryItem, DictionaryImportOperationStatus Status) ImportUdtFile(XDocument udtFileContent, Guid userKey, Guid? parentKey, TemporaryFileModel temporaryFileModel)
     {
         if (udtFileContent.Root == null)
         {
@@ -103,7 +106,8 @@ internal sealed class DictionaryItemImportService : IDictionaryItemImportService
 
         try
         {
-            IEnumerable<IDictionaryItem> dictionaryItems = _packageDataInstallation.ImportDictionaryItem(udtFileContent.Root, userId, parentKey);
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            IEnumerable<IDictionaryItem> dictionaryItems = _packageDataInstallation.ImportDictionaryItem(udtFileContent.Root, currentUserId, parentKey);
             IDictionaryItem? importedDictionaryItem = dictionaryItems.FirstOrDefault();
             return importedDictionaryItem != null
                 ? (importedDictionaryItem, DictionaryImportOperationStatus.Success)

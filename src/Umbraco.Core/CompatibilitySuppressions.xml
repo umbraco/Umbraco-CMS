@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
@@ -899,6 +898,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.CopyAsync(Umbraco.Cms.Core.Models.IDataType,System.Nullable{System.Guid},System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.CopyAsync(Umbraco.Cms.Core.Models.IDataType,System.Nullable{System.Guid},System.Int32)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -906,7 +912,21 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.CreateAsync(Umbraco.Cms.Core.Models.IDataType,System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.CreateAsync(Umbraco.Cms.Core.Models.IDataType,System.Int32)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.DeleteAsync(System.Guid,System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -948,7 +968,21 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.MoveAsync(Umbraco.Cms.Core.Models.IDataType,System.Nullable{System.Guid},System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.MoveAsync(Umbraco.Cms.Core.Models.IDataType,System.Nullable{System.Guid},System.Int32)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDataTypeService.UpdateAsync(Umbraco.Cms.Core.Models.IDataType,System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -1032,7 +1066,21 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IPackagingService.CreateCreatedPackageAsync(Umbraco.Cms.Core.Packaging.PackageDefinition,System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IPackagingService.CreateCreatedPackageAsync(Umbraco.Cms.Core.Packaging.PackageDefinition,System.Int32)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IPackagingService.DeleteCreatedPackageAsync(System.Guid,System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -1074,7 +1122,28 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IPackagingService.UpdateCreatedPackageAsync(Umbraco.Cms.Core.Packaging.PackageDefinition,System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IPackagingService.UpdateCreatedPackageAsync(Umbraco.Cms.Core.Packaging.PackageDefinition,System.Int32)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IRelationService.CreateAsync(Umbraco.Cms.Core.Models.IRelationType,System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IRelationService.DeleteAsync(System.Guid,System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -1089,6 +1158,13 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IRelationService.GetPagedByRelationTypeKey(System.Guid,System.Int32,System.Int32,Umbraco.Cms.Core.Services.Ordering)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IRelationService.UpdateAsync(Umbraco.Cms.Core.Models.IRelationType,System.Guid)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

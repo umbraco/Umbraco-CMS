@@ -42,7 +42,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
         IDictionaryItem updated = await _dictionaryPresentationFactory.MapUpdateModelToDictionaryItemAsync(current, updateDictionaryItemRequestModel);
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result =
-            await _dictionaryItemService.UpdateAsync(updated, CurrentUserId(_backOfficeSecurityAccessor));
+            await _dictionaryItemService.UpdateAsync(updated, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
