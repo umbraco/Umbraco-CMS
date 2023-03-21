@@ -2,12 +2,16 @@ import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } fr
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store';
 import { MemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import type { MemberGroupDetails } from '@umbraco-cms/models';
-import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import type { RepositoryTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/repository';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	RepositoryTreeDataSource,
+	UmbDetailRepository,
+	UmbTreeRepository,
+} from '@umbraco-cms/backoffice/repository';
 
 // TODO => Update type when backend updated
 export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRepository<any> {

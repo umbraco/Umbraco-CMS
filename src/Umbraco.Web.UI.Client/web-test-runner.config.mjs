@@ -38,27 +38,28 @@ export default {
 				importMap: {
 					imports: {
 						'src/': './src/',
-						'@umbraco-cms/backend-api': './libs/backend-api/index.ts',
-						'@umbraco-cms/context-api': './libs/context-api/index.ts',
-						'@umbraco-cms/controller': './libs/controller/index.ts',
-						'@umbraco-cms/css': './libs/css/custom-properties.css',
-						'@umbraco-cms/element': './libs/element/index.ts',
-						'@umbraco-cms/entity-action': './libs/entity-action/index.ts',
-						'@umbraco-cms/events': './libs/events/index.ts',
-						'@umbraco-cms/extensions-api': './libs/extensions-api/index.ts',
-						'@umbraco-cms/extensions-registry': './libs/extensions-registry/index.ts',
-						'@umbraco-cms/modal': './libs/modal/index.ts',
-						'@umbraco-cms/models': './libs/models/index.ts',
-						'@umbraco-cms/notification': './libs/notification/index.ts',
-						'@umbraco-cms/observable-api': './libs/observable-api/index.ts',
-						'@umbraco-cms/property-editor': './libs/property-editor/index.ts',
-						'@umbraco-cms/repository': './libs/repository/index.ts',
-						'@umbraco-cms/resources': './libs/resources/index.ts',
-						'@umbraco-cms/router': './src/core/router/index.ts',
-						'@umbraco-cms/store': './libs/store/index.ts',
-						'@umbraco-cms/test-utils': './libs/test-utils/index.ts',
-						'@umbraco-cms/utils': './libs/utils/index.ts',
-						'@umbraco-cms/workspace': './libs/workspace/index.ts',
+						'@umbraco-cms/backoffice/backend-api': './libs/backend-api/index.ts',
+						'@umbraco-cms/backoffice/context-api': './libs/context-api/index.ts',
+						'@umbraco-cms/backoffice/controller': './libs/controller/index.ts',
+						'@umbraco-cms/backoffice/element': './libs/element/index.ts',
+						'@umbraco-cms/backoffice/entity-action': './libs/entity-action/index.ts',
+						'@umbraco-cms/backoffice/events': './libs/umb-events/index.ts',
+						'@umbraco-cms/backoffice/extensions-api': './libs/extensions-api/index.ts',
+						'@umbraco-cms/backoffice/extensions-registry': './libs/extensions-registry/index.ts',
+						'@umbraco-cms/backoffice/modal': './libs/modal/index.ts',
+						'@umbraco-cms/backoffice/models': './libs/models/index.ts',
+						'@umbraco-cms/backoffice/notification': './libs/notification/index.ts',
+						'@umbraco-cms/backoffice/observable-api': './libs/observable-api/index.ts',
+						'@umbraco-cms/backoffice/property-editor': './libs/property-editor/index.ts',
+						'@umbraco-cms/backoffice/repository': './libs/repository/index.ts',
+						'@umbraco-cms/backoffice/resources': './libs/resources/index.ts',
+						'@umbraco-cms/backoffice/store': './libs/store/index.ts',
+						'@umbraco-cms/backoffice/utils': './libs/utils/index.ts',
+						'@umbraco-cms/backoffice/workspace': './libs/workspace/index.ts',
+						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
+						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
+						'@umbraco-cms/internal/router': './src/core/router/index.ts',
+						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts'
 					},
 				},
 			},
@@ -77,7 +78,7 @@ export default {
 				<title>Umbraco</title>
 				<base href="/" />
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
-				<link rel="stylesheet" href="libs/css/custom-properties.css">
+				<link rel="stylesheet" href="src/core/css/custom-properties.css">
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>

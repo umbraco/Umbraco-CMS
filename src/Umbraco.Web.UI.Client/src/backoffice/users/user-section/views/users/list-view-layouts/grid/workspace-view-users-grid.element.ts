@@ -8,9 +8,9 @@ import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../../user-groups/repository/user-group.store';
-import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
-import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { getLookAndColorFromUserStatus } from '@umbraco-cms/backoffice/utils';
+import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/backoffice/models';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-view-users-grid')
 export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {

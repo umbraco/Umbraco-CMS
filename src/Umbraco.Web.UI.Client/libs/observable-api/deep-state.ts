@@ -1,20 +1,9 @@
 import { BehaviorSubject } from 'rxjs';
 import { createObservablePart } from './create-observable-part.function';
 import { deepFreeze } from './deep-freeze.function';
-
-export function naiveObjectComparison(objOne: any, objTwo: any): boolean {
-	return JSON.stringify(objOne) === JSON.stringify(objTwo);
-}
-
-export type MappingFunction<T, R> = (mappable: T) => R;
-export type MemoizationFunction<R> = (previousResult: R, currentResult: R) => boolean;
-
-export function defaultMemoization(previousValue: any, currentValue: any): boolean {
-	if (typeof previousValue === 'object' && typeof currentValue === 'object') {
-		return naiveObjectComparison(previousValue, currentValue);
-	}
-	return previousValue === currentValue;
-}
+import type { MappingFunction } from './mapping-function';
+import type { MemoizationFunction } from './memoization-function';
+import { naiveObjectComparison } from './naive-object-comparison';
 
 /**
  * @export

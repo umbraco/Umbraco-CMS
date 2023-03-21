@@ -14,8 +14,8 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../../../../shared/components/table';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './column-layouts/document-table-actions-column-layout.element';
 

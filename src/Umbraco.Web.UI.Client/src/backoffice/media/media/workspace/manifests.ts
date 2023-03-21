@@ -1,11 +1,11 @@
-import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
-} from '@umbraco-cms/models';
+} from '@umbraco-cms/backoffice/extensions-registry';
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -22,8 +22,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
-		loader: () =>
-			import('../../../shared/components/workspace/workspace-content/views/edit/workspace-view-content-edit.element'),
+		loader: () => import('./views/edit/media-edit-workspace-view.element'),
 		weight: 200,
 		meta: {
 			label: 'Media',
@@ -38,8 +37,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Info',
 		name: 'Media Workspace Info View',
-		loader: () =>
-			import('../../../shared/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
+		loader: () => import('./views/info/media-info-workspace-view.element'),
 		weight: 100,
 		meta: {
 			label: 'Info',

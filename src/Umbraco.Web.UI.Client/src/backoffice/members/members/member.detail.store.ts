@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
 import { umbMemberData } from '../../../core/mocks/data/member.data';
-import type { MemberDetails, MemberGroupDetails } from '@umbraco-cms/models';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState, createObservablePart } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
+import type { MemberDetails, MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { ArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export

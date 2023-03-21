@@ -1,4 +1,4 @@
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { Editor } from 'tinymce';
 import { UmbLinkPickerModalResult, UMB_LINK_PICKER_MODAL_TOKEN } from '../../../../modals/link-picker';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
@@ -26,7 +26,7 @@ export class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance: UmbModalContext) => {
 			this.#modalContext = instance;
 		});
 

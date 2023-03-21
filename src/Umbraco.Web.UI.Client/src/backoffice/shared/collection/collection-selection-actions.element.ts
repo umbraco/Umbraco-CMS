@@ -3,10 +3,10 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
-import type { ManifestEntityBulkAction, MediaDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbExecutedEvent } from '@umbraco-cms/events';
+import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
 import '../components/entity-bulk-action/entity-bulk-action.element';
 
@@ -48,7 +48,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
 	private _entityBulkActions: Array<ManifestEntityBulkAction> = [];
 
-	private _collectionContext?: UmbCollectionContext<MediaDetails>;
+	private _collectionContext?: UmbCollectionContext;
 	private _selection: Array<string> = [];
 
 	constructor() {

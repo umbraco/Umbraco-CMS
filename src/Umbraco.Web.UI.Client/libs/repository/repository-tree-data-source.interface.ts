@@ -1,5 +1,5 @@
-import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
-import type { DataSourceResponse } from '@umbraco-cms/models';
+import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface RepositoryTreeDataSource {
 	getRootItems(): Promise<DataSourceResponse<PagedEntityTreeItemResponseModel>>;

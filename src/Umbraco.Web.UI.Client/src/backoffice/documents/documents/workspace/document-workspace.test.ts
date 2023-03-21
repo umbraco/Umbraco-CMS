@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbDocumentWorkspaceElement } from './document-workspace.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbDocumentWorkspaceElement', () => {
 	let element: UmbDocumentWorkspaceElement;

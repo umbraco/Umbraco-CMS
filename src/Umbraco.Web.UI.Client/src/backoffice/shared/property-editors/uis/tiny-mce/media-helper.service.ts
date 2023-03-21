@@ -2,7 +2,8 @@
 // will be useful for downstream implementors...
 
 import { Editor, EditorEvent } from "tinymce";
-import { UmbElementMixinInterface, UmbLitElement } from "@umbraco-cms/element";
+import { UmbElementMixinInterface } from "@umbraco-cms/backoffice/element";
+import { UmbLitElement } from "@umbraco-cms/internal/lit-element";
 
 export class UmbMediaHelper {
 

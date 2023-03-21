@@ -1,4 +1,5 @@
-import type { ManifestSection, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
+import { ManifestSectionSidebarAppMenuKind } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
 
 const sectionAlias = 'Umb.Section.Settings';
 
@@ -13,8 +14,9 @@ const section: ManifestSection = {
 	},
 };
 
-const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
-	type: 'menuSectionSidebarApp',
+const menuSectionSidebarApp: ManifestSectionSidebarAppMenuKind = {
+	type: 'sectionSidebarApp',
+	kind: 'menu',
 	alias: 'Umb.SectionSidebarMenu.Settings',
 	name: 'Settings Section Sidebar Menu',
 	weight: 100,

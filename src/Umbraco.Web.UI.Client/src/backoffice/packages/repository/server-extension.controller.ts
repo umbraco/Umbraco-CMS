@@ -1,7 +1,7 @@
 import { Subject, takeUntil } from 'rxjs';
 import { UmbPackageRepository } from './package.repository';
-import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbExtensionRegistry } from '@umbraco-cms/extensions-api';
+import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 export class UmbServerExtensionController extends UmbController {
 	#host: UmbControllerHostInterface;
@@ -33,7 +33,7 @@ export class UmbServerExtensionController extends UmbController {
 			)
 			.subscribe((extensions) => {
 				extensions.forEach((extension) => {
-					this.extensionRegistry.register(extension, this.#host);
+					this.extensionRegistry.register(extension);
 				});
 			});
 	}

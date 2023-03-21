@@ -1,4 +1,4 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 
 const configurationManifests: Array<ManifestPropertyEditorUI> = [
 	{

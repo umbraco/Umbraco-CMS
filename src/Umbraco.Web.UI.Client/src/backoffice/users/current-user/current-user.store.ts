@@ -1,8 +1,8 @@
 import { umbUsersData } from '../../../core/mocks/data/users.data';
-import { umbracoPath } from '@umbraco-cms/utils';
-import type { UserDetails } from '@umbraco-cms/models';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ObjectState } from '@umbraco-cms/observable-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export const UMB_CURRENT_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserStore>('UmbCurrentUserStore');
 
@@ -31,4 +31,3 @@ export class UmbCurrentUserStore {
 		return currentUser ? currentUser.userGroups.includes(adminUserGroupKey) : false;
 	}
 }
-

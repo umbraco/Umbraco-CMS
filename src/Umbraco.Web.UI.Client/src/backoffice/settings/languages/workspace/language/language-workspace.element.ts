@@ -3,8 +3,8 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {

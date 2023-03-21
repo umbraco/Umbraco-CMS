@@ -1,5 +1,5 @@
 import { UmbEntityData } from './entity.data';
-import type { UserGroupDetails } from '@umbraco-cms/models';
+import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
 class UmbUserGroupsData extends UmbEntityData<UserGroupDetails> {

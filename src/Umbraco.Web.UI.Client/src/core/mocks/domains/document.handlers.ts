@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbDocumentData } from '../data/document.data';
-import type { DocumentResponseModel } from '@umbraco-cms/backend-api';
-import { umbracoPath } from '@umbraco-cms/utils';
+import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [

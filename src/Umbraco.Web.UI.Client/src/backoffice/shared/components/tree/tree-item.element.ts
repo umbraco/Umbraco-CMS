@@ -10,10 +10,10 @@ import {
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 } from '../section/section-sidebar/section-sidebar.context';
 import type { UmbTreeContextBase } from './tree.context';
-import type { Entity } from '@umbraco-cms/models';
-import type { UmbTreeStore } from '@umbraco-cms/store';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { Entity } from '@umbraco-cms/backoffice/models';
+import type { UmbTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 // TODO: align menu items and tree items
 @customElement('umb-tree-item')

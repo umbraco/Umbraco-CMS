@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { RelationTypeResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-relation-type-workspace-edit-element

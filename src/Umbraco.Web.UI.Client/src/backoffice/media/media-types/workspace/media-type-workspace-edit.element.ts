@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbWorkspaceMediaTypeContext } from './media-type-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-media-type-workspace-edit')
 export class UmbMediaTypeWorkspaceEditElement extends UmbLitElement {
@@ -12,7 +12,7 @@ export class UmbMediaTypeWorkspaceEditElement extends UmbLitElement {
 		css`
 			#header {
 				display: flex;
-				padding: 0 var(--uui-size-space-6);
+				padding: 0 var(--uui-size-layout-1);
 				gap: var(--uui-size-space-4);
 				width: 100%;
 			}

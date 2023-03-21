@@ -4,9 +4,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../../shared/components/workspace/workspace-variant/workspace-variant.context';
 import { UmbVariantId } from '../../../../shared/variants/variant-id.class';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-block-grid

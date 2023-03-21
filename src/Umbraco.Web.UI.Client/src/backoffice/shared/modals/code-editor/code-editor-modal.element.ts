@@ -1,9 +1,9 @@
-import { UmbModalHandler } from '@umbraco-cms/modal';
+import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
 import { html } from 'lit';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbCodeEditorModalData, UmbCodeEditorModalResult } from '.';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 // TODO => Integrate with code editor
 @customElement('umb-code-editor-modal')

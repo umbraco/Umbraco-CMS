@@ -30,7 +30,7 @@ import { manifest as userPicker } from './Umbraco.UserPicker';
 import { manifest as memberPicker } from './Umbraco.MemberPicker';
 import { manifest as memberGroupPicker } from './Umbraco.MemberGroupPicker';
 
-import type { ManifestPropertyEditorModel } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests: Array<ManifestPropertyEditorModel> = [
 	colorPicker,

@@ -1,6 +1,6 @@
 import { logs } from './logs.data';
 import { UmbData } from './data';
-import { LogMessageResponseModel, LogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backend-api';
+import { LogMessageResponseModel, LogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
 class UmbLogviewerSearchesData extends UmbData<SavedLogSearchResponseModel> {

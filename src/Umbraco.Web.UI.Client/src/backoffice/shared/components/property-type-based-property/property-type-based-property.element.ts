@@ -9,10 +9,10 @@ import type {
 	DataTypeResponseModel,
 	DataTypePropertyPresentationModel,
 	PropertyTypeResponseModelBaseModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 import '../workspace-property/workspace-property.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {

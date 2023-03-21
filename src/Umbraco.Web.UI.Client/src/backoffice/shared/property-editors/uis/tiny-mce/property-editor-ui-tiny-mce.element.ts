@@ -1,10 +1,9 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
-import { UmbInputTinyMceElement } from '../../../../shared/components/input-tiny-mce/input-tiny-mce.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-property-editor-ui-tiny-mce
@@ -23,8 +22,8 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		this.configuration = config;
 	}
 
-	#onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputTinyMceElement).value as string;
+	#onChange(event: InputEvent) {
+		this.value = (event.target as HTMLInputElement).value;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 

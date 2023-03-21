@@ -1,8 +1,8 @@
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
-import type { TemplateResponseModel } from '@umbraco-cms/backend-api';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export

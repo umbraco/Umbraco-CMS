@@ -1,6 +1,6 @@
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import type { EntityTreeItemResponseModel, RelationTypeResponseModel } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemResponseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: investigate why we don't get an entity type as part of the RelationTypeResponseModel
 export const data: Array<RelationTypeResponseModel> = [

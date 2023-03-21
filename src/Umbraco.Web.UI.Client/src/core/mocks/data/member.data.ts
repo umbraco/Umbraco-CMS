@@ -1,7 +1,10 @@
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import type { MemberDetails } from '@umbraco-cms/models';
-import type { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
+import type { MemberDetails } from '@umbraco-cms/backoffice/models';
+import type {
+	EntityTreeItemResponseModel,
+	PagedEntityTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MemberDetails> = [
 	{

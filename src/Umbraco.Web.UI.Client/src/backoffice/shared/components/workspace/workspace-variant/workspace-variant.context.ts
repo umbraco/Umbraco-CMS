@@ -2,10 +2,10 @@ import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/wor
 import { UmbVariantId } from '../../../variants/variant-id.class';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
 import { ActiveVariant } from '../workspace-context/workspace-split-view-manager.class';
-import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { DocumentVariantResponseModel } from '@umbraco-cms/backend-api';
+import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 //type EntityType = DocumentModel;
 

@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
 
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-workspace-footer-layout

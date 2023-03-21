@@ -1,3 +1,4 @@
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 import { manifest as colorPicker } from './color-picker/manifests';
 import { manifest as documentPicker } from './document-picker/manifests';
 import { manifest as datePicker } from './date-picker/manifests';
@@ -32,7 +33,6 @@ import { manifests as numbers } from './number/manifests';
 import { manifest as userPicker } from './user-picker/manifests';
 import { manifest as memberPicker } from './member-picker/manifests';
 import { manifest as memberGroupPicker } from './member-group-picker/manifests';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
 	colorPicker,

@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbInputNumberRangeElement } from './input-number-range.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbPropertyEditorUINumberRangeElement', () => {
   let element: UmbInputNumberRangeElement;
 

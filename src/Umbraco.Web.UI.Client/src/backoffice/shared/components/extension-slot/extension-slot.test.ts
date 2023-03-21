@@ -1,9 +1,9 @@
 import { customElement } from 'lit/decorators.js';
 import { expect, fixture, html } from '@open-wc/testing';
 import { InitializedExtension, UmbExtensionSlotElement } from './extension-slot.element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestDashboard } from '@umbraco-cms/extensions-registry';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestDashboard } from '@umbraco-cms/backoffice/extensions-registry';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 @customElement('test-extension-slot-manifest-element')
 class MyExtensionSlotManifestElement extends HTMLElement {}

@@ -5,8 +5,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbUserStore } from '../../users/repository/user.store';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
-import type { UserGroupDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import '../../../shared/components/input-user/input-user.element';
 import '../../../shared/components/input-section/input-section.element';
@@ -24,8 +24,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 			#main {
 				display: grid;
 				grid-template-columns: 1fr 350px;
-				gap: var(--uui-size-space-6);
-				padding: var(--uui-size-space-6);
+				gap: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 			#left-column {
 				display: flex;

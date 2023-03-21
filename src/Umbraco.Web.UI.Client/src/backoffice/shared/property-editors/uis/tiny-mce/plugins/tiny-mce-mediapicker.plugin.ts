@@ -1,9 +1,9 @@
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaPickerModalResult, UMB_MEDIA_PICKER_MODAL_TOKEN } from '../../../../../media/media/modals/media-picker';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../../../../users/current-user/current-user.store';
 import { UmbMediaHelper } from '../media-helper.service';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
-import type { UserDetails } from '@umbraco-cms/models';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -33,11 +33,11 @@ export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 
 		this.#mediaHelper = new UmbMediaHelper(this.host);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance: UmbModalContext) => {
 			this.#modalContext = instance;
 		});
 
-		this.host.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
+		this.host.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance: UmbCurrentUserStore) => {
 			this.#currentUserStore = instance;
 			this.#observeCurrentUser();
 		});
@@ -53,7 +53,7 @@ export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 	async #observeCurrentUser() {
 		if (!this.#currentUserStore) return;
 
-		this.host.observe(this.#currentUserStore.currentUser, (currentUser) => {
+		this.host.observe(this.#currentUserStore.currentUser, (currentUser?: UserDetails) => {
 			this.#currentUser = currentUser;
 		});
 	}

@@ -1,5 +1,5 @@
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbCodeEditorModalData, UmbCodeEditorModalResult, UMB_CODE_EDITOR_MODAL_TOKEN } from '../../../../../../backoffice/shared/modals/code-editor';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbCodeEditorModalData, UmbCodeEditorModalResult, UMB_CODE_EDITOR_MODAL_TOKEN } from '../../../../modals/code-editor';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 
 export class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
@@ -9,7 +9,7 @@ export class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance: UmbModalContext) => {
 			this.#modalContext = instance;
 		});
 

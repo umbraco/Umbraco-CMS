@@ -1,6 +1,6 @@
 import { MockedRequest, setupWorker } from 'msw';
 import { handlers } from './browser-handlers';
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const worker = setupWorker(...handlers);
 

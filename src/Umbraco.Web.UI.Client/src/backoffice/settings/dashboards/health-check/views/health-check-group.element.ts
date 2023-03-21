@@ -16,9 +16,9 @@ import {
 	HealthCheckResource,
 	HealthCheckWithResultPresentationModel,
 	StatusResultTypeModel,
-} from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import './health-check-action.element';
 
 @customElement('umb-dashboard-health-check-group')

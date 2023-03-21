@@ -1,6 +1,6 @@
 import { Editor } from "tinymce";
-import { DataTypePropertyPresentationModel } from "@umbraco-cms/backend-api";
-import { UmbElementMixinInterface } from "@umbraco-cms/element";
+import { DataTypePropertyPresentationModel } from "@umbraco-cms/backoffice/backend-api";
+import { UmbElementMixinInterface } from "@umbraco-cms/backoffice/element";
 
 export interface TinyMcePluginArguments {
     host: UmbElementMixinInterface;

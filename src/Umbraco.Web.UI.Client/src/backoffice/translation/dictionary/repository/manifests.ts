@@ -2,7 +2,7 @@ import { UmbDictionaryRepository } from '../repository/dictionary.repository';
 import { UmbDictionaryTreeStore } from './dictionary.tree.store';
 import { UmbDictionaryStore } from './dictionary.store';
 import { ManifestRepository } from 'libs/extensions-registry/repository.models';
-import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/extensions-registry';
+import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const DICTIONARY_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary';
 

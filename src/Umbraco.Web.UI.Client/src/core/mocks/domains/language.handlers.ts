@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbLanguagesData } from '../data/languages.data';
-import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { umbracoPath } from '@umbraco-cms/utils';
+import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [

@@ -5,17 +5,17 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { AstNode, Editor, EditorEvent } from 'tinymce';
 import { firstValueFrom } from 'rxjs';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbMediaHelper } from '../../property-editors/uis/tiny-mce/media-helper.service';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store';
 import { TinyMcePluginArguments } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-plugin';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { UserDetails } from '@umbraco-cms/models';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
 import '../../../../../public-assets/tiny-mce/tinymce.min.js';
 
@@ -35,7 +35,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				position: relative;
 				min-height: 100px;
 			}
-			
+
 			.tox-tinymce-aux {
 				z-index: 9000;
 			}
@@ -341,7 +341,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		(async () => {
 			const pluginArgs: TinyMcePluginArguments = {
 				host: this,
-				editor,				
+				editor,
 				configuration: this.configuration,
 			};
 
@@ -351,8 +351,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		})();
 
 		// define keyboard shortcuts
-		editor.addShortcut('Ctrl+S', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.save')));
-		editor.addShortcut('Ctrl+P', '', () => this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish')));
+		editor.addShortcut('Ctrl+S', '', () =>
+			this.dispatchEvent(new CustomEvent('rte.shortcut.save', { composed: true, bubbles: true }))
+		);
+		editor.addShortcut('Ctrl+P', '', () =>
+			this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish', { composed: true, bubbles: true }))
+		);
 
 		// bind editor events
 		editor.on('init', () => this.#onInit(editor));
@@ -472,6 +476,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		return this._configObject.toolbar.includes('umbmediapicker');
 	}
 
+	/**
+	 * Nothing rendered by default - TinyMCE initialisation creates 
+	 * a target div and binds the RTE to that element
+	 * @returns 
+	 */
 	render() {
 		return html``;
 	}

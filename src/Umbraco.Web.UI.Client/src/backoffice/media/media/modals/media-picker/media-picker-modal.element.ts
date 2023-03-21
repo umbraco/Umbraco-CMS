@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbMediaPickerModalData, UmbMediaPickerModalResult } from '.';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-media-picker-modal')
 export class UmbMediaPickerModalElement extends UmbModalBaseElement<

@@ -14,8 +14,8 @@ import {
 	HealthCheckResultResponseModel,
 	PagedHealthCheckGroupResponseModel,
 	StatusResultTypeModel,
-} from '@umbraco-cms/backend-api';
-import { umbracoPath } from '@umbraco-cms/utils';
+} from '@umbraco-cms/backoffice/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
 	rest.get(umbracoPath('/health-check-group'), (_req, res, ctx) => {

@@ -1,8 +1,8 @@
-import type { DataTypeResponseModel } from '@umbraco-cms/backend-api';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeStore>('UmbDataTypeStore');
 

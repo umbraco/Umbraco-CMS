@@ -3,10 +3,10 @@ import {
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
 	HealthCheckResource,
-} from '@umbraco-cms/backend-api';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbHealthCheckContext {
 	private _checks = new BehaviorSubject<HealthCheckGroupPresentationModel | undefined>(undefined);
