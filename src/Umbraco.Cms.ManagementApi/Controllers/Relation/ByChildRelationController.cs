@@ -22,7 +22,7 @@ public class ByChildRelationController : RelationControllerBase
         _relationViewModelFactory = relationViewModelFactory;
     }
 
-    [HttpGet("child-relations/{childId:int}")]
+    [HttpGet("child-relation/{childId:int}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationViewModel>), StatusCodes.Status200OK)]
     public async Task<PagedViewModel<RelationViewModel>> ByChild(int childId, int skip, int take, string? relationTypeAlias = "")

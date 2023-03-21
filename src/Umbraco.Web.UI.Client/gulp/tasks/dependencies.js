@@ -291,11 +291,6 @@ function dependencies() {
                 "./node_modules/@umbraco-ui/uui-css/dist/uui-text.css"
             ],
             "base": "./node_modules/@umbraco-ui"
-        },
-        {
-            "name": "sortablejs",
-            "src":  ["./node_modules/sortablejs/Sortable.min.js"],
-            "base": "./node_modules/sortablejs"
         }
     ];
 

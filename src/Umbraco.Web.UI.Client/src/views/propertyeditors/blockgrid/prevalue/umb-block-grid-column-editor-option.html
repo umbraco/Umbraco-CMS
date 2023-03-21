@@ -5,7 +5,7 @@
             {{vm.columnSpanOption.columnSpan}}
         </span>
         <div class="__border"></div>
-        <button type="button" class="btn-reset" ng-click="vm.onClickRemove()">
+        <button type="button" ng-attr-title="{{vm.removeLabel}}" class="btn-reset" ng-click="vm.onClickRemove()">
             <span class="sr-only">
                 <localize key="general_remove">Remove</localize>
             </span>
@@ -18,7 +18,7 @@
         <div class="__border"></div>
         <button type="button" class="btn-reset" ng-click="vm.onClickAdd()">
             <span class="sr-only">
-                <localize key="TODO spell out the action">Add</localize>
+                <localize key="blockEditor_addColumnSpanOption" tokens="[vm.columnSpanOption.columnSpan]">Add span option</localize>
                 {{vm.columnSpanOption.columnSpan}}
             </span>
         </button>

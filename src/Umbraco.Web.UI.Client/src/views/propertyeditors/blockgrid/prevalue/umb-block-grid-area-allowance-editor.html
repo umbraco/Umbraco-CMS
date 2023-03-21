@@ -2,13 +2,11 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <div ng-show="vm.loading !== true" class="__list" ng-class="{'--disabled': vm.disabled}">
-
+    <div ng-show="vm.loading !== true" class="__list">
         
         <div ng-repeat="allowance in vm.model track by allowance.$key" class="umb-block-grid-area-allowance-editor__entry">
             <select 
                 ng-model="allowance.$chosenValue"
-                ng-disabled="vm.disabled"
                 localize="title"
                 title="blockEditor_pickSpecificAllowance"
                 required
@@ -19,7 +17,6 @@
             </select>
             <input 
                 type="number"
-                ng-disabled="vm.disabled"
                 name="label"
                 min="0"
                 ng-max="model.value.max"
@@ -31,7 +28,6 @@
             <span>–</span>
             <input 
                 type="number"
-                ng-disabled="vm.disabled"
                 name="label"
                 ng-model="allowance.maxAllowed"
                 placeholder="∞"
@@ -44,8 +40,7 @@
                 class="btn-reset umb-outline"
                 localize="title"
                 title="actions_delete"
-                ng-click="vm.deleteAllowance(allowance);"
-                ng-disabled="vm.disabled">
+                ng-click="vm.deleteAllowance(allowance);">
                 <umb-icon icon="icon-trash" class="icon"></umb-icon>
                 <span class="sr-only">
                     <localize key="actions_delete">Delete</localize>
@@ -56,11 +51,14 @@
 
     <button
         type="button"
-        ng-disabled="vm.disabled"
         class="btn-reset umb-block-grid-area-editor__create-button umb-outline"
         ng-click="vm.onNewAllowanceClick()">
         <localize key="general_add">Add</localize>
     </button>
+
+    <div ng-if="vm.model.length === 0" class="__empty-label">
+      <localize key="blockEditor_areaAllowedBlocksEmpty">By default, all block types are allowed in an Area, Use this option to allow only selected types.</localize>
+    </div>
 
 </div>
 

@@ -218,6 +218,19 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
+
+
+        builder.AddPropertyIndexValueFactories();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
+        builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
+
         return builder;
     }
 
@@ -296,18 +309,7 @@ public static partial class UmbracoBuilderExtensions
 
     private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
     {
-        builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
-            .Append<RenamingPreValueMigrator>()
-            .Append<RichTextPreValueMigrator>()
-            .Append<UmbracoSliderPreValueMigrator>()
-            .Append<MediaPickerPreValueMigrator>()
-            .Append<ContentPickerPreValueMigrator>()
-            .Append<NestedContentPreValueMigrator>()
-            .Append<DecimalPreValueMigrator>()
-            .Append<ListViewPreValueMigrator>()
-            .Append<DropDownFlexiblePreValueMigrator>()
-            .Append<ValueListPreValueMigrator>()
-            .Append<MarkdownEditorPreValueMigrator>();
+        builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>();
 
         return builder;
     }

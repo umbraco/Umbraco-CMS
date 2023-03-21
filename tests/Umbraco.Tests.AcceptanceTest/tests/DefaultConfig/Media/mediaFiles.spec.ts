@@ -3,7 +3,8 @@ import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('media File Types', () => {
 
-    test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
+    test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
+        await umbracoApi.report.report(testInfo);
         await umbracoApi.login();
         await umbracoUi.goToSection(ConstantHelper.sections.media);
         await umbracoApi.media.deleteAllMedia();
@@ -13,7 +14,7 @@ test.describe('media File Types', () => {
         test('create Article', async ({page, umbracoApi, umbracoUi}) => {
             const articleName = "Article";
             const fileName = "Article.pdf";
-            const path = fileName;
+            const path = 'mediaLibrary/' + fileName;
             const mimeType = "application/pdf";
             await umbracoApi.media.ensureNameNotExists(articleName);
 
@@ -31,7 +32,7 @@ test.describe('media File Types', () => {
         test('create Audio', async ({page, umbracoApi, umbracoUi}) => {
             const audioName = "Audio";
             const fileName = "Audio.mp3";
-            const path = fileName;
+            const path = 'mediaLibrary/' + fileName;
             const mimeType = "audio/mp3"
             await umbracoApi.media.ensureNameNotExists(audioName);
 
@@ -49,7 +50,7 @@ test.describe('media File Types', () => {
         test('create File', async ({page, umbracoApi, umbracoUi}) => {
             const fileItemName = "File";
             const fileName = "File.txt";
-            const path = fileName;
+            const path = 'mediaLibrary/' + fileName;
             const mimeType = "*/*";
             await umbracoApi.media.ensureNameNotExists(fileItemName);
             
@@ -83,7 +84,7 @@ test.describe('media File Types', () => {
             const imageName = "Umbraco";
             const umbracoFileValue = {"src": "Umbraco.png"};
             const fileName = "Umbraco.png"
-            const path = fileName;
+            const path = 'mediaLibrary/' + fileName;
             const mimeType = "image/png";
             await umbracoApi.media.ensureNameNotExists(imageName);
 
@@ -101,7 +102,7 @@ test.describe('media File Types', () => {
         test('create VectorGraphics(SVG)', async ({page, umbracoApi, umbracoUi}) => {
             const vectorGraphicsName = 'VectorGraphics';
             const fileName = "VectorGraphics.svg";
-            const path = fileName;
+            const path = 'mediaLibrary/' + fileName;
             const mimeType = "image/svg+xml";
             await umbracoApi.media.ensureNameNotExists(vectorGraphicsName);
 
@@ -119,7 +120,7 @@ test.describe('media File Types', () => {
         test('create Video', async ({page, umbracoApi, umbracoUi}) => {
             const videoName = "Video";
             const fileName = "Video.mp4";
-            const path = fileName;
+            const path = 'mediaLibrary/' + fileName;
             const mimeType = "video/mp4";
             await umbracoApi.media.ensureNameNotExists(videoName);
 
@@ -366,7 +367,7 @@ test.describe('media File Types', () => {
         const fileItemNameOld = "File";
         const fileItemNameNew = "UpdatedFile";
         const fileName = "File.txt";
-        const path = fileName;
+        const path = 'mediaLibrary/' + fileName;
         const mimeType = "*/*";
         await umbracoApi.media.ensureNameNotExists(fileItemNameOld);
 
@@ -388,7 +389,7 @@ test.describe('media File Types', () => {
     test('Update existing File with new File', async ({page, umbracoApi, umbracoUi}) => {
         const fileItemName = "File";
         const fileName = "File.txt";
-        const path = fileName;
+        const path = 'mediaLibrary/' + fileName;
         const fileNameNew = "UpdatedFile.txt"
         const pathNew = "./fixtures/mediaLibrary/" + fileNameNew;
         const mimeType = "*/*";

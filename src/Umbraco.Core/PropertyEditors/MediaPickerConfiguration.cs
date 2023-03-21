@@ -3,6 +3,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration for the media picker value editor.
 /// </summary>
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerConfiguration : IIgnoreUserStartNodesConfig
 {
     [ConfigurationField("multiPicker", "Pick multiple items", "boolean")]

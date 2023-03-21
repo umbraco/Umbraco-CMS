@@ -5,8 +5,12 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);umbraco\Logs\**</DefaultItemExcludes>
     <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot\media\**</DefaultItemExcludes>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(ImplicitUsings)' == 'enable' or '$(ImplicitUsings)' == 'true'">
     <Using Include="Umbraco.Cms.Core.DependencyInjection" />
     <Using Include="Umbraco.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <UmbracoJsonSchemaReferences Include="https://json.schemastore.org/appsettings.json" Weight="-100" />
+    <UmbracoJsonSchemaFiles Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.Cms.json" Weight="-90" />
   </ItemGroup>
 </Project>

@@ -63,6 +63,12 @@ public static partial class Constants
             public const string AreaToken = "area";
         }
 
+        public static class RoutePath
+        {
+            public const string Tree = "tree";
+            public const string RecycleBin = "recycle-bin";
+        }
+
         public static class AttributeRouting
         {
             public const string BackOfficeToken = "umbracoBackOffice";

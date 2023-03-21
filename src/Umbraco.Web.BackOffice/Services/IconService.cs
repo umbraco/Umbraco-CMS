@@ -5,9 +5,9 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -34,7 +34,6 @@ public class IconService : IIconService
     {
     }
 
-    [Obsolete("Use other ctor - Will be removed in Umbraco 12")]
     public IconService(
         IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
@@ -101,6 +100,7 @@ public class IconService : IIconService
         }
     }
 
+    // TODO: Refactor to return IEnumerable<FileInfo>
     private IEnumerable<FileInfo> GetAllIconsFiles()
     {
         var icons = new HashSet<FileInfo>(new CaseInsensitiveFileInfoComparer());
@@ -161,46 +161,45 @@ public class IconService : IIconService
     /// <returns>A collection of <see cref="FileInfo"/> representing the found SVG icon files.</returns>
     private static IEnumerable<FileInfo> GetIconsFiles(IFileProvider fileProvider, string path)
     {
-        // Iterate through all plugin folders, this is necessary because on Linux we'll get casing issues when
+        // Iterate through all plugin folders and their subfolders, this is necessary because on Linux we'll get casing issues when
         // we directly try to access {path}/{pluginDirectory.Name}/{Constants.SystemDirectories.PluginIcons}
         foreach (IFileInfo pluginDirectory in fileProvider.GetDirectoryContents(path))
         {
-            // Ideally there shouldn't be any files, but we'd better check to be sure
             if (!pluginDirectory.IsDirectory)
             {
                 continue;
             }
 
-            // Iterate through the sub directories of each plugin folder
+            // Iterate through the sub directories of each plugin folder in order to support case insensitive paths (for Linux)
             foreach (IFileInfo subDir1 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}"))
             {
-                // Skip files again
-                if (!subDir1.IsDirectory)
+                // Hard-coding the "backoffice" directory name to gain a better performance when traversing the pluginDirectory directories
+                if (subDir1.IsDirectory && subDir1.Name.InvariantEquals("backoffice"))
                 {
-                    continue;
-                }
-
-                // Iterate through second level sub directories
-                foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}"))
-                {
-                    // Skip files again
-                    if (!subDir2.IsDirectory)
+                    // Iterate through second level sub directories in order to support case insensitive paths (for Linux)
+                    foreach (IFileInfo subDir2 in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}"))
                     {
-                        continue;
-                    }
-
-                    // Does the directory match the plugin icons folder? (case insensitive for legacy support)
-                    if (!$"/{subDir1.Name}/{subDir2.Name}".InvariantEquals(Constants.SystemDirectories.PluginIcons))
-                    {
-                        continue;
-                    }
-
-                    // Iterate though the files of the second level sub directory. This should be where the SVG files are located :D
-                    foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}/{subDir2.Name}"))
-                    {
-                        if (file.Name.InvariantEndsWith(".svg") && file.PhysicalPath != null)
+                        if (!subDir2.IsDirectory)
                         {
-                            yield return new FileInfo(file.PhysicalPath);
+                            continue;
+                        }
+
+                        // Does the directory match the plugin icons folder? (case insensitive for legacy support)
+                        if (!$"/{subDir1.Name}/{subDir2.Name}".InvariantEquals(Constants.SystemDirectories.PluginIcons))
+                        {
+                            continue;
+                        }
+
+                        // Iterate though the files of the second level sub directory. This should be where the SVG files are located :D
+                        foreach (IFileInfo file in fileProvider.GetDirectoryContents($"{path}/{pluginDirectory.Name}/{subDir1.Name}/{subDir2.Name}"))
+                        {
+                            // TODO: Refactor to work with IFileInfo, then we can also remove the .PhysicalPath check
+                            // as this won't work for files that aren't located on a physical file system
+                            // (e.g. embedded resource, Azure Blob Storage, etc.)
+                            if (file.Name.InvariantEndsWith(".svg") && !string.IsNullOrEmpty(file.PhysicalPath))
+                            {
+                                yield return new FileInfo(file.PhysicalPath);
+                            }
                         }
                     }
                 }

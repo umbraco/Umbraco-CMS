@@ -81,6 +81,51 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         {
             Mappers.AddRange(_mapperCollection);
         }
+
+        InitCommandTimeout();
+    }
+
+    // https://github.com/umbraco/Umbraco-CMS/issues/13354
+    // This sets the Database Command to connectionString Connection Timeout /  Connect Timeout
+    // This could be better, ideally the UmbracoDatabaseFactory.CreateDatabase() function would set this based on a setting (global or connectionstring setting)
+    private void InitCommandTimeout()
+    {
+        if (CommandTimeout != 0)
+        {
+            // CommandTimeout configured elsewhere, so we'll skip
+            return;
+        }
+
+        if (Connection is not null && Connection.ConnectionTimeout > 0)
+        {
+            CommandTimeout = Connection.ConnectionTimeout;
+            return;
+        }
+
+        // get from ConnectionString
+        var connectionParser = new DbConnectionStringBuilder
+        {
+            ConnectionString = ConnectionString
+        };
+
+        if (connectionParser.TryGetValue("connection timeout", out var connectionTimeoutString))
+        {
+            if (int.TryParse(connectionTimeoutString.ToString(), out var connectionTimeout))
+            {
+                _logger.LogTrace("Setting Command Timeout to value configured in connectionstring Connection Timeout : {TimeOut} seconds", connectionTimeout);
+                CommandTimeout = connectionTimeout;
+                return;
+            }
+        }
+
+        if (connectionParser.TryGetValue("connect timeout", out var connectTimeoutString))
+        {
+            if (int.TryParse(connectTimeoutString.ToString(), out var connectionTimeout))
+            {
+                _logger.LogTrace("Setting Command Timeout to value configured in connectionstring Connect Timeout : {TimeOut} seconds", connectionTimeout);
+                CommandTimeout = connectionTimeout;
+            }
+        }
     }
 
     #endregion

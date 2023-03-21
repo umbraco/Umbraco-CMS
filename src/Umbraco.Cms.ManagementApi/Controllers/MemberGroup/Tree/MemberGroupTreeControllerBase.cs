@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -12,8 +11,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.MemberGroup.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberGroup}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.MemberGroup))]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberGroup}")]
+[ApiExplorerSettings(GroupName = "Member Group")]
 public class MemberGroupTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
     public MemberGroupTreeControllerBase(IEntityService entityService)

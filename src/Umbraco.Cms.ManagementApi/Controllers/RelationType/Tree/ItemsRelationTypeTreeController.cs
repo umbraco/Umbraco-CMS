@@ -14,7 +14,7 @@ public class ItemsRelationTypeTreeController : RelationTypeTreeControllerBase
         : base(entityService) =>
         _relationService = relationService;
 
-    [HttpGet("items")]
+    [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<FolderTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<FolderTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)

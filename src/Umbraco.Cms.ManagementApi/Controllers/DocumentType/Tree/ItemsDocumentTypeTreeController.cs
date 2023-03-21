@@ -12,7 +12,7 @@ public class ItemsDocumentTypeTreeController : DocumentTypeTreeControllerBase
     {
     }
 
-    [HttpGet("items")]
+    [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<DocumentTypeTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys)

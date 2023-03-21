@@ -423,7 +423,7 @@ public class AuthenticationController : UmbracoApiControllerBase
 
                 var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
-                await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.PasswordReset);
+                await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.PasswordReset, true);
 
                 _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
             }

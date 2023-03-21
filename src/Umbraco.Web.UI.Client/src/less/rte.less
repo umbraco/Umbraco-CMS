@@ -20,7 +20,7 @@
 }
 .umb-rte.--initialized .umb-rte-editor-con {
     height:auto;
-    min-height: 100px;
+    min-height: 95px;
     visibility: visible;
 }
 
@@ -140,12 +140,23 @@
     }
 }
 
+.tox {
+  &.tox-tinymce-aux {
+    z-index: 65535;
+  }
+}
+
 .tox-tinymce-inline {
   z-index: 999;
 }
 
 .tox-tinymce-fullscreen {
   position: absolute;
+}
+
+// FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed
+.tox .tox-collection__item:not(.tox-collection__item--state-disabled) .tox-collection__item-label {
+  line-height: 1 !important;
 }
 
 .mce-menu {

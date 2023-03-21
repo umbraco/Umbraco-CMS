@@ -3,22 +3,24 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-using NSwag.AspNetCore;
+using Microsoft.OpenApi.Models;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.ManagementApi.Configuration;
+using Umbraco.Cms.ManagementApi.Controllers.Security;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
+using Umbraco.Cms.ManagementApi.OpenApi;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models.Configuration;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.ManagementApi;
@@ -26,7 +28,7 @@ namespace Umbraco.Cms.ManagementApi;
 public class ManagementApiComposer : IComposer
 {
     private const string ApiTitle = "Umbraco Backoffice API";
-    private const string ApiAllName = "All";
+    private const string ApiDefaultDocumentName = "v1";
 
     private ApiVersion DefaultApiVersion => new(1, 0);
 
@@ -44,7 +46,8 @@ public class ManagementApiComposer : IComposer
             .AddTrees()
             .AddFactories()
             .AddServices()
-            .AddMappers();
+            .AddMappers()
+            .AddBackOfficeAuthentication();
 
         services.AddApiVersioning(options =>
         {
@@ -55,16 +58,105 @@ public class ManagementApiComposer : IComposer
             options.UseApiBehavior = false;
         });
 
-        services.AddOpenApiDocument(options =>
+        services.AddSwaggerGen(swaggerGenOptions =>
         {
-            options.Title = ApiTitle;
-            options.Version = ApiAllName;
-            options.DocumentName = ApiAllName;
-            options.Description = "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility";
-            options.PostProcess = document =>
+            swaggerGenOptions.CustomOperationIds(e =>
             {
-                document.Tags = document.Tags.OrderBy(tag => tag.Name).ToList();
-            };
+                var httpMethod = e.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
+
+                // if the route info "Name" is supplied we'll use this explicitly as the operation ID
+                // - usage example: [HttpGet("my-api/route}", Name = "MyCustomRoute")]
+                if (string.IsNullOrWhiteSpace(e.ActionDescriptor.AttributeRouteInfo?.Name) == false)
+                {
+                    var explicitOperationId = e.ActionDescriptor.AttributeRouteInfo!.Name;
+                    return explicitOperationId.InvariantStartsWith(httpMethod)
+                        ? explicitOperationId
+                        : $"{httpMethod}{explicitOperationId}";
+                }
+
+                var relativePath = e.RelativePath;
+
+                if (string.IsNullOrWhiteSpace(relativePath))
+                {
+                    throw new Exception(
+                        $"There is no relative path for controller action {e.ActionDescriptor.RouteValues["controller"]}");
+                }
+
+                // Remove the prefixed base path with version, e.g. /umbraco/management/api/v1/tracked-reference/{id} => tracked-reference/{id}
+                var unprefixedRelativePath =
+                    OperationIdRegexes.VersionPrefixRegex().Replace(relativePath, string.Empty);
+
+                // Remove template placeholders, e.g. tracked-reference/{id} => tracked-reference/Id
+                var formattedOperationId = OperationIdRegexes.TemplatePlaceholdersRegex()
+                    .Replace(unprefixedRelativePath, m => $"By{m.Groups[1].Value.ToFirstUpper()}");
+
+                // Remove dashes (-) and slashes (/) and convert the following letter to uppercase with
+                // the word "By" in front, e.g. tracked-reference/Id => TrackedReferenceById
+                formattedOperationId = OperationIdRegexes.ToCamelCaseRegex()
+                    .Replace(formattedOperationId, m => m.Groups[1].Value.ToUpper());
+
+                // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
+                return $"{httpMethod}{formattedOperationId.ToFirstUpper()}";
+            });
+            swaggerGenOptions.SwaggerDoc(
+                ApiDefaultDocumentName,
+                new OpenApiInfo
+                {
+                    Title = ApiTitle,
+                    Version = DefaultApiVersion.ToString(),
+                    Description =
+                        "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility"
+                });
+
+            swaggerGenOptions.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
+
+            swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
+
+            // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
+            string ActionSortKeySelector(ApiDescription apiDesc)
+            {
+                return
+                    $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
+            }
+
+            swaggerGenOptions.OrderActionsBy(ActionSortKeySelector);
+
+            swaggerGenOptions.AddSecurityDefinition(
+                "OAuth",
+                new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Umbraco",
+                    Type = SecuritySchemeType.OAuth2,
+                    Description = "Umbraco Authentication",
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl =
+                                new Uri(Paths.BackOfficeApiAuthorizationEndpoint, UriKind.Relative),
+                            TokenUrl = new Uri(Paths.BackOfficeApiTokenEndpoint, UriKind.Relative)
+                        }
+                    }
+                });
+
+            swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                // this weird looking construct works because OpenApiSecurityRequirement
+                // is a specialization of Dictionary<,>
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference { Id = "OAuth", Type = ReferenceType.SecurityScheme }
+                    },
+                    new List<string>()
+                }
+            });
+
+            swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>();
+            swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
+
+            swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         });
 
         services.AddVersionedApiExplorer(options =>
@@ -78,6 +170,10 @@ public class ManagementApiComposer : IComposer
         services.AddControllers();
         builder.Services.ConfigureOptions<ConfigureMvcOptions>();
 
+        // TODO: when this is moved to core, make the AddUmbracoOptions extension private again and remove core InternalsVisibleTo for Umbraco.Cms.ManagementApi
+        builder.AddUmbracoOptions<NewBackOfficeSettings>();
+        builder.Services.AddSingleton<IValidateOptions<NewBackOfficeSettings>, NewBackOfficeSettingsValidator>();
+
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
         {
             options.AddFilter(new UmbracoPipelineFilter(
@@ -88,8 +184,10 @@ public class ManagementApiComposer : IComposer
                     applicationBuilder.UseWhen(
                         httpContext =>
                         {
-                            GlobalSettings? settings = httpContext.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
-                            IHostingEnvironment hostingEnvironment = httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
+                            GlobalSettings? settings = httpContext.RequestServices
+                                .GetRequiredService<IOptions<GlobalSettings>>().Value;
+                            IHostingEnvironment hostingEnvironment =
+                                httpContext.RequestServices.GetRequiredService<IHostingEnvironment>();
                             var officePath = settings.GetBackOfficePath(hostingEnvironment);
 
                             return httpContext.Request.Path.Value?.StartsWith($"{officePath}/management/api/") ?? false;
@@ -110,7 +208,7 @@ public class ManagementApiComposer : IComposer
                                     Detail = exception.StackTrace,
                                     Status = StatusCodes.Status500InternalServerError,
                                     Instance = exception.GetType().Name,
-                                    Type = "Error",
+                                    Type = "Error"
                                 };
                                 await context.Response.WriteAsJsonAsync(response);
                             }));
@@ -126,21 +224,23 @@ public class ManagementApiComposer : IComposer
                         GlobalSettings? settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
                         IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
                         var officePath = settings.GetBackOfficePath(hostingEnvironment);
-                        // serve documents (same as app.UseSwagger())
-                        applicationBuilder.UseOpenApi(config =>
-                        {
-                            config.Path = $"{officePath}/swagger/{{documentName}}/swagger.json";
-                        });
 
-                        // Serve Swagger UI
-                        applicationBuilder.UseSwaggerUi3(config =>
+                        applicationBuilder.UseSwagger(swaggerOptions =>
                         {
-                            config.Path = officePath + "/swagger";
-                            config.SwaggerRoutes.Clear();
-                            var swaggerPath = $"{officePath}/swagger/{ApiAllName}/swagger.json";
-                            config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
-                            config.OperationsSorter = "alpha";
-                            config.TagsSorter = "alpha";
+                            swaggerOptions.RouteTemplate =
+                                $"{officePath.TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
+                        });
+                        applicationBuilder.UseSwaggerUI(
+                            swaggerUiOptions =>
+                        {
+                            swaggerUiOptions.SwaggerEndpoint(
+                                $"{officePath}/swagger/v1/swagger.json",
+                                $"{ApiTitle} {DefaultApiVersion}");
+                            swaggerUiOptions.RoutePrefix =
+                                $"{officePath.TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
+
+                            swaggerUiOptions.OAuthClientId(New.Cms.Core.Constants.OauthClientIds.Swagger);
+                            swaggerUiOptions.OAuthUsePkce();
                         });
                     }
                 },
@@ -157,13 +257,14 @@ public class ManagementApiComposer : IComposer
                         endpoints.MapControllers();
 
                         // Serve contract
-                        endpoints.MapGet($"{officePath}/management/api/openapi.json",async  context =>
+                        endpoints.MapGet($"{officePath}/management/api/openapi.json", async context =>
                         {
-                            await context.Response.SendFileAsync(new EmbeddedFileProvider(this.GetType().Assembly).GetFileInfo("OpenApi.json"));
+                            await context.Response.SendFileAsync(
+                                new EmbeddedFileProvider(GetType().Assembly).GetFileInfo("OpenApi.json"));
                         });
                     });
-                }
-            ));
+                }));
         });
     }
 }
+

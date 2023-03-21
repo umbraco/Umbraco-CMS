@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Razor.Hosting;
 using Microsoft.AspNetCore.Razor.Language;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
@@ -375,13 +377,17 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
                 pdbStream,
                 options: _compilationOptionsProvider.EmitOptions);
 
-            if (!result.Success)
+            if (result.Success is false)
             {
-                throw CompilationExceptionFactory.Create(
+                UmbracoCompilationException compilationException = CompilationExceptionFactory.Create(
                     codeDocument,
                     generatedCode,
                     assemblyName,
                     result.Diagnostics);
+
+                LogCompilationFailure(compilationException);
+
+                throw compilationException;
             }
 
             assemblyStream.Seek(0, SeekOrigin.Begin);
@@ -393,29 +399,48 @@ internal class CollectibleRuntimeViewCompiler : IViewCompiler
         }
     }
 
+    private void LogCompilationFailure(UmbracoCompilationException compilationException)
+    {
+        IEnumerable<string>? messages = compilationException.CompilationFailures?
+            .WhereNotNull()
+            .SelectMany(x => x.Messages!)
+            .WhereNotNull()
+            .Select(x => x.FormattedMessage)
+            .WhereNotNull();
+
+        foreach (var message in messages ?? Enumerable.Empty<string>())
+        {
+            _logger.LogError(compilationException, "Compilation error occured with message: {ErrorMessage}", message);
+        }
+    }
+
     private CSharpCompilation CreateCompilation(string compilationContent, string assemblyName)
     {
         IReadOnlyList<MetadataReference> refs = _referenceManager.CompilationReferences;
-        // We'll add the reference to the InMemory assembly directly, this means we don't have to hack around with assembly parts.
-        if (_loadContextManager.ModelsAssemblyLocation is null)
-        {
-            throw new InvalidOperationException("No InMemory assembly available, cannot compile views");
-        }
-
-        PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_loadContextManager.ModelsAssemblyLocation);
-
 
         var sourceText = SourceText.From(compilationContent, Encoding.UTF8);
         SyntaxTree syntaxTree = SyntaxFactory
             .ParseSyntaxTree(sourceText, _compilationOptionsProvider.ParseOptions)
             .WithFilePath(assemblyName);
 
-        return CSharpCompilation
+        CSharpCompilation compilation = CSharpCompilation
                 .Create(assemblyName)
                 .AddSyntaxTrees(syntaxTree)
                 .AddReferences(refs)
-                .AddReferences(inMemoryAutoReference)
                 .WithOptions(_compilationOptionsProvider.CSharpCompilationOptions);
+
+        // We'll add the reference to the InMemory assembly directly, this means we don't have to hack around with assembly parts.
+        // We might be asked to compile views before the InMemory models assembly is created tho (if you replace the no-nodes for instance)
+        // In this case we'll just skip the InMemory models assembly reference
+        if (_loadContextManager.ModelsAssemblyLocation is null)
+        {
+            _logger.LogInformation("No InMemory models assembly available, skipping reference");
+            return compilation;
+        }
+
+        PortableExecutableReference inMemoryAutoReference = MetadataReference.CreateFromFile(_loadContextManager.ModelsAssemblyLocation);
+        compilation = compilation.AddReferences(inMemoryAutoReference);
+        return compilation;
     }
 
     private string GetNormalizedPath(string relativePath)

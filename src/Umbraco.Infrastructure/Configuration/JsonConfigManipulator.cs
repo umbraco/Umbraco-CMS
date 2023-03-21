@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Configuration
 {

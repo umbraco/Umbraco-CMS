@@ -1,6 +1,44 @@
 (function () {
     "use strict";
 
+
+    // Utils:
+
+    function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
+        const map = [0];
+        weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
+        const foundValue = map.reduce((a, b) => {
+            let aDiff = Math.abs(a - target);
+            let bDiff = Math.abs(b - target);
+    
+            if (aDiff === bDiff) {
+                return a < b ? a : b;
+            } else {
+                return bDiff < aDiff ? b : a;
+            }
+        })
+        const foundIndex = map.indexOf(foundValue);
+        const targetDiff = (target-foundValue);
+        let interpolatedIndex = foundIndex;
+        if (targetDiff < 0 && foundIndex === 0) {
+            // Don't adjust.
+        } else if (targetDiff > 0 && foundIndex === map.length-1) {
+            // Don't adjust.
+        } else {
+            const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];
+            interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : (targetDiff/foundInterpolationWeight)
+        }
+        return interpolatedIndex;
+    }
+
+    function getAccumulatedValueOfIndex(index, weights) {
+        let i = 0, len = Math.min(index, weights.length), calc = 0;
+        while(i<len) {
+            calc += weights[i++];
+        }
+        return calc;
+    }
+
     function TransferProperties(fromObject, toObject) {
         for (var p in fromObject) {
             toObject[p] = fromObject[p];
@@ -22,7 +60,7 @@
             controller: BlockGridAreaController,
             controllerAs: "vm",
             bindings: {
-                model: "=",
+                model: "<",
                 block: "<",
                 allBlockTypes: "<",
                 allBlockGroups: "<",
@@ -34,7 +72,7 @@
             }
         });
 
-    function BlockGridAreaController($scope, $element, assetsService, localizationService, editorService, overlayService) {
+    function BlockGridAreaController($scope, localizationService, editorService, overlayService) {
 
         var unsubscribe = [];
 
@@ -45,29 +83,79 @@
         vm.$onInit = function() {
 
             vm.rootLayoutColumns = vm.gridColumns;
-
-            assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope).then(onLoaded);
-        };
-
-        function onLoaded() {
-            vm.loading = false;
             initializeSortable();
-        }
+            vm.loading = false;
+
+        };
 
         function initializeSortable() {
 
-            const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid-area-editor__grid-wrapper');
+            vm.sorterOptions = {
+                resolveVerticalDirection: resolveVerticalDirection,
+                compareElementToModel: (el, modelEntry) => modelEntry.key === el.dataset.areaKey,
+                querySelectModelToElement: (container, modelEntry) => container.querySelector(`[data-area-key='${modelEntry.key}']`),
+                itemHasNestedContainersResolver: () => false,// We never have nested in this case.
+                containerSelector: ".umb-block-grid-area-editor__grid-wrapper",
+                itemSelector: ".umb-block-grid-area-editor__area",
+                placeholderClass: "umb-block-grid-area-editor__area-placeholder",
+                onSync: onSortSync
+            }
 
-            const sortable = Sortable.create(gridLayoutContainerEl, {
-                sort: true,  // sorting inside list
-                animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
-                easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
-                cancel: '',
-                draggable: ".umb-block-grid-area-editor__area",  // Specifies which items inside the element should be draggable
-                ghostClass: "umb-block-grid-area-editor__area-placeholder"
-            });
+            function onSortSync() {
+                $scope.$evalAsync();
+                setDirty();
+            }
 
-            // TODO: setDirty if sort has happend.
+            function resolveVerticalDirection(data) {
+
+                /** We need some data about the grid to figure out if there is room to be placed next to the found element */
+                const approvedContainerComputedStyles = getComputedStyle(data.containerElement);
+                const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split("px")[0]) || 0;
+                const gridColumnNumber = vm.rootLayoutColumns;
+    
+                const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
+                const currentElementColumns = data.item.columnSpan;
+
+                if(currentElementColumns >= gridColumnNumber) {
+                    return true;
+                }
+    
+                // Get grid template:
+                const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x)).filter(n => n > 0).map((n, i, list) => list.length === i ? n : n + gridColumnGap);
+    
+                // ensure all columns are there.
+                // This will also ensure handling non-css-grid mode,
+                // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+                let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
+                const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+                if(amountOfUnknownColumns > 0) {
+                    let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+                    const layoutWidth = data.containerRect.width;
+                    const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                    if(missingColumnWidth > 0) {
+                        while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                            approvedContainerGridColumns.push(missingColumnWidth);
+                        }
+                    }
+                }
+    
+                let offsetPlacement = 0;
+                /* If placeholder is in this same line, we want to assume that it will offset the placement of the found element, 
+                which provides more potential space for the item to drop at.
+                This is relevant in this calculation where we look at the space to determine if its a vertical or horizontal drop in relation to the found element.
+                */
+                if(data.placeholderIsInThisRow && data.elementRect.left < data.relatedRect.left) {
+                    offsetPlacement = -(data.elementRect.width + gridColumnGap);
+                }
+    
+                const relatedStartX = Math.max(data.relatedRect.left - data.containerRect.left + offsetPlacement, 0);
+                const relatedStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns));
+    
+                // If the found related element does not have enough room after which for the current element, then we go vertical mode:
+                return (relatedStartCol + (data.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber);
+                
+            }
+    
 
         }
 
@@ -76,7 +164,6 @@
         }
 
         vm.requestDeleteArea = function (area) {
-            // TODO: Translations
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockAreaMessage", "blockEditor_confirmDeleteBlockAreaNotice"]).then(function (data) {
                 overlayService.confirmDelete({
                     title: data[0],
@@ -128,16 +215,23 @@
 
         vm.openArea = null;
         vm.openAreaOverlay = function (area) {
-
-            // TODO: use the right localization key:
-            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [area.alias]).then(function (localized) {
+            localizationService.localize("blockEditor_blockConfigurationOverlayTitle").then(function (localized) {
 
                 var clonedAreaData = Utilities.copy(area);
                 vm.openArea = area;
 
+                function updateTitle() {
+                    overlayModel.title = localizationService.tokenReplace(localized, [clonedAreaData.alias]);
+                }
+
+                const areaIndex = vm.model.indexOf(area);
+                const otherAreas = [...vm.model];
+                otherAreas.splice(areaIndex, 1);
+
                 var overlayModel = {
+                    otherAreaAliases: otherAreas.map(x => x.alias),
                     area: clonedAreaData,
-                    title: localized,
+                    updateTitle: updateTitle,
                     allBlockTypes: vm.allBlockTypes,
                     allBlockGroups: vm.allBlockGroups,
                     loadedElementTypes: vm.loadedElementTypes,
@@ -153,6 +247,8 @@
                         vm.openArea = null;
                     }
                 };
+
+                updateTitle();
 
                 // open property settings editor
                 editorService.open(overlayModel);

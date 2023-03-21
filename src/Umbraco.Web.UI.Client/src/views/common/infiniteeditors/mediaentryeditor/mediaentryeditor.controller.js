@@ -44,6 +44,20 @@ angular.module("umbraco")
 
             function updateMedia() {
 
+                if (!vm.mediaEntry.mediaKey) {
+                    vm.imageSrc = vm.mediaEntry.$dataURL;
+                    vm.fileSrc = vm.mediaEntry.$dataURL;
+                    vm.loading = false;
+                    vm.hasDimensions = false;
+                    vm.isCroppable = false;
+                    vm.fileExtension = 'JPG';
+
+                    localizationService.localize("mediaPicker_editMediaEntryLabel", [vm.mediaEntry.name, vm.model.documentName]).then(data => {
+                        vm.title = data;
+                    });
+                    return;
+                }
+
                 vm.loading = true;
 
                 entityResource.getById(vm.mediaEntry.mediaKey, "Media").then(function (mediaEntity) {

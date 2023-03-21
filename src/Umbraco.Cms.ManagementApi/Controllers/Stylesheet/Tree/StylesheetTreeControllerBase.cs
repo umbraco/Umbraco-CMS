@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.ManagementApi.Controllers.Tree;
@@ -9,8 +8,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Stylesheet.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.Stylesheet))]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Stylesheet}")]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Stylesheet))]
 public class StylesheetTreeControllerBase : FileSystemTreeControllerBase
 {
     public StylesheetTreeControllerBase(FileSystems fileSystems)

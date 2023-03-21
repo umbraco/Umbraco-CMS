@@ -5,7 +5,8 @@ test.describe('System Information', () => {
   const enCulture = "en-US";
   const dkCulture = "da-DK";
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.users.setCurrentLanguage(enCulture);
   });
@@ -14,7 +15,7 @@ test.describe('System Information', () => {
     await umbracoApi.users.setCurrentLanguage(enCulture);
   });
 
-  async function openSystemInformation(page: Page, umbracoUi : UiHelpers) {
+  async function openSystemInformation(page: Page, umbracoUi: UiHelpers) {
     //We have to wait for page to load, if the site is slow
     await umbracoUi.clickElement(umbracoUi.getGlobalHelp());
     await expect(page.locator('.umb-help-list-item').last()).toBeVisible();
@@ -24,7 +25,7 @@ test.describe('System Information', () => {
 
   test('Check System Info Displays', async ({page, umbracoApi, umbracoUi}) => {
     await openSystemInformation(page, umbracoUi);
-    await expect(page.locator('.table').locator('tr')).toHaveCount(14);
+    await expect(page.locator('.table').locator('tr')).toHaveCount(15);
     await expect(await page.locator("tr", {hasText: "Current Culture"})).toContainText(enCulture);
     await expect(await page.locator("tr", {hasText: "Current UI Culture"})).toContainText(enCulture);
   });
@@ -46,4 +47,4 @@ test.describe('System Information', () => {
     // Close the help panel
     await page.locator('.umb-button__content').last().click();
   });
-  });
+});
