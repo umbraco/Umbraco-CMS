@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Icon = "icon-thumbnail-list",
     ValueEditorIsReusable = false,
     IsDeprecated = true)]
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentPropertyEditor : DataEditor
 {
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
