@@ -10,13 +10,18 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 public class ByRouteContentApiController : ContentApiControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
+    private readonly IRequestPreviewService _requestPreviewService;
 
     public ByRouteContentApiController(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiContentBuilder apiContentBuilder,
-        IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, apiContentBuilder) =>
+        IRequestRoutingService requestRoutingService,
+        IRequestPreviewService requestPreviewService)
+        : base(publishedSnapshotAccessor, apiContentBuilder)
+    {
         _requestRoutingService = requestRoutingService;
+        _requestPreviewService = requestPreviewService;
+    }
 
     /// <summary>
     ///     Gets a content item by route.
@@ -43,7 +48,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
 
         var contentRoute = _requestRoutingService.GetContentRoute(path);
 
-        IPublishedContent? contentItem = contentCache.GetByRoute(contentRoute);
+        IPublishedContent? contentItem = contentCache.GetByRoute(_requestPreviewService.IsPreview(), contentRoute);
 
         if (contentItem is null)
         {
