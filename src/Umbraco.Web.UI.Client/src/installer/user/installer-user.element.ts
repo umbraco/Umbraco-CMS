@@ -16,7 +16,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 
 			uui-form-layout-item {
 				margin-top: 0;
-				margin-bottom: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-layout-1);
 			}
 
 			uui-form {

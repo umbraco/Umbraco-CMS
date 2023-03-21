@@ -1,4 +1,4 @@
-import { DeepState } from "./deep-state";
+import { DeepState } from './deep-state';
 
 /**
  * @export
@@ -10,7 +10,6 @@ import { DeepState } from "./deep-state";
  * The ObjectState provides methods to append data when the data is an Object.
  */
 export class ObjectState<T> extends DeepState<T> {
-
 	/**
 	 * @method update
 	 * @param {Partial<T>} partialData - A object containing some of the data to update in this Subject.

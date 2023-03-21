@@ -34,6 +34,7 @@ import './packages';
 import './search';
 import './templating';
 import './shared';
+import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/extensions-registry';
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -54,6 +55,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());

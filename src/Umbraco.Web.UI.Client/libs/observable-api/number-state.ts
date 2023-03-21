@@ -1,4 +1,4 @@
-import { BasicState } from "./basic-state";
+import { BasicState } from './basic-state';
 
 /**
  * @export
@@ -10,5 +10,4 @@ export class NumberState<T> extends BasicState<T | number> {
 	constructor(initialData: T | number) {
 		super(initialData);
 	}
-
 }

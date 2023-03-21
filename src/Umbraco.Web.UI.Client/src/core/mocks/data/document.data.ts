@@ -515,7 +515,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		parentKey: null,
 		name: 'All property editors',
 		type: 'document',
-		icon: 'icon-item-arrangement',
+		icon: 'document',
 		hasChildren: true,
 	},
 	{
@@ -530,7 +530,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		parentKey: null,
 		name: 'Article in english',
 		type: 'document',
-		icon: 'icon-item-arrangement',
+		icon: 'document',
 		hasChildren: true,
 	},
 	{
@@ -545,7 +545,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		parentKey: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		name: 'Blog post B',
 		type: 'document',
-		icon: 'icon-item-arrangement',
+		icon: 'document',
 		hasChildren: false,
 	},
 	{

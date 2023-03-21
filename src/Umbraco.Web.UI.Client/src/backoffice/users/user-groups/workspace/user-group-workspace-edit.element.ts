@@ -24,8 +24,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 			#main {
 				display: grid;
 				grid-template-columns: 1fr 350px;
-				gap: var(--uui-size-space-6);
-				padding: var(--uui-size-space-6);
+				gap: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 			#left-column {
 				display: flex;

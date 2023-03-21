@@ -33,7 +33,7 @@ export class UmbServerExtensionController extends UmbController {
 			)
 			.subscribe((extensions) => {
 				extensions.forEach((extension) => {
-					this.extensionRegistry.register(extension, this.#host);
+					this.extensionRegistry.register(extension);
 				});
 			});
 	}

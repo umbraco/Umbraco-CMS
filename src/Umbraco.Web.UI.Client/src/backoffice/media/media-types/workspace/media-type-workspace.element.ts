@@ -13,7 +13,7 @@ export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
 		css`
 			#header {
 				display: flex;
-				padding: 0 var(--uui-size-space-6);
+				padding: 0 var(--uui-size-layout-1);
 				gap: var(--uui-size-space-4);
 				width: 100%;
 			}
