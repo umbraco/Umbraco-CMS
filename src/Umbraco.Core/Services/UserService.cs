@@ -1110,7 +1110,7 @@ internal class UserService : RepositoryService, IUserService
         // Only super can see super
         if (performingUser.IsSuper() is false)
         {
-            baseQuery.Where(x => x.Id != Constants.Security.SuperUserId);
+            baseQuery.Where(x => x.Key != Constants.Security.SuperUserKey);
         }
 
         // Only admins can see admins
