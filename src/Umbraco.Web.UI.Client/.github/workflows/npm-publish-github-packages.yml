@@ -22,6 +22,9 @@ on:
       - './rollup-libs.config.js'
   workflow_dispatch:
 
+env:
+  NODE_OPTIONS: --max-old-space-size=16384
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,7 +35,7 @@ jobs:
           node-version: 18
           cache: 'npm'
       - run: npm ci
-      - run: NODE_OPTIONS=--max-old-space-size=4096 npm run build:libs
+      - run: npm run build:libs
       - uses: actions/upload-artifact@v3
         with:
           name: artifact
