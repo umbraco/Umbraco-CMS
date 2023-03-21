@@ -22,9 +22,9 @@ cpSync(`${srcDir}/package.json`, `${inputDir}/package.json`, { recursive: true }
 const libs = readdirSync(inputDir);
 
 // Create output folder
-if (!lstatSync(outputDir)) {
-	mkdirSync(outputDir, { recursive: true });
-}
+try {
+	mkdirSync(outputDir, {recursive: true});
+} catch {}
 
 // Transform all .d.ts files and copy all other files to the output folder
 libs.forEach(lib => {
