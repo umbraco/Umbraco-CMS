@@ -54,7 +54,7 @@ public class PackagingService : IPackagingService
         _userService = userService;
     }
 
-    [Obsolete("Use constructor that also takes an IHostEnvironment instead. Scheduled for removal in V15")]
+    [Obsolete("Use constructor that also takes an IHostEnvironment and IUserService instead. Scheduled for removal in V15")]
     public PackagingService(
         IAuditService auditService,
         ICreatedPackagesRepository createdPackages,
