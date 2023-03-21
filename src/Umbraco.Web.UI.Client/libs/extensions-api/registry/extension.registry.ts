@@ -8,7 +8,7 @@ import type {
 } from '../../models';
 import { UmbContextToken } from '@umbraco-cms/context-api';
 
-function ExtensionArrayMemoization<T extends { alias: string }>(
+function extensionArrayMemoization<T extends { alias: string }>(
 	previousValue: Array<T>,
 	currentValue: Array<T>
 ): boolean {
@@ -23,7 +23,7 @@ function ExtensionArrayMemoization<T extends { alias: string }>(
 	return false;
 }
 
-function ExtensionSingleMemoization<T extends { alias: string }>(
+function extensionSingleMemoization<T extends { alias: string }>(
 	previousValue: T | undefined,
 	currentValue: T | undefined
 ): boolean {
@@ -96,25 +96,25 @@ export class UmbExtensionRegistry {
 	private _kindsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => kind.matchType === type)),
-			distinctUntilChanged(ExtensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization)
 		);
 	}
 	private _extensionsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type)),
-			distinctUntilChanged(ExtensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization)
 		);
 	}
 	private _kindsOfTypes(types: string[]) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => types.indexOf(kind.matchType) !== -1)),
-			distinctUntilChanged(ExtensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization)
 		);
 	}
 	private _extensionsOfTypes<ExtensionType = ManifestBase>(types: string[]): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1)),
-			distinctUntilChanged(ExtensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization)
 		) as Observable<Array<ExtensionType>>;
 	}
 
@@ -140,7 +140,7 @@ export class UmbExtensionRegistry {
 				}
 				return ext;
 			}),
-			distinctUntilChanged(ExtensionSingleMemoization)
+			distinctUntilChanged(extensionSingleMemoization)
 		) as Observable<T | undefined>;
 	}
 
@@ -166,7 +166,7 @@ export class UmbExtensionRegistry {
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			),
-			distinctUntilChanged(ExtensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization)
 		) as Observable<Array<T>>;
 	}
 
@@ -193,7 +193,7 @@ export class UmbExtensionRegistry {
 					})
 					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
 			),
-			distinctUntilChanged(ExtensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization)
 		) as Observable<Array<ExtensionTypes>>;
 	}
 }
