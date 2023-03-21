@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbMediaWorkspaceContext } from './media-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbMediaWorkspaceContext } from './media-workspace.context';
 
 @customElement('umb-media-workspace-edit')
 export class UmbMediaWorkspaceEditElement extends UmbLitElement {
@@ -13,6 +13,15 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+			}
+
+			#header {
+				margin: 0 var(--uui-size-layout-1);
+				flex: 1 1 auto;
+			}
+
+			#footer {
+				margin: 0 var(--uui-size-layout-1);
 			}
 		`,
 	];
@@ -37,16 +46,14 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-content alias="Umb.Workspace.Media">
-			${this._key
-				? html`
-						<umb-workspace-action-menu
-							slot="action-menu"
-							entity-type="media"
-							unique="${this._key}"></umb-workspace-action-menu>
-				  `
-				: nothing}
-		</umb-workspace-content>`;
+		if (!this._key) return nothing;
+		return html` <umb-workspace-layout alias="Umb.Workspace.Media">
+			<div id="header" slot="header">TODO: MISSING INPUT COMPONENT</div>
+			<umb-workspace-action-menu
+				slot="action-menu"
+				entity-type="media"
+				unique="${this._key}"></umb-workspace-action-menu>
+		</umb-workspace-layout>`;
 	}
 }
 

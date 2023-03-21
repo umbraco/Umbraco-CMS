@@ -3,7 +3,7 @@ import { UmbMediaRepository } from '../repository/media.repository';
 import type { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import type { MediaDetails } from '@umbraco-cms/backoffice/models';
+import type { MediaDetails } from '../';
 
 type EntityType = MediaDetails;
 export class UmbMediaWorkspaceContext

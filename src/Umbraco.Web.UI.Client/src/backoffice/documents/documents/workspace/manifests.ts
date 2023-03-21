@@ -1,13 +1,13 @@
-import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
-import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
-import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
+import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
+import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -24,7 +24,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		loader: () => import('./views/document-workspace-view-edit.element'),
+		loader: () => import('./views/edit/document-workspace-view-edit.element'),
 		weight: 200,
 		meta: {
 			label: 'Content',
@@ -39,8 +39,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
-		loader: () =>
-			import('../../../shared/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
+		loader: () => import('./views/info/document-info-workspace-view.element'),
 		weight: 100,
 		meta: {
 			label: 'Info',

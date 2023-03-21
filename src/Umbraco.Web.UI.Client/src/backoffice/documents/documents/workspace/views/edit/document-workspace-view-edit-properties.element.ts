@@ -2,9 +2,12 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
+import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTypePropertyTypeResponseModel, PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	DocumentTypePropertyTypeResponseModel,
+	PropertyTypeContainerResponseModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
