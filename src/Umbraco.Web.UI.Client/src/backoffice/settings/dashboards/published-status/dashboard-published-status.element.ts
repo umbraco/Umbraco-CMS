@@ -2,9 +2,8 @@ import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
-
+import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { PublishedCacheResource } from '@umbraco-cms/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 import { UmbLitElement } from '@umbraco-cms/element';
@@ -82,14 +81,14 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		}
 	}
 	private async _onReloadCacheHandler() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Reload',
 			content: html` Trigger a in-memory and local file cache reload on all servers. `,
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) this._reloadMemoryCache();
+		modalHandler?.onSubmit().then(() => {
+			this._reloadMemoryCache();
 		});
 	}
 
@@ -105,14 +104,14 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 
 	private async _onRebuildCacheHandler() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Rebuild',
 			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
 			color: 'danger',
 			confirmLabel: 'Continue',
 		});
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) this._rebuildDatabaseCache();
+		modalHandler?.onSubmit().then(() => {
+			this._rebuildDatabaseCache();
 		});
 	}
 
@@ -141,9 +140,10 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
-					@click=${this._onRefreshCacheHandler}
-					>Refresh Status</uui-button
-				>
+					label="Refresh Status"
+					@click=${this._onRefreshCacheHandler}>
+					Refresh Status
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Memory Cache">
@@ -157,10 +157,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Reload Memory Cache"
 					@click=${this._onReloadCacheHandler}
-					.state=${this._buttonStateReload}
-					>Reload Memory Cache</uui-button
-				>
+					.state=${this._buttonStateReload}>
+					Reload Memory Cache
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Database Cache">
@@ -173,10 +174,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Rebuild Database Cache"
 					@click=${this._onRebuildCacheHandler}
-					.state=${this._buttonStateRebuild}
-					>Rebuild Database Cache</uui-button
-				>
+					.state=${this._buttonStateRebuild}>
+					Rebuild Database Cache
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Internal Cache">
@@ -188,10 +190,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Snapshot Internal Cache"
 					@click=${this._onSnapshotCacheHandler}
-					.state=${this._buttonStateCollect}
-					>Snapshot Internal Cache</uui-button
-				>
+					.state=${this._buttonStateCollect}>
+					Snapshot Internal Cache
+				</uui-button>
 			</uui-box>
 		`;
 	}

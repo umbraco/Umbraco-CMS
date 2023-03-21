@@ -1,9 +1,9 @@
 import {
-	ContentTreeItemModel,
+	ContentTreeItemResponseModel,
 	DictionaryItemTranslationModel,
-	EntityTreeItemModel,
-	FolderTreeItemModel,
-	PackageManifestModel,
+	EntityTreeItemResponseModel,
+	FolderTreeItemResponseModel,
+	PackageManifestResponseModel,
 	ProblemDetailsModel,
 } from '@umbraco-cms/backend-api';
 
@@ -26,7 +26,7 @@ export interface Entity {
 	parentKey: string | null;
 }
 
-export interface ContentDetails extends ContentTreeItemModel {
+export interface ContentDetails extends ContentTreeItemResponseModel {
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
 	//data: Array<ContentPropertyData>;
@@ -80,7 +80,7 @@ export interface DataTypeProperty {
 */
 
 // TODO: Make sure Entity Type/interface.
-export interface MemberTypeDetails extends EntityTreeItemModel {
+export interface MemberTypeDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
@@ -100,7 +100,7 @@ export interface ContentPropertyData {
 }
 
 // Media
-export interface MediaDetails extends ContentTreeItemModel {
+export interface MediaDetails extends ContentTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
@@ -111,23 +111,23 @@ export interface MediaDetails extends ContentTreeItemModel {
 
 // Media Types
 
-export interface MediaTypeDetails extends FolderTreeItemModel {
+export interface MediaTypeDetails extends FolderTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
 // Member Groups
-export interface MemberGroupDetails extends EntityTreeItemModel {
+export interface MemberGroupDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 }
 
-export interface MemberDetails extends EntityTreeItemModel {
+export interface MemberDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 }
 
 // Dictionary
-export interface DictionaryDetails extends EntityTreeItemModel {
+export interface DictionaryDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	translations: DictionaryItemTranslationModel[];
 }
@@ -153,7 +153,7 @@ export interface SwatchDetails {
 	value: string;
 }
 
-export type UmbPackage = PackageManifestModel;
+export type UmbPackage = PackageManifestResponseModel;
 
 export type PackageManifestResponse = UmbPackage[];
 

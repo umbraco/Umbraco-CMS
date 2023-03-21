@@ -7,20 +7,20 @@ import {
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/notification';
 import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/store';
 
 // Extend entityType base type?, so we are sure to have parentKey?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
 export class UmbEntityWorkspaceManager<
 	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
-	EntityDetailsType extends EntityTreeItemModel = ReturnType<StoreType['getScaffold']>
+	EntityDetailsType extends EntityTreeItemResponseModel = ReturnType<StoreType['getScaffold']>
 > {
 	private _host;
 
 	state = new ObjectState<EntityDetailsType | undefined>(undefined);
 
-	protected _storeSubscription?: UmbObserverController;
+	protected _storeSubscription?: UmbObserverController<EntityDetailsType | undefined>;
 
 	private _notificationContext?: UmbNotificationContext;
 	private _store?: StoreType;

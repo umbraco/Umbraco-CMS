@@ -1,0 +1,47 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta
+	title="Guides/Extending the Backoffice/Sections/Intro"
+	parameters={{ previewTabs: { canvas: { hidden: true } } }}
+/>
+
+# Sections
+
+TODO: Introduction to sections
+
+<img src="docs/section.svg" width="400" />
+
+**Manifest**
+
+```json
+// TODO: get interface
+{
+	"type": "section",
+	"alias": "My.Section",
+	"name": "My Section",
+	"meta": {
+		"label": "My Section",
+		"pathname": "my-section"
+	}
+}
+```
+
+**Default Element**
+
+```ts
+// TODO: get interface
+interface UmbSectionElement {}
+```
+
+## The Section Context
+
+**Interface**
+
+```ts
+// TODO: get interface
+interface UmbSectionContext {}
+```
+
+## Examples of sections:
+
+TODO: link to all sections in storybook. Can we somehow auto-generate this list?

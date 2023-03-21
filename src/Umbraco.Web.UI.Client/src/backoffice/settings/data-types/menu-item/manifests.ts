@@ -10,6 +10,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Data Types',
 		icon: 'umb:folder',
 		entityType: 'data-type',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

@@ -4,10 +4,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUITextareaElement, UUITextareaEvent } from '@umbraco-ui/uui';
-import { UmbWorkspaceDictionaryContext } from '../../dictionary-workspace.context';
+import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.context';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DictionaryItemModel, LanguageModel } from '@umbraco-cms/backend-api';
+import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backend-api';
 
 @customElement('umb-workspace-view-dictionary-edit')
 export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
@@ -22,14 +22,14 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 	];
 
 	@state()
-	private _dictionary?: DictionaryItemModel;
+	private _dictionary?: DictionaryItemResponseModel;
 
 	#repo!: UmbDictionaryRepository;
 
 	@state()
-	private _languages: Array<LanguageModel> = [];
+	private _languages: Array<LanguageResponseModel> = [];
 
-	#workspaceContext!: UmbWorkspaceDictionaryContext;
+	#workspaceContext!: UmbDictionaryWorkspaceContext;
 
 	async connectedCallback() {
 		super.connectedCallback();
@@ -37,7 +37,7 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 		this.#repo = new UmbDictionaryRepository(this);
 		this._languages = await this.#repo.getLanguages();
 
-		this.consumeContext<UmbWorkspaceDictionaryContext>('umbWorkspaceContext', (_instance) => {
+		this.consumeContext<UmbDictionaryWorkspaceContext>('umbWorkspaceContext', (_instance) => {
 			this.#workspaceContext = _instance;
 			this.#observeDictionary();
 		});
@@ -49,7 +49,7 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 		});
 	}
 
-	#renderTranslation(language: LanguageModel) {
+	#renderTranslation(language: LanguageResponseModel) {
 		if (!language.isoCode) return;
 
 		const translation = this._dictionary?.translations?.find((x) => x.isoCode === language.isoCode);
@@ -68,7 +68,7 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 		if (e instanceof UUITextareaEvent) {
 			const target = e.composedPath()[0] as UUITextareaElement;
 			const translation = target.value.toString();
-			const isoCode = target.getAttribute('name')!;			
+			const isoCode = target.getAttribute('name')!;
 
 			this.#workspaceContext.setPropertyValue(isoCode, translation);
 		}

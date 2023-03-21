@@ -9,8 +9,10 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 10,
 		meta: {
 			label: 'Redirect Management',
-			sections: ['Umb.Section.Content'],
 			pathname: 'redirect-management',
+		},
+		conditions: {
+			sections: ['Umb.Section.Content'],
 		},
 	},
 	{
@@ -21,10 +23,12 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 20,
 		meta: {
 			label: 'Welcome',
-			sections: ['Umb.Section.Content'],
 			pathname: 'welcome',
 		},
-	}
+		conditions: {
+			sections: ['Umb.Section.Content'],
+		},
+	},
 ];
 
 export const manifests = [...dashboards];

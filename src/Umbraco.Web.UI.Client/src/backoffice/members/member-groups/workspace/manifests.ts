@@ -1,4 +1,3 @@
-import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
 
@@ -20,10 +19,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/info/workspace-view-member-group-info.element'),
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.MemberGroup'],
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.MemberGroup'],
 		},
 	},
 ];
@@ -34,11 +35,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.MemberGroup.SaveAndPublish',
 		name: 'Save Member Group Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.MemberGroup'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.MemberGroup'],
 		},
 	},
 ];

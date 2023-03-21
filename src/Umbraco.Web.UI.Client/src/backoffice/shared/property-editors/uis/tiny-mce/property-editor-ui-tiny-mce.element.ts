@@ -1,6 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbInputTinyMceElement } from '../../../../shared/components/input-tiny-mce/input-tiny-mce.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
@@ -9,8 +10,8 @@ import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
  * @element umb-property-editor-ui-tiny-mce
  */
 @customElement('umb-property-editor-ui-tiny-mce')
-export class UmbPropertyEditorUITinyMceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorElement {
+	static styles = [UUITextStyles];
 
 	@property({ type: String })
 	value = '';

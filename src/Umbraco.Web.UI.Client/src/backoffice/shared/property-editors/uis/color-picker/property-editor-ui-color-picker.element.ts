@@ -2,15 +2,16 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 import type { SwatchDetails } from '@umbraco-cms/models';
 
 /**
  * @element umb-property-editor-ui-color-picker
  */
 @customElement('umb-property-editor-ui-color-picker')
-export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
+export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	@property()
@@ -23,7 +24,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement {
 	private _swatches: SwatchDetails[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyModel>) {
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
 		const useLabel = config.find((x) => x.alias === 'useLabel');
 		if (useLabel) this._showLabels = useLabel.value;
 

@@ -94,7 +94,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('entityBulkAction').pipe(
 				map((extensions) => {
-					return extensions.filter((extension) => extension.meta.entityType === this.entityType);
+					return extensions.filter((extension) => extension.conditions.entityType === this.entityType);
 				})
 			),
 			(bulkActions) => {

@@ -1,8 +1,8 @@
-import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
 import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
-import { UmbMediaDetailStore, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN } from './media.detail.store';
+import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
+import type { RepositoryTreeDataSource } from '@umbraco-cms/repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
@@ -26,7 +26,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	#treeStore?: UmbMediaTreeStore;
 
 	#detailDataSource: UmbMediaDetailServerDataSource;
-	#detailStore?: UmbMediaDetailStore;
+	#store?: UmbMediaStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -42,8 +42,8 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_MEDIA_DETAIL_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
+			new UmbContextConsumerController(this.#host, UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#store = instance;
 			}),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
@@ -133,7 +133,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		const { data, error } = await this.#detailDataSource.get(key);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.#store?.append(data);
 		}
 
 		return { data, error };
@@ -157,7 +157,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		this.#detailStore?.append(template);
+		this.#store?.append(template);
 		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };
@@ -180,7 +180,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#detailStore?.append(document);
+		this.#store?.append(document);
 		this.#treeStore?.updateItem(document.key, { name: document.name });
 
 		// TODO: would be nice to align the stores on methods/methodNames.
@@ -206,7 +206,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
+		this.#store?.remove([key]);
 		this.#treeStore?.removeItem(key);
 		// TODO: would be nice to align the stores on methods/methodNames.
 

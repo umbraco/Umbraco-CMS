@@ -1,4 +1,5 @@
-import { UmbCreateDocumentEntityAction } from './create.action';
+import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
+import { UmbCreateDocumentEntityAction } from './create/create.action';
 import { UmbPublishDocumentEntityAction } from './publish.action';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';
@@ -12,10 +13,9 @@ import {
 	UmbTrashEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
+import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/extensions-registry';
 
 const entityType = 'document';
-const repositoryAlias = 'Umb.Repository.Documents';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -24,11 +24,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Create Document Entity Action',
 		weight: 1000,
 		meta: {
-			entityType,
 			icon: 'umb:add',
 			label: 'Create',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -37,11 +39,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Trash Document Entity Action',
 		weight: 900,
 		meta: {
-			entityType,
 			icon: 'umb:trash',
 			label: 'Trash',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbTrashEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -50,11 +54,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Create Document Blueprint Entity Action',
 		weight: 800,
 		meta: {
-			entityType,
 			icon: 'umb:blueprint',
 			label: 'Create Content Template',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCreateDocumentBlueprintEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -63,11 +69,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Move Document Entity Action',
 		weight: 700,
 		meta: {
-			entityType,
 			icon: 'umb:enter',
 			label: 'Move',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbMoveEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -76,11 +84,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Copy Document Entity Action',
 		weight: 600,
 		meta: {
-			entityType,
 			icon: 'umb:documents',
 			label: 'Copy',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbCopyEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -89,11 +99,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Sort Document Entity Action',
 		weight: 500,
 		meta: {
-			entityType,
 			icon: 'umb:navigation-vertical',
 			label: 'Sort',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbSortChildrenOfEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -102,11 +114,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Culture And Hostnames Document Entity Action',
 		weight: 400,
 		meta: {
-			entityType,
 			icon: 'umb:home',
 			label: 'Culture And Hostnames',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentCultureAndHostnamesEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -114,11 +128,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.Permissions',
 		name: 'Document Permissions Entity Action',
 		meta: {
-			entityType,
 			icon: 'umb:vcard',
 			label: 'Permissions',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPermissionsEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -126,23 +142,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.PublicAccess',
 		name: 'Document Permissions Entity Action',
 		meta: {
-			entityType,
 			icon: 'umb:lock',
 			label: 'Public Access',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbDocumentPublicAccessEntityAction,
 		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.Publish',
-		name: 'Publish Document Entity Action',
-		meta: {
+		conditions: {
 			entityType,
-			icon: 'umb:globe',
-			label: 'Publish',
-			repositoryAlias,
-			api: UmbPublishDocumentEntityAction,
 		},
 	},
 	{
@@ -150,11 +156,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.Publish',
 		name: 'Publish Document Entity Action',
 		meta: {
-			entityType,
 			icon: 'umb:globe',
 			label: 'Publish',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbPublishDocumentEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -162,11 +170,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.Unpublish',
 		name: 'Unpublish Document Entity Action',
 		meta: {
-			entityType,
 			icon: 'umb:globe',
 			label: 'Unpublish',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbUnpublishDocumentEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -174,13 +184,24 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.Document.Rollback',
 		name: 'Rollback Document Entity Action',
 		meta: {
-			entityType,
 			icon: 'umb:undo',
 			label: 'Rollback',
-			repositoryAlias,
+			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			api: UmbRollbackDocumentEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 ];
 
-export const manifests = [...entityActions];
+const modals: Array<ManifestModal> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.CreateDocument',
+		name: 'Create Document Modal',
+		loader: () => import('../../document-types/modals/allowed-document-types/allowed-document-types-modal.element'),
+	},
+];
+
+export const manifests = [...entityActions, ...modals];

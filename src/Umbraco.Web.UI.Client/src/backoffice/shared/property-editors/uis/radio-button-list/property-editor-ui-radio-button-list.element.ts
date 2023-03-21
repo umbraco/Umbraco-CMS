@@ -3,14 +3,15 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import '../../../components/input-radio-button-list/input-radio-button-list.element';
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-radio-button-list
  */
 @customElement('umb-property-editor-ui-radio-button-list')
-export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement {
+export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	#value = '';
@@ -23,7 +24,7 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement {
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyModel>) {
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
 		const listData = config.find((x) => x.alias === 'items');
 
 		if (!listData) return;

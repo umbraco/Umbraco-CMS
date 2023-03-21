@@ -2,26 +2,25 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import {
-	UmbInputMultiUrlPickerElement,
-	MultiUrlData,
-} from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
+import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
+import { UmbLinkPickerLink } from '../../../../shared/modals/link-picker';
+import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DataTypePropertyModel } from '@umbraco-cms/backend-api';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
  */
 
 @customElement('umb-property-editor-ui-multi-url-picker')
-export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement {
+export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	@property({ type: Array })
-	value: MultiUrlData[] = [];
+	value: UmbLinkPickerLink[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: DataTypePropertyModel[]) {
+	public set config(config: DataTypePropertyPresentationModel[]) {
 		const overlaySize = config.find((x) => x.alias === 'overlaySize');
 		if (overlaySize) this._overlaySize = overlaySize.value;
 

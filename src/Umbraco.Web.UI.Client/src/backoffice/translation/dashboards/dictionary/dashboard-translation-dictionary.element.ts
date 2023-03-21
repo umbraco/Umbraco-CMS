@@ -4,9 +4,9 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit-html/directives/when.js';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
-import { UmbCreateDictionaryModalResultData } from '../../dictionary/entity-actions/create/create-dictionary-modal-layout.element';
+import { UMB_CREATE_DICTIONARY_MODAL_TOKEN } from '../../dictionary/entity-actions/create/';
 import { UmbLitElement } from '@umbraco-cms/element';
-import { DictionaryOverviewModel, LanguageModel } from '@umbraco-cms/backend-api';
+import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backend-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/context-api';
 
@@ -47,7 +47,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	@state()
 	private _tableItemsFiltered: Array<UmbTableItem> = [];
 
-	#dictionaryItems: DictionaryOverviewModel[] = [];
+	#dictionaryItems: DictionaryOverviewResponseModel[] = [];
 
 	#repo!: UmbDictionaryRepository;
 
@@ -57,7 +57,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#tableColumns: Array<UmbTableColumn> = [];
 
-	#languages: Array<LanguageModel> = [];
+	#languages: Array<LanguageResponseModel> = [];
 
 	constructor() {
 		super();
@@ -156,13 +156,10 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 
-		const modalHandler = this.#modalContext?.open('umb-create-dictionary-modal-layout', {
-			type: 'sidebar',
-			data: { unique: null },
-		});
+		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL_TOKEN, { unique: null });
 
 		// TODO: get type from modal result
-		const { name }: UmbCreateDictionaryModalResultData = await modalHandler.onClose();
+		const { name } = await modalHandler.onSubmit();
 		if (!name) return;
 
 		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });

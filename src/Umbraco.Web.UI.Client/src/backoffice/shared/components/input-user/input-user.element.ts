@@ -2,7 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../input-list-base/input-list-base';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/user.store';
+import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/repository/user.store';
+import { UMB_USER_PICKER_MODAL_TOKEN } from '../../../users/users/modals/user-picker';
 import type { UserEntity } from '@umbraco-cms/models';
 
 @customElement('umb-input-user')
@@ -38,7 +39,7 @@ export class UmbPickerUserElement extends UmbInputListBase {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.pickerLayout = 'umb-picker-layout-user';
+		this.pickerToken = UMB_USER_PICKER_MODAL_TOKEN;
 		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (userStore) => {
 			this._userStore = userStore;
 			this._observeUser();

@@ -74,7 +74,7 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 		this.observe<ManifestCollectionView[]>(
 			umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
-					return extensions.filter((extension) => extension.meta.entityType === 'media');
+					return extensions.filter((extension) => extension.conditions.entityType === 'media');
 				})
 			),
 			(layouts) => {

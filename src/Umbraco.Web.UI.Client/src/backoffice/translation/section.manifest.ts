@@ -20,8 +20,10 @@ const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
 	weight: 100,
 	meta: {
 		label: 'Dictionary',
-		sections: [sectionAlias],
 		menu: 'Umb.Menu.Dictionary',
+	},
+	conditions: {
+		sections: [sectionAlias],
 	},
 };
 
@@ -34,8 +36,10 @@ const dashboards: Array<ManifestDashboard> = [
 		loader: () => import('./dashboards/dictionary/dashboard-translation-dictionary.element'),
 		meta: {
 			label: 'Dictionary overview',
-			sections: [sectionAlias],
 			pathname: '',
+		},
+		conditions: {
+			sections: [sectionAlias],
 		},
 	},
 ];

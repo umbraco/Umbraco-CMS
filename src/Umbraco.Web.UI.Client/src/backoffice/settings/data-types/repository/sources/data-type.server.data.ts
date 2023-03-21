@@ -1,10 +1,10 @@
+import { v4 as uuidv4 } from 'uuid';
 import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
 import {
 	ProblemDetailsModel,
 	DataTypeResource,
-	DataTypeModel,
-	DataTypeCreateModel,
-	DataTypeUpdateModel,
+	DataTypeResponseModel,
+	DataTypeModelBaseModel,
 } from '@umbraco-cms/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/resources';
@@ -15,7 +15,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @class UmbDataTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<DataTypeModel> {
+export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<DataTypeResponseModel> {
 	#host: UmbControllerHostInterface;
 
 	/**
@@ -54,9 +54,10 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async createScaffold(parentKey: string | null) {
-		const data: DataTypeModel = {
+		const data: DataTypeResponseModel = {
 			$type: '',
 			parentKey: parentKey,
+			key: uuidv4(),
 		};
 
 		return { data };
@@ -68,15 +69,15 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async insert(dataType: DataTypeModel) {
+	async insert(dataType: DataTypeResponseModel) {
 		if (!dataType.key) {
 			const error: ProblemDetailsModel = { title: 'DataType key is missing' };
 			return { error };
 		}
-		const requestBody: DataTypeCreateModel = { ...dataType };
+		const requestBody: DataTypeModelBaseModel = { ...dataType };
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeModel>(
+		return tryExecuteAndNotify<DataTypeResponseModel>(
 			this.#host,
 			// TODO: avoid this any?..
 			tryExecuteAndNotify(
@@ -90,21 +91,21 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 
 	/**
 	 * Updates a DataType on the server
-	 * @param {DataTypeModel} DataType
+	 * @param {DataTypeResponseModel} DataType
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(dataType: DataTypeModel) {
+	async update(dataType: DataTypeResponseModel) {
 		if (!dataType.key) {
 			const error: ProblemDetailsModel = { title: 'DataType key is missing' };
 			return { error };
 		}
 
-		const requestBody: DataTypeUpdateModel = { ...dataType };
+		const requestBody: DataTypeModelBaseModel = { ...dataType };
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeModel>(
+		return tryExecuteAndNotify<DataTypeResponseModel>(
 			this.#host,
 			DataTypeResource.putDataTypeByKey({
 				key: dataType.key,
@@ -126,7 +127,7 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeModel>(
+		return tryExecuteAndNotify<DataTypeResponseModel>(
 			this.#host,
 			DataTypeResource.deleteDataTypeByKey({
 				key,
@@ -147,7 +148,7 @@ export class UmbDataTypeServerDataSource implements RepositoryDetailDataSource<D
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeModel>(
+		return tryExecuteAndNotify<DataTypeResponseModel>(
 			this.#host,
 			DataTypeResource.deleteDataTypeByKey({
 				key,

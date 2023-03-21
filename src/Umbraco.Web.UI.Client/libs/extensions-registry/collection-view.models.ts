@@ -1,6 +1,6 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestCollectionView extends ManifestElement {
+export interface ManifestCollectionView extends ManifestElement, ManifestWithConditions<ConditionsCollectionView> {
 	type: 'collectionView';
 	meta: MetaCollectionView;
 }
@@ -8,6 +8,9 @@ export interface ManifestCollectionView extends ManifestElement {
 export interface MetaCollectionView {
 	label: string;
 	icon: string;
-	entityType: string;
 	pathName: string;
+}
+
+export interface ConditionsCollectionView {
+	entityType: string;
 }

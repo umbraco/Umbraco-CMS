@@ -1,5 +1,5 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/controller';
 import { ObjectState } from '@umbraco-cms/observable-api';
@@ -8,7 +8,7 @@ import type { MediaTypeDetails } from '@umbraco-cms/models';
 type EntityType = MediaTypeDetails;
 export class UmbWorkspaceMediaTypeContext
 	extends UmbWorkspaceContext<UmbMediaTypeRepository>
-	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
+	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<MediaTypeDetails | undefined>(undefined);
 	data = this.#data.asObservable();

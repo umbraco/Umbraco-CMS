@@ -1,18 +1,18 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-
+import { UMB_INVITE_USER_MODAL_TOKEN } from '../../../../users/users/modals/invite-user';
+import { UMB_CREATE_USER_MODAL_TOKEN } from '../../../../users/users/modals/create-user';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import type { IRoute } from '@umbraco-cms/router';
+
 import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'src/core/modal';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
 import './workspace-view-users-selection.element';
-import './workspace-view-users-invite.element';
-import './workspace-view-users-create.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-overview')
@@ -160,13 +160,15 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 	}
 
 	private _showInviteOrCreate() {
-		let modal = undefined;
+		let token = undefined;
+		// TODO: we need to find a better way to determine if we should create or invite
 		if (this.isCloud) {
-			modal = document.createElement('umb-workspace-view-users-invite');
+			token = UMB_INVITE_USER_MODAL_TOKEN;
 		} else {
-			modal = document.createElement('umb-workspace-view-users-create');
+			token = UMB_CREATE_USER_MODAL_TOKEN;
 		}
-		this._modalContext?.open(modal, { type: 'dialog' });
+
+		this._modalContext?.open(token);
 	}
 
 	render() {

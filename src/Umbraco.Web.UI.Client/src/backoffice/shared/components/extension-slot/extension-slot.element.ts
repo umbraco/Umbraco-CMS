@@ -38,8 +38,8 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public defaultElement = '';
 
 	@property()
-	public renderMethod: (manifest: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null = (manifest) =>
-		manifest.component;
+	public renderMethod: (extension: InitializedExtension) => TemplateResult<1 | 2> | HTMLElement | null = (extension) =>
+		extension.component;
 
 	connectedCallback(): void {
 		super.connectedCallback();

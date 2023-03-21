@@ -19,14 +19,14 @@ export class UmbMemberTypesMenuItemElement extends UmbLitElement {
 	// TODO: how do we want to cache the tree? (do we want to rerender every time the user opens the tree)?
 	// TODO: can we make this reusable?
 	render() {
-		return html`<umb-tree-item
+		return html` <uui-menu-item
 			label="Member Types"
-			icon="umb:folder"
 			@show-children=${this._onShowChildren}
 			@hide-children=${this._onHideChildren}
-			has-children>
+			has-children
+			><uui-icon slot="icon" name="umb:folder"></uui-icon>
 			${this._renderTree ? html`<umb-tree alias="Umb.Tree.MemberTypes"></umb-tree>` : nothing}
-		</umb-tree-item> `;
+		</uui-menu-item>`;
 	}
 }
 

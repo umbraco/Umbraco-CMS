@@ -1,4 +1,4 @@
-import type { ManifestDashboard } from '@umbraco-cms/models';
+import type { ManifestDashboard, ManifestModal } from '@umbraco-cms/models';
 
 const dashboards: Array<ManifestDashboard> = [
 	{
@@ -10,8 +10,10 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 500,
 		meta: {
 			label: 'Welcome',
-			sections: ['Umb.Section.Settings'],
 			pathname: 'welcome',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 	{
@@ -23,8 +25,10 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 400,
 		meta: {
 			label: 'Examine Management',
-			sections: ['Umb.Section.Settings'],
 			pathname: 'examine-management',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 	{
@@ -36,8 +40,10 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 300,
 		meta: {
 			label: 'Models Builder',
-			sections: ['Umb.Section.Settings'],
 			pathname: 'models-builder',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 	{
@@ -49,8 +55,10 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 200,
 		meta: {
 			label: 'Published Status',
-			sections: ['Umb.Section.Settings'],
 			pathname: 'published-status',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 	{
@@ -62,8 +70,10 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 102,
 		meta: {
 			label: 'Health Check',
-			sections: ['Umb.Section.Settings'],
 			pathname: 'health-check',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 	{
@@ -75,8 +85,10 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 101,
 		meta: {
 			label: 'Profiling',
-			sections: ['Umb.Section.Settings'],
 			pathname: 'profiling',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 	{
@@ -88,10 +100,21 @@ const dashboards: Array<ManifestDashboard> = [
 		weight: 100,
 		meta: {
 			label: 'Telemetry Data',
-			sections: ['Umb.Section.Settings'],
 			pathname: 'telemetry',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
 		},
 	},
 ];
 
-export const manifests = [...dashboards];
+const modals: Array<ManifestModal> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.ExamineFieldsSettings',
+		name: 'Examine Field Settings Modal',
+		loader: () => import('./examine-management/views/modal-views/fields-settings.element'),
+	},
+];
+
+export const manifests = [...dashboards, ...modals];
