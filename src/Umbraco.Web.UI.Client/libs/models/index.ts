@@ -61,21 +61,6 @@ export interface UserGroupDetails extends UserGroupEntity {
 	permissions: Array<string>;
 }
 
-/*
-// Data Types
-export interface DataTypeDetails extends FolderTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	propertyEditorAlias: string | null;
-	propertyEditorUiAlias: string | null;
-	data: Array<DataTypeProperty>;
-}
-
-export interface DataTypeProperty {
-	alias: string;
-	value: any;
-}
-*/
-
 // TODO: Make sure Entity Type/interface.
 export interface MemberTypeDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
