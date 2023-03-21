@@ -95,6 +95,59 @@ describe('UmbExtensionRegistry', () => {
 				})
 				.unsubscribe();
 		});
+
+		it('Observable only trigged when changes made to the scope of it', (done) => {
+			let amountOfTimesTriggered = -1;
+			let lastAmount = 0;
+
+			extensionRegistry
+				.extensionsOfType('section')
+				.subscribe((extensions) => {
+					amountOfTimesTriggered++;
+					const newAmount = extensions?.length ?? 0;
+					if (amountOfTimesTriggered === 0) {
+						expect(newAmount).to.eq(3);
+					}
+					if (amountOfTimesTriggered === 1) {
+						expect(newAmount).to.eq(4);
+					}
+					if (lastAmount === newAmount) {
+						expect(null).to.eq('Update was triggered without a change, this test should fail.');
+					} else {
+						lastAmount = newAmount;
+
+						if (lastAmount === 3) {
+							// We registerer a extension that should not affect this observable.
+							extensionRegistry.register({
+								type: 'workspace',
+								name: 'test-editor-2',
+								alias: 'Umb.Test.Editor.2',
+								meta: {
+									entityType: 'testEntity',
+								},
+							});
+							// And then register a extension that triggers this observable.
+							extensionRegistry.register({
+								type: 'section',
+								name: 'test-section-4',
+								alias: 'Umb.Test.Section.4',
+								weight: 9999,
+								meta: {
+									label: 'Test Section 4',
+									pathname: 'test-section-4',
+								},
+							});
+						}
+
+						if (newAmount === 4) {
+							expect(amountOfTimesTriggered).to.eq(1);
+							expect(extensions?.[0]?.alias).to.eq('Umb.Test.Section.4');
+							done();
+						}
+					}
+				})
+				.unsubscribe();
+		});
 	});
 });
 
