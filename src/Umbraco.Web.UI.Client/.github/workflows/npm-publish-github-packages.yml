@@ -32,7 +32,7 @@ jobs:
           node-version: 18
           cache: 'npm'
       - run: npm ci
-      - run: npm run build:libs
+      - run: NODE_OPTIONS=--max-old-space-size=4096 npm run build:libs
       - uses: actions/upload-artifact@v3
         with:
           name: artifact
