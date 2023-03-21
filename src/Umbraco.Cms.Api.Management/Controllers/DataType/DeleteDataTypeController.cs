@@ -26,7 +26,7 @@ public class DeleteDataTypeController : DataTypeControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        Attempt<IDataType?, DataTypeOperationStatus> result = await _dataTypeService.DeleteAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDataType?, DataTypeOperationStatus> result = await _dataTypeService.DeleteAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

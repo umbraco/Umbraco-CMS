@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
@@ -317,7 +318,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             var languageNo = new Language("nb-NO", "Norwegian Bokmål (Norway)");
-            await languageService.CreateAsync(languageNo);
+            await languageService.CreateAsync(languageNo, Constants.Security.SuperUserKey);
 
             // Act
             var item = repository.Get(1);
@@ -400,7 +401,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
         var language = await languageService.GetAsync("en-US");
 
         var languageDK = new Language("da-DK", "Danish (Denmark)");
-        await languageService.CreateAsync(languageDK); //Id 2
+        await languageService.CreateAsync(languageDK, Constants.Security.SuperUserKey); //Id 2
 
         await dictionaryItemService.CreateAsync(
             new DictionaryItem("Read More")
@@ -409,7 +410,8 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
                 {
                     new DictionaryTranslation(language, "Read More"), new DictionaryTranslation(languageDK, "Læs mere")
                 }
-            }); // Id 1
+            },
+            Constants.Security.SuperUserKey); // Id 1
 
         await dictionaryItemService.CreateAsync(
             new DictionaryItem("Article")
@@ -418,6 +420,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
                 {
                     new DictionaryTranslation(language, "Article"), new DictionaryTranslation(languageDK, "Artikel")
                 }
-            }); // Id 2
+            },
+            Constants.Security.SuperUserKey); // Id 2
     }
 }

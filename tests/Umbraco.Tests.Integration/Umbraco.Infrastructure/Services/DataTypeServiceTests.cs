@@ -46,7 +46,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext
             };
-        var result = await DataTypeService.CreateAsync(dataType);
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
         Assert.True(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
 
@@ -67,7 +67,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         dataType.Name += " UPDATED";
-        var result = await DataTypeService.UpdateAsync(dataType);
+        var result = await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
         Assert.True(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
 
@@ -89,7 +89,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
                     Name = Guid.NewGuid().ToString(),
                     DatabaseType = ValueStorageType.Nvarchar
                 };
-            var result = await DataTypeService.CreateAsync(dataType);
+            var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
             Assert.True(result.Success);
             return result.Result;
         }
@@ -153,7 +153,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         // Act
         var definition = dataTypeDefinitions.First();
         var definitionKey = definition.Key;
-        var result = await DataTypeService.DeleteAsync(definitionKey);
+        var result = await DataTypeService.DeleteAsync(definitionKey, Constants.Security.SuperUserKey);
         Assert.True(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
         Assert.NotNull(result.Result);
@@ -173,7 +173,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_DataType_In_Container()
     {
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
@@ -181,7 +181,8 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext,
                 ParentId = container.Id
-            });
+            },
+            Constants.Security.SuperUserKey);
 
         Assert.True(result.Success);
         Assert.IsNotNull(result.Result);
@@ -200,15 +201,16 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
             {
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
         Assert.IsNotNull(dataType);
         Assert.AreEqual(Constants.System.Root, dataType.ParentId);
 
-        var result = await DataTypeService.MoveAsync(dataType, container.Key);
+        var result = await DataTypeService.MoveAsync(dataType, container.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
 
@@ -220,20 +222,21 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Move_DataType_To_Root()
     {
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext,
                 ParentId = container.Id
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
         Assert.IsNotNull(dataType);
         Assert.AreEqual(container.Id, dataType.ParentId);
 
-        var result = await DataTypeService.MoveAsync(dataType, null);
+        var result = await DataTypeService.MoveAsync(dataType, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
 
@@ -250,9 +253,10 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
             {
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
-        var result = await DataTypeService.CopyAsync(dataType, null);
+        var result = await DataTypeService.CopyAsync(dataType, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
         Assert.IsNotNull(result.Result);
@@ -267,15 +271,16 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Copy_DataType_To_Container()
     {
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" })).Result;
+        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
-        var result = await DataTypeService.CopyAsync(dataType, container.Key);
+        var result = await DataTypeService.CopyAsync(dataType, container.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
         Assert.IsNotNull(result.Result);
@@ -290,17 +295,18 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Copy_DataType_Between_Containers()
     {
-        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" })).Result;
-        var container2 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 2" })).Result;
+        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" }, null, Constants.Security.SuperUserKey)).Result;
+        var container2 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 2" }, null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext,
                 ParentId = container1.Id
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
-        var result = await DataTypeService.CopyAsync(dataType, container2.Key);
+        var result = await DataTypeService.CopyAsync(dataType, container2.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
         Assert.IsNotNull(result.Result);
@@ -319,16 +325,17 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Copy_DataType_From_Container_To_Root()
     {
-        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" })).Result;
+        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" }, null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext,
                 ParentId = container1.Id
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
-        var result = await DataTypeService.CopyAsync(dataType, null);
+        var result = await DataTypeService.CopyAsync(dataType, null, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.Success, result.Status);
         Assert.IsNotNull(result.Result);
@@ -356,7 +363,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
             };
 
         // Act
-        var result = await DataTypeService.CreateAsync(dataTypeDefinition);
+        var result = await DataTypeService.CreateAsync(dataTypeDefinition, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.IsFalse(result.Success);
@@ -375,7 +382,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
             };
 
         // Act
-        var result = await DataTypeService.CreateAsync(dataTypeDefinition);
+        var result = await DataTypeService.CreateAsync(dataTypeDefinition, Constants.Security.SuperUserKey);
 
         // Assert
         Assert.IsFalse(result.Success);
@@ -405,13 +412,14 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
             {
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
         Assert.IsNotNull(dataType);
         Assert.AreEqual(Constants.System.Root, dataType.ParentId);
 
-        var result = await DataTypeService.MoveAsync(dataType, Guid.NewGuid());
+        var result = await DataTypeService.MoveAsync(dataType, Guid.NewGuid(), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(DataTypeOperationStatus.ParentNotFound, result.Status);
 

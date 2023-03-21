@@ -31,7 +31,7 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     public async Task<IActionResult> Delete(Guid key)
     {
         Attempt<PackageDefinition?, PackageOperationStatus> result =
-            await _packagingService.DeleteCreatedPackageAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+            await _packagingService.DeleteCreatedPackageAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

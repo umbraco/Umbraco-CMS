@@ -170,11 +170,11 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
     {
-        var parent = (await DictionaryItemService.CreateAsync(new DictionaryItem("Parent"))).Result;
-        var child1 = (await DictionaryItemService.CreateAsync(new DictionaryItem(parent.Key, "Child1"))).Result;
-        var child2 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child1.Key, "Child2"))).Result;
-        var child3 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child2.Key, "Child3"))).Result;
-        var child4 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child3.Key, "Child4"))).Result;
+        var parent = (await DictionaryItemService.CreateAsync(new DictionaryItem("Parent"), Constants.Security.SuperUserKey)).Result;
+        var child1 = (await DictionaryItemService.CreateAsync(new DictionaryItem(parent.Key, "Child1"), Constants.Security.SuperUserKey)).Result;
+        var child2 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child1.Key, "Child2"), Constants.Security.SuperUserKey)).Result;
+        var child3 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child2.Key, "Child3"), Constants.Security.SuperUserKey)).Result;
+        var child4 = (await DictionaryItemService.CreateAsync(new DictionaryItem(child3.Key, "Child4"), Constants.Security.SuperUserKey)).Result;
 
         var def = new PackageDefinition
         {

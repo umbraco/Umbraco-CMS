@@ -14,17 +14,20 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly IAuditRepository _auditRepository;
+    private readonly IUserService _userService;
 
     public LanguageService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         ILanguageRepository languageRepository,
-        IAuditRepository auditRepository)
+        IAuditRepository auditRepository,
+        IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _languageRepository = languageRepository;
         _auditRepository = auditRepository;
+        _userService = userService;
     }
 
     /// <inheritdoc />
@@ -55,7 +58,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, Guid userKey)
         => await SaveAsync(
             language,
             () =>
@@ -76,10 +79,10 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             },
             AuditType.Save,
             "Update Language",
-            userId);
+            userKey);
 
     /// <inheritdoc />
-    public async Task<Attempt<ILanguage, LanguageOperationStatus>> CreateAsync(ILanguage language, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ILanguage, LanguageOperationStatus>> CreateAsync(ILanguage language, Guid userKey)
     {
         if (language.Id != 0)
         {
@@ -100,11 +103,11 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             },
             AuditType.New,
             "Create Language",
-            userId);
+            userKey);
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, Guid userKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -136,7 +139,8 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
 
-            Audit(AuditType.Delete, "Delete Language", userId, language.Id, UmbracoObjectTypes.Language.GetName());
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(AuditType.Delete, "Delete Language", currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language));
         }
@@ -147,7 +151,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         Func<LanguageOperationStatus> operationValidation,
         AuditType auditType,
         string auditMessage,
-        int userId)
+        Guid userKey)
     {
         if (IsValidIsoCode(language.IsoCode) == false)
         {
@@ -187,7 +191,8 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
 
-            Audit(auditType, auditMessage, userId, language.Id, UmbracoObjectTypes.Language.GetName());
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(auditType, auditMessage, currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
 
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus(LanguageOperationStatus.Success, language));

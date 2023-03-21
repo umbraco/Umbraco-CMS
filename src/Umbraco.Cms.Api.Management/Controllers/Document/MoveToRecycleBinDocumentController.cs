@@ -26,7 +26,7 @@ public class MoveToRecycleBinDocumentController : DocumentControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MoveToRecycleBin(Guid key)
     {
-        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveToRecycleBinAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveToRecycleBinAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : ContentEditingOperationStatusResult(result.Status);

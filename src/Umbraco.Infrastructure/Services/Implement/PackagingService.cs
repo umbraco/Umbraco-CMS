@@ -30,6 +30,7 @@ public class PackagingService : IPackagingService
     private readonly IPackageInstallation _packageInstallation;
     private readonly PackageMigrationPlanCollection _packageMigrationPlans;
     private readonly IHostEnvironment _hostEnvironment;
+    private readonly IUserService _userService;
 
     public PackagingService(
         IAuditService auditService,
@@ -39,7 +40,8 @@ public class PackagingService : IPackagingService
         ILegacyManifestParser legacyManifestParser,
         IKeyValueService keyValueService,
         PackageMigrationPlanCollection packageMigrationPlans,
-        IHostEnvironment hostEnvironment)
+        IHostEnvironment hostEnvironment,
+        IUserService userService)
     {
         _auditService = auditService;
         _createdPackages = createdPackages;
@@ -49,9 +51,10 @@ public class PackagingService : IPackagingService
         _keyValueService = keyValueService;
         _packageMigrationPlans = packageMigrationPlans;
         _hostEnvironment = hostEnvironment;
+        _userService = userService;
     }
 
-    [Obsolete("Use constructor that also takes an IHostEnvironment instead. Scheduled for removal in V15")]
+    [Obsolete("Use constructor that also takes an IHostEnvironment and IUserService instead. Scheduled for removal in V15")]
     public PackagingService(
         IAuditService auditService,
         ICreatedPackagesRepository createdPackages,
@@ -68,7 +71,8 @@ public class PackagingService : IPackagingService
               manifestParser,
               keyValueService,
               packageMigrationPlans,
-              StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>())
+              StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>(),
+              StaticServiceProvider.Instance.GetRequiredService<IUserService>())
     {
     }
 
@@ -126,12 +130,13 @@ public class PackagingService : IPackagingService
     {
         PackageDefinition? package = GetCreatedPackageById(id);
         Guid key = package?.PackageId ?? Guid.Empty;
+        Guid currentUserKey = _userService.GetUserById(id)?.Key ?? Constants.Security.SuperUserKey;
 
-        DeleteCreatedPackageAsync(key, userId).GetAwaiter().GetResult();
+        DeleteCreatedPackageAsync(key, currentUserKey).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, Guid userKey)
     {
         PackageDefinition? package = await GetCreatedPackageByKeyAsync(key);
         if (package == null)
@@ -139,7 +144,8 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.NotFound, null);
         }
 
-        _auditService.Add(AuditType.Delete, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
+        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        _auditService.Add(AuditType.Delete, currentUserId, -1, "Package", $"Created package '{package.Name}' deleted. Package key: {key}");
         _createdPackages.Delete(package.Id);
 
         return Attempt.SucceedWithStatus<PackageDefinition?, PackageOperationStatus>(PackageOperationStatus.Success, package);
@@ -165,7 +171,7 @@ public class PackagingService : IPackagingService
     public bool SaveCreatedPackage(PackageDefinition definition) => _createdPackages.SavePackage(definition);
 
     /// <inheritdoc/>
-    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, int userId)
+    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, Guid userKey)
     {
         if (_createdPackages.SavePackage(package) == false)
         {
@@ -177,20 +183,22 @@ public class PackagingService : IPackagingService
             return Attempt.FailWithStatus(PackageOperationStatus.DuplicateItemName, package);
         }
 
-        _auditService.Add(AuditType.New, userId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
+        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' created. Package key: {package.PackageId}");
         return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
 
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, int userId)
+    public async Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, Guid userKey)
     {
         if (_createdPackages.SavePackage(package) == false)
         {
             return Attempt.FailWithStatus(PackageOperationStatus.NotFound, package);
         }
 
-        _auditService.Add(AuditType.New, userId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
+        int currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        _auditService.Add(AuditType.New, currentUserId, -1, "Package", $"Created package '{package.Name}' updated. Package key: {package.PackageId}");
         return await Task.FromResult(Attempt.SucceedWithStatus(PackageOperationStatus.Success, package));
     }
 

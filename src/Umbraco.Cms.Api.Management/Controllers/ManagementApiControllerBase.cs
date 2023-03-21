@@ -38,6 +38,6 @@ public class ManagementApiControllerBase : Controller
         return base.CreatedAtAction(actionName, controllerName, new { name = name }, null);
     }
 
-    protected static int CurrentUserId(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        => backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? Core.Constants.Security.SuperUserId;
+    protected static Guid CurrentUserKey(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        => backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? Core.Constants.Security.SuperUserKey;
 }

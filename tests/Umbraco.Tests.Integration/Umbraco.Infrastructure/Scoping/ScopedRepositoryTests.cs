@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -147,7 +148,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(ILanguage));
 
         ILanguage lang = new Language("fr-FR", "French (France)");
-        await service.CreateAsync(lang);
+        await service.CreateAsync(lang, Constants.Security.SuperUserKey);
 
         // global cache has been flushed, reload
         var globalFullCached = (IEnumerable<ILanguage>)globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -175,7 +176,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
             // Use IsMandatory of isocode to ensure publishedContent cache is not also rebuild
             lang.IsMandatory = true;
-            await service.UpdateAsync(lang);
+            await service.UpdateAsync(lang, Constants.Security.SuperUserKey);
 
             // scoped cache has been flushed, reload
             var scopeFullCached = (IEnumerable<ILanguage>)scopedCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -241,13 +242,14 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         var globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(IDictionaryItem));
 
         var lang = new Language("fr-FR", "French (France)");
-        await languageService.CreateAsync(lang);
+        await languageService.CreateAsync(lang, Constants.Security.SuperUserKey);
 
         var item = (await dictionaryItemService.CreateAsync(
             new DictionaryItem("item-key")
             {
                 Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang, "item-value") }
-            })).Result;
+            },
+            Constants.Security.SuperUserKey)).Result;
 
         // Refresh the keyed cache manually
         await dictionaryItemService.GetAsync(item.Key);
@@ -272,7 +274,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
             Assert.AreNotSame(globalCache, scopedCache);
 
             item.ItemKey = "item-changed";
-            await dictionaryItemService.UpdateAsync(item);
+            await dictionaryItemService.UpdateAsync(item, Constants.Security.SuperUserKey);
 
             // scoped cache contains the "new" entity
             // Refresh the keyed cache manually

@@ -33,20 +33,20 @@ public interface ILanguageService
     ///     Updates an existing <see cref="ILanguage" /> object
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to update</param>
-    /// <param name="userId">Optional id of the user saving the language</param>
-    Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user saving the language</param>
+    Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, Guid userKey);
 
     /// <summary>
     ///     Creates a new <see cref="ILanguage" /> object
     /// </summary>
     /// <param name="language"><see cref="ILanguage" /> to create</param>
-    /// <param name="userId">Optional id of the user creating the language</param>
-    Task<Attempt<ILanguage, LanguageOperationStatus>> CreateAsync(ILanguage language, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user creating the language</param>
+    Task<Attempt<ILanguage, LanguageOperationStatus>> CreateAsync(ILanguage language, Guid userKey);
 
     /// <summary>
     ///     Deletes a <see cref="ILanguage" /> by removing it and its usages from the db
     /// </summary>
     /// <param name="isoCode">The ISO code of the <see cref="ILanguage" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the language</param>
-    Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user deleting the language</param>
+    Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, Guid userKey);
 }

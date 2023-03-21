@@ -25,7 +25,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel);
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         VerifyUpdate(result.Result);
@@ -76,7 +76,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel);
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         VerifyUpdate(result.Result);
@@ -100,8 +100,8 @@ public partial class ContentEditingServiceTests
     {
         var templateOne = new TemplateBuilder().WithAlias("textPageOne").WithName("Text page one").Build();
         var templateTwo = new TemplateBuilder().WithAlias("textPageTwo").WithName("Text page two").Build();
-        await TemplateService.CreateAsync(templateOne);
-        await TemplateService.CreateAsync(templateTwo);
+        await TemplateService.CreateAsync(templateOne, Constants.Security.SuperUserKey);
+        await TemplateService.CreateAsync(templateTwo, Constants.Security.SuperUserKey);
 
         var content = await CreateInvariantContent(templateOne, templateTwo);
         Assert.AreEqual(templateOne.Id, content.TemplateId);
@@ -112,7 +112,7 @@ public partial class ContentEditingServiceTests
             TemplateKey = templateTwo.Key
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel);
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         VerifyUpdate(result.Result);
 
         // re-get and re-test
@@ -130,7 +130,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_Remove_Template()
     {
         var templateOne = new TemplateBuilder().WithAlias("textPageOne").WithName("Text page one").Build();
-        await TemplateService.CreateAsync(templateOne);
+        await TemplateService.CreateAsync(templateOne, Constants.Security.SuperUserKey);
 
         var content = await CreateInvariantContent(templateOne);
         Assert.AreEqual(templateOne.Id, content.TemplateId);
@@ -141,7 +141,7 @@ public partial class ContentEditingServiceTests
             TemplateKey = null
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel);
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         VerifyUpdate(result.Result);
 
         // re-get and re-test
@@ -169,7 +169,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel);
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         VerifyUpdate(result.Result);
@@ -212,7 +212,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel);
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
 
@@ -239,7 +239,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel);
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
         Assert.IsNotNull(result.Result);

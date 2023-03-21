@@ -25,7 +25,7 @@ public class DeleteRelationTypeController : RelationTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        Attempt<IRelationType?, RelationTypeOperationStatus> result = await _relationService.DeleteAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IRelationType?, RelationTypeOperationStatus> result = await _relationService.DeleteAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success ? await Task.FromResult(Ok()) : RelationTypeOperationStatusResult(result.Status);
     }
 }

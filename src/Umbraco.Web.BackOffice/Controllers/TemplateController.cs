@@ -26,20 +26,6 @@ public class TemplateController : BackOfficeNotificationsController
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public TemplateController(
-        IFileService fileService,
-        IUmbracoMapper umbracoMapper,
-        IShortStringHelper shortStringHelper,
-        IDefaultViewContentProvider defaultViewContentProvider)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
-            umbracoMapper,
-            shortStringHelper,
-            defaultViewContentProvider,
-            fileService)
-    {
-    }
-
     [ActivatorUtilitiesConstructor]
     public TemplateController(
         ITemplateService templateService,
@@ -143,7 +129,7 @@ public class TemplateController : BackOfficeNotificationsController
             return NotFound();
         }
 
-        _templateService.DeleteAsync(template.Alias).GetAwaiter().GetResult();
+        _templateService.DeleteAsync(template.Alias, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
         return Ok();
     }
 
@@ -201,7 +187,7 @@ public class TemplateController : BackOfficeNotificationsController
 
             _umbracoMapper.Map(display, template);
 
-            _templateService.UpdateAsync(template).GetAwaiter().GetResult();
+            _templateService.UpdateAsync(template, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
             if (changeAlias)
             {
@@ -226,7 +212,7 @@ public class TemplateController : BackOfficeNotificationsController
             // we need to pass the template name as alias to keep the template file casing consistent with templates created with content
             // - see comment in FileService.CreateTemplateForContentType for additional details
             Attempt<ITemplate, TemplateOperationStatus> result =
-                _templateService.CreateAsync(display.Name!, display.Name!, display.Content).GetAwaiter().GetResult();
+                _templateService.CreateAsync(display.Name!, display.Name!, display.Content, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
             if (result.Success == false)
             {
                 return NotFound();

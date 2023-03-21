@@ -48,7 +48,7 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
         // Macros are not included!
         PackageDefinition packageDefinition = _umbracoMapper.Map(updatePackageRequestModel, package);
 
-        Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.UpdateCreatedPackageAsync(packageDefinition, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.UpdateCreatedPackageAsync(packageDefinition, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

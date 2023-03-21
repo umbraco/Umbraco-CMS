@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -15,10 +17,12 @@ namespace Umbraco.Cms.Core.Services;
 public class RelationService : RepositoryService, IRelationService
 {
     private readonly IAuditRepository _auditRepository;
+    private readonly IUserService _userService;
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
+    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in V15")]
     public RelationService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -27,11 +31,33 @@ public class RelationService : RepositoryService, IRelationService
         IRelationRepository relationRepository,
         IRelationTypeRepository relationTypeRepository,
         IAuditRepository auditRepository)
+        : this(
+            uowProvider,
+            loggerFactory,
+            eventMessagesFactory,
+            entityService,
+            relationRepository,
+            relationTypeRepository,
+            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+    {
+    }
+
+    public RelationService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IEntityService entityService,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        IAuditRepository auditRepository,
+        IUserService userService)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _relationRepository = relationRepository;
         _relationTypeRepository = relationTypeRepository;
         _auditRepository = auditRepository;
+        _userService = userService;
         _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
     }
 
@@ -539,7 +565,7 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
-    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, int userId)
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey)
     {
         if (relationType.Id != 0)
         {
@@ -551,18 +577,18 @@ public class RelationService : RepositoryService, IRelationService
             () => _relationTypeRepository.Get(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
             AuditType.New,
             $"Created relation type: {relationType.Name}",
-            userId);
+            userKey);
     }
 
-    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, int userId) =>
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey) =>
         await SaveAsync(
             relationType,
             () => _relationTypeRepository.Get(relationType.Key) is null ? RelationTypeOperationStatus.NotFound : RelationTypeOperationStatus.Success,
             AuditType.Save,
             $"Created relation type: {relationType.Name}",
-            userId);
+            userKey);
 
-    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage, int userId)
+    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<RelationTypeOperationStatus> operationValidation, AuditType auditType, string auditMessage, Guid userKey)
     {
         // Validate that parent & child object types are allowed
         UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
@@ -596,7 +622,8 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Save(relationType);
-            Audit(auditType, userId, relationType.Id, auditMessage);
+            var currentUser = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(auditType, currentUser, relationType.Id, auditMessage);
             scope.Complete();
             scope.Notifications.Publish(
                 new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
@@ -645,7 +672,7 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
-    public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, int userId)
+    public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -664,7 +691,8 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Delete(relationType);
-            Audit(AuditType.Delete, userId, relationType.Id, "Deleted relation type");
+            var currentUser = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
             scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType));

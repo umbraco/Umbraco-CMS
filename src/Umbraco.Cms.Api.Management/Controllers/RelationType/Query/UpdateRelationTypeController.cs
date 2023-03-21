@@ -47,7 +47,7 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
 
         _relationTypePresentationFactory.MapUpdateModelToRelationType(updateRelationTypeSavingViewModel, persistedRelationType);
 
-        Attempt<IRelationType, RelationTypeOperationStatus> result = await _relationService.UpdateAsync(persistedRelationType, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await _relationService.UpdateAsync(persistedRelationType, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success ? await Task.FromResult(Ok()) : RelationTypeOperationStatusResult(result.Status);
     }

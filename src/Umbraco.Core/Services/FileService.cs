@@ -34,6 +34,7 @@ public class FileService : RepositoryService, IFileService
     private readonly IStylesheetRepository _stylesheetRepository;
     private readonly ITemplateService _templateService;
     private readonly ITemplateRepository _templateRepository;
+    private readonly IUserService _userService;
 
     [Obsolete("Use other ctor - will be removed in Umbraco 15")]
     public FileService(
@@ -61,12 +62,13 @@ public class FileService : RepositoryService, IFileService
             hostingEnvironment,
             StaticServiceProvider.Instance.GetRequiredService<ITemplateService>(),
             templateRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
             shortStringHelper,
-            globalSettings
-        )
+            globalSettings)
     {
     }
 
+    [ActivatorUtilitiesConstructor]
     public FileService(
         ICoreScopeProvider uowProvider,
         ILoggerFactory loggerFactory,
@@ -79,8 +81,8 @@ public class FileService : RepositoryService, IFileService
         IHostingEnvironment hostingEnvironment,
         ITemplateService templateService,
         ITemplateRepository templateRepository,
-        // unused dependencies but the DI forces us to have them, otherwise we'll get an "ambiguous constructor"
-        // exception (and [ActivatorUtilitiesConstructor] doesn't work here either)
+        IUserService userService,
+        // We need these else it will be ambigious ctors
         IShortStringHelper shortStringHelper,
         IOptions<GlobalSettings> globalSettings)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
@@ -93,6 +95,7 @@ public class FileService : RepositoryService, IFileService
         _hostingEnvironment = hostingEnvironment;
         _templateService = templateService;
         _templateRepository = templateRepository;
+        _userService = userService;
     }
 
     #region Stylesheets
@@ -380,7 +383,8 @@ public class FileService : RepositoryService, IFileService
             throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
         }
 
-        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, userId).GetAwaiter().GetResult();
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, currentUserKey).GetAwaiter().GetResult();
 
         // mimic old service behavior
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -414,7 +418,8 @@ public class FileService : RepositoryService, IFileService
             throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
         }
 
-        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, userId).GetAwaiter().GetResult();
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, currentUserKey).GetAwaiter().GetResult();
         return result.Result;
     }
 
@@ -490,13 +495,14 @@ public class FileService : RepositoryService, IFileService
                 "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
         }
 
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
         if (template.Id > 0)
         {
-            _templateService.UpdateAsync(template, userId).GetAwaiter().GetResult();
+            _templateService.UpdateAsync(template, currentUserKey).GetAwaiter().GetResult();
         }
         else
         {
-            _templateService.CreateAsync(template, userId).GetAwaiter().GetResult();
+            _templateService.CreateAsync(template, currentUserKey).GetAwaiter().GetResult();
         }
     }
 
@@ -541,7 +547,10 @@ public class FileService : RepositoryService, IFileService
     /// <param name="userId"></param>
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
-        => _templateService.DeleteAsync(alias, userId).GetAwaiter().GetResult();
+    {
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+        _templateService.DeleteAsync(alias, currentUserKey).GetAwaiter().GetResult();
+    }
 
     /// <inheritdoc />
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
