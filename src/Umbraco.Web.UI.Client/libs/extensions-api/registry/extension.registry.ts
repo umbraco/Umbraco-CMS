@@ -33,6 +33,8 @@ function extensionSingleMemoization<T extends { alias: string }>(
 	return previousValue !== currentValue;
 }
 
+const sortExtensions = (a: ManifestBase, b: ManifestBase) => (b.weight || 0) - (a.weight || 0);
+
 export class UmbExtensionRegistry {
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
@@ -164,7 +166,7 @@ export class UmbExtensionRegistry {
 						}
 						return ext;
 					})
-					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
+					.sort(sortExtensions)
 			),
 			distinctUntilChanged(extensionArrayMemoization)
 		) as Observable<Array<T>>;
@@ -191,7 +193,7 @@ export class UmbExtensionRegistry {
 						}
 						return ext;
 					})
-					.sort((a, b) => (b.weight || 0) - (a.weight || 0))
+					.sort(sortExtensions)
 			),
 			distinctUntilChanged(extensionArrayMemoization)
 		) as Observable<Array<ExtensionTypes>>;
