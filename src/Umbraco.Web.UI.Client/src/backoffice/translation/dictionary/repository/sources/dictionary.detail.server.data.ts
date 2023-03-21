@@ -1,4 +1,3 @@
-import { DictionaryDetailDataSource } from './dictionary.details.server.data.interface';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
@@ -7,7 +6,8 @@ import {
 	LanguageResource,
 	ProblemDetailsModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import type { DictionaryDetails } from '@umbraco-cms/backoffice/models';
+import type { DictionaryDetails } from '../../';
+import { DictionaryDetailDataSource } from './dictionary.details.server.data.interface';
 
 /**
  * @description - A data source for the Dictionary detail that fetches data from the server
