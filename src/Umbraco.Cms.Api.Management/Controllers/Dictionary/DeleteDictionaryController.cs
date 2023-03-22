@@ -26,7 +26,7 @@ public class DeleteDictionaryController : DictionaryControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid key)
     {
-        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = await _dictionaryItemService.DeleteAsync(key, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = await _dictionaryItemService.DeleteAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

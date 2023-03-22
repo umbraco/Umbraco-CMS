@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -261,7 +262,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var nlContentName = "Content nl-NL";
         var nlCulture = "nl-NL";
 
-        await LanguageService.CreateAsync(new Language(nlCulture, "Dutch (Netherlands)"));
+        await LanguageService.CreateAsync(new Language(nlCulture, "Dutch (Netherlands)"), Constants.Security.SuperUserKey);
 
         var includeCultureNames = contentType.Variations.HasFlag(ContentVariation.Culture);
 
@@ -629,9 +630,9 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var globalSettings = new GlobalSettings();
 
         var languageEn = new Language("en", "English") { IsDefault = true };
-        await LanguageService.CreateAsync(languageEn);
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
         var languageFr = new Language("fr", "French");
-        await LanguageService.CreateAsync(languageFr);
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
 
         var contentType = CreateContentType(ContentVariation.Nothing);
 
@@ -1275,9 +1276,9 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     private async Task CreateFrenchAndEnglishLangs()
     {
         var languageEn = new Language("en", "English") { IsDefault = true };
-        await LanguageService.CreateAsync(languageEn);
+        await LanguageService.CreateAsync(languageEn, Constants.Security.SuperUserKey);
         var languageFr = new Language("fr", "French");
-        await LanguageService.CreateAsync(languageFr);
+        await LanguageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
     }
 
     private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") =>

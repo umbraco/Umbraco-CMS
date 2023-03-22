@@ -14,6 +14,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
     private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityRepository _entityRepository;
+    private readonly IUserService _userService;
 
     public DataTypeContainerService(
         ICoreScopeProvider provider,
@@ -21,12 +22,14 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
         IEventMessagesFactory eventMessagesFactory,
         IDataTypeContainerRepository dataTypeContainerRepository,
         IAuditRepository auditRepository,
-        IEntityRepository entityRepository)
+        IEntityRepository entityRepository,
+        IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dataTypeContainerRepository = dataTypeContainerRepository;
         _auditRepository = auditRepository;
         _entityRepository = entityRepository;
+        _userService = userService;
     }
 
     /// <inheritdoc />
@@ -45,10 +48,10 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
         => await Task.FromResult(GetParent(dataType));
 
     /// <inheritdoc />
-    public async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateAsync(EntityContainer container, Guid? parentId = null, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateAsync(EntityContainer container, Guid? parentKey, Guid userKey)
         => await SaveAsync(
             container,
-            userId,
+            userKey,
             () =>
             {
                 if (container.Id > 0)
@@ -56,11 +59,11 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
                     return DataTypeContainerOperationStatus.InvalidId;
                 }
 
-                EntityContainer? parentContainer = parentId.HasValue
-                    ? _dataTypeContainerRepository.Get(parentId.Value)
+                EntityContainer? parentContainer = parentKey.HasValue
+                    ? _dataTypeContainerRepository.Get(parentKey.Value)
                     : null;
 
-                if (parentId.HasValue && parentContainer == null)
+                if (parentKey.HasValue && parentContainer == null)
                 {
                     return DataTypeContainerOperationStatus.ParentNotFound;
                 }
@@ -71,10 +74,10 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
             AuditType.New);
 
     /// <inheritdoc />
-    public async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> UpdateAsync(EntityContainer container, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> UpdateAsync(EntityContainer container, Guid userKey)
         => await SaveAsync(
             container,
-            userId,
+            userKey,
             () =>
             {
                 if (container.Id == 0)
@@ -93,7 +96,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
             AuditType.New);
 
     /// <inheritdoc />
-    public async Task<Attempt<EntityContainer?, DataTypeContainerOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<EntityContainer?, DataTypeContainerOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -123,7 +126,8 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
 
         _dataTypeContainerRepository.Delete(container);
 
-        Audit(AuditType.Delete, userId, container.Id);
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        Audit(AuditType.Delete, currentUserId, container.Id);
         scope.Complete();
 
         scope.Notifications.Publish(new EntityContainerDeletedNotification(container, eventMessages).WithStateFrom(deletingEntityContainerNotification));
@@ -131,7 +135,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
         return Attempt.SucceedWithStatus<EntityContainer?, DataTypeContainerOperationStatus>(DataTypeContainerOperationStatus.Success, container);
     }
 
-    private async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> SaveAsync(EntityContainer container, int userId, Func<DataTypeContainerOperationStatus> operationValidation, AuditType auditType)
+    private async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> SaveAsync(EntityContainer container, Guid userKey, Func<DataTypeContainerOperationStatus> operationValidation, AuditType auditType)
     {
         if (container.ContainedObjectType != Constants.ObjectTypes.DataType)
         {
@@ -156,7 +160,8 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
 
         _dataTypeContainerRepository.Save(container);
 
-        Audit(auditType, userId, container.Id);
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        Audit(auditType, currentUserId, container.Id);
         scope.Complete();
 
         scope.Notifications.Publish(new EntityContainerSavedNotification(container, eventMessages).WithStateFrom(savingEntityContainerNotification));

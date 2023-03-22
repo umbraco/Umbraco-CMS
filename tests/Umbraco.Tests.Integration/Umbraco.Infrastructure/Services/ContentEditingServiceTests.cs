@@ -72,7 +72,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
         var language = new LanguageBuilder()
             .WithCultureInfo("da-DK")
             .Build();
-        await LanguageService.CreateAsync(language);
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithAlias("cultureVariationTest")
@@ -111,7 +111,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         return result.Result!;
     }
@@ -151,7 +151,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
             }
         };
 
-        var result = await ContentEditingService.CreateAsync(createModel);
+        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         return result.Result!;
     }

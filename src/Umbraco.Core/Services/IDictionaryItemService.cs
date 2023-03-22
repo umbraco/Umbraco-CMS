@@ -72,30 +72,30 @@ public interface IDictionaryItemService
     ///     Creates and saves a new dictionary item and assigns translations to all applicable languages if specified
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to create</param>
-    /// <param name="userId">Optional id of the user saving the dictionary item</param>
+    /// <param name="userKey">Key of the user saving the dictionary item</param>
     /// <returns></returns>
-    Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> CreateAsync(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> CreateAsync(IDictionaryItem dictionaryItem, Guid userKey);
 
     /// <summary>
     ///     Updates an existing <see cref="IDictionaryItem" /> object
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to update</param>
-    /// <param name="userId">Optional id of the user saving the dictionary item</param>
-    Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> UpdateAsync(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user saving the dictionary item</param>
+    Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> UpdateAsync(IDictionaryItem dictionaryItem, Guid userKey);
 
     /// <summary>
     ///     Deletes a <see cref="IDictionaryItem" /> object and its related translations
     ///     as well as its children.
     /// </summary>
     /// <param name="id">The ID of the <see cref="IDictionaryItem" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-    Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user deleting the dictionary item</param>
+    Task<Attempt<IDictionaryItem?, DictionaryItemOperationStatus>> DeleteAsync(Guid id, Guid userKey);
 
     /// <summary>
     ///     Moves a <see cref="IDictionaryItem" /> object
     /// </summary>
     /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to move</param>
     /// <param name="parentId">Id of the new <see cref="IDictionaryItem" /> parent, null if the item should be moved to the root</param>
-    /// <param name="userId">Optional id of the user moving the dictionary item</param>
-    Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> MoveAsync(IDictionaryItem dictionaryItem, Guid? parentId, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user moving the dictionary item</param>
+    Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> MoveAsync(IDictionaryItem dictionaryItem, Guid? parentId, Guid userKey);
 }

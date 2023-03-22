@@ -41,7 +41,7 @@ public class UpdateTemplateController : TemplateControllerBase
 
         template = _umbracoMapper.Map(requestModel, template);
 
-        Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserId(_backOfficeSecurityAccessor));
+        Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.UpdateAsync(template, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success ?
             Ok()

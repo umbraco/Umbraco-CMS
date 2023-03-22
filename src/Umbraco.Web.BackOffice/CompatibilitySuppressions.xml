@@ -16,6 +16,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Web.BackOffice.Controllers.TemplateController.#ctor(Umbraco.Cms.Core.Services.IFileService,Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.IO.IDefaultViewContentProvider)</Target>
+    <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
+    <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Extensions.RuntimeMinifierExtensions.GetScriptForLoadingBackOfficeAsync(Umbraco.Cms.Core.WebAssets.IRuntimeMinifier,Umbraco.Cms.Core.Configuration.Models.GlobalSettings,Umbraco.Cms.Core.Hosting.IHostingEnvironment,Umbraco.Cms.Core.Manifest.IManifestParser)</Target>
     <Left>lib/net7.0/Umbraco.Web.BackOffice.dll</Left>
     <Right>lib/net7.0/Umbraco.Web.BackOffice.dll</Right>

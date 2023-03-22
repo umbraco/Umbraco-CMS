@@ -127,15 +127,15 @@ public interface IDataTypeService : IService
     ///     Creates a new <see cref="IDataType" />
     /// </summary>
     /// <param name="dataType"><see cref="IDataType" /> to create</param>
-    /// <param name="userId">Id of the user issuing the creation</param>
-    Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user issuing the creation</param>
+    Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(IDataType dataType, Guid userKey);
 
     /// <summary>
     ///     Updates an existing <see cref="IDataType" />
     /// </summary>
     /// <param name="dataType"><see cref="IDataType" /> to update</param>
-    /// <param name="userId">Id of the user issuing the update</param>
-    Task<Attempt<IDataType, DataTypeOperationStatus>> UpdateAsync(IDataType dataType, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user issuing the update</param>
+    Task<Attempt<IDataType, DataTypeOperationStatus>> UpdateAsync(IDataType dataType, Guid userKey);
 
     /// <summary>
     ///     Deletes an <see cref="IDataType" />
@@ -157,8 +157,8 @@ public interface IDataTypeService : IService
     ///     all the <see cref="IPropertyType" /> data that references this <see cref="IDataType" />.
     /// </remarks>
     /// <param name="id">The guid Id of the <see cref="IDataType" /> to delete</param>
-    /// <param name="userId">Id of the user issuing the deletion</param>
-    Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user issuing the deletion</param>
+    Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, Guid userKey);
 
     /// <summary>
     ///     Gets a <see cref="IDataType" /> by its control Id
@@ -183,9 +183,9 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="toMove">The data type that will be moved</param>
     /// <param name="containerKey">The container key where the data type will be moved to.</param>
-    /// <param name="userId">The user that did the Move action</param>
+    /// <param name="userKey">The user that did the Move action</param>
     /// <returns></returns>
-    Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, Guid userKey);
 
     [Obsolete("Please use CopyASync instead. Will be removed in V15")]
     Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId) => Copy(copying, containerId, Constants.Security.SuperUserId);
@@ -198,9 +198,9 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="toCopy">The data type that will be copied</param>
     /// <param name="containerKey">The container key where the data type will be copied to.</param>
-    /// <param name="userId">The user that did the Copy action</param>
+    /// <param name="userKey">The user that did the Copy action</param>
     /// <returns></returns>
-    Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IDataType, DataTypeOperationStatus>> CopyAsync(IDataType toCopy, Guid? containerKey, Guid userKey);
 
     /// <summary>
     /// Performs validation for the configuration data of a given data type.

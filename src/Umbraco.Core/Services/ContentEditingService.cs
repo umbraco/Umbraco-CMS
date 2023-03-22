@@ -12,6 +12,8 @@ internal sealed class ContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
+    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IUserService _userService;
 
     public ContentEditingService(
         IContentService contentService,
@@ -20,11 +22,14 @@ internal sealed class ContentEditingService
         IDataTypeService dataTypeService,
         ITemplateService templateService,
         ILogger<ContentEditingService> logger,
-        ICoreScopeProvider scopeProvider)
+        ICoreScopeProvider scopeProvider,
+        IUserService userService)
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider)
     {
         _templateService = templateService;
         _logger = logger;
+        _scopeProvider = scopeProvider;
+        _userService = userService;
     }
 
     public async Task<IContent?> GetAsync(Guid id)
@@ -33,7 +38,7 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
         Attempt<IContent?, ContentEditingOperationStatus> result = await MapCreate(createModel);
         if (result.Success == false)
@@ -48,13 +53,13 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
         }
 
-        operationStatus = Save(content, userId);
+        operationStatus = Save(content, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content)
             : Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
     }
 
-    public async Task<Attempt<IContent, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<IContent, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
     {
         Attempt<ContentEditingOperationStatus> result = await MapUpdate(content, updateModel);
         if (result.Success == false)
@@ -68,17 +73,23 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus(operationStatus, content);
         }
 
-        operationStatus = Save(content, userId);
+        operationStatus = Save(content, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content)
             : Attempt.FailWithStatus(operationStatus, content);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, userId), false);
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, Guid userKey)
+    {
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        return await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, currentUserId), false);
+    }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, content => ContentService.Delete(content, userId), true);
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey)
+    {
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        return await HandleDeletionAsync(id, content => ContentService.Delete(content, currentUserId), false);
+    }
 
     protected override IContent Create(string? name, int parentId, IContentType contentType) => new Content(name, parentId, contentType);
 
@@ -107,11 +118,12 @@ internal sealed class ContentEditingService
         return ContentEditingOperationStatus.Success;
     }
 
-    private ContentEditingOperationStatus Save(IContent content, int userId)
+    private ContentEditingOperationStatus Save(IContent content, Guid userKey)
     {
         try
         {
-            OperationResult saveResult = ContentService.Save(content, userId);
+            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            OperationResult saveResult = ContentService.Save(content, currentUserId);
             return saveResult.Result switch
             {
                 // these are the only result states currently expected from Save

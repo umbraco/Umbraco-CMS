@@ -64,8 +64,8 @@ public interface IPackagingService : IService
     ///     Deletes a created package by key.
     /// </summary>
     /// <param name="key">The key of the package.</param>
-    /// <param name="userId">Optional id of the user deleting the package.</param>
-    Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">Key of the user deleting the package.</param>
+    Task<Attempt<PackageDefinition?, PackageOperationStatus>> DeleteCreatedPackageAsync(Guid key, Guid userKey);
 
     /// <summary>
     ///     Persists a package definition to storage
@@ -78,13 +78,15 @@ public interface IPackagingService : IService
     ///     Creates a new package.
     /// </summary>
     /// <param name="package"><see cref="PackageDefinition" />model for the package to create.</param>
-    Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, int userId);
+    /// <param name="userKey">Key of the user performing the create.</param>
+    Task<Attempt<PackageDefinition, PackageOperationStatus>> CreateCreatedPackageAsync(PackageDefinition package, Guid userKey);
 
     /// <summary>
     ///     Updates a created package.
     /// </summary>
     /// <param name="package"><see cref="PackageDefinition" />model for the package to update.</param>
-    Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, int userId);
+    /// <param name="userKey">Key of the user performing the update.</param>
+    Task<Attempt<PackageDefinition, PackageOperationStatus>> UpdateCreatedPackageAsync(PackageDefinition package, Guid userKey);
 
     /// <summary>
     ///     Creates the package file and returns it's physical path

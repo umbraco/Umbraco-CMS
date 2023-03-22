@@ -11,6 +11,7 @@ internal sealed class MediaEditingService
     : ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
     private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
+    private readonly IUserService _userService;
 
     public MediaEditingService(
         IMediaService contentService,
@@ -18,9 +19,13 @@ internal sealed class MediaEditingService
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
         ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
-        ICoreScopeProvider scopeProvider)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider) =>
+        ICoreScopeProvider scopeProvider,
+        IUserService userService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider)
+    {
         _logger = logger;
+        _userService = userService;
+    }
 
     public async Task<IMedia?> GetAsync(Guid id)
     {
@@ -28,7 +33,7 @@ internal sealed class MediaEditingService
         return await Task.FromResult(media);
     }
 
-    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
     {
         Attempt<IMedia?, ContentEditingOperationStatus> result = await MapCreate(createModel);
         if (result.Success == false)
@@ -38,13 +43,14 @@ internal sealed class MediaEditingService
 
         IMedia media = result.Result!;
 
-        ContentEditingOperationStatus operationStatus = Save(media, userId);
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus<IMedia?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, media)
             : Attempt.FailWithStatus<IMedia?, ContentEditingOperationStatus>(operationStatus, media);
     }
 
-    public async Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia content, MediaUpdateModel updateModel, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia content, MediaUpdateModel updateModel, Guid userKey)
     {
         Attempt<ContentEditingOperationStatus> result = await MapUpdate(content, updateModel);
         if (result.Success == false)
@@ -52,17 +58,24 @@ internal sealed class MediaEditingService
             return Attempt.FailWithStatus(result.Result, content);
         }
 
-        ContentEditingOperationStatus operationStatus = Save(content, userId);
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        ContentEditingOperationStatus operationStatus = Save(content, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content)
             : Attempt.FailWithStatus(operationStatus, content);
     }
 
-    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, media => ContentService.MoveToRecycleBin(media, userId).Result, false);
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, Guid userKey)
+    {
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        return await HandleDeletionAsync(id, media => ContentService.MoveToRecycleBin(media, currentUserId).Result, false);
+    }
 
-    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid id, int userId = Constants.Security.SuperUserId)
-        => await HandleDeletionAsync(id, media => ContentService.Delete(media, userId).Result, true);
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey)
+    {
+        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        return await HandleDeletionAsync(id, media => ContentService.Delete(media, currentUserId).Result, true);
+    }
 
     protected override IMedia Create(string? name, int parentId, IMediaType contentType)
         => new Models.Media(name, parentId, contentType);

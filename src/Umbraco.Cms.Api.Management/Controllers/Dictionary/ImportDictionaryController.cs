@@ -34,7 +34,7 @@ public class ImportDictionaryController : DictionaryControllerBase
             .ImportDictionaryItemFromUdtFileAsync(
                 importDictionaryRequestModel.TemporaryFileKey,
                 importDictionaryRequestModel.ParentKey,
-                CurrentUserId(_backOfficeSecurityAccessor));
+                CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Status switch
         {

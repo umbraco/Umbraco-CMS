@@ -22,8 +22,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     private readonly ILanguageRepository _languageRepository;
     private readonly ILanguageService _languageService;
     private readonly IDictionaryItemService _dictionaryItemService;
+    private readonly IUserService _userService;
 
-    [Obsolete("Please use constructor with language and dictionary services. Will be removed in V15")]
+    [Obsolete("Please use constructor with language, dictionary and user services. Will be removed in V15")]
     public LocalizationService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -39,7 +40,8 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             auditRepository,
             languageRepository,
             StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDictionaryItemService>())
+            StaticServiceProvider.Instance.GetRequiredService<IDictionaryItemService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
     {
     }
 
@@ -52,7 +54,8 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         IAuditRepository auditRepository,
         ILanguageRepository languageRepository,
         ILanguageService languageService,
-        IDictionaryItemService dictionaryItemService)
+        IDictionaryItemService dictionaryItemService,
+        IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dictionaryRepository = dictionaryRepository;
@@ -60,6 +63,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         _languageRepository = languageRepository;
         _languageService = languageService;
         _dictionaryItemService = dictionaryItemService;
+        _userService = userService;
     }
 
     /// <summary>
@@ -105,7 +109,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
                 .ToArray();
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = _dictionaryItemService
-            .CreateAsync(new DictionaryItem(parentId, key) { Translations = translations })
+            .CreateAsync(new DictionaryItem(parentId, key) { Translations = translations }, Constants.Security.SuperUserKey)
             .GetAwaiter()
             .GetResult();
         // mimic old service behavior
@@ -217,13 +221,14 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
         if (dictionaryItem.Id > 0)
         {
-            _dictionaryItemService.UpdateAsync(dictionaryItem, userId).GetAwaiter().GetResult();
+            _dictionaryItemService.UpdateAsync(dictionaryItem, currentUserKey).GetAwaiter().GetResult();
         }
         else
         {
-            _dictionaryItemService.CreateAsync(dictionaryItem, userId).GetAwaiter().GetResult();
+            _dictionaryItemService.CreateAsync(dictionaryItem, currentUserKey).GetAwaiter().GetResult();
         }
     }
 
@@ -235,7 +240,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user deleting the dictionary item</param>
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
-        => _dictionaryItemService.DeleteAsync(dictionaryItem.Key, userId).GetAwaiter().GetResult();
+    {
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+        _dictionaryItemService.DeleteAsync(dictionaryItem.Key, currentUserKey).GetAwaiter().GetResult();
+    }
 
     /// <summary>
     ///     Gets a <see cref="Language" /> by its id
@@ -313,9 +321,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public void Save(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
         Attempt<ILanguage, LanguageOperationStatus> result = language.Id > 0
-            ? _languageService.UpdateAsync(language, userId).GetAwaiter().GetResult()
-            : _languageService.CreateAsync(language, userId).GetAwaiter().GetResult();
+            ? _languageService.UpdateAsync(language, currentUserKey).GetAwaiter().GetResult()
+            : _languageService.CreateAsync(language, currentUserKey).GetAwaiter().GetResult();
 
         // mimic old Save behavior
         if (result.Status == LanguageOperationStatus.InvalidFallback)
@@ -331,7 +340,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="userId">Optional id of the user deleting the language</param>
     [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
-        => _languageService.DeleteAsync(language.IsoCode, userId).GetAwaiter().GetResult();
+    {
+        Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+        _languageService.DeleteAsync(language.IsoCode, currentUserKey).GetAwaiter().GetResult();
+    }
 
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()

@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -27,7 +28,7 @@ public class ContentVariantAllowedActionTests : UmbracoTestServerTestBase
     public async Task SetUpTestDate()
     {
         var dk = new Language(DkIso, "Danish");
-        await LanguageService.CreateAsync(dk);
+        await LanguageService.CreateAsync(dk, Constants.Security.SuperUserKey);
     }
 
     [Test]

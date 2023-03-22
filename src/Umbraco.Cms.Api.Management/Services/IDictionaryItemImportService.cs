@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Api.Management.Services;
 
 public interface IDictionaryItemImportService
 {
-    Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(Guid temporaryFileKey, Guid? parentKey, int userId = Constants.Security.SuperUserId);
+    Task<Attempt<IDictionaryItem?, DictionaryImportOperationStatus>> ImportDictionaryItemFromUdtFileAsync(Guid temporaryFileKey, Guid? parentKey, Guid userKey);
 }

@@ -350,17 +350,17 @@ public interface IRelationService : IService
     ///     Saves a <see cref="IRelationType" />
     /// </summary>
     /// <param name="relationType">RelationType to Save</param>
-    /// <param name="userId">Id of the user thats saving the relation type</param>
+    /// <param name="userKey">Key of the user thats saving the relation type</param>
     /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
-    Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, int userId) => throw new NotImplementedException();
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey);
 
     /// <summary>
     ///     Saves a <see cref="IRelationType" />
     /// </summary>
     /// <param name="relationType">RelationType to Save</param>
-    /// <param name="userId">Id of the user thats saving the relation type</param>
+    /// <param name="userKey">Key of the user thats saving the relation type</param>
     /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
-    Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, int userId) => throw new NotImplementedException();
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey);
 
     /// <summary>
     ///     Deletes a <see cref="IRelation" />
@@ -378,9 +378,9 @@ public interface IRelationService : IService
     ///     Deletes a <see cref="IRelationType" />
     /// </summary>
     /// <param name="key">Key of the relation type to delete</param>
-    /// <param name="userId">Id of the user that is deleting the relation type</param>
+    /// <param name="userKey">Key of the user that is deleting the relation type</param>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
-    Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, int userId) => throw new NotImplementedException();
+    Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey);
 
     /// <summary>
     ///     Deletes all <see cref="IRelation" /> objects based on the passed in <see cref="IRelationType" />
