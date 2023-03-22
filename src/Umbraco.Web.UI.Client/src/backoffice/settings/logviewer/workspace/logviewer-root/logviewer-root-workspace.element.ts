@@ -37,10 +37,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#router-slot {
-				height: 100%;
-			}
-
 			uui-tab-group {
 				--uui-tab-divider: var(--uui-color-border);
 				border-left: 1px solid var(--uui-color-border);

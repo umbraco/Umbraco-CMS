@@ -28,7 +28,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 
 			#sticky-top {
 				position: sticky;
-				top: -1px;
+				top: 0px;
 				z-index: 1;
 				box-shadow: 0 1px 3px rgba(0, 0, 0, 0), 0 1px 2px rgba(0, 0, 0, 0);
 				transition: 250ms box-shadow ease-in-out;
@@ -72,9 +72,6 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 			a {
 				color: inherit;
 				text-decoration: none;
-			}
-			router-slot {
-				overflow: hidden;
 			}
 		`,
 	];
@@ -173,56 +170,58 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<div id="sticky-top">
-				<div id="user-list-top-bar">
-					<uui-button
-						@click=${this._showInviteOrCreate}
-						label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
-						look="outline"></uui-button>
-					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
-					<div>
-						<!-- TODO: consider making this a shared component, as we need similar for other locations, example media library, members. -->
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
-								Status: <b>All</b>
+			<uui-scroll-container>
+				<div id="sticky-top">
+					<div id="user-list-top-bar">
+						<uui-button
+							@click=${this._showInviteOrCreate}
+							label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
+							look="outline"></uui-button>
+						<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
+						<div>
+							<!-- TODO: consider making this a shared component, as we need similar for other locations, example media library, members. -->
+							<uui-popover margin="8">
+								<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
+									Status: <b>All</b>
+								</uui-button>
+								<div slot="popover" class="filter-dropdown">
+									<uui-checkbox label="Active"></uui-checkbox>
+									<uui-checkbox label="Inactive"></uui-checkbox>
+									<uui-checkbox label="Invited"></uui-checkbox>
+									<uui-checkbox label="Disabled"></uui-checkbox>
+								</div>
+							</uui-popover>
+							<uui-popover margin="8">
+								<uui-button @click=${this._handleTogglePopover} slot="trigger" label="groups">
+									Groups: <b>All</b>
+								</uui-button>
+								<div slot="popover" class="filter-dropdown">
+									<uui-checkbox label="Active"></uui-checkbox>
+									<uui-checkbox label="Inactive"></uui-checkbox>
+									<uui-checkbox label="Invited"></uui-checkbox>
+									<uui-checkbox label="Disabled"></uui-checkbox>
+								</div>
+							</uui-popover>
+							<uui-popover margin="8">
+								<uui-button @click=${this._handleTogglePopover} slot="trigger" label="order by">
+									Order by: <b>Name (A-Z)</b>
+								</uui-button>
+								<div slot="popover" class="filter-dropdown">
+									<uui-checkbox label="Active"></uui-checkbox>
+									<uui-checkbox label="Inactive"></uui-checkbox>
+									<uui-checkbox label="Invited"></uui-checkbox>
+									<uui-checkbox label="Disabled"></uui-checkbox>
+								</div>
+							</uui-popover>
+							<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
+								<uui-icon name="settings"></uui-icon>
 							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="groups">
-								Groups: <b>All</b>
-							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="order by">
-								Order by: <b>Name (A-Z)</b>
-							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</uui-popover>
-						<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
-							<uui-icon name="settings"></uui-icon>
-						</uui-button>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<umb-router-slot .routes=${this._routes}></umb-router-slot>
+				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
+			</uui-scroll-container>
 
 			${this._renderSelection()}
 		`;

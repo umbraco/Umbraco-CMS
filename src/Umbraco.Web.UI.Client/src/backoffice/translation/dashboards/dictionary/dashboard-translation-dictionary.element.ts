@@ -19,6 +19,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
+				margin: var(--uui-size-layout-1);
 			}
 
 			#dictionary-top-bar {

@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
@@ -9,6 +9,12 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffic
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
+	static styles = [css`
+		uui-box {
+			margin: var(--uui-size-layout-1);
+		}
+	`]
+
 	@state()
 	private _extensions?: Array<ManifestTypes> = undefined;
 
@@ -57,7 +63,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot">
+			<umb-workspace-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot" .enforceNoFooter=${true}>
 				<uui-box>
 					<uui-table>
 						<uui-table-head>

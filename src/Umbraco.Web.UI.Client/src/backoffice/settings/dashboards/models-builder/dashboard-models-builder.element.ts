@@ -3,7 +3,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { ModelsBuilderResponseModel, ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	ModelsBuilderResponseModel,
+	ModelsBuilderResource,
+	ModelsModeModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -12,6 +16,11 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
 			.headline {
 				display: flex;
 				justify-content: space-between;

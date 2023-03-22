@@ -17,8 +17,8 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 				margin: var(--uui-size-layout-1);
 			}
 
-			uui-box {
-				margin-bottom: var(--uui-size-layout-1);
+			uui-box + uui-box {
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];

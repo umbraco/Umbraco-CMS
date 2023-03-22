@@ -21,6 +21,10 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		css`
 			:host {
 				height: 100%;
+			}			
+
+			#router-slot {
+				height: calc(100% - var(--umb-header-layout-height));
 			}
 		`,
 	];
@@ -129,7 +133,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

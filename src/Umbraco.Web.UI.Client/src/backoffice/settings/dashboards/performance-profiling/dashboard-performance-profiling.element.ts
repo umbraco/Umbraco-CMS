@@ -10,6 +10,11 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+			
 			uui-toggle {
 				font-weight: bold;
 			}

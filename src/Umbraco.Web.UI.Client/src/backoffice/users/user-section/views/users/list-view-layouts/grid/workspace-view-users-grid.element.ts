@@ -18,7 +18,6 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 		UUITextStyles,
 		css`
 			:host {
-				height: 100%;
 				display: flex;
 				flex-direction: column;
 			}
@@ -147,15 +146,13 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-scroll-container>
-				<div id="user-grid">
-					${repeat(
-						this._users,
-						(user) => user.key,
-						(user) => this.renderUserCard(user)
-					)}
-				</div>
-			</uui-scroll-container>
+			<div id="user-grid">
+				${repeat(
+					this._users,
+					(user) => user.key,
+					(user) => this.renderUserCard(user)
+				)}
+			</div>
 		`;
 	}
 }
