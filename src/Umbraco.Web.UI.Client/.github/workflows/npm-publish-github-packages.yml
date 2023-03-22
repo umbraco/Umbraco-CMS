@@ -63,7 +63,7 @@ jobs:
           always-auth: true
       - run: |
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
-          npm version 13.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
+          npm version 1.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
       - run: npm publish --tag next --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
