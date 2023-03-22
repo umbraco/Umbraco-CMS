@@ -61,7 +61,8 @@ export class UmbWorkspaceViewDocumentTypePermissionsElement extends UmbLitElemen
 						Allow content of the specified types to be created underneath content of this type.
 					</div>
 					<div slot="editor">
-						<umb-input-document-type-picker></umb-input-document-type-picker>
+						<umb-input-document-type-picker
+							.currentDocumentType="${this._documentType}"></umb-input-document-type-picker>
 					</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout alias="VaryByNature" label="Allow vary by culture">

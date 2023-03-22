@@ -1,8 +1,8 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, query, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
+import { UmbTemplateCardListElement } from '../../../../../shared/components/template-card/template-card-list.element';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
@@ -37,8 +37,17 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 		`,
 	];
 
+	@property()
+	defaultTemplateKey?: string = '123';
+
 	@state()
 	_documentType?: DocumentTypeModel;
+
+	@state()
+	_templates = [
+		{ key: '123', name: 'Blog Post Page' },
+		{ key: '456', name: 'Blog Entry Page' },
+	];
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
@@ -60,17 +69,21 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 		});
 	}
 
+	#changeDefaultTemplate(e: CustomEvent) {
+		this.defaultTemplateKey = (e.target as UmbTemplateCardListElement).value as string;
+		console.log('default template key', this.defaultTemplateKey);
+	}
+
+	#removeTemplate(key: string) {
+		console.log('remove template', key);
+	}
+
 	render() {
 		return html`<uui-box headline="Templates">
 			<umb-workspace-property-layout alias="Templates" label="Allowed Templates">
 				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
 				<div id="templates" slot="editor">
-					<umb-template-card-list>
-						<umb-template-card value="123"></umb-template-card>
-						<umb-template-card value="456"></umb-template-card>
-					</umb-template-card-list>
-						
-					</div>
+					<umb-input-template-picker umb-input-template-picker></umb-input-template-picker>
 				</div>
 			</umb-workspace-property-layout>
 		</uui-box>`;

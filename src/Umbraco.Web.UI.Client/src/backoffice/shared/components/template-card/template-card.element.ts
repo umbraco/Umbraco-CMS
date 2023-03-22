@@ -41,12 +41,15 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-divider-emphasis);
 				background-color: var(--uui-color-background);
-				padding: var(--uui-size-space-4);
+				padding: var(--uui-size-4);
 			}
 
-			:host([selected]) #card {
+			:host([default]) #card {
 				border: 1px solid var(--uui-color-selected);
 				outline: 1px solid var(--uui-color-selected);
+			}
+			#card:has(uui-button:hover) {
+				border: 1px solid var(--uui-color-selected);
 			}
 
 			#bottom {
@@ -117,7 +120,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 	name = '';
 
 	@property({ type: Boolean, reflect: true })
-	selected = false;
+	default = false;
 
 	_key = '';
 	@property({ type: String })
@@ -137,7 +140,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 		e.preventDefault();
 		e.stopPropagation();
 		//this.selected = true;
-		this.dispatchEvent(new CustomEvent('selected', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('default-change', { bubbles: true, composed: true }));
 	}
 	#openTemplate(e: KeyboardEvent) {
 		e.preventDefault();
@@ -152,8 +155,8 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				<uui-icon class="logo" name="umb:layout"></uui-icon>
 				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
 			</button>
-			<uui-button id="bottom" label="Default template" ?disabled="${this.selected}" @click="${this.#setSelection}">
-				${this.selected ? '(Default template)' : 'Set default'}
+			<uui-button id="bottom" label="Default template" ?disabled="${this.default}" @click="${this.#setSelection}">
+				${this.default ? '(Default template)' : 'Set default'}
 			</uui-button>
 		</div>`;
 	}

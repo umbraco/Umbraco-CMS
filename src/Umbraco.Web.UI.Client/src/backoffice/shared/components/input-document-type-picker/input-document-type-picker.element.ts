@@ -3,13 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
-import { UmbDocumentTypeTreeStore } from '../../../documents/document-types/repository/document-type.tree.store';
+import {
+	UmbDocumentTypeTreeStore,
+	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
+} from '../../../documents/document-types/repository/document-type.tree.store';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
-import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-picker';
+import { UMB_DOCUMENT_TYPE_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-type-picker';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
+import type { DocumentTypeModel, DocumentTypeTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-document-type-picker')
@@ -20,43 +22,16 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 			#add-button {
 				width: 100%;
 			}
+
+			#current-node {
+				background-color: var(--uui-color-surface-alt);
+			}
+
+			#wrapper-nodes {
+				margin-left: var(--uui-size-space-6);
+			}
 		`,
 	];
-	/**
-	 * This is a minimum amount of selected items in this input.
-	 * @type {number}
-	 * @attr
-	 * @default undefined
-	 */
-	@property({ type: Number })
-	min?: number;
-
-	/**
-	 * Min validation message.
-	 * @type {boolean}
-	 * @attr
-	 * @default
-	 */
-	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
-
-	/**
-	 * This is a maximum amount of selected items in this input.
-	 * @type {number}
-	 * @attr
-	 * @default undefined
-	 */
-	@property({ type: Number })
-	max?: number;
-
-	/**
-	 * Max validation message.
-	 * @type {boolean}
-	 * @attr
-	 * @default
-	 */
-	@property({ type: String, attribute: 'min-message' })
-	maxMessage = 'This field exceeds the allowed amount of items';
 
 	// TODO: do we need both selectedKeys and value? If we just use value we follow the same pattern as native form controls.
 	private _selectedKeys: Array<string> = [];
@@ -76,29 +51,20 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		}
 	}
 
+	@property()
+	currentDocumentType?: DocumentTypeModel;
+
 	@state()
 	private _items?: Array<DocumentTypeTreeItemModel>;
 
 	private _modalContext?: UmbModalContext;
-	private _documentStore?: UmbDocumentTypeTreeStore;
+	private _documentTypeStore?: UmbDocumentTypeTreeStore;
 	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 
 	constructor() {
 		super();
-
-		this.addValidator(
-			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && this._selectedKeys.length < this.min
-		);
-		this.addValidator(
-			'rangeOverflow',
-			() => this.maxMessage,
-			() => !!this.max && this._selectedKeys.length > this.max
-		);
-
-		this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this._documentStore = instance;
+		this.consumeContext(UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this._documentTypeStore = instance;
 			this._observePickedDocuments();
 		});
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
@@ -113,18 +79,18 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	private _observePickedDocuments() {
 		this._pickedItemsObserver?.destroy();
 
-		if (!this._documentStore) return;
+		if (!this._documentTypeStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentStore.items(this._selectedKeys), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentTypeStore.items(this._selectedKeys), (items) => {
 			this._items = items;
 		});
 	}
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL_TOKEN, {
-			multiple: this.max === 1 ? false : true,
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL_TOKEN, {
+			multiple: true,
 			selection: [...this._selectedKeys],
 		});
 
@@ -153,8 +119,13 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	render() {
 		return html`
-			${this._items?.map((item) => this._renderItem(item))}
-			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
+			<uui-ref-node id="current-node" .name="${this.currentDocumentType?.name ?? ''} (current)">
+				<uui-icon slot="icon" .name="${this.currentDocumentType?.icon ?? 'umb:document'}"></uui-icon>
+			</uui-ref-node>
+			<div id="wrapper-nodes">
+				<uui-ref-list> ${this._items?.map((item) => this._renderItem(item))} </uui-ref-list>
+				<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
+			</div>
 		`;
 	}
 
@@ -164,6 +135,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 		return html`
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
+				<uui-icon slot="icon" name="${ifDefined(item.icon)}"></uui-icon>
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this._removeItem(item)} label="Remove document ${item.name}">Remove</uui-button>

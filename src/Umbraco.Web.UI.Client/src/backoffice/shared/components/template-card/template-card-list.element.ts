@@ -57,6 +57,7 @@ export class UmbTemplateCardListElement extends FormControlMixin(UmbLitElement) 
 				el.selected = false;
 			}
 		});
+		this.value = newValue;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 

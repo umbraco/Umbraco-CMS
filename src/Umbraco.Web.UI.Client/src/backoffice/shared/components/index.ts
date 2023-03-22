@@ -28,6 +28,7 @@ import './input-media-picker/input-media-picker.element';
 import './input-multi-url-picker/input-multi-url-picker.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
+import './input-template-picker/input-template-picker.element';
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './section/section-main/section-main.element';
@@ -47,7 +48,7 @@ import './workspace/workspace-layout/workspace-layout.element';
 
 import './workspace/workspace-footer-layout/workspace-footer-layout.element';
 
-import './template-cards/template-card.element';
-import './template-cards/template-card-list.element';
+import './template-card/template-card.element';
+import './template-card/template-card-list.element';
 
 export const manifests = [...debugManifests];
