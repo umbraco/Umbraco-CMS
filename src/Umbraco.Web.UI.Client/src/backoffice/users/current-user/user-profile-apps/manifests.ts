@@ -3,6 +3,17 @@ import type { ManifestUserProfileApp } from 'libs/extensions-registry/models';
 export const userProfileApps: Array<ManifestUserProfileApp> = [
 	{
 		type: 'userProfileApp',
+		alias: 'Umb.UserProfileApp.profile',
+		name: 'Profile User Profile App',
+		loader: () => import('./user-profile-app-profile.element'),
+		weight: 0,
+		meta: {
+			label: 'Profile User Profile App',
+			pathname: 'profile',
+		},
+	},
+	{
+		type: 'userProfileApp',
 		alias: 'Umb.UserProfileApp.ExternalLoginProviders',
 		name: 'External Login Providers User Profile App',
 		loader: () => import('./user-profile-app-external-login-providers.element'),
