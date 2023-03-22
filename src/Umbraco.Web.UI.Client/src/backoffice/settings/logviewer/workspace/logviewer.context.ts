@@ -1,5 +1,5 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository';
-import { ArrayState, createObservablePart, DeepState, ObjectState, StringState } from '@umbraco-cms/observable-api';
+import { ArrayState, createObservablePart, DeepState, ObjectState, StringState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	DirectionModel,
 	LogLevelCountsReponseModel,
@@ -8,9 +8,9 @@ import {
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
-} from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextToken } from '@umbraco-cms/context-api';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { BasicState } from 'libs/observable-api/basic-state';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;

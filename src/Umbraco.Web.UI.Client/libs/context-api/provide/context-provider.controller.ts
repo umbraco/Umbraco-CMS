@@ -1,6 +1,6 @@
 import { UmbContextToken } from '../context-token';
 import { UmbContextProvider } from './context-provider';
-import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbContextProviderController<T = unknown>
 	extends UmbContextProvider<UmbControllerHostInterface>

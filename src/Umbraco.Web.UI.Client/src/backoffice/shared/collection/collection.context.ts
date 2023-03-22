@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs';
-import type { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
-import type { UmbTreeStore } from '@umbraco-cms/store';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbTreeStore } from '@umbraco-cms/backoffice/store';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { createExtensionClass } from 'libs/extensions-api/create-extension-class.function';
-import { UmbTreeRepository } from '@umbraco-cms/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<

@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit-html/directives/repeat.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { UUIMenuItemElement, UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageRepository } from '../../repository/language.repository';
-import { UmbModalElementPickerBase } from '@umbraco-cms/modal';
-import { LanguageResponseModel } from '@umbraco-cms/backend-api';
+import { UmbModalElementPickerBase } from '@umbraco-cms/internal/modal';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-language-picker-modal')
 export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<LanguageResponseModel> {

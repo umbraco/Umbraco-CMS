@@ -1,4 +1,4 @@
-import type { ManifestDashboard, ManifestModal } from '@umbraco-cms/models';
+import type { ManifestDashboard, ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
 
 const dashboards: Array<ManifestDashboard> = [
 	{

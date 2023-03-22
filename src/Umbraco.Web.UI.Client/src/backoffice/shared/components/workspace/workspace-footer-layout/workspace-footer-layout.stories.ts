@@ -2,7 +2,7 @@ import '../workspace-layout/workspace-layout.element';
 import './workspace-footer-layout.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbWorkspaceFooterLayout } from './workspace-footer-layout.element';
 

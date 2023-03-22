@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
-import { umbracoPath } from '@umbraco-cms/utils';
-import type { ProfilingStatusResponseModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { ProfilingStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/profiling/status'), (_req, res, ctx) => {

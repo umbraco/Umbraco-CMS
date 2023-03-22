@@ -8,7 +8,7 @@ import {
 } from '../../../users/user-groups/repository/user-group.store';
 
 import { UMB_USER_GROUP_PICKER_MODAL_TOKEN } from '../../../users/user-groups/modals/user-group-picker';
-import type { UserGroupEntity } from '@umbraco-cms/models';
+import type { UserGroupEntity } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-user-group')
 export class UmbInputPickerUserGroupElement extends UmbInputListBase {

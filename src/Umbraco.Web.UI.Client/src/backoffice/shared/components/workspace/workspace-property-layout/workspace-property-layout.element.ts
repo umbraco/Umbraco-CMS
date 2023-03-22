@@ -19,7 +19,7 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				grid-template-columns: 200px auto;
 				column-gap: var(--uui-size-layout-2);
 				border-bottom: 1px solid var(--uui-color-divider);
-				padding: var(--uui-size-space-6) 0;
+				padding: var(--uui-size-layout-1) 0;
 				container-type: inline-size;
 			}
 
@@ -38,7 +38,7 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 			}
 
 			:host-context(umb-variantable-property:first-of-type) {
-				padding-top:0;
+				padding-top: 0;
 			}
 
 			p {

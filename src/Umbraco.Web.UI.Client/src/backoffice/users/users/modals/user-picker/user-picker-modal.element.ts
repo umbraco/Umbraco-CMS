@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
-import { UmbModalElementPickerBase } from '@umbraco-cms/modal';
-import type { UserDetails } from '@umbraco-cms/models';
+import { UmbModalElementPickerBase } from '@umbraco-cms/internal/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-user-picker-modal')
 export class UmbUserPickerModalElement extends UmbModalElementPickerBase<UserDetails> {

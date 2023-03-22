@@ -1,6 +1,6 @@
-import { UmbContextProviderController } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { DeepState } from '@umbraco-cms/observable-api';
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { DeepState } from '@umbraco-cms/backoffice/observable-api';
 
 /*
 

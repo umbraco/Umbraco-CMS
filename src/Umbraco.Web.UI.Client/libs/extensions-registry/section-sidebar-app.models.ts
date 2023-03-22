@@ -9,14 +9,13 @@ export interface ConditionsSectionSidebarApp {
 	sections: Array<string>;
 }
 
-// TODO: this is a temp solution until we implement kinds
-export interface ManifestMenuSectionSidebarApp extends Omit<ManifestSectionSidebarApp, 'type'> {
-	type: 'menuSectionSidebarApp';
-	meta: MetaMenuSectionSidebarApp;
-	conditions: ConditionsSectionSidebarApp;
+export interface ManifestSectionSidebarAppMenuKind extends ManifestSectionSidebarApp {
+	type: 'sectionSidebarApp';
+	kind: 'menu';
+	meta: MetaSectionSidebarAppMenuKind;
 }
 
-export interface MetaMenuSectionSidebarApp {
+export interface MetaSectionSidebarAppMenuKind {
 	label: string;
 	menu: string;
 }

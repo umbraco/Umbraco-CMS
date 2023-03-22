@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
 
 @customElement('umb-document-workspace-split-view')
@@ -24,7 +24,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			#splitViews {
 				display: flex;
 				width: 100%;
-				height: 100%;
+				height: calc(100% - var(--umb-footer-layout-height));
 			}
 
 			#breadcrumbs {

@@ -3,11 +3,11 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map, of } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
-import type { ManifestDashboard, ManifestSectionView } from '@umbraco-cms/models';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { ManifestDashboard, ManifestSectionView } from '@umbraco-cms/backoffice/extensions-registry';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: this might need a new name, since it's both view and dashboard now
 @customElement('umb-section-views')
@@ -21,6 +21,8 @@ export class UmbSectionViewsElement extends UmbLitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
+				height:var(--umb-header-layout-height);
+				box-sizing: border-box;
 			}
 
 			#views {

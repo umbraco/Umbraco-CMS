@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 let isAuthenticated = false;
 

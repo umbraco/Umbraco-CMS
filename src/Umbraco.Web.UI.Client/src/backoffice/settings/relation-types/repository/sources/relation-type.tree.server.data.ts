@@ -1,8 +1,8 @@
 import { RelationTypeTreeDataSource } from '.';
-import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the RelationType tree that fetches data from the server

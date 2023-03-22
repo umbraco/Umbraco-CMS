@@ -18,10 +18,11 @@ import {
 	UmbAppLanguageContext,
 } from './settings/languages/app-language-select/app-language.context';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // Domains
 import './settings';
@@ -54,6 +55,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());

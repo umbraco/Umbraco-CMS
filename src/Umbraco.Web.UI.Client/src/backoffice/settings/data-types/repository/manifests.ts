@@ -2,7 +2,7 @@ import { UmbDataTypeRepository } from '../repository/data-type.repository';
 import { UmbDataTypeStore } from './data-type.store';
 import { UmbDataTypeTreeStore } from './data-type.tree.store';
 import { ManifestRepository } from 'libs/extensions-registry/repository.models';
-import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/extensions-registry';
+import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const DATA_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.DataType';
 

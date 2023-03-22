@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
-import { UmbRouteLocation } from '@umbraco-cms/router';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestWorkspace } from '@umbraco-cms/extensions-registry';
+import { UmbRouteLocation } from '@umbraco-cms/internal/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
 
 /**
  * @element umb-data-type-workspace-edit-element

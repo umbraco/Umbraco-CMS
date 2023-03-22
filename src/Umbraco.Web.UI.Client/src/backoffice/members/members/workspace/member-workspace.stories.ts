@@ -1,7 +1,7 @@
 import './member-workspace.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import { data } from '../../../../core/mocks/data/member.data';
 

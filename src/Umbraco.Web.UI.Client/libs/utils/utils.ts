@@ -1,5 +1,5 @@
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
-import type { UserStatus } from '@umbraco-cms/models';
+import type { UserStatus } from '@umbraco-cms/backoffice/models';
 
 export const getLookAndColorFromUserStatus = (status: UserStatus): { look: InterfaceLook; color: InterfaceColor } => {
 	switch ((status || '').toLowerCase()) {

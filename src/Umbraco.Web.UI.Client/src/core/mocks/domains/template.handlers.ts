@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbTemplateData } from '../data/template.data';
-import { umbracoPath } from '@umbraco-cms/utils';
-import { TemplateModelBaseModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { TemplateModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: add schema
 export const handlers = [

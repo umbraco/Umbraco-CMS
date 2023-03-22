@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context';
 import { UmbDictionaryWorkspaceEditElement } from './dictionary-workspace-edit.element';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dictionary-workspace')
 export class UmbWorkspaceDictionaryElement extends UmbLitElement {

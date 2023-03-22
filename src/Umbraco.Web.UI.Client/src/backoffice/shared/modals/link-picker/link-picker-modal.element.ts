@@ -4,8 +4,8 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbTreeElement } from '../../components/tree/tree.element';
 import { UmbLinkPickerConfig, UmbLinkPickerLink, UmbLinkPickerModalData, UmbLinkPickerModalResult } from '.';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
-import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {

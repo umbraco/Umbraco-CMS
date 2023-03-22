@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbPropertyEditorUINumberRangeElement } from './property-editor-ui-number-range.element';
 import './property-editor-ui-number-range.element';

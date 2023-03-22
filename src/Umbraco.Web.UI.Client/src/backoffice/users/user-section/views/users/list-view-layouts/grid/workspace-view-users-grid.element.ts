@@ -2,15 +2,15 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import type { UmbSectionViewUsersElement } from '../../section-view-users.element';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../../user-groups/repository/user-group.store';
-import { getLookAndColorFromUserStatus } from '@umbraco-cms/utils';
-import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { getLookAndColorFromUserStatus } from '@umbraco-cms/backoffice/utils';
+import type { UserDetails, UserEntity, UserGroupEntity } from '@umbraco-cms/backoffice/models';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-view-users-grid')
 export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
@@ -18,7 +18,6 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 		UUITextStyles,
 		css`
 			:host {
-				height: 100%;
 				display: flex;
 				flex-direction: column;
 			}
@@ -147,15 +146,13 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-scroll-container>
-				<div id="user-grid">
-					${repeat(
-						this._users,
-						(user) => user.key,
-						(user) => this.renderUserCard(user)
-					)}
-				</div>
-			</uui-scroll-container>
+			<div id="user-grid">
+				${repeat(
+					this._users,
+					(user) => user.key,
+					(user) => this.renderUserCard(user)
+				)}
+			</div>
 		`;
 	}
 }

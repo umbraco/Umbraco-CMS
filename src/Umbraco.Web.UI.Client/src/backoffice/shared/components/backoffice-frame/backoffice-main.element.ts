@@ -2,13 +2,13 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
+import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbSectionElement } from '../section/section.element';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
-import type { IRoutingInfo, UmbRouterSlotChangeEvent } from '@umbraco-cms/router';
-import type { ManifestSection } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { createExtensionElementOrFallback } from '@umbraco-cms/extensions-api';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbLitElement {
@@ -18,12 +18,7 @@ export class UmbBackofficeMain extends UmbLitElement {
 			:host {
 				background-color: var(--uui-color-background);
 				display: block;
-				width: 100%;
-				height: 100%;
-				overflow: hidden;
-			}
-			router-slot {
-				height: 100%;
+				height: calc(100% - 60px); // 60 => top header height
 			}
 		`,
 	];

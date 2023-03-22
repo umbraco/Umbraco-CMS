@@ -1,12 +1,11 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-//import type { UmbPropertyActionMenuContext } from '../shared/property-action-menu/property-action-menu.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyAction } from '../shared/property-action/property-action.model';
 import {
 	UmbWorkspacePropertyContext,
 	UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN,
 } from '../../components/workspace-property/workspace-property.context';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 @customElement('umb-property-action-clear')
 export class UmbPropertyActionClearElement extends UmbLitElement implements UmbPropertyAction {

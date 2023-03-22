@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbRelationTypeData } from '../data/relation-type.data';
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [

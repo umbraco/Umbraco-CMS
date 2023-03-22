@@ -1,5 +1,5 @@
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
-import type { ManifestTree } from '@umbraco-cms/models';
+import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
 
 const tree: ManifestTree = {
 	type: 'tree',

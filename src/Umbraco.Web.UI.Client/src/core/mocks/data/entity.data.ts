@@ -1,5 +1,5 @@
 import { UmbData } from './data';
-import type { Entity } from '@umbraco-cms/models';
+import type { Entity } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
 export class UmbEntityData<T extends Entity> extends UmbData<T> {

@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbUserGroupsData } from '../data/user-groups.data';
-import type { UserGroupDetails } from '@umbraco-cms/models';
+import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 
 export const handlers = [
 	rest.get('/umbraco/backoffice/user-groups/list/items', (req, res, ctx) => {

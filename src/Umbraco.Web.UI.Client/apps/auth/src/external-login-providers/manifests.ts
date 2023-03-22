@@ -1,5 +1,5 @@
 // TODO: could these be renamed as login providers?
-import type { ManifestExternalLoginProvider } from '@umbraco-cms/models';
+import type { ManifestExternalLoginProvider } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests: Array<ManifestExternalLoginProvider> = [
 	{

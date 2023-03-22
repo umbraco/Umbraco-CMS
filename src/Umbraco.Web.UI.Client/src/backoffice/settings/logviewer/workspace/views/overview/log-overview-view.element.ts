@@ -1,8 +1,8 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context';
-import { LogLevelCountsReponseModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')
@@ -11,14 +11,14 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				margin: var(--uui-size-layout-1);
 			}
 
 			#logviewer-layout {
-				margin: 20px;
-				height: calc(100vh - 160px);
+				padding-bottom: var(--uui-size-layout-1);
 				display: grid;
 				grid-template-columns: 7fr 2fr;
-				grid-template-rows: 1fr 1fr;
+				grid-template-rows: auto auto;
 				gap: 20px 20px;
 				grid-auto-flow: row;
 				grid-template-areas:

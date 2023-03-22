@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
-import { when } from 'lit-html/directives/when.js';
+import { when } from 'lit/directives/when.js';
 import { UmbCreateDictionaryModalData, UmbCreateDictionaryModalResult } from '.';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-create-dictionary-modal')
 export class UmbCreateDictionaryModalLayoutElement extends UmbModalBaseElement<

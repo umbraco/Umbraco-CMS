@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview.element';
 import './views/health-check-overview.element';

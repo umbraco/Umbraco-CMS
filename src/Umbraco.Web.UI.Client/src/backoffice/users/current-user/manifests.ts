@@ -1,5 +1,5 @@
 import { manifests as modalManifests } from './modals/manifests';
-import type { ManifestHeaderApp, ManifestUserDashboard } from '@umbraco-cms/models';
+import type { ManifestTypes, ManifestUserDashboard } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const userDashboards: Array<ManifestUserDashboard> = [
 	{
@@ -15,7 +15,7 @@ export const userDashboards: Array<ManifestUserDashboard> = [
 	},
 ];
 
-export const headerApps: Array<ManifestHeaderApp> = [
+export const headerApps: Array<ManifestTypes> = [
 	{
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.CurrentUser',

@@ -1,5 +1,5 @@
 import type { UmbExtensionRegistry } from './registry/extension.registry';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export type UmbEntrypointOnInit = (host: UmbControllerHostInterface, extensionRegistry: UmbExtensionRegistry) => void;
 

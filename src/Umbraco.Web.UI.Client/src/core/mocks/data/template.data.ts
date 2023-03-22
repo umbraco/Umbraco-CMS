@@ -7,7 +7,7 @@ import {
 	TemplateResponseModel,
 	TemplateModelBaseModel,
 	TemplateScaffoldResponseModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
 

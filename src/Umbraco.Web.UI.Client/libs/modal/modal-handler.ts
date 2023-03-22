@@ -5,10 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject } from 'rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ManifestModal } from '@umbraco-cms/extensions-registry';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.

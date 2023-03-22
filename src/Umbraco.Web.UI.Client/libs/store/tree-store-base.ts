@@ -1,6 +1,6 @@
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backend-api';
-import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export

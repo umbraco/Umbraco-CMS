@@ -3,11 +3,11 @@ import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import { UmbUserGroupWorkspaceEditElement } from './user-group-workspace-edit.element';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
-import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { IRoutingInfo } from '@umbraco-cms/router';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { IRoutingInfo } from '@umbraco-cms/internal/router';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement {

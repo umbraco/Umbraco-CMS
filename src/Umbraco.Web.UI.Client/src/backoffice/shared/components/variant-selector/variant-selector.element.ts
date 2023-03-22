@@ -2,14 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import {
 	UmbWorkspaceVariantContext,
 	UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,
 } from '../workspace/workspace-variant/workspace-variant.context';
 import { ActiveVariant } from '../workspace/workspace-context/workspace-split-view-manager.class';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -334,7 +334,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 													html`
 														<li class="${this._isVariantActive(variant.culture!) ? 'selected' : ''}">
 															<button
-																class="variant-selector-switch-button 
+																class="variant-selector-switch-button
 																${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
 																@click=${() => this._switchVariant(variant)}>
 																${this._isNotPublishedMode(variant.culture!, variant.state!)

@@ -1,9 +1,15 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
-import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestWorkspace,
+	ManifestWorkspaceAction,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extensions-registry';
+
+const DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.DataType',
+	alias: DATA_TYPE_WORKSPACE_ALIAS,
 	name: 'Data Type Workspace',
 	loader: () => import('./data-type-workspace.element'),
 	meta: {
@@ -24,7 +30,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			icon: 'edit',
 		},
 		conditions: {
-			workspaces: ['Umb.Workspace.DataType'],
+			workspaces: [DATA_TYPE_WORKSPACE_ALIAS],
 		},
 	},
 	{
@@ -39,7 +45,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			icon: 'info',
 		},
 		conditions: {
-			workspaces: ['Umb.Workspace.DataType'],
+			workspaces: [DATA_TYPE_WORKSPACE_ALIAS],
 		},
 	},
 ];
@@ -56,7 +62,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			api: UmbSaveWorkspaceAction,
 		},
 		conditions: {
-			workspaces: ['Umb.Workspace.MemberGroup'],
+			workspaces: [DATA_TYPE_WORKSPACE_ALIAS],
 		},
 	},
 ];

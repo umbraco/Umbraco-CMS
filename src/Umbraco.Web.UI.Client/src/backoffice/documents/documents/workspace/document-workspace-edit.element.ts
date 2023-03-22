@@ -6,10 +6,10 @@ import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/router';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
-import { VariantModelBaseModel } from '@umbraco-cms/backend-api';
+import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-document-workspace-edit')
 export class UmbDocumentWorkspaceEditElement extends UmbLitElement {

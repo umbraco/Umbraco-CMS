@@ -1,7 +1,7 @@
 import './dashboard-welcome.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbDashboardWelcomeElement } from './dashboard-welcome.element';
 

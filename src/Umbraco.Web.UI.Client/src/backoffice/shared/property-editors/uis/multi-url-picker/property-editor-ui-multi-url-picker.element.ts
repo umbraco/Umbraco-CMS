@@ -2,16 +2,15 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UmbLinkPickerLink } from '../../../../shared/modals/link-picker';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backend-api';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
  */
-
 @customElement('umb-property-editor-ui-multi-url-picker')
 export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];

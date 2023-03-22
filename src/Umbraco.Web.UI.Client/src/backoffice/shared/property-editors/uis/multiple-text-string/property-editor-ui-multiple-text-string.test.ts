@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIMultipleTextStringElement } from './property-editor-ui-multiple-text-string.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIMultipleTextStringElement', () => {
   let element: UmbPropertyEditorUIMultipleTextStringElement;

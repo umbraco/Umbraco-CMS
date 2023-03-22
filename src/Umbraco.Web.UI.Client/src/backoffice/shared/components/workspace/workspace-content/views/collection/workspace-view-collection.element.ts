@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import {
 	UmbCollectionContext,
 	UMB_COLLECTION_CONTEXT_TOKEN,
@@ -9,9 +9,9 @@ import {
 
 import '../../../../../../shared/collection/dashboards/dashboard-collection.element';
 import type { UmbEntityWorkspaceContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { FolderTreeItemResponseModel } from '@umbraco-cms/backend-api';
-import { ManifestWorkspaceViewCollection } from '@umbraco-cms/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {

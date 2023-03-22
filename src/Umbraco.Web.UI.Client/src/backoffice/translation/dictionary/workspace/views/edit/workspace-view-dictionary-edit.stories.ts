@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 //import { data } from '../../../../../core/mocks/data/dictionary.data';
 import type { UmbWorkspaceViewDictionaryEditElement } from './workspace-view-dictionary-edit.element';
 import './workspace-view-dictionary-edit.element';
@@ -15,11 +15,11 @@ export default {
 			/*html` <umb-context-provider key="umbDataTypeContext" .value=${new UmbWorkspaceDictionaryContext(data[0])}>
 				${story()}
 			</umb-context-provider>`,*/
-		}
+		},
 	],
 } as Meta;
 
 export const AAAOverview: Story<UmbWorkspaceViewDictionaryEditElement> = () =>
 	html` <umb-workspace-view-dictionary-edit></umb-workspace-view-dictionary-edit>`;
-	
+
 AAAOverview.storyName = 'Overview';

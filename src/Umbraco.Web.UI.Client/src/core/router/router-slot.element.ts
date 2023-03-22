@@ -1,12 +1,12 @@
 import type { IRoute } from 'router-slot/model';
 import { RouterSlot } from 'router-slot';
-import { html, PropertyValueMap } from 'lit';
+import { css, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbLitElement } from '../lit-element';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
 import { UmbRouteContext } from './route.context';
 import { UmbRoute } from './route.interface';
-import { UmbLitElement } from '@umbraco-cms/element';
 
 /**
  *  @element umb-router-slot
@@ -17,6 +17,20 @@ import { UmbLitElement } from '@umbraco-cms/element';
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends UmbLitElement {
+	static styles = [
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			router-slot {
+				height: 100%;
+			}
+		`,
+	];
+
 	#router: RouterSlot = new RouterSlot();
 	#modalRouter: RouterSlot = new RouterSlot();
 	#listening = false;

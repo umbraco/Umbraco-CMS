@@ -1,5 +1,9 @@
 import { MEDIA_REPOSITORY_ALIAS } from './media/repository/manifests';
-import type { ManifestDashboardCollection, ManifestSection, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
+import type {
+	ManifestDashboardCollection,
+	ManifestSection,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const sectionAlias = 'Umb.Section.Media';
 
@@ -32,8 +36,9 @@ const dashboards: Array<ManifestDashboardCollection> = [
 	},
 ];
 
-const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
-	type: 'menuSectionSidebarApp',
+const menuSectionSidebarApp: ManifestTypes = {
+	type: 'sectionSidebarApp',
+	kind: 'menu',
 	alias: 'Umb.SectionSidebarMenu.Media',
 	name: 'Media Section Sidebar Menu',
 	weight: 100,

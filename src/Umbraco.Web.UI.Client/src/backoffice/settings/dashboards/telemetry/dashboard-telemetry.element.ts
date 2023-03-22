@@ -3,17 +3,18 @@ import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { TelemetryResponseModel, TelemetryLevelModel, TelemetryResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { TelemetryResponseModel, TelemetryLevelModel, TelemetryResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-telemetry')
 export class UmbDashboardTelemetryElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			.italic {
-				font-style: italic;
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
 			}
 		`,
 	];
@@ -120,7 +121,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<h1>Consent for telemetry data</h1>
-				<div style="max-width:580px">
+				<div style="max-width:75ch">
 					<p>
 						In order to improve Umbraco and add new functionality based on as relevant information as possible, we would
 						like to collect system- and usage information from your installation. Aggregate data will be shared on a

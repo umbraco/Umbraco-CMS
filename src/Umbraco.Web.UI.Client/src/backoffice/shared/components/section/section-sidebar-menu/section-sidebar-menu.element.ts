@@ -1,10 +1,28 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ManifestMenu, ManifestMenuSectionSidebarApp } from '@umbraco-cms/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/element';
+import {
+	ManifestKind,
+	ManifestMenu,
+	ManifestSectionSidebarAppMenuKind,
+} from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 import '../../menu/menu.element';
+
+// TODO: Move to separate file:
+const manifest: ManifestKind = {
+	type: 'kind',
+	alias: 'Umb.Kind.Menu',
+	matchKind: 'menu',
+	matchType: 'sectionSidebarApp',
+	manifest: {
+		type: 'sectionSidebarApp',
+		elementName: 'umb-section-sidebar-menu',
+	},
+};
+umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement extends UmbLitElement {
@@ -18,14 +36,14 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 	];
 
 	@property()
-	manifest?: ManifestMenuSectionSidebarApp;
+	manifest?: ManifestSectionSidebarAppMenuKind;
 
 	render() {
 		// TODO: link to dashboards when clicking on the menu item header
-		return html` <h3>${this.manifest?.meta.label}</h3>
+		return html` <h3>${this.manifest?.meta?.label}</h3>
 			<umb-extension-slot
 				type="menu"
-				.filter=${(menu: ManifestMenu) => menu.alias === this.manifest!.meta.menu}
+				.filter=${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}
 				default-element="umb-menu"></umb-extension-slot>`;
 	}
 }

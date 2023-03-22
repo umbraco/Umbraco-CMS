@@ -8,15 +8,20 @@ import {
 	IndexerResource,
 	SearcherResponseModel,
 	SearcherResource,
-} from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display:block;
+				margin:var(--uui-size-layout-1);
+			}
+
 			uui-box + uui-box {
 				margin-top: var(--uui-size-space-5);
 			}

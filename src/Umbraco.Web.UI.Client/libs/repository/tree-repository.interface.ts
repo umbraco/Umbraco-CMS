@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
+import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbTreeRepository {
 	requestRootTreeItems: () => Promise<{

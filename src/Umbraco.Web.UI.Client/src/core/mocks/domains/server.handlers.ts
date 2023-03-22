@@ -1,6 +1,6 @@
 import { rest } from 'msw';
-import { RuntimeLevelModel, ServerStatusResponseModel, VersionResponseModel } from '@umbraco-cms/backend-api';
-import { umbracoPath } from '@umbraco-cms/utils';
+import { RuntimeLevelModel, ServerStatusResponseModel, VersionResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const serverRunningHandler = rest.get(umbracoPath('/server/status'), (_req, res, ctx) => {
 	return res(
