@@ -48,8 +48,6 @@ jobs:
     concurrency:
       group: npm-publish
       cancel-in-progress: true
-    env:
-      NPM_TOKEN: ${{secrets.NPM_TOKEN}}
     steps:
       - uses: actions/download-artifact@v3
         with:
@@ -57,14 +55,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Authenticate with Registry
-        run: |
-          echo "@umbraco-cms:registry=https://registry.npmjs.org/" > .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-          npm whoami
+          registry-url: https://registry.npmjs.org/
+          scope: '@umbraco-cms'
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       - name: Version and publish
         run: |
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
+          npm whoami
           npm version 1.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
           npm publish --tag next --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
