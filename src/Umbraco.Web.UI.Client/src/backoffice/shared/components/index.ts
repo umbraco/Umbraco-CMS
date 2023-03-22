@@ -34,14 +34,16 @@ import './section/section-sidebar/section-sidebar.element';
 import './section/section.element';
 import './table/table.element';
 import './tree/tree.element';
+import './tree/tree-menu-item/tree-menu-item.element';
 import './variantable-property/variantable-property.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
+
+import './header-app/header-app-button.element';
 
 import './history/history-list.element';
 import './history/history-item.element';
 
 import './workspace/workspace-action/workspace-action.element';
-import './workspace/workspace-content/workspace-content.element';
 import './workspace/workspace-layout/workspace-layout.element';
 
 import './workspace/workspace-footer-layout/workspace-footer-layout.element';

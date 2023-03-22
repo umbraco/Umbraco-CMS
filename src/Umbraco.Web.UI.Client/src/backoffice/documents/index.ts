@@ -4,8 +4,8 @@ import { manifests as contentMenuManifest } from './menu.manifests';
 import { manifests as documentBlueprintManifests } from './document-blueprints/manifests';
 import { manifests as documentTypeManifests } from './document-types/manifests';
 import { manifests as documentManifests } from './documents/manifests';
-import type { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
+import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	...dashboardManifests,

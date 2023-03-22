@@ -1,4 +1,4 @@
-import { ManifestSectionSidebarApp } from '@umbraco-cms/extensions-registry';
+import { ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extensions-registry';
 
 const entityActions: Array<ManifestSectionSidebarApp> = [
 	{

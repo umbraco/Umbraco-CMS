@@ -1,8 +1,7 @@
-
 import { rest } from 'msw';
 
-import { umbracoPath } from '@umbraco-cms/utils';
-import type { PackageManifestResponse } from '@umbraco-cms/models';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { PackageManifestResponse } from '@umbraco-cms/backoffice/models';
 
 export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifest'), (_req, res, ctx) => {
 	return res(

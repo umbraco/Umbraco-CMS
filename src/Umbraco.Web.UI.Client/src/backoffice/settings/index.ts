@@ -3,6 +3,7 @@ import { manifests as settingsSectionManifests } from './section.manifests';
 import { manifests as settingsMenuManifests } from './menu.manifests';
 import { manifests as dashboardManifests } from './dashboards/manifests';
 import { manifests as dataTypeManifests } from './data-types/manifests';
+import { manifests as relationTypeManifests } from './relation-types/manifests';
 import { manifests as extensionManifests } from './extensions/manifests';
 import { manifests as cultureManifests } from './cultures/manifests';
 import { manifests as languageManifests } from './languages/manifests';
@@ -11,9 +12,9 @@ import {
 	UmbAppLanguageContext,
 	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
 } from './languages/app-language-select/app-language.context';
-import { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
-import { UmbContextProviderController } from '@umbraco-cms/context-api';
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	...settingsSectionManifests,
@@ -24,6 +25,7 @@ export const manifests: Array<ManifestTypes> = [
 	...cultureManifests,
 	...languageManifests,
 	...logviewerManifests,
+	...relationTypeManifests,
 ];
 
 export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {

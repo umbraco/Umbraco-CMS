@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../input-list-base/input-list-base';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/users/repository/user.store';
 import { UMB_USER_PICKER_MODAL_TOKEN } from '../../../users/users/modals/user-picker';
-import type { UserEntity } from '@umbraco-cms/models';
+import type { UserEntity } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-user')
 export class UmbPickerUserElement extends UmbInputListBase {

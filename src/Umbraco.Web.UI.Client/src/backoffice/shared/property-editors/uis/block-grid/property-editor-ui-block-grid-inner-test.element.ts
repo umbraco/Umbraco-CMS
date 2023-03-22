@@ -2,8 +2,8 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { IRoute, IRoutingInfo } from 'router-slot';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 
 /**
  * @element umb-property-editor-ui-block-grid-inner-test

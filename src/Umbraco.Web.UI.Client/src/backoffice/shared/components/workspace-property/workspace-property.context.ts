@@ -1,10 +1,10 @@
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace/workspace-context/workspace-variable-entity-context.interface';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
-import type { DataTypeResponseModel } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ObjectState, StringState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
+import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { ObjectState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 // If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
 export type WorkspacePropertyData<ValueType> = {

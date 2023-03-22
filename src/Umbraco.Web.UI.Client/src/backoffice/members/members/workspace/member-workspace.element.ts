@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { UmbMemberWorkspaceEditElement } from './member-workspace-edit.element';
 import { UmbMemberWorkspaceContext } from './member-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-workspace')
 export class UmbMemberWorkspaceElement extends UmbLitElement {

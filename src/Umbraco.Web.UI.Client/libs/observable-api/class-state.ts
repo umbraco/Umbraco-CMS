@@ -6,10 +6,9 @@ interface ClassStateData {
 
 /**
  * @export
- * @class DeepState
+ * @class ClassState
  * @extends {BehaviorSubject<T>}
- * @description - A RxJS BehaviorSubject which deepFreezes the data to ensure its not manipulated from any implementations.
- * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
+ * @description - A RxJS BehaviorSubject which can hold class instance which has a equal method to compare in coming instances for changes.
  */
 export class ClassState<T extends ClassStateData | undefined | null> extends BehaviorSubject<T> {
 	constructor(initialData: T) {

@@ -1,9 +1,9 @@
 import { UmbEntityWorkspaceContextInterface } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
 import { UmbMemberGroupRepository } from '../repository/member-group.repository';
-import type { MemberGroupDetails } from '@umbraco-cms/models';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ObjectState } from '@umbraco-cms/observable-api';
+import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MemberGroupDetails;
 export class UmbWorkspaceMemberGroupContext

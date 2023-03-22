@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIMultiUrlPickerElement } from './property-editor-ui-multi-url-picker.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIMultiUrlPickerElement', () => {
   let element: UmbPropertyEditorUIMultiUrlPickerElement;

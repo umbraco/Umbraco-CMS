@@ -1,14 +1,16 @@
-import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
+import type {
+	RepositoryTreeDataSource,
+	UmbTreeRepository,
+	UmbDetailRepository,
+} from '@umbraco-cms/backoffice/repository';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { ProblemDetailsModel, DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
 import { UmbDataTypeServerDataSource } from './sources/data-type.server.data';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store';
 import { DataTypeTreeServerDataSource } from './sources/data-type.tree.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetailsModel, DataTypeResponseModel } from '@umbraco-cms/backend-api';
-import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
-import { UmbDetailRepository } from '@umbraco-cms/repository';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
 
 type ItemType = DataTypeResponseModel;
 

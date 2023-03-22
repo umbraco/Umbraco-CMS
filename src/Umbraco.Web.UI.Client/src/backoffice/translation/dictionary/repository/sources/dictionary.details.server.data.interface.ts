@@ -1,10 +1,11 @@
+import type { DictionaryDetails } from '../../';
 import {
 	DictionaryItemResponseModel,
 	UploadDictionaryResponseModel,
 	PagedDictionaryOverviewResponseModel,
 	PagedLanguageResponseModel,
-} from '@umbraco-cms/backend-api';
-import type { DataSourceResponse, DictionaryDetails } from '@umbraco-cms/models';
+} from '@umbraco-cms/backoffice/backend-api';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface DictionaryDetailDataSource {
 	createScaffold(parentKey: string): Promise<DataSourceResponse<DictionaryItemResponseModel>>;

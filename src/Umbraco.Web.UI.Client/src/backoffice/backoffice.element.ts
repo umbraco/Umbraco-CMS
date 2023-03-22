@@ -6,8 +6,11 @@ import {
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
-import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // Domains
 const CORE_PACKAGES = [
@@ -46,6 +49,9 @@ export class UmbBackofficeElement extends UmbLitElement {
 		super();
 
 		this.#loadCorePackages();
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
+		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
 

@@ -6,8 +6,8 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUITextareaElement, UUITextareaEvent } from '@umbraco-ui/uui';
 import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.context';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-workspace-view-dictionary-edit')
 export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {

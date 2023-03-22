@@ -1,11 +1,11 @@
 import { rest } from 'msw';
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
 	PagedRedirectUrlResponseModel,
 	RedirectUrlResponseModel,
 	RedirectStatusModel,
 	RedirectUrlStatusResponseModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {

@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIUserPickerElement } from './property-editor-ui-user-picker.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIUserPickerElement', () => {
   let element: UmbPropertyEditorUIUserPickerElement;

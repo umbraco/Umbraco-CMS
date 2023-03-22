@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UUITextareaElement } from '@umbraco-ui/uui';
 import type { UmbWorkspacePropertyContext } from '../../../../shared/components/workspace-property/workspace-property.context';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorElement {

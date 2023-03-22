@@ -6,9 +6,9 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
 import UmbInputCultureSelectElement from '../../../../../../shared/components/input-culture-select/input-culture-select.element';
 import UmbInputLanguagePickerElement from '../../../../../../shared/components/input-language-picker/input-language-picker.element';
-import { UmbChangeEvent } from '@umbraco-cms/events';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageResponseModel } from '@umbraco-cms/backend-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-language-details-workspace-view')
 export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {

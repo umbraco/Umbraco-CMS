@@ -8,9 +8,9 @@ import {
 	UmbCurrentUserHistoryStore,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './current-user/current-user-history.store';
-import { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
-import { UmbContextProviderController } from '@umbraco-cms/context-api';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 export const manifests: Array<ManifestTypes> = [
 	...userGroupManifests,
@@ -19,12 +19,12 @@ export const manifests: Array<ManifestTypes> = [
 	...currentUserManifests,
 ];
 
-export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
 	extensionRegistry.registerMany(manifests);
 
-	new UmbContextProviderController(_host, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
+	new UmbContextProviderController(host, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 	new UmbContextProviderController(
-		_host,
+		host,
 		UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 		new UmbCurrentUserHistoryStore()
 	);

@@ -1,7 +1,7 @@
 import { TemplateTreeDataSource } from '.';
-import { ProblemDetailsModel, TemplateResource } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { ProblemDetailsModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template tree that fetches data from the server

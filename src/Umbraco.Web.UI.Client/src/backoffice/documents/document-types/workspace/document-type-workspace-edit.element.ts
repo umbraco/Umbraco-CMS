@@ -4,9 +4,9 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UMB_ICON_PICKER_MODAL_TOKEN } from '../../../shared/modals/icon-picker';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-document-type-workspace-edit')
 export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {

@@ -1,4 +1,4 @@
-import { BasicState } from "./basic-state";
+import { BasicState } from './basic-state';
 
 /**
  * @export

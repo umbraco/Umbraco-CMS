@@ -4,10 +4,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
-import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {

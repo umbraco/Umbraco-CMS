@@ -1,14 +1,15 @@
-import type { ManifestMenuItem } from '@umbraco-cms/models';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
-const menuItem: ManifestMenuItem = {
+const menuItem: ManifestTypes = {
 	type: 'menuItem',
+	kind: 'tree',
 	alias: 'Umb.MenuItem.MemberGroups',
 	name: 'Member Groups Menu Item',
 	weight: 800,
-	loader: () => import('./member-groups-menu-item.element'),
 	meta: {
 		label: 'Member Groups',
 		icon: 'umb:folder',
+		treeAlias: 'Umb.Tree.MemberGroups',
 	},
 	conditions: {
 		menus: ['Umb.Menu.Members'],

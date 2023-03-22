@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-tree-context-menu-service')
 export class UmbTreeContextMenuService extends UmbLitElement {

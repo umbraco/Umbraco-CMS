@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 //import type { UmbPropertyActionMenuContext } from '../shared/property-action-menu/property-action-menu.context';
 import { UmbPropertyAction } from '../shared/property-action/property-action.model';
 import type { UmbWorkspacePropertyContext } from '../../components/workspace-property/workspace-property.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-action-clear')
 export class UmbPropertyActionClearElement extends UmbLitElement implements UmbPropertyAction {

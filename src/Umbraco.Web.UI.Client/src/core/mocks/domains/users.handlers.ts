@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { v4 as uuidv4 } from 'uuid';
 import { umbUsersData } from '../data/users.data';
-import type { UserDetails } from '@umbraco-cms/models';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
 
 // TODO: add schema
 export const handlers = [
@@ -66,7 +66,7 @@ export const handlers = [
 			mediaStartNodes: [],
 		};
 
-		const invited = umbUsersData.save([newUser]);
+		const invited = umbUsersData.save(newUser);
 
 		console.log('invited', invited);
 

@@ -1,13 +1,13 @@
 import { rest } from 'msw';
 import { v4 as uuidv4 } from 'uuid';
 
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
 	PackageMigrationStatusResponseModel,
 	PackageDefinitionResponseModel,
 	PagedPackageDefinitionResponseModel,
 	PagedPackageMigrationStatusResponseModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/package/migration-status'), (_req, res, ctx) => {

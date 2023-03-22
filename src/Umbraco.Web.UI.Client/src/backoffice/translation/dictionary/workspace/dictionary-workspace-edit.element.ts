@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dictionary-workspace-edit')
 export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
@@ -12,7 +12,7 @@ export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
 		css`
 			#header {
 				display: flex;
-				padding: 0 var(--uui-size-space-6);
+				padding: 0 var(--uui-size-layout-1);
 				gap: var(--uui-size-space-4);
 				width: 100%;
 			}

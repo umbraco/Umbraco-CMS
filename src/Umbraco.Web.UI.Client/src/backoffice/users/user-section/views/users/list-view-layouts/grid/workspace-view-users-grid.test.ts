@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbWorkspaceViewUsersGridElement } from './workspace-view-users-grid.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbWorkspaceViewUsersCreateElement', () => {
 	let element: UmbWorkspaceViewUsersGridElement;

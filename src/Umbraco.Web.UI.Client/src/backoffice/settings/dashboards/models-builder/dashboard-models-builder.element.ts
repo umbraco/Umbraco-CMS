@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { ModelsBuilderResponseModel, ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { ModelsBuilderResponseModel, ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbLitElement {
@@ -90,7 +90,11 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 			<uui-box>
 				<div class="headline">
 					<h1>Models Builder</h1>
-					<uui-button .state="${this._buttonStateReload}" look="secondary" @click="${this._onDashboardReload}">
+					<uui-button
+						.state="${this._buttonStateReload}"
+						look="secondary"
+						label="Reload"
+						@click="${this._onDashboardReload}">
 						Reload
 					</uui-button>
 				</div>

@@ -8,9 +8,9 @@ import {
 	DatabaseSettingsPresentationModel,
 	InstallResource,
 	ProblemDetailsModel,
-} from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecute } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -35,7 +35,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 			uui-form-layout-item {
 				margin-top: 0;
-				margin-bottom: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-layout-1);
 			}
 
 			uui-input,
@@ -47,7 +47,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			hr {
 				width: 100%;
 				margin-top: var(--uui-size-space-2);
-				margin-bottom: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-layout-1);
 				border: none;
 				border-bottom: 1px solid var(--uui-color-border);
 			}

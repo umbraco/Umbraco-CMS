@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 
-import { umbracoPath } from '@umbraco-cms/utils';
-import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/upgrade/settings'), (_req, res, ctx) => {

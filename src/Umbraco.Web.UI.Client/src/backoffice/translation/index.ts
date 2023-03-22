@@ -1,7 +1,7 @@
 import { manifests as translationSectionManifests } from './section.manifest';
 import { manifests as dictionaryManifests } from './dictionary/manifests';
-import type { ManifestTypes } from '@umbraco-cms/models';
-import { UmbEntrypointOnInit } from '@umbraco-cms/extensions-api';
+import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests: Array<ManifestTypes> = [...translationSectionManifests, ...dictionaryManifests];
 

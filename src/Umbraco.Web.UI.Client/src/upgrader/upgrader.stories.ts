@@ -1,12 +1,13 @@
-import '.';
+import './upgrader-view.element';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit-html';
 
-import { UmbUpgraderView } from './upgrader-view.element';
+import type { UmbUpgraderView } from './upgrader-view.element';
 
 export default {
 	title: 'Apps/Upgrader/States',
+	component: 'umb-upgrader-view',
 	args: {
 		errorMessage: '',
 		upgrading: false,
@@ -31,28 +32,26 @@ export default {
 				${story()}
 			</div>`,
 	],
-} as Meta<UmbUpgraderView>;
+} satisfies Meta<UmbUpgraderView>;
 
-const Template: Story<UmbUpgraderView> = ({ upgrading, errorMessage, settings, fetching }) =>
-	html`<umb-upgrader-view
-		.upgrading=${upgrading}
-		.errorMessage=${errorMessage}
-		.settings=${settings}
-		.fetching=${fetching}></umb-upgrader-view>`;
+type Story = StoryObj<UmbUpgraderView>;
 
-export const Overview = Template.bind({});
+export const Overview: Story = {};
 
-export const Upgrading = Template.bind({});
-Upgrading.args = {
-	upgrading: true,
+export const Upgrading: Story = {
+	args: {
+		upgrading: true,
+	},
 };
 
-export const Fetching = Template.bind({});
-Fetching.args = {
-	fetching: true,
+export const Fetching: Story = {
+	args: {
+		fetching: true,
+	},
 };
 
-export const Error = Template.bind({});
-Error.args = {
-	errorMessage: 'Something went wrong',
+export const Error: Story = {
+	args: {
+		errorMessage: 'Something went wrong',
+	},
 };

@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIBlockGridElement } from './property-editor-ui-block-grid.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIBlockGridElement', () => {
   let element: UmbPropertyEditorUIBlockGridElement;

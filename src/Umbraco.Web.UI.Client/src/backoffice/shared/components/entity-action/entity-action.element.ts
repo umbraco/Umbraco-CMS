@@ -2,9 +2,9 @@ import { html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { UmbExecutedEvent } from '@umbraco-cms/events';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestEntityAction } from '@umbraco-cms/extensions-registry';
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-entity-action')
 class UmbEntityActionElement extends UmbLitElement {

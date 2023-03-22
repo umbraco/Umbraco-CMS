@@ -1,6 +1,5 @@
-import { LanguageResponseModel, PagedLanguageResponseModel } from '@umbraco-cms/backend-api';
-import type { DataSourceResponse } from '@umbraco-cms/models';
-import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
+import { LanguageResponseModel, PagedLanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { RepositoryDetailDataSource, DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 // TODO: This is a temporary solution until we have a proper paging interface
 type paging = {

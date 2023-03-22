@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {

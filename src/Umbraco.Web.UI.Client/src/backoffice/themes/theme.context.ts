@@ -1,10 +1,10 @@
 import { map } from 'rxjs';
 import { manifests } from './manifests';
-import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
-import { StringState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ManifestTheme } from '@umbraco-cms/extensions-registry';
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 

@@ -5,7 +5,7 @@ import {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 	PagedDocumentTreeItemResponseModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -384,6 +384,26 @@ export const data: Array<DocumentResponseModel> = [
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
+			{
+				$type: '',
+				state: ContentStateModel.PUBLISHED_PENDING_CHANGES,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'es-es',
+				segment: null,
+				name: 'Articulo en ingles',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+			{
+				$type: '',
+				state: ContentStateModel.NOT_CREATED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'pl-pl',
+				segment: null,
+				name: 'Artykuł w języku polskim',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
 		],
 	},
 	{
@@ -495,7 +515,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		parentKey: null,
 		name: 'All property editors',
 		type: 'document',
-		icon: 'icon-item-arrangement',
+		icon: 'document',
 		hasChildren: true,
 	},
 	{
@@ -510,7 +530,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		parentKey: null,
 		name: 'Article in english',
 		type: 'document',
-		icon: 'icon-item-arrangement',
+		icon: 'document',
 		hasChildren: true,
 	},
 	{
@@ -525,7 +545,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		parentKey: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		name: 'Blog post B',
 		type: 'document',
-		icon: 'icon-item-arrangement',
+		icon: 'document',
 		hasChildren: false,
 	},
 	{

@@ -1,18 +1,14 @@
-import {
+import type {
 	ContentTreeItemResponseModel,
-	DictionaryItemTranslationModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
 	PackageManifestResponseModel,
-	ProblemDetailsModel,
-} from '@umbraco-cms/backend-api';
-
-// Extension Manifests
-export * from '@umbraco-cms/extensions-registry';
+} from '@umbraco-cms/backoffice/backend-api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ClassConstructor<T> = new (...args: any[]) => T;
 
 // Users
@@ -24,13 +20,6 @@ export interface Entity {
 	type: string;
 	hasChildren: boolean;
 	parentKey: string | null;
-}
-
-export interface ContentDetails extends ContentTreeItemResponseModel {
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	//data: Array<ContentPropertyData>;
-	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
 export interface UserEntity extends Entity {
@@ -64,49 +53,11 @@ export interface UserGroupDetails extends UserGroupEntity {
 	permissions: Array<string>;
 }
 
-/*
-// Data Types
-export interface DataTypeDetails extends FolderTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	propertyEditorAlias: string | null;
-	propertyEditorUiAlias: string | null;
-	data: Array<DataTypeProperty>;
-}
-
-export interface DataTypeProperty {
-	alias: string;
-	value: any;
-}
-*/
-
 // TODO: Make sure Entity Type/interface.
 export interface MemberTypeDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
-}
-
-// Content
-export interface ContentProperty {
-	alias: string;
-	label: string;
-	description: string;
-	dataTypeKey: string;
-}
-
-export interface ContentPropertyData {
-	alias: string;
-	value: any;
-}
-
-// Media
-export interface MediaDetails extends ContentTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	data: Array<ContentPropertyData>;
-	variants: Array<any>; // TODO: define variant data
-	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
 // Media Types
@@ -126,12 +77,6 @@ export interface MemberDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 }
 
-// Dictionary
-export interface DictionaryDetails extends EntityTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	translations: DictionaryItemTranslationModel[];
-}
-
 // Document Blueprint
 export interface DocumentBlueprintDetails {
 	key: string;
@@ -141,11 +86,6 @@ export interface DocumentBlueprintDetails {
 	data: Array<any>;
 	icon: string;
 	documentTypeKey: string;
-}
-
-export interface DataSourceResponse<T = undefined> {
-	data?: T;
-	error?: ProblemDetailsModel;
 }
 
 export interface SwatchDetails {

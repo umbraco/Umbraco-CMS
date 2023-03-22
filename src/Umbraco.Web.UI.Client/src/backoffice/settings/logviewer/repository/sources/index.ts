@@ -1,4 +1,4 @@
-import {
+import type {
 	DirectionModel,
 	LogLevelCountsReponseModel,
 	LogLevelModel,
@@ -7,10 +7,8 @@ import {
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
 	SavedLogSearchResponseModel,
-} from '@umbraco-cms/backend-api';
-import type { DataSourceResponse } from '@umbraco-cms/models';
-
-
+} from '@umbraco-cms/backoffice/backend-api';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface LogSearchDataSource {
 	getAllSavedSearches({
@@ -30,7 +28,13 @@ export interface LogSearchDataSource {
 }
 
 export interface LogMessagesDataSource {
-	getLogViewerLevel({ skip, take }: { skip?: number; take?: number }): Promise<DataSourceResponse<PagedLoggerResponseModel>>;
+	getLogViewerLevel({
+		skip,
+		take,
+	}: {
+		skip?: number;
+		take?: number;
+	}): Promise<DataSourceResponse<PagedLoggerResponseModel>>;
 	getLogViewerLevelCount({
 		startDate,
 		endDate,

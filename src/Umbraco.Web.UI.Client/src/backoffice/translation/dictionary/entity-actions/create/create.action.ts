@@ -5,10 +5,10 @@ import {
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 } from '../../../../../backoffice/shared/components/section/section-sidebar/section-sidebar.context';
 import { UMB_CREATE_DICTIONARY_MODAL_TOKEN } from '.';
-import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 // TODO: temp import
 import './create-dictionary-modal-layout.element';

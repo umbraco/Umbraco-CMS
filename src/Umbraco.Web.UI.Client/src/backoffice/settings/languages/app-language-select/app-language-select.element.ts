@@ -6,8 +6,8 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbLanguageRepository } from '../repository/language.repository';
 import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageResponseModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {

@@ -4,9 +4,10 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../property-editors/modals/property-editor-ui-picker';
 import { UmbPropertySettingsModalResult } from '.';
-import { UmbModalContext, UmbModalBaseElement, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { ManifestPropertyEditorUI } from '@umbraco-cms/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<undefined, UmbPropertySettingsModalResult> {
@@ -17,11 +18,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<undefin
 				color: var(--uui-color-text);
 			}
 			#content {
-				padding: var(--uui-size-space-6);
+				padding: var(--uui-size-layout-1);
 			}
 			#appearances {
 				display: flex;
-				gap: var(--uui-size-space-6);
+				gap: var(--uui-size-layout-1);
 				max-width: 350px;
 				margin: 0 auto;
 			}

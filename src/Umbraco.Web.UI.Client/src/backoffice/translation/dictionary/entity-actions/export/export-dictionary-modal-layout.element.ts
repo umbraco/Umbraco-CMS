@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
 import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '.';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-export-dictionary-modal-layout')
 export class UmbExportDictionaryModalLayoutElement extends UmbModalBaseElement<

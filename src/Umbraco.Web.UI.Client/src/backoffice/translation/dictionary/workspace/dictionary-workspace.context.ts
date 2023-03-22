@@ -1,9 +1,9 @@
+import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
 import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
 import { UmbEntityWorkspaceContextInterface } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ObjectState } from '@umbraco-cms/observable-api';
-import type { DictionaryDetails } from '@umbraco-cms/models';
+import type { DictionaryDetails } from '../';
 
 type EntityType = DictionaryDetails;
 

@@ -8,9 +8,9 @@ import {
 } from '../../current-user-history.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store';
 import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../change-password';
-import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import type { UserDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {

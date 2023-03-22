@@ -4,9 +4,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { TooltipMenuItem } from '../components/tooltip-menu';
 import '../components/tooltip-menu/tooltip-menu.element';
-import type { ManifestCollectionView } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-collection-toolbar')
 export class UmbCollectionToolbarElement extends UmbLitElement {

@@ -1,5 +1,5 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import '../libs/css/custom-properties.css';
+import '../src/core/css/custom-properties.css';
 
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-modal';
@@ -17,11 +17,11 @@ import { UmbDocumentStore } from '../src/backoffice/documents/documents/reposito
 import { UmbDocumentTreeStore } from '../src/backoffice/documents/documents/repository/document.tree.store.ts';
 
 import customElementManifests from '../custom-elements.json';
-import { UmbIconStore } from '../libs/store/icon/icon.store';
+import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
-import { UmbLitElement } from '../libs/element';
+import { UmbLitElement } from '../src/core/lit-element';
 
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 

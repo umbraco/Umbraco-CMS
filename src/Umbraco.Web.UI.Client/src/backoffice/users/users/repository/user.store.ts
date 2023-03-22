@@ -1,8 +1,8 @@
-import type { UserDetails } from '@umbraco-cms/models';
-import { ArrayState, NumberState } from '@umbraco-cms/observable-api';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/store';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { ArrayState, NumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export type UmbUserStoreItemType = UserDetails;
 

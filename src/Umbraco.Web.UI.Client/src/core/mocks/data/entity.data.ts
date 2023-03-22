@@ -1,5 +1,5 @@
 import { UmbData } from './data';
-import type { Entity } from '@umbraco-cms/models';
+import type { Entity } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
 export class UmbEntityData<T extends Entity> extends UmbData<T> {
@@ -10,7 +10,7 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	getList(skip: number, take: number) {
 		return this.data.slice(skip, skip + take);
 	}
-	
+
 	getByKey(key: string) {
 		return this.data.find((item) => item.key === key);
 	}
@@ -19,20 +19,18 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return this.data.filter((item) => keys.includes(item.key));
 	}
 
-	save(saveItems: Array<T>) {
-		saveItems.forEach((saveItem) => {
-			const foundIndex = this.data.findIndex((item) => item.key === saveItem.key);
-			if (foundIndex !== -1) {
-				// update
-				this.data[foundIndex] = saveItem;
-				this.updateData(saveItem);
-			} else {
-				// new
-				this.data.push(saveItem);
-			}
-		});
+	save(saveItem: T) {
+		const foundIndex = this.data.findIndex((item) => item.key === saveItem.key);
+		if (foundIndex !== -1) {
+			// update
+			this.data[foundIndex] = saveItem;
+			this.updateData(saveItem);
+		} else {
+			// new
+			this.data.push(saveItem);
+		}
 
-		return saveItems;
+		return saveItem;
 	}
 
 	move(keys: Array<string>, destinationKey: string) {
