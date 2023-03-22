@@ -37,6 +37,11 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 				flex-direction: column;
 				gap: var(--uui-size-space-3);
 			}
+			#userProfileApps {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
 		`,
 	];
 
