@@ -3,10 +3,9 @@ import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extensions-
 export const manifests: Array<ManifestCollectionView> = [
 	{
 		type: 'collectionView',
-		alias: 'Umb.CollectionView.Grid',
-		name: 'Grid',
-		elementName: 'umb-collection-view-media-grid',
-		loader: () => import('./collection-view-media-grid.element'),
+		alias: 'Umb.CollectionView.MediaGrid',
+		name: 'Media Grid Collection View',
+		loader: () => import('./media-grid-collection-view.element'),
 		weight: 300,
 		meta: {
 			label: 'Grid',
@@ -19,10 +18,9 @@ export const manifests: Array<ManifestCollectionView> = [
 	},
 	{
 		type: 'collectionView',
-		alias: 'Umb.CollectionView.Table',
-		name: 'Table',
-		elementName: 'umb-collection-view-media-table',
-		loader: () => import('./collection-view-media-table.element'),
+		alias: 'Umb.CollectionView.MediaTable',
+		name: 'Media Table Collection View',
+		loader: () => import('./media-table-collection-view.element'),
 		weight: 200,
 		meta: {
 			label: 'Table',

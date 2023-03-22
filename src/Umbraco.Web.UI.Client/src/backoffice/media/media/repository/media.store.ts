@@ -1,8 +1,8 @@
-import type { MediaDetails } from '@umbraco-cms/backoffice/models';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { MediaDetails } from '../';
 
 /**
  * @export

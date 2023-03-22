@@ -2,12 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+// TODO: this should be a lib import
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
 
-@customElement('umb-collection-view-media-grid')
-export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
+@customElement('umb-media-grid-collection-view')
+export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -175,8 +176,10 @@ export class UmbCollectionViewsMediaGridElement extends UmbLitElement {
 	}
 }
 
+export default UmbMediaGridCollectionViewElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-view-media-grid': UmbCollectionViewsMediaGridElement;
+		'umb-media-grid-collection-view': UmbMediaGridCollectionViewElement;
 	}
 }

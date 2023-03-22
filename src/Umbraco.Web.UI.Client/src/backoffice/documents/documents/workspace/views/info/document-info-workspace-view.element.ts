@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
-import { UmbEntityWorkspaceContextInterface } from '../../../workspace-context/workspace-entity-context.interface';
 import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbEntityWorkspaceContextInterface } from '../../../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 
 interface HistoryNode {
 	userId?: number;
@@ -21,8 +21,8 @@ interface HistoryNode {
 
 type HistoryLogType = 'Publish' | 'Save' | 'Unpublish' | 'ContentVersionEnableCleanup' | 'ContentVersionPreventCleanup';
 
-@customElement('umb-workspace-view-content-info')
-export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
+@customElement('umb-document-info-workspace-view')
+export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -332,10 +332,10 @@ export class UmbWorkspaceViewContentInfoElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceViewContentInfoElement;
+export default UmbDocumentInfoWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-content-info': UmbWorkspaceViewContentInfoElement;
+		'umb-document-info-workspace-view': UmbDocumentInfoWorkspaceViewElement;
 	}
 }

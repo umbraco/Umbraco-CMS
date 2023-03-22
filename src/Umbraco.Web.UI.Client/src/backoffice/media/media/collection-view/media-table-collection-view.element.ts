@@ -1,8 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../collection.context';
-import {
+import type {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
@@ -10,13 +9,14 @@ import {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../components/table';
-import type { MediaDetails } from '@umbraco-cms/backoffice/models';
+} from '../../../shared/components/table';
+import type { MediaDetails } from '../';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-collection-view-media-table')
-export class UmbCollectionViewMediaTableElement extends UmbLitElement {
+@customElement('umb-media-table-collection-view')
+export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -132,8 +132,10 @@ export class UmbCollectionViewMediaTableElement extends UmbLitElement {
 	}
 }
 
+export default UmbMediaTableCollectionViewElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-view-media-table': UmbCollectionViewMediaTableElement;
+		'umb-media-table-collection-view': UmbMediaTableCollectionViewElement;
 	}
 }
