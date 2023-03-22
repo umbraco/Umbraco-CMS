@@ -55,7 +55,7 @@
 		"check": "npm run lint && npm run compile && npm run build-storybook"
 	},
 	"engines": {
-		"node": ">=18.15 <19",
+		"node": ">=18.14 <19",
 		"npm": ">=9.5 < 10"
 	},
 	"dependencies": {
