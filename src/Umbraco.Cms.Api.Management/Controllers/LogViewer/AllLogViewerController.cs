@@ -55,7 +55,13 @@ public class AllLogViewerController : LogViewerControllerBase
 
         if (logsAttempt.Success)
         {
-            return Ok(_umbracoMapper.Map<PagedViewModel<LogMessageResponseModel>>(logsAttempt.Result));
+            var viewModel = new PagedViewModel<LogMessageResponseModel>
+            {
+                Total = logsAttempt.Result!.Total,
+                Items = _umbracoMapper.MapEnumerable<ILogEntry, LogMessageResponseModel>(logsAttempt.Result.Items)
+            };
+
+            return Ok(viewModel);
         }
 
         return LogViewerOperationStatusResult(logsAttempt.Status);
