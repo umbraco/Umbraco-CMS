@@ -45,6 +45,9 @@ jobs:
     # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
+    concurrency:
+      group: npm-publish
+      cancel-in-progress: true
     permissions:
       contents: read
       packages: write
