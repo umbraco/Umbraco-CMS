@@ -11,14 +11,14 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				margin: var(--uui-size-layout-1);
 			}
 
 			#logviewer-layout {
-				margin: 20px;
-				height: calc(100vh - 160px);
+				padding-bottom: var(--uui-size-layout-1);
 				display: grid;
 				grid-template-columns: 7fr 2fr;
-				grid-template-rows: 1fr 1fr;
+				grid-template-rows: auto auto;
 				gap: 20px 20px;
 				grid-auto-flow: row;
 				grid-template-areas:

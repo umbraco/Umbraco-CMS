@@ -12,8 +12,9 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			.italic {
-				font-style: italic;
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
 			}
 		`,
 	];
@@ -120,7 +121,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<h1>Consent for telemetry data</h1>
-				<div style="max-width:580px">
+				<div style="max-width:75ch">
 					<p>
 						In order to improve Umbraco and add new functionality based on as relevant information as possible, we would
 						like to collect system- and usage information from your installation. Aggregate data will be shared on a

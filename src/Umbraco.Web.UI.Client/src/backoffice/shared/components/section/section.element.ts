@@ -27,11 +27,6 @@ export class UmbSectionElement extends UmbLitElement {
 				display: flex;
 			}
 
-			#router-slot {
-				overflow: auto;
-				height: 100%;
-			}
-
 			h3 {
 				padding: var(--uui-size-4) var(--uui-size-8);
 			}

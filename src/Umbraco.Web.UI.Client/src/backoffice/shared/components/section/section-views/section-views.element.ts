@@ -21,6 +21,8 @@ export class UmbSectionViewsElement extends UmbLitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
+				height:var(--umb-header-layout-height);
+				box-sizing: border-box;
 			}
 
 			#views {
