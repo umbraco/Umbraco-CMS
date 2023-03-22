@@ -1,18 +1,17 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, query, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+import { customElement, state } from 'lit/decorators.js';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 
 @customElement('umb-workspace-view-document-type-listview')
 export class UmbWorkspaceViewDocumentTypeListviewElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@state()
-	_documentType?: DocumentTypeModel;
+	_documentType?: DocumentTypeResponseModel;
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 

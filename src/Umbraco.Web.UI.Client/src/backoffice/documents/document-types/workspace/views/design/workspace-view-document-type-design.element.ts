@@ -14,7 +14,6 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
 			}
 			#workspace-tab-bar {
 				padding: 0 var(--uui-size-layout-1);
