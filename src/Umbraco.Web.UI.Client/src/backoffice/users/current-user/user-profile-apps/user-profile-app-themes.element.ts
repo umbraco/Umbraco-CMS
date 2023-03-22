@@ -7,8 +7,8 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../themes/theme.context';
 
-@customElement('umb-user-dashboard-test')
-export class UmbUserProfileAppTestElement extends UmbLitElement {
+@customElement('umb-user-profile-app-themes')
+export class UmbUserProfileAppThemesElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -71,10 +71,10 @@ export class UmbUserProfileAppTestElement extends UmbLitElement {
 	}
 }
 
-export default UmbUserProfileAppTestElement;
+export default UmbUserProfileAppThemesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-dashboard-test': UmbUserProfileAppTestElement;
+		'umb-user-profile-app-themes': UmbUserProfileAppThemesElement;
 	}
 }
