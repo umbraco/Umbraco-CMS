@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -2398,8 +2399,16 @@ public class ContentService : RepositoryService, IContentService
             // if it's published we may want to force-unpublish it - that would be backward-compatible... but...
             // making a radical decision here: trashing is equivalent to moving under an unpublished node so
             // it's NOT unpublishing, only the content is now masked - allowing us to restore it if wanted
-            // if (content.HasPublishedVersion)
-            // { }
+            if (content.PublishedState == PublishedState.Published)
+            {
+                var result = Unpublish(content, userId: userId);
+
+                if (result.Result != PublishResultType.SuccessUnpublish)
+                {
+                    _logger.LogError($"Failed to unpublish content with id {content.Id} while moving to recycle bin.");
+                }
+            }
+
             PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
