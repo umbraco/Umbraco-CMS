@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, nothing } from 'lit';
+import { css, CSSResultGroup, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
@@ -104,13 +104,8 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 						<uui-button look="primary" @click=${this._edit}>Edit</uui-button>
 						<uui-button look="primary" @click=${this._changePassword}>Change password</uui-button>
 					</uui-box>
-					<uui-box>
-						<b slot="headline">External login providers</b>
-						<umb-extension-slot id="externalLoginProviders" type="externalLoginProvider"></umb-extension-slot>
-					</uui-box>
-					<div>
-						<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
-					</div>
+
+					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
