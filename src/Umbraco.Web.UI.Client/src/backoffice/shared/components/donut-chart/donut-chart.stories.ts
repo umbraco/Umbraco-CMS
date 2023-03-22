@@ -1,8 +1,8 @@
-import './donut-slice';
-import './donut-chart';
+import './donut-slice.element';
+import './donut-chart.element';
 
 import { Meta } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 export default {
 	title: 'Components/Donut chart',

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement, svg } from 'lit';
 import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
 import { clamp } from 'lodash-es';
-import { UmbDonutSliceElement } from './donut-slice';
+import { UmbDonutSliceElement } from './donut-slice.element';
 
 export interface Circle {
 	color: string;
@@ -180,8 +180,6 @@ export class UmbDonutChartElement extends LitElement {
 
 			this.#printCircles();
 		}
-
-
 	}
 
 	#calculatePercentage(partialValue: number) {

@@ -32,8 +32,19 @@ export const data: Array<TemplateDBItem> = [
 		icon: 'icon-layout',
 		hasChildren: false,
 		alias: 'Doc1',
-		content:
-			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Doc1>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
+		content: `@using Umbraco.Extensions
+		@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
+		@{
+			if (Model?.Areas.Any() != true) { return; }
+		}
+		
+		<div class="umb-block-grid__area-container"
+			 style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? Model.GridColumns?.ToString() ?? "12");">
+			@foreach (var area in Model.Areas)
+			{
+				@await Html.GetBlockGridItemAreaHtmlAsync(area)
+			}
+		</div>`,
 	},
 	{
 		$type: '',

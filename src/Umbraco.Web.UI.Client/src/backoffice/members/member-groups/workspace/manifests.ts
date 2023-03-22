@@ -36,7 +36,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.MemberGroup.SaveAndPublish',
+		alias: 'Umb.WorkspaceAction.MemberGroup.Save',
 		name: 'Save Member Group Workspace Action',
 		meta: {
 			label: 'Save',

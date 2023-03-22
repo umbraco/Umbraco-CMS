@@ -1,6 +1,6 @@
 import './media-workspace.element';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 import { data as mediaNodes } from '../../../../core/mocks/data/media.data';
 import type { UmbMediaWorkspaceElement } from './media-workspace.element';
 
