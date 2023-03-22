@@ -48,9 +48,6 @@ jobs:
     concurrency:
       group: npm-publish
       cancel-in-progress: true
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/download-artifact@v3
         with:
@@ -65,4 +62,4 @@ jobs:
           npm version 1.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
       - run: npm publish --tag next --access public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
