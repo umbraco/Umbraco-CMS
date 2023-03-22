@@ -5,7 +5,8 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalRouteBuilder, UmbPropertyEditorModalRegistrationController } from '@umbraco-cms/internal/router';
+import { UmbModalRegistrationController } from 'libs/modal/modal-registration.controller';
+import type { UmbModalRouteBuilder } from 'libs/modal/modal-route-registration';
 
 /**
  * @element umb-input-multi-url-picker
@@ -104,6 +105,8 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	@state()
 	private _linkPickerURL?: UmbModalRouteBuilder;
 
+	private myModalRegistration;
+
 	constructor() {
 		super();
 		this.addValidator(
@@ -118,7 +121,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 		);
 
 		// TODO: Need concept for contextual being aware about the context, as this might not work if input is used outside a property editor.
-		new UmbPropertyEditorModalRegistrationController(this, UMB_LINK_PICKER_MODAL_TOKEN, {
+		this.myModalRegistration = new UmbModalRegistrationController(this, UMB_LINK_PICKER_MODAL_TOKEN, {
 			path: `:index`,
 			onSetup: (params) => {
 				// Get index:
@@ -160,6 +163,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 				this._setSelection(submitData.link, submitData.index);
 			},
 			getUrlBuilder: (urlBuilder) => {
+				console.log('got link builder', urlBuilder);
 				this._linkPickerURL = urlBuilder;
 			},
 		});

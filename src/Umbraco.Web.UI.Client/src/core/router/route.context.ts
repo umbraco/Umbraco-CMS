@@ -1,30 +1,15 @@
-import { IRoute, IRoutingInfo, Params, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
-import { v4 as uuidv4 } from 'uuid';
-import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbModalConfig, UmbModalToken, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { IRoute, IRoutingInfo, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
+import {
+	UmbContextConsumerController,
+	UmbContextProviderController,
+	UmbContextToken,
+} from '@umbraco-cms/backoffice/context-api';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
+import { UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal/modal.context';
+import { UmbModalRouteOptions, UmbModalRouteRegistration } from 'libs/modal/modal-route-registration';
 
 const EmptyDiv = document.createElement('div');
-
-export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbModalTokenResult = unknown> = {
-	path: string;
-	config?: UmbModalConfig;
-	onSetup?: (routingInfo: Params) => UmbModalTokenData | false;
-	onSubmit?: (data: UmbModalTokenResult) => void | PromiseLike<void>;
-	onReject?: () => void;
-	getUrlBuilder?: (urlBuilder: UmbModalRouteBuilder) => void;
-};
-
-export type UmbModalRegistrationToken = UmbModalRouteRegistration;
-
-type UmbModalRouteRegistration<D extends object = object, R = any> = {
-	key: string;
-	alias: UmbModalToken | string;
-	options: UmbModalRouteOptions<D, R>;
-	routeSetup: (component: HTMLElement, info: IRoutingInfo) => void;
-};
-
-export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) => string;
 
 export class UmbRouteContext {
 	//#host: UmbControllerHostInterface;
@@ -58,6 +43,7 @@ export class UmbRouteContext {
 		alias: UmbModalToken<D, R> | string,
 		options: UmbModalRouteOptions<D, R>
 	) {
+		/*
 		const registration = {
 			key: options.config?.key || uuidv4(),
 			alias: alias,
@@ -79,6 +65,10 @@ export class UmbRouteContext {
 				}
 			},
 		};
+		*/
+		const registration = new UmbModalRouteRegistration(alias, options);
+
+		console.log('Route Context Modal Registration', registration);
 		this.#modalRegistrations.push(registration);
 		this.#generateNewUrlBuilder(registration);
 		this.#generateContextRoutes();
@@ -93,14 +83,28 @@ export class UmbRouteContext {
 	}
 
 	#getModalRoutePath(modalRegistration: UmbModalRouteRegistration) {
-		return `/modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
+		return `/modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
 	}
 
 	#generateRoute(modalRegistration: UmbModalRouteRegistration): IRoute {
 		return {
 			path: this.#getModalRoutePath(modalRegistration),
 			component: EmptyDiv,
-			setup: modalRegistration.routeSetup,
+			//setup: modalRegistration.routeSetup,
+			setup: (component: HTMLElement, info: IRoutingInfo<any, any>) => {
+				if (!this.#modalContext) return;
+				const modalHandler = modalRegistration.routeSetup(this.#modalContext, info.match.params);
+				if (modalHandler) {
+					modalHandler.onSubmit().then(
+						() => {
+							this.#removeModalPath(info);
+						},
+						() => {
+							this.#removeModalPath(info);
+						}
+					);
+				}
+			},
 		};
 	}
 
@@ -109,6 +113,8 @@ export class UmbRouteContext {
 			return this.#generateRoute(modalRegistration);
 		});
 
+		// Add an empty route, so that we can always have a route to go to for closing the modals.
+		// TODO: Check if this is nesecary with the _internal_modalRouterChanged present.
 		this.#contextRoutes.push({
 			path: '',
 			component: EmptyDiv,
@@ -123,9 +129,12 @@ export class UmbRouteContext {
 		this.#routerBasePath = routerBasePath;
 		this.#generateNewUrlBuilders();
 	}
+	// TODO: what is going on here, We need to make sure if the modals are still relevant then not close them.
+	// Also notice each registration should now hold its handler when its active.
 	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
 		if (this.#activeModalPath === activeModalPath) return;
 		if (this.#activeModalPath) {
+			// If if there is a modal using the old path.
 			const activeModal = this.#modalRegistrations.find(
 				(registration) => this.#getModalRoutePath(registration) === this.#activeModalPath
 			);
@@ -144,7 +153,7 @@ export class UmbRouteContext {
 		if (!modalRegistration.options.getUrlBuilder || !this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
-		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.options.path}`;
+		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
 
 		const urlBuilder = (params: { [key: string]: string | number }) => {
 			const localRoutePath = stripSlash(
@@ -152,9 +161,11 @@ export class UmbRouteContext {
 					return params[args[0]].toString();
 				})
 			);
+			console.log('urlBuilder', params, localRoutePath);
 			return routeBasePath + localRoutePath;
 		};
 
+		console.log('Provide new url builder', urlBuilder, modalRegistration.options.getUrlBuilder);
 		modalRegistration.options.getUrlBuilder(urlBuilder);
 	};
 }

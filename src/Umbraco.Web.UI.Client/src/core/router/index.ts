@@ -1,5 +1,4 @@
 export * from 'router-slot';
-export * from './property-editor-modal-registration.controller';
 export * from './route.interface';
 export * from './route.context';
 export * from './router-slot.element';

@@ -74,6 +74,6 @@ export class UmbVariantRouterSlotElement extends UmbRouterSlotElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-router-slot': UmbRouterSlotElement;
+		'umb-variant-router-slot': UmbVariantRouterSlotElement;
 	}
 }

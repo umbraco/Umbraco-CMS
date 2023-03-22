@@ -1,6 +1,6 @@
 import type { IRoute } from 'router-slot/model';
 import { RouterSlot } from 'router-slot';
-import { css, PropertyValueMap } from 'lit';
+import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '../lit-element';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';

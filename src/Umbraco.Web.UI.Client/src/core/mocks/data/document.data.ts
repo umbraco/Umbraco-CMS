@@ -65,6 +65,7 @@ export const data: Array<DocumentResponseModel> = [
 				],
 			},
 			{
+				$type: '',
 				alias: 'multiUrlPicker',
 				culture: 'da-dk',
 				segment: null,
@@ -286,6 +287,7 @@ export const data: Array<DocumentResponseModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
+				$type: '',
 				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
