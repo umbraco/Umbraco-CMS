@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbPropertyEditorUITreePickerElement } from './property-editor-ui-tree-picker.element';
 import './property-editor-ui-tree-picker.element';

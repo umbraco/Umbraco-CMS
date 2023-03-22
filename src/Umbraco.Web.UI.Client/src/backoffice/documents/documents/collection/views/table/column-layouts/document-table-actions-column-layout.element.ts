@@ -1,5 +1,5 @@
 import { css, html, LitElement, nothing } from 'lit';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbTableColumn, UmbTableItem } from '../../../../../../shared/components/table';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';

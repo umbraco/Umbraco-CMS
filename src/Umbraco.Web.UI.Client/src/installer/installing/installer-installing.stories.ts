@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import { installerContextProvider } from '../shared/utils.story-helpers';
 import type { UmbInstallerInstallingElement } from './installer-installing.element';

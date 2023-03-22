@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
