@@ -1,15 +1,15 @@
+import type { ManifestTypes, ManifestUserProfileApp } from '@umbraco-cms/backoffice/extensions-registry';
 import { manifests as modalManifests } from './modals/manifests';
-import type { ManifestTypes, ManifestUserDashboard } from '@umbraco-cms/backoffice/extensions-registry';
 
-export const userDashboards: Array<ManifestUserDashboard> = [
+export const userProfileApps: Array<ManifestUserProfileApp> = [
 	{
-		type: 'userDashboard',
-		alias: 'Umb.UserDashboard.Themes',
-		name: 'Themes User Dashboard',
-		loader: () => import('./user-dashboard-themes.element'),
+		type: 'userProfileApp',
+		alias: 'Umb.UserProfileApp.Themes',
+		name: 'Themes User Profile App',
+		loader: () => import('./user-profile-app-themes.element'),
 		weight: 1,
 		meta: {
-			label: 'Themes User Dashboard',
+			label: 'Themes User Profile App',
 			pathname: 'themes',
 		},
 	},
@@ -30,4 +30,4 @@ export const headerApps: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...userDashboards, ...headerApps, ...modalManifests];
+export const manifests = [...userProfileApps, ...headerApps, ...modalManifests];

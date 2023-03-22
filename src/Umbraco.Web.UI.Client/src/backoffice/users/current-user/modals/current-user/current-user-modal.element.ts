@@ -184,7 +184,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 						<umb-extension-slot id="externalLoginProviders" type="externalLoginProvider"></umb-extension-slot>
 					</uui-box>
 					<div>
-						<umb-extension-slot id="userDashboards" type="userDashboard"></umb-extension-slot>
+						<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 					</div>
 					<uui-box>
 						<b slot="headline">Recent History</b>
