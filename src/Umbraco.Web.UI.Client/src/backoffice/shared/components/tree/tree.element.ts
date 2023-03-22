@@ -8,7 +8,7 @@ import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './tree-item.element';
+import './tree-item/tree-item.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
 

@@ -4,12 +4,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { map, Observable } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
-} from '../section/section-sidebar/section-sidebar.context';
-import type { UmbTreeContextBase } from './tree.context';
+} from '../../section/section-sidebar/section-sidebar.context';
+import type { UmbTreeContextBase } from '../tree.context';
 import type { Entity } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStore } from '@umbraco-cms/backoffice/store';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
