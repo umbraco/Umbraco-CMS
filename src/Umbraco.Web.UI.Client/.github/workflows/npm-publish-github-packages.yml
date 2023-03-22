@@ -41,7 +41,7 @@ jobs:
           name: artifact
           path: ./dist/libs
 
-  publish-gpr:
+  publish-npm:
     # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
