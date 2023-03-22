@@ -140,4 +140,25 @@ public partial class UserServiceCrudTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.MissingUser, result.Status);
     }
+
+    [Test]
+    public async Task Invited_Users_Has_Invited_state()
+    {
+        var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        UserInviteModel userInviteModel = new UserInviteModel
+        {
+            UserName = "some@email.com",
+            Email = "some@email.com",
+            Name = "Bob",
+            UserGroups = new HashSet<IUserGroup> {userGroup!},
+        };
+
+        IUserService userService = CreateUserService();
+        var result = await userService.InviteAsync(Constants.Security.SuperUserKey, userInviteModel);
+        Assert.IsTrue(result.Success);
+
+        var invitedUser = await userService.GetAsync(result.Result.InvitedUser!.Key);
+        Assert.IsNotNull(invitedUser);
+        Assert.AreEqual(UserState.Invited, invitedUser.UserState);
+    }
 }
