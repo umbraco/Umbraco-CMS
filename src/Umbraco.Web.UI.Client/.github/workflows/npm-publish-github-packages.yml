@@ -59,7 +59,6 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org/
-          scope: '@umbraco-cms'
           always-auth: true
       - run: |
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
