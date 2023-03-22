@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostInterface, UmbControllerHostMixin } from './controller-host.mixin';
-import { UmbContextProviderController } from '@umbraco-cms/context-api';
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 class MyClass {
 	prop = 'value from provider';

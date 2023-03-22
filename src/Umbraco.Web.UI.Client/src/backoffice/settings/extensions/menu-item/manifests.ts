@@ -1,4 +1,4 @@
-import type { ManifestMenuItem } from '@umbraco-cms/models';
+import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
@@ -9,6 +9,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Extensions',
 		icon: 'umb:wand',
 		entityType: 'extension-root',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

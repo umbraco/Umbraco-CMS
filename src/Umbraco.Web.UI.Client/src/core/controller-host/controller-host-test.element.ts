@@ -1,7 +1,7 @@
 import { html } from 'lit-html';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-controller-host-test')
 export class UmbControllerHostTestElement extends UmbLitElement {

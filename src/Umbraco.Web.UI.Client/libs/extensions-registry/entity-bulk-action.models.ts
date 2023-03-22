@@ -1,13 +1,16 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestEntityBulkAction extends ManifestElement {
+export interface ManifestEntityBulkAction extends ManifestElement, ManifestWithConditions<ConditionsEntityBulkAction> {
 	type: 'entityBulkAction';
 	meta: MetaEntityBulkAction;
 }
 
 export interface MetaEntityBulkAction {
 	label: string;
-	entityType: string;
 	api: any; // create interface
 	repositoryAlias: string;
+}
+
+export interface ConditionsEntityBulkAction {
+	entityType: string;
 }

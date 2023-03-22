@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute, IRoutingInfo } from '@umbraco-cms/router';
-import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/models';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import type { IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-created-packages-section-view')
 export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {

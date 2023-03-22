@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-overlay-size.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIOverlaySizeElement', () => {
   let element: UmbPropertyEditorUIOverlaySizeElement;

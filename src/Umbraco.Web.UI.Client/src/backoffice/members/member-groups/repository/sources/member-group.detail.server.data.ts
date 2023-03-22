@@ -1,8 +1,8 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import type { MemberGroupDetails } from '@umbraco-cms/models';
-import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import { RepositoryDetailDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @description - A data source for the MemberGroup detail that fetches data from the server

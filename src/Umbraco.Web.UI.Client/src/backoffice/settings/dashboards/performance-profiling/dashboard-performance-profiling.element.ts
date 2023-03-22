@@ -1,15 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ProfilingResource } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { ProfilingResource } from '@umbraco-cms/backoffice/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+			
 			uui-toggle {
 				font-weight: bold;
 			}

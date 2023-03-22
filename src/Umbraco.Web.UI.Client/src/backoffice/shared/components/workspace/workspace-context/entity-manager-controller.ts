@@ -1,26 +1,26 @@
 import { v4 as uuidv4 } from 'uuid';
-import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/notification';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
-import { UmbEntityDetailStore } from '@umbraco-cms/store';
+} from '@umbraco-cms/backoffice/notification';
+import { ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
 
 // Extend entityType base type?, so we are sure to have parentKey?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
 export class UmbEntityWorkspaceManager<
 	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
-	EntityDetailsType extends EntityTreeItemModel = ReturnType<StoreType['getScaffold']>
+	EntityDetailsType extends EntityTreeItemResponseModel = ReturnType<StoreType['getScaffold']>
 > {
 	private _host;
 
 	state = new ObjectState<EntityDetailsType | undefined>(undefined);
 
-	protected _storeSubscription?: UmbObserverController;
+	protected _storeSubscription?: UmbObserverController<EntityDetailsType | undefined>;
 
 	private _notificationContext?: UmbNotificationContext;
 	private _store?: StoreType;

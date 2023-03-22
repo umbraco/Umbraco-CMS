@@ -1,16 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTEXT_DEBUGGER_MODAL_TOKEN } from './modals/debug';
-import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 
 @customElement('umb-debug')
 export class UmbDebug extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				float: right;
+			}
+
 			#container {
 				display: block;
 				font-family: monospace;

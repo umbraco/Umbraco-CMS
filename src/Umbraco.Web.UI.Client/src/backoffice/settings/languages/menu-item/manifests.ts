@@ -1,4 +1,4 @@
-import type { ManifestMenuItem } from '@umbraco-cms/models';
+import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
@@ -9,6 +9,8 @@ const menuItem: ManifestMenuItem = {
 		label: 'Languages',
 		icon: 'umb:globe',
 		entityType: 'language-root',
+	},
+	conditions: {
 		menus: ['Umb.Menu.Settings'],
 	},
 };

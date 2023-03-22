@@ -3,16 +3,21 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { PublishedCacheResource } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display:block;
+				margin:var(--uui-size-layout-1);
+			}
+			
 			uui-box + uui-box {
 				margin-top: var(--uui-size-space-5);
 			}
@@ -140,9 +145,10 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
-					@click=${this._onRefreshCacheHandler}
-					>Refresh Status</uui-button
-				>
+					label="Refresh Status"
+					@click=${this._onRefreshCacheHandler}>
+					Refresh Status
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Memory Cache">
@@ -156,10 +162,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Reload Memory Cache"
 					@click=${this._onReloadCacheHandler}
-					.state=${this._buttonStateReload}
-					>Reload Memory Cache</uui-button
-				>
+					.state=${this._buttonStateReload}>
+					Reload Memory Cache
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Database Cache">
@@ -172,10 +179,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Rebuild Database Cache"
 					@click=${this._onRebuildCacheHandler}
-					.state=${this._buttonStateRebuild}
-					>Rebuild Database Cache</uui-button
-				>
+					.state=${this._buttonStateRebuild}>
+					Rebuild Database Cache
+				</uui-button>
 			</uui-box>
 
 			<uui-box headline="Internal Cache">
@@ -187,10 +195,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 					type="button"
 					look="primary"
 					color="danger"
+					label="Snapshot Internal Cache"
 					@click=${this._onSnapshotCacheHandler}
-					.state=${this._buttonStateCollect}
-					>Snapshot Internal Cache</uui-button
-				>
+					.state=${this._buttonStateCollect}>
+					Snapshot Internal Cache
+				</uui-button>
 			</uui-box>
 		`;
 	}

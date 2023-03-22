@@ -1,10 +1,10 @@
 import { UmbPackageStore, UMB_PACKAGE_STORE_TOKEN } from './package.store';
 import { UmbPackageServerDataSource } from './sources/package.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ManifestBase } from '@umbraco-cms/extensions-registry';
-import { isManifestJSType } from "@umbraco-cms/extensions-api";
-import { OpenAPI } from "@umbraco-cms/backend-api";
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { isManifestJSType } from '@umbraco-cms/backoffice/extensions-api';
+import { OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: Figure out if we should base stores like this on something more generic for "collections" rather than trees.
 
@@ -51,7 +51,6 @@ export class UmbPackageRepository {
 					// Crudely validate that the extension at least follows a basic manifest structure
 					// Idea: Use `Zod` to validate the manifest
 					if (this.isManifestBase(e)) {
-
 						/**
 						 * Crude check to see if extension is of type "js" since it is safe to assume we do not
 						 * need to load any other types of extensions in the backoffice (we need a js file to load)

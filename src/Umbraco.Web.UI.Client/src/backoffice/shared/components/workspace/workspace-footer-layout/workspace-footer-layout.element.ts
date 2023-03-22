@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
 
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-workspace-footer-layout
@@ -61,7 +61,7 @@ export class UmbWorkspaceFooterLayout extends UmbLitElement {
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}
+					.filter=${(extension: ManifestWorkspaceAction) => extension.conditions.workspaces.includes(this.alias)}
 					default-element="umb-workspace-action"></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 			</umb-footer-layout>

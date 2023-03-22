@@ -6,8 +6,8 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '.';
-import { DictionaryUploadModel } from '@umbraco-cms/backend-api';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
+import { UploadDictionaryResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-import-dictionary-modal-layout')
 export class UmbImportDictionaryModalLayoutElement extends UmbModalBaseElement<
@@ -27,7 +27,7 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalBaseElement<
 	private _form!: HTMLFormElement;
 
 	@state()
-	private _uploadedDictionary?: DictionaryUploadModel;
+	private _uploadedDictionary?: UploadDictionaryResponseModel;
 
 	@state()
 	private _showUploadView = true;

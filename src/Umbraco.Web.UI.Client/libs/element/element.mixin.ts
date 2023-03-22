@@ -1,15 +1,15 @@
 import { Observable } from 'rxjs';
 
-import type { HTMLElementConstructor } from '@umbraco-cms/models';
+import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
 
-import { UmbControllerHostInterface, UmbControllerHostMixin } from '@umbraco-cms/controller';
+import { UmbControllerHostInterface, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbContextToken,
 	UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
-} from '@umbraco-cms/context-api';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
+} from '@umbraco-cms/backoffice/context-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: can we use this aliases to generate the key of this type
 interface ResolvedContexts {

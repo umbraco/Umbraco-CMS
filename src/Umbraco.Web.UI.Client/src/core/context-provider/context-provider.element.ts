@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 @customElement('umb-context-provider')
 export class UmbContextProviderElement extends UmbLitElement {

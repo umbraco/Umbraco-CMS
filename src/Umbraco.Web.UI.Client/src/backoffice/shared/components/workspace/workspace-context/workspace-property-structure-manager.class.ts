@@ -1,16 +1,16 @@
 import { UmbDocumentTypeRepository } from '../../../../documents/document-types/repository/document-type.repository';
 import {
-	DocumentTypeModel,
-	DocumentTypePropertyTypeModel,
-	PropertyTypeContainerViewModelBaseModel,
-} from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/observable-api';
+	DocumentTypeResponseModel,
+	DocumentTypePropertyTypeResponseModel,
+	PropertyTypeContainerResponseModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
 
 // TODO: get this type from the repository, or use some generic type.
-type T = DocumentTypeModel;
+type T = DocumentTypeResponseModel;
 
 // TODO: make general interface for NodeTypeRepository, to replace UmbDocumentTypeRepository:
 export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepository = UmbDocumentTypeRepository> {
@@ -20,7 +20,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	#documentTypes = new ArrayState<T>([], (x) => x.key);
 
-	#containers = new ArrayState<PropertyTypeContainerViewModelBaseModel>([], (x) => x.key);
+	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.key);
 
 	constructor(host: UmbControllerHostInterface, typeRepository: R) {
 		this.#host = host;
@@ -85,7 +85,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	}
 	propertyStructuresOf(containerKey: string | null) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
-			const props: DocumentTypePropertyTypeModel[] = [];
+			const props: DocumentTypePropertyTypeResponseModel[] = [];
 			docTypes.forEach((docType) => {
 				docType.properties?.forEach((property) => {
 					if (property.containerKey === containerKey) {
@@ -110,7 +110,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	}
 
 	containersOfParentKey(
-		parentKey: PropertyTypeContainerViewModelBaseModel['parentKey'],
+		parentKey: PropertyTypeContainerResponseModelBaseModel['parentKey'],
 		containerType: PropertyContainerTypes
 	) {
 		return this.#containers.getObservablePart((data) => {

@@ -1,7 +1,7 @@
-import type { RepositoryTreeDataSource } from '../../../../../../libs/repository/repository-tree-data-source.interface';
-import { ProblemDetailsModel, DocumentTypeResource } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import type { RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { ProblemDetailsModel, DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document tree that fetches data from the server

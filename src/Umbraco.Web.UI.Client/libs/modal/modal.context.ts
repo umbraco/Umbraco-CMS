@@ -6,8 +6,8 @@ import { BehaviorSubject } from 'rxjs';
 import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 

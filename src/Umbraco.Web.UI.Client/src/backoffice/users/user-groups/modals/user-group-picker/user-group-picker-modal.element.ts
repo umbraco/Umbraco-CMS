@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../repository/user-group.store';
-import { UmbModalElementPickerBase } from '@umbraco-cms/modal';
-import type { UserGroupDetails } from '@umbraco-cms/models';
+import { UmbModalElementPickerBase } from '@umbraco-cms/internal/modal';
+import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<UserGroupDetails> {

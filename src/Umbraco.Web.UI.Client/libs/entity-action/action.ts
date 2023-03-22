@@ -1,6 +1,6 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { umbExtensionsRegistry, createExtensionClass } from '@umbraco-cms/extensions-api';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { umbExtensionsRegistry, createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbAction<RepositoryType = unknown> {
 	host: UmbControllerHostInterface;

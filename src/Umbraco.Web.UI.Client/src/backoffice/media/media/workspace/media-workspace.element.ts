@@ -1,12 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { UmbWorkspaceEntityElement } from '../../../shared/components/workspace/workspace-entity-element.interface';
+import { IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbMediaWorkspaceContext } from './media-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbMediaWorkspaceEditElement } from './media-workspace-edit.element';
 
 @customElement('umb-media-workspace')
-export class UmbMediaWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
+export class UmbMediaWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -18,31 +19,23 @@ export class UmbMediaWorkspaceElement extends UmbLitElement implements UmbWorksp
 		`,
 	];
 
-	private _workspaceContext: UmbMediaWorkspaceContext = new UmbMediaWorkspaceContext(this);
+	#workspaceContext = new UmbMediaWorkspaceContext(this);
+	#element = new UmbMediaWorkspaceEditElement();
 
 	@state()
-	_unique?: string;
-
-	public load(entityKey: string) {
-		this._workspaceContext.load(entityKey);
-		this._unique = entityKey;
-	}
-
-	public create(parentKey: string | null) {
-		this._workspaceContext.createScaffold(parentKey);
-	}
+	_routes: IRoute[] = [
+		{
+			path: 'edit/:key',
+			component: () => this.#element,
+			setup: (component: HTMLElement, info: IRoutingInfo) => {
+				const key = info.match.params.key;
+				this.#workspaceContext.load(key);
+			},
+		},
+	];
 
 	render() {
-		return html`<umb-workspace-content alias="Umb.Workspace.Media">
-			${this._unique
-				? html`
-						<umb-workspace-action-menu
-							slot="action-menu"
-							entity-type="media"
-							unique="${this._unique}"></umb-workspace-action-menu>
-				  `
-				: nothing}
-		</umb-workspace-content>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

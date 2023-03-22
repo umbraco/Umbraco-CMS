@@ -1,8 +1,8 @@
 import {
-	HealthCheckGroupModel,
-	HealthCheckGroupWithResultModel,
+	HealthCheckGroupPresentationModel,
+	HealthCheckGroupWithResultResponseModel,
 	StatusResultTypeModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export function getGroupByName(name: string) {
 	return healthGroupsWithoutResult.find((group) => group.name?.toLowerCase() == name.toLowerCase());
@@ -12,7 +12,7 @@ export function getGroupWithResultsByName(name: string) {
 	return healthGroups.find((group) => group.name.toLowerCase() === name.toLowerCase());
 }
 
-export const healthGroups: Array<HealthCheckGroupWithResultModel & { name: string }> = [
+export const healthGroups: Array<HealthCheckGroupWithResultResponseModel & { name: string }> = [
 	{
 		name: 'Configuration',
 		checks: [
@@ -211,7 +211,7 @@ export const healthGroups: Array<HealthCheckGroupWithResultModel & { name: strin
 		],
 	},
 ];
-export const healthGroupsWithoutResult: HealthCheckGroupModel[] = [
+export const healthGroupsWithoutResult: HealthCheckGroupPresentationModel[] = [
 	{
 		name: 'Configuration',
 		checks: [

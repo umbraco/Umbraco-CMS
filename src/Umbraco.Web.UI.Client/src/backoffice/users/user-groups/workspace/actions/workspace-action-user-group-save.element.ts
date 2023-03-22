@@ -2,8 +2,8 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbWorkspaceUserContext } from '../../../users/workspace/user-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbUserWorkspaceContext } from '../../../users/workspace/user-workspace.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
@@ -12,13 +12,13 @@ export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _workspaceContext?: UmbWorkspaceUserContext;
+	private _workspaceContext?: UmbUserWorkspaceContext;
 
 	constructor() {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbWorkspaceUserContext>('umbWorkspaceContext', (instance) => {
+		this.consumeContext<UmbUserWorkspaceContext>('umbWorkspaceContext', (instance) => {
 			this._workspaceContext = instance;
 		});
 	}

@@ -1,5 +1,9 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
-import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestWorkspace,
+	ManifestWorkspaceAction,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -19,7 +23,6 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/design/workspace-view-document-type-design.element'),
 		weight: 100,
 		meta: {
-			workspaces: ['Umb.Workspace.DocumentType'],
 			label: 'Design',
 			pathname: 'design',
 			icon: 'umb:document-dashed-line',
@@ -63,6 +66,9 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			pathname: 'templates',
 			icon: 'umb:layout',
 		},
+		conditions: {
+			workspaces: ['Umb.Workspace.DocumentType'],
+		},
 	},
 ];
 
@@ -72,11 +78,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.DocumentType.Save',
 		name: 'Save Document Type Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.DocumentType'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.DocumentType'],
 		},
 	},
 ];

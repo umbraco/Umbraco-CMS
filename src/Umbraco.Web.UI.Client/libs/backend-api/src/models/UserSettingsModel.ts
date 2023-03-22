@@ -2,11 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ConsentLevelModel } from './ConsentLevelModel';
+import type { ConsentLevelPresentationModel } from './ConsentLevelPresentationModel';
 
 export type UserSettingsModel = {
     minCharLength?: number;
     minNonAlphaNumericLength?: number;
-    consentLevels?: Array<ConsentLevelModel>;
+    consentLevels?: Array<ConsentLevelPresentationModel>;
 };
-

@@ -1,8 +1,11 @@
-import type { DataSourceResponse } from '@umbraco-cms/models';
-import type { EntityTreeItemModel, PagedEntityTreeItemModel } from '@umbraco-cms/backend-api';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type {
+	EntityTreeItemResponseModel,
+	PagedEntityTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export interface TemplateTreeDataSource {
-	getRootItems(): Promise<DataSourceResponse<PagedEntityTreeItemModel>>;
-	getChildrenOf(parentKey: string): Promise<DataSourceResponse<PagedEntityTreeItemModel>>;
-	getItems(key: Array<string>): Promise<DataSourceResponse<EntityTreeItemModel[]>>;
+	getRootItems(): Promise<DataSourceResponse<PagedEntityTreeItemResponseModel>>;
+	getChildrenOf(parentKey: string): Promise<DataSourceResponse<PagedEntityTreeItemResponseModel>>;
+	getItems(key: Array<string>): Promise<DataSourceResponse<EntityTreeItemResponseModel[]>>;
 }

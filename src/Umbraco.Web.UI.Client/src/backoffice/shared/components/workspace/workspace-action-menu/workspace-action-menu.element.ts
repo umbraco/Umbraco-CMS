@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbWorkspaceEntityContextInterface } from '../workspace-context/workspace-entity-context.interface';
-import { UmbExecutedEvent } from '@umbraco-cms/events';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbEntityWorkspaceContextInterface } from '../workspace-context/workspace-entity-context.interface';
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
@@ -34,7 +34,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	@state()
 	private _actionMenuIsOpen = false;
 
-	private _workspaceContext?: UmbWorkspaceEntityContextInterface;
+	private _workspaceContext?: UmbEntityWorkspaceContextInterface;
 
 	@state()
 	_entityKey?: string;
@@ -45,7 +45,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbWorkspaceEntityContextInterface>('umbWorkspaceContext', (context) => {
+		this.consumeContext<UmbEntityWorkspaceContextInterface>('umbWorkspaceContext', (context) => {
 			this._workspaceContext = context;
 			this._observeInfo();
 		});

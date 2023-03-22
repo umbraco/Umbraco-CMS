@@ -1,15 +1,15 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbWorkspaceEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
-import type { DataTypeModel } from '@umbraco-cms/backend-api';
-import { appendToFrozenArray, ObjectState } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDataTypeRepository>
-	implements UmbWorkspaceEntityContextInterface<DataTypeModel | undefined>
+	implements UmbEntityWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
-	#data = new ObjectState<DataTypeModel | undefined>(undefined);
+	#data = new ObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 	key = this.#data.getObservablePart((data) => data?.key);
@@ -28,9 +28,9 @@ export class UmbDataTypeWorkspaceContext
 
 	async createScaffold(parentKey: string | null) {
 		const { data } = await this.repository.createScaffold(parentKey);
-		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);
+		return { data };
 	}
 
 	getData() {
@@ -63,8 +63,8 @@ export class UmbDataTypeWorkspaceContext
 		const currentData = this.#data.value;
 		if (currentData) {
 			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
-			const newDataSet = appendToFrozenArray(currentData.data || [], entry, (x) => x.alias);
-			this.#data.update({ data: newDataSet });
+			const newDataSet = appendToFrozenArray(currentData.values || [], entry, (x) => x.alias);
+			this.#data.update({ values: newDataSet });
 		}
 	}
 

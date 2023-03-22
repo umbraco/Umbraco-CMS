@@ -5,8 +5,8 @@ import {
 	UmbNotificationOptions,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/notification';
-import { UmbLitElement } from '@umbraco-cms/element';
+} from '@umbraco-cms/backoffice/notification';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('story-notification-default-example')
 export class StoryNotificationDefaultExampleElement extends UmbLitElement {

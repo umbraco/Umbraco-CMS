@@ -3,9 +3,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit-html/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
-import type { Entity, ManifestTree } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import type { Entity } from '@umbraco-cms/backoffice/models';
+import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './tree-item.element';
 import './context-menu/tree-context-menu-page.service';
@@ -73,6 +74,7 @@ export class UmbTreeElement extends UmbLitElement {
 				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
 			async (tree) => {
 				if (this._tree?.alias === tree?.alias) return;
+
 				this._tree = tree;
 				this.#provideTreeContext();
 			}

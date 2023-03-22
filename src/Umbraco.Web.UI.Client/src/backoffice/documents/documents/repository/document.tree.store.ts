@@ -1,6 +1,6 @@
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbTreeStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbTreeStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export

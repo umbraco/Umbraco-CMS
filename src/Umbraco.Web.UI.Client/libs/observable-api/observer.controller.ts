@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { UmbObserver } from './observer';
-import { UmbControllerInterface, UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbControllerInterface, UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbObserverController<T = unknown> extends UmbObserver<T> implements UmbControllerInterface {
 	_alias?: string;
@@ -13,6 +13,7 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 		this._alias = alias;
 
 		// Lets check if controller is already here:
+		// No we don't want this, as multiple different controllers might be looking at the same source.
 		/*
 		if (this._subscriptions.has(source)) {
 			const subscription = this._subscriptions.get(source);
@@ -21,9 +22,5 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 		*/
 
 		host.addController(this);
-	}
-
-	hostConnected() {
-		return;
 	}
 }

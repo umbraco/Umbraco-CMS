@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
 	rest.get(umbracoPath('/published-cache/status'), (_req, res, ctx) => {

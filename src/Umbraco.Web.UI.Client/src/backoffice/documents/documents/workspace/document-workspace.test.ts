@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbDocumentWorkspaceElement } from './document-workspace.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbDocumentWorkspaceElement', () => {
 	let element: UmbDocumentWorkspaceElement;
@@ -16,14 +16,5 @@ describe('UmbDocumentWorkspaceElement', () => {
 	it('passes the a11y audit', async () => {
 		// TODO: should we use shadowDom here?
 		await expect(element).to.be.accessible(defaultA11yConfig);
-	});
-
-	describe('methods', () => {
-    it('has a load method', () => {
-      expect(element).to.have.property('load').that.is.a('function');
-    });
-    it('has a create method', () => {
-      expect(element).to.have.property('create').that.is.a('function');
-    });
 	});
 });

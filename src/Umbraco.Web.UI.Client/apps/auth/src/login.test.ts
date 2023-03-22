@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import UmbLogin from './login.element';
 
 describe('UmbLogin', () => {

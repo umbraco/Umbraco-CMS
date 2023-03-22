@@ -6,7 +6,7 @@ import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 } from '../section-sidebar/section-sidebar.context';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenu extends UmbLitElement {

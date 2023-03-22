@@ -3,9 +3,9 @@ import './upgrader-view.element';
 
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UpgradeResource, UpgradeSettingsModel } from '@umbraco-cms/backend-api';
-import { tryExecute } from '@umbraco-cms/resources';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UpgradeResource, UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-upgrader
@@ -13,7 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
 @customElement('umb-upgrader')
 export class UmbUpgrader extends UmbLitElement {
 	@state()
-	private upgradeSettings?: UpgradeSettingsModel;
+	private upgradeSettings?: UpgradeSettingsResponseModel;
 
 	@state()
 	private fetching = true;

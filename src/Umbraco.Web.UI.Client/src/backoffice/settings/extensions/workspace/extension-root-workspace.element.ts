@@ -1,15 +1,22 @@
-import { html } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { map } from 'rxjs';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
-import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { ManifestBase } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
+	static styles = [css`
+		uui-box {
+			margin: var(--uui-size-layout-1);
+		}
+	`]
+
 	@state()
-	private _extensions?: Array<ManifestBase> = undefined;
+	private _extensions?: Array<ManifestTypes> = undefined;
 
 	private _modalContext?: UmbModalContext;
 
@@ -23,12 +30,26 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	private _observeExtensions() {
-		this.observe(umbExtensionsRegistry.extensionsSortedByTypeAndWeight(), (extensions) => {
-			this._extensions = extensions || undefined;
-		});
+		this.observe(
+			umbExtensionsRegistry.extensions.pipe(
+				map((exts) =>
+					exts.sort((a, b) => {
+						// If type is the same, sort by weight
+						if (a.type === b.type) {
+							return (b.weight || 0) - (a.weight || 0);
+						}
+						// Otherwise sort by type
+						return a.type.localeCompare(b.type);
+					})
+				)
+			),
+			(extensions) => {
+				this._extensions = extensions || undefined;
+			}
+		);
 	}
 
-	async #removeExtension(extension: ManifestBase) {
+	async #removeExtension(extension: ManifestTypes) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
@@ -42,7 +63,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot">
+			<umb-workspace-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot" .enforceNoFooter=${true}>
 				<uui-box>
 					<uui-table>
 						<uui-table-head>

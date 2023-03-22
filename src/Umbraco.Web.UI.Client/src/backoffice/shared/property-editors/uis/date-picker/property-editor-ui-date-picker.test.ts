@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIDatePickerElement', () => {
 	let element: UmbPropertyEditorUIDatePickerElement;

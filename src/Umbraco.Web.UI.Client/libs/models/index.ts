@@ -1,18 +1,14 @@
-import {
-	ContentTreeItemModel,
-	DictionaryItemTranslationModel,
-	EntityTreeItemModel,
-	FolderTreeItemModel,
-	PackageManifestModel,
-	ProblemDetailsModel,
-} from '@umbraco-cms/backend-api';
-
-// Extension Manifests
-export * from '@umbraco-cms/extensions-registry';
+import type {
+	ContentTreeItemResponseModel,
+	EntityTreeItemResponseModel,
+	FolderTreeItemResponseModel,
+	PackageManifestResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ClassConstructor<T> = new (...args: any[]) => T;
 
 // Users
@@ -24,13 +20,6 @@ export interface Entity {
 	type: string;
 	hasChildren: boolean;
 	parentKey: string | null;
-}
-
-export interface ContentDetails extends ContentTreeItemModel {
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	//data: Array<ContentPropertyData>;
-	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
 export interface UserEntity extends Entity {
@@ -64,72 +53,28 @@ export interface UserGroupDetails extends UserGroupEntity {
 	permissions: Array<string>;
 }
 
-/*
-// Data Types
-export interface DataTypeDetails extends FolderTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	propertyEditorAlias: string | null;
-	propertyEditorUiAlias: string | null;
-	data: Array<DataTypeProperty>;
-}
-
-export interface DataTypeProperty {
-	alias: string;
-	value: any;
-}
-*/
-
 // TODO: Make sure Entity Type/interface.
-export interface MemberTypeDetails extends EntityTreeItemModel {
+export interface MemberTypeDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
-// Content
-export interface ContentProperty {
-	alias: string;
-	label: string;
-	description: string;
-	dataTypeKey: string;
-}
-
-export interface ContentPropertyData {
-	alias: string;
-	value: any;
-}
-
-// Media
-export interface MediaDetails extends ContentTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	data: Array<ContentPropertyData>;
-	variants: Array<any>; // TODO: define variant data
-	//layout?: any; // TODO: define layout type - make it non-optional
-}
-
 // Media Types
 
-export interface MediaTypeDetails extends FolderTreeItemModel {
+export interface MediaTypeDetails extends FolderTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
 // Member Groups
-export interface MemberGroupDetails extends EntityTreeItemModel {
+export interface MemberGroupDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
 }
 
-export interface MemberDetails extends EntityTreeItemModel {
+export interface MemberDetails extends EntityTreeItemResponseModel {
 	key: string; // TODO: Remove this when the backend is fixed
-}
-
-// Dictionary
-export interface DictionaryDetails extends EntityTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	translations: DictionaryItemTranslationModel[];
 }
 
 // Document Blueprint
@@ -143,17 +88,12 @@ export interface DocumentBlueprintDetails {
 	documentTypeKey: string;
 }
 
-export interface DataSourceResponse<T = undefined> {
-	data?: T;
-	error?: ProblemDetailsModel;
-}
-
 export interface SwatchDetails {
 	label: string;
 	value: string;
 }
 
-export type UmbPackage = PackageManifestModel;
+export type UmbPackage = PackageManifestResponseModel;
 
 export type PackageManifestResponse = UmbPackage[];
 

@@ -1,4 +1,4 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
@@ -21,7 +21,8 @@ export const manifest: ManifestPropertyEditorUI = {
 				{
 					alias: 'offsetTime',
 					label: 'Offset time',
-					description: 'When enabled the time displayed will be offset with the servers timezone, this is useful for scenarios like scheduled publishing when an editor is in a different timezone than the hosted server',
+					description:
+						'When enabled the time displayed will be offset with the servers timezone, this is useful for scenarios like scheduled publishing when an editor is in a different timezone than the hosted server',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
 				},
 			],
@@ -32,8 +33,8 @@ export const manifest: ManifestPropertyEditorUI = {
 				},
 				{
 					alias: 'offsetTime',
-					value: false
-				}
+					value: false,
+				},
 			],
 		},
 	},

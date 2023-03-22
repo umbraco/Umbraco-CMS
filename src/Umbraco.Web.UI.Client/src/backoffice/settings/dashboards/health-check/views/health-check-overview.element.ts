@@ -3,14 +3,11 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from '../health-check-dashboard.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-
-import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
 
 import './health-check-group-box-overview.element';
 
@@ -19,6 +16,11 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
 			uui-box + uui-box {
 				margin-top: var(--uui-size-space-5);
 			}
@@ -26,6 +28,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 			.flex {
 				display: flex;
 				justify-content: space-between;
+				align-items:center;
 			}
 
 			.grid {

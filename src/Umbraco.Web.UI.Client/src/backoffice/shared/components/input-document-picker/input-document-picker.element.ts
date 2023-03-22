@@ -7,10 +7,10 @@ import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/docume
 import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-picker';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
-import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -77,11 +77,11 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@state()
-	private _items?: Array<DocumentTreeItemModel>;
+	private _items?: Array<DocumentTreeItemResponseModel>;
 
 	private _modalContext?: UmbModalContext;
 	private _documentStore?: UmbDocumentTreeStore;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
+	private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 
 	constructor() {
 		super();
@@ -133,7 +133,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		});
 	}
 
-	private async _removeItem(item: FolderTreeItemModel) {
+	private async _removeItem(item: EntityTreeItemResponseModel) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -158,9 +158,9 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	private _renderItem(item: FolderTreeItemModel) {
+	private _renderItem(item: EntityTreeItemResponseModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
+		const tempItem = item as EntityTreeItemResponseModel & { isTrashed: boolean };
 
 		return html`
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>

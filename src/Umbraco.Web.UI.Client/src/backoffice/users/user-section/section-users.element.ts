@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { ManifestSectionView } from '@umbraco-cms/models';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestSectionView } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-users-section')
 export class UmbUsersSectionElement extends LitElement {

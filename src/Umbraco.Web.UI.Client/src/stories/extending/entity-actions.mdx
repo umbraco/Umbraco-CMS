@@ -64,11 +64,13 @@ const manifest = {
 	name: 'My Entity Action',
 	weight: 10,
 	meta: {
-		entityType: 'my-entity',
 		icon: 'umb:add',
 		label: 'My Entity Action',
 		repositoryAlias: 'My.Repository',
 		api: MyEntityAction,
+	},
+	conditions: {
+		entityType: 'my-entity',
 	},
 };
 
@@ -155,11 +157,13 @@ const manifest = {
 	name: 'My Entity Bulk Action',
 	weight: 10,
 	meta: {
-		entityType: 'my-entity',
 		icon: 'umb:add',
 		label: 'My Entity Bulk Action',
 		repositoryAlias: 'My.Repository',
 		api: MyEntityBulkAction,
+	},
+	conditions: {
+		entityType: 'my-entity',
 	},
 };
 

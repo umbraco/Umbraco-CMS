@@ -1,7 +1,13 @@
-import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
-import { DocumentResource, ProblemDetailsModel, DocumentModel } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { v4 as uuidv4 } from 'uuid';
+import { RepositoryDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import {
+	DocumentResource,
+	ProblemDetailsModel,
+	DocumentResponseModel,
+	ContentStateModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -9,7 +15,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @class UmbDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<DocumentModel> {
+export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<DocumentResponseModel> {
 	#host: UmbControllerHostInterface;
 
 	/**
@@ -47,10 +53,25 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
-		const data: DocumentModel = {
+	async createScaffold(documentTypeKey: string) {
+		const data: DocumentResponseModel = {
+			urls: [],
+			templateKey: null,
+			key: uuidv4(),
+			contentTypeKey: documentTypeKey,
 			values: [],
-			variants: [],
+			variants: [
+				{
+					$type: '',
+					state: ContentStateModel.DRAFT,
+					publishDate: null,
+					culture: null,
+					segment: null,
+					name: '',
+					createDate: new Date().toISOString(),
+					updateDate: undefined,
+				},
+			],
 		};
 
 		return { data };
@@ -62,7 +83,7 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async insert(document: DocumentModel) {
+	async insert(document: DocumentResponseModel) {
 		if (!document.key) {
 			//const error: ProblemDetails = { title: 'Document key is missing' };
 			return Promise.reject();
@@ -79,7 +100,7 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 		}
 		//return tryExecuteAndNotify(this.#host, DocumentResource.postDocument(payload));
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentModel>(
+		return tryExecuteAndNotify<DocumentResponseModel>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document/save', {
 				method: 'POST',
@@ -98,7 +119,7 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(document: DocumentModel) {
+	async update(document: DocumentResponseModel) {
 		if (!document.key) {
 			const error: ProblemDetailsModel = { title: 'Document key is missing' };
 			return { error };
@@ -115,7 +136,7 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentModel>(
+		return tryExecuteAndNotify<DocumentResponseModel>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document/save', {
 				method: 'POST',
@@ -140,7 +161,7 @@ export class UmbDocumentServerDataSource implements RepositoryDetailDataSource<D
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentModel>(
+		return tryExecuteAndNotify<DocumentResponseModel>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',

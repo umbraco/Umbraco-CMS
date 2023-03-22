@@ -1,6 +1,7 @@
-import type { Entity, ManifestSection, ManifestSectionView } from '@umbraco-cms/models';
-import { ObjectState, StringState } from '@umbraco-cms/observable-api';
-import { UmbContextToken } from '@umbraco-cms/context-api';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
+import type { Entity } from '@umbraco-cms/backoffice/models';
+import { ObjectState, StringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type ActiveTreeItemType = Entity | undefined;
 
@@ -22,10 +23,6 @@ export class UmbSectionContext {
 	#activeTreeItem = new ObjectState<ActiveTreeItemType | undefined>(undefined);
 	public readonly activeTreeItem = this.#activeTreeItem.asObservable();
 
-	// TODO: what is the best context to put this in?
-	#activeViewPathname = new StringState(undefined);
-	public readonly activeViewPathname = this.#activeViewPathname.asObservable();
-
 	constructor(manifest: ManifestSection) {
 		this.setManifest(manifest);
 	}
@@ -45,10 +42,6 @@ export class UmbSectionContext {
 
 	public setActiveTreeItem(item?: ActiveTreeItemType) {
 		this.#activeTreeItem.next(item);
-	}
-
-	public setActiveView(view?: ManifestSectionView) {
-		this.#activeViewPathname.next(view?.meta.pathname);
 	}
 }
 

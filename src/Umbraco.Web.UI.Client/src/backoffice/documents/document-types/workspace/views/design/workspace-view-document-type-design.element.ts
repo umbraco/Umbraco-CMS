@@ -1,12 +1,11 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
+import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
@@ -15,10 +14,8 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				margin: var(--uui-size-layout-1);
 			}
-
-			/** Tab group */
-
 			#workspace-tab-bar {
 				padding: 0 var(--uui-size-layout-1);
 				display: flex;
@@ -80,7 +77,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	];
 
 	@state()
-	_documentType?: DocumentTypeModel;
+	_documentType?: DocumentTypeResponseModel;
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 

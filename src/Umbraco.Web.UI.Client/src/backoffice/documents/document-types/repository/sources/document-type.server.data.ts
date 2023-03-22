@@ -1,7 +1,7 @@
-import { RepositoryDetailDataSource } from '@umbraco-cms/repository';
-import { DocumentTypeResource, ProblemDetailsModel, DocumentTypeModel } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { RepositoryDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import { DocumentTypeResource, ProblemDetailsModel, DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSource<DocumentTypeModel> {
+export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSource<DocumentTypeResponseModel> {
 	#host: UmbControllerHostInterface;
 
 	/**
@@ -48,7 +48,7 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(parentKey: string | null) {
-		const data: DocumentTypeModel = {
+		const data: DocumentTypeResponseModel = {
 			properties: [],
 		};
 
@@ -61,7 +61,7 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async insert(document: DocumentTypeModel) {
+	async insert(document: DocumentTypeResponseModel) {
 		if (!document.key) {
 			//const error: ProblemDetails = { title: 'Document key is missing' };
 			return Promise.reject();
@@ -78,7 +78,7 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		}
 		//return tryExecuteAndNotify(this.#host, DocumentTypeResource.postDocument(payload));
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentTypeModel>(
+		return tryExecuteAndNotify<DocumentTypeResponseModel>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document-type', {
 				method: 'POST',
@@ -97,7 +97,7 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(document: DocumentTypeModel) {
+	async update(document: DocumentTypeResponseModel) {
 		if (!document.key) {
 			const error: ProblemDetailsModel = { title: 'Document key is missing' };
 			return { error };
@@ -114,7 +114,7 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentTypeModel>(
+		return tryExecuteAndNotify<DocumentTypeResponseModel>(
 			this.#host,
 			fetch(`/umbraco/management/api/v1/document-type/${document.key}`, {
 				method: 'PUT',
@@ -139,7 +139,7 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 		}
 
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentTypeModel>(
+		return tryExecuteAndNotify<DocumentTypeResponseModel>(
 			this.#host,
 			fetch(`/umbraco/management/api/v1/document-type/${key}`, {
 				method: 'DELETE',
@@ -185,5 +185,32 @@ export class UmbDocumentTypeServerDataSource implements RepositoryDetailDataSour
 			this.#host,
 		);
 		*/
+	}
+
+	/**
+	 * Get the allowed document types for a given parent key
+	 * @param {string} key
+	 * @return {*}
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async getAllowedChildrenOf(key: string) {
+		if (!key) throw new Error('Key is missing');
+
+		let problemDetails: ProblemDetailsModel | undefined = undefined;
+		let data = undefined;
+
+		try {
+			const res = await fetch(`/umbraco/management/api/v1/document-type/allowed-children-of/${key}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			data = await res.json();
+		} catch (error) {
+			problemDetails = { title: `Get allowed children of ${key} failed` };
+		}
+
+		return { data, error: problemDetails };
 	}
 }

@@ -1,4 +1,4 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 // TODO: implement
 export class UmbUserGroupRepository {
