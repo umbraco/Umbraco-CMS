@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class UserServiceCrudTests
 {

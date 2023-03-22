@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 public partial class UserServiceCrudTests
 {
@@ -17,7 +17,7 @@ public partial class UserServiceCrudTests
     [TestCase("test@email.com", "test@email.com", false, true)]
     [TestCase("NotAnEmail", "test@email.com", false, true)]
     [TestCase("aDifferentEmail@email.com", "test@email.com", false, true)]
-    public async Task Invite_User_Name_Must_Be_Email(
+    public async Task Creating_User_Name_Must_Be_Email(
         string username,
         string email,
         bool userNameIsEmailEnabled,
@@ -27,7 +27,7 @@ public partial class UserServiceCrudTests
         var userService = CreateUserService(securitySettings);
 
         var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
-        var inviteModel = new UserInviteModel
+        var creationModel = new UserCreateModel
         {
             UserName = username,
             Email = email,
@@ -35,7 +35,7 @@ public partial class UserServiceCrudTests
             UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
-        var result = await userService.InviteAsync(Constants.Security.SuperUserKey, inviteModel);
+        var result = await userService.CreateAsync(Constants.Security.SuperUserKey, creationModel, true);
 
         if (shouldSucceed is false)
         {
@@ -46,14 +46,14 @@ public partial class UserServiceCrudTests
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(UserOperationStatus.Success, result.Status);
-        var invitedUser = result.Result.InvitedUser;
-        Assert.IsNotNull(invitedUser);
-        Assert.AreEqual(username, invitedUser.Username);
-        Assert.AreEqual(email, invitedUser.Email);
+        var createdUser = result.Result.CreatedUser;
+        Assert.IsNotNull(createdUser);
+        Assert.AreEqual(username, createdUser.Username);
+        Assert.AreEqual(email, createdUser.Email);
     }
 
     [Test]
-    public async Task Cannot_Invite_User_With_Duplicate_Email()
+    public async Task Cannot_Create_User_With_Duplicate_Email()
     {
         var email = "test@test.com";
         var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
@@ -69,7 +69,7 @@ public partial class UserServiceCrudTests
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, initialUserCreateModel, true);
         Assert.IsTrue(result.Success);
 
-        var duplicateUserInviteModel = new UserInviteModel
+        var duplicateUserCreateModel = new UserCreateModel
         {
             UserName = "Test2",
             Email = email,
@@ -77,13 +77,13 @@ public partial class UserServiceCrudTests
             UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
-        var secondResult = await userService.InviteAsync(Constants.Security.SuperUserKey, duplicateUserInviteModel);
+        var secondResult = await userService.CreateAsync(Constants.Security.SuperUserKey, duplicateUserCreateModel, true);
         Assert.IsFalse(secondResult.Success);
         Assert.AreEqual(UserOperationStatus.DuplicateEmail, secondResult.Status);
     }
 
     [Test]
-    public async Task Cannot_Invite_User_With_Duplicate_UserName()
+    public async Task Cannot_Create_User_With_Duplicate_UserName()
     {
         var userName = "UserName";
         var userGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
@@ -99,7 +99,7 @@ public partial class UserServiceCrudTests
         var result = await userService.CreateAsync(Constants.Security.SuperUserKey, initialUserCreateModel, true);
         Assert.IsTrue(result.Success);
 
-        var duplicateUserInviteModelModel = new UserInviteModel
+        var duplicateUserCreateModel = new UserCreateModel
         {
             UserName = userName,
             Email = "another@email.com",
@@ -107,15 +107,15 @@ public partial class UserServiceCrudTests
             UserGroups = new HashSet<IUserGroup> { userGroup! }
         };
 
-        var secondResult = await userService.InviteAsync(Constants.Security.SuperUserKey, duplicateUserInviteModelModel);
+        var secondResult = await userService.CreateAsync(Constants.Security.SuperUserKey, duplicateUserCreateModel, true);
         Assert.IsFalse(secondResult.Success);
         Assert.AreEqual(UserOperationStatus.DuplicateUserName, secondResult.Status);
     }
 
     [Test]
-    public async Task Cannot_Invite_User_Without_User_Group()
+    public async Task Cannot_Create_User_Without_User_Group()
     {
-        UserInviteModel userInviteModel = new UserInviteModel
+        UserCreateModel userCreateModel = new UserCreateModel
         {
             UserName = "NoUser@Group.com",
             Email = "NoUser@Group.com",
@@ -124,18 +124,18 @@ public partial class UserServiceCrudTests
 
         IUserService userService = CreateUserService();
 
-        var result = await userService.InviteAsync(Constants.Security.SuperUserKey, userInviteModel);
+        var result = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.NoUserGroup, result.Status);
     }
 
     [Test]
-    public async Task Performing_User_Must_Exist_When_Inviting()
+    public async Task Performing_User_Must_Exist_When_Creating()
     {
         IUserService userService = CreateUserService();
 
-        var result = await userService.InviteAsync(Guid.Empty, new UserInviteModel());
+        var result = await userService.CreateAsync(Guid.Empty, new UserCreateModel(), true);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserOperationStatus.MissingUser, result.Status);
