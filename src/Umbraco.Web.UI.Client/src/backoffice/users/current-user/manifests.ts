@@ -1,6 +1,6 @@
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 import { manifests as modalManifests } from './modals/manifests';
-import { manifests as userProfileAppsManifests } from './profile-apps/manifests';
+import { manifests as userProfileAppsManifests } from './user-profile-apps/manifests';
 
 export const headerApps: Array<ManifestTypes> = [
 	{
