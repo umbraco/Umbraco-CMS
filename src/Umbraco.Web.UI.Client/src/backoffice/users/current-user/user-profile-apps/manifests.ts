@@ -6,10 +6,21 @@ export const userProfileApps: Array<ManifestUserProfileApp> = [
 		alias: 'Umb.UserProfileApp.Themes',
 		name: 'Themes User Profile App',
 		loader: () => import('./user-profile-app-themes.element'),
-		weight: 1,
+		weight: 100,
 		meta: {
 			label: 'Themes User Profile App',
 			pathname: 'themes',
+		},
+	},
+	{
+		type: 'userProfileApp',
+		alias: 'Umb.UserProfileApp.History',
+		name: 'History User Profile App',
+		loader: () => import('./user-profile-app-history.element'),
+		weight: 200,
+		meta: {
+			label: 'History User Profile App',
+			pathname: 'history',
 		},
 	},
 ];
