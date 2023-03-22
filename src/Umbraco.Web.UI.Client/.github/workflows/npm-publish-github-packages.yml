@@ -43,7 +43,7 @@ jobs:
           path: ./dist/libs
 
   publish-npm:
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     concurrency:
