@@ -5,7 +5,7 @@ import { UUISelectEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../themes/theme.context';
+import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../themes/theme.context';
 
 @customElement('umb-user-dashboard-test')
 export class UmbUserProfileAppTestElement extends UmbLitElement {
