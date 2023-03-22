@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbMediaData } from '../data/media.data';
-import type { MediaDetails } from '@umbraco-cms/backoffice/models';
+import type { MediaDetails } from '../../../backoffice/media/media';
 
 // TODO: add schema
 export const handlers = [

@@ -4,7 +4,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
-import type { MediaDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
@@ -49,7 +48,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
 	private _entityBulkActions: Array<ManifestEntityBulkAction> = [];
 
-	private _collectionContext?: UmbCollectionContext<MediaDetails>;
+	private _collectionContext?: UmbCollectionContext;
 	private _selection: Array<string> = [];
 
 	constructor() {

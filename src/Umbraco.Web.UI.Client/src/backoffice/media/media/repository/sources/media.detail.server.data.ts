@@ -1,8 +1,8 @@
+import type { MediaDetails } from '../../';
 import { RepositoryDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { MediaDetails } from '@umbraco-cms/backoffice/models';
 
 /**
  * A data source for the Template detail that fetches data from the server

@@ -7,7 +7,6 @@ import './collection-toolbar.element';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extensions-registry';
-import type { MediaDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -36,7 +35,7 @@ export class UmbCollectionElement extends UmbLitElement {
 	@state()
 	private _selection?: Array<string> | null;
 
-	private _collectionContext?: UmbCollectionContext<MediaDetails>;
+	private _collectionContext?: UmbCollectionContext;
 
 	private _entityType!: string;
 	@property({ type: String, attribute: 'entity-type' })
