@@ -1058,17 +1058,22 @@ internal class UserService : RepositoryService, IUserService
 
         SortedSet<UserState>? includeUserStates = null;
 
-        // TODO: Refactor this into the UserFilter
         // The issue is that this is a limiting filter we have to ensure that it still follows our rules
         // So I'm not allowed to ask for the disabled users if the setting has been flipped
         if (baseFilter.IncludeUserStates is null || baseFilter.IncludeUserStates.IsCollectionEmpty())
         {
             includeUserStates = filter.IncludeUserStates;
         }
-        else if(filter.IncludeUserStates is not null)
+        else
         {
-            includeUserStates = new SortedSet<UserState>(filter.IncludeUserStates);
+            includeUserStates = new SortedSet<UserState>(filter.IncludeUserStates!);
             includeUserStates.IntersectWith(baseFilter.IncludeUserStates);
+
+            // This means that we've only chosen to include a user state that is not allowed, so we'll return an empty result
+            if(includeUserStates.Count == 0)
+            {
+                return Attempt.SucceedWithStatus(UserOperationStatus.Success, new PagedModel<IUser>());
+            }
         }
 
 
