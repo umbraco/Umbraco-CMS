@@ -63,20 +63,21 @@ Notice we are using a Controller here, this means your element has to be a Contr
 #### Simple Modal Registration
 
 ```ts
-new UmbModalRegistrationController(this, MY_SOMETHING_PICKER_MODAL, {
-	path: `:key`,
+new UmbPropertyEditorModalRegistrationController(this, MY_SOMETHING_PICKER_MODAL, {
+	path: `:alias`,
 	onSetup: (params) => {
-		const keyParam = params.key;
-		if (!keyParam) return false;
+		const aliasParam = params.alias;
+		if (!aliasParam) return false;
+		// In this example alias is not being used, but we could use it to get the right data set for the modal.
 
 		// Make a Data object to be used in the modal:
 		return {
-			key: keyParam,
+			key: this.myCurrentValue,
 		};
 	},
 	onSubmit: (submitData) => {
-		// Here we got the Result object from the modal:
-		this._mySetPickedKey(submitData.key);
+		// Here we got the Result object from the modal, which we can use to get the new selected key.
+		this.myCurrentValue = submitData.key;
 	},
 	getUrlBuilder: (urlBuilder) => {
 		// Here we got a urlBuilder, read further down this document for more into on this:
@@ -115,11 +116,11 @@ new UmbPropertyEditorModalRegistrationController(this, MY_SOMETHING_PICKER_MODAL
 The Modal registration has an option to retrive a URL Builder, this is a function that can be used to generate a URL to a modal.
 
 ```ts
-const modalLink = _myUrlBuilder?.({ key: 'my-key-1234' });
+const modalLink = _myUrlBuilder?.({ alias: 'my-input-alias' });
 ```
 
-The modalLink from above could look like: /umbraco/backoffice/my/location/modal/Our.Modal.SomethingPicker/my-key-1234
+The modalLink from above could look like: /umbraco/backoffice/my/location/modal/Our.Modal.SomethingPicker/my-input-alias
 
 Notice the Property Editor registration will add the property alias and variant id to the URL, so it becomes:
 
-/umbraco/backoffice/my/location/modal/Our.Modal.SomethingPicker/my-property-alias/en-us/my-key-1234
+/umbraco/backoffice/my/location/modal/Our.Modal.SomethingPicker/my-property-alias/en-us/my-input-alias
