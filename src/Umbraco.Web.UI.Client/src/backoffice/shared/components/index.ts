@@ -51,6 +51,5 @@ import './workspace/workspace-layout/workspace-layout.element';
 import './workspace/workspace-footer-layout/workspace-footer-layout.element';
 
 import './template-card/template-card.element';
-import './template-card/template-card-list.element';
 
 export const manifests = [...debugManifests];

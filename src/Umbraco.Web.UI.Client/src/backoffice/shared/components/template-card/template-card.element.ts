@@ -2,11 +2,10 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-template-card
- * @description wrap inside a umb-template-card-list
  * @slot actions
  * @fires open
  * @fires selected

@@ -1,10 +1,10 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
-import { UmbTemplateCardListElement } from '../../../../../shared/components/template-card/template-card-list.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeModel } from '@umbraco-cms/backend-api';
+
 import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-templates')
@@ -41,7 +41,7 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 	defaultTemplateKey?: string = '123';
 
 	@state()
-	_documentType?: DocumentTypeModel;
+	_documentType?: DocumentTypeResponseModel;
 
 	@state()
 	_templates = [
@@ -70,7 +70,7 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 	}
 
 	#changeDefaultTemplate(e: CustomEvent) {
-		this.defaultTemplateKey = (e.target as UmbTemplateCardListElement).value as string;
+		//this.defaultTemplateKey = (e.target as UmbTemplateCardElement).value as string;
 		console.log('default template key', this.defaultTemplateKey);
 	}
 

@@ -3,16 +3,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbDocumentTypeTreeStore,
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
 } from '../../../documents/document-types/repository/document-type.tree.store';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-type-picker';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTypeModel, DocumentTypeTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
-import type { UmbObserverController } from '@umbraco-cms/observable-api';
 
 @customElement('umb-input-document-type-picker')
 export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitElement) {
@@ -52,14 +52,14 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	}
 
 	@property()
-	currentDocumentType?: DocumentTypeModel;
+	currentDocumentType?: DocumentTypeResponseModel;
 
 	@state()
-	private _items?: Array<DocumentTypeTreeItemModel>;
+	private _items?: Array<DocumentTypeResponseModel>;
 
 	private _modalContext?: UmbModalContext;
 	private _documentTypeStore?: UmbDocumentTypeTreeStore;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
+	private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 
 	constructor() {
 		super();
@@ -99,7 +99,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		});
 	}
 
-	private async _removeItem(item: FolderTreeItemModel) {
+	private async _removeItem(item: EntityTreeItemResponseModel) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -129,9 +129,9 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		`;
 	}
 
-	private _renderItem(item: FolderTreeItemModel) {
+	private _renderItem(item: EntityTreeItemResponseModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
+		const tempItem = item as EntityTreeItemResponseModel & { isTrashed: boolean };
 
 		return html`
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>

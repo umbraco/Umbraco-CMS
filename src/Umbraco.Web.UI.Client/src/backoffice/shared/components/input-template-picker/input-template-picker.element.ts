@@ -3,14 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, queryAll, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
+import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UmbTemplateCardElement } from '../template-card/template-card.element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { TemplateModel, TemplateResource } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-
-type DocTypTemplateModel = TemplateModel & { default: boolean };
 
 @customElement('umb-input-template-picker')
 export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElement) {
@@ -83,16 +82,6 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	private _templates: Array<DocTypTemplateModel> = [];
-	public get templates(): Array<DocTypTemplateModel> {
-		return this._templates;
-	}
-	public set templates(newTemplates: Array<DocTypTemplateModel>) {
-		const keys = newTemplates.map((template) => template.key);
-		super.value = keys.join(',');
-		this._templates = newTemplates;
-	}
-
 	@state()
 	private _items: Array<any> = [
 		{ key: '2bf464b6-3aca-4388-b043-4eb439cc2643', name: 'Doc 1', default: false },
@@ -103,21 +92,18 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	//private _documentStore?: UmbDocumentTreeStore;
 	//private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
 
-	@queryAll('.template-card')
-	private _templateCardElements?: NodeListOf<Element>;
-
 	constructor() {
 		super();
 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._templates.length < this.min
+			() => !!this.min && this._items.length < this.min
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this._templates.length > this.max
+			() => !!this.max && this._items.length > this.max
 		);
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
