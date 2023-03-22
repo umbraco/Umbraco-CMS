@@ -1,4 +1,4 @@
-import { BehaviorSubject, withLatestFrom, map, Observable, distinctUntilChanged } from 'rxjs';
+import { BehaviorSubject, map, Observable, distinctUntilChanged, combineLatest } from 'rxjs';
 import type {
 	ManifestTypes,
 	ManifestTypeMap,
@@ -14,13 +14,13 @@ function extensionArrayMemoization<T extends { alias: string }>(
 ): boolean {
 	// If length is different, data is different:
 	if (previousValue.length !== currentValue.length) {
-		return true;
+		return false;
 	}
 	// previousValue has an alias that is not present in currentValue:
 	if (previousValue.find((p) => !currentValue.find((c) => c.alias === p.alias))) {
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 function extensionSingleMemoization<T extends { alias: string }>(
@@ -28,9 +28,9 @@ function extensionSingleMemoization<T extends { alias: string }>(
 	currentValue: T | undefined
 ): boolean {
 	if (previousValue && currentValue) {
-		return previousValue.alias !== currentValue.alias;
+		return previousValue.alias === currentValue.alias;
 	}
-	return previousValue !== currentValue;
+	return previousValue === currentValue;
 }
 
 const sortExtensions = (a: ManifestBase, b: ManifestBase) => (b.weight || 0) - (a.weight || 0);
@@ -128,9 +128,10 @@ export class UmbExtensionRegistry {
 		Key extends keyof ManifestTypeMap | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<Key>
 	>(type: Key, alias: string) {
-		return this.extensions.pipe(
-			map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
-			withLatestFrom(this._kindsOfType(type)),
+		return combineLatest([
+			this.extensions.pipe(map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias))),
+			this._kindsOfType(type),
+		]).pipe(
 			map(([ext, kinds]) => {
 				// TODO: share one merge function between the different methods of this class:
 				// Specific Extension Meta merge (does not merge conditions)
@@ -154,8 +155,7 @@ export class UmbExtensionRegistry {
 		Key extends keyof ManifestTypeMap | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<Key>
 	>(type: Key) {
-		return this._extensionsOfType(type).pipe(
-			withLatestFrom(this._kindsOfType(type)),
+		return combineLatest([this._extensionsOfType(type), this._kindsOfType(type)]).pipe(
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
@@ -179,8 +179,7 @@ export class UmbExtensionRegistry {
 	extensionsOfTypes<ExtensionTypes extends ManifestBase = ManifestBase>(
 		types: string[]
 	): Observable<Array<ExtensionTypes>> {
-		return this._extensionsOfTypes(types).pipe(
-			withLatestFrom(this._kindsOfTypes(types)),
+		return combineLatest([this._extensionsOfTypes(types), this._kindsOfTypes(types)]).pipe(
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
