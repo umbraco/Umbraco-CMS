@@ -79,5 +79,8 @@
     <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Update.cs">
       <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.PartialUpdates.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
