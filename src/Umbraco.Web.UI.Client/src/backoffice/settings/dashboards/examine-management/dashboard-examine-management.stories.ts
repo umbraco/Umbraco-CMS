@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element';
 import './dashboard-examine-management.element';

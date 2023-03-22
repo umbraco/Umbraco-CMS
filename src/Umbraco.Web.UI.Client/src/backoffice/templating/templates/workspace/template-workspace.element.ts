@@ -1,7 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UUIInputElement, UUITextareaElement } from '@umbraco-ui/uui';
+import { customElement, query, state } from 'lit/decorators.js';
+import { UUIInputElement } from '@umbraco-ui/uui';
+import { UmbCodeEditorElement } from '../../../shared/components/code-editor/code-editor.element';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -16,8 +17,18 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 				height: 100%;
 			}
 
-			#content {
-				height: 200px;
+			umb-code-editor {
+				--editor-height: calc(100vh - 300px);
+			}
+
+			uui-box {
+				margin: 1em;
+				--uui-box-default-padding: 0;
+			}
+
+			uui-input {
+				width: 100%;
+				margin: 1em;
 			}
 		`,
 	];
@@ -36,6 +47,9 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 
 	@state()
 	private _content?: string | null = '';
+
+	@query('umb-code-editor')
+	private _codeEditor?: UmbCodeEditorElement;
 
 	#templateWorkspaceContext = new UmbTemplateWorkspaceContext(this);
 	#isNew = false;
@@ -59,17 +73,35 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		this.#templateWorkspaceContext.setName(value);
 	}
 
-	#onTextareaInput(event: Event) {
-		const target = event.target as UUITextareaElement;
-		const value = target.value as string;
+	//TODO - debounce that
+	#onCodeEditorInput(event: Event) {
+		const target = event.target as UmbCodeEditorElement;
+		const value = target.code as string;
 		this.#templateWorkspaceContext.setContent(value);
+	}
+
+	#insertCode(event: Event) {
+		const target = event.target as UUIInputElement;
+		const value = target.value as string;
+
+		this._codeEditor?.insert(`My hovercraft is full of eels`);
 	}
 
 	render() {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-layout alias="Umb.Workspace.Template">
-			<uui-input .value=${this._name} @input=${this.#onNameInput}></uui-input>
-			<uui-textarea id="content" .value=${this._content} @input="${this.#onTextareaInput}"></uui-textarea>
+			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
+			<uui-box>
+				<uui-button color="danger" look="primary" slot="header" @click=${this.#insertCode}
+					>Insert "My hovercraft is full of eels"</uui-button
+				>
+
+				<umb-code-editor
+					language="razor"
+					id="content"
+					.code=${this._content ?? ''}
+					@input=${this.#onCodeEditorInput}></umb-code-editor>
+			</uui-box>
 		</umb-workspace-layout>`;
 	}
 }

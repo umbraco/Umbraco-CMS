@@ -1,44 +1,43 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 import './ref-property-editor-ui.element';
 import type { UmbRefPropertyEditorUIElement } from './ref-property-editor-ui.element';
 
 const meta: Meta<UmbRefPropertyEditorUIElement> = {
-    title: 'Components/Ref Property Editor UI',
-    component: 'umb-ref-property-editor-ui',
+	title: 'Components/Ref Property Editor UI',
+	component: 'umb-ref-property-editor-ui',
 };
-  
+
 export default meta;
 type Story = StoryObj<UmbRefPropertyEditorUIElement>;
-  
+
 export const Overview: Story = {
-    args: {
-		name: "Custom Property Editor UI",
-		alias: "Umb.PropertyEditorUI.CustomUI",
-		propertyEditorAlias: "Umbraco.JSON"
-    }
+	args: {
+		name: 'Custom Property Editor UI',
+		alias: 'Umb.PropertyEditorUI.CustomUI',
+		propertyEditorAlias: 'Umbraco.JSON',
+	},
 };
 
-
 export const WithDetail: Story = {
-    args: {
-		name: "Custom Property Editor UI",
-		alias: "Umb.PropertyEditorUI.CustomUI",
-		propertyEditorAlias: "Umbraco.JSON",
-		detail: "With some custom details"
-    }
+	args: {
+		name: 'Custom Property Editor UI',
+		alias: 'Umb.PropertyEditorUI.CustomUI',
+		propertyEditorAlias: 'Umbraco.JSON',
+		detail: 'With some custom details',
+	},
 };
 
 export const WithSlots: Story = {
-    args: {
-		name: "Custom Property Editor UI",
-		alias: "Umb.PropertyEditorUI.CustomUI",
-		propertyEditorAlias: "Umbraco.JSON",
-		detail: "With some custom details"
-    },
+	args: {
+		name: 'Custom Property Editor UI',
+		alias: 'Umb.PropertyEditorUI.CustomUI',
+		propertyEditorAlias: 'Umbraco.JSON',
+		detail: 'With some custom details',
+	},
 	render: (args) => html`
-		<umb-ref-property-editor-ui 
-			.name=${args.name} 
+		<umb-ref-property-editor-ui
+			.name=${args.name}
 			.alias=${args.alias}
 			.propertyEditorAlias=${args.propertyEditorAlias}
 			.detail=${args.detail}>
@@ -51,5 +50,5 @@ export const WithSlots: Story = {
 				</uui-action-bar>
 			</div>
 		</umb-ref-property-editor-ui>
-	`
+	`,
 };

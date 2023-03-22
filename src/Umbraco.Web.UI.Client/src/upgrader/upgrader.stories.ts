@@ -1,7 +1,7 @@
 import './upgrader-view.element';
 
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbUpgraderView } from './upgrader-view.element';
 

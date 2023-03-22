@@ -1,7 +1,7 @@
 import './workspace-layout.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbWorkspaceLayout } from './workspace-layout.element';
 
