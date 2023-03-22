@@ -56,20 +56,20 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
 
-	private _currentUserHistoryStore?: UmbCurrentUserHistoryStore;
+	#currentUserHistoryStore?: UmbCurrentUserHistoryStore;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, (instance) => {
-			this._currentUserHistoryStore = instance;
-			this._observeHistory();
+			this.#currentUserHistoryStore = instance;
+			this.#observeHistory();
 		});
 	}
 
-	private async _observeHistory() {
-		if (this._currentUserHistoryStore) {
-			this.observe(this._currentUserHistoryStore.latestHistory, (history) => {
+	#observeHistory() {
+		if (this.#currentUserHistoryStore) {
+			this.observe(this.#currentUserHistoryStore.latestHistory, (history) => {
 				this._history = history;
 			});
 		}
@@ -80,13 +80,13 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 			<uui-box>
 				<b slot="headline">Recent History</b>
 				<div id="recent-history-items">
-					${this._history.reverse().map((item) => html` ${this._renderHistoryItem(item)} `)}
+					${this._history.reverse().map((item) => html` ${this.#renderHistoryItem(item)} `)}
 				</div>
 			</uui-box>
 		`;
 	}
 
-	private _renderHistoryItem(item: UmbCurrentUserHistoryItem) {
+	#renderHistoryItem(item: UmbCurrentUserHistoryItem) {
 		return html`
 			<a href=${item.path} class="history-item">
 				<uui-icon name="umb:link"></uui-icon>

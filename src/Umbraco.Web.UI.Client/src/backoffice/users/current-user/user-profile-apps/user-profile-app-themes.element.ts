@@ -47,7 +47,7 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 		});
 	}
 
-	private _handleThemeChange(event: UUISelectEvent) {
+	#handleThemeChange(event: UUISelectEvent) {
 		if (!this.#themeService) return;
 
 		const theme = event.target.value.toString();
@@ -55,7 +55,7 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 		this.#themeService.setThemeByAlias(theme);
 	}
 
-	get options() {
+	get #options() {
 		return this._themes.map((t) => ({ name: t.name, value: t.alias, selected: t.alias === this._themeAlias }));
 	}
 
@@ -64,9 +64,9 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 			<b>Select Theme</b>
 			<uui-select
 				label="theme select"
-				@change=${this._handleThemeChange}
+				@change=${this.#handleThemeChange}
 				.value=${this._themeAlias}
-				.options=${this.options}></uui-select>
+				.options=${this.#options}></uui-select>
 		`;
 	}
 }
