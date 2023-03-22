@@ -10,7 +10,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 public partial class UserServiceCrudTests
 {
     [Test]
-    public async Task Cannot_Request_Disabled_If_Hidden()
+    [TestCase(UserState.Disabled)]
+    [TestCase(UserState.All)]
+    public async Task Cannot_Request_Disabled_If_Hidden(UserState includeState)
     {
         var userService = CreateUserService(new SecuritySettings { HideDisabledUsersInBackOffice = true });
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
@@ -31,7 +33,7 @@ public partial class UserServiceCrudTests
 
         var filter = new UserFilter
         {
-            IncludeUserStates = new SortedSet<UserState> { UserState.Disabled }
+            IncludeUserStates = new SortedSet<UserState> { includeState }
         };
 
         var filterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, filter, 0, 1000);
