@@ -1,16 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import {
-	UmbCurrentUserHistoryStore,
-	UmbCurrentUserHistoryItem,
-	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
-} from '../../current-user-history.store';
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store';
-import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../change-password';
 import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../change-password';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
@@ -51,12 +46,8 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UserDetails;
 
-	@state()
-	private _history: Array<UmbCurrentUserHistoryItem> = [];
-
 	private _modalContext?: UmbModalContext;
 	private _currentUserStore?: UmbCurrentUserStore;
-	private _currentUserHistoryStore?: UmbCurrentUserHistoryStore;
 
 	constructor() {
 		super();
@@ -70,11 +61,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 			this._observeCurrentUser();
 		});
 
-		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, (instance) => {
-			this._currentUserHistoryStore = instance;
-			this._observeHistory();
-		});
-
 		this._observeCurrentUser();
 	}
 
@@ -84,13 +70,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		this.observe(this._currentUserStore.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
 		});
-	}
-	private async _observeHistory() {
-		if (this._currentUserHistoryStore) {
-			this.observe(this._currentUserHistoryStore.latestHistory, (history) => {
-				this._history = history;
-			});
-		}
 	}
 
 	private _close() {
@@ -110,28 +89,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL_TOKEN, {
 			requireOldPassword: this._currentUserStore?.isAdmin || false,
 		});
-	}
-
-	private _renderHistoryItem(item: UmbCurrentUserHistoryItem) {
-		return html`
-			<a href=${item.path} class="history-item">
-				<uui-icon name="umb:link"></uui-icon>
-				<div>
-					<b>${Array.isArray(item.label) ? item.label[0] : item.label}</b>
-					<span>
-						${Array.isArray(item.label)
-							? item.label.map((label, index) => {
-									if (index === 0) return;
-									return html`
-										<span>${label}</span>
-										${index !== item.label.length - 1 ? html`<span>${'>'}</span>` : nothing}
-									`;
-							  })
-							: nothing}
-					</span>
-				</div>
-			</a>
-		`;
 	}
 
 	private _logout() {
