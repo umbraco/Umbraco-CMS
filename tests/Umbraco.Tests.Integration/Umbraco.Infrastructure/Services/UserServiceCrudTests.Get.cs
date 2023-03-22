@@ -1,8 +1,10 @@
 ﻿
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -13,12 +15,13 @@ public partial class UserServiceCrudTests
     {
         var userService = CreateUserService();
         var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
 
         var nonSuperCreateModel = new UserCreateModel
         {
             Email = "not@super.com",
             UserName = "not@super.com",
-            UserGroups = new HashSet<IUserGroup> { editorGroup! },
+            UserGroups = new HashSet<IUserGroup> { editorGroup!, adminGroup! },
             Name = "Not A Super User"
         };
 
@@ -106,5 +109,55 @@ public partial class UserServiceCrudTests
         Assert.AreEqual(2, adminAllUsers.Count);
         Assert.IsTrue(adminAllUsers.Any(x => x.Key == createEditorAttempt.Result.CreatedUser!.Key));
         Assert.IsTrue(adminAllUsers.Any(x => x.Key == createAdminAttempt.Result.CreatedUser!.Key));
+    }
+
+    [Test]
+    public async Task Cannot_See_Disabled_When_HideDisabled_Is_True()
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { HideDisabledUsersInBackOffice = true });
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+
+        var firstEditorCreateModel = new UserCreateModel
+        {
+            UserName = "firstEditor@mail.com",
+            Email = "firstEditor@mail.com",
+            Name = "First Editor",
+            UserGroups = new HashSet<IUserGroup> { editorGroup! }
+        };
+
+        var firstEditorResult = await userService.CreateAsync(Constants.Security.SuperUserKey, firstEditorCreateModel, true);
+        Assert.IsTrue(firstEditorResult.Success);
+
+        var secondEditorCreateModel = new UserCreateModel
+        {
+            UserName = "secondEditor@mail.com",
+            Email = "secondEditor@mail.com",
+            Name = "Second Editor",
+            UserGroups = new HashSet<IUserGroup> {editorGroup}
+        };
+
+        var secondEditorResult = await userService.CreateAsync(Constants.Security.SuperUserKey, secondEditorCreateModel, true);
+        Assert.IsTrue(secondEditorResult.Success);
+
+        var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, secondEditorResult.Result.CreatedUser!.Key);
+        Assert.AreEqual(disableStatus, UserOperationStatus.Success);
+
+        var allUsersAttempt = await userService.GetAllAsync(Constants.Security.SuperUserKey, 0, 10000);
+        Assert.IsTrue(allUsersAttempt.Success);
+        var allUsers = allUsersAttempt.Result!.Items.ToList();
+        Assert.AreEqual(2, allUsers.Count);
+        Assert.IsTrue(allUsers.Any(x => x.Key == firstEditorResult.Result.CreatedUser!.Key));
+        Assert.IsTrue(allUsers.Any(x => x.Key == Constants.Security.SuperUserKey));
+    }
+
+    [Test]
+    public async Task Requesting_User_Must_Exist_When_Calling_Get_All()
+    {
+        var userService = CreateUserService();
+
+        var getAllAttempt = await userService.GetAllAsync(Guid.NewGuid(), 0, 10000);
+        Assert.IsFalse(getAllAttempt.Success);
+        Assert.AreEqual(UserOperationStatus.MissingUser, getAllAttempt.Status);
+        Assert.IsNull(getAllAttempt.Result);
     }
 }
