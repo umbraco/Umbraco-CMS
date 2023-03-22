@@ -37,11 +37,15 @@ public interface IPackagingService : IService
 
     InstalledPackage? GetInstalledPackageByName(string packageName);
 
-    /// <summary>
-    ///     Returns the created packages
-    /// </summary>
-    /// <returns></returns>
+    [Obsolete("Use GetCreatedPackagesAsync instead. Scheduled for removal in Umbraco 15.")]
     IEnumerable<PackageDefinition?> GetAllCreatedPackages();
+
+    /// <summary>
+    ///     Returns the created packages as a paged model.
+    /// </summary>
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    Task<PagedModel<PackageDefinition>> GetCreatedPackagesAsync(int skip, int take);
 
     /// <summary>
     ///     Returns a created package by id

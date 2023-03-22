@@ -1,4 +1,3 @@
-using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -12,14 +11,10 @@ public class PackageViewModelMapDefinition : IMapDefinition
     {
         mapper.Define<PackageModelBase, PackageDefinition>((_, _) => new PackageDefinition(), Map);
         mapper.Define<PackageDefinition, PackageDefinitionResponseModel>(
-            (_, _) => new PackageDefinitionResponseModel
-            {
-                Name = string.Empty,
-                PackagePath = string.Empty
-            },
+            (_, _) => new PackageDefinitionResponseModel { Name = string.Empty, PackagePath = string.Empty },
             Map);
-        mapper.Define<InstalledPackage, PackageMigrationStatusResponseModel>((_, _) => new PackageMigrationStatusResponseModel { PackageName = string.Empty }, Map);
-        mapper.Define<IEnumerable<PackageDefinition>, PagedViewModel<PackageDefinitionResponseModel>>((_, _) => new PagedViewModel<PackageDefinitionResponseModel>(), Map);
+        mapper.Define<InstalledPackage, PackageMigrationStatusResponseModel>(
+            (_, _) => new PackageMigrationStatusResponseModel { PackageName = string.Empty }, Map);
     }
 
     // Umbraco.Code.MapAll -Id -PackageId -PackagePath -Macros
@@ -71,13 +66,5 @@ public class PackageViewModelMapDefinition : IMapDefinition
         }
 
         target.HasPendingMigrations = source.HasPendingMigrations;
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IEnumerable<PackageDefinition> source, PagedViewModel<PackageDefinitionResponseModel> target, MapperContext context)
-    {
-        PackageDefinition[] definitions = source.ToArray();
-        target.Items = context.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(definitions);
-        target.Total = definitions.Length;
     }
 }

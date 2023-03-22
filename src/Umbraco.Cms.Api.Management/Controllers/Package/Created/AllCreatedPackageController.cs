@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
@@ -31,12 +31,14 @@ public class AllCreatedPackageController : CreatedPackageControllerBase
     [ProducesResponseType(typeof(PagedViewModel<PackageDefinitionResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<PackageDefinitionResponseModel>>> All(int skip = 0, int take = 100)
     {
-        IEnumerable<PackageDefinition> createdPackages = _packagingService
-            .GetAllCreatedPackages()
-            .WhereNotNull()
-            .Skip(skip)
-            .Take(take);
+        PagedModel<PackageDefinition> createdPackages = await _packagingService.GetCreatedPackagesAsync(skip, take);
 
-        return await Task.FromResult(Ok(_umbracoMapper.Map<PagedViewModel<PackageDefinitionResponseModel>>(createdPackages)));
+        var viewModel = new PagedViewModel<PackageDefinitionResponseModel>
+        {
+            Total = createdPackages.Total,
+            Items = _umbracoMapper.MapEnumerable<PackageDefinition, PackageDefinitionResponseModel>(createdPackages.Items)
+        };
+
+        return await Task.FromResult(Ok(viewModel));
     }
 }
