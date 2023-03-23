@@ -52,7 +52,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrlFurtherOptionsModeAndQualityTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             Quality = 10,
             FurtherOptions = "format=webp",
@@ -66,7 +66,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrlFurtherOptionsWithModeAndQualityTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             FurtherOptions = "quality=10&format=webp",
         });
