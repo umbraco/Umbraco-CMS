@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
-import { UMB_CREATE_DICTIONARY_MODAL_TOKEN } from '../../dictionary/entity-actions/create/';
+import { UMB_CREATE_DICTIONARY_MODAL } from '../../../../../libs/modal/token/create-dictionary-modal.token';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
@@ -157,7 +157,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL_TOKEN, { unique: null });
+		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
 
 		// TODO: get type from modal result
 		const { name } = await modalHandler.onSubmit();

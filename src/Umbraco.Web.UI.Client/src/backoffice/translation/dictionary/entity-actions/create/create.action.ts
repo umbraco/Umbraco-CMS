@@ -4,7 +4,7 @@ import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 } from '../../../../../backoffice/shared/components/section/section-sidebar/section-sidebar.context';
-import { UMB_CREATE_DICTIONARY_MODAL_TOKEN } from '.';
+import { UMB_CREATE_DICTIONARY_MODAL } from '../../../../../../libs/modal/token/create-dictionary-modal.token';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -38,7 +38,7 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 
 		// TODO: how can we get the current entity detail in the modal? Passing the observable
 		// feels a bit hacky. Works, but hacky.
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL_TOKEN, {
+		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, {
 			unique: this.unique,
 			parentName: this.#sectionSidebarContext.headline,
 		});
