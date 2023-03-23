@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbChangePasswordModalData } from '../../../../../../libs/modal/token';
+import { UmbChangePasswordModalData } from '../../../../../../libs/modal/token/change-password-modal';
 import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
