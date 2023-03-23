@@ -43,6 +43,9 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
 	private _hasChildren = false;
 
+	@state()
+	private _iconSlotHasChildren = false;
+
 	#treeItemContext?: UmbTreeItemContextBase;
 
 	constructor() {
@@ -108,14 +111,32 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				.hasChildren=${this._hasChildren}
 				label="${ifDefined(this.item?.name)}"
 				href="${ifDefined(this._href)}">
-				${this.#renderIcon()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.#renderIcon()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
 			</uui-menu-item>
 		`;
 	}
 
+	#hasNodes = (e: Event) => {
+		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
+	};
+
 	#renderIcon() {
-		return html` ${this.item?.icon ? html` <uui-icon slot="icon" name="${this.item.icon}"></uui-icon> ` : nothing} `;
+		return html`
+			<slot
+				name="icon"
+				slot="icon"
+				@slotchange=${(e: Event) => {
+					this._iconSlotHasChildren = this.#hasNodes(e);
+				}}></slot>
+			${this.item?.icon && !this._iconSlotHasChildren
+				? html` <uui-icon slot="icon" name="${this.item.icon}"></uui-icon> `
+				: nothing}
+		`;
+	}
+
+	#renderLabel() {
+		return html`<slot name="label" slot="label"></slot>`;
 	}
 
 	#renderActions() {

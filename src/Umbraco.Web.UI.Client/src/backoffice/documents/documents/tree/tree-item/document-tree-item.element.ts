@@ -1,6 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbDocumentTreeItemContext } from './document-tree-item.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -9,18 +10,23 @@ export class UmbDocumentTreeItemElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			#label {
-				display: flex;
-				align-items: center;
+			#icon-container {
+				position: relative;
+			}
+
+			#icon {
+				vertical-align: middle;
 			}
 
 			#status-symbol {
-				width: 6px;
-				height: 6px;
+				width: 8px;
+				height: 8px;
 				background-color: blue;
 				display: block;
-				border-radius: 3px;
-				margin-right: 10px;
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				border-radius: 100%;
 			}
 		`,
 	];
@@ -30,12 +36,16 @@ export class UmbDocumentTreeItemElement extends UmbLitElement {
 
 	render() {
 		if (!this.item) return nothing;
+		new UmbDocumentTreeItemContext(this, this.item);
 		return html`
 			<umb-tree-item-base .item=${this.item}>
 				<!-- TODO: implement correct status symbol -->
-				<div id="label" slot="label">
-					<span id="status-symbol"></span>
-					<span>${this.item?.name}</span>
+				<div id="icon-container" slot="icon">
+					${this.item?.icon
+						? html`
+								<uui-icon id="icon" slot="icon" name="${this.item.icon}"></uui-icon> <span id="status-symbol"></span>
+						  `
+						: nothing}
 				</div>
 			</umb-tree-item-base>
 		`;
