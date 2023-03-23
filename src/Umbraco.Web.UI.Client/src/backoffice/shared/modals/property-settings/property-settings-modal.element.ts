@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '../../../../../libs/modal/token/property-editor-ui-picker-modal.token';
-import { UmbPropertySettingsModalResult } from '.';
+import { UmbPropertySettingsModalResult } from '../../../../../libs/modal/token/property-settings-modal.token';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';

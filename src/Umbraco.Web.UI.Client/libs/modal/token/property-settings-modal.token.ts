@@ -17,7 +17,7 @@ export interface UmbPropertySettingsModalResult {
 	};
 }
 
-export const UMB_PROPERTY_SETTINGS_MODAL_TOKEN = new UmbModalToken<object, UmbPropertySettingsModalResult>(
+export const UMB_PROPERTY_SETTINGS_MODAL = new UmbModalToken<object, UmbPropertySettingsModalResult>(
 	'Umb.Modal.PropertySettings',
 	{
 		type: 'sidebar',
