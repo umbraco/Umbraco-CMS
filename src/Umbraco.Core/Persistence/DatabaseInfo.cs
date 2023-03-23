@@ -39,5 +39,8 @@ public abstract class DatabaseInfoBase : IDatabaseInfo
 
     public virtual async Task<string?> CurrentMigrationState(string key) => await Task.FromResult(string.Empty);
 
+    public virtual async Task<string> FinalMigrationState() => await Task.FromResult(string.Empty);
+
+
     protected abstract Task<DatabaseState> GetConfiguredStateAsync();
 }

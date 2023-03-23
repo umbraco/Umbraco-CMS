@@ -41,27 +41,51 @@ public class EFDatabaseInfo : DatabaseInfoBase
 
                 if (db.Database.IsSqlite())
                 {
-                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
+                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>(
+                        $"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
                 }
                 else
                 {
-                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>(
+                                              $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") >
+                                          0;
                 }
 
-                return keyValueTableExists ? DatabaseState.NeedsUpgrade :
+                return keyValueTableExists
+                    ? DatabaseState.NeedsUpgrade
+                    :
                     // If there are pending migrations but no umbracoKeyValue table, it must mean its an empty database.
                     DatabaseState.NotInstalled;
             }
 
             // Get package migrations already run from database, then match to pending migrations to see if we need to run any
-            List<UmbracoKeyValue> keyValues = await db.UmbracoKeyValues.Where(x => x.Key.StartsWith(Constants.Conventions.Migrations.KeyValuePrefix)).ToListAsync();
+            List<UmbracoKeyValue> keyValues = await db.UmbracoKeyValues
+                .Where(x => x.Key.StartsWith(Constants.Conventions.Migrations.KeyValuePrefix)).ToListAsync();
             IReadOnlyDictionary<string, string?> dic = keyValues.ToDictionary(x => x.Key, x => x.Value);
-            return _pendingPackageMigrations.GetPendingPackageMigrations(dic).Count > 0 ? DatabaseState.NeedsPackageMigration : DatabaseState.Ok;
+            return _pendingPackageMigrations.GetPendingPackageMigrations(dic).Count > 0
+                ? DatabaseState.NeedsPackageMigration
+                : DatabaseState.Ok;
         });
 
-    public override async Task<string?> CurrentMigrationState(string key)
-        => await _umbracoDbContextFactory.ExecuteWithContextAsync(async db =>
+    public override async Task<string?> CurrentMigrationState(string key) =>
+        await _umbracoDbContextFactory.ExecuteWithContextAsync(async db =>
         {
-            return await Task.FromResult(db.UmbracoKeyValues.Where(x => x.Key == key).Select(x => x.Value).FirstOrDefault());
+            var migrationState = db.UmbracoKeyValues.Where(x => x.Key == key).Select(x => x.Value).FirstOrDefault();
+
+            if (migrationState is null)
+            {
+                IEnumerable<string> appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
+                migrationState = appliedMigrations.LastOrDefault();
+            }
+
+            return migrationState;
         });
+
+    public override async Task<string> FinalMigrationState() =>
+        await _umbracoDbContextFactory.ExecuteWithContextAsync(
+            async db =>
+            {
+                IEnumerable<string> pendingMigrations = await db.Database.GetPendingMigrationsAsync();
+                return pendingMigrations.Last();
+            });
 }

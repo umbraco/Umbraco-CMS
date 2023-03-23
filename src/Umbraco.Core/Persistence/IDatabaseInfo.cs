@@ -8,4 +8,6 @@ public interface IDatabaseInfo
     Task<DatabaseState> GetStateAsync();
 
     Task<string?> CurrentMigrationState(string key);
+
+    Task<string> FinalMigrationState();
 }
