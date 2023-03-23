@@ -139,7 +139,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 		e.preventDefault();
 		e.stopPropagation();
 		//this.selected = true;
-		this.dispatchEvent(new CustomEvent('default-change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change-default', { bubbles: true, composed: true }));
 	}
 	#openTemplate(e: KeyboardEvent) {
 		e.preventDefault();
@@ -149,7 +149,6 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 
 	render() {
 		return html`<div id="card">
-			<slot name="actions"></slot>
 			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
 				<uui-icon class="logo" name="umb:layout"></uui-icon>
 				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
@@ -157,6 +156,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 			<uui-button id="bottom" label="Default template" ?disabled="${this.default}" @click="${this.#setSelection}">
 				${this.default ? '(Default template)' : 'Set default'}
 			</uui-button>
+			<slot name="actions"></slot>
 		</div>`;
 	}
 }

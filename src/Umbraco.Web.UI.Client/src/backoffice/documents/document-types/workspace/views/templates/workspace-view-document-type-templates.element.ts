@@ -1,10 +1,9 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
-
 import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-templates')
@@ -37,24 +36,13 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 		`,
 	];
 
-	@property()
-	defaultTemplateKey?: string = '123';
-
 	@state()
 	_documentType?: DocumentTypeResponseModel;
-
-	@state()
-	_templates = [
-		{ key: '123', name: 'Blog Post Page' },
-		{ key: '456', name: 'Blog Entry Page' },
-	];
 
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	constructor() {
 		super();
-
-		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
 		this.consumeContext<UmbWorkspaceDocumentTypeContext>('umbWorkspaceContext', (documentTypeContext) => {
 			this._workspaceContext = documentTypeContext;
 			this._observeDocumentType();
@@ -69,13 +57,14 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 		});
 	}
 
-	#changeDefaultTemplate(e: CustomEvent) {
-		//this.defaultTemplateKey = (e.target as UmbTemplateCardElement).value as string;
-		console.log('default template key', this.defaultTemplateKey);
+	async #changeDefaultKey(e: CustomEvent) {
+		// save new default key
+		console.log('workspace: default template key', e);
 	}
 
-	#removeTemplate(key: string) {
-		console.log('remove template', key);
+	#changeAllowedKeys(e: CustomEvent) {
+		// save new allowed keys
+		console.log('workspace: allowed templates changed', e);
 	}
 
 	render() {
@@ -83,7 +72,11 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 			<umb-workspace-property-layout alias="Templates" label="Allowed Templates">
 				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
 				<div id="templates" slot="editor">
-					<umb-input-template-picker umb-input-template-picker></umb-input-template-picker>
+					<umb-input-template-picker
+						.defaultKey="${this._documentType?.defaultTemplateKey ?? ''}"
+						.allowedKeys="${this._documentType?.allowedTemplateKeys ?? []}"
+						@change-default="${this.#changeDefaultKey}"
+						@change-allowed="${this.#changeAllowedKeys}"></umb-input-template-picker>
 				</div>
 			</umb-workspace-property-layout>
 		</uui-box>`;

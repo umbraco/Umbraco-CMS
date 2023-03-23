@@ -123,8 +123,9 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 			<div id="wrapper">
 				<uui-box class="group-wrapper">
 					<div class="group-headline" slot="headline">
-						<uui-input label="Group name" value="${this._documentType?.name ?? ''}" size="10"></uui-input>
-						<uui-button label="Delete group" compact><uui-icon name="umb:trash"></uui-icon></uui-button>
+						<uui-input label="Group name" value="${this._documentType?.name ?? ''}" size="10">
+							<uui-button slot="append" label="Delete group" compact><uui-icon name="umb:trash"></uui-icon></uui-button>
+						</uui-input>
 					</div>
 					<umb-property-creator></umb-property-creator>
 				</uui-box>

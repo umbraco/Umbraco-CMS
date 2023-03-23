@@ -1,15 +1,14 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, queryAll, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
+import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTemplateCardElement } from '../template-card/template-card.element';
+import { UMB_TEMPLATE_PICKER_MODAL_TOKEN } from '../../modals/template-picker';
+import { UMB_TEMPLATE_MODAL_TOKEN } from '../../modals/template';
 
 @customElement('umb-input-template-picker')
 export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElement) {
@@ -30,19 +29,6 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 				max-width: 180px;
 				min-width: 180px;
 				min-height: 150px;
-			}
-
-			.fade-in {
-				animation: fadeIn 1s;
-			}
-
-			@keyframes fadeIn {
-				0% {
-					opacity: 0;
-				}
-				100% {
-					opacity: 1;
-				}
 			}
 		`,
 	];
@@ -82,30 +68,43 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	@state()
-	private _items: Array<any> = [
-		{ key: '2bf464b6-3aca-4388-b043-4eb439cc2643', name: 'Doc 1', default: false },
-		{ key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71', name: 'Test', default: true },
-	];
+	_allowedKeys: Array<string> = [];
+	@property({ type: Array<string> })
+	public get allowedKeys() {
+		return this._allowedKeys;
+	}
+	public set allowedKeys(newKeys: Array<string>) {
+		//this.#observePickedTemplates();
+		this._allowedKeys = newKeys;
+	}
+
+	_defaultKey = '';
+	@property({ type: String })
+	public get defaultKey(): string {
+		return this._defaultKey;
+	}
+	public set defaultKey(newKey: string) {
+		this._defaultKey = newKey;
+		super.value = newKey;
+	}
 
 	private _modalContext?: UmbModalContext;
-	//private _documentStore?: UmbDocumentTreeStore;
-	//private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
+	//private _templateStore?: UmbTemplateTreeStore;
+	//private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
+
+	@state()
+	_templates: TemplateResponseModel[] = [];
+
+	public get templates(): TemplateResponseModel[] {
+		return this._templates;
+	}
+	public set templates(newTemplates: TemplateResponseModel[]) {
+		this._templates = newTemplates;
+		this.allowedKeys = newTemplates.map((template) => template.key ?? '');
+	}
 
 	constructor() {
 		super();
-
-		this.addValidator(
-			'rangeUnderflow',
-			() => this.minMessage,
-			() => !!this.min && this._items.length < this.min
-		);
-		this.addValidator(
-			'rangeOverflow',
-			() => this.maxMessage,
-			() => !!this.max && this._items.length > this.max
-		);
-
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
@@ -113,78 +112,82 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._items = this._items.sort((a, b) => b.default - a.default);
-		this.#setup();
+		this.allowedKeys.forEach((key) => this.#setup(key));
 	}
 
-	async #setup() {
-		const templates = await tryExecuteAndNotify(this, TemplateResource.getTreeTemplateRoot({ skip: 0, take: 9999 }));
-		console.log(templates);
+	async #setup(templateKey: string) {
+		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateByKey({ key: templateKey }));
+		if (!data) return;
+		this.templates = [...this.templates, data];
 	}
 
 	protected getFormElement() {
 		return undefined;
 	}
 
-	#openTemplatePickerModal() {
-		console.log('template picker modal');
-	}
-
-	#changeSelected() {
-		console.log('selected');
-	}
-
-	/** Clicking the template card buttons */
-
 	#changeDefault(e: CustomEvent) {
-		const key = (e.target as UmbTemplateCardElement).value;
+		e.stopPropagation();
+		const newKey = (e.target as UmbTemplateCardElement).value as string;
+		this.defaultKey = newKey;
+		this.dispatchEvent(new CustomEvent('change-default', { bubbles: true, composed: true }));
+	}
 
-		const oldDefault = this._items.find((x) => x.default === true);
-		const newDefault = this._items.find((x) => x.key === key);
-
-		const items = this._items.map((item) => {
-			if (item.default === true) return { ...newDefault, default: true };
-			if (item.key === key) return { ...oldDefault, default: false };
-			return item;
+	#openPicker() {
+		//TODO: Tree-picker modal?
+		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL_TOKEN, {
+			multiple: true,
+			selection: [...this.allowedKeys],
 		});
 
-		this._items = items;
-	}
-
-	#openTemplate(e: CustomEvent) {
-		const key = (e.target as UmbTemplateCardElement).value;
-		console.log('open', key);
+		modalHandler?.onSubmit().then((data) => {
+			console.log(data.selection);
+			this.dispatchEvent(new CustomEvent('change-allowed', { bubbles: true, composed: true }));
+		});
 	}
 
 	#removeTemplate(key: string) {
-		console.log('remove', key);
+		console.log('picker: remove', key);
+		const templateIndex = this.templates.findIndex((x) => x.key === key);
+		this.templates.splice(templateIndex, 1);
+		this.templates = [...this._templates];
 	}
 
 	render() {
 		return html`
-			${repeat(
-				this._items,
-				(template) => template.default,
-				(template, index) => html`<div class="fade-in">
+			${this.templates.map(
+				(template) => html`
 					<umb-template-card
 						class="template-card"
-						name="${template.name}"
-						key="${template.key}"
-						@default-change="${this.#changeDefault}"
+						.name="${template.name ?? ''}"
+						.key="${template.key ?? ''}"
+						@change-default="${this.#changeDefault}"
 						@open="${this.#openTemplate}"
-						?default="${template.default}">
+						?default="${template.key === this.defaultKey}">
 						<uui-button
 							slot="actions"
 							label="Remove document ${template.name}"
-							@click="${() => this.#removeTemplate(template.key)}"
+							@click="${() => this.#removeTemplate(template.key ?? '')}"
 							compact>
 							<uui-icon name="umb:trash"> </uui-icon>
 						</uui-button>
 					</umb-template-card>
-				</div>`
+				`
 			)}
-			<uui-button id="add-button" look="placeholder" label="open">Add</uui-button>
+			<uui-button id="add-button" look="placeholder" label="open" @click="${this.#openPicker}">Add</uui-button>
 		`;
+	}
+
+	#openTemplate(e: CustomEvent) {
+		const key = (e.target as UmbTemplateCardElement).value;
+
+		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_MODAL_TOKEN, {
+			multiple: true,
+			selection: [...this.allowedKeys],
+		});
+
+		modalHandler?.onSubmit().then((res) => {
+			console.log('save template');
+		});
 	}
 }
 
