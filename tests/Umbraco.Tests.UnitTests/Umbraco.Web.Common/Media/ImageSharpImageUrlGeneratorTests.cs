@@ -7,66 +7,52 @@ using Umbraco.Cms.Imaging.ImageSharp.Media;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Media;
 
+/// <summary>
+///     Contains tests for all parameters for image generation options.
+/// </summary>
 [TestFixture]
 public class ImageSharpImageUrlGeneratorTests
 {
     private const string MediaPath = "/media/1005/img_0671.jpg";
 
-    private static readonly ImageUrlGenerationOptions.CropCoordinates s_crop = new(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
+    private static readonly ImageUrlGenerationOptions.CropCoordinates _sCrop = new(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
+    private static readonly ImageUrlGenerationOptions.FocalPointPosition _sFocus = new(0.96m, 0.80827067669172936m);
+    private static readonly ImageSharpImageUrlGenerator _sGenerator = new(Array.Empty<string>());
 
-    private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus1 = new(0.96m, 0.80827067669172936m);
-    private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus2 = new(0.4275m, 0.41m);
-    private static readonly ImageSharpImageUrlGenerator s_generator = new(new string[0]);
-
+    /// <summary>
+    ///     Tests that the media path is returned if no options are provided.
+    /// </summary>
     [Test]
-    public void GetImageUrl_CropAliasTest()
+    public void GivenMediaPath_AndNoOptions_ReturnsMediaPath()
     {
-        var urlString =
-            s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) { Crop = s_crop, Width = 100, Height = 100 });
-        Assert.AreEqual(
-            MediaPath + "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100",
-            urlString);
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath));
+        Assert.AreEqual(MediaPath, actual);
     }
 
+    /// <summary>
+    ///     Test that if options is null, the generated image URL is also null.
+    /// </summary>
     [Test]
-    public void GetImageUrl_WidthHeightTest()
+    public void GivenNullOptions_ReturnsNull()
     {
-        var urlString =
-            s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 200, Height = 300 });
-        Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300", urlString);
+        var actual = _sGenerator.GetImageUrl(null);
+        Assert.IsNull(actual);
     }
 
+    /// <summary>
+    ///     Test that if a null image url is given, null is returned.
+    /// </summary>
     [Test]
-    public void GetImageUrl_FocalPointTest()
+    public void GivenNullImageUrl_ReturnsNull()
     {
-        var urlString =
-            s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 100, Height = 100 });
-        Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=100&height=100", urlString);
-    }
-
-    [Test]
-    public void GetImageUrlFurtherOptionsTest()
-    {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
-        {
-            FocalPoint = s_focus1,
-            Width = 200,
-            Height = 300,
-            FurtherOptions = "&filter=comic&roundedcorners=radius-26|bgcolor-fff",
-        });
-        Assert.AreEqual(
-            MediaPath +
-            "?rxy=0.96,0.80827067669172936&width=200&height=300&filter=comic&roundedcorners=radius-26%7Cbgcolor-fff",
-            urlString);
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(null));
+        Assert.IsNull(actual);
     }
 
     [Test]
     public void GetImageUrlFurtherOptionsModeAndQualityTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             Quality = 10,
             FurtherOptions = "format=webp",
@@ -80,7 +66,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrlFurtherOptionsWithModeAndQualityTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             FurtherOptions = "quality=10&format=webp",
         });
@@ -91,169 +77,171 @@ public class ImageSharpImageUrlGeneratorTests
     }
 
     /// <summary>
-    ///     Test that if options is null, the generated image URL is also null.
+    ///     Test that if an empty string image url is given, null is returned.
     /// </summary>
     [Test]
-    public void GetImageUrlNullOptionsTest()
+    public void GivenEmptyStringImageUrl_ReturnsEmptyString()
     {
-        var urlString = s_generator.GetImageUrl(null);
-        Assert.AreEqual(null, urlString);
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty));
+        Assert.AreEqual(actual, string.Empty);
     }
 
     /// <summary>
-    ///     Test that if the image URL is null, the generated image URL is also null.
+    ///     Tests the correct query string is returned when given a crop.
     /// </summary>
     [Test]
-    public void GetImageUrlNullTest()
+    public void GivenCrop_ReturnsExpectedQueryString()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(null));
-        Assert.AreEqual(null, urlString);
+        const string expected = "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386";
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty) { Crop = _sCrop });
+        Assert.AreEqual(expected, actual);
     }
 
     /// <summary>
-    ///     Test that if the image URL is empty, the generated image URL is empty.
+    ///     Tests the correct query string is returned when given a width.
     /// </summary>
     [Test]
-    public void GetImageUrlEmptyTest()
+    public void GivenWidth_ReturnsExpectedQueryString()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty));
-        Assert.AreEqual(string.Empty, urlString);
+        const string expected = "?width=200";
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty) { Width = 200 });
+        Assert.AreEqual(expected, actual);
     }
 
     /// <summary>
-    ///     Test the GetImageUrl method on the ImageCropDataSet Model
+    ///     Tests the correct query string is returned when given a height.
     /// </summary>
     [Test]
-    public void GetBaseCropUrlFromModelTest()
+    public void GivenHeight_ReturnsExpectedQueryString()
     {
-        var urlString =
-            s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(string.Empty) { Crop = s_crop, Width = 100, Height = 100 });
-        Assert.AreEqual(
-            "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100",
-            urlString);
+        const string expected = "?height=200";
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty) { Height = 200 });
+        Assert.AreEqual(expected, actual);
     }
 
     /// <summary>
-    ///     Test that if Crop mode is specified as anything other than Crop the image doesn't use the crop
+    ///     Tests the correct query string is returned when provided a focal point.
     /// </summary>
     [Test]
-    public void GetImageUrl_SpecifiedCropModeTest()
+    public void GivenFocalPoint_ReturnsExpectedQueryString()
     {
-        var urlStringMin =
-            s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
-            {
-                ImageCropMode = ImageCropMode.Min,
-                Width = 300,
-                Height = 150,
-            });
-        var urlStringBoxPad =
-            s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
-            {
-                ImageCropMode = ImageCropMode.BoxPad,
-                Width = 300,
-                Height = 150,
-            });
-        var urlStringPad =
-            s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
-            {
-                ImageCropMode = ImageCropMode.Pad,
-                Width = 300,
-                Height = 150,
-            });
-        var urlStringMax =
-            s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
-            {
-                ImageCropMode = ImageCropMode.Max,
-                Width = 300,
-                Height = 150,
-            });
-        var urlStringStretch =
-            s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
-            {
-                ImageCropMode = ImageCropMode.Stretch,
-                Width = 300,
-                Height = 150,
-            });
-
-        Assert.AreEqual(MediaPath + "?rmode=min&width=300&height=150", urlStringMin);
-        Assert.AreEqual(MediaPath + "?rmode=boxpad&width=300&height=150", urlStringBoxPad);
-        Assert.AreEqual(MediaPath + "?rmode=pad&width=300&height=150", urlStringPad);
-        Assert.AreEqual(MediaPath + "?rmode=max&width=300&height=150", urlStringMax);
-        Assert.AreEqual(MediaPath + "?rmode=stretch&width=300&height=150", urlStringStretch);
+        const string expected = "?rxy=0.96,0.80827067669172936";
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty) { FocalPoint = _sFocus });
+        Assert.AreEqual(expected, actual);
     }
 
     /// <summary>
-    ///     Test for upload property type
+    ///     Tests the correct query string is returned when given further options.
+    ///     There are a few edge case inputs here to ensure thorough testing in future versions.
     /// </summary>
-    [Test]
-    public void GetImageUrl_UploadTypeTest()
+    [TestCase("&filter=comic&roundedcorners=radius-26%7Cbgcolor-fff", "?filter=comic&roundedcorners=radius-26%7Cbgcolor-fff")]
+    [TestCase("testoptions", "?testoptions=")]
+    [TestCase("&&&should=strip", "?should=strip")]
+    [TestCase("should=encode&$^%()", "?should=encode&$%5E%25()=")]
+    public void GivenFurtherOptions_ReturnsExpectedQueryString(string input, string expected)
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty)
         {
-            ImageCropMode = ImageCropMode.Crop,
-            ImageCropAnchor = ImageCropAnchor.Center,
-            Width = 100,
-            Height = 270,
+            FurtherOptions = input,
         });
-        Assert.AreEqual(MediaPath + "?rmode=crop&ranchor=center&width=100&height=270", urlString);
+        Assert.AreEqual(expected, actual);
     }
 
     /// <summary>
-    ///     Test for preferFocalPoint when focal point is centered
+    ///     Test that the correct query string is returned for all image crop modes.
     /// </summary>
-    [Test]
-    public void GetImageUrl_PreferFocalPointCenter()
+    [TestCase(ImageCropMode.Min, "?rmode=min")]
+    [TestCase(ImageCropMode.BoxPad, "?rmode=boxpad")]
+    [TestCase(ImageCropMode.Pad, "?rmode=pad")]
+    [TestCase(ImageCropMode.Max, "?rmode=max")]
+    [TestCase(ImageCropMode.Stretch, "?rmode=stretch")]
+    public void GivenCropMode_ReturnsExpectedQueryString(ImageCropMode cropMode, string expectedQueryString)
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Width = 300, Height = 150 });
-        Assert.AreEqual(MediaPath + "?width=300&height=150", urlString);
-    }
-
-    /// <summary>
-    ///     Test to check if crop ratio is ignored if useCropDimensions is true
-    /// </summary>
-    [Test]
-    public void GetImageUrl_PreDefinedCropNoCoordinatesWithWidthAndFocalPointIgnore()
-    {
-        var urlString =
-            s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus2, Width = 270, Height = 161 });
-        Assert.AreEqual(MediaPath + "?rxy=0.4275,0.41&width=270&height=161", urlString);
-    }
-
-    /// <summary>
-    ///     Test to check result when only a width parameter is passed, effectivly a resize only
-    /// </summary>
-    [Test]
-    public void GetImageUrl_WidthOnlyParameter()
-    {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Width = 200 });
-        Assert.AreEqual(MediaPath + "?width=200", urlString);
-    }
-
-    /// <summary>
-    ///     Test to check result when only a height parameter is passed, effectivly a resize only
-    /// </summary>
-    [Test]
-    public void GetImageUrl_HeightOnlyParameter()
-    {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Height = 200 });
-        Assert.AreEqual(MediaPath + "?height=200", urlString);
-    }
-
-    /// <summary>
-    ///     Test to check result when using a background color with padding
-    /// </summary>
-    [Test]
-    public void GetImageUrl_BackgroundColorParameter()
-    {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var cropUrl = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty)
         {
-            ImageCropMode = ImageCropMode.Pad,
-            Width = 400,
-            Height = 400,
-            FurtherOptions = "&bgcolor=fff",
+            ImageCropMode = cropMode,
         });
-        Assert.AreEqual(MediaPath + "?rmode=pad&width=400&height=400&bgcolor=fff", urlString);
+
+        Assert.AreEqual(expectedQueryString, cropUrl);
+    }
+
+    /// <summary>
+    ///     Test that the correct query string is returned for all image crop anchors.
+    /// </summary>
+    [TestCase(ImageCropAnchor.Bottom, "?ranchor=bottom")]
+    [TestCase(ImageCropAnchor.BottomLeft, "?ranchor=bottomleft")]
+    [TestCase(ImageCropAnchor.BottomRight, "?ranchor=bottomright")]
+    [TestCase(ImageCropAnchor.Center, "?ranchor=center")]
+    [TestCase(ImageCropAnchor.Left, "?ranchor=left")]
+    [TestCase(ImageCropAnchor.Right, "?ranchor=right")]
+    [TestCase(ImageCropAnchor.Top, "?ranchor=top")]
+    [TestCase(ImageCropAnchor.TopLeft, "?ranchor=topleft")]
+    [TestCase(ImageCropAnchor.TopRight, "?ranchor=topright")]
+    public void GivenCropAnchor_ReturnsExpectedQueryString(ImageCropAnchor imageCropAnchor, string expectedQueryString)
+    {
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty)
+        {
+            ImageCropAnchor = imageCropAnchor,
+        });
+        Assert.AreEqual(expectedQueryString, actual);
+    }
+
+    /// <summary>
+    ///     Tests that the quality query string always returns the input number regardless of value.
+    /// </summary>
+    [TestCase(int.MinValue)]
+    [TestCase(-50)]
+    [TestCase(0)]
+    [TestCase(50)]
+    [TestCase(int.MaxValue)]
+    public void GivenQuality_ReturnsExpectedQueryString(int quality)
+    {
+        var expected = "?quality=" + quality;
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty)
+        {
+            Quality = quality,
+        });
+        Assert.AreEqual(expected, actual);
+    }
+
+    /// <summary>
+    ///     Tests that the correct query string is returned for cache buster.
+    ///     There are some edge case tests here to ensure thorough testing in future versions.
+    /// </summary>
+    [TestCase("test-buster", "?rnd=test-buster")]
+    [TestCase("test-buster&&^-value", "?rnd=test-buster%26%26%5E-value")]
+    public void GivenCacheBusterValue_ReturnsExpectedQueryString(string input, string expected)
+    {
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty)
+        {
+            CacheBusterValue = input,
+        });
+        Assert.AreEqual(expected, actual);
+    }
+
+    /// <summary>
+    ///     Tests that an expected query string is returned when all options are given.
+    ///     This will be a good test to see if something breaks with ordering of query string parameters.
+    /// </summary>
+    [Test]
+    public void GivenAllOptions_ReturnsExpectedQueryString()
+    {
+        const string expected =
+            "/media/1005/img_0671.jpg?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&rxy=0.96,0.80827067669172936&rmode=stretch&ranchor=right&width=200&height=200&quality=50&more=options&rnd=buster";
+
+        var actual = _sGenerator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        {
+            Quality = 50,
+            Crop = _sCrop,
+            FocalPoint = _sFocus,
+            CacheBusterValue = "buster",
+            FurtherOptions = "more=options",
+            Height = 200,
+            Width = 200,
+            ImageCropAnchor = ImageCropAnchor.Right,
+            ImageCropMode = ImageCropMode.Stretch,
+        });
+
+        Assert.AreEqual(expected, actual);
     }
 }
