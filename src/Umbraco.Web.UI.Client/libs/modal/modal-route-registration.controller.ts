@@ -29,7 +29,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		host: UmbControllerHostInterface,
 		alias: UmbModalToken<D, R> | string,
 		path: string,
-		uniqueParts: Map<string, string | undefined> | null,
+		uniqueParts?: Map<string, string | undefined> | null,
 		modalConfig?: UmbModalConfig
 	) {
 		super(alias, path, modalConfig);
