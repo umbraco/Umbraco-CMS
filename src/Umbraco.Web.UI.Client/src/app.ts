@@ -17,11 +17,11 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+import { UmbIconStore } from './core/stores/icon/icon.store';
 import type { Guard, IRoute } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbIconStore } from './core/stores/icon/icon.store';
 import { umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-app')

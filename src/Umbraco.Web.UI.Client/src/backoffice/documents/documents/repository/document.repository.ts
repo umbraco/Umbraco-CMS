@@ -1,3 +1,7 @@
+import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
+import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
+import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store';
+import { UmbDocumentServerDataSource } from './sources/document.server.data';
 import type {
 	RepositoryTreeDataSource,
 	UmbTreeRepository,
@@ -7,10 +11,6 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
-import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
-import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store';
-import { UmbDocumentServerDataSource } from './sources/document.server.data';
 
 type ItemType = DocumentResponseModel;
 

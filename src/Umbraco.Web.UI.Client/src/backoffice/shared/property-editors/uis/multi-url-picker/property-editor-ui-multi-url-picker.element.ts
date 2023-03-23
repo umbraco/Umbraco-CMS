@@ -4,10 +4,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UmbLinkPickerLink } from '../../../../shared/modals/link-picker';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../../shared/components/workspace-property/workspace-property.context';
 import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from 'src/backoffice/shared/components/workspace-property/workspace-property.context';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
