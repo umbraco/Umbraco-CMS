@@ -4,9 +4,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbMediaRepository } from '../../../media/media/repository/media.repository';
-import { UMB_CONFIRM_MODAL } from '../../../../../libs/modal/token/confirm-modal.token';
-import { UMB_MEDIA_PICKER_MODAL } from '../../../../../libs/modal/token/media-picker-modal.token';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+	UMB_MEDIA_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';

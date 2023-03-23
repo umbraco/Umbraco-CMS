@@ -2,8 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
-import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '../../../../../../../libs/modal/token/property-editor-ui-picker-modal.token';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';

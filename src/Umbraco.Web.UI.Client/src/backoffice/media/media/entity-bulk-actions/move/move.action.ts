@@ -1,9 +1,8 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UMB_MEDIA_PICKER_MODAL } from '../../../../../../libs/modal/token/media-picker-modal.token';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
 	#modalContext?: UmbModalContext;

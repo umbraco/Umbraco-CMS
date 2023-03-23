@@ -1,8 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
-import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL } from '../../../../../../libs/modal/token/examine-fields-settings-modal.token';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_EXAMINE_FIELDS_SETTINGS_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import {
 	SearchResultResponseModel,
 	SearcherResource,

@@ -4,8 +4,8 @@ import './icon-picker-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbIconPickerModalElement } from './icon-picker-modal.element';
 import { UmbIconPickerModalData } from '../../../../../libs/modal/token/icon-picker-modal.token';
+import type { UmbIconPickerModalElement } from './icon-picker-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Icon Picker',

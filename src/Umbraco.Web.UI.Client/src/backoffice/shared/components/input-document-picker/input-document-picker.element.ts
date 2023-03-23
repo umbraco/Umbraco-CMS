@@ -5,9 +5,12 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
 import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
-import { UMB_CONFIRM_MODAL } from '../../../../../libs/modal/token/confirm-modal.token';
-import { UMB_DOCUMENT_PICKER_MODAL } from '../../../../../libs/modal/token/document-picker-modal.token';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+	UMB_DOCUMENT_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';

@@ -3,8 +3,8 @@ import './confirm-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbConfirmModalElement } from './confirm-modal.element';
 import type { UmbConfirmModalData } from '../../../../../libs/modal/token/confirm-modal.token';
+import type { UmbConfirmModalElement } from './confirm-modal.element';
 
 export default {
 	title: 'API/Modals/Layouts/Confirm',

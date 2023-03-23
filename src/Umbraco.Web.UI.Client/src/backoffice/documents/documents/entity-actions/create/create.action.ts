@@ -1,8 +1,11 @@
-import { UMB_ALLOWED_DOCUMENT_TYPES_MODAL } from '../../../../../../libs/modal/token/allowed-document-types-modal.token';
 import type { UmbDocumentRepository } from '../../repository/document.repository';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_ALLOWED_DOCUMENT_TYPES_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {

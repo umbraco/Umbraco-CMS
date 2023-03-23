@@ -1,8 +1,7 @@
-import { UMB_CONFIRM_MODAL } from '../../../modal/token/confirm-modal.token';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbDeleteEntityAction<
 	T extends { delete(unique: string): Promise<void>; requestItems(uniques: Array<string>): any }
