@@ -1,5 +1,5 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UMB_MEDIA_PICKER_MODAL_TOKEN } from '../../modals/media-picker';
+import { UMB_MEDIA_PICKER_MODAL } from '../../../../../../libs/modal/token/media-picker-modal.token';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -18,7 +18,7 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 
 	async execute() {
 		// TODO: the picker should be single picker by default
-		const modalHandler = this.#modalContext?.open(UMB_MEDIA_PICKER_MODAL_TOKEN, {
+		const modalHandler = this.#modalContext?.open(UMB_MEDIA_PICKER_MODAL, {
 			selection: [],
 			multiple: false,
 		});

@@ -5,7 +5,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbMediaRepository } from '../../../media/media/repository/media.repository';
 import { UMB_CONFIRM_MODAL } from '../../../../../libs/modal/token/confirm-modal.token';
-import { UMB_MEDIA_PICKER_MODAL_TOKEN } from '../../../media/media/modals/media-picker';
+import { UMB_MEDIA_PICKER_MODAL } from '../../../../../libs/modal/token/media-picker-modal.token';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -137,7 +137,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_MEDIA_PICKER_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_MEDIA_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
