@@ -32,12 +32,6 @@ export class UmbRouteContext {
 		});
 	}
 
-	#removeModalPath(info: IRoutingInfo) {
-		if (window.location.href.includes(info.match.fragments.consumed)) {
-			window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
-		}
-	}
-
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
 		this.#generateNewUrlBuilder(registration);
@@ -75,6 +69,12 @@ export class UmbRouteContext {
 				}
 			},
 		};
+	}
+
+	#removeModalPath(info: IRoutingInfo) {
+		if (window.location.href.includes(info.match.fragments.consumed)) {
+			window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
+		}
 	}
 
 	#generateContextRoutes() {
