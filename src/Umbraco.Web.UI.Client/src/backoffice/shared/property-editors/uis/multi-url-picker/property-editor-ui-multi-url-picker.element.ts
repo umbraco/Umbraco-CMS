@@ -2,11 +2,12 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
+import { UmbLinkPickerLink } from '../../../../shared/modals/link-picker';
 import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
-import { UmbLinkPickerLink } from '../../../../shared/modals/link-picker';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from 'src/backoffice/shared/components/workspace-property/workspace-property.context';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -50,6 +51,25 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	@state()
 	private _minNumber?: number;
 
+	@state()
+	private _alias?: string;
+
+	@state()
+	private _propertyVariantId?: string;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (context) => {
+			this.observe(context.alias, (alias) => {
+				this._alias = alias;
+			});
+			this.observe(context.variantId, (variantId) => {
+				this._propertyVariantId = variantId?.toString() || 'invariant';
+			});
+		});
+	}
+
 	private _onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputMultiUrlPickerElement).urls;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
@@ -57,6 +77,8 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 
 	render() {
 		return html`<umb-input-multi-url-picker
+			.alias="${this._alias}"
+			.variantId="${this._propertyVariantId}"
 			@change="${this._onChange}"
 			.overlaySize="${this._overlaySize}"
 			?hide-anchor="${this._hideAnchor}"

@@ -7,6 +7,7 @@ import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/lin
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalRegistrationController } from 'libs/modal/modal-registration.controller';
 import type { UmbModalRouteBuilder } from 'libs/modal/modal-route-registration';
+import { UmbVariantId } from '../../variants/variant-id.class';
 
 /**
  * @element umb-input-multi-url-picker
@@ -30,7 +31,16 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@property()
-	alias?: string;
+	public set alias(value: string | undefined) {
+		console.log('alias', value);
+		this.myModalRegistration.setUniqueIdentifier('propertyAlias', value);
+	}
+
+	@property()
+	public set variantId(value: string | UmbVariantId | undefined) {
+		console.log('variantId', value);
+		this.myModalRegistration.setUniqueIdentifier('variantId', value?.toString());
+	}
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -120,53 +130,60 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		// TODO: Need concept for contextual being aware about the context, as this might not work if input is used outside a property editor.
-		this.myModalRegistration = new UmbModalRegistrationController(this, UMB_LINK_PICKER_MODAL_TOKEN, {
-			path: `:index`,
-			onSetup: (params) => {
-				// Get index:
-				const indexParam = params.index;
-				if (!indexParam) return false;
-				let index: number | null = parseInt(params.index);
-				if (Number.isNaN(index)) return false;
+		this.myModalRegistration = new UmbModalRegistrationController(
+			this,
+			UMB_LINK_PICKER_MODAL_TOKEN,
+			new Map([
+				['propertyAlias', undefined],
+				['variantId', undefined],
+			]),
+			{
+				path: `:index`,
+				onSetup: (params) => {
+					// Get index:
+					const indexParam = params.index;
+					if (!indexParam) return false;
+					let index: number | null = parseInt(params.index);
+					if (Number.isNaN(index)) return false;
 
-				// Use the index to find data:
-				let data: UmbLinkPickerLink | null = null;
-				if (index >= 0 && index < this.urls.length) {
-					data = this._getItemByIndex(index);
-				} else {
-					// If not then make a new pick:
-					index = null;
-				}
+					// Use the index to find data:
+					let data: UmbLinkPickerLink | null = null;
+					if (index >= 0 && index < this.urls.length) {
+						data = this._getItemByIndex(index);
+					} else {
+						// If not then make a new pick:
+						index = null;
+					}
 
-				return {
-					index: index,
-					lol: false,
-					link: {
-						name: data?.name,
-						published: data?.published,
-						queryString: data?.queryString,
-						target: data?.target,
-						trashed: data?.trashed,
-						udi: data?.udi,
-						url: data?.url,
-					},
-					config: {
-						hideAnchor: this.hideAnchor,
-						ignoreUserStartNodes: this.ignoreUserStartNodes,
-						overlaySize: this.overlaySize || 'small',
-					},
-				};
-			},
-			onSubmit: (submitData) => {
-				if (!submitData) return;
-				this._setSelection(submitData.link, submitData.index);
-			},
-			getUrlBuilder: (urlBuilder) => {
-				console.log('got link builder', urlBuilder);
-				this._linkPickerURL = urlBuilder;
-			},
-		});
+					return {
+						index: index,
+						lol: false,
+						link: {
+							name: data?.name,
+							published: data?.published,
+							queryString: data?.queryString,
+							target: data?.target,
+							trashed: data?.trashed,
+							udi: data?.udi,
+							url: data?.url,
+						},
+						config: {
+							hideAnchor: this.hideAnchor,
+							ignoreUserStartNodes: this.ignoreUserStartNodes,
+							overlaySize: this.overlaySize || 'small',
+						},
+					};
+				},
+				onSubmit: (submitData) => {
+					if (!submitData) return;
+					this._setSelection(submitData.link, submitData.index);
+				},
+				getUrlBuilder: (urlBuilder) => {
+					console.log('got link builder', urlBuilder);
+					this._linkPickerURL = urlBuilder;
+				},
+			}
+		);
 	}
 
 	private _removeItem(index: number) {

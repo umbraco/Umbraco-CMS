@@ -1,7 +1,7 @@
 import type { UmbRouteContext } from '../../src/core/router/route.context';
 // TODO: Be aware here we import a class from src!
 import { UMB_ROUTE_CONTEXT_TOKEN } from '../../src/core/router/route.context';
-import { UmbModalRouteBuilder, UmbModalRouteOptions, UmbModalRouteRegistration } from './modal-route-registration';
+import { UmbModalRouteOptions, UmbModalRouteRegistration } from './modal-route-registration';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
@@ -14,24 +14,18 @@ export class UmbModalRegistrationController<D extends object = object, R = any> 
 	#modalOptions: UmbModalRouteOptions<D, R>;
 	#routeContext?: UmbRouteContext;
 	#modalRegistration?: UmbModalRegistrationToken;
-	#uniqueParts;
-	//#urlBuilder?: UmbModalRouteBuilder; // TODO: not going to work, as this will not trigger a re-render of the host element.
+	#uniqueParts: Map<string, string | undefined>;
 
 	constructor(
 		host: UmbControllerHostInterface,
 		alias: UmbModalToken<D, R> | string,
-		options: UmbModalRouteOptions<D, R>,
-		unique: Map<string, string | undefined> = new Map()
+		unique: Map<string, string | undefined> | null,
+		options: UmbModalRouteOptions<D, R>
 	) {
 		super(host);
 		this.#modalToken = alias;
-		this.#modalOptions = {
-			...options,
-			/*getUrlBuilder: (urlBuilder) => {
-				this.#urlBuilder = urlBuilder;
-			},*/
-		};
-		this.#uniqueParts = unique;
+		this.#modalOptions = options;
+		this.#uniqueParts = unique || new Map();
 
 		new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
 			this.#routeContext = _routeContext;
@@ -39,20 +33,21 @@ export class UmbModalRegistrationController<D extends object = object, R = any> 
 		});
 	}
 
-	/*
-	public getUrl(params: { [key: string]: string | number }) {
-		return this.#urlBuilder?.(params) || null;
-	}
-	*/
-
-	setUniqueIdentifier(identifier: string, value: string) {
+	setUniqueIdentifier(identifier: string, value: string | undefined) {
+		if (!this.#uniqueParts.has(identifier)) {
+			throw new Error(
+				`Identifier ${identifier} was not registered at the construction of the modal registration controller, it has to be.`
+			);
+		}
 		this.#uniqueParts.set(identifier, value);
+		this._registererModal();
 	}
 
 	private _registererModal() {
 		if (!this.#routeContext) return;
 		if (this.#modalRegistration) {
 			this.#routeContext.unregisterModal(this.#modalRegistration);
+			this.#modalRegistration = undefined;
 		}
 
 		const pathParts = Array.from(this.#uniqueParts.values());

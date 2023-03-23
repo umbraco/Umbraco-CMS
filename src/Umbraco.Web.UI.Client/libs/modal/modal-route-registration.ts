@@ -16,7 +16,7 @@ export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbM
 };
 
 export class UmbModalRouteRegistration<D extends object = object, R = any> {
-	#key;
+	#key: string;
 	#modalAlias: UmbModalToken<D, R> | string;
 	#options: UmbModalRouteOptions<D, R>;
 
