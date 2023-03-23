@@ -7,7 +7,11 @@ import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/sect
 import { UmbTreeContextBase } from '../tree.context';
 import { BooleanState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import {
+	UmbContextConsumerController,
+	UmbContextProviderController,
+	UmbContextToken,
+} from '@umbraco-cms/backoffice/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -65,6 +69,8 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 		});
+
+		new UmbContextProviderController(host, UMB_TREE_ITEM_CONTEXT_TOKEN, this);
 
 		this.#observeTreeItemActions();
 	}
