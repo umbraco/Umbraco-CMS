@@ -6,27 +6,29 @@ import { UmbModalToken } from './token/modal-token';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) => string;
 
-export type UmbModalRouteOptions<UmbModalTokenData extends object = object, UmbModalTokenResult = unknown> = {
-	path: string;
-	config?: UmbModalConfig;
-	onSetup?: (routingInfo: Params) => UmbModalTokenData | false;
-	onSubmit?: (data: UmbModalTokenResult) => void | PromiseLike<void>;
-	onReject?: () => void;
-	getUrlBuilder?: (urlBuilder: UmbModalRouteBuilder) => void;
-};
-
-export class UmbModalRouteRegistration<D extends object = object, R = any> {
+export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenResult = any> {
 	#key: string;
-	#modalAlias: UmbModalToken<D, R> | string;
-	#options: UmbModalRouteOptions<D, R>;
+	#path: string;
+	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string;
+	#modalConfig?: UmbModalConfig;
 
-	#modalHandler: UmbModalHandler<D, R> | undefined;
+	#onSetupCallback?: (routingInfo: Params) => UmbModalTokenData | false;
+	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
+	#onRejectCallback?: () => void;
+
+	#modalHandler: UmbModalHandler<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
 	// Notice i removed the key in the transferring to this class.
-	constructor(modalAlias: UmbModalToken<D, R> | string, options: UmbModalRouteOptions<D, R>) {
-		this.#key = options.config?.key || uuidv4();
+	constructor(
+		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string,
+		path: string,
+		modalConfig?: UmbModalConfig
+	) {
+		this.#key = modalConfig?.key || uuidv4();
 		this.#modalAlias = modalAlias;
-		this.#options = options;
+		this.#path = path;
+		this.#modalConfig = { ...modalConfig, key: this.#key };
 	}
 
 	public get key() {
@@ -38,11 +40,15 @@ export class UmbModalRouteRegistration<D extends object = object, R = any> {
 	}
 
 	public get path() {
-		return this.#options.path;
+		return this.#path;
 	}
 
-	public get options() {
-		return this.#options;
+	protected _setPath(path: string) {
+		this.#path = path;
+	}
+
+	public get modalConfig() {
+		return this.#modalConfig;
 	}
 
 	/**
@@ -59,20 +65,44 @@ export class UmbModalRouteRegistration<D extends object = object, R = any> {
 		return this.#modalHandler;
 	}
 
+	public usesRouteBuilder(): boolean {
+		return !!this.#urlBuilderCallback;
+	}
+	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
+		this.#urlBuilderCallback = callback;
+		return this;
+	}
+	public _internal_setRouteBuilder(urlBuilder: UmbModalRouteBuilder) {
+		this.#urlBuilderCallback?.(urlBuilder);
+	}
+
+	public onSetup(callback: (routingInfo: Params) => UmbModalTokenData | false) {
+		this.#onSetupCallback = callback;
+		return this;
+	}
+	public onSubmit(callback: (data: UmbModalTokenResult) => void) {
+		this.#onSubmitCallback = callback;
+		return this;
+	}
+	public onReject(callback: () => void) {
+		this.#onRejectCallback = callback;
+		return this;
+	}
+
+	#onSubmit = (data: UmbModalTokenResult) => {
+		this.#onSubmitCallback?.(data);
+		this.#modalHandler = undefined;
+	};
+	#onReject = () => {
+		this.#onRejectCallback?.();
+		this.#modalHandler = undefined;
+	};
+
 	routeSetup(modalContext: UmbModalContext, params: Params) {
-		const modalData = this.#options.onSetup?.(params);
+		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : true;
 		if (modalData !== false) {
-			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, { ...this.#options.config, key: this.#key });
-			this.#modalHandler.onSubmit().then(
-				(data) => {
-					this.#options.onSubmit?.(data);
-					this.#modalHandler = undefined;
-				},
-				() => {
-					this.#options.onReject?.();
-					this.#modalHandler = undefined;
-				}
-			);
+			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig);
+			this.#modalHandler.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalHandler;
 		}
 		return null;

@@ -78,7 +78,7 @@ export class UmbModalContext {
 	 */
 	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
-		data?: ModalData,
+		data?: ModalData | true,
 		config?: UmbModalConfig
 	) {
 		const modalHandler = new UmbModalHandlerClass(this.host, modalAlias, data, config) as unknown as UmbModalHandler<

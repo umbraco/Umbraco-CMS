@@ -4,10 +4,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
+import type { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalRegistrationController } from 'libs/modal/modal-registration.controller';
+import { UmbModalRouteRegistrationController } from 'libs/modal/modal-route-registration.controller';
 import type { UmbModalRouteBuilder } from 'libs/modal/modal-route-registration';
-import { UmbVariantId } from '../../variants/variant-id.class';
 
 /**
  * @element umb-input-multi-url-picker
@@ -113,7 +113,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 	private _urls: Array<UmbLinkPickerLink> = [];
 
 	@state()
-	private _linkPickerURL?: UmbModalRouteBuilder;
+	private _modalRoute?: UmbModalRouteBuilder;
 
 	private myModalRegistration;
 
@@ -130,60 +130,56 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		this.myModalRegistration = new UmbModalRegistrationController(
+		this.myModalRegistration = new UmbModalRouteRegistrationController(
 			this,
 			UMB_LINK_PICKER_MODAL_TOKEN,
+			`:index`,
 			new Map([
 				['propertyAlias', undefined],
 				['variantId', undefined],
-			]),
-			{
-				path: `:index`,
-				onSetup: (params) => {
-					// Get index:
-					const indexParam = params.index;
-					if (!indexParam) return false;
-					let index: number | null = parseInt(params.index);
-					if (Number.isNaN(index)) return false;
+			])
+		)
+			.onSetup((params) => {
+				// Get index:
+				const indexParam = params.index;
+				if (!indexParam) return false;
+				let index: number | null = parseInt(params.index);
+				if (Number.isNaN(index)) return false;
 
-					// Use the index to find data:
-					let data: UmbLinkPickerLink | null = null;
-					if (index >= 0 && index < this.urls.length) {
-						data = this._getItemByIndex(index);
-					} else {
-						// If not then make a new pick:
-						index = null;
-					}
+				// Use the index to find data:
+				let data: UmbLinkPickerLink | null = null;
+				if (index >= 0 && index < this.urls.length) {
+					data = this._getItemByIndex(index);
+				} else {
+					// If not then make a new pick:
+					index = null;
+				}
 
-					return {
-						index: index,
-						lol: false,
-						link: {
-							name: data?.name,
-							published: data?.published,
-							queryString: data?.queryString,
-							target: data?.target,
-							trashed: data?.trashed,
-							udi: data?.udi,
-							url: data?.url,
-						},
-						config: {
-							hideAnchor: this.hideAnchor,
-							ignoreUserStartNodes: this.ignoreUserStartNodes,
-							overlaySize: this.overlaySize || 'small',
-						},
-					};
-				},
-				onSubmit: (submitData) => {
-					if (!submitData) return;
-					this._setSelection(submitData.link, submitData.index);
-				},
-				getUrlBuilder: (urlBuilder) => {
-					console.log('got link builder', urlBuilder);
-					this._linkPickerURL = urlBuilder;
-				},
-			}
-		);
+				return {
+					index: index,
+					link: {
+						name: data?.name,
+						published: data?.published,
+						queryString: data?.queryString,
+						target: data?.target,
+						trashed: data?.trashed,
+						udi: data?.udi,
+						url: data?.url,
+					},
+					config: {
+						hideAnchor: this.hideAnchor,
+						ignoreUserStartNodes: this.ignoreUserStartNodes,
+						overlaySize: this.overlaySize || 'small',
+					},
+				};
+			})
+			.onSubmit((submitData) => {
+				if (!submitData) return;
+				this._setSelection(submitData.link, submitData.index);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._modalRoute = routeBuilder;
+			});
 	}
 
 	private _removeItem(index: number) {
@@ -212,12 +208,12 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 	// TODO: We should get a href property on uui-ref-node, and not use this method:
 	private _temporary_onClick_editItem(index: number) {
-		window.history.pushState({}, '', this._linkPickerURL?.({ index: index || -1 }));
+		window.history.pushState({}, '', this._modalRoute?.({ index: index || -1 }));
 	}
 
 	render() {
 		return html`${this.urls?.map((link, index) => this._renderItem(link, index))}
-			<uui-button look="placeholder" label="Add" .href=${this._linkPickerURL?.({ index: -1 })}>Add</uui-button>`;
+			<uui-button look="placeholder" label="Add" .href=${this._modalRoute?.({ index: -1 })}>Add</uui-button>`;
 	}
 
 	private _renderItem(link: UmbLinkPickerLink, index: number) {
@@ -227,7 +223,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			@open="${() => this._temporary_onClick_editItem(index)}">
 			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
 			<uui-action-bar slot="actions">
-				<uui-button .href=${this._linkPickerURL?.({ index })} label="Edit link">Edit</uui-button>
+				<uui-button .href=${this._modalRoute?.({ index })} label="Edit link">Edit</uui-button>
 				<uui-button @click="${() => this._removeItem(index)}" label="Remove link">Remove</uui-button>
 			</uui-action-bar>
 		</uui-ref-node>`;

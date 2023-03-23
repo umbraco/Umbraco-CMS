@@ -1,31 +1,41 @@
 import type { UmbRouteContext } from '../../src/core/router/route.context';
 // TODO: Be aware here we import a class from src!
 import { UMB_ROUTE_CONTEXT_TOKEN } from '../../src/core/router/route.context';
-import { UmbModalRouteOptions, UmbModalRouteRegistration } from './modal-route-registration';
+import type { UmbControllerInterface } from '../controller';
+import { UmbModalRouteRegistration } from './modal-route-registration';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalConfig, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
-import { UmbController } from 'libs/controller/controller.class';
 
 export type UmbModalRegistrationToken = UmbModalRouteRegistration;
 
-export class UmbModalRegistrationController<D extends object = object, R = any> extends UmbController {
-	#modalToken: UmbModalToken<D, R> | string;
-	#modalOptions: UmbModalRouteOptions<D, R>;
+export class UmbModalRouteRegistrationController<D extends object = object, R = any>
+	extends UmbModalRouteRegistration<D, R>
+	implements UmbControllerInterface
+{
+	//#host: UmbControllerHostInterface;
+
+	#configuredPath: string;
+	#uniqueParts: Map<string, string | undefined>;
+
 	#routeContext?: UmbRouteContext;
 	#modalRegistration?: UmbModalRegistrationToken;
-	#uniqueParts: Map<string, string | undefined>;
+
+	public get unique() {
+		return undefined;
+	}
 
 	constructor(
 		host: UmbControllerHostInterface,
 		alias: UmbModalToken<D, R> | string,
-		unique: Map<string, string | undefined> | null,
-		options: UmbModalRouteOptions<D, R>
+		path: string,
+		uniqueParts: Map<string, string | undefined> | null,
+		modalConfig?: UmbModalConfig
 	) {
-		super(host);
-		this.#modalToken = alias;
-		this.#modalOptions = options;
-		this.#uniqueParts = unique || new Map();
+		super(alias, path, modalConfig);
+		//this.#host = host;
+		this.#configuredPath = path;
+		this.#uniqueParts = uniqueParts || new Map();
 
 		new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
 			this.#routeContext = _routeContext;
@@ -56,14 +66,11 @@ export class UmbModalRegistrationController<D extends object = object, R = any> 
 		if (pathParts.some((value) => value === undefined)) return;
 
 		// Add the configured part of the path:
-		pathParts.push(this.#modalOptions.path);
+		pathParts.push(this.#configuredPath);
 
-		const modifiedModalOptions = {
-			...this.#modalOptions,
-			path: pathParts.join('/'),
-		};
+		this._setPath(pathParts.join('/'));
 
-		this.#modalRegistration = this.#routeContext?.registerModal(this.#modalToken, modifiedModalOptions);
+		this.#modalRegistration = this.#routeContext.registerModal(this);
 	}
 
 	hostConnected() {
@@ -76,5 +83,9 @@ export class UmbModalRegistrationController<D extends object = object, R = any> 
 			this.#routeContext?.unregisterModal(this.#modalRegistration);
 			this.#modalRegistration = undefined;
 		}
+	}
+
+	public destroy(): void {
+		this.hostDisconnected();
 	}
 }
