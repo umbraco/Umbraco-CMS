@@ -27,6 +27,7 @@ import { handlers as cultureHandlers } from './domains/culture.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
 import { handlers as logViewerHandlers } from './domains/log-viewer.handlers';
 import { handlers as packageHandlers } from './domains/package.handlers';
+import { handlers as rteEmbedHandlers } from './domains/rte-embed.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -57,6 +58,7 @@ const handlers = [
 	...redirectManagementHandlers,
 	...logViewerHandlers,
 	...packageHandlers,
+	...rteEmbedHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
