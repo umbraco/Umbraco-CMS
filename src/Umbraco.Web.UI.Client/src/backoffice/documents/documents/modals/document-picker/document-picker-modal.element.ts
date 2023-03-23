@@ -2,7 +2,10 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
-import { UmbDocumentPickerModalData, UmbDocumentPickerModalResult } from '.';
+import {
+	UmbDocumentPickerModalData,
+	UmbDocumentPickerModalResult,
+} from '../../../../../../libs/modal/token/document-picker-modal.token';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 // TODO: make use of UmbPickerLayoutBase
