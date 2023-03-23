@@ -2,8 +2,8 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-import { UMB_INVITE_USER_MODAL_TOKEN } from '../../../../users/users/modals/invite-user';
-import { UMB_CREATE_USER_MODAL_TOKEN } from '../../../../users/users/modals/create-user';
+import { UMB_INVITE_USER_MODAL } from '../../../../../../libs/modal/token/invite-user-modal.token';
+import { UMB_CREATE_USER_MODAL } from '../../../../../../libs/modal/token/create-user-modal.token';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import type { IRoute } from '@umbraco-cms/internal/router';
@@ -160,9 +160,9 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 		let token = undefined;
 		// TODO: we need to find a better way to determine if we should create or invite
 		if (this.isCloud) {
-			token = UMB_INVITE_USER_MODAL_TOKEN;
+			token = UMB_INVITE_USER_MODAL;
 		} else {
-			token = UMB_CREATE_USER_MODAL_TOKEN;
+			token = UMB_CREATE_USER_MODAL;
 		}
 
 		this._modalContext?.open(token);

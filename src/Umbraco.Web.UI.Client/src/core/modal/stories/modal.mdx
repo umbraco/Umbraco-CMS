@@ -51,7 +51,7 @@ A modal can be registred via the UmbModalRouteRegistrationController. The regist
 Notice we are using a Controller here, this means your element has to be a Controller Host (TODO: Insert link to story about Controller Host also available through the UmbElementMixin)
 
 ```ts
-this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL_TOKEN)
+this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL)
 	.onSubmit((submitData) => {
 		console.log('Modal submitted with data'.submitData);
 	})
@@ -193,7 +193,7 @@ class MyElement extends UmbElementMixin(LitElement) {
 	#onClick() {
 		const data = {'data goes here'};
 		const options {'options go here'};
-		const modalHandler = this.#modalContext?.open(SOME_MODAL_TOKEN), data, options);
+		const modalHandler = this.#modalContext?.open(MY_MODAL_TOKEN), data, options);
 
 		modalHandler?.onSubmit().then((data) => {
 			// if modal submitted, then data is supplied here.
