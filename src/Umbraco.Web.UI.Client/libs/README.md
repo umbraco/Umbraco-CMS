@@ -87,7 +87,7 @@ customElements.define('my-custom-dashboard', MyDashboardElement);
 
 ### TypeScript with Lit
 
-First install Lit and Vite. This command will create a new folder called "my-package". Choose "lit" and "typescript" when prompted.
+First install Lit and Vite. This command will create a new folder called `my-package` which will have the Vite tooling and Lit for WebComponent development setup.
 
 ```bash
 npm create vite@latest -- --template lit-ts my-package
