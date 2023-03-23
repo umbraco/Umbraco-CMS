@@ -108,12 +108,13 @@ module.exports = {
 		},
 	},
 
+	// TODO: Its not bullet proof, but it will catch most/some cases.
 	/** @type {import('eslint').Rule.RuleModule} */
 	'prefer-umbraco-cms-imports': {
 		meta: {
 			type: 'suggestion',
 			docs: {
-				description: 'Ensure that imports from "libs" namespace are replaced with "@umbraco-cms/backoffice" namespace',
+				description: 'Replace relative imports to libs/... with @umbraco-cms/backoffice/...',
 				category: 'Best Practices',
 				recommended: true,
 			},
@@ -121,17 +122,20 @@ module.exports = {
 			schema: [],
 		},
 		create: function (context) {
+			const libsRegex = /(\.\.\/)*libs\/(.*)/;
 			return {
 				ImportDeclaration: function (node) {
-					if (node.source.value.startsWith('libs/')) {
-						const newImportPath = node.source.value.replace(/^libs\//, '@umbraco-cms/backoffice/');
-						const specifiers = node.specifiers.map((specifier) => specifier.local.name).join(', ');
-						const newImportStatement = `import { ${specifiers} } from '${newImportPath}';`;
+					const sourceValue = node.source.value;
+					if (sourceValue.startsWith('libs/') || libsRegex.test(sourceValue)) {
+						const importPath = sourceValue.replace(libsRegex, (match, p1, p2) => {
+							const levels = p1.match(/\.\.\//g) || [];
+							return `@umbraco-cms/backoffice/${p2}`;
+						});
 						context.report({
 							node,
-							message: `Use '${newImportPath}' instead of '${node.source.value}' for imports from 'libs' namespace.`,
+							message: `Use import alias @umbraco-cms/backoffice instead of relative path "${sourceValue}".`,
 							fix: function (fixer) {
-								return fixer.replaceText(node, newImportStatement);
+								return fixer.replaceTextRange(node.source.range, `'${importPath}'`);
 							},
 						});
 					}
