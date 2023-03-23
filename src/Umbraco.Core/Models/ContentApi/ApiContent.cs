@@ -2,14 +2,14 @@ namespace Umbraco.Cms.Core.Models.ContentApi;
 
 public class ApiContent : ApiElement, IApiContent
 {
-    public ApiContent(Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties)
+    public ApiContent(Guid id, string name, string contentType, string path, IDictionary<string, object?> properties)
         : base(id, contentType, properties)
     {
         Name = name;
-        Route = route;
+        Path = path;
     }
 
     public string Name { get; }
 
-    public IApiContentRoute Route { get; }
+    public string Path { get; }
 }

@@ -2,6 +2,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -20,13 +21,12 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var expansionStrategyAccessor = CreateOutputExpansionStrategyAccessor();
 
         var contentNameProvider = new ApiContentNameProvider();
-        var apiUrProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
-        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+        var apiUrProvider = new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor());
         return new MultiNodeTreePickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
-            new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor),
+            new ApiContentBuilder(contentNameProvider, apiUrProvider, expansionStrategyAccessor),
             new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor));
     }
 
@@ -57,7 +57,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url", result.First().Route.Path);
+        Assert.AreEqual("the-page-url", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
         Assert.IsEmpty(result.First().Properties);
     }
@@ -71,7 +71,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var otherContentKey = Guid.NewGuid();
         var otherContent = SetupPublishedContent("The other page", otherContentKey, PublishedItemType.Content, PublishedContentType);
-        RegisterContentWithProviders(otherContent.Object);
+        PublishedContentCacheMock
+            .Setup(pcc => pcc.GetById(otherContentKey))
+            .Returns(otherContent.Object);
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
@@ -84,7 +86,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url", result.First().Route.Path);
+        Assert.AreEqual("the-page-url", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
 
         Assert.AreEqual("The other page", result.Last().Name);
@@ -129,7 +131,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("The page", result.First().Name);
         Assert.AreEqual(key, result.First().Id);
-        Assert.AreEqual("/page-url-segment", result.First().Route.Path);
+        Assert.AreEqual("page-url-segment", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
         Assert.AreEqual(2, result.First().Properties.Count);
         Assert.AreEqual("Content API value", result.First().Properties[ContentApiPropertyType.Alias]);
@@ -166,7 +168,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var otherMediaKey = Guid.NewGuid();
         var otherMedia = SetupPublishedContent("The other media", otherMediaKey, PublishedItemType.Media, PublishedMediaType);
-        RegisterMediaWithProviders(otherMedia.Object);
+        PublishedMediaCacheMock
+            .Setup(pcc => pcc.GetById(otherMediaKey))
+            .Returns(otherMedia.Object);
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
@@ -203,7 +207,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
         Assert.AreEqual(PublishedContent.Key, result.First().Id);
-        Assert.AreEqual("/the-page-url", result.First().Route.Path);
+        Assert.AreEqual("the-page-url", result.First().Path);
         Assert.AreEqual("TheContentType", result.First().ContentType);
     }
 

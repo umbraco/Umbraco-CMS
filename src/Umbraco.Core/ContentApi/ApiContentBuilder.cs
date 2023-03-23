@@ -6,13 +6,13 @@ namespace Umbraco.Cms.Core.ContentApi;
 public class ApiContentBuilder : IApiContentBuilder
 {
     private readonly IApiContentNameProvider _apiContentNameProvider;
-    private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
+    private readonly IApiUrlProvider _apiUrlProvider;
     private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 
-    public ApiContentBuilder(IApiContentNameProvider apiContentNameProvider, IApiContentRouteBuilder apiContentRouteBuilder, IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
+    public ApiContentBuilder(IApiContentNameProvider apiContentNameProvider, IApiUrlProvider apiUrlProvider, IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
     {
         _apiContentNameProvider = apiContentNameProvider;
-        _apiContentRouteBuilder = apiContentRouteBuilder;
+        _apiUrlProvider = apiUrlProvider;
         _outputExpansionStrategyAccessor = outputExpansionStrategyAccessor;
     }
 
@@ -27,7 +27,7 @@ public class ApiContentBuilder : IApiContentBuilder
             content.Key,
             _apiContentNameProvider.GetName(content),
             content.ContentType.Alias,
-            _apiContentRouteBuilder.Build(content),
+            _apiUrlProvider.Url(content),
             properties);
     }
 }

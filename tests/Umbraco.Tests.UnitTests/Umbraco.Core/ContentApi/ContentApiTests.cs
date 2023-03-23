@@ -1,7 +1,5 @@
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Models;
@@ -73,12 +71,4 @@ public class ContentApiTests
     }
 
     protected IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor() => new NoopOutputExpansionStrategyAccessor();
-
-    protected IOptions<GlobalSettings> CreateGlobalSettings(bool hideTopLevelNodeFromPath = true)
-    {
-        var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hideTopLevelNodeFromPath };
-        var globalSettingsOptionsMock = new Mock<IOptions<GlobalSettings>>();
-        globalSettingsOptionsMock.SetupGet(s => s.Value).Returns(globalSettings);
-        return globalSettingsOptionsMock.Object;
-    }
 }
