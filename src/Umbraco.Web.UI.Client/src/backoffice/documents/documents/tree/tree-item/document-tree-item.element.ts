@@ -39,16 +39,27 @@ export class UmbDocumentTreeItemElement extends UmbLitElement {
 		new UmbDocumentTreeItemContext(this, this.item);
 		return html`
 			<umb-tree-item-base .item=${this.item}>
-				<!-- TODO: implement correct status symbol -->
-				<div id="icon-container" slot="icon">
-					${this.item?.icon
-						? html`
-								<uui-icon id="icon" slot="icon" name="${this.item.icon}"></uui-icon> <span id="status-symbol"></span>
-						  `
-						: nothing}
-				</div>
+				${this.#renderIconWithStatusSymbol()} ${this.#renderLabel()}
 			</umb-tree-item-base>
 		`;
+	}
+
+	// TODO: implement correct status symbol
+	#renderIconWithStatusSymbol() {
+		return html`
+			<span id="icon-container" slot="icon">
+				${this.item?.icon
+					? html`
+							<uui-icon id="icon" slot="icon" name="${this.item.icon}"></uui-icon> <span id="status-symbol"></span>
+					  `
+					: nothing}
+			</span>
+		`;
+	}
+
+	// TODO: lower opacity if item is not published
+	#renderLabel() {
+		return html` <span id="label" slot="label">${this.item?.name}</span> `;
 	}
 }
 
