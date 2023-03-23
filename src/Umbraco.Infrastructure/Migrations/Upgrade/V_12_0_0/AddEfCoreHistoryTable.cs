@@ -6,5 +6,5 @@ public class AddEfCoreHistoryTable : EfCoreMigrationBase
 
     public AddEfCoreHistoryTable(IEFCoreMigrationContext context, IEFCoreMigrationService efCoreMigrationService) : base(context) => _efCoreMigrationService = efCoreMigrationService;
 
-    protected override void Migrate() => _efCoreMigrationService.AddHistoryTable().GetAwaiter().GetResult();
+    protected override void Migrate() => _efCoreMigrationService.MigrateAsync().GetAwaiter().GetResult();
 }

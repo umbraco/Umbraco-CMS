@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private async Task ExecuteEFCoreUpgrade()
         {
             _logger.LogInformation("Running EFCore upgrade");
-            await _efCoreMigrationService.AddHistoryTable();
+            await _efCoreMigrationService.MigrateAsync();
         }
 
         public override bool RequiresExecution(object model)

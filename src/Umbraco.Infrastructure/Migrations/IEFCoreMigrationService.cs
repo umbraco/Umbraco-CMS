@@ -2,5 +2,5 @@
 
 public interface IEFCoreMigrationService
 {
-    Task AddHistoryTable();
+    Task MigrateAsync();
 }
