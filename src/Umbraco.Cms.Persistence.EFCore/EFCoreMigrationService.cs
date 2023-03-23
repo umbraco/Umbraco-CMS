@@ -20,7 +20,11 @@ public class EFCoreMigrationService : IEFCoreMigrationService
         });
 
     public async Task<string?> GetCurrentMigrationStateAsync() =>
-        await _umbracoDbContextFactory.ExecuteWithContextAsync(async db => db.Database.GetMigrations().LastOrDefault());
+        await _umbracoDbContextFactory.ExecuteWithContextAsync(async db =>
+        {
+            IEnumerable<string> appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
+            return appliedMigrations.LastOrDefault();
+        });
 
     public async Task<string> GetFinalMigrationStateAsync() =>
         await _umbracoDbContextFactory.ExecuteWithContextAsync(
