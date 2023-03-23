@@ -90,7 +90,7 @@ customElements.define('my-custom-dashboard', MyDashboardElement);
 First install Lit and Vite. This command will create a new folder called "my-package". Choose "lit" and "typescript" when prompted.
 
 ```bash
-npm create vite@latest my-package
+npm create vite@latest -- --template lit-ts my-package
 ```
 
 Go to the new folder and install the backoffice package.
