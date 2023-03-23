@@ -8,10 +8,10 @@ import {
 	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,
-} from '../../../../../libs/modal/token/embedded-media-modal.token';
+	UmbModalHandler,
+} from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 
 interface UmbEmbeddedMediaModalModel {
 	url?: string;

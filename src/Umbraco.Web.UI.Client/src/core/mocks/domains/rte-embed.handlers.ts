@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { OEmbedResult, OEmbedStatus } from '../../../../libs/modal/token/embedded-media-modal.token';
+import { OEmbedResult, OEmbedStatus } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [

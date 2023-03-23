@@ -5,10 +5,7 @@ import { when } from 'lit/directives/when.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
-import {
-	UmbImportDictionaryModalData,
-	UmbImportDictionaryModalResult,
-} from '../../../../../../libs/modal/token/import-dictionary-modal.token';
+import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { UploadDictionaryResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 

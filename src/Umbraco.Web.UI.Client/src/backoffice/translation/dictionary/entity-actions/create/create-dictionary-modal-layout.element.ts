@@ -2,10 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import {
-	UmbCreateDictionaryModalData,
-	UmbCreateDictionaryModalResult,
-} from '../../../../../../libs/modal/token/create-dictionary-modal.token';
+import { UmbCreateDictionaryModalData, UmbCreateDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-create-dictionary-modal')

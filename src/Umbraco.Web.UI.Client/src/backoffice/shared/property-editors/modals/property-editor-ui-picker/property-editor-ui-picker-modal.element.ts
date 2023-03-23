@@ -7,7 +7,7 @@ import type { UUIInputEvent } from '@umbraco-ui/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult,
-} from '../../../../../../libs/modal/token/property-editor-ui-picker-modal.token';
+} from '@umbraco-cms/backoffice/modal';
 import type { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
