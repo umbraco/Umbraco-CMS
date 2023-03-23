@@ -32,13 +32,11 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 	@property()
 	public set alias(value: string | undefined) {
-		console.log('alias', value);
 		this.myModalRegistration.setUniqueIdentifier('propertyAlias', value);
 	}
 
 	@property()
 	public set variantId(value: string | UmbVariantId | undefined) {
-		console.log('variantId', value);
 		this.myModalRegistration.setUniqueIdentifier('variantId', value?.toString());
 	}
 
