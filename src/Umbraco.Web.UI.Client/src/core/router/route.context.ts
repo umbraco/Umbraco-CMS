@@ -4,10 +4,9 @@ import {
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
 import { UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal/modal.context';
-import { UmbModalRouteOptions, UmbModalRouteRegistration } from 'libs/modal/modal-route-registration';
+import { UmbModalRouteRegistration } from 'libs/modal/modal-route-registration';
 
 const EmptyDiv = document.createElement('div');
 
@@ -38,20 +37,6 @@ export class UmbRouteContext {
 			window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
 		}
 	}
-
-	/*
-	public registerModal<D extends object = object, R = any>(
-		alias: UmbModalToken<D, R> | string,
-		options: UmbModalRouteOptions<D, R>
-	) {
-		const registration = new UmbModalRouteRegistration(alias, options);
-
-		this.#modalRegistrations.push(registration);
-		this.#generateNewUrlBuilder(registration);
-		this.#generateContextRoutes();
-		return registration;
-	}
-	*/
 
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
