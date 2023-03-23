@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -17,14 +17,15 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "blocklist",
     ValueType = ValueTypes.Json,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-thumbnail-list")]
+    Icon = "icon-thumbnail-list",
+    ValueEditorIsReusable = false)]
 public class BlockListPropertyEditor : BlockEditorPropertyEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
 
     // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         PropertyEditorCollection propertyEditors,
@@ -33,12 +34,29 @@ public class BlockListPropertyEditor : BlockEditorPropertyEditor
     {
     }
 
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         PropertyEditorCollection propertyEditors,
         IIOHelper ioHelper,
         IEditorConfigurationParser editorConfigurationParser)
-        : base(dataValueEditorFactory, propertyEditors)
+        : this(
+            dataValueEditorFactory,
+            propertyEditors,
+            ioHelper,
+            editorConfigurationParser,
+            StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
+    {
+
+    }
+
+    public BlockListPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        PropertyEditorCollection propertyEditors,
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser,
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        : base(dataValueEditorFactory, propertyEditors, blockValuePropertyIndexValueFactory)
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;

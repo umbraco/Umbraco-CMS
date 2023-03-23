@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -15,7 +15,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.Slider,
     "Slider",
     "slider",
-    Icon = "icon-navigation-horizontal")]
+    Icon = "icon-navigation-horizontal",
+    ValueEditorIsReusable = true)]
 public class SliderPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Middleware;
@@ -18,6 +18,6 @@ public sealed class ConfigureGlobalOptionsForKeepAliveMiddlware : IPostConfigure
     /// </summary>
     /// <param name="name"></param>
     /// <param name="options"></param>
-    public void PostConfigure(string name, GlobalSettings options) =>
+    public void PostConfigure(string? name, GlobalSettings options) =>
         options.ReservedUrls += _keepAliveSettings.Value.KeepAlivePingUrl;
 }

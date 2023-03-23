@@ -198,3 +198,19 @@
 .btn-group-vertical > .btn-large:last-child {
   .border-radius(0 0 @borderRadiusLarge @borderRadiusLarge);
 }
+
+.btn-group-justified {
+  display: flex;
+
+  .umb-button {
+    margin-left: 0;
+  }
+
+  > * {
+    flex-grow: 1;
+  }
+
+  > .dropdown-toggle {
+    flex-grow: 0;
+  }
+}

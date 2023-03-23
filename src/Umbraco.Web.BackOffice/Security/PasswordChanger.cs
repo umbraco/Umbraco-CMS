@@ -52,7 +52,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
         }
 
         var userId = changingPasswordModel.Id.ToString();
-        TUser identityUser = await userMgr.FindByIdAsync(userId);
+        TUser? identityUser = await userMgr.FindByIdAsync(userId);
         if (identityUser == null)
         {
             // this really shouldn't ever happen... but just in case
@@ -96,7 +96,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
         }
 
         // can we change to the new password?
-        IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword, changingPasswordModel.NewPassword);
+        IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword!, changingPasswordModel.NewPassword);
         if (changeResult.Succeeded == false)
         {
             // no, fail with error messages for "password"

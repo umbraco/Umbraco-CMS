@@ -9,9 +9,12 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -59,7 +62,17 @@ public class MigrationPlanTests
                 }
             });
 
-        var executor = new MigrationPlanExecutor(scopeProvider, scopeProvider, loggerFactory, migrationBuilder);
+        var databaseFactory = Mock.Of<IUmbracoDatabaseFactory>();
+        var publishedSnapshotService = Mock.Of<IPublishedSnapshotService>();
+        var distributedCache = new DistributedCache(Mock.Of<IServerMessenger>(), new CacheRefresherCollection(Enumerable.Empty<ICacheRefresher>));
+        var executor = new MigrationPlanExecutor(
+            scopeProvider,
+            scopeProvider,
+            loggerFactory,
+            migrationBuilder,
+            databaseFactory,
+            publishedSnapshotService,
+            distributedCache);
 
         var plan = new MigrationPlan("default")
             .From(string.Empty)

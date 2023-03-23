@@ -12,7 +12,7 @@ public class GlobalSettingsValidator
     : ConfigurationValidatorBase, IValidateOptions<GlobalSettings>
 {
     /// <inheritdoc />
-    public ValidateOptionsResult Validate(string name, GlobalSettings options)
+    public ValidateOptionsResult Validate(string? name, GlobalSettings options)
     {
         if (!ValidateSmtpSetting(options.Smtp, out var message))
         {

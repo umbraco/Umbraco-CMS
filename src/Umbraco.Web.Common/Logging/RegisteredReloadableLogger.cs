@@ -1,12 +1,13 @@
 using Serilog;
 using Serilog.Extensions.Hosting;
+using Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto;
 
 namespace Umbraco.Cms.Web.Common.Logging;
 
 /// <remarks>
 ///     HACK:
 ///     Ensures freeze is only called a single time even when resolving a logger from the snapshot container
-///     built for <see cref="ModelsBuilder.RefreshingRazorViewEngine" />.
+///     built for <see cref="RefreshingRazorViewEngine" />.
 /// </remarks>
 internal class RegisteredReloadableLogger
 {

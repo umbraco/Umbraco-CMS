@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -19,6 +19,9 @@ public class RelationItem
 
     [DataMember(Name = "udi")]
     public Udi? NodeUdi => NodeType == Constants.UdiEntityType.Unknown ? null : Udi.Create(NodeType, NodeKey);
+
+    [DataMember(Name = "published")]
+    public bool? NodePublished { get; set; }
 
     [DataMember(Name = "icon")]
     public string? ContentTypeIcon { get; set; }

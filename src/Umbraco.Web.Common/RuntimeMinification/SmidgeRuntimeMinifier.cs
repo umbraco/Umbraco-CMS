@@ -157,14 +157,6 @@ public class SmidgeRuntimeMinifier : IRuntimeMinifier
         }
     }
 
-    /// <inheritdoc />
-    [Obsolete("Invalidation is handled automatically. Scheduled for removal V11.")]
-    public void Reset()
-    {
-        var version = DateTime.UtcNow.Ticks.ToString();
-        _configManipulator.SaveConfigValue(Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version);
-    }
-
     private BundleEnvironmentOptions ConfigureBundleEnvironmentOptions(BundlingOptions bundleOptions)
     {
         var bundleEnvironmentOptions = new BundleEnvironmentOptions();

@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -45,12 +42,13 @@ public class MemberManagerTests
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IEntityService>(),
                 new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
-                AppCaches.Disabled),
+                AppCaches.Disabled,
+                Mock.Of<ITwoFactorLoginService>())
         };
 
         _fakeMemberStore = new MemberUserStore(
             _mockMemberService.Object,
-            new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider),
+            new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider, NullLogger<UmbracoMapper>.Instance),
             scopeProvider,
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),

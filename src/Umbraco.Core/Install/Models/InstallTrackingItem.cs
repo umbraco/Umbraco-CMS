@@ -1,5 +1,6 @@
-namespace Umbraco.Cms.Core.Install.Models;
+﻿namespace Umbraco.Cms.Core.Install.Models;
 
+[Obsolete("Will no longer be required with the new backoffice API")]
 public class InstallTrackingItem
 {
     public InstallTrackingItem(string name, int serverOrder)

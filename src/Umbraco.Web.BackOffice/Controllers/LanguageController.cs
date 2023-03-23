@@ -30,21 +30,13 @@ public class LanguageController : UmbracoAuthorizedJsonController
         _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
     }
 
-    [Obsolete("Use the constructor without global settings instead, scheduled for removal in V11.")]
-    public LanguageController(ILocalizationService localizationService, IUmbracoMapper umbracoMapper,
-        IOptionsSnapshot<GlobalSettings> globalSettings)
-        : this(localizationService, umbracoMapper)
-    {
-    }
-
-    /// <summary>
-    ///     Returns all cultures available for creating languages.
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet]
-    public IDictionary<string, string> GetAllCultures()
-        => CultureInfo.GetCultures(CultureTypes.AllCultures).DistinctBy(x => x.Name).OrderBy(x => x.EnglishName)
-            .ToDictionary(x => x.Name, x => x.EnglishName);
+        /// <summary>
+        /// Returns all cultures available for creating languages.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IDictionary<string, string> GetAllCultures()
+            => CultureInfo.GetCultures(CultureTypes.AllCultures).DistinctBy(x => x.Name).OrderBy(x => x.EnglishName).ToDictionary(x => x.Name, x => x.EnglishName);
 
     /// <summary>
     ///     Returns all currently configured languages.

@@ -90,7 +90,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
-    public override async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
+    public override async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
     {
         IdentityResult result = await base.ChangePasswordWithResetAsync(userId, token, newPassword);
         if (result.Succeeded)
@@ -101,7 +101,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return result;
     }
 
-    public override async Task<IdentityResult> ChangePasswordAsync(BackOfficeIdentityUser user, string? currentPassword, string? newPassword)
+    public override async Task<IdentityResult> ChangePasswordAsync(BackOfficeIdentityUser user, string currentPassword, string newPassword)
     {
         IdentityResult result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
         if (result.Succeeded)

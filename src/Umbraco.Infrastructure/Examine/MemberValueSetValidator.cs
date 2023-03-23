@@ -18,12 +18,12 @@ public class MemberValueSetValidator : ValueSetValidator
     {
     }
 
-    public MemberValueSetValidator(IEnumerable<string> includeItemTypes, IEnumerable<string> excludeItemTypes)
+    public MemberValueSetValidator(IEnumerable<string>? includeItemTypes, IEnumerable<string>? excludeItemTypes)
         : base(includeItemTypes, excludeItemTypes, DefaultMemberIndexFields, null)
     {
     }
 
-    public MemberValueSetValidator(IEnumerable<string> includeItemTypes, IEnumerable<string> excludeItemTypes, IEnumerable<string> includeFields, IEnumerable<string> excludeFields)
+    public MemberValueSetValidator(IEnumerable<string>? includeItemTypes, IEnumerable<string>? excludeItemTypes, IEnumerable<string>? includeFields, IEnumerable<string>? excludeFields)
         : base(includeItemTypes, excludeItemTypes, includeFields, excludeFields)
     {
     }

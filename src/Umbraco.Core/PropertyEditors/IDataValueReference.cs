@@ -14,4 +14,10 @@ public interface IDataValueReference
     /// <param name="value"></param>
     /// <returns></returns>
     IEnumerable<UmbracoEntityReference> GetReferences(object? value);
+
+    /// <summary>
+    ///     Returns all reference types that are automatically tracked.
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<string> GetAutomaticRelationTypesAliases() => Enumerable.Empty<string>();
 }
