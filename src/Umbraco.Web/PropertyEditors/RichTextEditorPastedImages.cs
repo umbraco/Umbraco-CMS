@@ -18,6 +18,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILogger _logger;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly string _tempFolderAbsolutePath;
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 
@@ -27,6 +28,7 @@ namespace Umbraco.Web.PropertyEditors
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
+            _tempFolderAbsolutePath = Path.GetFullPath(IOHelper.MapPath(SystemDirectories.TempImageUploads));
         }
 
         /// <summary>
@@ -59,12 +61,13 @@ namespace Umbraco.Web.PropertyEditors
                 if (string.IsNullOrEmpty(tmpImgPath))
                     continue;
 
-                if (IsValidPath(tmpImgPath) == false)
+                var absoluteTempImagePath = Path.GetFullPath(IOHelper.MapPath(tmpImgPath));
+
+                if (IsValidPath(absoluteTempImagePath) == false)
                 {
                     continue;
                 }
 
-                var absoluteTempImagePath = IOHelper.MapPath(tmpImgPath);
                 var fileName = Path.GetFileName(absoluteTempImagePath);
                 var safeFileName = fileName.ToSafeFileName();
 
@@ -147,8 +150,7 @@ namespace Umbraco.Web.PropertyEditors
 
         private bool IsValidPath(string imagePath)
         {
-            var cleaned = imagePath.Replace("\\", "/");
-            return cleaned.StartsWith(SystemDirectories.TempImageUploads, StringComparison.OrdinalIgnoreCase);
+            return imagePath.StartsWith(_tempFolderAbsolutePath, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
