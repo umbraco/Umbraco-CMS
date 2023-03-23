@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../../current-user/modals/change-password';
+import { UMB_CHANGE_PASSWORD_MODAL } from '../../../../../libs/modal/token';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/backoffice/utils';
@@ -181,7 +181,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 	}
 
 	private _changePassword() {
-		this._modalContext?.open(UMB_CHANGE_PASSWORD_MODAL_TOKEN, {
+		this._modalContext?.open(UMB_CHANGE_PASSWORD_MODAL, {
 			requireOldPassword: this._currentUserStore?.isAdmin === false,
 		});
 	}
