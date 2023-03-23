@@ -100,7 +100,7 @@ cd my-package
 npm install -D @umbraco-cms/backoffice
 ```
 
-Then go to the element located in `src/my-element.ts` and add the following code.
+Then go to the element located in `src/my-element.ts` and replace it with the following code.
 
 ```typescript
 // src/my-element.ts
