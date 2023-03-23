@@ -59,7 +59,7 @@ public class InitialState : Migration
                 }
             }
 
-            var migrationState = db.UmbracoKeyValues.Where(x => x.Key == $"{Constants.Conventions.Migrations.KeyValuePrefix}+Umbraco.Core").FirstOrDefault();
+            var migrationState = db.UmbracoKeyValues.Where(x => x.Key == $"{Constants.Conventions.Migrations.KeyValuePrefix}Umbraco.Core").FirstOrDefault();
             if (migrationState is not null)
             {
                 db.UmbracoKeyValues.Remove(migrationState);
