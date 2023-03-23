@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 import { UUIButtonState } from '@umbraco-ui/uui';
 
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
+import { UMB_CONFIRM_MODAL } from '../../../../../../libs/modal/token/confirm-modal.token';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
@@ -82,7 +82,7 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 
 	async _onMigration() {
 		if (!this.name) return;
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'positive',
 			headline: `Run migrations for ${this.name}?`,
 			content: `Do you want to start run migrations for ${this.name}`,

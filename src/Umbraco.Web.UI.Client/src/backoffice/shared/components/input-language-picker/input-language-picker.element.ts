@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
+import { UMB_CONFIRM_MODAL } from '../../../../../libs/modal/token/confirm-modal.token';
 import { UMB_LANGUAGE_PICKER_MODAL_TOKEN } from '../../../settings/languages/modals/language-picker';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
@@ -133,7 +133,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _removeItem(item: LanguageResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

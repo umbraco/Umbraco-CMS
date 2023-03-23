@@ -1,2 +1,2 @@
 export * from './modal-token';
-export * from './change-password-modal';
+export * from './change-password-modal.token';

@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import { UMB_CHANGE_PASSWORD_MODAL } from '../../../../../libs/modal/token/change-password-modal';
+import { UMB_CHANGE_PASSWORD_MODAL } from '../../../../../libs/modal/token/change-password-modal.token';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/backoffice/utils';

@@ -1,4 +1,4 @@
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../src/backoffice/shared/modals/confirm';
+import { UMB_CONFIRM_MODAL } from '../../../modal/token/confirm-modal.token';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
@@ -25,7 +25,7 @@ export class UmbTrashEntityAction<
 		if (data) {
 			const item = data[0];
 
-			const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+			const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
 				headline: `Trash ${item.name}`,
 				content: 'Are you sure you want to move this item to the recycle bin?',
 				color: 'danger',

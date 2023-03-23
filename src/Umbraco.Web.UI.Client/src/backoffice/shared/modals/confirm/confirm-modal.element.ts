@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbConfirmModalData, UmbConfirmModalResult } from '.';
+import { UmbConfirmModalData, UmbConfirmModalResult } from '../../../../../libs/modal/token/confirm-modal.token';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 
