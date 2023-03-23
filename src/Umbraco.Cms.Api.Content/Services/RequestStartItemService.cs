@@ -6,18 +6,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Services;
 
-internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestStartItemProvider
+public class RequestStartItemService : RequestHeaderService, IRequestStartItemService
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    // this provider lifetime is Scope, so we can cache this as a field
+    // this service lifetime is Scope, so we can cache this as a field
     private IPublishedContent? _requestedStartContent;
 
-    public RequestStartItemProvider(
+    public RequestStartItemService(
         IHttpContextAccessor httpContextAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor)
         : base(httpContextAccessor) =>
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
+
+    protected override string HeaderName => "Start-Item";
 
     /// <inheritdoc/>
     public IPublishedContent? GetStartItem()
@@ -27,7 +29,7 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
             return _requestedStartContent;
         }
 
-        var headerValue = GetHeaderValue("Start-Item");
+        var headerValue = GetHeaderValue();
         if (headerValue.IsNullOrWhiteSpace())
         {
             return null;
