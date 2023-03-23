@@ -1,7 +1,7 @@
 import './document-info-workspace-view.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 // import { data } from '../../../../../../core/mocks/data/document.data';
 // import { UmbNodeContext } from '../../node.context';

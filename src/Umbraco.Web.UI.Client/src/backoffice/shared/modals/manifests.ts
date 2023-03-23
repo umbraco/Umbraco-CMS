@@ -37,6 +37,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Code Editor Modal',
 		loader: () => import('./code-editor/code-editor-modal.element'),
 	}
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.EmbeddedMedia',
+		name: 'Embedded Media Modal',
+		loader: () => import('./embedded-media/embedded-media-modal.element'),
+	},
 ];
 
 export const manifests = [...modals];

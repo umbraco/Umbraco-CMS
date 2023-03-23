@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

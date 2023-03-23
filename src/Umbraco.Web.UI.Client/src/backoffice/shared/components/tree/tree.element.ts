@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { repeat } from 'lit-html/directives/repeat.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
 import type { Entity } from '@umbraco-cms/backoffice/models';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';

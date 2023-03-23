@@ -1,7 +1,7 @@
 import './workspace-view-member-group-info.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data';
 //import { UmbDataTypeContext } from '../../data-type.context';

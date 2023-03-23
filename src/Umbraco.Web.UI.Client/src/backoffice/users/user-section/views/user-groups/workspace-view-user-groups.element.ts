@@ -31,6 +31,11 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 				height: 100%;
 				display: flex;
 				flex-direction: column;
+				margin:var(--uui-size-layout-1);
+			}
+
+			umb-table {
+				padding:0;
 			}
 		`,
 	];

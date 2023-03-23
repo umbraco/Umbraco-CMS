@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 import { umbDataTypeData } from '../../../../../core/mocks/data/data-type.data';
 
 import './property-editor-ui-tiny-mce.element';

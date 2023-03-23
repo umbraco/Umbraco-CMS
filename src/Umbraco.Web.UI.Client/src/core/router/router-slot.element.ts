@@ -1,6 +1,6 @@
 import type { IRoute } from 'router-slot/model';
 import { RouterSlot } from 'router-slot';
-import { LitElement, PropertyValueMap } from 'lit';
+import { css, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
@@ -14,6 +14,18 @@ import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends LitElement {
+	static styles = [css`
+		:host {
+			display:flex;
+			flex-direction:column;
+			height:100%;
+		}
+
+		router-slot {
+			height:100%;
+		}
+	`]
+
 	#router: RouterSlot = new RouterSlot();
 	#listening = false;
 

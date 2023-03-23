@@ -1,6 +1,6 @@
 import './document-type-workspace-edit.element';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { treeData } from '../../../../core/mocks/data/document-type.data';
 import type { UmbDocumentTypeWorkspaceElement } from './document-type-workspace.element';
