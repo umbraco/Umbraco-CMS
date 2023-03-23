@@ -58,6 +58,13 @@ public class InitialState : Migration
                     UpSqlite(migrationBuilder);
                 }
             }
+
+            var migrationState = db.UmbracoKeyValues.Where(x => x.Key == "Umbraco.Core.Upgrader.State+Umbraco.Core").FirstOrDefault();
+            if (migrationState is not null)
+            {
+                db.UmbracoKeyValues.Remove(migrationState);
+                await db.SaveChangesAsync();
+            }
         });
     }
 
