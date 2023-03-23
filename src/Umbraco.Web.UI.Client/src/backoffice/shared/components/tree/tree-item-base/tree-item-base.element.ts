@@ -40,6 +40,9 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
 	private _hasActions = false;
 
+	@state()
+	private _hasChildren = false;
+
 	#treeItemContext?: UmbTreeItemContextBase;
 
 	constructor() {
@@ -49,7 +52,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
 			// TODO: investigate if we can make an observe decorator
-			this.observe(this.#treeItemContext.hasChildren, (value) => (this.hasChildren = value));
+			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
 			this.observe(this.#treeItemContext.isSelected, (value) => (this._isSelected = value));
@@ -102,7 +105,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
-				.hasChildren=${this.hasChildren}
+				.hasChildren=${this._hasChildren}
 				label="${ifDefined(this.item?.name)}"
 				href="${ifDefined(this._href)}">
 				${this.#renderIcon()} ${this.#renderActions()} ${this.#renderChildItems()}
