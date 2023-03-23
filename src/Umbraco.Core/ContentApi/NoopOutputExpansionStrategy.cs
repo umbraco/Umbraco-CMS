@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.ContentApi;
 
-public class NoopOutputExpansionStrategy : IOutputExpansionStrategy
+internal sealed class NoopOutputExpansionStrategy : IOutputExpansionStrategy
 {
     public IDictionary<string, object?> MapElementProperties(IPublishedElement element)
         => MapProperties(element.Properties);
