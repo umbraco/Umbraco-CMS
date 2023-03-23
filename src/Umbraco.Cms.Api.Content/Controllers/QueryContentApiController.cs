@@ -69,7 +69,7 @@ public class QueryContentApiController : ContentApiControllerBase
                                                          .ThenBy(c => c.SortOrder);
 
         // Currently sorting is not supported through the ContentAPI index
-        // So we need to add the name to it
+        // So we need to add the name to it;
         if (sort is not null && sort.StartsWith("name"))
         {
             string sortValue = sort.Substring(sort.IndexOf(':', StringComparison.Ordinal) + 1);
