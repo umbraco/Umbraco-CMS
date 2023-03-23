@@ -1,4 +1,4 @@
-import { UMB_ALLOWED_DOCUMENT_TYPES_MODAL_TOKEN } from '../../../document-types/modals/allowed-document-types';
+import { UMB_ALLOWED_DOCUMENT_TYPES_MODAL } from '../../../../../../libs/modal/token/allowed-document-types-modal.token';
 import type { UmbDocumentRepository } from '../../repository/document.repository';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
@@ -24,7 +24,7 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		const { data } = await this.repository.requestByKey(this.unique);
 
 		if (data && data.contentTypeKey) {
-			const modalHandler = this.#modalContext?.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL_TOKEN, {
+			const modalHandler = this.#modalContext?.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
 				key: data.contentTypeKey,
 			});
 

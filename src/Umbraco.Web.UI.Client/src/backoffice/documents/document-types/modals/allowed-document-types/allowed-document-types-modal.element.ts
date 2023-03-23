@@ -3,7 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbDocumentTypeRepository } from '../../repository/document-type.repository';
-import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '.';
+import {
+	UmbAllowedDocumentTypesModalData,
+	UmbAllowedDocumentTypesModalResult,
+} from '../../../../../../libs/modal/token/allowed-document-types-modal.token';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
