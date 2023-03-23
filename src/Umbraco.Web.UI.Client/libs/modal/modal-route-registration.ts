@@ -17,6 +17,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#onRejectCallback?: () => void;
 
 	#modalHandler: UmbModalHandler<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
 	// Notice i removed the key in the transferring to this class.
@@ -58,6 +59,12 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		return !!this.#modalHandler;
 	}
 
+	public open(params: { [key: string]: string | number }) {
+		if (this.active) return;
+
+		window.history.pushState({}, '', this.#routeBuilder?.(params));
+	}
+
 	/**
 	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
 	 */
@@ -65,14 +72,12 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		return this.#modalHandler;
 	}
 
-	public usesRouteBuilder(): boolean {
-		return !!this.#urlBuilderCallback;
-	}
 	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
 		this.#urlBuilderCallback = callback;
 		return this;
 	}
 	public _internal_setRouteBuilder(urlBuilder: UmbModalRouteBuilder) {
+		this.#routeBuilder = urlBuilder;
 		this.#urlBuilderCallback?.(urlBuilder);
 	}
 

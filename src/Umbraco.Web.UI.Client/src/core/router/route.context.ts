@@ -4,9 +4,8 @@ import {
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
-import { UMB_MODAL_CONTEXT_TOKEN } from 'libs/modal/modal.context';
-import { UmbModalRouteRegistration } from 'libs/modal/modal-route-registration';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
 
@@ -118,7 +117,7 @@ export class UmbRouteContext {
 	}
 
 	#generateNewUrlBuilder = (modalRegistration: UmbModalRouteRegistration) => {
-		if (!modalRegistration.usesRouteBuilder() || !this.#routerBasePath) return;
+		if (!this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
 		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;

@@ -1,4 +1,3 @@
-import type { UmbRouteContext } from '../../src/core/router/route.context';
 // TODO: Be aware here we import a class from src!
 import { UMB_ROUTE_CONTEXT_TOKEN } from '../../src/core/router/route.context';
 import type { UmbControllerInterface } from '../controller';
@@ -6,8 +5,6 @@ import { UmbModalRouteRegistration } from './modal-route-registration';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalConfig, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
-
-export type UmbModalRegistrationToken = UmbModalRouteRegistration;
 
 export class UmbModalRouteRegistrationController<D extends object = object, R = any>
 	extends UmbModalRouteRegistration<D, R>
@@ -18,8 +15,8 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	#configuredPath: string;
 	#uniqueParts: Map<string, string | undefined>;
 
-	#routeContext?: UmbRouteContext;
-	#modalRegistration?: UmbModalRegistrationToken;
+	#routeContext?: typeof UMB_ROUTE_CONTEXT_TOKEN.TYPE;
+	#modalRegistration?: UmbModalRouteRegistration;
 
 	public get unique() {
 		return undefined;

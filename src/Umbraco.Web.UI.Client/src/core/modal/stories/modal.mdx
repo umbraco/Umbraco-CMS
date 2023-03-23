@@ -82,6 +82,81 @@ descripe the addional features of the route Registration:
 - Reject a modal by returning false in setup.
 - Use a param as part of setup to determin the data going to the modal.
 
+#### Modal registration for UI as part of a Property Editor
+
+```ts
+
+
+	@property()
+	public set alias(value: string | undefined) {
+		this.myModalRegistration.setUniqueIdentifier('propertyAlias', value);
+	}
+
+	@property()
+	public set variantId(value: string | UmbVariantId | undefined) {
+		this.myModalRegistration.setUniqueIdentifier('variantId', value?.toString());
+	}
+
+	private _items = [
+		{ name: 'Item 1' },
+		{ name: 'Item 2' },
+		{ name: 'Item 3' },
+	]
+
+
+	constructor() {
+		super();
+
+		this.myModalRegistration = new UmbModalRouteRegistrationController(
+			this,
+			MY_MODAL_TOKEN,
+			`:index`,
+			new Map([
+				['propertyAlias', undefined],
+				['variantId', undefined],
+			])
+		)
+		.onSetup((params) => {
+			// Get item index:
+			const indexParam = params.index;
+			if (!indexParam) return false;
+			let index: number | null = parseInt(params.index);
+			if (Number.isNaN(index)) return false;
+
+			// Use the index to find data:
+			let data = null;
+			if (index >= 0 && index < this._items.length) {
+				data = this._items[index];
+			} else {
+				// If not then make a new pick:
+				index = null;
+			}
+
+			return {
+				index: index,
+				itemData: {
+					name: data?.name
+				},
+			};
+		})
+		.onSubmit((submitData) => {
+			if (!submitData) return;
+			this._items[submitData.index] = submitData.itemData;
+		})
+		.observeRouteBuilder((routeBuilder) => {
+			this._modalRouteBuilder = routeBuilder;
+		});
+	}
+
+	render() {
+		return html`
+			${this._items?.map((item, index) =>
+				html`<uui-button look="placeholder" label="Edit item ${index}" .href=${this._modalRouteBuilder?.({ index: -1 })}>Add</uui-button>`
+			)}
+		`;
+	}
+```
+
 #### Generate the URL to a Modal Route Registration
 
 The Modal registration has an option to retrive a URL Builder, this is a function that can be used to generate a URL to a modal.
@@ -109,7 +184,7 @@ class MyElement extends UmbElementMixin(LitElement) {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_ALIAS, (instance) => {
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 			// modalContext is now ready to be used
 		});

@@ -5,9 +5,9 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
 import type { UmbVariantId } from '../../variants/variant-id.class';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalRouteRegistrationController } from 'libs/modal/modal-route-registration.controller';
-import type { UmbModalRouteBuilder } from 'libs/modal/modal-route-registration';
 
 /**
  * @element umb-input-multi-url-picker
@@ -206,7 +206,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 	// TODO: We should get a href property on uui-ref-node, and not use this method:
 	private _temporary_onClick_editItem(index: number) {
-		window.history.pushState({}, '', this._modalRoute?.({ index: index || -1 }));
+		this.myModalRegistration.open({ index });
 	}
 
 	render() {
