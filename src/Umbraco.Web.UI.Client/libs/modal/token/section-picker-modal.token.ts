@@ -5,7 +5,7 @@ export interface UmbSectionPickerModalData {
 	selection: string[];
 }
 
-export const UMB_SECTION_PICKER_MODAL_TOKEN = new UmbModalToken<UmbSectionPickerModalData>('Umb.Modal.SectionPicker', {
+export const UMB_SECTION_PICKER_MODAL = new UmbModalToken<UmbSectionPickerModalData>('Umb.Modal.SectionPicker', {
 	type: 'sidebar',
 	size: 'small',
 });
