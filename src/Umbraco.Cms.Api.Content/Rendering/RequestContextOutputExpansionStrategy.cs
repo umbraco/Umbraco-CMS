@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Rendering;
 
-internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionStrategy
+public class RequestContextOutputExpansionStrategy : IOutputExpansionStrategy
 {
     private readonly bool _expandAll;
     private readonly string[] _expandAliases;

@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 [VersionedContentApiRoute("content")]
 [ApiExplorerSettings(GroupName = "Content")]
 [ApiVersion("1.0")]
-[ContentApiAccess]
 [JsonOptionsName(Constants.JsonOptionsNames.ContentApi)]
 [LocalizeFromAcceptLanguageHeader]
 public abstract class ContentApiControllerBase : Controller
