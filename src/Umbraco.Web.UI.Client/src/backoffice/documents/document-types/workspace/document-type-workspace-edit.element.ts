@@ -2,7 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UMB_ICON_PICKER_MODAL_TOKEN } from '../../../shared/modals/icon-picker';
+import { UMB_ICON_PICKER_MODAL } from '../../../../../libs/modal/token/icon-picker-modal.token';
 import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -83,7 +83,7 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
+		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL);
 
 		modalHandler?.onSubmit().then((saved) => {
 			if (saved.icon) this.#workspaceContext?.setIcon(saved.icon);

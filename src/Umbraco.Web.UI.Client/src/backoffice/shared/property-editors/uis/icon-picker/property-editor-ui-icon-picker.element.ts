@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UMB_ICON_PICKER_MODAL_TOKEN } from '../../../modals/icon-picker';
+import { UMB_ICON_PICKER_MODAL } from '../../../../../../libs/modal/token/icon-picker-modal.token';
 import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	}
 
 	private _openModal() {
-		this._modalContext?.open(UMB_ICON_PICKER_MODAL_TOKEN);
+		this._modalContext?.open(UMB_ICON_PICKER_MODAL);
 	}
 
 	render() {
