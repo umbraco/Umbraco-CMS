@@ -68,6 +68,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		// Add the configured part of the path:
 		pathParts.push(this.#configuredPath);
 
+		// Make this the path of the modal registration:
 		this._setPath(pathParts.join('/'));
 
 		this.#modalRegistration = this.#routeContext.registerModal(this);
