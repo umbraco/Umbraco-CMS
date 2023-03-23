@@ -83,7 +83,7 @@ export class UmbRouteContext {
 		});
 
 		// Add an empty route, so that we can always have a route to go to for closing the modals.
-		// TODO: Check if this is nesecary with the _internal_modalRouterChanged present.
+		// TODO: Check if this is necessary with the _internal_modalRouterChanged present.
 		this.#contextRoutes.push({
 			path: '',
 			component: EmptyDiv,
