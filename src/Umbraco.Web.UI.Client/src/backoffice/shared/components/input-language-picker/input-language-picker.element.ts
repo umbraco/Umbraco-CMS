@@ -5,7 +5,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
 import { UMB_CONFIRM_MODAL } from '../../../../../libs/modal/token/confirm-modal.token';
-import { UMB_LANGUAGE_PICKER_MODAL_TOKEN } from '../../../settings/languages/modals/language-picker';
+import { UMB_LANGUAGE_PICKER_MODAL } from '../../../../../libs/modal/token/language-picker-modal.token';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -121,7 +121,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		const modalHandler = this._modalContext?.open(UMB_LANGUAGE_PICKER_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_LANGUAGE_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIsoCodes],
 			filter: this.filter,
