@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Persistence;
-using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -34,6 +34,7 @@ public class RuntimeState : IRuntimeState
     private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata = null!;
     private readonly IRuntimeModeValidationService _runtimeModeValidationService = null!;
     private readonly IDatabaseInfo _databaseInfo = null!;
+    private readonly IEFCoreMigrationService _efCoreMigrationService = null!;
 
     /// <summary>
     /// The initial <see cref="RuntimeState"/>
@@ -59,7 +60,8 @@ public class RuntimeState : IRuntimeState
        IConflictingRouteService conflictingRouteService,
        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
        IRuntimeModeValidationService runtimeModeValidationService,
-       IDatabaseInfo databaseInfo)
+       IDatabaseInfo databaseInfo,
+       IEFCoreMigrationService efCoreMigrationService)
     {
         _globalSettings = globalSettings;
         _unattendedSettings = unattendedSettings;
@@ -71,6 +73,7 @@ public class RuntimeState : IRuntimeState
         _databaseProviderMetadata = databaseProviderMetadata;
         _runtimeModeValidationService = runtimeModeValidationService;
         _databaseInfo = databaseInfo;
+        _efCoreMigrationService = efCoreMigrationService;
     }
 
     /// <summary>
@@ -96,7 +99,8 @@ public class RuntimeState : IRuntimeState
             conflictingRouteService,
             databaseProviderMetadata,
             StaticServiceProvider.Instance.GetRequiredService<IRuntimeModeValidationService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDatabaseInfo>())
+            StaticServiceProvider.Instance.GetRequiredService<IDatabaseInfo>(),
+            StaticServiceProvider.Instance.GetRequiredService<IEFCoreMigrationService>())
     { }
 
     [Obsolete("Use ctor with all params. This will be removed in Umbraco 12.")]
@@ -236,7 +240,12 @@ public class RuntimeState : IRuntimeState
 
                     CurrentMigrationState = _databaseInfo.CurrentMigrationState(stateValueKey).GetAwaiter().GetResult();
 
-                    FinalMigrationState = upgrader.Plan.FinalState;
+                    if (string.IsNullOrEmpty(CurrentMigrationState))
+                    {
+                        CurrentMigrationState = _efCoreMigrationService.GetCurrentMigrationStateAsync().GetAwaiter().GetResult() ?? string.Empty;
+                    }
+
+                    FinalMigrationState = _efCoreMigrationService.GetFinalMigrationStateAsync().GetAwaiter().GetResult();
                     _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
                     // the db version does not match... but we do have a migration table
                     // so, at least one valid table, so we quite probably are installed & need to upgrade
