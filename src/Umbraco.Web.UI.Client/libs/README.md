@@ -111,23 +111,24 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 @customElement('my-element')
 export default class MyElement extends UmbElementMixin(LitElement) {
-	#notificationContext?: UmbNotificationContext;
+
+	private _notificationContext?: UmbNotificationContext;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
-			this.#notificationContext = _instance;
+			this._notificationContext = _instance;
 		});
 	}
 
 	onClick() {
-		this.#notificationContext?.peek('positive', { data: { message: '#h5yr' } });
+		this._notificationContext?.peek('positive', { data: { message: '#h5yr' } });
 	}
 
 	render() {
 		return html`
 			<uui-box headline="Welcome">
-				<p>TS dashboard</p>
+				<p>A TypeScript Lit Dashboard</p>
 				<uui-button look="primary" label="Click me" @click=${() => this.onClick()}></uui-button>
 			</uui-box>
 		`;
