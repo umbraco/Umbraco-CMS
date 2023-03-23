@@ -35,6 +35,7 @@
 				"local-rules/bad-type-import": "error",
 				"local-rules/no-direct-api-import": "warn",
 				"local-rules/prefer-import-aliases": "error",
+				"local-rules/prefer-umbraco-cms-imports": "error",
 				"@typescript-eslint/no-non-null-assertion": "off"
 			},
 			"settings": {
