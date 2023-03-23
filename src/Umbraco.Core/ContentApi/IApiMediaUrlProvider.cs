@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.ContentApi;
 
-public interface IApiUrlProvider
+public interface IApiMediaUrlProvider
 {
-    string Url(IPublishedContent content);
+    string GetUrl(IPublishedContent media);
 }

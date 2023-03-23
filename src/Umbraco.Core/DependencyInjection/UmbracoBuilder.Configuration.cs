@@ -52,6 +52,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ActiveDirectorySettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
+            .AddUmbracoOptions<ContentApiSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
