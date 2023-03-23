@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBase } from '../input-list-base/input-list-base';
-import { UMB_SECTION_PICKER_MODAL } from '../../../../../libs/modal/token/section-picker-modal.token';
+import { UMB_SECTION_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 

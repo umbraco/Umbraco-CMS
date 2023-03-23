@@ -4,10 +4,9 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
-import { UMB_CREATE_DICTIONARY_MODAL } from '../../../../../libs/modal/token/create-dictionary-modal.token';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-dashboard-translation-dictionary')

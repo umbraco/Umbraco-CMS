@@ -2,10 +2,13 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-import { UMB_INVITE_USER_MODAL } from '../../../../../../libs/modal/token/invite-user-modal.token';
-import { UMB_CREATE_USER_MODAL } from '../../../../../../libs/modal/token/create-user-modal.token';
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_INVITE_USER_MODAL,
+	UMB_CREATE_USER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import type { IRoute } from '@umbraco-cms/internal/router';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

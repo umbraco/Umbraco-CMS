@@ -1,8 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UMB_PROPERTY_SETTINGS_MODAL } from '../../../../libs/modal/token/property-settings-modal.token';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-creator')

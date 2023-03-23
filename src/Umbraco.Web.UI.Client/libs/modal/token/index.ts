@@ -4,6 +4,7 @@ export * from './change-password-modal.token';
 export * from './confirm-modal.token';
 export * from './create-dictionary-modal.token';
 export * from './create-user-modal.token';
+export * from './current-user-modal.token';
 export * from './debug-modal.token';
 export * from './document-picker-modal.token';
 export * from './embedded-media-modal.token';
