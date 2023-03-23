@@ -142,7 +142,7 @@ declare global {
 }
 ```
 
-Finally add an umbraco-package.json file in the root of your package.
+Finally add an umbraco-package.json file in the root of your package folder `my-package`.
 
 ```json
 {
