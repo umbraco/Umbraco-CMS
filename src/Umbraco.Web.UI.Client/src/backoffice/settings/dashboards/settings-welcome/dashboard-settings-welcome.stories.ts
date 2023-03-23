@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbDashboardSettingsWelcomeElement } from './dashboard-settings-welcome.element';
 import './dashboard-settings-welcome.element';

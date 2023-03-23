@@ -5,7 +5,11 @@ import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbra
 import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { RedirectManagementResource, RedirectStatusModel, RedirectUrlResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	RedirectManagementResource,
+	RedirectStatusModel,
+	RedirectUrlResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-redirect-management')
@@ -13,6 +17,11 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+			
 			.actions {
 				display: flex;
 				gap: var(--uui-size-space-1);

@@ -9,7 +9,6 @@ export class UmbDashboardWelcomeElement extends LitElement {
 		css`
 			:host {
 				display: block;
-				position: relative;
 				margin: var(--uui-size-layout-1);
 			}
 		`,

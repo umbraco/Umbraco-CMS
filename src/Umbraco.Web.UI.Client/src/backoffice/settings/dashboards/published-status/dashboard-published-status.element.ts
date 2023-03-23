@@ -13,6 +13,11 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display:block;
+				margin:var(--uui-size-layout-1);
+			}
+			
 			uui-box + uui-box {
 				margin-top: var(--uui-size-space-5);
 			}

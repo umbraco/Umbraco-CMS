@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type {
 	PropertyEditorConfigDefaultData,

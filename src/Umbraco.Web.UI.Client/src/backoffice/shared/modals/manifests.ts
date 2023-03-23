@@ -31,6 +31,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Section Picker Modal',
 		loader: () => import('./section-picker/section-picker-modal.element'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.EmbeddedMedia',
+		name: 'Embedded Media Modal',
+		loader: () => import('./embedded-media/embedded-media-modal.element'),
+	},
 ];
 
 export const manifests = [...modals];
