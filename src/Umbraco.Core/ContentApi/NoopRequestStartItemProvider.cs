@@ -2,7 +2,8 @@
 
 namespace Umbraco.Cms.Core.ContentApi;
 
-public class NoopRequestStartItemService : IRequestStartItemService
+internal sealed class NoopRequestStartItemProvider : IRequestStartItemProvider
 {
+    /// <inheritdoc />
     public IPublishedContent? GetStartItem() => null;
 }

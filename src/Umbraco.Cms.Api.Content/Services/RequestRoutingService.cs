@@ -7,25 +7,26 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Services;
 
-public class RequestRoutingService : IRequestRoutingService
+internal sealed class RequestRoutingService : IRequestRoutingService
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRequestCultureService _requestCultureService;
-    private readonly IRequestStartItemService _requestStartItemService;
+    private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
 
     public RequestRoutingService(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IHttpContextAccessor httpContextAccessor,
         IRequestCultureService requestCultureService,
-        IRequestStartItemService requestStartItemService)
+        IRequestStartItemProviderAccessor requestStartItemProviderAccessor)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _httpContextAccessor = httpContextAccessor;
         _requestCultureService = requestCultureService;
-        _requestStartItemService = requestStartItemService;
+        _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
     }
 
+    /// <inheritdoc />
     public string GetContentRoute(string requestedPath)
     {
         HttpRequest? request = _httpContextAccessor.HttpContext?.Request;
@@ -34,10 +35,15 @@ public class RequestRoutingService : IRequestRoutingService
             throw new InvalidOperationException("Could not obtain an HTTP request context");
         }
 
+        if (_requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider) is false)
+        {
+            throw new InvalidOperationException($"Could not obtain an {nameof(IRequestStartItemProvider)} instance");
+        }
+
         requestedPath = requestedPath.EnsureStartsWith("/");
 
         // do we have an explicit start item?
-        IPublishedContent? startItem = _requestStartItemService.GetStartItem();
+        IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
         if (startItem != null)
         {
             // the content cache can resolve content by the route "{root ID}/{content path}", which is what we construct here
@@ -61,7 +67,8 @@ public class RequestRoutingService : IRequestRoutingService
             _requestCultureService.SetRequestCulture(domainAndUri.Culture);
         }
 
-        // the content cache can resolve content by the route "{domain content ID}/{content path}", which is what we construct here
+        // when resolving content from a configured domain, the content cache expects the content route
+        // to be "{domain content ID}/{content path}", which is what we construct here
         return $"{domainAndUri.ContentId}{DomainUtilities.PathRelativeToDomain(domainAndUri.Uri, contentRoute.AbsolutePath)}";
     }
 
