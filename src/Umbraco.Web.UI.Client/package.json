@@ -59,12 +59,8 @@
 		"npm": ">=9.5 < 10"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.2.0-rc.0",
-		"@umbraco-ui/uui-css": "^1.2.0-rc.0",
-		"@umbraco-ui/uui-modal": "file:umbraco-ui-uui-modal-0.0.0.tgz",
-		"@umbraco-ui/uui-modal-container": "file:umbraco-ui-uui-modal-container-0.0.0.tgz",
-		"@umbraco-ui/uui-modal-dialog": "file:umbraco-ui-uui-modal-dialog-0.0.0.tgz",
-		"@umbraco-ui/uui-modal-sidebar": "file:umbraco-ui-uui-modal-sidebar-0.0.0.tgz",
+		"@umbraco-ui/uui": "^1.2.0-rc.1",
+		"@umbraco-ui/uui-css": "^1.2.0-rc.1",
 		"element-internals-polyfill": "^1.1.19",
 		"lit": "^2.6.1",
 		"lodash-es": "4.17.21",
