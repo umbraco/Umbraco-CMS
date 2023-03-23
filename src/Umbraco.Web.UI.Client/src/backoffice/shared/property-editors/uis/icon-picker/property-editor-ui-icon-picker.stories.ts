@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbIconPickerModalElement } from '../../../../shared/modals/icon-picker/icon-picker-modal.element';
 import type { UmbPropertyEditorUIIconPickerElement } from './property-editor-ui-icon-picker.element';

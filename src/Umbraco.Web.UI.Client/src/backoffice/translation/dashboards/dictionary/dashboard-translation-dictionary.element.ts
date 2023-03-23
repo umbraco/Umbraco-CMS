@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { when } from 'lit-html/directives/when.js';
+import { when } from 'lit/directives/when.js';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
 import { UMB_CREATE_DICTIONARY_MODAL_TOKEN } from '../../dictionary/entity-actions/create/';

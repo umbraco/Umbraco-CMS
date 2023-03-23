@@ -1,7 +1,7 @@
 import './workspace-view-relation-type-relation.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 //import { data } from '../../../../../core/mocks/data/relation-type.data';
 //import { UmbRelationTypeContext } from '../../relation-type.context';

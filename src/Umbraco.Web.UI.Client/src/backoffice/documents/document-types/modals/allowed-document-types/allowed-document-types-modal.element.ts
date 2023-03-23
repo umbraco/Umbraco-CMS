@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbDocumentTypeRepository } from '../../repository/document-type.repository';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '.';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';

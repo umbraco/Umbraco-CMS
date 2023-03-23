@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection-view.element';
 import './property-editor-ui-collection-view.element';

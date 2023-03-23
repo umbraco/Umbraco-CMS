@@ -43,6 +43,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Template Modal',
 		loader: () => import('./template/template-modal.element'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.EmbeddedMedia',
+		name: 'Embedded Media Modal',
+		loader: () => import('./embedded-media/embedded-media-modal.element'),
+	},
 ];
 
 export const manifests = [...modals];

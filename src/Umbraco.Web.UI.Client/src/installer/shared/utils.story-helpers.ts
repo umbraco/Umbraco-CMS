@@ -1,4 +1,4 @@
-import { html } from 'lit-html';
+import { html } from 'lit';
 import { UmbInstallerContext } from '../installer.context';
 import '../../core/context-provider/context-provider.element';
 
