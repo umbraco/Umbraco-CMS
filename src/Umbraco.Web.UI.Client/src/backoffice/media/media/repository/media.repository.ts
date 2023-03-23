@@ -7,9 +7,8 @@ import type { RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repositor
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
 type ItemDetailType = MediaDetails;
 

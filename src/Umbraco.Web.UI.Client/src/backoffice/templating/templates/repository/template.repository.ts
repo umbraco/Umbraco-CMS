@@ -2,12 +2,11 @@ import { UmbTemplateDetailServerDataSource } from './sources/template.detail.ser
 import { TemplateTreeServerDataSource } from './sources/template.tree.server.data';
 import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
+import type { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
-import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
 export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<TemplateResponseModel> {
 	#init;

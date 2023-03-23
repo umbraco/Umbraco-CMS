@@ -4,10 +4,13 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
 import type { UmbVariantId } from '../../variants/variant-id.class';
-import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbLinkPickerLink,
+	UMB_LINK_PICKER_MODAL,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalRouteRegistrationController } from 'libs/modal/modal-route-registration.controller';
 
 /**
  * @element umb-input-multi-url-picker

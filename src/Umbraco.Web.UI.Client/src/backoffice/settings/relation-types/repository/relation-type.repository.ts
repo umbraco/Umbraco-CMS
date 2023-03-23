@@ -6,8 +6,7 @@ import { RelationTypeTreeDataSource } from './sources';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
-import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemType = RelationTypeResponseModel;
