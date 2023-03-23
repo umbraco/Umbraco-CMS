@@ -138,7 +138,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				? repeat(
 						this._childItems,
 						(item) => item.key,
-						(item) => html`<umb-tree-item-base .item=${item}></umb-tree-item-base>`
+						(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
 				  )
 				: ''}
 		`;
