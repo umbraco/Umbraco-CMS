@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Api.Content.Services;
 
-public class RequestCultureService : RequestHeaderService, IRequestCultureService
+internal sealed class RequestCultureService : RequestHeaderHandler, IRequestCultureService
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
 
@@ -13,10 +13,10 @@ public class RequestCultureService : RequestHeaderService, IRequestCultureServic
         : base(httpContextAccessor) =>
         _variationContextAccessor = variationContextAccessor;
 
-    protected override string HeaderName => HeaderNames.AcceptLanguage;
+    /// <inheritdoc />
+    public string? GetRequestedCulture() => GetHeaderValue(HeaderNames.AcceptLanguage);
 
-    public string? GetRequestedCulture() => GetHeaderValue();
-
+    /// <inheritdoc />
     public void SetRequestCulture(string culture)
     {
         if (_variationContextAccessor.VariationContext?.Culture == culture)
