@@ -22,9 +22,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		this.requestUpdate('item', oldVal);
 	}
 
-	@property({ type: Boolean, attribute: 'has-children' })
-	hasChildren = false;
-
 	@state()
 	private _childItems?: EntityTreeItemResponseModel[];
 
@@ -52,6 +49,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
 			// TODO: investigate if we can make an observe decorator
+			this.observe(this.#treeItemContext.hasChildren, (value) => (this.hasChildren = value));
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
 			this.observe(this.#treeItemContext.isSelected, (value) => (this._isSelected = value));
