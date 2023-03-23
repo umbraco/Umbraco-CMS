@@ -2,11 +2,10 @@ import type { IRoute } from 'router-slot/model';
 import { RouterSlot } from 'router-slot';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbRouteContext, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '../lit-element';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
-import { UmbRouteContext } from './route.context';
-import { UmbRoute } from './route.interface';
 
 /**
  *  @element umb-router-slot

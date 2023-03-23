@@ -1,4 +1,5 @@
-import { IRoute, IRoutingInfo, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
+import { IRoutingInfo, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
+import { UmbRoute } from './route.interface';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
@@ -13,7 +14,7 @@ export class UmbRouteContext {
 	//#host: UmbControllerHostInterface;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
 	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
-	#contextRoutes: IRoute[] = [];
+	#contextRoutes: UmbRoute[] = [];
 	#routerBasePath?: string;
 	#activeModalPath?: string;
 
@@ -49,7 +50,7 @@ export class UmbRouteContext {
 		return `/modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
 	}
 
-	#generateRoute(modalRegistration: UmbModalRouteRegistration): IRoute {
+	#generateRoute(modalRegistration: UmbModalRouteRegistration): UmbRoute {
 		return {
 			path: this.#getModalRoutePath(modalRegistration),
 			component: EmptyDiv,

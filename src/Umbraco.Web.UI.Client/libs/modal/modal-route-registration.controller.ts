@@ -1,5 +1,5 @@
 // TODO: Be aware here we import a class from src!
-import { UMB_ROUTE_CONTEXT_TOKEN } from '../../src/core/router/route.context';
+import { UMB_ROUTE_CONTEXT_TOKEN } from '../router/route.context';
 import type { UmbControllerInterface } from '../controller';
 import { UmbModalRouteRegistration } from './modal-route-registration';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
