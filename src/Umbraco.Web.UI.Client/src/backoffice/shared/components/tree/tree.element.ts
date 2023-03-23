@@ -8,7 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './tree-item/tree-item.element';
+import './tree-item-base/tree-item-base.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
 
@@ -118,7 +118,7 @@ export class UmbTreeElement extends UmbLitElement {
 				this._items,
 				// TODO: add getUnique to a repository interface
 				(item, index) => index,
-				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
+				(item) => html`<umb-tree-item-base .item=${item}></umb-tree-item-base>`
 			)}
 		`;
 	}

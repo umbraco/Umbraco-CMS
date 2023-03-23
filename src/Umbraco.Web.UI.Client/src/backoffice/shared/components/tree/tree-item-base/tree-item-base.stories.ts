@@ -1,14 +1,14 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './tree-item.element';
-import type { UmbTreeItem } from './tree-item.element';
+import './tree-item-base.element';
+import type { UmbTreeItemBaseElement } from './tree-item-base.element';
 
-const meta: Meta<UmbTreeItem> = {
+const meta: Meta<UmbTreeItemBaseElement> = {
 	title: 'Components/Tree/Tree Item',
 	component: 'umb-tree-item',
 };
 
 export default meta;
-type Story = StoryObj<UmbTreeItem>;
+type Story = StoryObj<UmbTreeItemBaseElement>;
 
 export const Overview: Story = {
 	args: {

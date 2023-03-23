@@ -3,12 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeItemContextBase, UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item.context';
+import { UmbTreeItemContextBase, UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-tree-item')
-export class UmbTreeItem extends UmbLitElement {
+@customElement('umb-tree-item-base')
+export class UmbTreeItemBaseElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	private _item?: EntityTreeItemResponseModel;
@@ -137,7 +137,7 @@ export class UmbTreeItem extends UmbLitElement {
 				? repeat(
 						this._childItems,
 						(item) => item.key,
-						(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
+						(item) => html`<umb-tree-item-base .item=${item}></umb-tree-item-base>`
 				  )
 				: ''}
 		`;
@@ -146,6 +146,6 @@ export class UmbTreeItem extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-item': UmbTreeItem;
+		'umb-tree-item-base': UmbTreeItemBaseElement;
 	}
 }
