@@ -142,8 +142,6 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IOptionsMonitor<RequestHandlerSettings>>().CurrentValue)));
 
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
-        builder.Services.AddSingleton<IEFCoreMigrationBuilder, EFCoreMigrationBuilder>();
-        builder.Services.AddSingleton<IEFCoreMigrationPlanExecutor, EFCoreMigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
         builder.AddPreValueMigrators();
