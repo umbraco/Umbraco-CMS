@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Content.Rendering;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -37,7 +38,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_ExpandsNothingByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor();
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
         var prop1 = new PublishedElementPropertyBase(ContentApiPropertyType, content.Object, false, PropertyCacheLevel.None);
@@ -63,7 +64,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandSpecificContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "contentPickerTwo" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
 
@@ -95,7 +96,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandAllContent()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(true);
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
 
@@ -130,7 +131,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_DoesNotExpandNestedContentPicker(string rootPropertyTypeAlias, string nestedPropertyTypeAlias)
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { rootPropertyTypeAlias, nestedPropertyTypeAlias });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
 
         var content = new Mock<IPublishedContent>();
 
@@ -160,7 +161,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_DoesNotExpandElementsByDefault()
     {
         var accessor = CreateOutputExpansionStrategyAccessor();
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
@@ -211,7 +212,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandSpecifiedElement()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "element" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
@@ -254,7 +255,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_CanExpandAllElements()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(true );
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var contentPickerValue = CreateSimplePickedContent(111, 222);
@@ -311,7 +312,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     public void OutputExpansionStrategy_DoesNotExpandElementNestedContentPicker()
     {
         var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "element" });
-        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiUrlProvider(), accessor);
         var apiElementBuilder = new ApiElementBuilder(accessor);
 
         var nestedContentPickerValue = CreateSimplePickedContent(111, 222);
@@ -364,12 +365,9 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     {
         var key = Guid.NewGuid();
         content.SetupGet(c => c.Key).Returns(key);
-        content.SetupGet(c => c.UrlSegment).Returns("url-segment");
         content.SetupGet(c => c.Properties).Returns(properties);
         content.SetupGet(c => c.ContentType).Returns(_contentType);
         content.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
-
-        RegisterContentWithProviders(content.Object);
     }
 
     private IPublishedContent CreateSimplePickedContent(int numberOneValue, int numberTwoValue)
@@ -380,6 +378,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
             CreateNumberProperty(content.Object, numberOneValue, "numberOne"),
             CreateNumberProperty(content.Object, numberTwoValue, "numberTwo"));
 
+        RegisterContentWithProviders(content.Object);
         return content.Object;
     }
 
@@ -391,7 +390,18 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
             CreateNumberProperty(content.Object, numberValue, "number"),
             CreateContentPickerProperty(content.Object, nestedContentPickerValue.Key, nestedContentPickerPropertyTypeAlias, apiContentBuilder));
 
+        RegisterContentWithProviders(content.Object);
         return content.Object;
+    }
+
+    private void RegisterContentWithProviders(IPublishedContent content)
+    {
+        PublishedUrlProviderMock
+            .Setup(p => p.GetUrl(content, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Returns(content.UrlSegment);
+        PublishedContentCacheMock
+            .Setup(pcc => pcc.GetById(content.Key))
+            .Returns(content);
     }
 
     private PublishedElementPropertyBase CreateContentPickerProperty(IPublishedElement parent, Guid pickedContentKey, string propertyTypeAlias, IApiContentBuilder contentBuilder)
@@ -441,5 +451,5 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);
     }
 
-    private IApiContentRouteBuilder ApiContentRouteBuilder() => new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+    private IApiUrlProvider ApiUrlProvider() => new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor());
 }

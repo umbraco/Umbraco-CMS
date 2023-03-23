@@ -24,8 +24,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IApiContentNameProvider _apiContentNameProvider;
-    private readonly IApiMediaUrlProvider _apiMediaUrlProvider;
-    private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
+    private readonly IApiUrlProvider _apiUrlProvider;
 
     [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
     public MultiUrlPickerValueConverter(
@@ -41,8 +40,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
             umbracoContextAccessor,
             publishedUrlProvider,
             StaticServiceProvider.Instance.GetRequiredService<IApiContentNameProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiMediaUrlProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiContentRouteBuilder>())
+            StaticServiceProvider.Instance.GetRequiredService<IApiUrlProvider>())
     {
     }
 
@@ -53,8 +51,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
         IApiContentNameProvider apiContentNameProvider,
-        IApiMediaUrlProvider apiMediaUrlProvider,
-        IApiContentRouteBuilder apiContentRouteBuilder)
+        IApiUrlProvider apiUrlProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
                                      throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
@@ -62,8 +59,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
         _jsonSerializer = jsonSerializer;
         _publishedUrlProvider = publishedUrlProvider;
         _apiContentNameProvider = apiContentNameProvider;
-        _apiMediaUrlProvider = apiMediaUrlProvider;
-        _apiContentRouteBuilder = apiContentRouteBuilder;
+        _apiUrlProvider = apiUrlProvider;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
@@ -171,31 +167,29 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
 
         ApiLink? ToLink(MultiUrlPickerValueEditor.LinkDto item)
         {
-            switch (item.Udi?.EntityType)
-            {
-                case Constants.UdiEntityType.Document:
-                    IPublishedContent? content = publishedSnapshot.Content?.GetById(item.Udi.Guid);
-                    return content == null
-                        ? null
-                        : ApiLink.Content(
-                            item.Name.IfNullOrWhiteSpace(_apiContentNameProvider.GetName(content)),
-                            item.Target,
-                            content.Key,
-                            content.ContentType.Alias,
-                            _apiContentRouteBuilder.Build(content));
-                case Constants.UdiEntityType.Media:
-                    IPublishedContent? media = publishedSnapshot.Media?.GetById(item.Udi.Guid);
-                    return media == null
-                        ? null
-                        : ApiLink.Media(
-                            item.Name.IfNullOrWhiteSpace(_apiContentNameProvider.GetName(media)),
-                            _apiMediaUrlProvider.GetUrl(media),
-                            item.Target,
-                            media.Key,
-                            media.ContentType.Alias);
-                default:
-                    return ApiLink.External(item.Name, $"{item.Url}{item.QueryString}", item.Target);
-            }
+            IPublishedContent? content = item.Udi != null
+                ? item.Udi.EntityType switch
+                {
+                    Constants.UdiEntityType.Document => publishedSnapshot.Content?.GetById(item.Udi.Guid),
+                    Constants.UdiEntityType.Media => publishedSnapshot.Media?.GetById(item.Udi.Guid),
+                    _ => null
+                }
+                : null;
+
+            var url = content != null ? _apiUrlProvider.Url(content) : item.Url;
+            return url.IsNullOrWhiteSpace()
+                ? null
+                : new ApiLink(
+                    $"{url}{item.QueryString}",
+                    item.Name ?? (content != null ? _apiContentNameProvider.GetName(content) : null),
+                    item.Target,
+                    content?.Key,
+                    content?.ContentType.Alias,
+                    content == null
+                        ? LinkType.External
+                        : content.ItemType == PublishedItemType.Media
+                            ? LinkType.Media
+                            : LinkType.Content);
         }
 
         return dtos.Select(ToLink).WhereNotNull().ToArray();

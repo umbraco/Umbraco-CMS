@@ -2,13 +2,13 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.ContentApi.Accessors;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -18,16 +18,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 {
     [Test]
-    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsContentToLinksWithContentInfo()
+    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsContentToLinks()
     {
         var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var serializer = new JsonNetSerializer();
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
         Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
-        var inter = Serializer().Serialize(new[]
+        var inter = serializer.Serialize(new[]
         {
             new MultiUrlPickerValueEditor.LinkDto
             {
@@ -37,59 +38,26 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
-        var link = result.First();
-        Assert.AreEqual(PublishedContent.Name, link.Title);
-        Assert.AreEqual(LinkType.Content, link.LinkType);
-        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("TheContentType", link.DestinationType);
-        Assert.Null(link.Url);
-        Assert.Null(link.Target);
-        var route = link.Route;
-        Assert.NotNull(route);
-        Assert.AreEqual("/the-page-url", route.Path);
+        Assert.AreEqual(PublishedContent.Name, result.First().Title);
+        Assert.AreEqual(PublishedContent.Key, result.First().ContentId);
+        Assert.AreEqual("the-page-url", result.First().Url);
+        Assert.AreEqual("TheContentType", result.First().DestinationType);
+        Assert.AreEqual(LinkType.Content, result.First().LinkType);
+        Assert.AreEqual(null, result.First().Target);
     }
 
     [Test]
-    public void MultiUrlPickerValueConverter_InSingleMode_ConvertsMediaToLinksWithoutContentInfo()
-    {
-        var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 1 }));
-        var publishedPropertyType = new Mock<IPublishedPropertyType>();
-        publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
-
-        var valueConverter = MultiUrlPickerValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
-
-        var inter = Serializer().Serialize(new[]
-        {
-            new MultiUrlPickerValueEditor.LinkDto
-            {
-                Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key)
-            }
-        });
-        var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
-        var link = result.First();
-        Assert.AreEqual(PublishedMedia.Name, link.Title);
-        Assert.AreEqual(PublishedMedia.Key, link.DestinationId);
-        Assert.AreEqual("TheMediaType", link.DestinationType);
-        Assert.AreEqual("the-media-url", link.Url);
-        Assert.AreEqual(LinkType.Media, link.LinkType);
-        Assert.AreEqual(null, link.Target);
-        Assert.AreEqual(null, link.Route);
-    }
-
-    [Test]
-    public void MultiUrlPickerValueConverter_InMultiMode_CanHandleMixedLinkTypes()
+    public void MultiUrlPickerValueConverter_InMultiMode_ConvertsContentToLinks()
     {
         var publishedDataType = new PublishedDataType(123, "test", new Lazy<object>(() => new MultiUrlPickerConfiguration { MaxNumber = 10 }));
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var serializer = new JsonNetSerializer();
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
         Assert.AreEqual(typeof(IEnumerable<ApiLink>), valueConverter.GetContentApiPropertyValueType(publishedPropertyType.Object));
 
-        var inter = Serializer().Serialize(new[]
+        var inter = serializer.Serialize(new[]
         {
             new MultiUrlPickerValueEditor.LinkDto
             {
@@ -98,38 +66,25 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
             new MultiUrlPickerValueEditor.LinkDto
             {
                 Udi = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key)
-            },
-            new MultiUrlPickerValueEditor.LinkDto
-            {
-                Name = "The link",
-                QueryString = "?something=true",
-                Target = "_blank",
-                Url = "https://umbraco.com/"
             }
         });
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
-        Assert.AreEqual(3, result.Count());
+        Assert.AreEqual(2, result.Count());
 
-        var first = result.First();
-        var second = result.Skip(1).First();
-        var last = result.Last();
+        Assert.AreEqual(PublishedContent.Name, result.First().Title);
+        Assert.AreEqual(PublishedContent.Key, result.First().ContentId);
+        Assert.AreEqual("the-page-url", result.First().Url);
+        Assert.AreEqual("TheContentType", result.First().DestinationType);
+        Assert.AreEqual(LinkType.Content, result.First().LinkType);
+        Assert.AreEqual(null, result.First().Target);
 
-        Assert.AreEqual(PublishedContent.Name, first.Title);
-        Assert.AreEqual(LinkType.Content, first.LinkType);
-        Assert.AreEqual(PublishedContent.Key, first.DestinationId);
-        Assert.NotNull(first.Route);
-
-        Assert.AreEqual(PublishedMedia.Name, second.Title);
-        Assert.AreEqual(PublishedMedia.Key, second.DestinationId);
-        Assert.AreEqual("TheMediaType", second.DestinationType);
-        Assert.Null(second.Route);
-
-        Assert.AreEqual("The link", last.Title);
-        Assert.AreEqual("https://umbraco.com/?something=true", last.Url);
-        Assert.AreEqual(LinkType.External, last.LinkType);
-        Assert.AreEqual("_blank", last.Target);
-        Assert.Null(last.Route);
+        Assert.AreEqual(PublishedMedia.Name, result.Last().Title);
+        Assert.AreEqual(PublishedMedia.Key, result.Last().ContentId);
+        Assert.AreEqual("the-media-url", result.Last().Url);
+        Assert.AreEqual("TheMediaType", result.Last().DestinationType);
+        Assert.AreEqual(LinkType.Media, result.Last().LinkType);
+        Assert.AreEqual(null, result.Last().Target);
     }
 
     [Test]
@@ -139,9 +94,10 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var serializer = new JsonNetSerializer();
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
-        var inter = Serializer().Serialize(new[]
+        var inter = serializer.Serialize(new[]
         {
             new MultiUrlPickerValueEditor.LinkDto
             {
@@ -154,12 +110,11 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
-        var link = result.First();
-        Assert.AreEqual("The link", link.Title);
-        Assert.AreEqual("https://umbraco.com/?something=true", link.Url);
-        Assert.AreEqual(LinkType.External, link.LinkType);
-        Assert.AreEqual("_blank", link.Target);
-        Assert.Null(link.Route);
+        Assert.AreEqual("The link", result.First().Title);
+        Assert.AreEqual(null, result.First().ContentId);
+        Assert.AreEqual("https://umbraco.com/?something=true", result.First().Url);
+        Assert.AreEqual(LinkType.External, result.First().LinkType);
+        Assert.AreEqual("_blank", result.First().Target);
     }
 
     [Test]
@@ -169,9 +124,10 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var serializer = new JsonNetSerializer();
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
-        var inter = Serializer().Serialize(new[]
+        var inter = serializer.Serialize(new[]
         {
             new MultiUrlPickerValueEditor.LinkDto
             {
@@ -184,13 +140,11 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
-        var link = result.First();
-        Assert.AreEqual("Custom link name", link.Title);
-        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("/the-page-url",  link.Route!.Path);
-        Assert.AreEqual(LinkType.Content, link.LinkType);
-        Assert.AreEqual("_blank", link.Target);
-        Assert.Null(link.Url);
+        Assert.AreEqual("Custom link name", result.First().Title);
+        Assert.AreEqual(PublishedContent.Key, result.First().ContentId);
+        Assert.AreEqual("the-page-url?something=true", result.First().Url);
+        Assert.AreEqual(LinkType.Content, result.First().LinkType);
+        Assert.AreEqual("_blank", result.First().Target);
     }
 
     [Test]
@@ -200,9 +154,10 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var serializer = new JsonNetSerializer();
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
-        var inter = Serializer().Serialize(new[]
+        var inter = serializer.Serialize(new[]
         {
             new MultiUrlPickerValueEditor.LinkDto
             {
@@ -214,13 +169,11 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
-        var link = result.First();
-        Assert.AreEqual(PublishedContent.Name, link.Title);
-        Assert.AreEqual(PublishedContent.Key, link.DestinationId);
-        Assert.AreEqual("/the-page-url", link.Route!.Path);
-        Assert.AreEqual(LinkType.Content, link.LinkType);
-        Assert.Null(link.Target);
-        Assert.Null(link.Url);
+        Assert.AreEqual(PublishedContent.Name, result.First().Title);
+        Assert.AreEqual(PublishedContent.Key, result.First().ContentId);
+        Assert.AreEqual("the-page-url?something=true", result.First().Url);
+        Assert.AreEqual(LinkType.Content, result.First().LinkType);
+        Assert.AreEqual(null, result.First().Target);
     }
 
     [TestCase(123)]
@@ -232,7 +185,8 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var serializer = new JsonNetSerializer();
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
@@ -248,28 +202,13 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
-        var valueConverter = MultiUrlPickerValueConverter();
+        var serializer = new JsonNetSerializer();
+        var valueConverter = new MultiUrlPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IProfilingLogger>(), serializer, Mock.Of<IUmbracoContextAccessor>(), PublishedUrlProvider, new ApiContentNameProvider(), ApiUrlProvider());
 
         var result = valueConverter.ConvertIntermediateToContentApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiLink>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
 
-    private IApiMediaUrlProvider ApiMediaUrlProvider() => new ApiMediaUrlProvider(PublishedUrlProvider);
-
-    private MultiUrlPickerValueConverter MultiUrlPickerValueConverter()
-    {
-        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
-        return new MultiUrlPickerValueConverter(
-            PublishedSnapshotAccessor,
-            Mock.Of<IProfilingLogger>(),
-            Serializer(),
-            Mock.Of<IUmbracoContextAccessor>(),
-            PublishedUrlProvider,
-            new ApiContentNameProvider(),
-            ApiMediaUrlProvider(),
-            routeBuilder);
-    }
-
-    private IJsonSerializer Serializer() => new JsonNetSerializer();
+    private IApiUrlProvider ApiUrlProvider() => new ApiUrlProvider(PublishedUrlProvider, new NoopRequestStartNodeServiceAccessor());
 }
