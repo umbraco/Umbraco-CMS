@@ -27,7 +27,7 @@ export interface UmbLinkPickerConfig {
 	overlaySize?: UUIModalSidebarSize;
 }
 
-export const UMB_LINK_PICKER_MODAL_TOKEN = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalResult>(
+export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalResult>(
 	'Umb.Modal.LinkPicker',
 	{
 		type: 'sidebar',

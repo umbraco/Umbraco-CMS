@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
-import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL_TOKEN } from '../../modals/link-picker';
+import { UmbLinkPickerLink, UMB_LINK_PICKER_MODAL } from '../../../../../libs/modal/token/link-picker-modal.token';
 import type { UmbVariantId } from '../../variants/variant-id.class';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -130,7 +130,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 		this.myModalRegistration = new UmbModalRouteRegistrationController(
 			this,
-			UMB_LINK_PICKER_MODAL_TOKEN,
+			UMB_LINK_PICKER_MODAL,
 			`:index`,
 			new Map([
 				['propertyAlias', undefined],
