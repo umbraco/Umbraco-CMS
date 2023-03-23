@@ -1,11 +1,14 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
-import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '.';
+import {
+	UmbExportDictionaryModalData,
+	UmbExportDictionaryModalResult,
+} from '../../../../../../libs/modal/token/export-dictionary-modal.token';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
-@customElement('umb-export-dictionary-modal-layout')
-export class UmbExportDictionaryModalLayoutElement extends UmbModalBaseElement<
+@customElement('umb-export-dictionary-modal')
+export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 	UmbExportDictionaryModalData,
 	UmbExportDictionaryModalResult
 > {
@@ -49,10 +52,10 @@ export class UmbExportDictionaryModalLayoutElement extends UmbModalBaseElement<
 	}
 }
 
-export default UmbExportDictionaryModalLayoutElement;
+export default UmbExportDictionaryModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-export-dictionary-modal-layout': UmbExportDictionaryModalLayoutElement;
+		'umb-export-dictionary-modal': UmbExportDictionaryModalElement;
 	}
 }

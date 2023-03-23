@@ -5,12 +5,15 @@ import { when } from 'lit/directives/when.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
-import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '.';
+import {
+	UmbImportDictionaryModalData,
+	UmbImportDictionaryModalResult,
+} from '../../../../../../libs/modal/token/import-dictionary-modal.token';
 import { UploadDictionaryResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
-@customElement('umb-import-dictionary-modal-layout')
-export class UmbImportDictionaryModalLayoutElement extends UmbModalBaseElement<
+@customElement('umb-import-dictionary-modal')
+export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	UmbImportDictionaryModalData,
 	UmbImportDictionaryModalResult
 > {
@@ -156,10 +159,10 @@ export class UmbImportDictionaryModalLayoutElement extends UmbModalBaseElement<
 	}
 }
 
-export default UmbImportDictionaryModalLayoutElement;
+export default UmbImportDictionaryModalLayout;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-import-dictionary-modal-layout': UmbImportDictionaryModalLayoutElement;
+		'umb-import-dictionary-modal': UmbImportDictionaryModalLayout;
 	}
 }
