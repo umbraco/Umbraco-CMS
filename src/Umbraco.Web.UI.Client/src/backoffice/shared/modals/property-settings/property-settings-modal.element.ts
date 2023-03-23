@@ -2,7 +2,7 @@ import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-ui
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../property-editors/modals/property-editor-ui-picker';
+import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '../../../../../libs/modal/token/property-editor-ui-picker-modal.token';
 import { UmbPropertySettingsModalResult } from '.';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
@@ -261,7 +261,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object,
 	}
 
 	#onOpenPropertyEditorUIPicker() {
-		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN, {
+		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 			selection: [],
 		});
 
