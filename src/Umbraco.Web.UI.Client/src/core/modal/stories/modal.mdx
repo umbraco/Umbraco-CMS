@@ -151,7 +151,7 @@ descripe the addional features of the route Registration:
 	render() {
 		return html`
 			${this._items?.map((item, index) =>
-				html`<uui-button look="placeholder" label="Edit item ${index}" .href=${this._modalRouteBuilder?.({ index: -1 })}>Add</uui-button>`
+				html`<uui-button look="placeholder" label="Edit item ${index}" .href=${this._modalRouteBuilder?.({ index })}>Add</uui-button>`
 			)}
 		`;
 	}
