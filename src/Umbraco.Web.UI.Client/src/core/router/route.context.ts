@@ -82,8 +82,7 @@ export class UmbRouteContext {
 			return this.#generateRoute(modalRegistration);
 		});
 
-		// Add an empty route, so that we can always have a route to go to for closing the modals.
-		// TODO: Check if this is necessary with the _internal_modalRouterChanged present.
+		// Add an empty route, so there is a route for the router to react on when no modals are open.
 		this.#contextRoutes.push({
 			path: '',
 			component: EmptyDiv,
@@ -98,7 +97,7 @@ export class UmbRouteContext {
 		this.#routerBasePath = routerBasePath;
 		this.#generateNewUrlBuilders();
 	}
-	// TODO: what is going on here, We need to make sure if the modals are still relevant then not close them.
+
 	// Also notice each registration should now hold its handler when its active.
 	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
 		if (this.#activeModalPath === activeModalPath) return;
