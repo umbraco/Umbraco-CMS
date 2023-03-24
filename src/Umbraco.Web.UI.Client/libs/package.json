@@ -26,5 +26,6 @@
 		"@types/uuid": "^9.0.1",
 		"@umbraco-ui/uui": "^1.2.0-rc.0",
 		"rxjs": "^7.8.0"
-	}
+	},
+	"customElements": "custom-elements.json"
 }
