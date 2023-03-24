@@ -1,0 +1,53 @@
+import {
+	FileSystemTreeItemPresentationModel,
+	PagedFileSystemTreeItemPresentationModel,
+	StylesheetResource,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { RepositoryTreeDataSource } from 'libs/repository/repository-tree-data-source.interface';
+
+/**
+ * A data source for the Stylesheet tree that fetches data from the server
+ * @export
+ * @class UmbStylesheetTreeServerDataSource
+ * @implements {RepositoryTreeDataSource}
+ */
+export class UmbStylesheetTreeServerDataSource
+	implements RepositoryTreeDataSource<PagedFileSystemTreeItemPresentationModel>
+{
+	#host: UmbControllerHostInterface;
+
+	/**
+	 * Creates an instance of UmbStylesheetTreeServerDataSource.
+	 * @param {UmbControllerHostInterface} host
+	 * @memberof UmbStylesheetTreeServerDataSource
+	 */
+	constructor(host: UmbControllerHostInterface) {
+		this.#host = host;
+	}
+
+	/**
+	 * Fetches the stylesheet tree root items from the server
+	 * @return {*}
+	 * @memberof UmbStylesheetTreeServerDataSource
+	 */
+	async getRootItems() {
+		return tryExecuteAndNotify(this.#host, StylesheetResource.getTreeStylesheetRoot({}));
+	}
+
+	/**
+	 * Fetches the children of a given stylesheet path from the server
+	 * @param {(string | undefined)} path
+	 * @return {*}
+	 * @memberof UmbStylesheetTreeServerDataSource
+	 */
+	async getChildrenOf(path: string | undefined) {
+		return tryExecuteAndNotify(
+			this.#host,
+			StylesheetResource.getTreeStylesheetChildren({
+				path,
+			})
+		);
+	}
+}
