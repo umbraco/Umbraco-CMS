@@ -31,7 +31,7 @@ public class QueryContentApiController : ContentApiControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Query(string? fetch, string[]? filter, string[]? sort)
+    public async Task<IActionResult> Query(string? fetch = null, [FromQuery] string[]? filter = null, [FromQuery] string[]? sort = null)
     {
         IPublishedContentCache? contentCache = GetContentCache();
         if (contentCache is null)
@@ -42,6 +42,7 @@ public class QueryContentApiController : ContentApiControllerBase
         IEnumerable<Guid> ids = Enumerable.Empty<Guid>();
         ids = _apiQueryService.ExecuteQuery(fetch, filter, sort);
 
+        // Manually left-aligning
         IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById)
             .WhereNotNull()
             .OrderBy(x => x.Path)
@@ -49,18 +50,18 @@ public class QueryContentApiController : ContentApiControllerBase
 
         // Currently sorting is not supported through the ContentAPI index
         // So we need to add the name to it
-        if (sort is not null && sort[0].StartsWith("name")) // TODO: change
-        {
-            string sortValue = sort[0].Substring(sort[0].IndexOf(':', StringComparison.Ordinal) + 1);
-            if (sortValue.StartsWith("asc"))
-            {
-                contentItems = contentItems.OrderBy(x => x.Name);
-            }
-            else
-            {
-                contentItems = contentItems.OrderByDescending(x => x.Name);
-            }
-        }
+        // if (sort is not null && sort[0].StartsWith("name")) // TODO: change
+        // {
+        //     string sortValue = sort[0].Substring(sort[0].IndexOf(':', StringComparison.Ordinal) + 1);
+        //     if (sortValue.StartsWith("asc"))
+        //     {
+        //         contentItems = contentItems.OrderBy(x => x.Name);
+        //     }
+        //     else
+        //     {
+        //         contentItems = contentItems.OrderByDescending(x => x.Name);
+        //     }
+        // }
 
         IEnumerable<IApiContent> results = contentItems.Select(ApiContentBuilder.Build);
 

@@ -16,9 +16,11 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         : base(publishedSnapshotAccessor, requestRoutingService) =>
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
 
+    /// <inheritdoc />
     public bool CanHandle(string queryString)
         => queryString.StartsWith(AncestorsSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc />
     public IBooleanOperation? BuildApiIndexQuery(IQuery query, string queryString)
     {
         var fieldValue = queryString.Substring(AncestorsSpecifier.Length);

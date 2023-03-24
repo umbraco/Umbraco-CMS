@@ -13,9 +13,11 @@ internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
     {
     }
 
+    /// <inheritdoc />
     public bool CanHandle(string queryString)
         => queryString.StartsWith(ChildrenSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc />
     public IBooleanOperation? BuildApiIndexQuery(IQuery query, string queryString)
     {
         var fieldValue = queryString.Substring(ChildrenSpecifier.Length);

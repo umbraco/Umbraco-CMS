@@ -25,6 +25,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, RequestContextRequestStartItemProviderAccessor>();
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
+        builder.Services.AddSingleton<IApiQueryService, ApiQueryService>();
 
         builder
             .Services

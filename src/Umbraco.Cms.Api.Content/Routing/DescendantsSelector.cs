@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Routing;
 
-public class DescendantsSelector : QueryOptionBase, ISelectorHandler
+internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string DescendantsSpecifier = "descendants:";
 
@@ -14,9 +14,11 @@ public class DescendantsSelector : QueryOptionBase, ISelectorHandler
     {
     }
 
+    /// <inheritdoc />
     public bool CanHandle(string queryString)
         => queryString.StartsWith(DescendantsSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc />
     public IBooleanOperation? BuildApiIndexQuery(IQuery query, string queryString)
     {
         var fieldValue = queryString.Substring(DescendantsSpecifier.Length);
