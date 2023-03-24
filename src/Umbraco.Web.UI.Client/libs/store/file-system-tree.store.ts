@@ -43,7 +43,7 @@ export class UmbFileSystemTreeStore extends UmbStoreBase implements UmbTreeStore
 	 * An observable to observe the root items
 	 * @memberof UmbFileSystemTreeStore
 	 */
-	rootItems = this.#data.getObservablePart((items) => items.filter((item) => item.path === item.name));
+	rootItems = this.#data.getObservablePart((items) => items.filter((item) => item.path?.includes('/') === false));
 
 	/**
 	 * Returns an observable to observe the children of a given parent
@@ -52,7 +52,7 @@ export class UmbFileSystemTreeStore extends UmbStoreBase implements UmbTreeStore
 	 * @memberof UmbFileSystemTreeStore
 	 */
 	childrenOf(parentPath: string | null) {
-		return this.#data.getObservablePart((items) => items.filter((item) => item.path?.startsWith(parentPath ?? '')));
+		return this.#data.getObservablePart((items) => items.filter((item) => item.path?.startsWith(parentPath + '/')));
 	}
 
 	/**

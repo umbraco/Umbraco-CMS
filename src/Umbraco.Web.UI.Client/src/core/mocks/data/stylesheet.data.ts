@@ -58,14 +58,14 @@ class UmbStylesheetData extends UmbEntityData<StylesheetDBItem> {
 	}
 
 	getTreeRoot(): PagedFileSystemTreeItemPresentationModel {
-		const items = this.data.filter((item) => item.path === item.name);
+		const items = this.data.filter((item) => item.path?.includes('/') === false);
 		const treeItems = items.map((item) => createFileSystemTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(parentPath: string): PagedFileSystemTreeItemPresentationModel {
-		const items = this.data.filter((item) => item.path?.startsWith(parentPath));
+		const items = this.data.filter((item) => item.path?.startsWith(parentPath + '/'));
 		const treeItems = items.map((item) => createFileSystemTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
