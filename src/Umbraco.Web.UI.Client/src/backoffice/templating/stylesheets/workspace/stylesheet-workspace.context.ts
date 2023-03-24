@@ -1,17 +1,17 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface as UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
-import type { MemberDetails } from '@umbraco-cms/backoffice/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbWorkspaceContextInterface } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-context.interface';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbWorkspaceContext<UmbStylesheetRepository>
-	implements UmbEntityWorkspaceContextInterface<MemberDetails | undefined>
+	implements UmbWorkspaceContextInterface
 {
 	constructor(host: UmbControllerHostInterface) {
 		super(host, new UmbStylesheetRepository(host));
 	}
 
+	/*
 	getEntityType(): string {
 		return 'stylesheet';
 	}
@@ -28,11 +28,12 @@ export class UmbStylesheetWorkspaceContext
 		console.log('save');
 	}
 
-	async load(key: string) {
-		console.log('load', key);
+	async load(path: string) {
+		console.log('load', path);
 	}
 
 	public destroy(): void {
 		console.log('destroy');
 	}
+	*/
 }

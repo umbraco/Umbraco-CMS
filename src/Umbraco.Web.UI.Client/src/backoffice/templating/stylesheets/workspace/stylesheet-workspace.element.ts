@@ -5,6 +5,7 @@ import { IRoutingInfo } from 'router-slot';
 import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element';
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { serverPathFromUrlFriendlyPath } from '../../utils';
 
 @customElement('umb-stylesheet-workspace')
 export class UmbStylesheetWorkspaceElement extends UmbLitElement {
@@ -29,7 +30,8 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				const path = info.match.params.path;
-				this.#workspaceContext.load(path);
+				const serverPath = serverPathFromUrlFriendlyPath(path);
+				this.#workspaceContext.load(serverPath);
 			},
 		},
 	];
