@@ -16,7 +16,7 @@ export class UmbStylesheetWorkspaceEditElement extends LitElement {
 	];
 
 	render() {
-		return html` <umb-workspace-layout alias="Umb.Workspace.Stylesheet">Member Workspace</umb-workspace-layout> `;
+		return html` <umb-workspace-layout alias="Umb.Workspace.Stylesheet">Stylesheet workspace</umb-workspace-layout> `;
 	}
 }
 
