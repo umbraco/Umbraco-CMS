@@ -1,6 +1,6 @@
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
@@ -9,17 +9,15 @@ import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
  * @description - General Tree Data Store
  */
 // TODO: consider if tree store could be turned into a general EntityTreeStore class?
-export class UmbEntityTreeStore<
-	T extends EntityTreeItemResponseModel = EntityTreeItemResponseModel
-> extends UmbStoreBase {
-	#data = new ArrayState<T>([], (x) => x.key);
+export class UmbEntityTreeStore extends UmbStoreBase implements UmbTreeStore<EntityTreeItemResponseModel> {
+	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
 
 	/**
 	 * Appends items to the store
 	 * @param {Array<EntityTreeItemResponseModel>} items
 	 * @memberof UmbEntityTreeStore
 	 */
-	appendItems(items: Array<T>) {
+	appendItems(items: Array<EntityTreeItemResponseModel>) {
 		this.#data.append(items);
 	}
 
@@ -29,7 +27,7 @@ export class UmbEntityTreeStore<
 	 * @param {Partial<EntityTreeItemResponseModel>} data
 	 * @memberof UmbEntityTreeStore
 	 */
-	updateItem(key: string, data: Partial<T>) {
+	updateItem(key: string, data: Partial<EntityTreeItemResponseModel>) {
 		this.#data.next(partialUpdateFrozenArray(this.#data.getValue(), data, (entry) => entry.key === key));
 	}
 
