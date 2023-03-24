@@ -4,7 +4,7 @@ import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './membe
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { RepositoryTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
@@ -17,7 +17,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepo
 
 	#host: UmbControllerHostInterface;
 
-	#treeSource: RepositoryTreeDataSource;
+	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMemberTypeTreeStore;
 
 	#detailSource: UmbMemberTypeDetailServerDataSource;

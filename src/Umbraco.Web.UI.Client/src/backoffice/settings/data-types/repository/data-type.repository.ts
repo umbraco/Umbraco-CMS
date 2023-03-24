@@ -1,8 +1,4 @@
-import type {
-	RepositoryTreeDataSource,
-	UmbTreeRepository,
-	UmbDetailRepository,
-} from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -23,7 +19,7 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 
 	#host: UmbControllerHostInterface;
 
-	#treeSource: RepositoryTreeDataSource;
+	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDataTypeTreeStore;
 
 	#detailDataSource: UmbDataTypeServerDataSource;

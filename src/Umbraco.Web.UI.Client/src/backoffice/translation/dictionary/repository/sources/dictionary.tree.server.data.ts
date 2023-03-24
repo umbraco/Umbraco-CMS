@@ -1,6 +1,6 @@
 import { DictionaryResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class DictionaryTreeServerDataSource
  * @implements {DictionaryTreeDataSource}
  */
-export class DictionaryTreeServerDataSource implements RepositoryTreeDataSource {
+export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostInterface;
 
 	/**

@@ -2,11 +2,7 @@ import { UmbDocumentServerDataSource } from './sources/document.server.data';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
 import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
-import type {
-	RepositoryTreeDataSource,
-	UmbTreeRepository,
-	UmbDetailRepository,
-} from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -19,7 +15,7 @@ export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailReposi
 
 	#host: UmbControllerHostInterface;
 
-	#treeSource: RepositoryTreeDataSource;
+	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDocumentTreeStore;
 
 	#detailDataSource: UmbDocumentServerDataSource;

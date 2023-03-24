@@ -5,16 +5,16 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { RepositoryTreeDataSource } from 'libs/repository/repository-tree-data-source.interface';
+import { UmbTreeDataSource } from 'libs/repository/repository-tree-data-source.interface';
 
 /**
  * A data source for the Stylesheet tree that fetches data from the server
  * @export
  * @class UmbStylesheetTreeServerDataSource
- * @implements {RepositoryTreeDataSource}
+ * @implements {UmbTreeDataSource}
  */
 export class UmbStylesheetTreeServerDataSource
-	implements RepositoryTreeDataSource<PagedFileSystemTreeItemPresentationModel, FileSystemTreeItemPresentationModel>
+	implements UmbTreeDataSource<PagedFileSystemTreeItemPresentationModel, FileSystemTreeItemPresentationModel>
 {
 	#host: UmbControllerHostInterface;
 
