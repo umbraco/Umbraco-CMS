@@ -5,7 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
 
 namespace Umbraco.Cms.Api.Content.Services;
-public class ApiQueryService : IApiQueryService
+internal sealed class ApiQueryService : IApiQueryService
 {
     private readonly QueryHandlerCollection _queryHandlers;
     private readonly IExamineManager _examineManager;
@@ -16,10 +16,11 @@ public class ApiQueryService : IApiQueryService
         _examineManager = examineManager;
     }
 
-    public IEnumerable<Guid> ExecuteQuery(Dictionary<string, string> queryParams, string fieldValue)
+    public IEnumerable<Guid> ExecuteQuery(string? fetch, string[]? filter, string[]? sort)
     {
-        var queryHandler = _queryHandlers.FirstOrDefault(h => h.CanHandle(queryParams["fetch"])) as IQueryOptionHandler;
+        var queryHandler = fetch is not null ? _queryHandlers.FirstOrDefault(h => h.CanHandle(fetch)) as ISelectorHandler : null;
 
+        // TODO: If no handler, get everything from the index
         if (queryHandler is null)
         {
             return Enumerable.Empty<Guid>();
@@ -32,24 +33,24 @@ public class ApiQueryService : IApiQueryService
 
         IQuery baseQuery = apiIndex.Searcher.CreateQuery();
         IBooleanOperation? queryOperation = queryHandler
-            .BuildApiIndexQuery(baseQuery, fieldValue);
+            .BuildApiIndexQuery(baseQuery, fetch!);
 
         if (queryOperation is null)
         {
             return Enumerable.Empty<Guid>();
         }
 
-        if (queryParams.ContainsKey("filter"))
-        {
-            var alias = GetContentTypeAliasFromFilter(queryParams["filter"]);
-
-            if (alias is not null)
-            {
-                queryOperation = queryOperation
-                    .And()
-                    .Field("__NodeTypeAlias", alias);
-            }
-        }
+        // if (filter is not null)
+        // {
+        //     var alias = GetContentTypeAliasFromFilter(filter);
+        //
+        //     if (alias is not null)
+        //     {
+        //         queryOperation = queryOperation
+        //             .And()
+        //             .Field("__NodeTypeAlias", alias); // use that for now
+        //     }
+        // }
 
         ISearchResults results = queryOperation.Execute();
 
