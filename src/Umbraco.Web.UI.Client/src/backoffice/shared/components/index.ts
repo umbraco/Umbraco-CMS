@@ -32,10 +32,14 @@ import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './section/section-main/section-main.element';
 import './section/section-sidebar/section-sidebar.element';
 import './section/section.element';
+
 import './table/table.element';
+
 import './tree/tree.element';
 import './tree/entity-tree-item/entity-tree-item.element';
+import './tree/file-system-tree-item/file-system-tree-item.element';
 import './tree/tree-menu-item/tree-menu-item.element';
+
 import './variantable-property/variantable-property.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
 
@@ -46,8 +50,8 @@ import './history/history-item.element';
 
 import './workspace/workspace-action/workspace-action.element';
 import './workspace/workspace-layout/workspace-layout.element';
-import './code-editor';
-
 import './workspace/workspace-footer-layout/workspace-footer-layout.element';
+
+import './code-editor';
 
 export const manifests = [...debugManifests];
