@@ -5,7 +5,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbTreeDataSource } from 'libs/repository/repository-tree-data-source.interface';
+import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Stylesheet tree that fetches data from the server
