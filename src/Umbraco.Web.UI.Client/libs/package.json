@@ -20,7 +20,9 @@
 	},
 	"type": "module",
 	"files": [
-		"*.d.ts"
+		"*.d.ts",
+		"*.json",
+		"*.md"
 	],
 	"peerDependencies": {
 		"@types/uuid": "^9.0.1",
