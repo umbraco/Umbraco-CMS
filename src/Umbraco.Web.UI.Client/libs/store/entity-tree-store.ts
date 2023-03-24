@@ -8,7 +8,6 @@ import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
  * @extends {UmbStoreBase}
  * @description - General Tree Data Store
  */
-// TODO: consider if tree store could be turned into a general EntityTreeStore class?
 export class UmbEntityTreeStore extends UmbStoreBase implements UmbTreeStore<EntityTreeItemResponseModel> {
 	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
 
