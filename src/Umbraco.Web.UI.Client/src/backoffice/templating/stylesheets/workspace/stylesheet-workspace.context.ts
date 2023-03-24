@@ -1,39 +1,42 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
+import { StylesheetDetails } from '..';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbWorkspaceContext<UmbStylesheetRepository>
 	implements UmbWorkspaceContextInterface
 {
+	#data = new ObjectState<StylesheetDetails | undefined>(undefined);
+	data = this.#data.asObservable();
+
 	constructor(host: UmbControllerHostInterface) {
 		super(host, new UmbStylesheetRepository(host));
 	}
 
-	/*
 	getEntityType(): string {
 		return 'stylesheet';
 	}
 
-	getEntityKey() {
-		return '1234';
-	}
-
 	getData() {
-		return 'fake' as unknown as MemberDetails;
+		return this.#data.getValue();
 	}
 
-	async save() {
-		console.log('save');
+	getEntityKey() {
+		return this.getData()?.path || '';
 	}
 
 	async load(path: string) {
-		console.log('load', path);
+		const { data } = await this.repository.requestByPath(path);
+		if (data) {
+			this.setIsNew(false);
+			this.#data.update(data);
+		}
 	}
 
 	public destroy(): void {
-		console.log('destroy');
+		this.#data.complete();
 	}
-	*/
 }

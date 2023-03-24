@@ -1,5 +1,6 @@
 import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from './stylesheet.tree.store';
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data';
+import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -12,8 +13,9 @@ import {
 export class UmbStylesheetRepository
 	implements UmbTreeRepository<PagedFileSystemTreeItemPresentationModel, FileSystemTreeItemPresentationModel>
 {
-	#host: UmbControllerHostInterface;
-	#treeDataSource: UmbStylesheetTreeServerDataSource;
+	#host;
+	#dataSource;
+	#treeDataSource;
 	#treeStore?: UmbStylesheetTreeStore;
 	#notificationContext?: UmbNotificationContext;
 	#initResolver?: () => void;
@@ -21,7 +23,9 @@ export class UmbStylesheetRepository
 
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
+
 		// TODO: figure out how spin up get the correct data source
+		this.#dataSource = new UmbStylesheetServerDataSource(this.#host);
 		this.#treeDataSource = new UmbStylesheetTreeServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -94,5 +98,13 @@ export class UmbStylesheetRepository
 		if (!paths) throw new Error('Paths are missing');
 		await this.#init;
 		return this.#treeStore!.items(paths);
+	}
+
+	// DETAILS
+	async requestByPath(path: string) {
+		if (!path) throw new Error('Path is missing');
+		await this.#init;
+		const { data, error } = await this.#dataSource.get(path);
+		return { data, error };
 	}
 }

@@ -32,7 +32,7 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDe
 	async get(path: string) {
 		if (!path) throw new Error('Path is missing');
 		console.log('GET STYLESHEET WITH PATH', path);
-		return {};
+		return { data: undefined, error: undefined };
 	}
 
 	insert(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
