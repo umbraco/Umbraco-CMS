@@ -1,7 +1,7 @@
 import type { Observable } from 'rxjs';
 import { TreeItemPresentationModel } from '../backend-api';
 
-export interface UmbTreeStore<T extends TreeItemPresentationModel> {
+export interface UmbTreeStore<T extends TreeItemPresentationModel = any> {
 	appendItems: (items: Array<T>) => void;
 	updateItem: (unique: string, item: Partial<T>) => void;
 	removeItem: (unique: string) => void;
