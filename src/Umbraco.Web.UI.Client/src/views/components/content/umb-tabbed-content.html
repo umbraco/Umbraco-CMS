@@ -21,7 +21,7 @@
                         preview="(propertyEditorDisabled(property) && allowUpdate) || (!allowUpdate && !property.supportsReadOnly)"
                         allow-unlock="allowUpdate && allowEditInvariantFromNonDefault"
                         on-unlock="unlockInvariantValue(property)"
-                        ng-attr-readonly="{{ !allowUpdate || undefined}}">
+                        ng-attr-readonly="{{property.readonly || (!allowUpdate && !property.supportsReadOnly) || undefined}}">
                     </umb-property-editor>
 
                 </umb-property>
