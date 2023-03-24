@@ -5,13 +5,13 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeItemContextBase, UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
-	private _item?: EntityTreeItemResponseModel;
+	private _item?: TreeItemPresentationModel;
 	@property({ type: Object, attribute: false })
 	get item() {
 		return this._item;
@@ -23,7 +23,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	}
 
 	@state()
-	private _childItems?: EntityTreeItemResponseModel[];
+	private _childItems?: TreeItemPresentationModel[];
 
 	@state()
 	private _href?: string;
@@ -158,7 +158,8 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			${this._childItems
 				? repeat(
 						this._childItems,
-						(item) => item.key,
+						// TODO: get unique here instead of name. we might be able to get it from the context
+						(item) => item.name,
 						(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
 				  )
 				: ''}
