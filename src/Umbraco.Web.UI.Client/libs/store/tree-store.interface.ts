@@ -6,7 +6,7 @@ export interface UmbTreeStore<T extends TreeItemPresentationModel = TreeItemPres
 	updateItem: (unique: string, item: Partial<T>) => void;
 	removeItem: (unique: string) => void;
 
-	rootItems: () => Observable<Array<T>>;
+	rootItems: Observable<Array<T>>;
 	childrenOf: (parentUnique: string | null) => Observable<Array<T>>;
 	treeItems: (uniques: Array<string>) => Observable<Array<T>>;
 }
