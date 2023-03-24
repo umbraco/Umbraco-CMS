@@ -12,16 +12,20 @@ type Story = StoryObj<UmbTreeItemBaseElement>;
 
 export const Overview: Story = {
 	args: {
-		label: 'My Tree Item',
-		icon: 'umb:home',
-		hasChildren: false,
+		item: {
+			name: 'My Tree Item',
+			icon: 'umb:home',
+			hasChildren: false,
+		},
 	},
 };
 
 export const WithChildren: Story = {
 	args: {
-		label: 'My Tree Item',
-		icon: 'umb:home',
-		hasChildren: true,
+		item: {
+			name: 'My Tree Item',
+			icon: 'umb:home',
+			hasChildren: true,
+		},
 	},
 };
