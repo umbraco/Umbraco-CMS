@@ -23,12 +23,4 @@ export const handlers = [
 		const items = umbStylesheetData.getTreeItem(paths);
 		return res(ctx.status(200), ctx.json(items));
 	}),
-
-	rest.get(umbracoPath('/stylesheet/:path'), (req, res, ctx) => {
-		const path = req.params.path as string;
-		if (!path) return;
-
-		const response = umbStylesheetData.getByPath(path);
-		return res(ctx.status(200), ctx.json(response));
-	}),
 ];
