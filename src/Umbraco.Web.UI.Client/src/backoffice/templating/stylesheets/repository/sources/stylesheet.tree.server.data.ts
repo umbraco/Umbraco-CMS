@@ -14,7 +14,7 @@ import { RepositoryTreeDataSource } from 'libs/repository/repository-tree-data-s
  * @implements {RepositoryTreeDataSource}
  */
 export class UmbStylesheetTreeServerDataSource
-	implements RepositoryTreeDataSource<PagedFileSystemTreeItemPresentationModel>
+	implements RepositoryTreeDataSource<PagedFileSystemTreeItemPresentationModel, FileSystemTreeItemPresentationModel>
 {
 	#host: UmbControllerHostInterface;
 
@@ -46,6 +46,21 @@ export class UmbStylesheetTreeServerDataSource
 		return tryExecuteAndNotify(
 			this.#host,
 			StylesheetResource.getTreeStylesheetChildren({
+				path,
+			})
+		);
+	}
+
+	/**
+	 * Fetches stylesheet items from the server
+	 * @param {(string | undefined)} path
+	 * @return {*}
+	 * @memberof UmbStylesheetTreeServerDataSource
+	 */
+	async getItems(path: Array<string>) {
+		return tryExecuteAndNotify(
+			this.#host,
+			StylesheetResource.getTreeStylesheetItem({
 				path,
 			})
 		);
