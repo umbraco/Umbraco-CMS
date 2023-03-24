@@ -71,6 +71,12 @@ stages:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            workingDirectory:  src/Umbraco.Web.UI.New.Client
+            displayName: Run npm ci
+          - script: npm run build:for:cms
+            displayName: Run New Backoffice Build
+            workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
