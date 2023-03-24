@@ -1,5 +1,5 @@
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { StylesheetDetails } from '../..';
+import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 /**
@@ -8,7 +8,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
  * @class UmbStylesheetServerDataSource
  * @implements {UmbStylesheetServerDataSource}
  */
-export class UmbStylesheetServerDataSource implements UmbDataSource<DataTypeResponseModel> {
+export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDetails> {
 	#host: UmbControllerHostInterface;
 
 	/**
@@ -18,6 +18,9 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<DataTypeResp
 	 */
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
+	}
+	createScaffold(parentKey: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
+		throw new Error('Method not implemented.');
 	}
 
 	/**
@@ -29,5 +32,16 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<DataTypeResp
 	async get(path: string) {
 		if (!path) throw new Error('Path is missing');
 		console.log('GET STYLESHEET WITH PATH', path);
+		return {};
+	}
+
+	insert(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
+		throw new Error('Method not implemented.');
+	}
+	update(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
+		throw new Error('Method not implemented.');
+	}
+	delete(key: string): Promise<DataSourceResponse<StylesheetDetails>> {
+		throw new Error('Method not implemented.');
 	}
 }
