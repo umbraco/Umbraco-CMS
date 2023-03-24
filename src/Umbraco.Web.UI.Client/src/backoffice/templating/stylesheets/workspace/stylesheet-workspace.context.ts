@@ -1,7 +1,7 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { UmbWorkspaceContextInterface } from 'src/backoffice/shared/components/workspace/workspace-context/workspace-context.interface';
+import { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbWorkspaceContext<UmbStylesheetRepository>

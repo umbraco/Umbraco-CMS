@@ -1,4 +1,4 @@
-import { UmbWorkspaceContextInterface } from '../../../../src/backoffice/shared/components/workspace/workspace-context/workspace-context.interface';
+import { UmbWorkspaceContextInterface } from '../../context/workspace-context.interface';
 import { UmbWorkspaceActionBase } from '../workspace-action-base';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
