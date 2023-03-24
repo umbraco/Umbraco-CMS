@@ -1,18 +1,18 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbTemplateModalData {
-	multiple: boolean;
-	selection: string[];
+	key: string;
+	language?: 'razor' | 'typescript' | 'javascript' | 'css' | 'markdown' | 'json' | 'html';
 }
 
 export interface UmbTemplateModalResult {
-	selection: string[] | undefined;
+	key: string;
 }
 
 export const UMB_TEMPLATE_MODAL_TOKEN = new UmbModalToken<UmbTemplateModalData, UmbTemplateModalResult>(
 	'Umb.Modal.Template',
 	{
 		type: 'sidebar',
-		size: 'large',
+		size: 'full',
 	}
 );

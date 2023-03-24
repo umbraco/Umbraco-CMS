@@ -9,8 +9,8 @@ import type { UmbDocumentTypePickerModalData } from './index';
 
 export default {
 	title: 'API/Modals/Layouts/Content Picker',
-	component: 'umb-document-picker-modal',
-	id: 'umb-document-picker-modal',
+	component: 'umb-document-type-picker-modal',
+	id: 'umb-document-type-picker-modal',
 } as Meta;
 
 const data: UmbDocumentTypePickerModalData = {

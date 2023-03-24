@@ -76,6 +76,10 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	public set allowedKeys(newKeys: Array<string>) {
 		//this.#observePickedTemplates();
 		this._allowedKeys = newKeys;
+		//this._templates = [];
+		//this._allowedKeys.forEach((key) => {
+		//	this.#setup(key);
+		//});
 	}
 
 	_defaultKey = '';
@@ -140,7 +144,10 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		});
 
 		modalHandler?.onSubmit().then((data) => {
-			console.log(data.selection);
+			if (!data.selection) return;
+			this.templates = [];
+			this.allowedKeys = data.selection;
+			this.allowedKeys.forEach((key) => this.#setup(key));
 			this.dispatchEvent(new CustomEvent('change-allowed', { bubbles: true, composed: true }));
 		});
 	}
@@ -181,12 +188,12 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		const key = (e.target as UmbTemplateCardElement).value;
 
 		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_MODAL_TOKEN, {
-			multiple: true,
-			selection: [...this.allowedKeys],
+			key: key as string,
+			language: 'razor',
 		});
 
-		modalHandler?.onSubmit().then((res) => {
-			console.log('save template');
+		modalHandler?.onSubmit().then(({ key }) => {
+			// TODO: update list
 		});
 	}
 }

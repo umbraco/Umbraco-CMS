@@ -1,9 +1,14 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UmbTreeElement } from '../../components/tree/tree.element';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { UUIInputEvent } from '@umbraco-ui/uui';
+import { UmbCodeEditor } from '../../components/code-editor';
 import { UmbTemplateModalData, UmbTemplateModalResult } from '.';
+import { UmbInputEvent } from 'libs/umb-events/input.event';
+import { TemplateResource, TemplateResponseModel } from 'libs/backend-api/src';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 //TODO: make a default tree-picker that can be used across multiple pickers
 // TODO: make use of UmbPickerLayoutBase
@@ -12,78 +17,136 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	static styles = [
 		UUITextStyles,
 		css`
-			h3 {
-				margin-left: var(--uui-size-space-5);
-				margin-right: var(--uui-size-space-5);
+			uui-box {
+				position: relative;
+				display: block;
+				height: 100%;
+				margin: var(--uui-size-layout-1);
 			}
 
-			uui-input {
+			#layout-header {
+				display: flex;
+				width: 100%;
+				align-items: center;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
+			#template-name {
+				align-items: center;
+				padding: 0 var(--uui-size-space-3);
+				flex-grow: 1;
+			}
+
+			umb-code-editor {
+				position: absolute;
+				top: 75px;
+				left: 0;
+				bottom: 0;
 				width: 100%;
 			}
 
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				margin: 16px 0;
-			}
-
-			#content-list {
+			#button-group {
 				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
+				justify-content: space-between;
 			}
 
-			.content-item {
-				cursor: pointer;
-			}
-
-			.content-item.selected {
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
+			#secondary-group {
+				display: flex;
+				gap: var(--uui-size-space-4);
 			}
 		`,
 	];
 
 	@state()
-	_selection: Array<string> = [];
+	_key = '';
 
 	@state()
-	_multiple = true;
+	_template?: TemplateResponseModel;
+
+	@query('umb-code-editor')
+	_codeEditor?: UmbCodeEditor;
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._selection = this.data?.selection ?? [];
-		this._multiple = this.data?.multiple ?? true;
+
+		if (!this.data?.key) return;
+
+		this._key = this.data.key;
+		this.#getTemplate();
 	}
 
-	private _handleSelectionChange(e: CustomEvent) {
-		e.stopPropagation();
-		const element = e.target as UmbTreeElement;
-		//TODO: Should multiple property be implemented here or be passed down into umb-tree?
-		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
+	async #getTemplate() {
+		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateByKey({ key: this._key }));
+		if (!data) return;
+
+		this._template = data;
+	}
+
+	async #saveTemplate() {
+		const { error } = await tryExecuteAndNotify(
+			this,
+			TemplateResource.putTemplateByKey({ key: this._key, requestBody: this._template })
+		);
+		if (!error) {
+			console.log(`template (${this._key}) saved successfully`);
+		}
 	}
 
 	private _submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		if (!this._template?.key) return;
+
+		this.#saveTemplate();
+		this.modalHandler?.submit({ key: this._template.key });
 	}
 
 	private _close() {
 		this.modalHandler?.reject();
 	}
 
+	#codeEditorInput(e: UmbInputEvent) {
+		e.stopPropagation();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._template.code = this._codeEditor?.code;
+	}
+
+	#templateNameInput(e: UUIInputEvent) {
+		if (!this._template) return;
+		this._template.name = e.target.value as string;
+	}
+
 	render() {
 		return html`
-			<umb-workspace-layout headline="Templates">
+			<umb-body-layout>
+				<div id="layout-header" slot="header">
+					<uui-input
+						.value="${this._template?.name}"
+						id="template-name"
+						@input="${this.#templateNameInput}"
+						label="template name">
+						<div slot="append">${this._template?.alias}</div>
+					</uui-input>
+				</div>
+
 				<uui-box>
-					<uui-input></uui-input>
-					<hr />
-					Code editor?
+					<div slot="headline" id="button-group">
+						<uui-button look="secondary" label="To be continued">Master template: To be continued</uui-button>
+						<div id="secondary-group">
+							<uui-button label="To be continued" look="secondary">To be continued</uui-button>
+							<uui-button label="To be continued" look="secondary">To be continued</uui-button>
+							<uui-button label="To be continued" look="secondary">To be continued</uui-button>
+						</div>
+					</div>
+					<umb-code-editor
+						language="${ifDefined(this.data?.language)}"
+						.code="${this._template?.content ?? ''}"
+						@input="${this.#codeEditorInput}"></umb-code-editor>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
 }

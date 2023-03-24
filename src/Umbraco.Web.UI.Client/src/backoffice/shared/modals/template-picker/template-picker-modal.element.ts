@@ -62,7 +62,6 @@ export class UmbTemplatePickerModalElement extends UmbModalBaseElement<
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		//TODO: Should multiple property be implemented here or be passed down into umb-tree?
 		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
 	}
 
@@ -74,6 +73,7 @@ export class UmbTemplatePickerModalElement extends UmbModalBaseElement<
 		this.modalHandler?.reject();
 	}
 
+	// TODO: make umb-tree have a disabled option (string array like selection)?
 	render() {
 		return html`
 			<umb-workspace-layout headline="Select Content">
