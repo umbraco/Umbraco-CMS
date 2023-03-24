@@ -38,8 +38,6 @@ jobs:
           node-version: 18
           cache: 'npm'
       - run: npm ci
-      - run: npm run wc-analyze
-      - run: npm run wc-analyze:vscode
       - run: npm run build:libs
       - uses: actions/upload-artifact@v3
         with:
