@@ -36,12 +36,7 @@ public class ContentFinderByUrl : IContentFinder
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
     public virtual Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
-        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
-        {
-            return Task.FromResult(false);
-        }
-
-        if (umbracoContext.InPreviewMode)
+        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? _))
         {
             return Task.FromResult(false);
         }
@@ -84,7 +79,7 @@ public class ContentFinderByUrl : IContentFinder
 
         IPublishedContent? node =
             umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
-        if (node != null)
+        if (node != null && (!umbracoContext.InPreviewMode || !RootHasIdName(node)))
         {
             docreq.SetPublishedContent(node);
             if (_logger.IsEnabled(LogLevel.Debug))
@@ -101,5 +96,21 @@ public class ContentFinderByUrl : IContentFinder
         }
 
         return node;
+    }
+
+    /// <summary>
+    /// Checking if the content is at root and if so if the name of the root is an integer.
+    /// Fixes https://github.com/umbraco/Umbraco-CMS/issues/13824
+    /// </summary>
+    /// <param name="node">the node to check</param>
+    /// <returns>true if the node is at the root level and the name can be parsed to an integer</returns>
+    private bool RootHasIdName(IPublishedContent node)
+    {
+        if (node.Level != 1)
+        {
+            return false;
+        }
+
+        return int.TryParse(node.Name, out _);
     }
 }
