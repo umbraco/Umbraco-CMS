@@ -9,25 +9,27 @@ import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
  * @description - General Tree Data Store
  */
 // TODO: consider if tree store could be turned into a general EntityTreeStore class?
-export class UmbTreeStoreBase extends UmbStoreBase {
-	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
+export class UmbTreeStoreBase<
+	T extends EntityTreeItemResponseModel = EntityTreeItemResponseModel
+> extends UmbStoreBase {
+	#data = new ArrayState<T>([], (x) => x.key);
 
 	/**
 	 * Appends items to the store
-	 * @param {Array<EntityTreeItemModel>} items
+	 * @param {Array<EntityTreeItemResponseModel>} items
 	 * @memberof UmbTreeStoreBase
 	 */
-	appendItems(items: Array<EntityTreeItemResponseModel>) {
+	appendItems(items: Array<T>) {
 		this.#data.append(items);
 	}
 
 	/**
 	 * Updates an item in the store
 	 * @param {string} key
-	 * @param {Partial<EntityTreeItemModel>} data
+	 * @param {Partial<EntityTreeItemResponseModel>} data
 	 * @memberof UmbTreeStoreBase
 	 */
-	updateItem(key: string, data: Partial<EntityTreeItemResponseModel>) {
+	updateItem(key: string, data: Partial<T>) {
 		this.#data.next(partialUpdateFrozenArray(this.#data.getValue(), data, (entry) => entry.key === key));
 	}
 
