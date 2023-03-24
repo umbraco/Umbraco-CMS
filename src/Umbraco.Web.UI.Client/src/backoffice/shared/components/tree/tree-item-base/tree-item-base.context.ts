@@ -14,6 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { urlFriendlyPathFromServerPath } from 'src/backoffice/templating/utils';
 
 // add type for unique function
 export type UmbTreeItemUniqueFunction<T extends TreeItemPresentationModel> = (x: T) => string | null | undefined;
@@ -126,7 +127,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 
 		new UmbObserverController(this.host, this.#sectionContext.pathname, (pathname) => {
 			if (!pathname) return;
-			const path = this.#constructPath(pathname, this.type, this.unique);
+			const path = this.constructPath(pathname, this.type, this.unique);
 			this.#path.next(path);
 		});
 	}
@@ -143,8 +144,8 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 		);
 	}
 
-	#constructPath(pathname: string, entityType: string, key: string) {
-		return `section/${pathname}/${entityType}/edit/${key}`;
+	constructPath(pathname: string, entityType: string, unique: string) {
+		return `section/${pathname}/${entityType}/edit/${unique}`;
 	}
 }
 
