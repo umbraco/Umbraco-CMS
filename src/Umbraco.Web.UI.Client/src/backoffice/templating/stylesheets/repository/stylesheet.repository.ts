@@ -7,7 +7,6 @@ import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
-	ProblemDetailsModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbStylesheetRepository
@@ -59,18 +58,24 @@ export class UmbStylesheetRepository
 		return { data, error };
 	}
 
-	async requestTreeItemsOf(path: string | null) {}
+	async requestTreeItemsOf(path: string | null) {
+		if (!path) throw new Error('Cannot request tree item with missing path');
 
-	async requestTreeItems(keys: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+		const { data, error } = await this.#treeDataSource.getChildrenOf(path);
+
+		if (data) {
+			this.#treeStore!.appendItems(data.items);
 		}
 
-		const { data, error } = await this.#treeDataSource.getItems(keys);
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
+	}
 
+	async requestTreeItems(paths: Array<string>) {
+		if (!paths) throw new Error('Paths are missing');
+		await this.#init;
+		const { data, error } = await this.#treeDataSource.getItems(paths);
 		return { data, error };
 	}
 
@@ -79,13 +84,15 @@ export class UmbStylesheetRepository
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentPath: string | null) {
+		if (!parentPath) throw new Error('Parent Path is missing');
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentPath);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(paths: Array<string>) {
+		if (!paths) throw new Error('Paths are missing');
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(paths);
 	}
 }
