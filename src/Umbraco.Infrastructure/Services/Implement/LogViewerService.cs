@@ -66,10 +66,12 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyList<ILogViewerQuery>> GetSavedLogQueriesAsync()
+    public async Task<PagedModel<ILogViewerQuery>> GetSavedLogQueriesAsync(int skip, int take)
     {
         using ICoreScope scope = _provider.CreateCoreScope(autoComplete: true);
-        return await Task.FromResult(_logViewerQueryRepository.GetMany().ToList());
+        ILogViewerQuery[] savedLogQueries = _logViewerQueryRepository.GetMany().ToArray();
+        var pagedModel = new PagedModel<ILogViewerQuery>(savedLogQueries.Length, savedLogQueries.Skip(skip).Take(take));
+        return await Task.FromResult(pagedModel);
     }
 
     /// <inheritdoc/>
@@ -146,21 +148,23 @@ public class LogViewerService : ILogViewerService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IEnumerable<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate)
+    public async Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate, int skip, int take)
     {
         LogTimePeriod logTimePeriod = GetTimePeriod(startDate, endDate);
 
         // We will need to stop the request if trying to do this on a 1GB file
         if (CanViewLogs(logTimePeriod) == false)
         {
-            return Attempt.FailWithStatus(
+            return Attempt.FailWithStatus<PagedModel<LogTemplate>, LogViewerOperationStatus>(
                 LogViewerOperationStatus.CancelledByLogsSizeValidation,
-                Enumerable.Empty<LogTemplate>());
+                null!);
         }
+
+        LogTemplate[] messageTemplates = _logViewer.GetMessageTemplates(logTimePeriod).ToArray();
 
         return Attempt.SucceedWithStatus(
             LogViewerOperationStatus.Success,
-            _logViewer.GetMessageTemplates(logTimePeriod));
+            new PagedModel<LogTemplate>(messageTemplates.Length, messageTemplates.Skip(skip).Take(take)));
     }
 
     /// <inheritdoc/>
