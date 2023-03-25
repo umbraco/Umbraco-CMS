@@ -31,7 +31,7 @@ public class QueryContentApiController : ContentApiControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Query(string? fetch = null, [FromQuery] string[]? filter = null, [FromQuery] string[]? sort = null)
+    public async Task<IActionResult> Query(string? fetch, [FromQuery] string[] filter, [FromQuery] string[] sort)
     {
         IPublishedContentCache? contentCache = GetContentCache();
         if (contentCache is null)
