@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Cms.Api.Content.Routing;
+namespace Umbraco.Cms.Api.Content.Querying;
 
 public abstract class QueryOptionBase
 {

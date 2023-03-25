@@ -2,7 +2,7 @@ using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Cms.Api.Content.Routing;
+namespace Umbraco.Cms.Api.Content.Querying.Selectors;
 
 internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 {

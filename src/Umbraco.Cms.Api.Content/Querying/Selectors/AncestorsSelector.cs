@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Content.Routing;
+namespace Umbraco.Cms.Api.Content.Querying.Selectors;
 
 internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 {

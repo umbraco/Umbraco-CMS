@@ -1,7 +1,7 @@
 using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 
-namespace Umbraco.Cms.Api.Content.Routing;
+namespace Umbraco.Cms.Api.Content.Querying.Selectors;
 
 public interface ISelectorHandler : IQueryHandler
 {
