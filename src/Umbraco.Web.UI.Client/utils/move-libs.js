@@ -10,21 +10,30 @@
 // Note: This script is not used in the build process, it is only used to transform the d.ts files
 //       when the d.ts files are copied to the dist folder
 
-import { readdirSync, readFileSync, writeFileSync, cpSync, mkdirSync, lstatSync } from 'fs';
+// Note: Updated to help copy the two JSON files generated from webcomponant analyzer tool
+// One is specific to VSCode HTMLCutomData for intellisense and the other is a more broad format used in storybook etc
 
+import { readdirSync, readFileSync, writeFileSync, cpSync, mkdirSync } from 'fs';
+
+const rootDir = './';
 const srcDir = './libs';
 const inputDir = './dist/libs';
 const outputDir = '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice/libs';
 
-// Copy package.json
+// Copy package files
 cpSync(`${srcDir}/package.json`, `${inputDir}/package.json`, { recursive: true });
+cpSync(`${srcDir}/README.md`, `${inputDir}/README.md`, { recursive: true });
+cpSync(`${rootDir}/custom-elements.json`, `${inputDir}/custom-elements.json`, { recursive: true });
+cpSync(`${rootDir}/vscode-html-custom-data.json`, `${inputDir}/vscode-html-custom-data.json`, { recursive: true });
 
 const libs = readdirSync(inputDir);
 
 // Create output folder
 try {
-	mkdirSync(outputDir, {recursive: true});
-} catch {}
+	mkdirSync(outputDir, { recursive: true });
+} catch {
+	// Ignore
+}
 
 // Transform all .d.ts files and copy all other files to the output folder
 libs.forEach(lib => {

@@ -2,6 +2,10 @@
 	"name": "@umbraco-cms/backoffice",
 	"version": "13.0.0-alpha.0",
 	"license": "MIT",
+	"keywords": [
+		"umbraco",
+		"backoffice"
+	],
 	"repository": {
 		"url": "https://github.com/umbraco/Umbraco.CMS.Backoffice",
 		"type": "git"
@@ -15,9 +19,15 @@
 		"url": "https://umbraco.com"
 	},
 	"type": "module",
+	"files": [
+		"*.d.ts",
+		"*.json",
+		"*.md"
+	],
 	"peerDependencies": {
 		"@types/uuid": "^9.0.1",
 		"@umbraco-ui/uui": "^1.2.0-rc.0",
 		"rxjs": "^7.8.0"
-	}
+	},
+	"customElements": "custom-elements.json"
 }
