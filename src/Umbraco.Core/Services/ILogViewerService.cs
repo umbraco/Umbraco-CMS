@@ -32,9 +32,11 @@ public interface ILogViewerService : IService
         string[]? logLevels = null);
 
     /// <summary>
-    ///     Get all saved log queries from your chosen data source.
+    ///     Get all saved log queries from your chosen data source as a paged model.
     /// </summary>
-    Task<IReadOnlyList<ILogViewerQuery>> GetSavedLogQueriesAsync();
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    Task<PagedModel<ILogViewerQuery>> GetSavedLogQueriesAsync(int skip, int take);
 
     /// <summary>
     ///     Gets a saved log query by name from your chosen data source.
@@ -74,13 +76,15 @@ public interface ILogViewerService : IService
     Task<Attempt<LogLevelCounts?, LogViewerOperationStatus>> GetLogLevelCountsAsync(DateTime? startDate, DateTime? endDate);
 
     /// <summary>
-    ///     Returns a list of all unique message templates and their counts.
+    ///     Returns a paged model of all unique message templates and their counts.
     ///     The attempt will fail if the log files for the given
     ///     time period are too large (more than 1GB).
     /// </summary>
     /// <param name="startDate">The start date for the date range.</param>
     /// <param name="endDate">The end date for the date range.</param>
-    Task<Attempt<IEnumerable<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate);
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    Task<Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus>> GetMessageTemplatesAsync(DateTime? startDate, DateTime? endDate, int skip, int take);
 
     /// <summary>
     ///     Get the log level values of the global minimum and the UmbracoFile one from the config file.

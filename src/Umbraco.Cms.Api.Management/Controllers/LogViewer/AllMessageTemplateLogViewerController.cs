@@ -7,15 +7,16 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-public class MessageTemplateLogViewerController : LogViewerControllerBase
+public class AllMessageTemplateLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public MessageTemplateLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
+    public AllMessageTemplateLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
         _logViewerService = logViewerService;
         _umbracoMapper = umbracoMapper;
@@ -39,16 +40,17 @@ public class MessageTemplateLogViewerController : LogViewerControllerBase
         DateTime? startDate = null,
         DateTime? endDate = null)
     {
-        Attempt<IEnumerable<LogTemplate>, LogViewerOperationStatus> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate);
+        Attempt<PagedModel<LogTemplate>, LogViewerOperationStatus> messageTemplatesAttempt = await _logViewerService.GetMessageTemplatesAsync(startDate, endDate, skip, take);
 
         if (messageTemplatesAttempt.Success)
         {
-            IEnumerable<LogTemplate> messageTemplates = messageTemplatesAttempt
-                .Result
-                .Skip(skip)
-                .Take(take);
+            var viewModel = new PagedViewModel<LogTemplateResponseModel>
+            {
+                Total = messageTemplatesAttempt.Result.Total,
+                Items = _umbracoMapper.MapEnumerable<LogTemplate, LogTemplateResponseModel>(messageTemplatesAttempt.Result.Items)
+            };
 
-            return Ok(_umbracoMapper.Map<PagedViewModel<LogTemplateResponseModel>>(messageTemplates));
+            return Ok(viewModel);
         }
 
         return LogViewerOperationStatusResult(messageTemplatesAttempt.Status);
