@@ -5,18 +5,22 @@ import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { AstNode, Editor, EditorEvent } from 'tinymce';
 import { firstValueFrom } from 'rxjs';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbMediaHelper } from '../../property-editors/uis/tiny-mce/media-helper.service';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store';
 import { TinyMcePluginArguments } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-plugin';
+import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
+
+// TODO => determine optimal method for including tiny. Currently using public assets
+// as we need to ship all core plugins to allow implementors to register these. Have not considered
+// other locations for serving these assests - might make better sense in /libs
 import '../../../../../public-assets/tiny-mce/tinymce.min.js';
 
 declare global {
@@ -58,9 +62,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@property()
 	configuration: Array<DataTypePropertyPresentationModel> = [];
 
-	// TODO => type this
+	// TODO => create interface when we know what shape that will take
+	// TinyMCE provides the EditorOptions interface, but all props are required 
 	@state()
-	private _configObject: any = {};
+	private _configObject = {};
 
 	private _styleFormats = [
 		{
@@ -198,7 +203,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#currentUserStore?: UmbCurrentUserStore;
 	modalContext!: UmbModalContext;
-	#mediaHelper = new UmbMediaHelper(this);
+	#mediaHelper = new UmbMediaHelper();
 	currentUser?: UserDetails;
 
 	protected getFormElement() {
@@ -290,7 +295,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		if (this.#isMediaPickerEnabled()) {
 			Object.assign(tinyConfig, {
 				// Update the TinyMCE Config object to allow pasting
-				images_upload_handler: this.#mediaHelper.uploadImageHandler,
+				images_upload_handler: this.#uploadImageHandler,
 				automatic_uploads: false,
 				images_replace_blob_uris: false,
 				// This allows images to be pasted in & stored as Base64 until they get uploaded to server
@@ -308,6 +313,64 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		args.content = args.content.replace(/<\s*b([^>]*)>(.*?)<\s*\/\s*b([^>]*)>/g, '<strong$1>$2</strong$3>');
 		// convert i to em
 		args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, '<em$1>$2</em$3>');
+	}
+	
+	// TODO => arg types
+	#uploadImageHandler(blobInfo: any, progress: any) {
+		return new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', window.Umbraco?.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
+
+			xhr.onloadstart = () => this.dispatchEvent(new CustomEvent('rte.file.uploading'));
+
+			xhr.onloadend = () => this.dispatchEvent(new CustomEvent('rte.file.uploaded'));
+
+			xhr.upload.onprogress = (e) => progress((e.loaded / e.total) * 100);
+
+			xhr.onerror = () => reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+
+			xhr.onload = () => {
+				if (xhr.status < 200 || xhr.status >= 300) {
+					reject('HTTP Error: ' + xhr.status);
+					return;
+				}
+
+				// TODO => confirm this is required given no more Angular handling XHR/HTTP
+				const data = xhr.responseText.split('\n');
+
+				if (data.length <= 1) {
+					reject('Unrecognized text string: ' + data);
+					return;
+				}
+
+				let json: { [key: string]: string } = {};
+
+				try {
+					json = JSON.parse(data[1]);
+				} catch (e: any) {
+					reject('Invalid JSON: ' + data + ' - ' + e.message);
+					return;
+				}
+
+				if (!json || typeof json.tmpLocation !== 'string') {
+					reject('Invalid JSON: ' + data);
+					return;
+				}
+
+				// Put temp location into localstorage (used to update the img with data-tmpimg later on)
+				localStorage.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
+
+				// We set the img src url to be the same as we started
+				// The Blob URI is stored in TinyMce's cache
+				// so the img still shows in the editor
+				resolve(blobInfo.blobUri());
+			};
+
+			const formData = new FormData();
+			formData.append('file', blobInfo.blob(), blobInfo.blob().name);
+
+			xhr.send(formData);
+		});
 	}
 
 	/**

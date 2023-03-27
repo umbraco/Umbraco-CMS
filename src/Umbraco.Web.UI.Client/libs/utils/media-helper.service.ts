@@ -1,18 +1,10 @@
-// TODO => very much temporary. Need to determine where to provide share services like this one, which
-// will be useful for downstream implementors...
+// TODO => this is NOT a full reimplementation of the existing media helper service, currently
+// contains only functions referenced by the TinyMCE editor
 
 import { Editor, EditorEvent } from "tinymce";
-import { UmbElementMixinInterface } from "@umbraco-cms/backoffice/element";
-import { UmbLitElement } from "@umbraco-cms/internal/lit-element";
 
-export class UmbMediaHelper {
+export class UmbMediaHelper {	
 
-	#host: UmbLitElement | UmbElementMixinInterface;
-
-	constructor(host: UmbLitElement | UmbElementMixinInterface) {
-		this.#host = host;
-	}
-	
 	/**
 	 * 
 	 * @param editor 
@@ -197,68 +189,5 @@ export class UmbMediaHelper {
 		});
 
 		e.target.setAttribute('data-mce-src', resizedPath);
-	}
-
-	/**
-	 * 
-	 * @param blobInfo 
-	 * @param progress 
-	 * @returns 
-	 */
-	uploadImageHandler(blobInfo: any, progress: any) {
-		return new Promise((resolve, reject) => {
-			const xhr = new XMLHttpRequest();
-			xhr.open('POST', window.Umbraco?.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
-
-			xhr.onloadstart = () => this.#host.dispatchEvent(new CustomEvent('rte.file.uploading'));
-
-			xhr.onloadend = () => this.#host.dispatchEvent(new CustomEvent('rte.file.uploaded'));
-
-			xhr.upload.onprogress = (e) => progress((e.loaded / e.total) * 100);
-
-			xhr.onerror = () => reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
-
-			xhr.onload = () => {
-				if (xhr.status < 200 || xhr.status >= 300) {
-					reject('HTTP Error: ' + xhr.status);
-					return;
-				}
-
-				// TODO => confirm this is required given no more Angular handling XHR/HTTP
-				const data = xhr.responseText.split('\n');
-
-				if (data.length <= 1) {
-					reject('Unrecognized text string: ' + data);
-					return;
-				}
-
-				let json: { [key: string]: string } = {};
-
-				try {
-					json = JSON.parse(data[1]);
-				} catch (e: any) {
-					reject('Invalid JSON: ' + data + ' - ' + e.message);
-					return;
-				}
-
-				if (!json || typeof json.tmpLocation !== 'string') {
-					reject('Invalid JSON: ' + data);
-					return;
-				}
-
-				// Put temp location into localstorage (used to update the img with data-tmpimg later on)
-				localStorage.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
-
-				// We set the img src url to be the same as we started
-				// The Blob URI is stored in TinyMce's cache
-				// so the img still shows in the editor
-				resolve(blobInfo.blobUri());
-			};
-
-			const formData = new FormData();
-			formData.append('file', blobInfo.blob(), blobInfo.blob().name);
-
-			xhr.send(formData);
-		});
 	}
 }

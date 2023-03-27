@@ -36,7 +36,7 @@ const modals: Array<ManifestModal> = [
 		alias: 'Umb.Modal.CodeEditor',
 		name: 'Code Editor Modal',
 		loader: () => import('./code-editor/code-editor-modal.element'),
-	}
+	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.EmbeddedMedia',
