@@ -430,6 +430,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
+        builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
 
         return builder;
     }

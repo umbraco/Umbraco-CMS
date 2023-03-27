@@ -3,14 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByIdContentApiController : ContentApiControllerBase
 {
-    public ByIdContentApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiContentBuilder apiContentBuilder)
-        : base(publishedSnapshotAccessor, apiContentBuilder)
+    public ByIdContentApiController(IApiPublishedContentCache apiPublishedContentCache, IApiContentBuilder apiContentBuilder)
+        : base(apiPublishedContentCache, apiContentBuilder)
     {
     }
 
@@ -26,14 +25,7 @@ public class ByIdContentApiController : ContentApiControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ById(Guid id)
     {
-        IPublishedContentCache? contentCache = GetContentCache();
-
-        if (contentCache is null)
-        {
-            return BadRequest(ContentCacheNotFoundProblemDetails());
-        }
-
-        IPublishedContent? contentItem = contentCache.GetById(id);
+        IPublishedContent? contentItem = ApiPublishedContentCache.GetById(id);
 
         if (contentItem is null)
         {

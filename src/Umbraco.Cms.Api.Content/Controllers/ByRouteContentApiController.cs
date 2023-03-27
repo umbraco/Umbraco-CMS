@@ -3,33 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByRouteContentApiController : ContentApiControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
-    private readonly IRequestPreviewService _requestPreviewService;
 
     public ByRouteContentApiController(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IApiPublishedContentCache apiPublishedContentCache,
         IApiContentBuilder apiContentBuilder,
-        IRequestRoutingService requestRoutingService,
-        IRequestPreviewService requestPreviewService)
-        : base(publishedSnapshotAccessor, apiContentBuilder)
-    {
-        _requestRoutingService = requestRoutingService;
-        _requestPreviewService = requestPreviewService;
-    }
+        IRequestRoutingService requestRoutingService)
+        : base(apiPublishedContentCache, apiContentBuilder)
+        => _requestRoutingService = requestRoutingService;
 
     /// <summary>
     ///     Gets a content item by route.
     /// </summary>
     /// <param name="path">The path to the content item.</param>
     /// <remarks>
-    ///     Optional path for the start node of the content item
-    ///     can be added through a "start-node" header.
+    ///     Optional URL segment for the root content item
+    ///     can be added through the "start-item" header.
     /// </remarks>
     /// <returns>The content item or not found result.</returns>
     [HttpGet("item/{*path}")]
@@ -39,16 +33,9 @@ public class ByRouteContentApiController : ContentApiControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "/")
     {
-        IPublishedContentCache? contentCache = GetContentCache();
-
-        if (contentCache is null)
-        {
-            return BadRequest(ContentCacheNotFoundProblemDetails());
-        }
-
         var contentRoute = _requestRoutingService.GetContentRoute(path);
 
-        IPublishedContent? contentItem = contentCache.GetByRoute(_requestPreviewService.IsPreview(), contentRoute);
+        IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
 
         if (contentItem is null)
         {
