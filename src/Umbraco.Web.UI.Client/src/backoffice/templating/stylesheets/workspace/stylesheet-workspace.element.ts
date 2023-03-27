@@ -2,10 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
-import { serverFilePathFromUrlFriendlyPath } from '../../utils';
 import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element';
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { serverPathFromUrlFriendlyPath } from '../../utils';
 
 @customElement('umb-stylesheet-workspace')
 export class UmbStylesheetWorkspaceElement extends UmbLitElement {
@@ -30,7 +30,7 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				const path = info.match.params.path;
-				const serverPath = serverFilePathFromUrlFriendlyPath(path);
+				const serverPath = serverPathFromUrlFriendlyPath(path);
 				this.#workspaceContext.load(serverPath);
 			},
 		},

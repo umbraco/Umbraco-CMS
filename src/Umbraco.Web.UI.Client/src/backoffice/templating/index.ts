@@ -4,8 +4,6 @@ import { manifests as stylesheetManifests } from './stylesheets/manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
-import './components';
-
 export const manifests = [...menuManifests, ...templateManifests, ...stylesheetManifests];
 
 const registerExtensions = (manifests: Array<ManifestTypes>) => {
