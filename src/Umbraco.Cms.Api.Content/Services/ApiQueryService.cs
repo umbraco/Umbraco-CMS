@@ -1,10 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Examine;
 using Examine.Search;
-using Umbraco.Cms.Api.Content.Routing;
+using Umbraco.Cms.Api.Content.Querying.Filters;
+using Umbraco.Cms.Api.Content.Querying.Selectors;
+using Umbraco.Cms.Api.Content.Querying.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
 
 namespace Umbraco.Cms.Api.Content.Services;
+
 internal sealed class ApiQueryService : IApiQueryService
 {
     private readonly QueryHandlerCollection _queryHandlers;
@@ -16,54 +22,84 @@ internal sealed class ApiQueryService : IApiQueryService
         _examineManager = examineManager;
     }
 
-    public IEnumerable<Guid> ExecuteQuery(string? fetch, string[]? filter, string[]? sort)
+    public IEnumerable<Guid> ExecuteQuery(string? fetch, string[] filters, string[] sorts)
     {
-        var queryHandler = fetch is not null ? _queryHandlers.FirstOrDefault(h => h.CanHandle(fetch)) as ISelectorHandler : null;
-
-        // TODO: If no handler, get everything from the index
-        if (queryHandler is null)
-        {
-            return Enumerable.Empty<Guid>();
-        }
-
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentAPIIndexName, out IIndex? apiIndex))
         {
             return Enumerable.Empty<Guid>();
         }
 
         IQuery baseQuery = apiIndex.Searcher.CreateQuery();
-        IBooleanOperation? queryOperation = queryHandler
-            .BuildApiIndexQuery(baseQuery, fetch!);
+
+        // Handle Selecting
+        IBooleanOperation? queryOperation = HandleSelector(fetch, baseQuery);
 
         if (queryOperation is null)
         {
             return Enumerable.Empty<Guid>();
         }
 
-        // if (filter is not null)
-        // {
-        //     var alias = GetContentTypeAliasFromFilter(filter);
-        //
-        //     if (alias is not null)
-        //     {
-        //         queryOperation = queryOperation
-        //             .And()
-        //             .Field("__NodeTypeAlias", alias); // use that for now
-        //     }
-        // }
+        // Handle Filtering
+        HandleFiltering(filters, baseQuery);
 
-        ISearchResults results = queryOperation.Execute();
+        // Handle Sorting
+        var sortQuery = HandleSorting(sorts, queryOperation);
 
-        return results.Select(x => Guid.Parse(x.Id));
+        //ISearchResults? results = sortQuery is not null ? sortQuery.Execute() : queryOperation.Execute();
+        ISearchResults? results = sortQuery is not null ? sortQuery.Execute() : DefaultSort(queryOperation)?.Execute();
+
+        return results!.Select(x => Guid.Parse(x.Id));
     }
 
-    private string? GetContentTypeAliasFromFilter(string filterValue)
+    private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
     {
-        if (!filterValue.StartsWith("contentType", StringComparison.OrdinalIgnoreCase))
+        IBooleanOperation? queryOperation;
+
+        if (fetch is not null &&
+            _queryHandlers.FirstOrDefault(h => h.CanHandle(fetch)) is ISelectorHandler selectorHandler)
         {
-            return null;
+            queryOperation = selectorHandler
+                .BuildSelectorIndexQuery(baseQuery, fetch);
+        }
+        else
+        {
+            // TODO: If no params or no fetch value, get everything from the index
+            queryOperation = baseQuery.Field("__IndexType", "content");
         }
 
-        return filterValue.Substring(filterValue.IndexOf(':', StringComparison.Ordinal) + 1);
+        return queryOperation;
+    }
+
+    private void HandleFiltering(IEnumerable<string> filters, IQuery baseQuery)
+    {
+        foreach (var filter in filters)
+        {
+            if (_queryHandlers.FirstOrDefault(h => h.CanHandle(filter)) is IFilterHandler filterHandler)
+            {
+                filterHandler.BuildFilterIndexQuery(baseQuery, filter);
+            }
+        }
+    }
+
+    private IOrdering? HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
+    {
+        IOrdering? orderingQuery = null;
+
+        foreach (var sort in sorts)
+        {
+            if (_queryHandlers.FirstOrDefault(h => h.CanHandle(sort)) is ISortHandler sortHandler)
+            {
+                orderingQuery = sortHandler.BuildSortIndexQuery(queryCriteria, sort);
+            }
+        }
+
+        return orderingQuery;
+    }
+
+    private IOrdering? DefaultSort(IBooleanOperation queryCriteria)
+    {
+        var defaultSorts = new[] { "path:asc", "sortOrder:asc" };
+
+        return HandleSorting(defaultSorts, queryCriteria);
     }
 }
