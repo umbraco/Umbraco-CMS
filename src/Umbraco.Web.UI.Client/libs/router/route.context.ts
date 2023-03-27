@@ -11,7 +11,6 @@ import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms
 const EmptyDiv = document.createElement('div');
 
 export class UmbRouteContext {
-	//#host: UmbControllerHostInterface;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
 	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
 	#contextRoutes: UmbRoute[] = [];
@@ -19,13 +18,7 @@ export class UmbRouteContext {
 	#activeModalPath?: string;
 
 	constructor(host: UmbControllerHostInterface, private _onGotModals: (contextRoutes: any) => void) {
-		//this.#host = host;
 		new UmbContextProviderController(host, UMB_ROUTE_CONTEXT_TOKEN, this);
-		/*new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (context) => {
-			console.log('got a parent', this === context, this, context);
-			// Why did i want a parent route? was it to capture and inherit routes?
-			// This is maybe not so necessary as it stands right now, so lets see how it goes.
-		});*/
 		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			this.#modalContext = context;
 			this.#generateContextRoutes();
