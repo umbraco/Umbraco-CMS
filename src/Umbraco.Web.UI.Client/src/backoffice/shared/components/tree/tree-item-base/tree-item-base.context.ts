@@ -5,6 +5,7 @@ import {
 } from '../../section/section-sidebar/section-sidebar.context';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import { UmbTreeContextBase } from '../tree.context';
+import { UmbTreeItemContext } from '../tree-item.context.interface';
 import { BooleanState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import {
@@ -14,12 +15,13 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { urlFriendlyPathFromServerFilePath } from 'src/backoffice/templating/utils';
 
 // add type for unique function
 export type UmbTreeItemUniqueFunction<T extends TreeItemPresentationModel> = (x: T) => string | null | undefined;
 
-export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeItemPresentationModel> {
+export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeItemPresentationModel>
+	implements UmbTreeItemContext<T>
+{
 	public host: UmbControllerHostInterface;
 	public treeItem: T;
 	public unique: string;
@@ -144,6 +146,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 		);
 	}
 
+	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string) {
 		return `section/${pathname}/${entityType}/edit/${unique}`;
 	}

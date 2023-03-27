@@ -92,7 +92,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		const { asObservable } = await this.#treeItemContext.requestChildren();
 		if (!asObservable) return;
 
-		this.observe(asObservable(), (childItems) => {
+		this.observe(asObservable(), (childItems: any) => {
 			this._childItems = childItems;
 		});
 	}

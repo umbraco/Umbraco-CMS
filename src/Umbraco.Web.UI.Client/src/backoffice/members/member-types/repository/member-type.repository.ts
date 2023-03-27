@@ -11,8 +11,9 @@ import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 
 // TODO => use correct type when available
 type ItemType = any;
+type TreeItemType = any;
 
-export class UmbMemberTypeRepository implements UmbTreeRepository, UmbDetailRepository<ItemType> {
+export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostInterface;

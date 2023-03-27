@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbStylesheetRepository
-	implements UmbTreeRepository<PagedFileSystemTreeItemPresentationModel, FileSystemTreeItemPresentationModel>
+	implements UmbTreeRepository<FileSystemTreeItemPresentationModel, PagedFileSystemTreeItemPresentationModel>
 {
 	#host;
 	#dataSource;

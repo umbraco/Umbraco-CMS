@@ -10,7 +10,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 type ItemType = DocumentResponseModel;
 
-export class UmbDocumentRepository implements UmbTreeRepository, UmbDetailRepository<ItemType> {
+export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostInterface;

@@ -13,7 +13,7 @@ export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel =
 	private _entityType: string | null;
 	private _entityKey: string | null;
 
-	#repository?: UmbTreeRepository;
+	#repository?: UmbTreeRepository<any>;
 
 	private _store?: any;
 	protected _dataObserver?: UmbObserverController<DataType[]>;
