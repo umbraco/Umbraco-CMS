@@ -47,7 +47,7 @@ export class UmbExtensionRegistry {
 		const nextData = this._kinds
 			.getValue()
 			.filter(
-				(k) => k.matchType !== (kind as ManifestKind).matchType && k.matchKind !== (kind as ManifestKind).matchKind
+				(k) => !(k.matchType === (kind as ManifestKind).matchType && k.matchKind === (kind as ManifestKind).matchKind)
 			);
 		nextData.push(kind as ManifestKind);
 		this._kinds.next(nextData);
