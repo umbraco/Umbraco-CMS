@@ -125,7 +125,10 @@ export class UmbExtensionRegistry {
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<Key>
 	>(type: Key, alias: string) {
 		return combineLatest([
-			this.extensions.pipe(map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias))),
+			this.extensions.pipe(
+				map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
+				distinctUntilChanged(extensionSingleMemoization)
+			),
 			this._kindsOfType(type),
 		]).pipe(
 			map(([ext, kinds]) => {
