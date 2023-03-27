@@ -106,7 +106,7 @@ public class ConfigurationFieldAttribute : Attribute
     }
 
     /// <summary>
-    ///     Gets or sets the key of the field.
+    ///     Gets the key of the field.
     /// </summary>
     /// <remarks>
     ///     When null or empty, the <see cref="ConfigurationEditor" /> should derive a key

@@ -22,6 +22,8 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder AddUmbracoSqlServerSupport(this IUmbracoBuilder builder)
     {
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificMapperFactory, SqlServerSpecificMapperFactory>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>());
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>());
@@ -44,6 +46,8 @@ public static class UmbracoBuilderExtensions
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);
+
+        NPocoSqlServerDatabaseExtensions.ConfigureNPocoBulkExtensions();
 
         // Support provider name set by the configuration API for connection string environment variables
         builder.Services.ConfigureAll<ConnectionStrings>(options =>

@@ -47,7 +47,8 @@ public class ManifestParserTests
             new JsonNetSerializer(),
             Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
-            Mock.Of<IDataValueEditorFactory>());
+            Mock.Of<IDataValueEditorFactory>(),
+            Mock.Of<IManifestFileProviderFactory>());
     }
 
     private ManifestParser _parser;

@@ -62,9 +62,9 @@ public class MemberAuthenticationBuilder : AuthenticationBuilder
     private class EnsureMemberScheme<TOptions> : IPostConfigureOptions<TOptions>
         where TOptions : RemoteAuthenticationOptions
     {
-        public void PostConfigure(string name, TOptions options)
+        public void PostConfigure(string? name, TOptions options)
         {
-            if (!name.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix))
+            if (name is null || !name.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix))
             {
                 return;
             }

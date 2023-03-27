@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Configuration.Grid;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DataContract]
+[Obsolete("The grid is obsolete, will be removed in V13")]
 public class GridEditor : IGridEditorConfig
 {
     public GridEditor()

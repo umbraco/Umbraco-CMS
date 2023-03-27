@@ -1,6 +1,6 @@
 using System.Data;
 using System.Data.Common;
-using Microsoft.Data.SqlClient;
+using System.Globalization;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -83,7 +83,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1222)
+            catch (SqliteException ex) when (ex.SqliteErrorCode == SQLitePCL.raw.SQLITE_BUSY)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
@@ -142,7 +142,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
                     "SqliteDistributedLockingMechanism requires a transaction to function.");
             }
 
-            var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId}";
+            var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId.ToString(CultureInfo.InvariantCulture)}";
 
             DbCommand command = db.CreateCommand(db.Connection, CommandType.Text, query);
 

@@ -93,13 +93,13 @@
               </umb-media-preview>
 
               <div class="umb-media-entry-editor__imageholder-actions">
-                <button class="btn btn-link" ng-click="vm.repickMedia()">
+                <button ng-if="vm.mediaEntry.mediaKey" class="btn btn-link" ng-click="vm.repickMedia()">
                   <umb-icon icon="icon-wrong"></umb-icon>
                   <localize key="mediaPicker_changeMedia"
                     >Replace media</localize
                   >
                 </button>
-                <button class="btn btn-link" ng-click="vm.openMedia()">
+                <button ng-if="vm.mediaEntry.mediaKey" class="btn btn-link" ng-click="vm.openMedia()">
                   <umb-icon icon="icon-out"></umb-icon>
                   <localize key="mediaPicker_openMedia">Open media</localize>
                 </button>

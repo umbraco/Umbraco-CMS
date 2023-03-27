@@ -1,36 +1,26 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.ManagementApi.ViewModels.Installer;
 
-[DataContract(Name = "databaseInstall")]
 public class DatabaseInstallViewModel
 {
-    [DataMember(Name = "id")]
     [Required]
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
-    [DataMember(Name = "providerName")]
     [Required]
-    public string? ProviderName { get; init; }
+    public string? ProviderName { get; set; }
 
-    [DataMember(Name = "server")]
-    public string? Server { get; init; }
+    public string? Server { get; set; }
 
-    [DataMember(Name = "name")]
-    public string? Name { get; init; }
+    public string? Name { get; set; }
 
-    [DataMember(Name = "username")]
-    public string? Username { get; init; }
+    public string? Username { get; set; }
 
-    [DataMember(Name = "password")]
     [PasswordPropertyText]
-    public string? Password { get; init; }
+    public string? Password { get; set; }
 
-    [DataMember(Name = "useIntegratedAuthentication")]
-    public bool UseIntegratedAuthentication { get; init; }
+    public bool UseIntegratedAuthentication { get; set; }
 
-    [DataMember(Name = "connectionString")]
-    public string? ConnectionString { get; init; }
+    public string? ConnectionString { get; set; }
 }

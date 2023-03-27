@@ -15,7 +15,7 @@ internal class OptionsMonitorAdapter<T> : IOptionsMonitor<T>
 
     public T CurrentValue { get; }
 
-    public T Get(string name) => CurrentValue;
+    public T Get(string? name) => CurrentValue;
 
     public IDisposable OnChange(Action<T, string> listener) => throw new NotImplementedException();
 }

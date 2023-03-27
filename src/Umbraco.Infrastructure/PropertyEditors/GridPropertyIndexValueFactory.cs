@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// <summary>
     /// Parses the grid value into indexable values
     /// </summary>
+    [Obsolete("The grid is obsolete, will be removed in V13")]
     public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
         public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)

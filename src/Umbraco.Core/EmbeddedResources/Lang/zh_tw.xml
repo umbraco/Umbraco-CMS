@@ -2,7 +2,7 @@
 <language alias="zh_tw" intName="Chinese (Taiwan)" localName="中文（正體，台灣）" lcid="0404" culture="zh-TW">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">管理主機名稱</key>
@@ -145,7 +145,7 @@
     <key alias="childItems" version="7.0">子項目</key>
     <key alias="target" version="7.0">目標</key>
     <key alias="scheduledPublishServerTime">預計發表的時間（伺服器端）</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">這是什麼意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">這是什麼意思？</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">點選以便上傳</key>
@@ -753,7 +753,6 @@
     <key alias="reset">重設</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">當前版本</key>
     <key alias="diffHelp"><![CDATA[這顯示目前版本以及所選版本的差異。<br /><del>紅色</del> 文字將不會顯示於所選版本，而<ins>綠色</ins>表示增加部分。]]></key>
     <key alias="documentRolledBack">文檔已回滾</key>
     <key alias="htmlHelp">這顯示所選版本的HTML格式，如果您想要比較兩版本的差異，請使用比較檢視</key>

@@ -736,7 +736,7 @@ internal abstract class BulkDataReader : IDataReader
     /// </summary>
     protected BulkDataReader()
     {
-        _schemaTable.Locale = CultureInfo.InvariantCulture;
+        _schemaTable!.Locale = CultureInfo.InvariantCulture;
 
         DataColumnCollection columns = _schemaTable.Columns;
 

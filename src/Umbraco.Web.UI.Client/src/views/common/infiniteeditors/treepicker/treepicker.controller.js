@@ -196,7 +196,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                         {
                             var filter = Utilities.fromJson($scope.model.filter);
                             $scope.model.filter = function (node){ return _.isMatch(node.metaData, filter);};
-                        }            
+                        }
                         else
                         {
                             //convert to object
@@ -314,6 +314,15 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             }
         }
 
+        function getRootEntity(id, name) {
+          return {
+            icon: "icon-folder",
+            alias: null,
+            id,
+            name
+          };
+        }
+
         //wires up selection
         function nodeSelectHandler(args) {
             args.event.preventDefault();
@@ -351,90 +360,66 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     $scope.model.select(args.node);
                 }
                 else {
-                    select(args.node.name, args.node.id);
-                    //toggle checked state
-                    args.node.selected = args.node.selected === true ? false : true;
-                }
+                    // If this is a container, construct a base entity to return immediately
+                    let entity = undefined;
+                    if (args.node.nodeType === "container") {
+                        entity = args.node;
 
+                        // mimic the server response from the EntityController
+                        entity.id = parseInt(entity.id, 10);
+                        entity.metaData.IsContainer = true;
+                        // end-mimic
+                    }
+
+                    // apply the item to the model
+                    select(args.node.name, args.node.id, entity);
+
+                    //toggle checked state
+                    args.node.selected = !args.node.selected;
+                }
             }
         }
 
         /** Method used for selecting a node */
         function select(text, id, entity) {
-            //if we get the root, we just return a constructed entity, no need for server data
-            if (id < 0) {
-
-                var rootNode = {
-                    alias: null,
-                    icon: "icon-folder",
-                    id: id,
-                    name: text
-                };
-
-                if (vm.multiPicker) {
-                    if (entity) {
-                        multiSelectItem(entity);
-                    }
-                    else {
-                        multiSelectItem(rootNode);
-                    }
-                }
-                else {
-                    $scope.model.selection.push(rootNode);
-                    $scope.model.submit($scope.model);
-                }
+            // we do not need to query the server in case an entity is provided
+            if (entity) {
+              applySelect(entity);
             }
+            // nor do we need to query if a root entity was selected (id < 0)
+            else if (id < 0) {
+              applySelect(entity || getRootEntity(id, text));
+            }
+            // otherwise we have to get it from the server
             else {
+              entityResource.getById(id, vm.entityType).then(function (ent) {
+                  applySelect(ent);
+              });
+            }
+        }
 
-                if (vm.multiPicker) {
-
-                    if (entity) {
-                        multiSelectItem(entity);
-                    }
-                    else {
-                        //otherwise we have to get it from the server
-                        entityResource.getById(id, vm.entityType).then(function (ent) {
-                            multiSelectItem(ent);
-                        });
-                    }
-
-                }
-                else {
-
-                    hideSearch();
-
-                    //if an entity has been passed in, use it
-                    if (entity) {
-                        $scope.model.selection.push(entity);
-                        $scope.model.submit($scope.model);
-                    }
-                    else {
-                        //otherwise we have to get it from the server
-                        entityResource.getById(id, vm.entityType).then(function (ent) {
-                            $scope.model.selection.push(ent);
-                            $scope.model.submit($scope.model);
-                        });
-                    }
-                }
+        /** Method used to apply the selected entity to selections and submit the form if need-be **/
+        function applySelect(entity) {
+            multiSelectItem(entity);
+            if (!vm.multiPicker) {
+              $scope.model.submit($scope.model);
             }
         }
 
         function multiSelectItem(item) {
 
-            var found = false;
-            var foundIndex = 0;
-
-            if ($scope.model.selection.length > 0) {
-                for (var i = 0; $scope.model.selection.length > i; i++) {
-                    var selectedItem = $scope.model.selection[i];
-                    if (selectedItem.id === parseInt(item.id)) {
-                        found = true;
-                        foundIndex = i;
-                    }
-                }
+            if (!vm.multiPicker) {
+              $scope.model.selection.length = 0;
+              hideSearch();
             }
 
-            if (found) {
+            var foundIndex = -1;
+
+            if ($scope.model.selection.length) {
+                foundIndex = $scope.model.selection.findIndex(ent => ent.id === parseInt(item.id, 10));
+            }
+
+            if (foundIndex !== -1) {
                 $scope.model.selection.splice(foundIndex, 1);
             }
             else {
@@ -545,7 +530,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
 
                 //we need to ensure that any currently displayed nodes that get selected
                 // from the search get updated to have a check box!
-                function checkChildren(children) {
+                const checkChildren = function(children) {
                     children.forEach(child => {
                         //check if the id is in the selection, if so ensure it's flagged as selected
                         var exists = vm.searchInfo.selectedSearchResults.find(selected => child.id === selected.id);
@@ -592,7 +577,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                                             isSearchResult: true
                                         },
                                         hasChildren: false,
-                                        parent: () => parent                                        
+                                        parent: () => parent
                                     });
                                 }
                             });
@@ -620,12 +605,12 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
             performFiltering(results);
 
             //now actually remove all filtered items so they are not even displayed
-            results = results.filter(item => !item.filtered);          
+            results = results.filter(item => !item.filtered);
             vm.searchInfo.results = results;
 
             //sync with the curr selected results
             vm.searchInfo.results.forEach(result => {
-                var exists = $scope.model.selection.find(item => result.id === item.id);               
+                var exists = $scope.model.selection.find(item => result.id === item.id);
                 if (exists) {
                     result.selected = true;
                 }

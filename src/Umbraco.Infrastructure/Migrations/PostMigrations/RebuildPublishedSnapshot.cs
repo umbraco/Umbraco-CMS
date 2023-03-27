@@ -3,6 +3,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 /// <summary>
 ///     Rebuilds the published snapshot.
 /// </summary>
+[Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
 public class RebuildPublishedSnapshot : MigrationBase
 {
     private readonly IPublishedSnapshotRebuilder _rebuilder;

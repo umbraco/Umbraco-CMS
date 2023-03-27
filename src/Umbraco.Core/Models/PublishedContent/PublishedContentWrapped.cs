@@ -54,7 +54,7 @@ public abstract class PublishedContentWrapped : IPublishedContent
     public IPublishedContent Unwrap() => _content;
 
     /// <inheritdoc />
-    public virtual string? Name => _content.Name;
+    public virtual string Name => _content.Name;
 
     /// <inheritdoc />
     public virtual string? UrlSegment => _content.UrlSegment;
@@ -99,10 +99,10 @@ public abstract class PublishedContentWrapped : IPublishedContent
     public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
 
     /// <inheritdoc />
-    public virtual IEnumerable<IPublishedContent>? Children => _content.Children;
+    public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
     /// <inheritdoc />
-    public virtual IEnumerable<IPublishedContent>? ChildrenForAllCultures => _content.ChildrenForAllCultures;
+    public virtual IEnumerable<IPublishedContent> ChildrenForAllCultures => _content.ChildrenForAllCultures;
 
     /// <inheritdoc cref="IPublishedElement.Properties" />
     public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;

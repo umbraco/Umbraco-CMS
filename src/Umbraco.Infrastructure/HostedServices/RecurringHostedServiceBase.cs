@@ -45,13 +45,6 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         _delay = delay;
     }
 
-    // Scheduled for removal in V11
-    [Obsolete("Please use constructor that takes an ILogger instead")]
-    protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
-        : this(null, period, delay)
-    {
-    }
-
     /// <inheritdoc />
     public void Dispose()
     {
@@ -118,7 +111,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     {
         using (!ExecutionContext.IsFlowSuppressed() ? (IDisposable)ExecutionContext.SuppressFlow() : null)
         {
-            _timer = new Timer(ExecuteAsync, null, (int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
+            _timer = new Timer(ExecuteAsync, null, _delay, _period);
         }
 
         return Task.CompletedTask;
@@ -158,7 +151,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         {
             // Resume now that the task is complete - Note we use period in both because we don't want to execute again after the delay.
             // So first execution is after _delay, and the we wait _period between each
-            _timer?.Change((int)_period.TotalMilliseconds, (int)_period.TotalMilliseconds);
+            _timer?.Change(_period, _period);
         }
     }
 

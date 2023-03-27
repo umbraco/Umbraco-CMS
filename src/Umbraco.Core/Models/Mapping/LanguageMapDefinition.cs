@@ -9,8 +9,7 @@ public class LanguageMapDefinition : IMapDefinition
     {
         mapper.Define<ILanguage, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<ILanguage, ContentEditing.Language>((source, context) => new ContentEditing.Language(), Map);
-        mapper.Define<IEnumerable<ILanguage>, IEnumerable<ContentEditing.Language>>(
-            (source, context) => new List<ContentEditing.Language>(), Map);
+        mapper.Define<IEnumerable<ILanguage>, IEnumerable<ContentEditing.Language>>((source, context) => new List<ContentEditing.Language>(), Map);
     }
 
     // Umbraco.Code.MapAll -Udi -Path -Trashed -AdditionalData -Icon

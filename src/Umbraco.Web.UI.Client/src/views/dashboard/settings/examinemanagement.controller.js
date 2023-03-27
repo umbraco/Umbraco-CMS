@@ -85,9 +85,11 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
     function nextSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
     }
+    
     function prevSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
     }
+    
     function goToPageSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
     }
@@ -137,11 +139,13 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
     }
 
     function showIndexInfo(index) {
+        vm.selectedSearcher = null;
         vm.selectedIndex = index;
         setViewState("index-details");
     }
 
     function showSearcherInfo(searcher) {
+        vm.selectedIndex = null;
         vm.selectedSearcher = searcher;
         setViewState("searcher-details");
     }

@@ -1,23 +1,24 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions;
 
 /// <summary>
-///     This action is invoked upon creation of a document, media, member
+///     This action is invoked upon creation of a document, media, member.
 /// </summary>
 public class ActionMove : IAction
 {
-    /// <summary>
-    ///     The unique action letter
-    /// </summary>
+    /// <inheritdoc cref="IAction.ActionLetter"/>
     public const char ActionLetter = 'M';
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IAction.ActionAlias"/>
+    public const string ActionAlias = "move";
+
+    /// <inheritdoc/>
     public char Letter => ActionLetter;
 
-    /// <inheritdoc />
-    public string Alias => "move";
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
 
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.StructureCategory;

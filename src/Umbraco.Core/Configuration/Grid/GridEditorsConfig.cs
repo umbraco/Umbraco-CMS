@@ -1,12 +1,15 @@
-using System.Reflection;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Core.Configuration.Grid;
 
@@ -17,6 +20,7 @@ internal class GridEditorsConfig : IGridEditorsConfig
 
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<GridEditorsConfig> _logger;
+    private readonly IGridEditorsConfigFileProviderFactory _gridEditorsConfigFileProviderFactory;
     private readonly IManifestParser _manifestParser;
 
     public GridEditorsConfig(
@@ -24,13 +28,32 @@ internal class GridEditorsConfig : IGridEditorsConfig
         IHostingEnvironment hostingEnvironment,
         IManifestParser manifestParser,
         IJsonSerializer jsonSerializer,
-        ILogger<GridEditorsConfig> logger)
+        ILogger<GridEditorsConfig> logger,
+        IGridEditorsConfigFileProviderFactory gridEditorsConfigFileProviderFactory)
     {
         _appCaches = appCaches;
         _hostingEnvironment = hostingEnvironment;
         _manifestParser = manifestParser;
         _jsonSerializer = jsonSerializer;
         _logger = logger;
+        _gridEditorsConfigFileProviderFactory = gridEditorsConfigFileProviderFactory;
+    }
+
+    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
+    public GridEditorsConfig(
+        AppCaches appCaches,
+        IHostingEnvironment hostingEnvironment,
+        IManifestParser manifestParser,
+        IJsonSerializer jsonSerializer,
+        ILogger<GridEditorsConfig> logger)
+        : this(
+              appCaches,
+              hostingEnvironment,
+              manifestParser,
+              jsonSerializer,
+              logger,
+              StaticServiceProvider.Instance.GetRequiredService<IGridEditorsConfigFileProviderFactory>())
+    {
     }
 
     public IEnumerable<IGridEditorConfig> Editors
@@ -39,13 +62,37 @@ internal class GridEditorsConfig : IGridEditorsConfig
         {
             List<IGridEditorConfig> GetResult()
             {
-                var configFolder =
-                    new DirectoryInfo(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config));
+                IFileInfo? gridConfig = null;
                 var editors = new List<IGridEditorConfig>();
-                var gridConfig = Path.Combine(configFolder.FullName, "grid.editors.config.js");
-                if (File.Exists(gridConfig))
+                var configPath = Constants.SystemDirectories.Config.TrimStart(Constants.CharArrays.Tilde);
+
+                // Get physical file if it exists
+                var configPhysicalDirPath = _hostingEnvironment.MapPathContentRoot(configPath);
+
+                if (Directory.Exists(configPhysicalDirPath) == true)
                 {
-                    var sourceString = File.ReadAllText(gridConfig);
+                    var physicalFileProvider = new PhysicalFileProvider(configPhysicalDirPath);
+                    gridConfig = GetConfigFile(physicalFileProvider, string.Empty);
+                }
+
+                // If there is no physical file, check in RCLs
+                if (gridConfig is null)
+                {
+                    IFileProvider? compositeFileProvider = _gridEditorsConfigFileProviderFactory.Create();
+
+                    if (compositeFileProvider is null)
+                    {
+                        throw new ArgumentNullException(nameof(compositeFileProvider));
+                    }
+
+                    gridConfig = GetConfigFile(compositeFileProvider, configPath);
+                }
+
+                if (gridConfig is not null)
+                {
+                    using Stream stream = gridConfig.CreateReadStream();
+                    using var reader = new StreamReader(stream, Encoding.UTF8);
+                    var sourceString = reader.ReadToEnd();
 
                     try
                     {
@@ -63,19 +110,16 @@ internal class GridEditorsConfig : IGridEditorsConfig
                 // Read default from embedded file
                 else
                 {
-                    Assembly assembly = GetType().Assembly;
-                    Stream? resourceStream = assembly.GetManifestResourceStream(
-                        "Umbraco.Cms.Core.EmbeddedResources.Grid.grid.editors.config.js");
+                    IFileProvider configFileProvider = new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Grid");
+                    IFileInfo embeddedConfig = configFileProvider.GetFileInfo("grid.editors.config.js");
 
-                    if (resourceStream is not null)
-                    {
-                        using var reader = new StreamReader(resourceStream, Encoding.UTF8);
-                        var sourceString = reader.ReadToEnd();
-                        editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString)!);
-                    }
+                    using Stream stream = embeddedConfig.CreateReadStream();
+                    using var reader = new StreamReader(stream, Encoding.UTF8);
+                    var sourceString = reader.ReadToEnd();
+                    editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString)!);
                 }
 
-                // add manifest editors, skip duplicates
+                // Add manifest editors, skip duplicates
                 foreach (GridEditor gridEditor in _manifestParser.CombinedManifest.GridEditors)
                 {
                     if (editors.Contains(gridEditor) == false)
@@ -94,5 +138,11 @@ internal class GridEditorsConfig : IGridEditorsConfig
 
             return result!;
         }
+    }
+
+    private static IFileInfo? GetConfigFile(IFileProvider fileProvider, string path)
+    {
+        IFileInfo fileInfo = fileProvider.GetFileInfo($"{path}/grid.editors.config.js");
+        return fileInfo.Exists ? fileInfo : null;
     }
 }

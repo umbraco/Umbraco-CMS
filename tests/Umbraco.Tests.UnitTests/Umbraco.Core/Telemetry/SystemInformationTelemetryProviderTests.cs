@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
@@ -35,6 +35,21 @@ public class SystemInformationTelemetryProviderTests
     }
 
     [Test]
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+
+    public void ReportsRuntimeModeCorrectly(RuntimeMode runtimeMode)
+    {
+        var telemetryProvider = CreateProvider(runtimeMode: runtimeMode);
+        var usageInformation = telemetryProvider.GetInformation().ToArray();
+
+        var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.RuntimeMode);
+        Assert.IsNotNull(actual?.Data);
+        Assert.AreEqual(runtimeMode.ToString(), actual.Data);
+    }
+
+    [Test]
     [TestCase(true)]
     [TestCase(false)]
     public void ReportsDebugModeCorrectly(bool isDebug)
@@ -65,23 +80,6 @@ public class SystemInformationTelemetryProviderTests
     }
 
     [Test]
-    [TestCase(GlobalSettings.StaticUmbracoPath, false)]
-    [TestCase("mycustompath", true)]
-    [TestCase("~/notUmbraco", true)]
-    [TestCase("/umbraco", true)]
-    [TestCase("umbraco", true)]
-    public void ReportsCustomUmbracoPathCorrectly(string path, bool isCustom)
-    {
-        var telemetryProvider = CreateProvider(umbracoPath: path);
-
-        var usageInformation = telemetryProvider.GetInformation().ToArray();
-        var actual = usageInformation.FirstOrDefault(x => x.Name == Constants.Telemetry.CustomUmbracoPath);
-
-        Assert.NotNull(actual?.Data);
-        Assert.AreEqual(isCustom, actual.Data);
-    }
-
-    [Test]
     [TestCase("Development")]
     [TestCase("Staging")]
     [TestCase("Production")]
@@ -99,8 +97,8 @@ public class SystemInformationTelemetryProviderTests
     private SystemInformationTelemetryProvider CreateProvider(
         ModelsMode modelsMode = ModelsMode.InMemoryAuto,
         bool isDebug = true,
-        string umbracoPath = "",
-        string environment = "")
+        string environment = "",
+        RuntimeMode runtimeMode = RuntimeMode.BackofficeDevelopment)
     {
         var hostEnvironment = new Mock<IHostEnvironment>();
         hostEnvironment.Setup(x => x.EnvironmentName).Returns(environment);
@@ -111,11 +109,11 @@ public class SystemInformationTelemetryProviderTests
         return new SystemInformationTelemetryProvider(
             Mock.Of<IUmbracoVersion>(),
             Mock.Of<ILocalizationService>(),
-            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings{ ModelsMode = modelsMode }),
+            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
             Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
-            Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings { UmbracoPath = umbracoPath }),
             hostEnvironment.Object,
             Mock.Of<IUmbracoDatabaseFactory>(x => x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y => y.DatabaseType == DatabaseType.SQLite)),
-            Mock.Of<IServerRoleAccessor>());
+            Mock.Of<IServerRoleAccessor>(),
+            Mock.Of<IOptionsMonitor<RuntimeSettings>>(x => x.CurrentValue == new RuntimeSettings { Mode = runtimeMode }));
     }
 }
