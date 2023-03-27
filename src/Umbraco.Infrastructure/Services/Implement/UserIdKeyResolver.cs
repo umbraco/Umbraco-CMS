@@ -25,21 +25,25 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 
         Sql<ISqlContext> query = sqlContext.Sql()
             .Select<UserDto>(x => x.Id)
+            .From<UserDto>()
             .Where<UserDto>(x => x.Key == key);
 
 
         return scope.Database.ExecuteScalarAsync<int?>(query);
     }
 
-    public Task<Guid?> GetAsync(int id)
+    public async Task<Guid?> GetAsync(int id)
     {
         using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
         ISqlContext sqlContext = scope.SqlContext;
 
         Sql<ISqlContext> query = sqlContext.Sql()
             .Select<UserDto>(x => x.Key)
+            .From<UserDto>()
             .Where<UserDto>(x => x.Id == id);
 
-        return scope.Database.ExecuteScalarAsync<Guid?>(query);
+        string? guidString = await scope.Database.ExecuteScalarAsync<string?>(query);
+
+        return guidString is null ? null : new Guid(guidString);
     }
 }
