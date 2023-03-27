@@ -1,15 +1,16 @@
-import type { TemplateResult } from 'lit';
+import { CodeEditorLanguage } from '../../components/code-editor/code-editor.model';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCodeEditorModalData {
 	headline: string;
-	content?: TemplateResult | string;
+	content: string;
+	language: CodeEditorLanguage;
 	color?: 'positive' | 'danger';
 	confirmLabel?: string;
 }
 
 export interface UmbCodeEditorModalResult {
-	content?: TemplateResult | string;
+	content: string;
 }
 
 export const UMB_CODE_EDITOR_MODAL_TOKEN = new UmbModalToken<UmbCodeEditorModalData, UmbCodeEditorModalResult>(
