@@ -5,8 +5,9 @@ import { umbracoPath } from "@umbraco-cms/backoffice/utils";
 
 export const handlers = [
 	rest.get(umbracoPath('/rteembed'), (req, res, ctx) => {
-		const width = req.url.searchParams.get('width') ?? ModalElement.defaultWidth;
-		const height = req.url.searchParams.get('height') ?? ModalElement.defaultHeight;
+		const params = req.url.searchParams;
+		const width = params.get('width') ? parseInt(params.get('width')!, 10) : ModalElement.defaultWidth;
+		const height = params.get('height') ? parseInt(params.get('height')!, 10) : ModalElement.defaultHeight;
 		const url = req.url.searchParams.get('url');
 
 		let embedUrl = 'https://www.youtube.com/embed/wJNbtYdr-Hg';

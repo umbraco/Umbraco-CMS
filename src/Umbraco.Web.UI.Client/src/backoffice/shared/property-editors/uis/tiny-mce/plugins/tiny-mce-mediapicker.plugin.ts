@@ -1,9 +1,9 @@
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaPickerModalResult, UMB_MEDIA_PICKER_MODAL_TOKEN } from '../../../../../media/media/modals/media-picker';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../../../../users/current-user/current-user.store';
 import { UmbMediaHelper } from '../../../../../../../libs/utils/media-helper.service';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -31,7 +31,7 @@ export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.#mediaHelper = new UmbMediaHelper(this.host);
+		this.#mediaHelper = new UmbMediaHelper();
 
 		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance: UmbModalContext) => {
 			this.#modalContext = instance;

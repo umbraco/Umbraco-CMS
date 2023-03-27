@@ -13,6 +13,7 @@ export default {
 const data: UmbCodeEditorModalData = {
 	headline: 'Code editor modal example',
 	content: `<b>This example</b> opens an HTML <i>string</i> in the Code Editor modal.`,
+	language: 'html',
 };
 
 export const Overview: Story<UmbCodeEditorModalData> = () => html`
