@@ -1,7 +1,6 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { AstNode, Editor, EditorEvent } from 'tinymce';
 import { firstValueFrom } from 'rxjs';
@@ -30,6 +29,7 @@ declare global {
 	}
 }
 
+// TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	static styles = [
@@ -65,7 +65,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	// TODO => create interface when we know what shape that will take
 	// TinyMCE provides the EditorOptions interface, but all props are required 
 	@state()
-	private _configObject = {};
+	private _configObject: Record<string, any> = {};
 
 	private _styleFormats = [
 		{
@@ -204,7 +204,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#currentUserStore?: UmbCurrentUserStore;
 	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
-	currentUser?: UserDetails;
+	#currentUser?: UserDetails;
 
 	protected getFormElement() {
 		return undefined;
@@ -226,8 +226,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	async #observeCurrentUser() {
 		if (!this.#currentUserStore) return;
 
-		this.observe(this.#currentUserStore.currentUser, (currentUser) => {
-			this.currentUser = currentUser;
+		this.observe(this.#currentUserStore.currentUser, (currentUser?: UserDetails) => {
+			this.#currentUser = currentUser;
 		});
 	}
 
@@ -263,7 +263,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
 			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster,
 			contextMenu: false,
-			language: () => this.#getLanguage(),
+			language: this.#getLanguage(),
 			menubar: false,
 			paste_remove_styles_if_webkit: true,
 			paste_preprocess: (_: Editor, args: { content: string }) => this.#cleanupPasteData(args),
@@ -281,14 +281,15 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		Object.assign(tinyConfig, {
 			content_css: this._configObject.stylesheets.join(','),
 			extended_valid_elements: this.#extendedValidElements,
-			height: ifDefined(this._configObject.dimensions?.height),
+			height: this._configObject.height ?? 500,
 			invalid_elements: this._configObject.invalidElements,
 			plugins,
 			toolbar,
 			style_formats: this._styleFormats,
 			valid_elements: this._configObject.validElements,
-			width: ifDefined(this._configObject.dimensions?.width),
+			width: this._configObject.width,
 		});
+
 
 		// Need to check if we are allowed to UPLOAD images
 		// This is done by checking if the insert image toolbar button is available
@@ -376,7 +377,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * Returns the language to use for TinyMCE */
 	#getLanguage() {
-		const localeId = this.currentUser?.language;
+		const localeId = this.#currentUser?.language;
 		//try matching the language using full locale format
 		let languageMatch = this.#availableLanguages.find((x) => x.toLowerCase() === localeId);
 

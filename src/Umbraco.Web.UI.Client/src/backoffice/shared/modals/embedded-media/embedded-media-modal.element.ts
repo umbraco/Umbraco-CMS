@@ -8,17 +8,6 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 
-interface UmbEmbeddedMediaModalModel {
-	url?: string;
-	info?: string;
-	a11yInfo?: string;
-	originalWidth: number;
-	originalHeight: number;
-	width: number;
-	height: number;
-	constrain: boolean;
-}
-
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	static styles = [
@@ -59,8 +48,13 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 		`,
 	];
 
+	#info?: string;
+	#a11yInfo?: string;
 	#loading = false;
-	#embedResult!: OEmbedResult;
+	#embedResult?: OEmbedResult;
+
+	static defaultWidth = 360;
+	static defaultHeight = 240;
 
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>;
@@ -68,24 +62,14 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	@property({ type: Object })
 	data?: UmbEmbeddedMediaModalData;
 
-	#handleConfirm() {
-		this.modalHandler?.submit({ selection: this.#embedResult });
-	}
-
-	#handleCancel() {
-		this.modalHandler?.reject();
-	}
-
 	@state()
-	private _model: UmbEmbeddedMediaModalModel = {
+	private _model: UmbEmbeddedMediaModalResult = {
 		url: '',
-		width: 360,
-		height: 240,
+		width: UmbEmbeddedMediaModalElement.defaultWidth,
+		height: UmbEmbeddedMediaModalElement.defaultHeight,
 		constrain: true,
-		info: '',
-		a11yInfo: '',
-		originalHeight: 240,
-		originalWidth: 360,
+		originalHeight: UmbEmbeddedMediaModalElement.defaultHeight,
+		originalWidth: UmbEmbeddedMediaModalElement.defaultWidth,
 	};
 
 	connectedCallback() {
@@ -96,9 +80,17 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 		}
 	}
 
+	#handleConfirm() {
+		this.modalHandler?.submit(this._model);
+	}
+
+	#handleCancel() {
+		this.modalHandler?.reject();
+	}
+
 	async #getPreview() {
-		this._model.info = '';
-		this._model.a11yInfo = '';
+		this.#info = '';
+		this.#a11yInfo = '';
 
 		this.#loading = true;
 		this.requestUpdate('_model');
@@ -114,31 +106,31 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 					} as { [key: string]: string })
 			);
 
-			this.#embedResult = await result.json();
+		 	this.#embedResult = await result.json();
 
-			switch (this.#embedResult.oEmbedStatus) {
+			switch (this.#embedResult?.oEmbedStatus) {
 				case 0:
-					this.#onPreviewFailed('Not supported');
+					this.#setMessages('Not supported');
 					break;
 				case 1:
-					this.#onPreviewFailed('Could not embed media - please ensure the URL is valid');
+					this.#setMessages('Could not embed media - please ensure the URL is valid');
 					break;
 				case 2:
-					this._model.info = '';
-					this._model.a11yInfo = 'Retrieved URL';
+					this.#setMessages('', 'Retrieved URL');
+					this._model.preview = this.#embedResult.markup;
 					break;
 			}
 		} catch (e) {
-			this.#onPreviewFailed('Could not embed media - please ensure the URL is valid');
+			this.#setMessages('Could not embed media - please ensure the URL is valid');
 		}
 
 		this.#loading = false;
 		this.requestUpdate('_model');
 	}
 
-	#onPreviewFailed(message: string) {
-		this._model.info = message;
-		this._model.a11yInfo = message;
+	#setMessages(info: string, a11yMessage = info) {
+		this.#info = info;
+		this.#a11yInfo = a11yMessage;
 	}
 
 	#onUrlChange(e: InputEvent) {
@@ -159,6 +151,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	/**
 	 * Calculates the width or height axis dimension when the other is changed.
 	 * If constrain is false, axis change independently
+	 * TODO => should this regenerate the preview? Currently does, but is it neccessary?
 	 * @param axis {string}
 	 */
 	#changeSize(axis: 'width' | 'height') {
@@ -212,13 +205,13 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 					</umb-workspace-property-layout>
 
 					${when(
-						this.#embedResult?.oEmbedStatus === OEmbedStatus.Success || this._model.a11yInfo,
+						this.#embedResult?.oEmbedStatus === OEmbedStatus.Success || this.#a11yInfo,
 						() => html` <umb-workspace-property-layout label="Preview" orientation="vertical">
 							<div slot="editor">
 								${when(this.#loading, () => html`<uui-loader-circle></uui-loader-circle>`)}
-								${when(this.#embedResult.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
-								${when(this._model.info, () => html` <p aria-hidden="true">${this._model.info}</p>`)}
-								${when(this._model.a11yInfo, () => html` <p class="sr-only" role="alert">${this._model.a11yInfo}</p>`)}
+								${when(this.#embedResult?.markup, () => html`${unsafeHTML(this.#embedResult?.markup)}`)}
+								${when(this.#info, () => html` <p aria-hidden="true">${this.#info}</p>`)}
+								${when(this.#a11yInfo, () => html` <p class="sr-only" role="alert">${this.#a11yInfo}</p>`)}
 							</div>
 						</umb-workspace-property-layout>`
 					)}
@@ -246,7 +239,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 							slot="editor"
 							@change=${this.#onConstrainChange}
 							?disabled=${this.#dimensionControlsDisabled()}
-							.checked=${this._model.constrain}></uui-toggle>
+							?checked=${this._model.constrain}></uui-toggle>
 					</umb-workspace-property-layout>
 				</uui-box>
 

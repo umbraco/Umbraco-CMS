@@ -6,9 +6,9 @@ export enum OEmbedStatus {
 	Success,
 }
 
-interface UmbEmbeddedMediaDimensions {
-	width?: number;
-	height?: number;
+export interface UmbEmbeddedMediaDimensions {
+	width: number;
+	height: number;
 	constrain?: boolean;
 }
 
@@ -22,8 +22,10 @@ export interface OEmbedResult extends UmbEmbeddedMediaDimensions {
 	markup?: string;
 }
 
-export type UmbEmbeddedMediaModalResult = {
-	selection: OEmbedResult;
+export interface UmbEmbeddedMediaModalResult extends UmbEmbeddedMediaModalData {
+	preview?: string;
+	originalWidth: number;
+	originalHeight: number;
 };
 
 export const UMB_EMBEDDED_MEDIA_MODAL_TOKEN = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>(

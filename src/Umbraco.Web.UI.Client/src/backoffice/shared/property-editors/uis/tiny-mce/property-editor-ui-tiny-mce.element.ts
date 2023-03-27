@@ -24,7 +24,6 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 
 	#onChange(event: InputEvent) {
 		this.value = (event.target as HTMLInputElement).value;
-		console.log(this.value);
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
