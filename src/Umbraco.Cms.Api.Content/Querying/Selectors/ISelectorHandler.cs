@@ -11,5 +11,5 @@ public interface ISelectorHandler : IQueryHandler
     /// <param name="query">The base query to build upon.</param>
     /// <param name="queryString">The selector query string.</param>
     /// <returns>An <see cref="IBooleanOperation"/> representing the Examine query to execute, or null if the query cannot be built.</returns>
-    IBooleanOperation? BuildApiIndexQuery(IQuery query, string queryString);
+    IBooleanOperation? BuildSelectorIndexQuery(IQuery query, string queryString);
 }

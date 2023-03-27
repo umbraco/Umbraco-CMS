@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -11,8 +14,7 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     private const string AncestorsSpecifier = "ancestors:";
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    public AncestorsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IRequestRoutingService requestRoutingService)
+    public AncestorsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
         : base(publishedSnapshotAccessor, requestRoutingService) =>
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
 
@@ -21,7 +23,7 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         => queryString.StartsWith(AncestorsSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc />
-    public IBooleanOperation? BuildApiIndexQuery(IQuery query, string queryString)
+    public IBooleanOperation? BuildSelectorIndexQuery(IQuery query, string queryString)
     {
         var fieldValue = queryString.Substring(AncestorsSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);

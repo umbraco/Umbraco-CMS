@@ -1,3 +1,4 @@
+using System;
 using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
@@ -18,7 +19,7 @@ internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
         => queryString.StartsWith(ChildrenSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc />
-    public IBooleanOperation? BuildApiIndexQuery(IQuery query, string queryString)
+    public IBooleanOperation? BuildSelectorIndexQuery(IQuery query, string queryString)
     {
         var fieldValue = queryString.Substring(ChildrenSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
