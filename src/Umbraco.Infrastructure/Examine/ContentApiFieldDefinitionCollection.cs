@@ -8,7 +8,11 @@ public class ContentApiFieldDefinitionCollection : FieldDefinitionCollection
     {
         new("id", FieldDefinitionTypes.FullText),
         new("parentKey", FieldDefinitionTypes.FullText),
-        new("ancestorKeys", FieldDefinitionTypes.FullText)
+        new("ancestorKeys", FieldDefinitionTypes.FullText),
+        new("name", FieldDefinitionTypes.FullText),
+        new("level", FieldDefinitionTypes.Integer),
+        new("path", FieldDefinitionTypes.Raw),
+        new("sortOrder", FieldDefinitionTypes.Integer)
     };
 
     public ContentApiFieldDefinitionCollection()

@@ -29,10 +29,15 @@ public class ContentApiValueSetBuilder : IContentApiValueSetBuilder
             {
                 ["id"] = content.Key,
                 ["parentKey"] = ancestorKeys.LastOrDefault(),
-                ["ancestorKeys"] = ancestorKeys.Any() ? string.Join(",", ancestorKeys) : default(Guid) // ToDo: Store as array if it is faster to search
+                ["ancestorKeys"] = ancestorKeys.Any() ? string.Join(" ", ancestorKeys) : default(Guid), // ToDo: Store as array if it is faster to search
+                ["name"] = content.Name!, // might be null?
+                ["level"] = content.Level,
+                ["path"] = content.Path, // CSV of int ids
+                ["sortOrder"] = content.SortOrder
             };
 
-            yield return new ValueSet(content.Id.ToString(), IndexTypes.Content, content.ContentType.Alias, indexValues);
+            yield return new ValueSet(content.Id.ToString(), IndexTypes.Content, content.ContentType.Alias,
+                indexValues);
         }
     }
 
