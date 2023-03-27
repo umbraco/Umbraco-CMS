@@ -6,6 +6,7 @@
 	"service": "app",
 	"workspaceFolder": "/workspace",
 	
+	
 	// Set *default* container specific settings.json values on container create.
 	"settings": {		
 		"omnisharp.defaultLaunchSolution": "umbraco.sln",
@@ -13,13 +14,62 @@
 		"omnisharp.enableRoslynAnalyzers": true
 	},
 
+	"features": {
+		// Workaround until the image is updated to include the latest version of .NET Core - .NET7
+		// https://github.com/devcontainers/templates/issues/38#issuecomment-1310803259		
+		"ghcr.io/devcontainers/features/dotnet:1": {
+			"version": "7"
+		},
+
+		// Adds SSH support to the container
+		// Allowing the Github CLI `gh codespace ssh` to work
+		"ghcr.io/devcontainers/features/sshd:1": {
+			"version": "latest"
+		},
+
+		// Adds SQLite feature from apt install
+		// Also adds the SQLite VSCode extension
+		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
+	},
+
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"ms-dotnettools.csharp"
 	],
+	
+	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
+	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [9000, 5000, 25]
+	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
+	// Port needed to help discover SMTP4Dev
+	"forwardPorts": [
+		5000
+	],
+
+	"portsAttributes": {
+		"5000": {
+			"label": "SMTP4Dev",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"9000": {
+			"label": "Umbraco HTTP",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"44331": {
+			"label": "Umbraco HTTPS",
+			"protocol": "https",
+			"onAutoForward": "notify"
+		}
+	},
+	"customizations": {
+		"codespaces": {
+		  "openFiles": [
+			".github/codespaces-readme.md"
+		  ]
+		}
+	}
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//

@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "radiobuttons",
     ValueType = ValueTypes.String,
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-target")]
+    Icon = "icon-target",
+    ValueEditorIsReusable = true)]
 public class RadioButtonsPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

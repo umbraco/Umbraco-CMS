@@ -212,4 +212,16 @@ public static class DeepCloneHelper
 
         public bool IsList => GenericListType != null;
     }
+
+    public static void CloneListItems<TList, TEntity>(TList source, TList target)
+        where TList : ICollection<TEntity>
+    {
+        target.Clear();
+        foreach (TEntity entity in source)
+        {
+            target.Add(entity is IDeepCloneable deepCloneableEntity
+                ? (TEntity)deepCloneableEntity.DeepClone()
+                : entity);
+        }
+    }
 }

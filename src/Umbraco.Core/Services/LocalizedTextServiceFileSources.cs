@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.FileProviders;
@@ -166,7 +167,7 @@ public class LocalizedTextServiceFileSources
     }
 
     /// <summary>
-    ///     returns all xml sources for all culture files found in the folder
+    ///     Returns all xml sources for all culture files found in the folder.
     /// </summary>
     /// <returns></returns>
     public IDictionary<CultureInfo, Lazy<XDocument>> GetXmlSources() => _xmlSources.Value;
@@ -179,7 +180,15 @@ public class LocalizedTextServiceFileSources
         {
             result.AddRange(
                 new PhysicalDirectoryContents(_fileSourceFolder.FullName)
-                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml")));
+                    .Where(x => !x.IsDirectory && !x.Name.Contains("user") && x.Name.EndsWith(".xml"))); // Filter out *.user.xml
+        }
+
+        if (_supplementFileSources is not null)
+        {
+            // Get only the .xml files and filter out the user defined language files (*.user.xml) that overwrite the default
+            result.AddRange(_supplementFileSources
+                .Where(x => !x.FileInfo.Name.Contains("user") && x.FileInfo.Name.EndsWith(".xml"))
+                .Select(x => x.FileInfo));
         }
 
         if (_directoryContents.Exists)
@@ -236,8 +245,8 @@ public class LocalizedTextServiceFileSources
             // now load in supplementary
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> found = _supplementFileSources.Where(x =>
             {
-                var extension = Path.GetExtension(x.File.FullName);
-                var fileCultureName = Path.GetFileNameWithoutExtension(x.File.FullName).Replace("_", "-")
+                var extension = Path.GetExtension(x.FileInfo.Name);
+                var fileCultureName = Path.GetFileNameWithoutExtension(x.FileInfo.Name).Replace("_", "-")
                     .Replace(".user", string.Empty);
                 return extension.InvariantEquals(".xml") && (
                     fileCultureName.InvariantEquals(culture.Name)
@@ -246,16 +255,16 @@ public class LocalizedTextServiceFileSources
 
             foreach (LocalizedTextServiceSupplementaryFileSource supplementaryFile in found)
             {
-                using (FileStream fs = supplementaryFile.File.OpenRead())
+                using (Stream stream = supplementaryFile.FileInfo.CreateReadStream())
                 {
                     XDocument xChildDoc;
                     try
                     {
-                        xChildDoc = XDocument.Load(fs);
+                        xChildDoc = XDocument.Load(stream);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Could not load file into XML {File}", supplementaryFile.File.FullName);
+                        _logger.LogError(ex, "Could not load file into XML {File}", supplementaryFile.FileInfo.Name);
                         continue;
                     }
 

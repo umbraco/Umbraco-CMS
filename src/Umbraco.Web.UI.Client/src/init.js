@@ -1,5 +1,5 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState', 'assetsService', 'eventsService', 'tourService', 'localStorageService', 'navigationService', 'localizationService',
+window.app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState', 'assetsService', 'eventsService', 'tourService', 'localStorageService', 'navigationService', 'localizationService',
     function ($rootScope, $route, $location, $cookies, urlHelper, appState, assetsService, eventsService, tourService, localStorageService, navigationService, localizationService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
@@ -63,7 +63,6 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
             appState.setGlobalState("isReady", true);
             //send the ready event with the included returnToPath,returnToSearch data
             eventsService.emit("app.ready", data);
-            returnToPath = null, returnToSearch = null;
         }
 
         var currentRouteParams = null;
@@ -119,8 +118,15 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
                 event.preventDefault();
                 var returnPath = null;
                 if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                  // Check if a ReturnUrl is present on the querystring and redirect to it if set
+                  var queryStrings = urlHelper.getQueryStringParams();
+                  if (typeof queryStrings.ReturnUrl !== 'undefined' && queryStrings.ReturnUrl.length > 0) {
+                    returnPath = queryStrings.ReturnUrl;
+                  }
+                  else {
                     //Set the current path before redirecting so we know where to redirect back to
-                    returnPath = encodeURIComponent(window.location.href.replace(window.location.origin,''));
+                    returnPath = encodeURIComponent(window.location.href.replace(window.location.origin, ''));                    
+                  }
                 }
                 $location.path(rejection.path)
                 if (returnPath) {

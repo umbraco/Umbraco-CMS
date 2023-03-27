@@ -1,0 +1,128 @@
+<ng-form name="vm.entriesForm">
+    <div
+        class="umb-block-grid__layout-container"
+        ng-class="{
+            '--not-allowing-drop': vm.showNotAllowedUI
+        }"
+        umb-block-grid-sorter="::vm.sorterOptions"
+        umb-block-grid-sorter-model="vm.entries"
+    >
+        <umb-block-grid-entry ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
+            class="umb-block-grid__layout-item"
+            ng-class="{'--has-areas': layoutEntry.areas.length > 0}"
+            data-content-element-type-alias="{{layoutEntry.$block.content.contentTypeAlias}}"
+            data-content-element-type-key="{{layoutEntry.$block.content.contentTypeKey}}"
+            data-element-udi="{{layoutEntry.contentUdi}}"
+            data-col-span="{{layoutEntry.columnSpan}}"
+            data-row-span="{{layoutEntry.rowSpan}}"
+            style="
+            --umb-block-grid--item-column-span: {{layoutEntry.columnSpan}};
+            --umb-block-grid--item-row-span: {{layoutEntry.rowSpan}};
+            "
+
+            parent-block="vm.parentBlock"
+            property-editor-form="vm.propertyEditorForm"
+            area-key="vm.areaKey"
+            layout-columns="vm.layoutColumns"
+            index="$index"
+            layout-entry="layoutEntry"
+            block-editor-api="vm.blockEditorApi"
+            depth="{{vm.depth}}"
+        >
+
+        </umb-block-grid-entry>
+    </div>
+
+    <div ng-if="vm.showNotAllowedUI" class="umb-block-grid__not-allowed-box">
+    </div>
+
+    <div 
+        class="umb-block-grid__area-actions" 
+        ng-if="!vm.blockEditorApi.readonly && vm.depth !== '0' && (vm.entries.length === 0 || !vm.entriesForm.areaMinCount.$valid)" 
+        ng-class="{'--highlight': vm.entries.length === 0 || !vm.entriesForm.areaMinCount.$valid || !vm.entriesForm.areaMaxCount.$valid || !vm.entriesForm.areaTypeRequirements.$valid}"
+
+        data-min="{{vm.entriesForm.areaMinCount.$valid ? 'true' : 'false'}}"
+        data-max="{{vm.entriesForm.areaMaxCount.$valid ? 'true' : 'false'}}"
+        data-type="{{vm.entriesForm.areaTypeRequirements.$valid ? 'true' : 'false'}}"
+        >
+        <button
+                id="{{vm.model.alias}}"
+                type="button"
+                class="btn-reset umb-block-grid__create-button umb-outline"
+                ng-disabled="vm.locallyAvailableBlockTypes.length === 0"
+                ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
+            <span ng-if="vm.createLabel">{{vm.createLabel}}</span>
+            <localize ng-if="!vm.createLabel && vm.locallyAvailableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+            <localize ng-if="!vm.createLabel && vm.locallyAvailableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.locallyAvailableBlockTypes[0].elementTypeModel.name]">Add content</localize>
+        </button>
+    </div>
+
+    <uui-button-inline-create
+        ng-if="!vm.blockEditorApi.readonly && vm.depth !== '0' && !(vm.entries.length === 0 || !vm.entriesForm.areaMinCount.$valid)"
+        class="umb-block-grid__block--last-inline-create-button"
+        ng-mouseover="vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey)"
+        ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)"
+        ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
+    </uui-button-inline-create>
+
+    <div class="umb-block-grid__actions" ng-if="!vm.blockEditorApi.readonly && vm.depth === '0'">
+        <button
+                id="{{vm.model.alias}}"
+                type="button"
+                class="btn-reset umb-block-grid__create-button umb-outline"
+                ng-disabled="vm.locallyAvailableBlockTypes.length === 0"
+                ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
+                <span ng-if="vm.createLabel">{{vm.createLabel}}</span>
+            <localize ng-if="!vm.createLabel && vm.locallyAvailableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+            <localize ng-if="!vm.createLabel && vm.locallyAvailableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.locallyAvailableBlockTypes[0].elementTypeModel.name]">Add content</localize>
+        </button>
+        <button type="button"
+                class="btn-reset umb-block-grid__clipboard-button umb-outline"
+                ng-class="{'--jump': vm.jumpClipboardButton}"
+                ng-disabled="vm.clipboardItems.length === 0"
+                ng-click="vm.blockEditorApi.requestShowClipboard(vm.parentBlock, vm.areaKey, vm.entries.length, $event)"
+                localize="title"
+                title="@blockEditor_tabClipboard">
+            <umb-icon icon="icon-paste-in" class="icon"></umb-icon>
+            <span class="sr-only">
+                <localize key="blockEditor_tabClipboard">Clipboard</localize>
+            </span>
+        </button>
+    </div>
+
+
+    <input type="hidden" name="areaMinCount" ng-model="vm.entries" val-server="areaMinCount" />
+    <input type="hidden" name="areaMaxCount" ng-model="vm.entries" val-server="areaMaxCount" />
+    <input type="hidden" name="areaTypeRequirements" ng-model="vm.entries" val-server="areaTypeRequirements" />
+
+    <div ng-if="vm.invalidAmount" class="umb-block-grid__entries-validation-message">
+
+        <div ng-messages="vm.entriesForm.areaMinCount.$error">
+            <div ng-message="areaMinCount">
+                <localize key="validation_entriesShort" tokens="[vm.areaConfig.minAllowed, vm.areaConfig.minAllowed - vm.entries.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+            </div>
+            <span ng-message="valServer" ng-bind-html="vm.entriesForm.areaMinCount.errorMsg"></span>
+        </div>
+
+        <div ng-messages="vm.entriesForm.areaMaxCount.$error">
+            <div ng-message="areaMaxCount">
+                <localize key="validation_entriesExceed" tokens="[vm.areaConfig.maxAllowed, vm.entries.length - vm.areaConfig.maxAllowed]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+            </div>
+            <span ng-message="valServer" ng-bind-html="vm.entriesForm.areaMaxCount.errorMsg"></span>
+        </div>
+
+        <div ng-if="vm.entriesForm.areaMinCount.$valid && vm.entriesForm.areaMaxCount.$valid" ng-messages="vm.entriesForm.areaTypeRequirements.$error">
+            <div ng-message="areaTypeRequirements">
+                <div ng-repeat="invalidBlockType in vm.invalidBlockTypes track by invalidBlockType.key">
+                    <localize
+                        key="{{(invalidBlockType.amount < invalidBlockType.minRequirement) ? 'blockEditor_areaValidationEntriesShort' : 'blockEditor_areaValidationEntriesExceed'}}"
+                        tokens="[invalidBlockType.name, invalidBlockType.amount, invalidBlockType.minRequirement, invalidBlockType.maxRequirement]"
+                        watch-tokens="true"
+                        >%0% must be present between %2%–%3% times.</localize>
+                </div>
+            </div>
+            <span ng-message="valServer" ng-bind-html="vm.entriesForm.areaTypeRequirements.errorMsg"></span>
+        </div>
+
+    </div>
+</ng-form>

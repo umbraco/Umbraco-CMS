@@ -1,8 +1,11 @@
 using System.Collections.Concurrent;
 using System.Dynamic;
 using System.Globalization;
+using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography;
+using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -15,6 +18,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -472,46 +476,6 @@ public class EntityController : UmbracoAuthorizedJsonController
     }
 
     /// <summary>
-    ///     Get entity URLs by UDIs
-    /// </summary>
-    /// <param name="udis">
-    ///     A list of UDIs to lookup items by
-    /// </param>
-    /// <param name="culture">The culture to fetch the URL for</param>
-    /// <returns>Dictionary mapping Udi -> Url</returns>
-    /// <remarks>
-    ///     We allow for POST because there could be quite a lot of Ids.
-    /// </remarks>
-    [HttpGet]
-    [HttpPost]
-    [Obsolete("Use GetUrlsByIds instead.")]
-    public IDictionary<Udi, string?> GetUrlsByUdis([FromJsonPath] Udi[] udis, string? culture = null)
-    {
-        if (udis == null || !udis.Any())
-        {
-            return new Dictionary<Udi, string?>();
-        }
-
-        var udiEntityType = udis.First().EntityType;
-        UmbracoEntityTypes entityType;
-
-        switch (udiEntityType)
-        {
-            case Constants.UdiEntityType.Document:
-                entityType = UmbracoEntityTypes.Document;
-                break;
-            case Constants.UdiEntityType.Media:
-                entityType = UmbracoEntityTypes.Media;
-                break;
-            default:
-                entityType = (UmbracoEntityTypes)(-1);
-                break;
-        }
-
-        return GetUrlsByIds(udis, entityType, culture);
-    }
-
-    /// <summary>
     ///     Gets the URL of an entity
     /// </summary>
     /// <param name="id">Int id of the entity to fetch URL for</param>
@@ -608,7 +572,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     [HttpGet]
     public UrlAndAnchors GetUrlAndAnchors(int id, string? culture = "*")
     {
-        culture ??= ClientCulture();
+        culture = culture is null or "*" ? ClientCulture() : culture;
 
         var url = _publishedUrlProvider.GetUrl(id, culture: culture);
         IEnumerable<string> anchorValues = _contentService.GetAnchorValuesFromRTEs(id, culture);
@@ -785,7 +749,11 @@ public class EntityController : UmbracoAuthorizedJsonController
             {
                 return new PagedResult<EntityBasic>(0, 0, 0);
             }
-
+            //adding multiple conditions ,considering id,key & name as filter param
+            //for id as int
+            int.TryParse(filter, out int filterAsIntId);
+            //for key as Guid
+            Guid.TryParse(filter, out Guid filterAsGuid);
             // else proceed as usual
             entities = _entityService.GetPagedChildren(
                 id,
@@ -795,7 +763,9 @@ public class EntityController : UmbracoAuthorizedJsonController
                 out long totalRecords,
                 filter.IsNullOrWhiteSpace()
                     ? null
-                    : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
+                    : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)
+                      || x.Id == filterAsIntId
+                      || x.Key == filterAsGuid),
                 Ordering.By(orderBy, orderDirection));
 
 

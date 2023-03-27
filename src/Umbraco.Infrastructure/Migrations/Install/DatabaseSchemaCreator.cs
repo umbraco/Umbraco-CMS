@@ -12,7 +12,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 
@@ -93,32 +92,20 @@ public class DatabaseSchemaCreator
     private readonly ILoggerFactory _loggerFactory;
     private readonly IUmbracoVersion _umbracoVersion;
 
-    [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V11.")]
-    public DatabaseSchemaCreator(
-        IUmbracoDatabase? database,
-        ILogger<DatabaseSchemaCreator> logger,
-        ILoggerFactory loggerFactory,
-        IUmbracoVersion umbracoVersion,
-        IEventAggregator eventAggregator)
-        : this(database, logger, loggerFactory, umbracoVersion, eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
-    {
-    }
-
-    public DatabaseSchemaCreator(
-        IUmbracoDatabase? database,
-        ILogger<DatabaseSchemaCreator> logger,
-        ILoggerFactory loggerFactory,
-        IUmbracoVersion umbracoVersion,
-        IEventAggregator eventAggregator,
-        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
-    {
-        _database = database ?? throw new ArgumentNullException(nameof(database));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-        _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
-        _eventAggregator = eventAggregator;
-        _defaultDataCreationSettings = defaultDataCreationSettings;
+        public DatabaseSchemaCreator(
+            IUmbracoDatabase? database,
+            ILogger<DatabaseSchemaCreator> logger,
+            ILoggerFactory loggerFactory,
+            IUmbracoVersion umbracoVersion,
+            IEventAggregator eventAggregator,
+            IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
+        {
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
+            _eventAggregator = eventAggregator;
+            _defaultDataCreationSettings = defaultDataCreationSettings;
 
         if (_database?.SqlContext?.SqlSyntax == null)
         {

@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Getty Images supplier of stock images, editorial photography, video and music for business and consumers.
 /// </summary>
-public class GettyImages : EmbedProviderBase
+public class GettyImages : OEmbedProviderBase
 {
     public GettyImages(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

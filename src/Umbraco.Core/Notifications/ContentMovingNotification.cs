@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 
+/// <summary>
+/// Called while content is moving, but before it has been moved. Cancel the operation to prevent the movement.
+/// </summary>
 public sealed class ContentMovingNotification : MovingNotification<IContent>
 {
     public ContentMovingNotification(MoveEventInfo<IContent> target, EventMessages messages)

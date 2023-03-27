@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
 /// <summary>
 ///     Ensures the new relation types are created
 /// </summary>
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public class AddNewRelationTypes : MigrationBase
 {
     public AddNewRelationTypes(IMigrationContext context)

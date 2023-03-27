@@ -1,8 +1,9 @@
-namespace Umbraco.Cms.Core.Install.Models;
+﻿namespace Umbraco.Cms.Core.Install.Models;
 
 /// <summary>
 ///     The object returned from each installation step
 /// </summary>
+[Obsolete("Will no longer be required with the new backoffice API")]
 public class InstallSetupResult
 {
     public InstallSetupResult()

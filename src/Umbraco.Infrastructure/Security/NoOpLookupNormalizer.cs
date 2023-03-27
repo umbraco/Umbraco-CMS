@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class NoopLookupNormalizer : ILookupNormalizer
 {
-    public string NormalizeName(string name) => name;
+    public string? NormalizeName(string? name) => name;
 
-    public string NormalizeEmail(string email) => email;
+    public string? NormalizeEmail(string? email) => email;
 }

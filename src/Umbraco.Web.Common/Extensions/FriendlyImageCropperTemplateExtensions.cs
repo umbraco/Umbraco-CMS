@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Extensions;
 
@@ -347,12 +347,4 @@ public static class FriendlyImageCropperTemplateExtensions
             useCropDimensions,
             cacheBusterValue,
             furtherOptions);
-
-    [Obsolete(
-        "Use GetCropUrl to merge local and media crops, get automatic cache buster value and have more parameters.")]
-    public static string GetLocalCropUrl(
-        this MediaWithCrops mediaWithCrops,
-        string alias,
-        string? cacheBusterValue = null) => mediaWithCrops.LocalCrops.Src +
-                                            mediaWithCrops.LocalCrops.GetCropUrl(alias, ImageUrlGenerator, cacheBusterValue: cacheBusterValue);
 }

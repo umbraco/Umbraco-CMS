@@ -85,6 +85,8 @@ public abstract class BeingDirtyBase : IRememberBeingDirty
     /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    protected void ClearPropertyChangedEvents() => PropertyChanged = null;
+
     /// <summary>
     ///     Registers that a property has changed.
     /// </summary>

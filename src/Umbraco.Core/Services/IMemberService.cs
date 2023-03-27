@@ -99,12 +99,63 @@ public interface IMemberService : IMembershipMemberService
     /// </remarks>
     /// <param name="username">Username of the Member to create</param>
     /// <param name="email">Email of the Member to create</param>
+    /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+    /// <returns>
+    ///     <see cref="IMember" />
+    /// </returns>
+    IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias) =>
+        throw new NotImplementedException();
+
+    /// <summary>
+    ///     Creates and persists a Member
+    /// </summary>
+    /// <remarks>
+    ///     Using this method will persist the Member object before its returned
+    ///     meaning that it will have an Id available (unlike the CreateMember method)
+    /// </remarks>
+    /// <param name="username">Username of the Member to create</param>
+    /// <param name="email">Email of the Member to create</param>
+    /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+    /// <param name="isApproved">Whether the member is approved or not</param>
+    /// <returns>
+    ///     <see cref="IMember" />
+    /// </returns>
+    IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved) =>
+        throw new NotImplementedException();
+
+    /// <summary>
+    ///     Creates and persists a Member
+    /// </summary>
+    /// <remarks>
+    ///     Using this method will persist the Member object before its returned
+    ///     meaning that it will have an Id available (unlike the CreateMember method)
+    /// </remarks>
+    /// <param name="username">Username of the Member to create</param>
+    /// <param name="email">Email of the Member to create</param>
     /// <param name="name">Name of the Member to create</param>
     /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
     IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias);
+
+    /// <summary>
+    ///     Creates and persists a Member
+    /// </summary>
+    /// <remarks>
+    ///     Using this method will persist the Member object before its returned
+    ///     meaning that it will have an Id available (unlike the CreateMember method)
+    /// </remarks>
+    /// <param name="username">Username of the Member to create</param>
+    /// <param name="email">Email of the Member to create</param>
+    /// <param name="name">Name of the Member to create</param>
+    /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
+    /// <param name="isApproved">Whether the member is approved or not</param>
+    /// <returns>
+    ///     <see cref="IMember" />
+    /// </returns>
+    IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Creates and persists a Member
