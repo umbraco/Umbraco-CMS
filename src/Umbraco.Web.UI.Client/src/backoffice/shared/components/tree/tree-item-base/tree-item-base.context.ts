@@ -148,7 +148,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string) {
-		return `section/${pathname}/${entityType}/edit/${unique}`;
+		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 }
 
