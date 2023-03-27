@@ -7,6 +7,5 @@ export interface ManifestTree extends ManifestBase {
 }
 
 export interface MetaTree {
-	storeAlias?: string;
 	repository?: ClassConstructor<unknown>;
 }
