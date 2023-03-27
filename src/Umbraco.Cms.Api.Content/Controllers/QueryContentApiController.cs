@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.ContentApi;
@@ -42,26 +46,7 @@ public class QueryContentApiController : ContentApiControllerBase
         IEnumerable<Guid> ids = Enumerable.Empty<Guid>();
         ids = _apiQueryService.ExecuteQuery(fetch, filter, sort);
 
-        // Manually left-aligning
-        IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById)
-            .WhereNotNull()
-            .OrderBy(x => x.Path)
-            .ThenBy(c => c.SortOrder);
-
-        // Currently sorting is not supported through the ContentAPI index
-        // So we need to add the name to it
-        // if (sort is not null && sort[0].StartsWith("name")) // TODO: change
-        // {
-        //     string sortValue = sort[0].Substring(sort[0].IndexOf(':', StringComparison.Ordinal) + 1);
-        //     if (sortValue.StartsWith("asc"))
-        //     {
-        //         contentItems = contentItems.OrderBy(x => x.Name);
-        //     }
-        //     else
-        //     {
-        //         contentItems = contentItems.OrderByDescending(x => x.Name);
-        //     }
-        // }
+        IEnumerable<IPublishedContent> contentItems = ids.Select(contentCache.GetById).WhereNotNull();
 
         IEnumerable<IApiContent> results = contentItems.Select(ApiContentBuilder.Build);
 
