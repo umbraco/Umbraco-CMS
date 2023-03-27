@@ -14,7 +14,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly IAuditRepository _auditRepository;
-    private readonly IUserService _userService;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public LanguageService(
         ICoreScopeProvider provider,
@@ -22,12 +22,12 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         IEventMessagesFactory eventMessagesFactory,
         ILanguageRepository languageRepository,
         IAuditRepository auditRepository,
-        IUserService userService)
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _languageRepository = languageRepository;
         _auditRepository = auditRepository;
-        _userService = userService;
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     /// <inheritdoc />
@@ -139,7 +139,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(AuditType.Delete, "Delete Language", currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
             scope.Complete();
             return await Task.FromResult(Attempt.SucceedWithStatus<ILanguage?, LanguageOperationStatus>(LanguageOperationStatus.Success, language));
@@ -191,7 +191,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             scope.Notifications.Publish(
                 new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(auditType, auditMessage, currentUserId, language.Id, UmbracoObjectTypes.Language.GetName());
 
             scope.Complete();

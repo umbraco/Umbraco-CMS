@@ -30,8 +30,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IIOHelper _ioHelper;
         private readonly IEditorConfigurationParser _editorConfigurationParser;
-        private readonly IUserService _userService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
 
         [Obsolete("Please use the constructor that takes less parameters. Will be removed in V15.")]
         public DataTypeService(
@@ -83,12 +83,10 @@ namespace Umbraco.Cms.Core.Services.Implement
             _ioHelper = ioHelper;
             _editorConfigurationParser = editorConfigurationParser;
 
-            // Trying to inject user service will cause ambigious constructors, this should be properly DI, when old ctor is removed.
-            _userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
-
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
             _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
             _dataTypeContainerRepository = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerRepository>();
+            _userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
         }
 
         #region Containers
@@ -111,7 +109,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                         Key = key
                     };
 
-                    Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+                    Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
                     Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.CreateAsync(container, parentKey, currentUserKey).GetAwaiter().GetResult();
 
                     // mimic old service behavior
@@ -177,7 +175,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 var isNew = container.Id == 0;
                 Guid? parentKey = isNew && container.ParentId > 0 ? _dataTypeContainerRepository.Get(container.ParentId)?.Key : null;
-                Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+                Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
 
                 Attempt<EntityContainer, DataTypeContainerOperationStatus> result = isNew
                     ? _dataTypeContainerService.CreateAsync(container, parentKey, currentUserKey).GetAwaiter().GetResult()
@@ -207,7 +205,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return OperationResult.Attempt.NoOperation(evtMsgs);
                 }
 
-                Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+                Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
                 Attempt<EntityContainer?, DataTypeContainerOperationStatus> result = _dataTypeContainerService.DeleteAsync(container.Key, currentUserKey).GetAwaiter().GetResult();
                 // mimic old service behavior
                 return result.Status switch
@@ -237,7 +235,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
 
                     container.Name = name;
-                    Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+                    Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
                     Attempt<EntityContainer, DataTypeContainerOperationStatus> result = _dataTypeContainerService.UpdateAsync(container, currentUserKey).GetAwaiter().GetResult();
                     // mimic old service behavior
                     return result.Status switch
@@ -425,7 +423,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingDataTypeNotification));
 
-                var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+                var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ??Constants.Security.SuperUserId;
                 Audit(AuditType.Move, currentUserId, toMove.Id);
                 scope.Complete();
             }
@@ -454,7 +452,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 containerKey = container.Key;
             }
 
-            Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
             Attempt<IDataType, DataTypeOperationStatus> result = CopyAsync(copying, containerKey, currentUserKey).GetAwaiter().GetResult();
 
             // mimic old service behavior
@@ -507,8 +505,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
-            Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
-            
+            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
 
             SaveAsync(
                 dataType,
@@ -585,7 +582,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
         public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
         {
-            Guid currentUserKey = _userService.GetUserById(userId)?.Key ?? Constants.Security.SuperUserKey;
+            Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
             DeleteAsync(dataType.Key, currentUserKey).GetAwaiter().GetResult();
         }
 
@@ -643,7 +640,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, eventMessages).WithStateFrom(deletingDataTypeNotification));
 
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(AuditType.Delete, currentUserId, dataType.Id);
 
             scope.Complete();
@@ -702,7 +699,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             EventMessages eventMessages = EventMessagesFactory.Get();
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             dataType.CreatorId = currentUserId;
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();

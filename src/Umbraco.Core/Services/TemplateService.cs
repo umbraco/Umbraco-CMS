@@ -19,7 +19,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly ITemplateContentParserService _templateContentParserService;
-    private readonly IUserService _userService;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public TemplateService(
         ICoreScopeProvider provider,
@@ -29,14 +29,14 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateRepository templateRepository,
         IAuditRepository auditRepository,
         ITemplateContentParserService templateContentParserService,
-        IUserService userService)
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
         _templateRepository = templateRepository;
         _auditRepository = auditRepository;
         _templateContentParserService = templateContentParserService;
-        _userService = userService;
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     [Obsolete("Please use ctor that takes all parameters, scheduled for removal in v15")]
@@ -56,7 +56,7 @@ public class TemplateService : RepositoryService, ITemplateService
             templateRepository,
             auditRepository,
             templateContentParserService,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
     {
     }
 
@@ -100,7 +100,7 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(AuditType.New, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
         }
@@ -239,7 +239,7 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(auditType, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus(TemplateOperationStatus.Success, template);
@@ -386,7 +386,7 @@ public class TemplateService : RepositoryService, ITemplateService
             scope.Notifications.Publish(
                 new TemplateDeletedNotification(template, eventMessages).WithStateFrom(deletingNotification));
 
-            var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(AuditType.Delete, currentUserId, template.Id, UmbracoObjectTypes.Template.GetName());
             scope.Complete();
             return Attempt.SucceedWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.Success, template);

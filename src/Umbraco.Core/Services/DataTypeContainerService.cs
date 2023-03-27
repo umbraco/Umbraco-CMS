@@ -14,7 +14,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
     private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityRepository _entityRepository;
-    private readonly IUserService _userService;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public DataTypeContainerService(
         ICoreScopeProvider provider,
@@ -23,13 +23,13 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
         IDataTypeContainerRepository dataTypeContainerRepository,
         IAuditRepository auditRepository,
         IEntityRepository entityRepository,
-        IUserService userService)
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _dataTypeContainerRepository = dataTypeContainerRepository;
         _auditRepository = auditRepository;
         _entityRepository = entityRepository;
-        _userService = userService;
+        _userIdKeyResolver = userIdKeyResolver;
     }
 
     /// <inheritdoc />
@@ -126,7 +126,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
 
         _dataTypeContainerRepository.Delete(container);
 
-        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
         Audit(AuditType.Delete, currentUserId, container.Id);
         scope.Complete();
 
@@ -160,7 +160,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
 
         _dataTypeContainerRepository.Save(container);
 
-        var currentUserId = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
         Audit(auditType, currentUserId, container.Id);
         scope.Complete();
 

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services;
 public class RelationService : RepositoryService, IRelationService
 {
     private readonly IAuditRepository _auditRepository;
-    private readonly IUserService _userService;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IEntityService _entityService;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
@@ -39,7 +39,7 @@ public class RelationService : RepositoryService, IRelationService
             relationRepository,
             relationTypeRepository,
             auditRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
     {
     }
 
@@ -51,13 +51,13 @@ public class RelationService : RepositoryService, IRelationService
         IRelationRepository relationRepository,
         IRelationTypeRepository relationTypeRepository,
         IAuditRepository auditRepository,
-        IUserService userService)
+        IUserIdKeyResolver userIdKeyResolver)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
         _relationRepository = relationRepository;
         _relationTypeRepository = relationTypeRepository;
         _auditRepository = auditRepository;
-        _userService = userService;
+        _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
     }
 
@@ -622,7 +622,7 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Save(relationType);
-            var currentUser = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUser = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(auditType, currentUser, relationType.Id, auditMessage);
             scope.Complete();
             scope.Notifications.Publish(
@@ -691,7 +691,7 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Delete(relationType);
-            var currentUser = _userService.GetAsync(userKey).Result?.Id ?? Constants.Security.SuperUserId;
+            var currentUser = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
             Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
             scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
             scope.Complete();
