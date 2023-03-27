@@ -73,7 +73,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	public async requestChildren() {
 		// TODO: wait for tree context to be ready
 		this.#isLoading.next(true);
-		const response = await this.treeContext!.repository.requestTreeItemsOf(this.unique);
+		const response = await this.treeContext!.requestChildrenOf(this.unique);
 		this.#isLoading.next(false);
 		return response;
 	}

@@ -1,4 +1,4 @@
-import { UmbRelationTypeRepository } from '../repository/relation-type.repository';
+import { RELATION_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.RelationTypes',
 	name: 'Relation Types Tree',
 	meta: {
-		repository: UmbRelationTypeRepository,
+		repositoryAlias: RELATION_TYPE_REPOSITORY_ALIAS,
 	},
 };
 

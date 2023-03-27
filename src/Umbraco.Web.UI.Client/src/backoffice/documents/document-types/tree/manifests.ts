@@ -1,4 +1,4 @@
-import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
+import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.DocumentTypes',
 	name: 'Document Types Tree',
 	meta: {
-		repository: UmbDocumentTypeRepository,
+		repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
 	},
 };
 

@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../repository/data-type.repository';
+import { DATA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.DataTypes',
 	name: 'Data Types Tree',
 	meta: {
-		repository: UmbDataTypeRepository,
+		repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 	},
 };
 

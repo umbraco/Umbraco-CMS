@@ -1,4 +1,4 @@
-import { UmbDictionaryRepository } from '../repository/dictionary.repository';
+import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.Dictionary',
 	name: 'Dictionary Tree',
 	meta: {
-		repository: UmbDictionaryRepository,
+		repositoryAlias: DICTIONARY_REPOSITORY_ALIAS,
 	},
 };
 

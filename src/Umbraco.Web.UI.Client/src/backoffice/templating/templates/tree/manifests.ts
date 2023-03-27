@@ -1,4 +1,4 @@
-import { UmbTemplateRepository } from '../repository/template.repository';
+import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.Templates',
 	name: 'Templates Tree',
 	meta: {
-		repository: UmbTemplateRepository,
+		repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 	},
 };
 

@@ -1,5 +1,5 @@
-import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
 import { STYLESHEET_ENTITY_TYPE } from '..';
+import { STYLESHEET_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
@@ -10,7 +10,7 @@ const tree: ManifestTree = {
 	name: 'Stylesheet Tree',
 	weight: 10,
 	meta: {
-		repository: UmbStylesheetRepository,
+		repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
 	},
 };
 

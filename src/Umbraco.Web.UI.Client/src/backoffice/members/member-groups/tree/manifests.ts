@@ -1,4 +1,4 @@
-import { UmbMemberGroupRepository } from '../repository/member-group.repository';
+import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const treeAlias = 'Umb.Tree.MemberGroups';
@@ -9,7 +9,7 @@ const tree: ManifestTree = {
 	name: 'Member Groups Tree',
 	weight: 100,
 	meta: {
-		repository: UmbMemberGroupRepository,
+		repositoryAlias: MEMBER_GROUP_REPOSITORY_ALIAS,
 	},
 };
 
