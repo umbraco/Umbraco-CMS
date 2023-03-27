@@ -27,6 +27,7 @@ public static partial class Constants
         public const string ConfigHostingDebug = ConfigHostingPrefix + "Debug";
         public const string ConfigCustomErrorsMode = ConfigCustomErrorsPrefix + "Mode";
         public const string ConfigActiveDirectory = ConfigPrefix + "ActiveDirectory";
+        public const string ConfigMarketplace = ConfigPrefix + "Marketplace";
         public const string ConfigLegacyPasswordMigration = ConfigPrefix + "LegacyPasswordMigration";
         public const string ConfigContent = ConfigPrefix + "Content";
         public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
@@ -41,6 +42,7 @@ public static partial class Constants
         public const string ConfigLogging = ConfigPrefix + "Logging";
         public const string ConfigMemberPassword = ConfigPrefix + "Security:MemberPassword";
         public const string ConfigModelsBuilder = ConfigPrefix + "ModelsBuilder";
+        public const string ConfigModelsMode = ConfigModelsBuilder + ":ModelsMode";
         public const string ConfigNuCache = ConfigPrefix + "NuCache";
         public const string ConfigPlugins = ConfigPrefix + "Plugins";
         public const string ConfigRequestHandler = ConfigPrefix + "RequestHandler";

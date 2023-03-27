@@ -47,7 +47,7 @@ public class PublicAccessChecker : IPublicAccessChecker
             return PublicAccessStatus.LockedOut;
         }
 
-        if (!_publicAccessService.HasAccess(publishedContentId, _contentService, username, userRoles))
+        if (!_publicAccessService.HasAccess(publishedContentId, _contentService, username!, userRoles))
         {
             return PublicAccessStatus.AccessDenied;
         }

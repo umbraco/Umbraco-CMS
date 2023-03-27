@@ -1,7 +1,8 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models;
 
+[Obsolete("Will no longer be required with the new backoffice API")]
 [DataContract(Name = "installInstructions", Namespace = "")]
 public class InstallInstructions
 {

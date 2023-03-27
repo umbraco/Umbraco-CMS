@@ -680,7 +680,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     private EntitySlim BuildEntity(BaseDto dto)
     {
-        if (dto.NodeObjectType == Constants.ObjectTypes.Document)
+        if (dto.NodeObjectType == Constants.ObjectTypes.Document
+            || dto.NodeObjectType == Constants.ObjectTypes.DocumentBlueprint)
         {
             return BuildDocumentEntity(dto);
         }

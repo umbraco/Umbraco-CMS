@@ -1,0 +1,152 @@
+<uui-button-inline-create
+    ng-if="!vm.blockEditorApi.readonly && !vm.hideInlineCreateAbove"
+    class="umb-block-grid__block--inline-create-button --above"
+    style="--umb-block-grid-editor--inline-create-width: {{vm.inlineCreateAboveWidth}};"
+    ng-class="{'--at-root': vm.depth === '0'}"
+    ng-click="vm.clickInlineCreateAbove()"
+    ng-mouseover="vm.mouseOverInlineCreate()"
+    ng-mouseleave="vm.mouseOutInlineCreate()">
+</uui-button-inline-create>
+
+<ng-form name="vm.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
+    <div
+        class="umb-block-grid__block"
+        ng-mouseleave="vm.layoutEntry.$block.onMouseLeave()"
+        ng-mouseenter="vm.layoutEntry.$block.onMouseEnter()"
+        ng-class="{
+                    '--active':vm.layoutEntry.$block.active,
+                    '--show-validation': vm.layoutEntry.$block.showValidation === true,
+                    '--hovering-area': vm.isHoveringArea,
+                    '--scale-mode': vm.isScaleMode,
+                    '--block-ui-visible': vm.layoutEntry.$block.blockUiVisibility === true
+                }">
+
+        <umb-block-grid-block class="umb-block-grid__block--view"
+                              stylesheet="{{::vm.layoutEntry.$block.stylesheet}}"
+                              view="{{::vm.layoutEntry.$block.view}}"
+                              api="vm.blockEditorApi"
+                              block="vm.layoutEntry.$block"
+                              index="vm.index"
+                              parent-form="vm.blockForm"
+                              style="--umb-block-grid--area-grid-columns: {{vm.areaGridColumns}}"
+                              >
+            <slot
+                ng-repeat="proxyProp in vm.proxyProperties track by proxyProp.slotName"
+                data-is-property-editor-proxy
+                name="{{proxyProp.slotName}}"
+                slot="{{proxyProp.slotName}}">
+            </slot>
+            <umb-block-grid-entries 
+                ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
+                slot="{{::areaEntry.$config.alias}}"
+                class="umb-block-grid__area"
+                ng-class="{'--highlight': areaEntry.$highlight}"
+                data-area-col-span="{{::areaEntry.$config.columnSpan}}"
+                data-area-row-span="{{::areaEntry.$config.rowSpan}}"
+                data-area-alias="{{::areaEntry.$config.alias}}"
+                style="
+                --umb-block-grid--grid-columns: {{::areaEntry.$config.columnSpan}};
+                --umb-block-grid--area-column-span: {{::areaEntry.$config.columnSpan}};
+                --umb-block-grid--area-row-span: {{::areaEntry.$config.rowSpan}};
+                "
+                block-editor-api="vm.blockEditorApi"
+                entries="areaEntry.items"
+                area-key="areaEntry.key"
+                layout-columns="areaEntry.$config.columnSpan"
+                parent-block="vm.layoutEntry.$block"
+                parent-form="vm.blockForm"
+                property-editor-form="vm.propertyEditorForm"
+                ng-mouseover="vm.mouseOverArea(areaEntry)"
+                ng-mouseleave="vm.mouseLeaveArea()"
+                depth="{{vm.childDepth}}"
+                create-label="{{::areaEntry.$config.createLabel}}">
+            </umb-block-grid-entries>
+
+        </umb-block-grid-block>
+
+        <div class="umb-block-grid__block--validation-border"></div>
+
+        <div class="umb-block-grid__block--context">
+            <div class="__context-bar">
+                <button
+                    ng-if="vm.parentBlock"
+                    type="button"
+                    class="btn-reset umb-outline action"
+                    localize="title"
+                    title="blockEditor_focusParentBlock"
+                    ng-click="vm.parentBlock.showBlockUI()"
+                    ng-class="{ '--error': false && vm.valFormManager.isShowingValidation() }"
+                    ng-bind="vm.parentBlock.label"
+                ></button>
+                <div class="__divider" ng-if="vm.parentBlock">/</div>
+                <div class="__label" title="{{vm.layoutEntry.$block.label}}" ng-bind="vm.layoutEntry.$block.label"></div>
+            </div>
+        </div>
+
+        <div class="umb-block-grid__block--actions">
+
+            <button type="button" class="btn-reset umb-outline action --content" localize="title" title="actions_editContent"
+                    ng-click="vm.blockEditorApi.editBlock(vm.layoutEntry.$block, false, vm.index, vm.blockForm);"
+                    ng-class="{ '--error': vm.blockForm.$error.valServerMatchContent }"
+                    ng-if="vm.layoutEntry.$block.showContent === true">
+                <umb-icon icon="icon-edit" class="icon"></umb-icon>
+                <span class="sr-only">
+                    <localize key="general_content">Content</localize>
+                </span>
+                <div class="__error-badge">!</div>
+            </button>
+
+            <button type="button" class="btn-reset umb-outline action --settings" localize="title" title="actions_editSettings"
+                    ng-click="vm.blockEditorApi.openSettingsForBlock(vm.layoutEntry.$block, vm.index, vm.blockForm);"
+                    ng-class="{ '--error': vm.blockForm.$error.valServerMatchSettings }"
+                    ng-if="vm.layoutEntry.$block.showSettings === true">
+                <umb-icon icon="icon-settings" class="icon"></umb-icon>
+                <span class="sr-only">
+                    <localize key="general_settings">Settings</localize>
+                </span>
+                <div class="__error-badge">!</div>
+            </button>
+            <button type="button" class="btn-reset umb-outline action --copy" localize="title" title="actions_copy"
+                    ng-click="vm.blockEditorApi.copyBlock(vm.layoutEntry.$block);"
+                    ng-if="vm.layoutEntry.$block.showCopy === true">
+                <umb-icon icon="icon-documents" class="icon"></umb-icon>
+                <span class="sr-only">
+                    <localize key="general_copy">Copy</localize>
+                </span>
+            </button>
+            <button ng-if="!vm.blockEditorApi.readonly"
+                    type="button" class="btn-reset umb-outline action --delete" localize="title" title="actions_delete"
+                    ng-click="vm.blockEditorApi.requestDeleteBlock(vm.layoutEntry.$block);">
+                <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                <span class="sr-only">
+                    <localize key="general_delete">Delete</localize>
+                </span>
+            </button>
+        </div>
+
+        <button 
+            ng-if="::!vm.blockEditorApi.readonly && vm.canScale" 
+            type="button"
+            title="@blockEditor_scaleHandlerButtonTitle"
+            localize="title"
+            class="umb-block-grid__scale-handler"
+            ng-mousedown="vm.scaleHandlerMouseDown($event)"
+            ng-keyup="vm.scaleHandlerKeyUp($event)">
+        </button>
+        <div ng-if="::!vm.blockEditorApi.readonly && vm.canScale" 
+            class="umb-block-grid__scale-label">
+            {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
+        </div>
+
+    </div>
+</ng-form>
+
+<uui-button-inline-create
+    ng-if="!vm.blockEditorApi.readonly && !vm.hideInlineCreateAfter"
+    class="umb-block-grid__block--inline-create-button --after"
+    ng-class="{'--at-root': vm.depth === '0'}"
+    ng-click="vm.clickInlineCreateAfter($event)"
+    ng-mouseover="vm.mouseOverInlineCreate()"
+    ng-mouseleave="vm.mouseOutInlineCreate()"
+    vertical>
+</uui-button-inline-create>

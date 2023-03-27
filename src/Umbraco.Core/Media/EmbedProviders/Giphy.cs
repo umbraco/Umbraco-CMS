@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Giphy.com the popular online GIFs and animated sticker provider.
 /// </summary>
-public class Giphy : EmbedProviderBase
+public class Giphy : OEmbedProviderBase
 {
     public Giphy(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

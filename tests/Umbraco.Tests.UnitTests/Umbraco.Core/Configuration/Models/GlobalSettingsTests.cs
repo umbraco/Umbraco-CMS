@@ -16,9 +16,9 @@ public class GlobalSettingsTests
 {
     [InlineAutoMoqData("~/umbraco", "/", "umbraco")]
     [InlineAutoMoqData("~/umbraco", "/MyVirtualDir", "umbraco")]
-    [InlineAutoMoqData("~/customPath", "/MyVirtualDir/", "custompath")]
-    [InlineAutoMoqData("~/some-wacky/nestedPath", "/MyVirtualDir", "some-wacky-nestedpath")]
-    [InlineAutoMoqData("~/some-wacky/nestedPath", "/MyVirtualDir/NestedVDir/", "some-wacky-nestedpath")]
+    [InlineAutoMoqData("~/customPath", "/MyVirtualDir/", "umbraco")]
+    [InlineAutoMoqData("~/some-wacky/nestedPath", "/MyVirtualDir", "umbraco")]
+    [InlineAutoMoqData("~/some-wacky/nestedPath", "/MyVirtualDir/NestedVDir/", "umbraco")]
     public void Umbraco_Mvc_Area(
         string path,
         string rootPath,

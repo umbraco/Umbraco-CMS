@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders;
 /// <summary>
 ///     Embed Provider for Kickstarter the popular online crowdfunding platform focused on creativity.
 /// </summary>
-public class Kickstarter : EmbedProviderBase
+public class Kickstarter : OEmbedProviderBase
 {
     public Kickstarter(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

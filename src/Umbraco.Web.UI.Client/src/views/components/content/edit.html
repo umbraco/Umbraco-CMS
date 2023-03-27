@@ -39,7 +39,8 @@
                         button-style="link"
                         label-key="general_close"
                         shortcut="esc"
-                        type="button">
+                        type="button"
+                        disabled="page.uploadsInProgress">
                     </umb-button>
 
                     <umb-button
@@ -48,7 +49,8 @@
                         type="button"
                         button-style="link"
                         action="preview(content)"
-                        label-key="buttons_saveAndPreview">
+                        label-key="buttons_saveAndPreview"
+                        disabled="page.uploadsInProgress">
                     </umb-button>
 
                     <umb-button
@@ -60,7 +62,8 @@
                         action="save(content)"
                         label-key="buttons_save"
                         shortcut="ctrl+s"
-                        add-ellipsis="{{page.saveButtonEllipsis}}">
+                        add-ellipsis="{{page.saveButtonEllipsis}}"
+                        disabled="page.uploadsInProgress">
                     </umb-button>
 
                     <umb-button-group
@@ -72,7 +75,8 @@
                         direction="up"
                         float="right"
                         label-key="buttons_morePublishingOptions"
-                        label="More publishing options">
+                        label="More publishing options"
+                        disabled="page.uploadsInProgress">
                     </umb-button-group>
 
                     <umb-button
@@ -81,7 +85,8 @@
                         button-style="primary"
                         state="saveAndCloseButtonState"
                         label-key="buttons_saveAndClose"
-                        type="button">
+                        type="button"
+                        disabled="page.uploadsInProgress">
                     </umb-button>
 
                     <umb-button
@@ -90,7 +95,8 @@
                         button-style="primary"
                         state="publishAndCloseButtonState"
                         label-key="buttons_publishAndClose"
-                        type="button">
+                        type="button"
+                        disabled="page.uploadsInProgress">
                     </umb-button>
 
                 </umb-editor-footer-content-right>

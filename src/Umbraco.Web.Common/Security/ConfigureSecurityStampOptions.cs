@@ -21,11 +21,14 @@ public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampVali
         // to flow through to this new one.
         options.OnRefreshingPrincipal = refreshingPrincipal =>
         {
-            ClaimsIdentity newIdentity = refreshingPrincipal.NewPrincipal.Identities.First();
-            ClaimsIdentity currentIdentity = refreshingPrincipal.CurrentPrincipal.Identities.First();
+            ClaimsIdentity? newIdentity = refreshingPrincipal.NewPrincipal?.Identities.First();
+            ClaimsIdentity? currentIdentity = refreshingPrincipal.CurrentPrincipal?.Identities.First();
 
-            // Since this is refreshing an existing principal, we want to merge all claims.
-            newIdentity.MergeAllClaims(currentIdentity);
+            if (currentIdentity is not null)
+            {
+                // Since this is refreshing an existing principal, we want to merge all claims.
+                newIdentity?.MergeAllClaims(currentIdentity);
+            }
 
             return Task.CompletedTask;
         };

@@ -72,7 +72,7 @@
             });
 
             event.stopPropagation();
-        }
+        };
 
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);
@@ -152,7 +152,6 @@
                 infiniteMode: true,
                 noTemplate: true,
                 isElement: true,
-                noTemplate: true,
                 submit: function (model) {
                     loadElementTypes().then(() => {
                         callback(model.documentTypeKey);

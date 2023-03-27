@@ -50,7 +50,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsMemberAuthorizedAsync(
+    public virtual async Task<bool> IsMemberAuthorizedAsync(
         IEnumerable<string>? allowTypes = null,
         IEnumerable<string>? allowGroups = null,
         IEnumerable<int>? allowMembers = null)
@@ -122,14 +122,14 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     }
 
     /// <inheritdoc />
-    public bool IsLoggedIn()
+    public virtual bool IsLoggedIn()
     {
         HttpContext? httpContext = _httpContextAccessor.HttpContext;
         return httpContext?.User.Identity?.IsAuthenticated ?? false;
     }
 
     /// <inheritdoc />
-    public async Task<bool> MemberHasAccessAsync(string path)
+    public virtual async Task<bool> MemberHasAccessAsync(string path)
     {
         if (await IsProtectedAsync(path))
         {
@@ -140,7 +140,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyDictionary<string, bool>> MemberHasAccessAsync(IEnumerable<string> paths)
+    public virtual async Task<IReadOnlyDictionary<string, bool>> MemberHasAccessAsync(IEnumerable<string> paths)
     {
         IReadOnlyDictionary<string, bool> protectedPaths = await IsProtectedAsync(paths);
 
@@ -163,10 +163,10 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     /// <remarks>
     ///     this is a cached call
     /// </remarks>
-    public Task<bool> IsProtectedAsync(string path) => Task.FromResult(_publicAccessService.IsProtected(path).Success);
+    public virtual Task<bool> IsProtectedAsync(string path) => Task.FromResult(_publicAccessService.IsProtected(path).Success);
 
     /// <inheritdoc />
-    public Task<IReadOnlyDictionary<string, bool>> IsProtectedAsync(IEnumerable<string> paths)
+    public virtual Task<IReadOnlyDictionary<string, bool>> IsProtectedAsync(IEnumerable<string> paths)
     {
         var result = new Dictionary<string, bool>();
         foreach (var path in paths)
@@ -179,7 +179,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     }
 
     /// <inheritdoc />
-    public async Task<MemberIdentityUser?> GetCurrentMemberAsync()
+    public virtual async Task<MemberIdentityUser?> GetCurrentMemberAsync()
     {
         if (_currentMember == null)
         {
@@ -188,13 +188,13 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
                 return null;
             }
 
-            _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User);
+            _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User!);
         }
 
         return _currentMember;
     }
 
-    public IPublishedContent? AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
+    public virtual IPublishedContent? AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
 
     /// <summary>
     ///     This will check if the member has access to this path
@@ -204,7 +204,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     private async Task<bool> HasAccessAsync(string path)
     {
         MemberIdentityUser? currentMember = await GetCurrentMemberAsync();
-        if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
+        if (currentMember?.UserName is null || !currentMember.IsApproved || currentMember.IsLockedOut)
         {
             return false;
         }
@@ -220,7 +220,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         var result = new Dictionary<string, bool>();
         MemberIdentityUser? currentMember = await GetCurrentMemberAsync();
 
-        if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
+        if (currentMember?.UserName is null || !currentMember.IsApproved || currentMember.IsLockedOut)
         {
             return result;
         }

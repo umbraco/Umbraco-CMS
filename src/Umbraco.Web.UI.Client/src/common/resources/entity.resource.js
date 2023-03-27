@@ -176,9 +176,9 @@ function entityResource($q, $http, umbRequestHelper) {
                      "GetUrlsByIds",
                      query),
                  {
-                     ids: ids
+                     ids: udis
                  }),
-             'Failed to retrieve url map for ids ' + ids);
+             'Failed to retrieve url map for ids ' + udis);
         },
 
         getUrlByUdi: function (udi, culture) {

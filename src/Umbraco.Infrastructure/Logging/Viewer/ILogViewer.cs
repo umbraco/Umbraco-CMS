@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -38,13 +38,6 @@ public interface ILogViewer
     IEnumerable<LogTemplate> GetMessageTemplates(LogTimePeriod logTimePeriod);
 
     bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
-
-    /// <summary>
-    ///     Gets the current Serilog minimum log level
-    /// </summary>
-    /// <returns></returns>
-    [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
-    string GetLogLevel();
 
     /// <summary>
     ///     Returns the collection of logs

@@ -4,6 +4,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 ///     Fixes up the original <see cref="ExternalLoginTableIndexes" /> for post RC release to ensure that
 ///     the correct indexes are applied.
 /// </summary>
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public class ExternalLoginTableIndexesFixup : MigrationBase
 {
     public ExternalLoginTableIndexesFixup(IMigrationContext context)

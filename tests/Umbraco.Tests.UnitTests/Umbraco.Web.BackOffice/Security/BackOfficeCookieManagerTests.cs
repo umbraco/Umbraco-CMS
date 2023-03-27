@@ -24,12 +24,13 @@ public class BackOfficeCookieManagerTests
     public void ShouldAuthenticateRequest_When_Not_Configured()
     {
         var globalSettings = new GlobalSettings();
+        var umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
 
         var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
         var mgr = new BackOfficeCookieManager(
             Mock.Of<IUmbracoContextAccessor>(),
             runtime,
-            new UmbracoRequestPaths(Options.Create(globalSettings), TestHelper.GetHostingEnvironment()),
+            new UmbracoRequestPaths(Options.Create(globalSettings), TestHelper.GetHostingEnvironment(), Options.Create(umbracoRequestPathsOptions)),
             Mock.Of<IBasicAuthService>());
 
         var result = mgr.ShouldAuthenticateRequest("/umbraco");
@@ -41,6 +42,7 @@ public class BackOfficeCookieManagerTests
     public void ShouldAuthenticateRequest_When_Configured()
     {
         var globalSettings = new GlobalSettings();
+        var umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
 
         var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
         var mgr = new BackOfficeCookieManager(
@@ -49,7 +51,8 @@ public class BackOfficeCookieManagerTests
             new UmbracoRequestPaths(
                 Options.Create(globalSettings),
                 Mock.Of<IHostingEnvironment>(x =>
-                    x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco")),
+                    x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco"),
+                Options.Create(umbracoRequestPathsOptions)),
             Mock.Of<IBasicAuthService>());
 
         var result = mgr.ShouldAuthenticateRequest("/umbraco");
@@ -61,6 +64,7 @@ public class BackOfficeCookieManagerTests
     public void ShouldAuthenticateRequest_Is_Back_Office()
     {
         var globalSettings = new GlobalSettings();
+        var umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
 
         var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
@@ -73,7 +77,8 @@ public class BackOfficeCookieManagerTests
                 Options.Create(globalSettings),
                 Mock.Of<IHostingEnvironment>(x =>
                     x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" &&
-                    x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")),
+                    x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
+                Options.Create(umbracoRequestPathsOptions)),
             Mock.Of<IBasicAuthService>());
 
         var result = mgr.ShouldAuthenticateRequest(remainingTimeoutSecondsPath);
@@ -87,6 +92,7 @@ public class BackOfficeCookieManagerTests
     public void ShouldAuthenticateRequest_Not_Back_Office()
     {
         var globalSettings = new GlobalSettings();
+        var umbracoRequestPathsOptions = new UmbracoRequestPathsOptions();
 
         var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
 
@@ -97,7 +103,8 @@ public class BackOfficeCookieManagerTests
                 Options.Create(globalSettings),
                 Mock.Of<IHostingEnvironment>(x =>
                     x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" &&
-                    x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")),
+                    x.ToAbsolute(Constants.SystemDirectories.Install) == "/install"),
+                Options.Create(umbracoRequestPathsOptions)),
             Mock.Of<IBasicAuthService>());
 
         var result = mgr.ShouldAuthenticateRequest("/notbackoffice");

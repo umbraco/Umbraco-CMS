@@ -57,6 +57,12 @@ public class ValueSetValidator : IValueSetValidator
 
     public virtual ValueSetValidationResult Validate(ValueSet valueSet)
     {
+        /* Notes on status on the result:
+         * A result status of filtered means that this whole value set result is to be filtered from the index
+         * For example the path is incorrect or it is in the recycle bin
+         * It does not mean that the values it contains have been through a filtering (for example if an language variant is not published)
+         * See notes on issue 11383 */
+
         if (ValidIndexCategories != null && !ValidIndexCategories.InvariantContains(valueSet.Category))
         {
             return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
@@ -74,31 +80,27 @@ public class ValueSetValidator : IValueSetValidator
             return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
         }
 
-        var isFiltered = false;
-
         var filteredValues = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
 
         // filter based on the fields provided (if any)
         if (IncludeFields != null || ExcludeFields != null)
         {
-            foreach (var key in valueSet.Values.Keys.ToList())
+            foreach (var key in valueSet.Values.Keys.ToArray())
             {
                 if (IncludeFields != null && !IncludeFields.InvariantContains(key))
                 {
                     filteredValues.Remove(key); // remove any value with a key that doesn't match the inclusion list
-                    isFiltered = true;
                 }
 
                 if (ExcludeFields != null && ExcludeFields.InvariantContains(key))
                 {
                     filteredValues.Remove(key); // remove any value with a key that matches the exclusion list
-                    isFiltered = true;
                 }
+
             }
         }
 
         var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
-        return new ValueSetValidationResult(
-            isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
+        return new ValueSetValidationResult(ValueSetValidationStatus.Valid, filteredValueSet);
     }
 }

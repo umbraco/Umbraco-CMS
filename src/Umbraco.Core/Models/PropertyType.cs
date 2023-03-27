@@ -283,12 +283,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
         base.PerformDeepClone(clone);
 
         var clonedEntity = (PropertyType)clone;
-
-        // need to manually assign the Lazy value as it will not be automatically mapped
-        if (PropertyGroupId != null)
-        {
-            clonedEntity._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);
-        }
+        clonedEntity.ClearPropertyChangedEvents();
     }
 
     /// <summary>
