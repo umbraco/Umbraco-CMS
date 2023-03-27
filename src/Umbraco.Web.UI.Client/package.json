@@ -28,7 +28,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build --mode staging",
-		"build:libs": "rollup -c rollup-libs.config.js && node utils/move-libs.js",
+		"build:libs": "npm run wc-analyze && npm run wc-analyze:vscode && rollup -c rollup-libs.config.js && node utils/move-libs.js",
 		"build:for:static": "tsc && vite build",
 		"build:for:cms": "tsc && vite build -c vite.cms.config.ts && npm run build:libs",
 		"build:for:cms:watch": "vite build -c vite.cms.config.ts --watch",
@@ -50,6 +50,7 @@
 		"build-storybook": "npm run wc-analyze && storybook build",
 		"generate:icons": "node ./devops/icons/index.js",
 		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",
+		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile vscode-html-custom-data.json",
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
 		"check": "npm run lint && npm run compile && npm run build-storybook"
