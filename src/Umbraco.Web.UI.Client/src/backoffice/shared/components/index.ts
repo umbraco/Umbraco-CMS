@@ -37,7 +37,6 @@ import './table/table.element';
 
 import './tree/tree.element';
 import './tree/entity-tree-item/entity-tree-item.element';
-import './tree/file-system-tree-item/file-system-tree-item.element';
 import './tree/tree-menu-item/tree-menu-item.element';
 
 import './variantable-property/variantable-property.element';
