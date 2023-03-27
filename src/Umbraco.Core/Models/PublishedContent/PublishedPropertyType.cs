@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
-            _modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
+            _modelClrType = _converter?.GetPropertyValueType(this) ?? typeof(object);
         }
 
         /// <inheritdoc />

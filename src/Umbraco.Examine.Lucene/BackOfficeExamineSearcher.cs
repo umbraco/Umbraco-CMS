@@ -169,7 +169,10 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
-        query = Regex.Replace(query, "[\\*\\-_]", string.Empty);
+        // However we cannot just remove - and _  since these signify a space, so we instead replace them with that.
+        query = Regex.Replace(query, "[\\*]", string.Empty);
+        query = Regex.Replace(query, "[\\-_]", " ");
+
 
         //check if text is surrounded by single or double quotes, if so, then exact match
         var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
