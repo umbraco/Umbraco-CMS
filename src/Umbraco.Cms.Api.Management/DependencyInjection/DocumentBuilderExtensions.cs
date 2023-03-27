@@ -11,6 +11,7 @@ internal static class DocumentBuilderExtensions
     internal static IUmbracoBuilder AddDocuments(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IDocumentPresentationFactory, DocumentPresentationFactory>();
+        builder.Services.AddTransient<IDocumentNotificationPresentationFactory, DocumentNotificationPresentationFactory>();
         builder.Services.AddTransient<IContentUrlFactory, ContentUrlFactory>();
         builder.Services.AddTransient<IDocumentEditingPresentationFactory, DocumentEditingPresentationFactory>();
 
