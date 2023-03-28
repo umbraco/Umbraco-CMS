@@ -34,7 +34,6 @@ export class UmbWorkspaceViewDocumentTypeListviewElement extends UmbLitElement {
 	}
 
 	render() {
-		//this._documentType?.name
 		return html` Listview `;
 	}
 }

@@ -104,7 +104,6 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	}
 
 	render() {
-		//this._documentType?.name
 		return html`
 			<div id="workspace-tab-bar">
 				${this.renderTabBar()}
