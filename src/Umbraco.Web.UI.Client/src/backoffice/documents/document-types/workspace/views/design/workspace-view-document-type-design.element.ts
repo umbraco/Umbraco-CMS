@@ -2,10 +2,10 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
-import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 
 @customElement('umb-workspace-view-document-type-design')
 export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
@@ -15,6 +15,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 			:host {
 				display: block;
 			}
+			/* TODO: This should be replaced with a general workspace bar — naming is hard */
 			#workspace-tab-bar {
 				padding: 0 var(--uui-size-layout-1);
 				display: flex;
@@ -83,9 +84,6 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 
 	@state()
 	private _tabs: any[] = [];
-
-	@query('uui-tab-group')
-	private _tabgroup?: HTMLElement;
 
 	constructor() {
 		super();
