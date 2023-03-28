@@ -15,7 +15,7 @@
         var vm = this;
 
         const dataTypesCanBeChangedConfig = window.Umbraco.Sys.ServerVariables.umbracoSettings.dataTypesCanBeChanged;
-        
+
         vm.allowChangeDataType = false;
         vm.changeDataTypeHelpTextIsVisible = false;
         vm.propertyTypeHasValues = false;
