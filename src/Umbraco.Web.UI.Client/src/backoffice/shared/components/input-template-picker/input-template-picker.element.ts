@@ -2,13 +2,13 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { UmbTemplateCardElement } from '../template-card/template-card.element';
+import { UMB_TEMPLATE_PICKER_MODAL_TOKEN } from '../../modals/template-picker';
+import { UMB_TEMPLATE_MODAL_TOKEN } from '../../modals/template';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTemplateCardElement } from '../template-card/template-card.element';
-import { UMB_TEMPLATE_PICKER_MODAL_TOKEN } from '../../modals/template-picker';
-import { UMB_TEMPLATE_MODAL_TOKEN } from '../../modals/template';
 
 @customElement('umb-input-template-picker')
 export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElement) {
