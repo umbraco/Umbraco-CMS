@@ -15,7 +15,7 @@
         var vm = this;
 
         const dataTypesCanBeChangedConfig = window.Umbraco.Sys.ServerVariables.umbracoSettings.dataTypesCanBeChanged;
-        
+
         vm.allowChangeDataType = false;
         vm.changeDataTypeHelpTextIsVisible = false;
         vm.propertyTypeHasValues = false;
@@ -199,7 +199,6 @@
 
         function submitOnEnter(event) {
             if(event && event.keyCode === 13) {
-                event.preventDefault();
                 submit();
             }
         }
