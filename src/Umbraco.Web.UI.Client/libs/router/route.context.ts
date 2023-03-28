@@ -1,4 +1,4 @@
-import type { IRoutingInfo, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
+import type { IRoutingInfo, ISlashOptions } from 'router-slot';
 import { UmbRoute } from './route.interface';
 import {
 	UmbContextConsumerController,
@@ -9,6 +9,17 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
+
+const PARAM_IDENTIFIER = /:([^\\/]+)/g;
+
+function stripSlash(path: string): string {
+	return slashify(path, { start: false, end: false });
+}
+
+function slashify(path: string, { start = true, end = true }: Partial<ISlashOptions> = {}): string {
+	path = start && !path.startsWith('/') ? `/${path}` : !start && path.startsWith('/') ? path.slice(1) : path;
+	return end && !path.endsWith('/') ? `${path}/` : !end && path.endsWith('/') ? path.slice(0, path.length - 1) : path;
+}
 
 export class UmbRouteContext {
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
