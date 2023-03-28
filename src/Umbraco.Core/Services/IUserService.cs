@@ -65,9 +65,9 @@ public interface IUserService : IMembershipUserService
 
     Task<UserOperationStatus> DeleteAsync(Guid key);
 
-    Task<UserOperationStatus> DisableAsync(Guid performingUserKey, params Guid[] keys);
+    Task<UserOperationStatus> DisableAsync(Guid performingUserKey, ISet<Guid> keys);
 
-    Task<UserOperationStatus> EnableAsync(Guid performingUserKey, params Guid[] keys);
+    Task<UserOperationStatus> EnableAsync(Guid performingUserKey, ISet<Guid> keys);
 
     Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
 

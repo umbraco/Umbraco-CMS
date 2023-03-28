@@ -1191,9 +1191,9 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<UserOperationStatus> DisableAsync(Guid performingUserKey, params Guid[] keys)
+    public async Task<UserOperationStatus> DisableAsync(Guid performingUserKey, ISet<Guid> keys)
     {
-        if(keys.Length == 0)
+        if(keys.Any() is false)
         {
             return UserOperationStatus.Success;
         }
@@ -1213,7 +1213,12 @@ internal class UserService : RepositoryService, IUserService
 
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
-        IUser[] usersToDisable = (await userStore.GetUsersAsync(keys)).ToArray();
+        IUser[] usersToDisable = (await userStore.GetUsersAsync(keys.ToArray())).ToArray();
+
+        if (usersToDisable.Length != keys.Count)
+        {
+            return UserOperationStatus.NotFound;
+        }
 
         foreach (IUser user in usersToDisable)
         {
@@ -1232,9 +1237,9 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<UserOperationStatus> EnableAsync(Guid performingUserKey, params Guid[] keys)
+    public async Task<UserOperationStatus> EnableAsync(Guid performingUserKey, ISet<Guid> keys)
     {
-        if(keys.Length == 0)
+        if(keys.Any() is false)
         {
             return UserOperationStatus.Success;
         }
@@ -1249,7 +1254,12 @@ internal class UserService : RepositoryService, IUserService
 
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
-        IUser[] usersToEnable = (await userStore.GetUsersAsync(keys)).ToArray();
+        IUser[] usersToEnable = (await userStore.GetUsersAsync(keys.ToArray())).ToArray();
+
+        if (usersToEnable.Length != keys.Count)
+        {
+            return UserOperationStatus.NotFound;
+        }
 
         foreach (IUser user in usersToEnable)
         {
