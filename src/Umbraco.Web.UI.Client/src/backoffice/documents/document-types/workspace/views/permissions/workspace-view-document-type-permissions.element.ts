@@ -5,8 +5,6 @@ import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.c
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import '../../../../../shared/property-creator/property-creator.element.ts';
-
 @customElement('umb-workspace-view-document-type-permissions')
 export class UmbWorkspaceViewDocumentTypePermissionsElement extends UmbLitElement {
 	static styles = [

@@ -2,7 +2,6 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import '../../../../../shared/property-creator/property-creator.element.ts';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 
