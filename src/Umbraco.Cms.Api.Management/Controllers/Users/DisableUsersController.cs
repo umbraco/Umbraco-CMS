@@ -20,7 +20,7 @@ public class DisableUsersController : UsersControllerBase
     public async Task<IActionResult> DisableUsers(DisableUserRequestModel model)
     {
         // FIXME: use the actual currently logged in user key
-        UserOperationStatus result = await _userService.DisableAsync(Constants.Security.SuperUserKey, model.UserIds.ToArray());
+        UserOperationStatus result = await _userService.DisableAsync(Constants.Security.SuperUserKey, model.UserIds);
 
         return result is UserOperationStatus.Success
             ? Ok()
