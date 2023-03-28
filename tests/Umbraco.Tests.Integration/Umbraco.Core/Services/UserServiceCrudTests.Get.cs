@@ -138,7 +138,7 @@ public partial class UserServiceCrudTests
         var secondEditorResult = await userService.CreateAsync(Constants.Security.SuperUserKey, secondEditorCreateModel, true);
         Assert.IsTrue(secondEditorResult.Success);
 
-        var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, secondEditorResult.Result.CreatedUser!.Key);
+        var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid>{ secondEditorResult.Result.CreatedUser!.Key });
         Assert.AreEqual(disableStatus, UserOperationStatus.Success);
 
         var allUsersAttempt = await userService.GetAllAsync(Constants.Security.SuperUserKey, 0, 10000);

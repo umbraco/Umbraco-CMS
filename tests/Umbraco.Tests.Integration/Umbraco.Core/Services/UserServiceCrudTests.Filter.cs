@@ -30,7 +30,7 @@ public partial class UserServiceCrudTests
         Assert.IsTrue(createAttempt.Success);
 
         var disableStatus =
-            await userService.DisableAsync(Constants.Security.SuperUserKey, createAttempt.Result.CreatedUser!.Key);
+            await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid>{ createAttempt.Result.CreatedUser!.Key });
         Assert.AreEqual(UserOperationStatus.Success, disableStatus);
 
         var filter = new UserFilter {IncludeUserStates = new SortedSet<UserState> {includeState}};

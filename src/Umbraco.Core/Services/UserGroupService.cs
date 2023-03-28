@@ -169,8 +169,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
 
     public async Task UpdateUserGroupsOnUsers(
-        IEnumerable<Guid> userGroupKeys,
-        IEnumerable<Guid> userKeys)
+        ISet<Guid> userGroupKeys,
+        ISet<Guid> userKeys)
     {
         IUser[] users = (await _userService.GetAsync(userKeys)).ToArray();
 

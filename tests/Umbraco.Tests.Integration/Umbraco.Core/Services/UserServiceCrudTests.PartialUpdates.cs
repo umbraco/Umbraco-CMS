@@ -28,7 +28,7 @@ public partial class UserServiceCrudTests
         var user = createAttempt.Result.CreatedUser;
         Assert.AreEqual(UserState.Disabled, user!.UserState);
 
-        var enableStatus = await userService.EnableAsync(Constants.Security.SuperUserKey, user.Key);
+        var enableStatus = await userService.EnableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key });
         Assert.AreEqual(UserOperationStatus.Success, enableStatus);
 
         var updatedUser = await userService.GetAsync(user.Key);
@@ -56,7 +56,7 @@ public partial class UserServiceCrudTests
         var user = createAttempt.Result.CreatedUser;
         Assert.AreEqual(UserState.Inactive, user!.UserState);
 
-        var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, user.Key);
+        var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key });
         Assert.AreEqual(UserOperationStatus.Success, disableStatus);
     }
 
@@ -78,7 +78,7 @@ public partial class UserServiceCrudTests
         Assert.IsTrue(createAttempt.Success);
 
         var createdUser = createAttempt.Result.CreatedUser;
-        var disableStatus = await userService.DisableAsync(createdUser!.Key, createdUser.Key);
+        var disableStatus = await userService.DisableAsync(createdUser!.Key, new HashSet<Guid>{ createdUser.Key });
         Assert.AreEqual(UserOperationStatus.CannotDisableSelf, disableStatus);
     }
 
@@ -101,7 +101,7 @@ public partial class UserServiceCrudTests
         Assert.IsTrue(userInviteAttempt.Success);
 
         var invitedUser = userInviteAttempt.Result.InvitedUser;
-        var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, invitedUser!.Key);
+        var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { invitedUser!.Key });
         Assert.AreEqual(UserOperationStatus.CannotDisableInvitedUser, disableStatus);
     }
 }
