@@ -14,7 +14,7 @@ public class UnlockUsersController : UsersControllerBase
 
     public UnlockUsersController(IUserService userService) => _userService = userService;
 
-    [HttpPatch("unlock")]
+    [HttpPost("unlock")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

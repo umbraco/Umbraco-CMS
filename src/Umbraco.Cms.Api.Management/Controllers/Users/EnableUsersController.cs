@@ -13,7 +13,7 @@ public class EnableUsersController : UsersControllerBase
 
     public EnableUsersController(IUserService userService) => _userService = userService;
 
-    [HttpPatch("enable")]
+    [HttpPost("enable")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

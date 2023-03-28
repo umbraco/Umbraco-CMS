@@ -19,7 +19,7 @@ public class ChangePasswordUsersController : UsersControllerBase
         _userService = userService;
     }
 
-    [HttpPatch("change-password/{id:guid}")]
+    [HttpPost("change-password/{id:guid}")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
     {

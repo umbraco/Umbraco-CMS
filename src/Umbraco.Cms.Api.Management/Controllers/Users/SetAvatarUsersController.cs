@@ -16,7 +16,7 @@ public class SetAvatarUsersController : UsersControllerBase
         _userService = userService;
     }
 
-    [HttpPatch("avatar/{id:guid}")]
+    [HttpPost("avatar/{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SetAvatar(Guid id, SetAvatarRequestModel model)

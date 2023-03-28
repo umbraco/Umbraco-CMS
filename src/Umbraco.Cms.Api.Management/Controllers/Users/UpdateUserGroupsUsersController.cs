@@ -14,7 +14,7 @@ public class UpdateUserGroupsUsersController : UsersControllerBase
         _userGroupService = userGroupService;
     }
 
-    [HttpPatch("set-user-groups")]
+    [HttpPost("set-user-groups")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateUserGroups(UpdateUserGroupsOnUserRequestModel requestModel)

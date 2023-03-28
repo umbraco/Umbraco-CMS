@@ -13,7 +13,7 @@ public class DisableUsersController : UsersControllerBase
 
     public DisableUsersController(IUserService userService) => _userService = userService;
 
-    [HttpPatch("disable")]
+    [HttpPost("disable")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
