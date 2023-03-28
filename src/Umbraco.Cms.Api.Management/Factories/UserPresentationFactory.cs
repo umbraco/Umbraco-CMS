@@ -43,7 +43,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             CreateDate = user.CreateDate,
             UpdateDate = user.UpdateDate,
             State = user.UserState,
-            UserGroups = new SortedSet<Guid>(user.Groups.Select(x => x.Key)),
+            UserGroupIds = new SortedSet<Guid>(user.Groups.Select(x => x.Key)),
             ContentStartNodeKeys = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             MediaStartNodeKeys = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             FailedLoginAttempts = user.FailedPasswordAttempts,
@@ -57,7 +57,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     public async Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
     {
-        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroups);
+        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroupIds);
 
         var createModel = new UserCreateModel
         {
@@ -72,7 +72,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     public async Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
     {
-        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroups);
+        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroupIds);
 
         var inviteModel = new UserInviteModel
         {
@@ -94,12 +94,12 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = updateModel.Email,
             Name = updateModel.Name,
             UserName = updateModel.UserName,
-            Language = updateModel.Language,
-            ContentStartNodeKeys = updateModel.ContentStartNodeKeys,
-            MediaStartNodeKeys = updateModel.MediaStartNodeKeys,
+            Language = updateModel.LanguageIsoCode,
+            ContentStartNodeKeys = updateModel.ContentStartNodeIds,
+            MediaStartNodeKeys = updateModel.MediaStartNodeIds,
         };
 
-        IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(updateModel.UserGroups);
+        IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(updateModel.UserGroupIds);
         model.UserGroups = userGroups;
 
         return model;

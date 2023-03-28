@@ -34,7 +34,7 @@ public class FilterUsersController : UsersControllerBase
     /// <param name="take">Amount to take.</param>
     /// <param name="orderBy">Property to order by.</param>
     /// <param name="orderDirection">Direction to order in.</param>
-    /// <param name="userGroups">Keys of the user groups to include in the result.</param>
+    /// <param name="userGroupIds">Keys of the user groups to include in the result.</param>
     /// <param name="userStates">User states to include in the result.</param>
     /// <param name="filter">A string that must be present in the users name or username.</param>
     /// <returns>A paged result of the users matching the query.</returns>
@@ -45,15 +45,15 @@ public class FilterUsersController : UsersControllerBase
         int take = 100,
         UserOrder orderBy = UserOrder.UserName,
         Direction orderDirection = Direction.Ascending,
-        [FromQuery] SortedSet<Guid>? userGroups = null,
+        [FromQuery] SortedSet<Guid>? userGroupIds = null,
         [FromQuery] SortedSet<UserState>? userStates = null,
         string filter = "")
     {
         var userFilter = new UserFilter
         {
-            IncludedUserGroups = userGroups,
+            IncludedUserGroups = userGroupIds,
             IncludeUserStates = userStates,
-            NameFilters = string.IsNullOrEmpty(filter) ? null : new SortedSet<string> {filter}
+            NameFilters = string.IsNullOrEmpty(filter) ? null : new SortedSet<string> { filter }
         };
 
         // FIXME: use the actual currently logged in user key

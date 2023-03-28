@@ -48,12 +48,12 @@ public class GetAllUsersController : UsersControllerBase
             throw new PanicException("Get all attempt succeeded, but result was null");
         }
 
-        var users = new PagedViewModel<UserResponseModel>
+        var pagedViewModel = new PagedViewModel<UserResponseModel>
         {
             Total = result.Total,
             Items = result.Items.Select(x => _userPresentationFactory.CreateResponseModel(x))
         };
 
-        return Ok(users);
+        return Ok(pagedViewModel);
     }
 }

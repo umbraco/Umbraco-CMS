@@ -8,6 +8,7 @@ public class UserFilter
 
     public SortedSet<Guid>? ExcludeUserGroups { get; set; }
 
+    // FIXME: Fix when we have known user group aliases.
     // This isn't awesome, but we don't want to surface aliases as a possible filter
     // But we can't actually query by key, so if we already know we need to filter out an alias this means we can skip a step
     internal SortedSet<string>? ExcludedUserGroupAliases { get; set; }

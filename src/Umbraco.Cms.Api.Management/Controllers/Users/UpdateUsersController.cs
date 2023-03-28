@@ -22,11 +22,11 @@ public class UpdateUsersController : UsersControllerBase
         _userPresentationFactory = userPresentationFactory;
     }
 
-    [HttpPut("{key:guid}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> Update(Guid key, UpdateUserRequestModel model)
+    public async Task<IActionResult> Update(Guid id, UpdateUserRequestModel model)
     {
-        IUser? existingUser = await _userService.GetAsync(key);
+        IUser? existingUser = await _userService.GetAsync(id);
 
         if (existingUser is null)
         {

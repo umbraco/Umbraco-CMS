@@ -42,7 +42,7 @@ public class InviteUriProvider : IInviteUriProvider
 
         string inviteToken = $"{invitee.Id}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
 
-        // TODO: This will need to change.
+        // FIXME: This will need to change.
         string? action = _linkGenerator.GetPathByAction(
             nameof(BackOfficeController.VerifyInvite),
             ControllerExtensions.GetControllerName<BackOfficeController>(),

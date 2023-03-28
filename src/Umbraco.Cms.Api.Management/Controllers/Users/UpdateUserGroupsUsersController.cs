@@ -19,7 +19,7 @@ public class UpdateUserGroupsUsersController : UsersControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateUserGroups(UpdateUserGroupsOnUserRequestModel requestModel)
     {
-        await _userGroupService.UpdateUserGroupsOnUsers(requestModel.UserGroupKeys, requestModel.UserKeys);
+        await _userGroupService.UpdateUserGroupsOnUsers(requestModel.UserGroupIds, requestModel.UserIds);
         return Ok();
     }
 }

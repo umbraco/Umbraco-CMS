@@ -17,10 +17,7 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
         status switch
         {
             UserOperationStatus.Success => Ok(),
-            UserOperationStatus.MissingUser => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Missing User")
-                .WithDetail("A performing user is required for the operation, but none was found.")
-                .Build()),
+            UserOperationStatus.MissingUser => StatusCode(StatusCodes.Status500InternalServerError, "A performing user is required for the operation, but none was found."),
             UserOperationStatus.MissingUserGroup => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")

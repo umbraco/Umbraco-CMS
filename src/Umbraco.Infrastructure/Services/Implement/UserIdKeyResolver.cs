@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
 // This could be made better with caching and stuff, but it's really a stop gap measure
 // So for now we'll just use the database to resolve the key/id every time.
+// It's okay that we never clear this, since you can never change a user's key/id
+// and it'll be caught by the services if it doesn't exist.
 internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 {
     private readonly IScopeProvider _scopeProvider;

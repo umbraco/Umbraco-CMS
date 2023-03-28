@@ -20,7 +20,7 @@ public class EnableUsersController : UsersControllerBase
     public async Task<IActionResult> EnableUsers(EnableUserRequestModel model)
     {
         // FIXME: use the actual currently logged in user key
-        UserOperationStatus result = await _userService.EnableAsync(Constants.Security.SuperUserKey, model.UserKeys.ToArray());
+        UserOperationStatus result = await _userService.EnableAsync(Constants.Security.SuperUserKey, model.UserIds.ToArray());
 
         return result is UserOperationStatus.Success
             ? Ok()

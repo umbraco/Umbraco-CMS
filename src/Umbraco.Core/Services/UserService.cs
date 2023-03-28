@@ -626,6 +626,7 @@ internal class UserService : RepositoryService, IUserService
         {
             return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, new UserCreationResult());
         }
+
         ICoreBackofficeUserManager backofficeUserManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackofficeUserManager>();
 
         IdentityCreationResult identityCreationResult = await backofficeUserManager.CreateAsync(model);
@@ -650,10 +651,7 @@ internal class UserService : RepositoryService, IUserService
             throw new PanicException("Was unable to get user after creating it");
         }
 
-        if (approveUser)
-        {
-            createdUser.IsApproved = true;
-        }
+        createdUser.IsApproved = approveUser;
 
         foreach (IUserGroup userGroup in model.UserGroups)
         {
@@ -818,8 +816,9 @@ internal class UserService : RepositoryService, IUserService
         }
 
         // Now that we're all authorized and validated we can actually map over changes and update the user
-        // TODO: This probably shouldn't live here, but where then?
+        // TODO: This probably shouldn't live here, once we have user content start nodes as keys this can be moved to a mapper
         // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
+        // TODO: Add auditing
         IUser updated = MapUserUpdate(model, model.ExistingUser, startContentIds, startMediaIds);
         UserOperationStatus saveStatus = await SaveAsync(updated);
 
@@ -843,7 +842,7 @@ internal class UserService : RepositoryService, IUserService
 
         // This shouldn't really be necessary since we're just gonna use it to generate a hash, but that's how it was.
         var avatarFileName = avatarTemporaryFile.FileName.ToSafeFileName(_shortStringHelper);
-        var extension = Path.GetExtension(avatarFileName).TrimStart('.');
+        var extension = Path.GetExtension(avatarFileName)[1..];
         if(allowedAvatarFileTypes.Contains(extension) is false || _contentSettings.DisallowedUploadedFileExtensions.Contains(extension))
         {
             return UserOperationStatus.InvalidAvatar;
@@ -952,7 +951,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (performingUser.IsAdmin() is false && model.User.IsAdmin())
         {
-            return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, new PasswordChangedModel());
+            return Attempt.FailWithStatus(UserOperationStatus.Forbidden, new PasswordChangedModel());
         }
 
         IBackofficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackofficePasswordChanger>();
@@ -1019,6 +1018,7 @@ internal class UserService : RepositoryService, IUserService
 
         UserFilter mergedFilter = filter.Merge(baseFilter);
 
+        // FIXME: This is not needed after we have keys
         SortedSet<string> excludedUserGroupAliases = mergedFilter.ExcludedUserGroupAliases ?? new SortedSet<string>();
         if (mergedFilter.ExcludeUserGroups is not null)
         {
@@ -1095,7 +1095,7 @@ internal class UserService : RepositoryService, IUserService
 
         scope.Complete();
 
-        var model = new PagedModel<IUser> {Items = result, Total = totalRecords};
+        var model = new PagedModel<IUser> { Items = result, Total = totalRecords };
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, model);
     }
@@ -1178,7 +1178,7 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.NotFound;
         }
 
-        // Check user hasn't logged in.  If they have they may have made content changes which will mean
+        // Check user hasn't logged in. If they have they may have made content changes which will mean
         // the Id is associated with audit trails, versions etc. and can't be removed.
         if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
         {
@@ -1280,7 +1280,7 @@ internal class UserService : RepositoryService, IUserService
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
         IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
 
-        var filePath = user.Avatar!;
+        string filePath = user.Avatar;
         user.Avatar = null;
         UserOperationStatus result = await backofficeUserStore.SaveAsync(user);
 

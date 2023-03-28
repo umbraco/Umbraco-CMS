@@ -2,9 +2,9 @@
 
 public class UpdateUserRequestModel : UserPresentationBase
 {
-    public string Language { get; set; } = string.Empty;
+    public string LanguageIsoCode { get; set; } = string.Empty;
 
-    public SortedSet<Guid> ContentStartNodeKeys { get; set; } = new();
+    public SortedSet<Guid> ContentStartNodeIds { get; set; } = new();
 
-    public SortedSet<Guid> MediaStartNodeKeys { get; set; } = new();
+    public SortedSet<Guid> MediaStartNodeIds { get; set; } = new();
 }
