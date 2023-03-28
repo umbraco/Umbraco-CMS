@@ -17,7 +17,8 @@
             controller: MediaPicker3Controller,
             controllerAs: "vm",
             bindings: {
-                model: "="
+                model: "=",
+                node: "="
             },
             require: {
                 propertyForm: "^form",
@@ -28,7 +29,10 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs) {
+    function MediaPicker3Controller($scope, $element, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs, umbRequestHelper, $injector, uploadTracker, editorState) {
+
+        const mediaUploader = $injector.instantiate(Utilities.MediaUploader);
+        let uploadInProgress = false;
 
         var unsubscribe = [];
 
@@ -46,11 +50,17 @@
         vm.allowAddMedia = true;
         vm.allowRemoveMedia = true;
         vm.allowEditMedia = true;
+        vm.allowDropMedia = true;
+
+        vm.handleFiles = handleFiles;
+
+        vm.invalidEntries = [];
 
         vm.addMediaAt = addMediaAt;
         vm.editMedia = editMedia;
         vm.removeMedia = removeMedia;
         vm.copyMedia = copyMedia;
+        vm.allowDir = true;
 
         vm.labels = {};
 
@@ -65,11 +75,19 @@
             vm.allowAddMedia = !vm.readonly;
             vm.allowRemoveMedia = !vm.readonly;
             vm.allowEditMedia = !vm.readonly;
+            vm.allowDropMedia = !vm.readonly;
 
             vm.sortableOptions.disabled = vm.readonly;
         });
 
         vm.$onInit = function() {
+            vm.node = vm.node || editorState.getCurrent();
+
+            // If we do not have a node on the scope, then disallow drop media
+            if (!vm.node?.key) {
+              console.warn('An Umbraco.MediaPicker3 did not detect a valid content node and disabled drag & drop.', $element[0]);
+              vm.allowDropMedia = false;
+            }
 
             vm.validationLimit = vm.model.config.validationLimit || {};
             // If single-mode we only allow 1 item as the maximum:
@@ -79,6 +97,17 @@
             vm.model.config.crops = vm.model.config.crops || [];
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
+
+            const uploaderOptions = {
+                uploadURL: umbRequestHelper.getApiUrl("mediaPickerThreeBaseUrl", "uploadMedia"),
+                allowedMediaTypeAliases: vm.allowedTypes
+            };
+
+            unsubscribe.push(mediaUploader.on('mediaEntryAccepted', _handleMediaEntryAccepted));
+            unsubscribe.push(mediaUploader.on('mediaEntryRejected', _handleMediaEntryRejected));
+            unsubscribe.push(mediaUploader.on('queueStarted', _handleMediaQueueStarted));
+            unsubscribe.push(mediaUploader.on('uploadSuccess', _handleMediaUploadSuccess));
+            unsubscribe.push(mediaUploader.on('queueCompleted', _handleMediaQueueCompleted));
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -135,10 +164,50 @@
                 vm.allowEdit = hasAccessToMedia;
                 vm.allowAdd = hasAccessToMedia;
 
-                vm.loading = false;
+                mediaUploader.init(uploaderOptions).then(() => {
+                    vm.loading = false;
+                });
             });
-
         };
+
+        function handleFiles (files, invalidFiles) {
+            if (vm.readonly) return;
+            const allFiles = [...files, ...invalidFiles];
+            mediaUploader.requestUpload(allFiles);
+        };
+
+        function _handleMediaEntryAccepted (event, data) {
+            vm.model.value.push(data.mediaEntry);
+            setDirty();
+        }
+
+        function _handleMediaEntryRejected (event, data) {
+            // we need to make sure the media entry hasn't been accepted earlier in process
+            const index = vm.model.value.findIndex(mediaEntry => mediaEntry.key === data.mediaEntry.key);
+            if (index !== -1) {
+                vm.model.value.splice(index, 1);
+            }
+            vm.invalidEntries.push(data.mediaEntry);
+            setDirty();
+        }
+
+        function _handleMediaUploadSuccess (event, data) {
+            const mediaEntry = vm.model.value.find(mediaEntry => mediaEntry.key === data.mediaEntry.key);
+            if (!mediaEntry) return;
+
+            mediaEntry.tmpLocation = data.tmpLocation;
+            updateMediaEntryData(mediaEntry);
+        }
+
+        function _handleMediaQueueStarted () {
+            uploadInProgress = true;
+            uploadTracker.uploadStarted(vm.node.key);
+        }
+
+        function _handleMediaQueueCompleted () {
+            uploadInProgress = false;
+            uploadTracker.uploadEnded(vm.node.key);
+        }
 
         function onServerValueChanged(newVal, oldVal) {
             if(newVal === null || !Array.isArray(newVal)) {
@@ -243,6 +312,8 @@
                     if (onSuccess) {
                         onSuccess();
                     }
+
+                    setDirty();
                 },
                 close: function () {
                     editorService.close();
@@ -291,12 +362,15 @@
             if (index !== -1) {
                 vm.model.value.splice(index, 1);
             }
+
+            setDirty();
         }
 
         function deleteAllMedias() {
             if (!vm.allowRemoveMedia) return;
 
             vm.model.value = [];
+            setDirty();
         }
 
         function setActiveMedia(mediaEntryOrNull) {
@@ -430,7 +504,7 @@
 
         vm.sortableOptions = {
             cursor: "grabbing",
-            handle: "umb-media-card",
+            handle: "umb-media-card, .umb-media-card",
             cancel: "input,textarea,select,option",
             classes: ".umb-media-card--dragging",
             distance: 5,
@@ -468,6 +542,10 @@
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
                 subscription();
+            }
+
+            if (uploadInProgress) {
+                uploadTracker.uploadEnded(vm.node.key);
             }
         });
     }

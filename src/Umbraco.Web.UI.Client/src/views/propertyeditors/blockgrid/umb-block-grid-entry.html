@@ -1,10 +1,11 @@
 <uui-button-inline-create
-    ng-if="!vm.blockEditorApi.readonly"
+    ng-if="!vm.blockEditorApi.readonly && !vm.hideInlineCreateAbove"
     class="umb-block-grid__block--inline-create-button --above"
+    style="--umb-block-grid-editor--inline-create-width: {{vm.inlineCreateAboveWidth}};"
     ng-class="{'--at-root': vm.depth === '0'}"
-    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.index, $event)"
-    ng-mouseover="vm.blockEditorApi.internal.showAreaHighlight(vm.parentBlock, vm.areaKey)"
-    ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)">
+    ng-click="vm.clickInlineCreateAbove()"
+    ng-mouseover="vm.mouseOverInlineCreate()"
+    ng-mouseleave="vm.mouseOutInlineCreate()">
 </uui-button-inline-create>
 
 <ng-form name="vm.blockForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
@@ -29,9 +30,15 @@
                               parent-form="vm.blockForm"
                               style="--umb-block-grid--area-grid-columns: {{vm.areaGridColumns}}"
                               >
+            <slot
+                ng-repeat="proxyProp in vm.proxyProperties track by proxyProp.slotName"
+                data-is-property-editor-proxy
+                name="{{proxyProp.slotName}}"
+                slot="{{proxyProp.slotName}}">
+            </slot>
             <umb-block-grid-entries 
-                slot="area-container"
                 ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
+                slot="{{::areaEntry.$config.alias}}"
                 class="umb-block-grid__area"
                 ng-class="{'--highlight': areaEntry.$highlight}"
                 data-area-col-span="{{::areaEntry.$config.columnSpan}}"
@@ -58,7 +65,6 @@
         </umb-block-grid-block>
 
         <div class="umb-block-grid__block--validation-border"></div>
-        <!--<div class="umb-block-grid__block--validation-badge">!</div>-->
 
         <div class="umb-block-grid__block--context">
             <div class="__context-bar">
@@ -70,18 +76,10 @@
                     title="blockEditor_focusParentBlock"
                     ng-click="vm.parentBlock.showBlockUI()"
                     ng-class="{ '--error': false && vm.valFormManager.isShowingValidation() }"
-                >
-                    <span>
-                        {{vm.parentBlock.label}}
-                    </span>
-                    <span class="sr-only">
-                        <localize key="blockEditor_focusParentBlock">Focus parent block</localize>
-                    </span>
-                </button>
+                    ng-bind="vm.parentBlock.label"
+                ></button>
                 <div class="__divider" ng-if="vm.parentBlock">/</div>
-                <div class="__label">
-                    <span>{{vm.layoutEntry.$block.label}}</span>
-                </div>
+                <div class="__label" title="{{vm.layoutEntry.$block.label}}" ng-bind="vm.layoutEntry.$block.label"></div>
             </div>
         </div>
 
@@ -127,39 +125,7 @@
         </div>
 
         <button 
-            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumnsInt !== vm.layoutEntry.columnSpan || (vm.layoutColumnsInt === vm.layoutEntry.columnSpan && vm.layoutEntry.forceLeft))"
-            type="button" 
-            aria-labelledby="forceLeftLabel"
-            title="@blockEditor_forceLeftButton"
-            localize="title"
-            class="umb-block-grid__force-left"
-            ng-class="{ '--active': vm.layoutEntry.forceLeft }"
-            ng-click="vm.toggleForceLeft()">
-            <span class="sr-only">
-                <localize ng-if="!vm.layoutEntry.forceLeft" id="forceLeftLabel" key="blockEditor_forceLeftLabel">Force placement at left side</localize>
-                <localize ng-if="vm.layoutEntry.forceLeft" id="forceLeftLabel" key="blockEditor_unforceLeftLabel">Remove forced placement at left side</localize>
-            </span>
-            <umb-icon icon="icon-navigation-left" class="icon"></umb-icon>
-        </button>
-
-        <button 
-            ng-if="vm.blockEditorApi.readonly !== true && (vm.layoutColumnsInt !== vm.layoutEntry.columnSpan || (vm.layoutColumnsInt === vm.layoutEntry.columnSpan && vm.layoutEntry.forceRight))"
-            type="button" 
-            aria-labelledby="forceRightLabel"
-            title="@blockEditor_forceRightButton"
-            localize="title"
-            class="umb-block-grid__force-right"
-            ng-class="{ '--active': vm.layoutEntry.forceRight }"
-            ng-click="vm.toggleForceRight()">
-            <span class="sr-only">
-                <localize ng-if="!vm.layoutEntry.forceRight" id="forceRightLabel" key="blockEditor_forceRightLabel">Force placement at right side</localize>
-                <localize ng-if="vm.layoutEntry.forceRight" id="forceRightLabel" key="blockEditor_unforceRightLabel">Remove forced placement at right side</localize>
-            </span>
-            <umb-icon icon="icon-navigation-right" class="icon"></umb-icon>
-        </button>
-
-        <button 
-            ng-if="::!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
+            ng-if="::!vm.blockEditorApi.readonly && vm.canScale" 
             type="button"
             title="@blockEditor_scaleHandlerButtonTitle"
             localize="title"
@@ -167,7 +133,7 @@
             ng-mousedown="vm.scaleHandlerMouseDown($event)"
             ng-keyup="vm.scaleHandlerKeyUp($event)">
         </button>
-        <div ng-if="::!vm.blockEditorApi.readonly && (vm.layoutEntry.$block.config.columnSpanOptions.length > 1 || (vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan))" 
+        <div ng-if="::!vm.blockEditorApi.readonly && vm.canScale" 
             class="umb-block-grid__scale-label">
             {{vm.layoutEntry.columnSpan}} x {{vm.layoutEntry.rowSpan}}
         </div>
@@ -180,10 +146,7 @@
     class="umb-block-grid__block--inline-create-button --after"
     ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.clickInlineCreateAfter($event)"
-    ng-mouseover="vm.mouseOverInlineCreateAfter()"
-    ng-mouseleave="vm.blockEditorApi.internal.hideAreaHighlight(vm.parentBlock, vm.areaKey)"
+    ng-mouseover="vm.mouseOverInlineCreate()"
+    ng-mouseleave="vm.mouseOutInlineCreate()"
     vertical>
 </uui-button-inline-create>
-<div ng-if="vm.hideInlineCreateAfter"
-    class="umb-block-grid__block--inline-create-button --after --detector" ng-mouseover="vm.mouseOverInlineCreateAfter()">
-</div>

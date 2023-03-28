@@ -4,13 +4,13 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
@@ -33,7 +33,6 @@ public class RuntimeState : IRuntimeState
     private readonly IRuntimeModeValidationService _runtimeModeValidationService = null!;
 
     /// <summary>
-    /// The initial <see cref="RuntimeState"/>
     /// The initial <see cref="RuntimeState"/>
     /// </summary>
     public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };

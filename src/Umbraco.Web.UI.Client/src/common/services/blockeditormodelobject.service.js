@@ -206,7 +206,6 @@
          * Used to highlight unsupported properties for the user, changes unsupported properties into a unsupported-property.
          */
         var notSupportedProperties = [
-            "Umbraco.Tags",
             "Umbraco.UploadField",
             "Umbraco.ImageCropper",
             "Umbraco.NestedContent"
@@ -642,7 +641,7 @@
                 };
 
                 // first time instant update of label.
-                blockObject.label = blockObject.content?.contentTypeName || "";
+                blockObject.label = (blockObject.config.label || blockObject.content?.contentTypeName) ?? "" ;
                 blockObject.index = 0;
 
                 if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
@@ -654,7 +653,7 @@
                             blockObject.__scope.$evalAsync();
                         });
                     });
-    
+
                     observer.observe(labelElement[0], {characterData: true, subtree:true});
 
                     blockObject.__watchers.push(() => {
@@ -671,9 +670,9 @@
                             $index: this.index + 1,
                             ... this.data
                         };
-    
+
                         this.__labelScope = Object.assign(this.__labelScope, labelVars);
-    
+
                         $compile(labelElement.contents())(this.__labelScope);
                     }.bind(blockObject)
                 } else {

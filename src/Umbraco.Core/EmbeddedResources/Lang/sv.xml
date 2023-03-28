@@ -2,7 +2,7 @@
 <language alias="sv" intName="Swedish" localName="Svenska" lcid="29" culture="sv-SE">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="apps">
     <key alias="umbContent">Innehåll</key>
@@ -682,7 +682,6 @@
     <key alias="reset">Återställ</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Nuvarande version</key>
     <key alias="diffHelp"><![CDATA[Här visas skillnaderna mellan nuvarande version och vald version<br /><del>Röd</del> text kommer inte att synas i den valda versionen. , <ins>Grön betyder att den har tillkommit</ins>]]></key>
     <key alias="documentRolledBack">Dokumentet har återgått till en tidigare version</key>
     <key alias="htmlHelp">Här visas den valda sidversionen i HTML. Om du vill se skillnaden mellan två versioner samtidigt, välj istället "Diff".</key>

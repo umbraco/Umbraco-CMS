@@ -2,7 +2,7 @@
 <Project>
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <LangVersion>preview</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Company>Umbraco HQ</Company>
     <Authors>Umbraco</Authors>
     <Copyright>Copyright © Umbraco $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
@@ -29,9 +29,9 @@
 
   <!-- Package Validation -->
   <PropertyGroup>
+    <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <!-- TODO: Change to 11.0.0 and remove all CompatibilitySuppressions.xml files when final version shipped -->
-    <PackageValidationBaselineVersion>10.2.1</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>11.0.0</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
@@ -41,7 +41,7 @@
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.113" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" IsImplicitlyDefined="true" />
-    <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.1.1" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" PrivateAssets="all" IsImplicitlyDefined="true" />
   </ItemGroup>
 
   <ItemGroup>

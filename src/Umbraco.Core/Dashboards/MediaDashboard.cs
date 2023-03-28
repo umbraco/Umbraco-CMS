@@ -7,7 +7,7 @@ public class MediaDashboard : IDashboard
 {
     public string Alias => "mediaFolderBrowser";
 
-    public string[] Sections => new[] { "media" };
+    public string[] Sections => new[] { Constants.Applications.Media };
 
     public string View => "views/dashboard/media/mediafolderbrowser.html";
 

@@ -1,15 +1,11 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.NewBackoffice;
 
@@ -39,7 +35,7 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
         var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
 
         var urlToContract = $"{officePath}/management/api/openapi.json";
-        var swaggerPath = $"{officePath}/swagger/All/swagger.json";
+        var swaggerPath = $"{officePath}/swagger/v1/swagger.json";
         var apiContract = JObject.Parse(await Client.GetStringAsync(urlToContract));
 
         var generatedJsonString = await Client.GetStringAsync(swaggerPath);

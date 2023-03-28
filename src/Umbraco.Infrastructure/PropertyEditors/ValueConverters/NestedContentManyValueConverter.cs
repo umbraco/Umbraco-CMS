@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     content.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentManyValueConverter : NestedContentValueConverterBase
 {
     private readonly IProfilingLogger _proflog;

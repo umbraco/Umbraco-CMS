@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.ManagementApi.Controllers.Tree;
@@ -9,8 +8,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.StaticFile.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute("static-file/tree")]
-[OpenApiTag("StaticFile")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/static-file")]
+[ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 {
     private static readonly string[] _allowedRootFolders = { "App_Plugins", "wwwroot" };

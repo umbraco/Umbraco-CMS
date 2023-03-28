@@ -1,13 +1,13 @@
 <div class="umb-property">
     <ng-form name="propertyForm">
         <div class="control-group umb-control-group"
-             ng-class="{'hidelabel':vm.property.hideLabel, '--label-on-top':vm.property.labelOnTop, 'umb-control-group__listview': vm.property.alias === '_umb_containerView'}">
+             ng-class="{'hidelabel':vm.hideLabel || vm.property.hideLabel, '--label-on-top':vm.property.labelOnTop, 'umb-control-group__listview': vm.property.alias === '_umb_containerView'}">
 
             <val-property-msg></val-property-msg>
 
             <div class="umb-el-wrap">
 
-                <div class="control-header" ng-hide="vm.property.hideLabel === true">
+                <div class="control-header" ng-hide="(vm.hideLabel || vm.property.hideLabel) === true">
 
                     <label data-element="property-label-{{vm.property.alias}}" class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}">{{vm.property.label}}<span ng-if="vm.property.validation.mandatory || vm.property.ncMandatory"><strong class="umb-control-required">*</strong></span></label>
 

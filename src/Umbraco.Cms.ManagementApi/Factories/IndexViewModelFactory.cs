@@ -37,6 +37,21 @@ public class IndexViewModelFactory : IIndexViewModelFactory
 
         Attempt<string?> isHealthy = indexDiag.IsHealthy();
 
+        var properties = new Dictionary<string, object?>();
+
+        foreach (var property in indexDiag.Metadata)
+        {
+            if (property.Value is null)
+            {
+                properties[property.Key] = null;
+            }
+            else
+            {
+                var propertyType = property.Value.GetType();
+                properties[property.Key] = propertyType.IsClass && !propertyType.IsArray ? property.Value?.ToString() : property.Value;
+            }
+        }
+
         var indexerModel = new IndexViewModel
         {
             Name = index.Name,
@@ -45,6 +60,7 @@ public class IndexViewModelFactory : IIndexViewModelFactory
             SearcherName = index.Searcher.Name,
             DocumentCount = indexDiag.GetDocumentCount(),
             FieldCount = indexDiag.GetFieldNames().Count(),
+            ProviderProperties = properties,
         };
 
         return indexerModel;

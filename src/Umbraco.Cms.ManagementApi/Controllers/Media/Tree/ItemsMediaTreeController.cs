@@ -20,7 +20,7 @@ public class ItemsMediaTreeController : MediaTreeControllerBase
     {
     }
 
-    [HttpGet("items")]
+    [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ContentTreeItemViewModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ContentTreeItemViewModel>>> Items([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null)

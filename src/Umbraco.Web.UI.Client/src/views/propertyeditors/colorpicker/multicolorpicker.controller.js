@@ -1,7 +1,7 @@
-﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
+angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
     function ($scope, angularHelper, $element, eventsService) {
 
-        var vm = this;
+        const vm = this;
 
         vm.add = add;
         vm.remove = remove;
@@ -15,9 +15,9 @@
         vm.labelEnabled = false;
         vm.editItem = null;
 
-        //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
-        var defaultColor = "000000";
-        var defaultLabel = null;
+        // NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
+        const defaultColor = "000000";
+        const defaultLabel = null;
 
         $scope.newColor = defaultColor;
         $scope.newLabel = defaultLabel;
@@ -31,12 +31,12 @@
             showAlpha: false
         };
 
-        function hide(color) {
+        function hide() {
             // show the add button
             $element.find(".btn.add").show();
         }
 
-        function show(color) {
+        function show() {
             // hide the add button
             $element.find(".btn.add").hide();
         }
@@ -48,21 +48,26 @@
                 }
             });
         }
+
         var evts = [];
         evts.push(eventsService.on("toggleValue", function (e, args) {
-            vm.labelEnabled = args.value;
+            if (args.inputId === "useLabel") {
+               vm.labelEnabled = args.value;
+            }
         }));
+
         $scope.$on('$destroy', function () {
             for (var e in evts) {
                 eventsService.unsubscribe(evts[e]);
             }
         });
+
         if (!Utilities.isArray($scope.model.value)) {
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) {
                 var oldValue = $scope.model.value[i];
-                if (oldValue.hasOwnProperty("value")) {
+                if (Object.prototype.hasOwnProperty.call(oldValue, "value")) {
                     items.push({
                         value: oldValue.value,
                         label: oldValue.label,
@@ -73,7 +78,7 @@
                     items.push({
                         value: oldValue,
                         label: oldValue,
-                        sortOrder: sortOrder,
+                        sortOrder: oldValue.sortOrder,
                         id: i
                     });
                 }
@@ -87,9 +92,9 @@
         }
 
         // ensure labels
-        for (var i = 0; i < $scope.model.value.length; i++) {
-            var item = $scope.model.value[i];
-            item.label = item.hasOwnProperty("label") ? item.label : item.value;
+        for (var ii = 0; ii < $scope.model.value.length; ii++) {
+            var item = $scope.model.value[ii];
+            item.label = Object.prototype.hasOwnProperty.call(item, "label") ? item.label : item.value;
         }
 
         function validLabel(label) {
@@ -122,11 +127,20 @@
                             label: newLabel
                         });
                     } else {
+
+                        if(vm.editItem.value === vm.editItem.label && vm.editItem.value === newLabel) {
+                          vm.editItem.label = $scope.newColor;
+
+                        }
+                         else {
+                          vm.editItem.label = newLabel;
+                        }
+
                         vm.editItem.value = $scope.newColor;
-                        vm.editItem.label = newLabel;
+
                         vm.editItem = null;
                     }
-                    
+
                     $scope.newLabel = "";
                     $scope.hasError = false;
                     $scope.focusOnNew = true;
@@ -169,7 +183,7 @@
             //handle: ".handle, .thumbnail",
             items: '> div.control-group',
             tolerance: 'pointer',
-            update: function (e, ui) {
+            update: function () {
                 setDirty();
             }
         };

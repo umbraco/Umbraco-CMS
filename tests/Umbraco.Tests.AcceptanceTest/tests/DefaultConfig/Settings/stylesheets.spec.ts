@@ -7,7 +7,8 @@ test.describe('Stylesheets', () => {
   const name = "TestStylesheet";
   const fileName = name + ".css";
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -12,8 +11,8 @@ namespace Umbraco.Cms.ManagementApi.Controllers.Template.Tree;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Template}/tree")]
-[OpenApiTag(nameof(Constants.UdiEntityType.Template))]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Template}")]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 public class TemplateTreeControllerBase : EntityTreeControllerBase<EntityTreeItemViewModel>
 {
     public TemplateTreeControllerBase(IEntityService entityService)

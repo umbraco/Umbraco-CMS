@@ -1,26 +1,15 @@
 /** Example of how a grid layout stylehseet could be done with Flex box: */
 
-
 .umb-block-grid__layout-container {
     position: relative;
     display: flex;
     flex-wrap: wrap;
+    gap: var(--umb-block-grid--row-gap, 0) var(--umb-block-grid--column-gap, 0);
 }
 .umb-block-grid__layout-item {
+    position: relative;
     --umb-block-grid__layout-item-calc: calc(var(--umb-block-grid--item-column-span) / var(--umb-block-grid--grid-columns));
-    width: calc(var(--umb-block-grid__layout-item-calc) * 100%);
-}
-.umb-block-grid__layout-item[data-force-left] {
-    align-self: flex-start;
-}
-.umb-block-grid__layout-item[data-force-left]::before {
-    content: '';
-    flex-basis: 100%;
-    height: 0;
-}
-.umb-block-grid__layout-item[data-force-right] {
-    margin-left: auto;
-    align-self: flex-end;
+    width: calc(var(--umb-block-grid__layout-item-calc) * 100% - (1 - var(--umb-block-grid__layout-item-calc)) * var(--umb-block-grid--column-gap, 0px));
 }
 
 
@@ -29,10 +18,15 @@
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    gap: var(--umb-block-grid--areas-row-gap, 0) var(--umb-block-grid--areas-column-gap, 0);
 }
 .umb-block-grid__area {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     --umb-block-grid__area-calc: calc(var(--umb-block-grid--area-column-span) / var(--umb-block-grid--area-grid-columns, 1));
-    width: calc(var(--umb-block-grid__area-calc) * 100%);
+    width: calc(var(--umb-block-grid__area-calc) * 100% - (1 - var(--umb-block-grid__area-calc)) * var(--umb-block-grid--areas-column-gap, 0px));
 }
 
 

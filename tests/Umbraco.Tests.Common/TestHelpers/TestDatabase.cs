@@ -78,6 +78,7 @@ public class TestDatabase : IUmbracoDatabase
     public DbTransaction Transaction { get; }
 
     public IDictionary<string, object> Data { get; }
+    public int CommandTimeout { get; set; }
 
     public ISqlContext SqlContext { get; }
 

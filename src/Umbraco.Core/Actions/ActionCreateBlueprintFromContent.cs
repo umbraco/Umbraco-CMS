@@ -8,8 +8,17 @@ namespace Umbraco.Cms.Core.Actions;
 /// </summary>
 public class ActionCreateBlueprintFromContent : IAction
 {
-    /// <inheritdoc />
-    public char Letter => 'ï';
+    /// <inheritdoc cref="IAction.ActionLetter"/>
+    public const char ActionLetter = 'ï';
+
+    /// <inheritdoc cref="IAction.ActionAlias" />
+    public const string ActionAlias = "createblueprint";
+
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
 
     /// <inheritdoc />
     public bool ShowInNotifier => false;
@@ -19,9 +28,6 @@ public class ActionCreateBlueprintFromContent : IAction
 
     /// <inheritdoc />
     public string Icon => Constants.Icons.Blueprint;
-
-    /// <inheritdoc />
-    public string Alias => "createblueprint";
 
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.ContentCategory;

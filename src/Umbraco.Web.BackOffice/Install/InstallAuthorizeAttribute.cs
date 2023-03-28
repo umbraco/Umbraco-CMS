@@ -42,7 +42,7 @@ public class InstallAuthorizeAttribute : TypeFilterAttribute
                 // Only authorize when the installer is enabled
                 context.Result = new ForbidResult(new AuthenticationProperties()
                 {
-                    RedirectUri = _linkGenerator.GetBackOfficeUrl(_hostingEnvironment)
+                    RedirectUri = _linkGenerator.GetUmbracoBackOfficeUrl(_hostingEnvironment)
                 });
             }
             else if (_runtimeState.Level == RuntimeLevel.Upgrade && (await context.HttpContext.AuthenticateBackOfficeAsync()).Succeeded == false)

@@ -9,7 +9,8 @@ test.describe('User groups', () => {
     await page.locator('[data-element="sub-view-userGroups"]').click();
   }
 
-  test.beforeEach(async ({ umbracoApi, page }) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
