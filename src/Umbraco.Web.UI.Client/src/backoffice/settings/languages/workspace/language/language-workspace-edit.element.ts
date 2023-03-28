@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
@@ -67,7 +67,9 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 				<uui-input value=${ifDefined(this._language?.name)} @input="${this.#handleInput}"></uui-input>
 			</div>
 			<div slot="footer" id="footer">
-				<a href="/section/settings/workspace/language-root">Languages</a> / ${this._language?.name}
+				${this._language?.name
+					? html`<a href="/section/settings/workspace/language-root">Languages</a> / ${this._language?.name}`
+					: nothing}
 			</div>
 		</umb-workspace-layout>`;
 	}
