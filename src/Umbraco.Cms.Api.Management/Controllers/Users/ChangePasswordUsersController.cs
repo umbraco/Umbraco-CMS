@@ -19,11 +19,11 @@ public class ChangePasswordUsersController : UsersControllerBase
         _userService = userService;
     }
 
-    [HttpPatch("change-password/{key:guid}")]
+    [HttpPatch("change-password/{id:guid}")]
     [MapToApiVersion("1.0")]
-    public async Task<IActionResult> ChangePassword(Guid key, ChangePasswordUserRequestModel model)
+    public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
     {
-        IUser? existingUser = await _userService.GetAsync(key);
+        IUser? existingUser = await _userService.GetAsync(id);
 
         if (existingUser is null)
         {

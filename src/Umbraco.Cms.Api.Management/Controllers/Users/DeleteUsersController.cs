@@ -10,10 +10,10 @@ public class DeleteUsersController : UsersControllerBase
 
     private readonly IUserService _userService;
 
-    [HttpDelete("{key:guid}")]
-    public async Task<IActionResult> DeleteUser(Guid key)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteUser(Guid id)
     {
-        UserOperationStatus result = await _userService.DeleteAsync(key);
+        UserOperationStatus result = await _userService.DeleteAsync(id);
 
         return result is UserOperationStatus.Success
             ? Ok()

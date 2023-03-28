@@ -20,13 +20,13 @@ public class ByKeyUsersController : UsersControllerBase
         _userPresentationFactory = userPresentationFactory;
     }
 
-    [HttpGet("{key:guid}")]
+    [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid key)
+    public async Task<IActionResult> ByKey(Guid id)
     {
-        IUser? user = await _userService.GetAsync(key);
+        IUser? user = await _userService.GetAsync(id);
 
         if (user is null)
         {

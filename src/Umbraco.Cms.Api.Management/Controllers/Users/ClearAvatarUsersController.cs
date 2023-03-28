@@ -10,10 +10,10 @@ public class ClearAvatarUsersController : UsersControllerBase
 
     public ClearAvatarUsersController(IUserService userService) => _userService = userService;
 
-    [HttpDelete("avatar/{userKey:guid}")]
-    public async Task<IActionResult> ClearAvatar(Guid userKey)
+    [HttpDelete("avatar/{id:guid}")]
+    public async Task<IActionResult> ClearAvatar(Guid id)
     {
-        UserOperationStatus result = await _userService.ClearAvatarAsync(userKey);
+        UserOperationStatus result = await _userService.ClearAvatarAsync(id);
 
         return result is UserOperationStatus.Success
             ? Ok()

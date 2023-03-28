@@ -16,12 +16,12 @@ public class SetAvatarUsersController : UsersControllerBase
         _userService = userService;
     }
 
-    [HttpPatch("avatar/{userKey:guid}")]
+    [HttpPatch("avatar/{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SetAvatar(Guid userKey, SetAvatarRequestModel model)
+    public async Task<IActionResult> SetAvatar(Guid id, SetAvatarRequestModel model)
     {
-        IUser? user = await _userService.GetAsync(userKey);
+        IUser? user = await _userService.GetAsync(id);
 
         if (user is null)
         {
