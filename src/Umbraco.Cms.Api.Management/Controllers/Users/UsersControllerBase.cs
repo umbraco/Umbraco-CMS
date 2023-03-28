@@ -25,6 +25,10 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")
                 .Build()),
+            UserOperationStatus.NoUserGroup => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("No User Group Specified")
+                .WithDetail("A user group must be specified to create a user")
+                .Build()),
             UserOperationStatus.UserNameIsNotEmail => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid Username")
                 .WithDetail("The username must be the same as the email.")
@@ -63,7 +67,12 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid avatar")
                 .WithDetail("The selected avatar is invalid")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user group operation status."),
+            UserOperationStatus.NotFound => NotFound(),
+            UserOperationStatus.CannotDisableInvitedUser => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cannot disable invited user")
+                .WithDetail("An invited user cannot be disabled.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user operation status."),
         };
 
     protected IActionResult FormatErrorMessageResult(IErrorMessageResult errorMessageResult) =>
