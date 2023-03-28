@@ -153,7 +153,15 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	#removeTemplate(key: string) {
-		console.log('picker: remove', key);
+		/*
+		TODO: We need to follow up on this experience.
+		Could we test if this document type is in use, if so we should have a dialog notifying the user(Dialog, are you sure...) about that we might will break something?
+		If thats the case, Im not why if a template will be removed from an actual document.
+		If if its just the option that will go away.
+		(Comment by Niels)
+		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
+		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
+		*/
 		const templateIndex = this.templates.findIndex((x) => x.key === key);
 		this.templates.splice(templateIndex, 1);
 		this.templates = [...this._templates];
