@@ -1,8 +1,10 @@
 import type { Observable } from 'rxjs';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
-import { DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { DeepState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;
@@ -14,7 +16,7 @@ export interface UmbTreeContext {
 }
 
 export class UmbTreeContextBase implements UmbTreeContext {
-	#host: UmbControllerHostInterface;
+	host: UmbControllerHostInterface;
 	public tree: ManifestTree;
 
 	#selectable = new DeepState(false);
@@ -23,15 +25,44 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	#selection = new DeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
-	repository!: UmbTreeRepository;
+	repository?: UmbTreeRepository;
+
+	#initResolver?: () => void;
+	#initialized = false;
+
+	#init = new Promise<void>((resolve) => {
+		this.#initialized ? resolve() : (this.#initResolver = resolve);
+	});
 
 	constructor(host: UmbControllerHostInterface, tree: ManifestTree) {
-		this.#host = host;
+		this.host = host;
 		this.tree = tree;
 
-		if (this.tree.meta.repository) {
-			// TODO: should be using the right extension and the createExtensionClass method.
-			this.repository = new this.tree.meta.repository(this.#host) as any;
+		const repositoryAlias = this.tree.meta.repositoryAlias;
+		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
+
+		new UmbObserverController(
+			this.host,
+			umbExtensionsRegistry.getByTypeAndAlias('repository', this.tree.meta.repositoryAlias),
+			async (repositoryManifest) => {
+				if (!repositoryManifest) return;
+
+				try {
+					const result = await createExtensionClass<UmbTreeRepository>(repositoryManifest, [this.host]);
+					this.repository = result;
+					this.#checkIfInitialized();
+				} catch (error) {
+					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
+				}
+			}
+		);
+	}
+
+	// TODO: find a generic way to do this
+	#checkIfInitialized() {
+		if (this.repository) {
+			this.#initialized = true;
+			this.#initResolver?.();
 		}
 	}
 
@@ -58,18 +89,22 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	}
 
 	public async requestRootItems() {
-		return this.repository.requestRootTreeItems();
+		await this.#init;
+		return this.repository!.requestRootTreeItems();
 	}
 
 	public async requestChildrenOf(parentKey: string | null) {
-		return this.repository.requestTreeItemsOf(parentKey);
+		await this.#init;
+		return this.repository!.requestTreeItemsOf(parentKey);
 	}
 
 	public async rootItems() {
-		return this.repository.rootTreeItems();
+		await this.#init;
+		return this.repository!.rootTreeItems();
 	}
 
 	public async childrenOf(parentKey: string | null) {
-		return this.repository.treeItemsOf(parentKey);
+		await this.#init;
+		return this.repository!.treeItemsOf(parentKey);
 	}
 }

@@ -9,7 +9,7 @@ import { ProblemDetailsModel, TemplateResponseModel } from '@umbraco-cms/backoff
 import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
 import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
-export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<TemplateResponseModel> {
+export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<TemplateResponseModel> {
 	#init;
 	#host: UmbControllerHostInterface;
 
