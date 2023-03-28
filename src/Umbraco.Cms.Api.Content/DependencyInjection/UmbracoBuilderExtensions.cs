@@ -21,6 +21,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddScoped<IOutputExpansionStrategy, RequestContextOutputExpansionStrategy>();
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
+        builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, RequestPreviewService>();
         builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, RequestContextOutputExpansionStrategyAccessor>();
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, RequestContextRequestStartItemProviderAccessor>();

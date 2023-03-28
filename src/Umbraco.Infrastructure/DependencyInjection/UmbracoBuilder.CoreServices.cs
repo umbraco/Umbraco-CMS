@@ -426,6 +426,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, NoopRequestStartItemProviderAccessor>();
         builder.Services.AddSingleton<IRequestCultureService, NoopRequestCultureService>();
         builder.Services.AddSingleton<IRequestRoutingService, NoopRequestRoutingService>();
+        builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
