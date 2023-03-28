@@ -42,9 +42,10 @@ public class InitialState : Migration
     {
         _umbracoDbContextFactory.ExecuteWithContextAsync<Task>(async db =>
         {
+            bool keyValueTableExists = false;
             if (migrationBuilder.IsSqlServer())
             {
-                var keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+                keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
                 if (keyValueTableExists is false)
                 {
                     UpSqlServer(migrationBuilder);
@@ -52,18 +53,23 @@ public class InitialState : Migration
             }
             else if (migrationBuilder.IsSqlite())
             {
-                var keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
+                keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
                 if (keyValueTableExists is false)
                 {
                     UpSqlite(migrationBuilder);
                 }
             }
 
-            var migrationState = db.UmbracoKeyValues.Where(x => x.Key == $"{Constants.Conventions.Migrations.KeyValuePrefix}Umbraco.Core").FirstOrDefault();
-            if (migrationState is not null)
+            // If Key value table exists, it means we have already installed not using EFCore
+            // Thus we have to delete the old migration value, as it is no longer needed
+            if (keyValueTableExists)
             {
-                db.UmbracoKeyValues.Remove(migrationState);
-                await db.SaveChangesAsync();
+                var migrationState = db.UmbracoKeyValues.Where(x => x.Key == $"{Constants.Conventions.Migrations.KeyValuePrefix}Umbraco.Core").FirstOrDefault();
+                if (migrationState is not null)
+                {
+                    db.UmbracoKeyValues.Remove(migrationState);
+                    await db.SaveChangesAsync();
+                }
             }
         });
     }
