@@ -39,7 +39,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Name = user.Name ?? string.Empty,
             AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator),
             UserName = user.Username,
-            Language = user.Language,
+            LanguageIsoCode = user.Language,
             CreateDate = user.CreateDate,
             UpdateDate = user.UpdateDate,
             State = user.UserState,
