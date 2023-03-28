@@ -1,4 +1,4 @@
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -13,6 +13,7 @@ export class UmbTreeItemElement extends UmbLitElement {
 	item?: TreeItemPresentationModel;
 
 	render() {
+		if (!this.item) return nothing;
 		return html`<umb-extension-slot
 			type="treeItem"
 			.filter=${(manifests: ManifestTreeItem) => manifests.conditions.entityType === this.item?.type}
