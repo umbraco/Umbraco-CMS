@@ -4,7 +4,7 @@ import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-a
 
 // TODO get unique method from an document repository static method
 export class UmbDocumentTreeItemContext extends UmbTreeItemContextBase<DocumentTreeItemResponseModel> {
-	constructor(host: UmbControllerHostInterface, treeItem: DocumentTreeItemResponseModel) {
-		super(host, treeItem, (x: DocumentTreeItemResponseModel) => x.key);
+	constructor(host: UmbControllerHostInterface) {
+		super(host, (x: DocumentTreeItemResponseModel) => x.key);
 	}
 }

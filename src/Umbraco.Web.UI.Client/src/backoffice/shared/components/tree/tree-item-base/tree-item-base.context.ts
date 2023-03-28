@@ -6,7 +6,7 @@ import {
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbTreeItemContext } from '../tree-item.context.interface';
-import { BooleanState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { BooleanState, DeepState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbContextConsumerController,
@@ -23,9 +23,11 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	implements UmbTreeItemContext<T>
 {
 	public host: UmbControllerHostInterface;
-	public treeItem: T;
-	public unique: string;
-	public type: string;
+	public unique?: string;
+	public type?: string;
+
+	#treeItem = new DeepState<T | undefined>(undefined);
+	treeItem = this.#treeItem.asObservable();
 
 	#hasChildren = new BooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
@@ -51,26 +53,36 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	treeContext?: UmbTreeContextBase;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
+	#getUniqueFunction: UmbTreeItemUniqueFunction<T>;
 
-	constructor(host: UmbControllerHostInterface, treeItem: T, getUniqueFunction: UmbTreeItemUniqueFunction<T>) {
+	constructor(host: UmbControllerHostInterface, getUniqueFunction: UmbTreeItemUniqueFunction<T>) {
 		this.host = host;
-		this.treeItem = treeItem;
-
-		const unique = getUniqueFunction(this.treeItem);
-		if (!unique) throw new Error('Could not create tree item context, unique key is missing');
-		this.unique = unique;
-
-		if (!this.treeItem.type) throw new Error('Could not create tree item context, tree item type is missing');
-		this.type = this.treeItem.type;
-
+		this.#getUniqueFunction = getUniqueFunction;
 		this.#observeTreeItemActions();
-		this.#hasChildren.next(this.treeItem.hasChildren || false);
-
 		this.#consumeContexts();
 		new UmbContextProviderController(host, UMB_TREE_ITEM_CONTEXT_TOKEN, this);
 	}
 
+	public setTreeItem(treeItem: T | undefined) {
+		if (!treeItem) {
+			this.#treeItem.next(undefined);
+			return;
+		}
+
+		const unique = this.#getUniqueFunction(treeItem);
+		if (!unique) throw new Error('Could not create tree item context, unique key is missing');
+		this.unique = unique;
+
+		if (!treeItem.type) throw new Error('Could not create tree item context, tree item type is missing');
+		this.type = treeItem.type;
+
+		this.#hasChildren.next(treeItem.hasChildren || false);
+		this.#treeItem.next(treeItem);
+	}
+
 	public async requestChildren() {
+		if (!this.unique) throw new Error('Could not request children, unique key is missing');
+
 		// TODO: wait for tree context to be ready
 		this.#isLoading.next(true);
 		const response = await this.treeContext!.requestChildrenOf(this.unique);
@@ -79,14 +91,20 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	}
 
 	public toggleContextMenu() {
-		this.#sectionSidebarContext?.toggleContextMenu(this.type, this.unique, this.treeItem.name || '');
+		if (!this.getTreeItem() || !this.type || this.unique === undefined) {
+			throw new Error('Could not request children, tree item is not set');
+		}
+
+		this.#sectionSidebarContext?.toggleContextMenu(this.type, this.unique, this.getTreeItem()?.name || '');
 	}
 
 	public select() {
+		if (!this.unique) throw new Error('Could not request children, unique key is missing');
 		this.treeContext?.select(this.unique);
 	}
 
 	public deselect() {
+		if (!this.unique) throw new Error('Could not request children, unique key is missing');
 		this.treeContext?.deselect(this.unique);
 	}
 
@@ -107,17 +125,22 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 		});
 	}
 
+	getTreeItem() {
+		return this.#treeItem.getValue();
+	}
+
 	#observeIsSelectable() {
 		if (!this.treeContext) return;
 		new UmbObserverController(this.host, this.treeContext.selectable, (value) => this.#isSelectable.next(value));
 	}
 
 	#observeIsSelected() {
-		if (!this.treeContext) return;
+		if (!this.treeContext) throw new Error('Could not request children, tree context is missing');
+		if (!this.unique) throw new Error('Could not request children, unique key is missing');
 
 		new UmbObserverController(
 			this.host,
-			this.treeContext.selection.pipe(map((selection) => selection.includes(this.unique))),
+			this.treeContext.selection.pipe(map((selection) => selection.includes(this.unique!))),
 			(isSelected) => {
 				this.#isSelected.next(isSelected);
 			}
@@ -129,6 +152,9 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 
 		new UmbObserverController(this.host, this.#sectionContext.pathname, (pathname) => {
 			if (!pathname) return;
+			if (!this.type) throw new Error('Cant construct path, entity type is missing');
+			if (!this.unique) throw new Error('Cant construct path, unique is missing');
+
 			const path = this.constructPath(pathname, this.type, this.unique);
 			this.#path.next(path);
 		});
@@ -152,4 +178,4 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	}
 }
 
-export const UMB_TREE_ITEM_CONTEXT_TOKEN = new UmbContextToken<UmbTreeItemContextBase>('UmbTreeItemContext');
+export const UMB_TREE_ITEM_CONTEXT_TOKEN = new UmbContextToken<UmbTreeItemContext>('UmbTreeItemContext');

@@ -24,13 +24,21 @@ umbExtensionsRegistry.register(manifest);
 export class UmbEntityTreeItemElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
+	private _item?: EntityTreeItemResponseModel;
 	@property({ type: Object, attribute: false })
-	item?: EntityTreeItemResponseModel;
+	public get item() {
+		return this._item;
+	}
+	public set item(value: EntityTreeItemResponseModel | undefined) {
+		this._item = value;
+		this.#context.setTreeItem(value);
+	}
+
+	#context = new UmbEntityTreeItemContext(this);
 
 	render() {
 		if (!this.item) return nothing;
-		new UmbEntityTreeItemContext(this, this.item);
-		return html`<umb-tree-item-base .item=${this.item}></umb-tree-item-base>`;
+		return html`<umb-tree-item-base></umb-tree-item-base>`;
 	}
 }
 

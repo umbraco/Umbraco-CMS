@@ -1,9 +1,10 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeItemContextBase, UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context';
+import { UmbTreeItemContext } from '../tree-item.context.interface';
+import { UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -11,16 +12,8 @@ import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 export class UmbTreeItemBaseElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
+	@state()
 	private _item?: TreeItemPresentationModel;
-	@property({ type: Object, attribute: false })
-	get item() {
-		return this._item;
-	}
-	set item(newVal) {
-		const oldVal = this._item;
-		this._item = newVal;
-		this.requestUpdate('item', oldVal);
-	}
 
 	@state()
 	private _childItems?: TreeItemPresentationModel[];
@@ -46,7 +39,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
 	private _iconSlotHasChildren = false;
 
-	#treeItemContext?: UmbTreeItemContextBase;
+	#treeItemContext?: UmbTreeItemContext;
 
 	constructor() {
 		super();
@@ -55,6 +48,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
 			// TODO: investigate if we can make an observe decorator
+			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
 			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
@@ -109,7 +103,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
 				.hasChildren=${this._hasChildren}
-				label="${ifDefined(this.item?.name)}"
+				label="${ifDefined(this._item?.name)}"
 				href="${ifDefined(this._href)}">
 				${this.#renderIcon()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
@@ -129,8 +123,8 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				@slotchange=${(e: Event) => {
 					this._iconSlotHasChildren = this.#hasNodes(e);
 				}}></slot>
-			${this.item?.icon && !this._iconSlotHasChildren
-				? html` <uui-icon slot="icon" name="${this.item.icon}"></uui-icon> `
+			${this._item?.icon && !this._iconSlotHasChildren
+				? html` <uui-icon slot="icon" name="${this._item.icon}"></uui-icon> `
 				: nothing}
 		`;
 	}

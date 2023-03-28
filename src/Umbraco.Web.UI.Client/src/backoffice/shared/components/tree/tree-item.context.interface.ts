@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
 
 // TODO: temp type. Add paged response type to the repository interface
@@ -8,12 +8,12 @@ interface PagedResponse<T> {
 	items: Array<T>;
 }
 
-export interface UmbTreeItemContext<T> {
+export interface UmbTreeItemContext<T extends TreeItemPresentationModel = TreeItemPresentationModel> {
 	host: UmbControllerHostInterface;
-	treeItem: T;
-	unique: string;
-	type: string;
+	unique?: string;
+	type?: string;
 
+	treeItem: Observable<T | undefined>;
 	hasChildren: Observable<boolean>;
 	isLoading: Observable<boolean>;
 	isSelectable: Observable<boolean>;
@@ -22,6 +22,7 @@ export interface UmbTreeItemContext<T> {
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 
+	setTreeItem(treeItem: T | undefined): void;
 	requestChildren(): Promise<{
 		data: PagedResponse<T> | undefined;
 		error: ProblemDetailsModel | undefined;

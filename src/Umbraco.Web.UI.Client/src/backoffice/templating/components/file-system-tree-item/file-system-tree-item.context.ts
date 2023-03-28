@@ -5,8 +5,8 @@ import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/bac
 
 // TODO get unique method from an entity repository static method
 export class UmbFileSystemTreeItemContext extends UmbTreeItemContextBase<FileSystemTreeItemPresentationModel> {
-	constructor(host: UmbControllerHostInterface, treeItem: FileSystemTreeItemPresentationModel) {
-		super(host, treeItem, (x: FileSystemTreeItemPresentationModel) => x.path);
+	constructor(host: UmbControllerHostInterface) {
+		super(host, (x: FileSystemTreeItemPresentationModel) => x.path);
 	}
 
 	constructPath(pathname: string, entityType: string, path: string) {

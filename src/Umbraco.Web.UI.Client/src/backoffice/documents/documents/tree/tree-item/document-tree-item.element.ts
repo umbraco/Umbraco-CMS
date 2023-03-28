@@ -31,16 +31,22 @@ export class UmbDocumentTreeItemElement extends UmbLitElement {
 		`,
 	];
 
+	private _item?: DocumentTreeItemResponseModel;
 	@property({ type: Object, attribute: false })
-	public item?: DocumentTreeItemResponseModel;
+	public get item() {
+		return this._item;
+	}
+	public set item(value: DocumentTreeItemResponseModel | undefined) {
+		this._item = value;
+		this.#context.setTreeItem(value);
+	}
+
+	#context = new UmbDocumentTreeItemContext(this);
 
 	render() {
 		if (!this.item) return nothing;
-		new UmbDocumentTreeItemContext(this, this.item);
 		return html`
-			<umb-tree-item-base .item=${this.item}>
-				${this.#renderIconWithStatusSymbol()} ${this.#renderLabel()}
-			</umb-tree-item-base>
+			<umb-tree-item-base> ${this.#renderIconWithStatusSymbol()} ${this.#renderLabel()} </umb-tree-item-base>
 		`;
 	}
 
