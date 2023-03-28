@@ -21,6 +21,9 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 			uui-input {
 				width: 100%;
 			}
+			#footer {
+				padding: 0 var(--uui-size-layout-1);
+			}
 		`,
 	];
 
@@ -62,6 +65,9 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</uui-button>
 				<uui-input value=${ifDefined(this._language?.name)} @input="${this.#handleInput}"></uui-input>
+			</div>
+			<div slot="footer" id="footer">
+				<a href="/section/settings/workspace/language-root">Languages</a> / ${this._language?.name}
 			</div>
 		</umb-workspace-layout>`;
 	}

@@ -14,7 +14,6 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 
 	#routerPath? = '';
 
-	// TODO: add create route
 	@state()
 	_routes = [
 		{
