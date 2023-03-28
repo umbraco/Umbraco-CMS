@@ -1,6 +1,6 @@
 import { rest } from "msw";
-import { umbracoPath } from "@umbraco-cms/backoffice/utils";
 import { OEmbedResult, OEmbedStatus } from "../../../backoffice/shared/modals/embedded-media";
+import { umbracoPath } from "@umbraco-cms/backoffice/utils";
 
 export const handlers = [
 	rest.get(umbracoPath('/rteembed'), (req, res, ctx) => {

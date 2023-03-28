@@ -3,11 +3,11 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from '../health-check-dashboard.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './health-check-group-box-overview.element';
 
