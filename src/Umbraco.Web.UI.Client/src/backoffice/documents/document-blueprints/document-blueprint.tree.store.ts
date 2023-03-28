@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbTreeStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export const UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintTreeStore>(
@@ -12,7 +12,7 @@ export const UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT_TOKEN = new UmbContextTok
  * @extends {UmbStoreBase}
  * @description - Tree Data Store for Document Blueprints
  */
-export class UmbDocumentBlueprintTreeStore extends UmbTreeStoreBase {
+export class UmbDocumentBlueprintTreeStore extends UmbEntityTreeStore {
 	constructor(host: UmbControllerHostInterface) {
 		super(host, UMB_DOCUMENT_BLUEPRINT_TREE_STORE_CONTEXT_TOKEN.toString());
 	}

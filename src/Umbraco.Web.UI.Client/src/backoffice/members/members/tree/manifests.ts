@@ -1,5 +1,5 @@
-import { UmbMemberRepository } from '../repository/member.repository';
-import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
+import { MEMBER_REPOSITORY_ALIAS } from '../repository/manifests';
+import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 const tree: ManifestTree = {
 	type: 'tree',
@@ -7,8 +7,18 @@ const tree: ManifestTree = {
 	name: 'Members Tree',
 	weight: 10,
 	meta: {
-		repository: UmbMemberRepository,
+		repositoryAlias: MEMBER_REPOSITORY_ALIAS,
 	},
 };
 
-export const manifests = [tree];
+const treeItem: ManifestTreeItem = {
+	type: 'treeItem',
+	kind: 'entity',
+	alias: 'Umb.TreeItem.Member',
+	name: 'Member Tree Item',
+	conditions: {
+		entityType: 'member',
+	},
+};
+
+export const manifests = [tree, treeItem];

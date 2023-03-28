@@ -1,4 +1,4 @@
-import type { RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel, DocumentResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class DocumentTreeServerDataSource
  * @implements {DocumentTreeDataSource}
  */
-export class DocumentTreeServerDataSource implements RepositoryTreeDataSource {
+export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostInterface;
 
 	// TODO: how do we handle trashed items?
