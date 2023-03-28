@@ -32,8 +32,8 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	 * This will give us all the structure for properties and containers.
 	 */
 	public async loadType(key?: string) {
-		// TODO: I guess it would make sense to clean up, in this case we most likely don't need any of the old document types:
-		//this.#documentTypes.next([]);
+		this.#documentTypes.next([]);
+		this.#containers.next([]);
 		await this._loadType(key);
 	}
 
