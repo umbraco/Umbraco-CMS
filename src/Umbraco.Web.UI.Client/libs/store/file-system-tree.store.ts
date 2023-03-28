@@ -27,7 +27,7 @@ export class UmbFileSystemTreeStore extends UmbStoreBase implements UmbTreeStore
 	 * @memberof UmbFileSystemTreeStore
 	 */
 	updateItem(path: string, data: Partial<FileSystemTreeItemPresentationModel>) {
-		this.#data.next(partialUpdateFrozenArray(this.#data.getValue(), data, (entry) => entry.path === path));
+		this.#data.appendOne(data)
 	}
 
 	/**
