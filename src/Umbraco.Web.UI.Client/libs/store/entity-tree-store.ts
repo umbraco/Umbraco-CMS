@@ -1,21 +1,20 @@
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
- * @class UmbTreeStoreBase
+ * @class UmbEntityTreeStore
  * @extends {UmbStoreBase}
  * @description - General Tree Data Store
  */
-// TODO: consider if tree store could be turned into a general EntityTreeStore class?
-export class UmbTreeStoreBase extends UmbStoreBase {
+export class UmbEntityTreeStore extends UmbStoreBase implements UmbTreeStore<EntityTreeItemResponseModel> {
 	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
 
 	/**
 	 * Appends items to the store
-	 * @param {Array<EntityTreeItemModel>} items
-	 * @memberof UmbTreeStoreBase
+	 * @param {Array<EntityTreeItemResponseModel>} items
+	 * @memberof UmbEntityTreeStore
 	 */
 	appendItems(items: Array<EntityTreeItemResponseModel>) {
 		this.#data.append(items);
@@ -24,8 +23,8 @@ export class UmbTreeStoreBase extends UmbStoreBase {
 	/**
 	 * Updates an item in the store
 	 * @param {string} key
-	 * @param {Partial<EntityTreeItemModel>} data
-	 * @memberof UmbTreeStoreBase
+	 * @param {Partial<EntityTreeItemResponseModel>} data
+	 * @memberof UmbEntityTreeStore
 	 */
 	updateItem(key: string, data: Partial<EntityTreeItemResponseModel>) {
 		this.#data.next(partialUpdateFrozenArray(this.#data.getValue(), data, (entry) => entry.key === key));
@@ -34,7 +33,7 @@ export class UmbTreeStoreBase extends UmbStoreBase {
 	/**
 	 * Removes an item from the store
 	 * @param {string} key
-	 * @memberof UmbTreeStoreBase
+	 * @memberof UmbEntityTreeStore
 	 */
 	removeItem(key: string) {
 		this.#data.removeOne(key);
@@ -42,7 +41,7 @@ export class UmbTreeStoreBase extends UmbStoreBase {
 
 	/**
 	 * An observable to observe the root items
-	 * @memberof UmbTreeStoreBase
+	 * @memberof UmbEntityTreeStore
 	 */
 	rootItems = this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
 
@@ -50,7 +49,7 @@ export class UmbTreeStoreBase extends UmbStoreBase {
 	 * Returns an observable to observe the children of a given parent
 	 * @param {(string | null)} parentKey
 	 * @return {*}
-	 * @memberof UmbTreeStoreBase
+	 * @memberof UmbEntityTreeStore
 	 */
 	childrenOf(parentKey: string | null) {
 		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === parentKey));
@@ -60,7 +59,7 @@ export class UmbTreeStoreBase extends UmbStoreBase {
 	 * Returns an observable to observe the items with the given keys
 	 * @param {Array<string>} keys
 	 * @return {*}
-	 * @memberof UmbTreeStoreBase
+	 * @memberof UmbEntityTreeStore
 	 */
 	items(keys: Array<string>) {
 		return this.#data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
