@@ -50,6 +50,9 @@ export class UmbBackofficeElement extends UmbLitElement {
 				font-size: 14px;
 				box-sizing: border-box;
 			}
+			umb-backoffice-modal-container {
+				z-index: 1000;
+			}
 		`,
 	];
 
