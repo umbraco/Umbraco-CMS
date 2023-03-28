@@ -1,6 +1,6 @@
 {
 	"cssVariables.lookupFiles": ["node_modules/@umbraco-ui/uui-css/dist/custom-properties.css"],
-	"cSpell.words": ["combobox", "variantable"],
+	"cSpell.words": ["combobox", "templating", "variantable"],
 	"exportall.config.folderListener": [],
 	"exportall.config.relExclusion": []
 }

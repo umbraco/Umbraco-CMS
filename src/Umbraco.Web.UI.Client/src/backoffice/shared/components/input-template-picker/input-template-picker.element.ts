@@ -5,33 +5,13 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbTemplateCardElement } from '../template-card/template-card.element';
 import { UMB_TEMPLATE_PICKER_MODAL_TOKEN } from '../../modals/template-picker';
 import { UMB_TEMPLATE_MODAL_TOKEN } from '../../modals/template';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTemplateRepository } from '../../../templating/templates/repository/template.repository';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-input-template-picker')
 export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#add-button {
-				width: 100%;
-			}
-			:host {
-				box-sizing: border-box;
-				display: flex;
-				gap: var(--uui-size-space-4);
-				flex-wrap: wrap;
-			}
-
-			:host > * {
-				max-width: 180px;
-				min-width: 180px;
-				min-height: 150px;
-			}
-		`,
-	];
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -74,12 +54,8 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		return this._allowedKeys;
 	}
 	public set allowedKeys(newKeys: Array<string>) {
-		//this.#observePickedTemplates();
 		this._allowedKeys = newKeys;
-		//this._templates = [];
-		//this._allowedKeys.forEach((key) => {
-		//	this.#setup(key);
-		//});
+		this.#observePickedTemplates();
 	}
 
 	_defaultKey = '';
@@ -93,47 +69,38 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _modalContext?: UmbModalContext;
-	//private _templateStore?: UmbTemplateTreeStore;
-	//private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
+	private _templateRepository: UmbTemplateRepository = new UmbTemplateRepository(this);
 
 	@state()
-	_templates: TemplateResponseModel[] = [];
-
-	public get templates(): TemplateResponseModel[] {
-		return this._templates;
-	}
-	public set templates(newTemplates: TemplateResponseModel[]) {
-		this._templates = newTemplates;
-		this.allowedKeys = newTemplates.map((template) => template.key ?? '');
-	}
+	_pickedTemplates: TemplateResponseModel[] = [];
 
 	constructor() {
 		super();
+
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.allowedKeys.forEach((key) => this.#setup(key));
-	}
-
-	async #setup(templateKey: string) {
-		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateByKey({ key: templateKey }));
-		if (!data) return;
-		this.templates = [...this.templates, data];
+	async #observePickedTemplates() {
+		this.observe(
+			await this._templateRepository.treeItems(this._allowedKeys),
+			(data) => {
+				this._pickedTemplates = data;
+			},
+			'_templateRepositoryTreeItems'
+		);
 	}
 
 	protected getFormElement() {
-		return undefined;
+		return this;
 	}
 
 	#changeDefault(e: CustomEvent) {
 		e.stopPropagation();
 		const newKey = (e.target as UmbTemplateCardElement).value as string;
 		this.defaultKey = newKey;
-		this.dispatchEvent(new CustomEvent('change-default', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change-default'));
 	}
 
 	#openPicker() {
@@ -144,11 +111,8 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 
 		modalHandler?.onSubmit().then((data) => {
 			if (!data.selection) return;
-			//TODO: a better way to do this?
-			this.templates = [];
 			this.allowedKeys = data.selection;
-			this.allowedKeys.forEach((key) => this.#setup(key));
-			this.dispatchEvent(new CustomEvent('change-allowed', { bubbles: true, composed: true }));
+			this.dispatchEvent(new CustomEvent('change-allowed'));
 		});
 	}
 
@@ -162,14 +126,21 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		const templateIndex = this.templates.findIndex((x) => x.key === key);
-		this.templates.splice(templateIndex, 1);
-		this.templates = [...this._templates];
+		this.allowedKeys = this.allowedKeys.filter((x) => x !== key);
+	}
+
+	#openTemplate(e: CustomEvent) {
+		const key = (e.target as UmbTemplateCardElement).value;
+
+		this._modalContext?.open(UMB_TEMPLATE_MODAL_TOKEN, {
+			key: key as string,
+			language: 'razor',
+		});
 	}
 
 	render() {
 		return html`
-			${this.templates.map(
+			${this._pickedTemplates.map(
 				(template) => html`
 					<umb-template-card
 						class="template-card"
@@ -192,21 +163,26 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	#openTemplate(e: CustomEvent) {
-		const key = (e.target as UmbTemplateCardElement).value;
+	static styles = [
+		UUITextStyles,
+		css`
+			#add-button {
+				width: 100%;
+			}
+			:host {
+				box-sizing: border-box;
+				display: flex;
+				gap: var(--uui-size-space-4);
+				flex-wrap: wrap;
+			}
 
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_MODAL_TOKEN, {
-			key: key as string,
-			language: 'razor',
-		});
-
-		/*
-		modalHandler?.onSubmit().then(({ key }) => {
-			// TODO: update template
-			// Hopefully our Template Repository will make sure this happens automatically, But lets follow up.
-		});
-		*/
-	}
+			:host > * {
+				max-width: 180px;
+				min-width: 180px;
+				min-height: 150px;
+			}
+		`,
+	];
 }
 
 export default UmbInputTemplatePickerElement;
