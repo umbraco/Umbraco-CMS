@@ -24,13 +24,13 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
     private static bool _isReady;
     private static bool _isReadSet;
     private static object? _isReadyLock;
-    private readonly ExamineIndexRebuilder _backgroundIndexRebuilder;
+    private readonly IExamineIndexRebuilder _backgroundIndexRebuilder;
     private readonly IRuntimeState _runtimeState;
     private readonly ISyncBootStateAccessor _syncBootStateAccessor;
 
     public RebuildOnStartupHandler(
         ISyncBootStateAccessor syncBootStateAccessor,
-        ExamineIndexRebuilder backgroundIndexRebuilder,
+        IExamineIndexRebuilder backgroundIndexRebuilder,
         IRuntimeState runtimeState)
     {
         _syncBootStateAccessor = syncBootStateAccessor;
