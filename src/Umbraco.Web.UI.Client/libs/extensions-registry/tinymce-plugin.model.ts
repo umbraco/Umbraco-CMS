@@ -1,11 +1,6 @@
-import type { ManifestWithMeta } from "./models";
+import { TinyMcePluginBase } from "../../src/backoffice/shared/property-editors/uis/tiny-mce/plugins/tiny-mce-plugin";
+import type { ManifestClass } from "./models";
 
-export interface ManifestTinyMcePlugin extends ManifestWithMeta {
+export interface ManifestTinyMcePlugin extends ManifestClass<TinyMcePluginBase> {
 	type: 'tinyMcePlugin';
-	meta: MetaTinyMcePlugin;
-}
-
-export interface MetaTinyMcePlugin {
-	exportName: string;
-	js: string;
 }

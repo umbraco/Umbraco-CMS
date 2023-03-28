@@ -22,7 +22,7 @@ interface MediaPickerResultData {
 	'data-caption'?: string;
 }
 
-export class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
+export default class TinyMceMediaPickerPlugin extends TinyMcePluginBase {
 	#mediaHelper: UmbMediaHelper;
 	#currentUser?: UserDetails;
 	#modalContext?: UmbModalContext;

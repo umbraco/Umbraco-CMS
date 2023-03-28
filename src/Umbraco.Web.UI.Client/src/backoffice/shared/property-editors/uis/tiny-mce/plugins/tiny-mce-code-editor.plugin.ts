@@ -2,7 +2,7 @@ import { UmbCodeEditorModalData, UmbCodeEditorModalResult, UMB_CODE_EDITOR_MODAL
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
-export class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
+export default class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
 
 	#modalContext?: UmbModalContext;
 

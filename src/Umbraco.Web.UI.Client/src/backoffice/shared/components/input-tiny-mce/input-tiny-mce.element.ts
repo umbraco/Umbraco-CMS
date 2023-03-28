@@ -11,13 +11,11 @@ import {
 import { TinyMcePluginArguments, TinyMcePluginBase } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-plugin';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import type { ClassConstructor, UserDetails } from '@umbraco-cms/backoffice/models';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { hasDefaultExport, loadExtension, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	ManifestTinyMcePlugin,
-} from 'libs/extensions-registry/tinymce-plugin.model';
+import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
 
 // TODO => determine optimal method for including tiny. Currently using public assets
 // as we need to ship all core plugins to allow implementors to register these. Have not considered
@@ -247,20 +245,21 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.#setTinyConfig();
 	}
 
+	/**
+	 * Load all custom plugins - need to split loading and instantiating as these
+	 * need the editor instance as a ctor argument. If we load them in the editor
+	 * setup method, the asynchronous nature means the editor is loaded before
+	 * the plugins are ready and so are not associated with the editor.
+	 */
 	async #loadPlugins() {
 		const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
 		const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
 
 		for (const plugin of plugins) {
-			if (!plugin.meta.exportName || !plugin.meta.js) {
-				return;
+			const module = await loadExtension(plugin);
+			if (hasDefaultExport<ClassConstructor<TinyMcePluginBase>>(module)) {
+				this.#plugins.push(module.default);
 			}
-
-			const module = await import(/* @vite-ignore */ plugin.meta.js);
-			if (!module) {
-				continue;
-			}
-			this.#plugins.push(module[plugin.meta.exportName]);
 		}
 	}
 
@@ -414,11 +413,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		// instantiate plugins - these are already loaded in this.#loadPlugins
 		// to ensure they are available before setting up the editor.
-		this.#plugins.forEach((p) => new p({
-			host: this,
-			editor,
-			configuration: this.configuration,
-		}));
+		for (const plugin of this.#plugins) {
+			new plugin({ host: this, editor, configuration: this.configuration });
+		}
 
 		// define keyboard shortcuts
 		editor.addShortcut('Ctrl+S', '', () =>
