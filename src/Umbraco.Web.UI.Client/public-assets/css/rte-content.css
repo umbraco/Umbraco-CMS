@@ -15,20 +15,20 @@
     background-position-x: 99%;
 }
 
-.embeditem {
+.umb-embed-holder {
     position: relative;
 }
 
-.embeditem>* {
+.umb-embed-holder>* {
     user-select: none;
     pointer-events: none;
 }
 
-.embeditem[data-mce-selected] {
+.umb-embed-holder[data-mce-selected] {
     outline: 2px solid var(--uui-palette-spanish-pink-light);
 }
 
-.embeditem::before {
+.umb-embed-holder::before {
     z-index: 1000;
     width: 100%;
     height: 100%;
@@ -36,7 +36,7 @@
     content: ' ';
 }
 
-.embeditem[data-mce-selected]::before {
+.umb-embed-holder[data-mce-selected]::before {
     background: rgba(0, 0, 0, 0.025);
 }
 

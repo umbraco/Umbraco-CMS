@@ -23,7 +23,7 @@ export class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 
 	#onAction() {
 		// Get the selected element
-		// Check nodename is a DIV and the claslist contains 'embeditem'
+		// Check nodename is a DIV and the claslist contains 'umb-embed-holder'
 		const selectedElm = this.editor.selection.getNode();
 		const nodeName = selectedElm.nodeName;
 		
@@ -32,7 +32,7 @@ export class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 			height: ModalElement.defaultHeight,
 		};
 
-		if (nodeName.toUpperCase() === 'DIV' && selectedElm.classList.contains('embeditem')) {
+		if (nodeName.toUpperCase() === 'DIV' && selectedElm.classList.contains('umb-embed-holder')) {
 			// See if we can go and get the attributes
 			const url = this.editor.dom.getAttrib(selectedElm, 'data-embed-url');
 			const embedWidth = this.editor.dom.getAttrib(selectedElm, 'data-embed-width');
@@ -56,7 +56,7 @@ export class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 		const wrapper = this.editor.dom.create(
 			'div',
 			{
-				class: 'mceNonEditable embeditem',
+				class: 'mceNonEditable umb-embed-holder',
 				'data-embed-url': embed.url ?? '',
 				'data-embed-height': embed.height,
 				'data-embed-width': embed.width,
@@ -69,7 +69,7 @@ export class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 		// Only replace if activeElement is an Embed element.
 		if (
 			activeElement?.nodeName.toUpperCase() === 'DIV' &&
-			activeElement.classList.contains('embeditem')
+			activeElement.classList.contains('umb-embed-holder')
 		) {
 			activeElement.replaceWith(wrapper); // directly replaces the html node
 		} else {

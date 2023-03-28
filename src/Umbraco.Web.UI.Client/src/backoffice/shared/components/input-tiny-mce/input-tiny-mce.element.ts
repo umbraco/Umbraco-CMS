@@ -8,14 +8,16 @@ import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store';
-import { TinyMcePluginArguments } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-plugin';
+import { TinyMcePluginArguments, TinyMcePluginBase } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-plugin';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
+import {
+	ManifestTinyMcePlugin,
+} from 'libs/extensions-registry/tinymce-plugin.model';
 
 // TODO => determine optimal method for including tiny. Currently using public assets
 // as we need to ship all core plugins to allow implementors to register these. Have not considered
@@ -63,7 +65,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	configuration: Array<DataTypePropertyPresentationModel> = [];
 
 	// TODO => create interface when we know what shape that will take
-	// TinyMCE provides the EditorOptions interface, but all props are required 
+	// TinyMCE provides the EditorOptions interface, but all props are required
 	@state()
 	private _configObject: Record<string, any> = {};
 
@@ -205,6 +207,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
 	#currentUser?: UserDetails;
+	#plugins: Array<new (args: TinyMcePluginArguments) => TinyMcePluginBase> = [];
 
 	protected getFormElement() {
 		return undefined;
@@ -231,7 +234,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		});
 	}
 
-	connectedCallback() {
+	async connectedCallback() {
 		super.connectedCallback();
 
 		// create an object by merging the configuration onto the fallback config
@@ -247,7 +250,22 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this._configObject.plugins.splice(this._configObject.plugins.indexOf('autoresize'), 1);
 		}
 
+		await this.#loadPlugins();
 		this.#setTinyConfig();
+	}
+
+	async #loadPlugins() {
+		const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
+		const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
+
+		for (const plugin of plugins) {
+			if (!plugin.meta.exportName || !plugin.meta.js) {
+				return;
+			}
+
+			const module = await import(/* @vite-ignore */ plugin.meta.js);
+			this.#plugins.push(module[plugin.meta.exportName]);
+		}
 	}
 
 	#setTinyConfig() {
@@ -263,6 +281,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
 			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster,
 			contextMenu: false,
+			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
 			language: this.#getLanguage(),
 			menubar: false,
 			paste_remove_styles_if_webkit: true,
@@ -290,7 +309,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			width: this._configObject.width,
 		});
 
-
 		// Need to check if we are allowed to UPLOAD images
 		// This is done by checking if the insert image toolbar button is available
 		if (this.#isMediaPickerEnabled()) {
@@ -315,7 +333,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// convert i to em
 		args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, '<em$1>$2</em$3>');
 	}
-	
+
 	// TODO => arg types
 	#uploadImageHandler(blobInfo: any, progress: any) {
 		return new Promise((resolve, reject) => {
@@ -398,21 +416,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// register custom option maxImageSize
 		editor.options.register('maxImageSize', { processor: 'number', default: this.#fallbackConfig.maxImageSize });
 
-		// register all plugins from manifests
-		// these receive the default args below, but can also
-		// provide their own args. Generally though, the additional
-		// args would be managed in the plugin
-		(async () => {
-			const pluginArgs: TinyMcePluginArguments = {
-				host: this,
-				editor,
-				configuration: this.configuration,
-			};
-
-			const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
-			const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
-			plugins.forEach((p) => new p.meta.api(pluginArgs, p.meta.args));
-		})();
+		// instantiate plugins - these are already loaded in this.#loadPlugins
+		// to ensure they are available before setting up the editor.
+		this.#plugins.forEach((p) => new p({
+			host: this,
+			editor,
+			configuration: this.configuration,
+		}));
 
 		// define keyboard shortcuts
 		editor.addShortcut('Ctrl+S', '', () =>
@@ -541,9 +551,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	/**
-	 * Nothing rendered by default - TinyMCE initialisation creates 
+	 * Nothing rendered by default - TinyMCE initialisation creates
 	 * a target div and binds the RTE to that element
-	 * @returns 
+	 * @returns
 	 */
 	render() {
 		return html``;
