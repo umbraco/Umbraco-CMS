@@ -7,8 +7,8 @@ import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-language-workspace-thingy')
-export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
+@customElement('umb-language-workspace-edit')
+export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -58,7 +58,7 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 	render() {
 		return html`<umb-workspace-layout alias="Umb.Workspace.Language">
 			<div id="header" slot="header">
-				<uui-button href="/section/settings/workspace/language-root" compact>
+				<uui-button label="Navigate back" href="/section/settings/workspace/language-root" compact>
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</uui-button>
 				<uui-input value=${ifDefined(this._language?.name)} @input="${this.#handleInput}"></uui-input>
@@ -67,10 +67,10 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 	}
 }
 
-export default UmbLanguageWorkspaceThingyElement;
+export default UmbLanguageWorkspaceEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-workspace-thingy': UmbLanguageWorkspaceThingyElement;
+		'umb-language-workspace-edit': UmbLanguageWorkspaceEditElement;
 	}
 }

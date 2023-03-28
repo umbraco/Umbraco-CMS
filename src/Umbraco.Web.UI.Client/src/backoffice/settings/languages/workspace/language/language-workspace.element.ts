@@ -24,6 +24,10 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 				this.#languageWorkspaceContext.load(info.match.params.isoCode);
 			},
 		},
+		{
+			path: 'create',
+			component: () => import('./language-workspace-create.element'),
+		},
 	];
 
 	render() {

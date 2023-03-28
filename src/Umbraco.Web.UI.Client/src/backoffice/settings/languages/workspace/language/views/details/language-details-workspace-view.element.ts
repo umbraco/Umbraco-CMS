@@ -4,8 +4,8 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
-import UmbInputCultureSelectElement from '../../../../../../shared/components/input-culture-select/input-culture-select.element';
-import UmbInputLanguagePickerElement from '../../../../../../shared/components/input-language-picker/input-language-picker.element';
+import { UmbInputCultureSelectElement } from '../../../../../../shared/components/input-culture-select/input-culture-select.element';
+import { UmbInputLanguagePickerElement } from '../../../../../../shared/components/input-language-picker/input-language-picker.element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -142,15 +142,13 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 	}
 
 	render() {
-		if (!this._language) return nothing;
-
 		return html`
 			<uui-box>
 				<umb-workspace-property-layout label="Language">
 					<div slot="editor">
 						<!-- TODO: disable already created cultures in the select -->
 						<umb-input-culture-select
-							value=${ifDefined(this._language.isoCode)}
+							value=${ifDefined(this._language?.isoCode)}
 							@change=${this.#handleCultureChange}
 							?readonly=${this._isNew === false}></umb-input-culture-select>
 
@@ -162,14 +160,15 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 				</umb-workspace-property-layout>
 
 				<umb-workspace-property-layout label="ISO Code">
-					<div slot="editor">${this._language.isoCode}</div>
+					<div slot="editor">${this._language?.isoCode}</div>
 				</umb-workspace-property-layout>
 
 				<umb-workspace-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
+							label="Default language"
 							?disabled=${this._isDefaultLanguage}
-							?checked=${this._language.isDefault || false}
+							?checked=${this._language?.isDefault || false}
 							@change=${this.#handleDefaultChange}>
 							<div>
 								<b>Default language</b>
@@ -177,14 +176,17 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 							</div>
 						</uui-toggle>
 						<!-- 	TODO: we need a UUI component for this -->
-						${this._language.isDefault !== this._isDefaultLanguage
+						${this._language?.isDefault && this._language?.isDefault !== this._isDefaultLanguage
 							? html`<div id="default-language-warning">
 									Switching default language may result in default content missing.
 							  </div>`
 							: nothing}
 
 						<hr />
-						<uui-toggle ?checked=${this._language.isMandatory || false} @change=${this.#handleMandatoryChange}>
+						<uui-toggle
+							label="Mandatory language"
+							?checked=${this._language?.isMandatory || false}
+							@change=${this.#handleMandatoryChange}>
 							<div>
 								<b>Mandatory language</b>
 								<div>Properties on this language have to be filled out before the node can be published.</div>
@@ -197,7 +199,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
 					<umb-input-language-picker
-						value=${ifDefined(this._language.fallbackIsoCode === null ? undefined : this._language.fallbackIsoCode)}
+						value=${ifDefined(this._language?.fallbackIsoCode === null ? undefined : this._language?.fallbackIsoCode)}
 						slot="editor"
 						max="1"
 						@change=${this.#handleFallbackChange}
