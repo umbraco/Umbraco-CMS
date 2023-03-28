@@ -99,7 +99,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		});
 	}
 
-	private async _removeItem(item: EntityTreeItemResponseModel) {
+	private async _removeItem(item: DocumentTypeResponseModel) {
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
@@ -129,9 +129,9 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		`;
 	}
 
-	private _renderItem(item: EntityTreeItemResponseModel) {
+	private _renderItem(item: DocumentTypeResponseModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as EntityTreeItemResponseModel & { isTrashed: boolean };
+		const tempItem = item as DocumentTypeResponseModel & { isTrashed: boolean };
 
 		return html`
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
