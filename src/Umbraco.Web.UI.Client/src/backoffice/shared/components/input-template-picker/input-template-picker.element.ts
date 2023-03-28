@@ -137,7 +137,6 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	#openPicker() {
-		//TODO: Tree-picker modal?
 		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL_TOKEN, {
 			multiple: true,
 			selection: [...this.allowedKeys],
@@ -145,6 +144,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 
 		modalHandler?.onSubmit().then((data) => {
 			if (!data.selection) return;
+			//TODO: a better way to do this?
 			this.templates = [];
 			this.allowedKeys = data.selection;
 			this.allowedKeys.forEach((key) => this.#setup(key));
@@ -193,7 +193,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		});
 
 		modalHandler?.onSubmit().then(({ key }) => {
-			// TODO: update list
+			// TODO: update template
 		});
 	}
 }

@@ -38,7 +38,7 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 			}
 
 			umb-code-editor {
-				position: absolute;
+				position: absolute; /** Umb-code-editor has issues with height, this is the temp solution on this case */
 				top: 75px;
 				left: 0;
 				bottom: 0;
