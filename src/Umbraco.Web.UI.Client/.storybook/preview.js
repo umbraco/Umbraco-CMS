@@ -1,11 +1,8 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 import '../src/core/css/custom-properties.css';
 
+import 'element-internals-polyfill';
 import '@umbraco-ui/uui';
-import '@umbraco-ui/uui-modal';
-import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-dialog';
-import '@umbraco-ui/uui-modal-sidebar';
 
 import { html } from 'lit';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
