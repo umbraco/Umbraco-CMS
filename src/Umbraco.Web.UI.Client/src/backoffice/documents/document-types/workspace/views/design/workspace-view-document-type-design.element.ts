@@ -63,6 +63,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 			#add-group {
 				margin-top: var(--uui-size-layout-1);
 				width: 100%;
+				--uui-button-height: var(--uui-size-layout-4);
 			}
 
 			.group-headline {
