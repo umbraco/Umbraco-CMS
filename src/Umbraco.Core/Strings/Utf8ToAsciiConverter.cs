@@ -11,6 +11,12 @@ namespace Umbraco.Cms.Core.Strings;
 /// </remarks>
 public static class Utf8ToAsciiConverter
 {
+    [Obsolete("Use ToAsciiString(ReadOnlySpan<char>..) instead")]
+    public static string ToAsciiString(string text, char fail = '?')
+    {
+        return ToAsciiString(text.AsSpan(), fail);
+    }
+
     /// <summary>
     ///     Converts an Utf8 string into an Ascii string.
     /// </summary>
