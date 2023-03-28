@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Infrastructure.Migrations;
 
-public interface IEFCoreMigrationService
+public interface IMigrationService
 {
     Task MigrateAsync();
 }

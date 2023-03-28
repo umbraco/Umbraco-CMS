@@ -53,7 +53,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IAmbientEFCoreScopeContextStack, AmbientEFCoreScopeContextStack>();
         services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
         services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();
-        services.AddSingleton<IEFCoreMigrationService, EFCoreMigrationService>();
+        services.AddSingleton<IMigrationService, MigrationService>();
         return services;
     }
 

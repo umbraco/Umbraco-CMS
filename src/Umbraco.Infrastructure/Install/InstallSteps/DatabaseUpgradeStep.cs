@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
     [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall, "DatabaseUpgrade", 12, "")]
     public class DatabaseUpgradeStep : InstallSetupStep<object>
     {
-        private readonly IEFCoreMigrationService _efCoreMigrationService;
+        private readonly IMigrationService _migrationService;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
         private readonly ILogger<DatabaseUpgradeStep> _logger;
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
             IOptionsMonitor<ConnectionStrings> connectionStrings)
-        : this(databaseBuilder, runtime, logger, umbracoVersion, connectionStrings, StaticServiceProvider.Instance.GetRequiredService<IEFCoreMigrationService>())
+        : this(databaseBuilder, runtime, logger, umbracoVersion, connectionStrings, StaticServiceProvider.Instance.GetRequiredService<IMigrationService>())
         {
         }
 
@@ -43,14 +43,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
             IOptionsMonitor<ConnectionStrings> connectionStrings,
-            IEFCoreMigrationService efCoreMigrationService)
+            IMigrationService migrationService)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
             _connectionStrings = connectionStrings;
-            _efCoreMigrationService = efCoreMigrationService;
+            _migrationService = migrationService;
         }
 
         public override async Task<InstallSetupResult?> ExecuteAsync(object model)
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private async Task ExecuteEFCoreUpgrade()
         {
             _logger.LogInformation("Running EFCore upgrade");
-            await _efCoreMigrationService.MigrateAsync();
+            await _migrationService.MigrateAsync();
         }
 
         public override bool RequiresExecution(object model)
