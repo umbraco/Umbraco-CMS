@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import '../../../../../shared/property-creator/property-creator.element.ts';
 
 @customElement('umb-workspace-view-document-type-templates')
 export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement {
