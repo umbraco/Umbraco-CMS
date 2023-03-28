@@ -24,13 +24,6 @@ import {
 // other locations for serving these assests - might make better sense in /libs
 import '../../../../../public-assets/tiny-mce/tinymce.min.js';
 
-declare global {
-	interface Window {
-		tinymce: any;
-		Umbraco: any;
-	}
-}
-
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
