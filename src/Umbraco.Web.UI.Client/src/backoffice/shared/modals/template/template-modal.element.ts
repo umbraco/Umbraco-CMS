@@ -14,49 +14,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 // TODO: make use of UmbPickerLayoutBase
 @customElement('umb-template-modal')
 export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModalData, UmbTemplateModalResult> {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-box {
-				position: relative;
-				display: block;
-				height: 100%;
-				margin: var(--uui-size-layout-1);
-			}
-
-			#layout-header {
-				display: flex;
-				width: 100%;
-				align-items: center;
-				margin: 0 var(--uui-size-layout-1);
-			}
-
-			#template-name {
-				align-items: center;
-				padding: 0 var(--uui-size-space-3);
-				flex-grow: 1;
-			}
-
-			umb-code-editor {
-				position: absolute; /** Umb-code-editor has issues with height, this is the temp solution on this case */
-				top: 75px;
-				left: 0;
-				bottom: 0;
-				width: 100%;
-			}
-
-			#button-group {
-				display: flex;
-				justify-content: space-between;
-			}
-
-			#secondary-group {
-				display: flex;
-				gap: var(--uui-size-space-4);
-			}
-		`,
-	];
-
 	@state()
 	_key = '';
 
@@ -149,6 +106,49 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 			</umb-body-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-box {
+				position: relative;
+				display: block;
+				height: 100%;
+				margin: var(--uui-size-layout-1);
+			}
+
+			#layout-header {
+				display: flex;
+				width: 100%;
+				align-items: center;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
+			#template-name {
+				align-items: center;
+				padding: 0 var(--uui-size-space-3);
+				flex-grow: 1;
+			}
+
+			umb-code-editor {
+				position: absolute; /** Umb-code-editor has issues with height, this is the temp solution on this case */
+				top: 75px;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+			}
+
+			#button-group {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			#secondary-group {
+				display: flex;
+				gap: var(--uui-size-space-4);
+			}
+		`,
+	];
 }
 
 export default UmbTemplateModalElement;
