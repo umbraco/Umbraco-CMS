@@ -264,6 +264,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			}
 
 			const module = await import(/* @vite-ignore */ plugin.meta.js);
+			if (!module) {
+				continue;
+			}
 			this.#plugins.push(module[plugin.meta.exportName]);
 		}
 	}
