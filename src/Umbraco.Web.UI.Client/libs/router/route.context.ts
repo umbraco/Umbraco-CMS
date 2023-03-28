@@ -1,4 +1,4 @@
-import { IRoutingInfo, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
+import type { IRoutingInfo, PARAM_IDENTIFIER, stripSlash } from 'router-slot';
 import { UmbRoute } from './route.interface';
 import {
 	UmbContextConsumerController,
