@@ -28,6 +28,8 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 
 		if (!this.data?.key) return;
 
+		// TODO: use the template workspace instead of a custom modal. This is still to be made available as infinite editors(Modals).
+		alert('This should be using the Template Workspace instead of a custom build modal.');
 		this._key = this.data.key;
 		this.#getTemplate();
 	}
