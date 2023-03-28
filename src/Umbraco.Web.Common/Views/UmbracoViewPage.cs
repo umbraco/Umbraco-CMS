@@ -41,7 +41,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 
             _helper = Context.RequestServices.GetRequiredService<UmbracoHelper>();
 
-            TModel model = ViewData.Model;
+            TModel? model = ViewData.Model;
             var content = model as IPublishedContent;
 
             if (content is null && model is IContentModel contentModel)

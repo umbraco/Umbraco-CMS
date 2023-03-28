@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.Web.Common.Controllers;
@@ -15,6 +16,14 @@ internal class PublishedRequestFilterAttribute : ResultFilterAttribute
     /// </summary>
     public override void OnResultExecuting(ResultExecutingContext context)
     {
+        if (context.Result is MaintenanceResult)
+        {
+            // If the result is already set to a maintenance result we can't do anything
+            // Since the umbraco pipeline has not run.
+            // Fortunately we don't need to either.
+            return;
+        }
+
         UmbracoRouteValues routeVals = GetUmbracoRouteValues(context);
         IPublishedRequest pcr = routeVals.PublishedRequest;
 

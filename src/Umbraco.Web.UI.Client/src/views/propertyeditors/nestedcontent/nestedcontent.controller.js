@@ -68,7 +68,7 @@
     function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $attrs) {
 
         const vm = this;
-        
+
         var model = $scope.$parent.$parent.model;
 
         vm.readonly = false;
@@ -103,9 +103,6 @@
 
         vm.minItems = model.config.minItems || 0;
         vm.maxItems = model.config.maxItems || 0;
-
-        if (vm.maxItems === 0)
-            vm.maxItems = 1000;
 
         vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;
         vm.expandsOnLoad = Object.toBoolean(model.config.expandsOnLoad)
@@ -167,7 +164,7 @@
             isDisabled: true,
             useLegacyIcon: false
         };
-        
+
         function removeAllEntries() {
 
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
@@ -186,7 +183,7 @@
                 });
             });
         }
-        
+
         // helper to force the current form into the dirty state
         function setDirty() {
             if (vm.umbProperty) {
@@ -204,9 +201,17 @@
             validate();
         };
 
+        vm.maxItemsExceeded = function () {
+            return vm.maxItems !== 0 && vm.nodes.length > vm.maxItems;
+        }
+
+        vm.maxItemsReached = function () {
+            return vm.maxItems !== 0 && vm.nodes.length >= vm.maxItems;
+        }
+
         vm.openNodeTypePicker = function ($event) {
 
-            if (vm.nodes.length >= vm.maxItems) {
+            if (vm.maxItemsReached()) {
                 return;
             }
 
@@ -531,7 +536,6 @@
             storageUpdate();
         });
         var notSupported = [
-            "Umbraco.Tags",
             "Umbraco.UploadField",
             "Umbraco.ImageCropper",
             "Umbraco.BlockList"
@@ -768,7 +772,7 @@
                 $scope.nestedContentForm.minCount.$setValidity("minCount", true);
             }
 
-            if (vm.nodes.length > vm.maxItems) {
+            if (vm.maxItemsExceeded()) {
                 $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
             }
             else {

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions;
 
+[Obsolete("The grid is obsolete, will be removed in V13")]
 public static class GridTemplateExtensions
 {
     public static IHtmlContent GetGridHtml(this IHtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")

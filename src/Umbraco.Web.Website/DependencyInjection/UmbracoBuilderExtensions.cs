@@ -1,9 +1,15 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Routing;
@@ -40,11 +46,25 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddDataProtection();
         builder.Services.AddAntiforgery();
 
-        builder.Services.AddSingleton<UmbracoRouteValueTransformer>();
+        builder.Services.AddSingleton<UmbracoRouteValueTransformer>(x => new UmbracoRouteValueTransformer(
+            x.GetRequiredService<ILogger<UmbracoRouteValueTransformer>>(),
+            x.GetRequiredService<IUmbracoContextAccessor>(),
+            x.GetRequiredService<IPublishedRouter>(),
+            x.GetRequiredService<IRuntimeState>(),
+            x.GetRequiredService<IUmbracoRouteValuesFactory>(),
+            x.GetRequiredService<IRoutableDocumentFilter>(),
+            x.GetRequiredService<IDataProtectionProvider>(),
+            x.GetRequiredService<IControllerActionSearcher>(),
+            x.GetRequiredService<IPublicAccessRequestHandler>(),
+            x.GetRequiredService<IUmbracoVirtualPageRoute>(),
+            x.GetRequiredService<IOptionsMonitor<GlobalSettings>>()
+            ));
         builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
         builder.Services.TryAddEnumerable(Singleton<MatcherPolicy, NotFoundSelectorPolicy>());
+        builder.Services.AddSingleton<IUmbracoVirtualPageRoute, UmbracoVirtualPageRoute>();
         builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
         builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
+        builder.Services.AddSingleton<MatcherPolicy, SurfaceControllerMatcherPolicy>();
 
         builder.Services.AddSingleton<FrontEndRoutes>();
 

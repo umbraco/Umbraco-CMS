@@ -1,4 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Migrations;
@@ -32,7 +35,8 @@ public class PackageMigrationRunner
         PackageMigrationPlanCollection packageMigrationPlans,
         IMigrationPlanExecutor migrationPlanExecutor,
         IKeyValueService keyValueService,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        ILogger<PackageMigrationRunner> logger)
     {
         _profilingLogger = profilingLogger;
         _scopeProvider = scopeProvider;
@@ -41,6 +45,27 @@ public class PackageMigrationRunner
         _keyValueService = keyValueService;
         _eventAggregator = eventAggregator;
         _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
+    }
+
+    [Obsolete("Use constructor that takes ILogger, this will be removed in V13")]
+    public PackageMigrationRunner(
+        IProfilingLogger profilingLogger,
+        ICoreScopeProvider scopeProvider,
+        PendingPackageMigrations pendingPackageMigrations,
+        PackageMigrationPlanCollection packageMigrationPlans,
+        IMigrationPlanExecutor migrationPlanExecutor,
+        IKeyValueService keyValueService,
+        IEventAggregator eventAggregator)
+        : this(
+            profilingLogger,
+            scopeProvider,
+            pendingPackageMigrations,
+            packageMigrationPlans,
+            migrationPlanExecutor,
+            keyValueService,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<PackageMigrationRunner>>())
+    {
     }
 
     /// <summary>
