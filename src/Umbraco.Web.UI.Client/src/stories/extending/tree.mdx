@@ -68,13 +68,21 @@ import { UmbMyTreeItemContext, MyTreeItemDataModel } from './my-tree-item.contex
 
 @customElement('my-tree-item')
 export class MyTreeItemElement extends UmbElementMixin(LitElement) {
+	private _item?: MyTreeItemDataModel;
 	@property({ type: Object, attribute: false })
-	public item?: MyTreeItemDataModel;
+	public get item() {
+		return this._item;
+	}
+	public set item(value: MyTreeItemDataModel | undefined) {
+		this._item = value;
+		this.#context.setTreeItem(value);
+	}
+
+	#context = new UmbMyTreeItemContext(this);
 
 	render() {
 		if (!this.item) return nothing;
-		new UmbMyTreeItemContext(this, this.item);
-		return html` <umb-tree-item-base .item=${this.item}> Some custom markup </umb-tree-item-base>`;
+		return html` <umb-tree-item-base> Some custom markup </umb-tree-item-base>`;
 	}
 }
 
@@ -87,10 +95,10 @@ export default MyTreeItemElement;
 // TODO: auto generate this from the interface
 export interface UmbTreeItemContext<T> {
 	host: UmbControllerHostInterface;
-	treeItem: T;
-	unique: string;
-	type: string;
+	unique?: string;
+	type?: string;
 
+	treeItem: Observable<T | undefined>;
 	hasChildren: Observable<boolean>;
 	isLoading: Observable<boolean>;
 	isSelectable: Observable<boolean>;
@@ -99,12 +107,13 @@ export interface UmbTreeItemContext<T> {
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
 
+	setTreeItem(treeItem: T | undefined): void;
+
 	requestChildren(): Promise<{
 		data: PagedResponse<T> | undefined;
 		error: ProblemDetailsModel | undefined;
 		asObservable?: () => Observable<T[]>;
 	}>;
-
 	toggleContextMenu(): void;
 	select(): void;
 	deselect(): void;
@@ -118,8 +127,8 @@ We provide a base class for the tree item context. This class provides some defa
 
 ```typescript
 export class UmbMyTreeItemContext extends UmbTreeItemContextBase<MyTreeItemDataModel> {
-	constructor(host: UmbControllerHostInterface, treeItem: MyTreeItemDataModel) {
-		super(host, treeItem, (x: MyTreeItemDataModel) => x.unique);
+	constructor(host: UmbControllerHostInterface) {
+		super(host, (x: MyTreeItemDataModel) => x.unique);
 	}
 
 	// overwrite any methods or properties here if needed
