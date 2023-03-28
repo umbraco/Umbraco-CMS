@@ -1,8 +1,8 @@
+import type { DictionaryDetails } from '../';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { DictionaryDetails } from '../';
 
 /**
  * @export

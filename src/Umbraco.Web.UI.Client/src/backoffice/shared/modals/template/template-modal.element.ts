@@ -1,11 +1,11 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbCodeEditor } from '../../components/code-editor';
 import { UmbTemplateModalData, UmbTemplateModalResult } from '.';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbInputEvent } from 'libs/umb-events/input.event';
 import { TemplateResource, TemplateResponseModel } from 'libs/backend-api/src';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
