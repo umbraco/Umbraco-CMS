@@ -192,10 +192,12 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 			language: 'razor',
 		});
 
+		/*
 		modalHandler?.onSubmit().then(({ key }) => {
 			// TODO: update template
 			// Hopefully our Template Repository will make sure this happens automatically, But lets follow up.
 		});
+		*/
 	}
 }
 
