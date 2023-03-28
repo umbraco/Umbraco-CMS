@@ -1,11 +1,6 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 import './core/css/custom-properties.css';
 
-// TODO: remove these imports when they are part of UUI
-import '@umbraco-ui/uui-modal';
-import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-dialog';
-import '@umbraco-ui/uui-modal-sidebar';
 import 'element-internals-polyfill';
 
 import './core/router/router-slot.element';

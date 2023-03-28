@@ -1,6 +1,9 @@
-import type { UUIDialogElement } from '@umbraco-ui/uui';
-import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type {
+	UUIDialogElement,
+	UUIModalDialogElement,
+	UUIModalSidebarElement,
+	UUIModalSidebarSize,
+} from '@umbraco-ui/uui';
 import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject } from 'rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context';

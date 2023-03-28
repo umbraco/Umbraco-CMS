@@ -1,9 +1,8 @@
 // TODO: remove this import when the search hack is removed
 import '../../src/backoffice/search/modals/search/search-modal.element';
 
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type { UUIModalDialogElement, UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
-import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

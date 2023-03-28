@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../../shared/components/workspace-property/workspace-property.context';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
