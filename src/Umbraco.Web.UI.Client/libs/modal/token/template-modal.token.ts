@@ -9,7 +9,6 @@ export interface UmbTemplateModalResult {
 	key: string;
 }
 
-// TODO: Move to libs:
 export const UMB_TEMPLATE_MODAL = new UmbModalToken<UmbTemplateModalData, UmbTemplateModalResult>(
 	'Umb.Modal.Template',
 	{
