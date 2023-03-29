@@ -1,4 +1,3 @@
-import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 import type { ManifestCollectionView } from './collection-view.models';
 import type { ManifestDashboard } from './dashboard.models';
 import type { ManifestDashboardCollection } from './dashboard-collection.models';
@@ -18,7 +17,6 @@ import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.mod
 import type { ManifestTheme } from './theme.models';
 import type { ManifestTree } from './tree.models';
 import type { ManifestTreeItem } from './tree-item.models';
-import type { ManifestUserDashboard } from './user-dashboard.models';
 import type { ManifestUserProfileApp } from './user-profile-app.models';
 import type { ManifestWorkspace } from './workspace.models';
 import type { ManifestWorkspaceAction } from './workspace-action.models';
@@ -27,6 +25,7 @@ import type { ManifestWorkspaceViewCollection } from './workspace-view-collectio
 import type { ManifestRepository } from './repository.models';
 import type { ManifestModal } from './modal.models';
 import type { ManifestStore, ManifestTreeStore } from './store.models';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 
 export * from './collection-view.models';
 export * from './dashboard-collection.models';
@@ -47,7 +46,6 @@ export * from './menu-item.models';
 export * from './theme.models';
 export * from './tree.models';
 export * from './tree-item.models';
-export * from './user-dashboard.models';
 export * from './user-profile-app.models';
 export * from './workspace-action.models';
 export * from './workspace-view-collection.models';
@@ -83,7 +81,6 @@ export type ManifestTypes =
 	| ManifestTheme
 	| ManifestTree
 	| ManifestTreeItem
-	| ManifestUserDashboard
 	| ManifestUserProfileApp
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
