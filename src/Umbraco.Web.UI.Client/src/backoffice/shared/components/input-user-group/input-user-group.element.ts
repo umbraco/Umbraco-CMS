@@ -1,17 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInputListBase } from '../input-list-base/input-list-base';
+import { UmbInputListBaseElement } from '../input-list-base/input-list-base';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../users/user-groups/repository/user-group.store';
 
-import { UMB_USER_GROUP_PICKER_MODAL_TOKEN } from '../../../users/user-groups/modals/user-group-picker';
+import { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UserGroupEntity } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-user-group')
-export class UmbInputPickerUserGroupElement extends UmbInputListBase {
+export class UmbInputPickerUserGroupElement extends UmbInputListBaseElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -48,7 +48,7 @@ export class UmbInputPickerUserGroupElement extends UmbInputListBase {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.pickerToken = UMB_USER_GROUP_PICKER_MODAL_TOKEN;
+		this.pickerToken = UMB_USER_GROUP_PICKER_MODAL;
 		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (usersContext) => {
 			this._userGroupStore = usersContext;
 			this._observeUserGroups();

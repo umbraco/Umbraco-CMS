@@ -113,7 +113,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 	import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 	import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
 	import { TemplateModel } from '@umbraco-cms/backend-api';
-	import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+	import { UmbControllerHostElement } from '@umbraco-cms/controller';
 	
 	export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository> {
 		#data = new DeepState<TemplateModel | undefined>(undefined);
@@ -121,7 +121,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 		name = createObservablePart(this.#data, (data) => data?.name);
 		content = createObservablePart(this.#data, (data) => data?.content);
 	
-		constructor(host: UmbControllerHostInterface) {
+		constructor(host: UmbControllerHostElement) {
 			super(host, new UmbTemplateRepository(host));
 		}
 	

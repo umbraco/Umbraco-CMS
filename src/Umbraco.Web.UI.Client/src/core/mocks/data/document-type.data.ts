@@ -84,7 +84,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				name: 'Multi URL Picker',
 				description: '',
 				dataTypeKey: 'dt-multiUrlPicker',
-				variesByCulture: false,
+				variesByCulture: true,
 				variesBySegment: false,
 				validation: {
 					mandatory: true,
@@ -890,8 +890,12 @@ export const data: Array<DocumentTypeResponseModel> = [
 		},
 	},
 	{
-		allowedTemplateKeys: [],
-		defaultTemplateKey: null,
+		allowedTemplateKeys: [
+			'2bf464b6-3aca-4388-b043-4eb439cc2643',
+			'9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+			'9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
+		],
+		defaultTemplateKey: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		key: 'simple-document-type-key',
 		alias: 'simpleDocumentType',
 		name: 'Simple Document Type',

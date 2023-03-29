@@ -1,7 +1,7 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
 import { StylesheetDetails } from '..';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -12,7 +12,7 @@ export class UmbStylesheetWorkspaceContext
 	#data = new ObjectState<StylesheetDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbStylesheetRepository(host));
 	}
 

@@ -2,7 +2,7 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbEntityWorkspaceContextInterface as UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbMemberTypeRepository } from '../repository/member-type.repository';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 // TODO => use correct tpye
 type EntityType = any;
@@ -14,7 +14,7 @@ export class UmbMemberTypeWorkspaceContext
 	#data = new ObjectState<EntityType | undefined>(undefined);
 	name = this.#data.getObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbMemberTypeRepository(host));
 	}
 

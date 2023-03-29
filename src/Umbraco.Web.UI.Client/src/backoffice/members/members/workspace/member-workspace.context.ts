@@ -2,13 +2,13 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbEntityWorkspaceContextInterface as UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbMemberRepository } from '../repository/member.repository';
 import type { MemberDetails } from '@umbraco-cms/backoffice/models';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbMemberWorkspaceContext
 	extends UmbWorkspaceContext<UmbMemberRepository>
 	implements UmbEntityWorkspaceContextInterface<MemberDetails | undefined>
 {
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbMemberRepository(host));
 	}
 

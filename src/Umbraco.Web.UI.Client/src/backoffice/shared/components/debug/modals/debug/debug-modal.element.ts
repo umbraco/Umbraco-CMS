@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbContextDebuggerModalData } from '.';
+import { UmbContextDebuggerModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-context-debugger-modal')

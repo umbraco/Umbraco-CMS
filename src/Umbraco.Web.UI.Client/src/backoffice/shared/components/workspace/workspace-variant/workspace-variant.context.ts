@@ -2,15 +2,19 @@ import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/wor
 import { UmbVariantId } from '../../../variants/variant-id.class';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
 import { ActiveVariant } from '../workspace-context/workspace-split-view-manager.class';
-import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import {
+	UmbContextConsumerController,
+	UmbContextProviderController,
+	UmbContextToken,
+} from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 //type EntityType = DocumentModel;
 
 export class UmbWorkspaceVariantContext {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
 	public getWorkspaceContext() {
@@ -32,7 +36,7 @@ export class UmbWorkspaceVariantContext {
 
 	private _currentVariantObserver?: UmbObserverController<ActiveVariant>;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		new UmbContextProviderController(host, UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.toString(), this);

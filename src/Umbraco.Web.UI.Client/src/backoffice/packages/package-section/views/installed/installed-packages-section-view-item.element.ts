@@ -3,9 +3,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 import { UUIButtonState } from '@umbraco-ui/uui';
-
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 import type { ManifestPackageView } from '@umbraco-cms/backoffice/extensions-registry';
@@ -15,7 +13,7 @@ import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-installed-packages-section-view-item')
-export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
+export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	static styles = css`
 		:host {
 			display: flex;
@@ -82,7 +80,7 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 
 	async _onMigration() {
 		if (!this.name) return;
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'positive',
 			headline: `Run migrations for ${this.name}?`,
 			content: `Do you want to start run migrations for ${this.name}`,
@@ -153,6 +151,6 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItem;
+		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItemElement;
 	}
 }

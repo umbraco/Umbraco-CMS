@@ -8,7 +8,7 @@ import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-ap
  * @fires {CustomEvent<SubmitEvent>} onAuthorizeUpgrade - fires when the user clicks the continue button
  */
 @customElement('umb-upgrader-view')
-export class UmbUpgraderView extends LitElement {
+export class UmbUpgraderViewElement extends LitElement {
 	static styles: CSSResultGroup = [
 		css`
 			.center {
@@ -100,10 +100,10 @@ export class UmbUpgraderView extends LitElement {
 	};
 }
 
-export default UmbUpgraderView;
+export default UmbUpgraderViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-upgrader-view': UmbUpgraderView;
+		'umb-upgrader-view': UmbUpgraderViewElement;
 	}
 }

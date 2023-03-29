@@ -2,15 +2,15 @@ import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 
 import './body-layout.element';
-import type { UmbBodyLayout } from './body-layout.element';
+import type { UmbBodyLayoutElement } from './body-layout.element';
 
-const meta: Meta<UmbBodyLayout> = {
+const meta: Meta<UmbBodyLayoutElement> = {
 	title: 'Components/Workspace Layout',
 	component: 'umb-body-layout',
 };
 
 export default meta;
-type Story = StoryObj<UmbBodyLayout>;
+type Story = StoryObj<UmbBodyLayoutElement>;
 
 export const Overview: Story = {
 	render: () => html` <umb-body-layout>

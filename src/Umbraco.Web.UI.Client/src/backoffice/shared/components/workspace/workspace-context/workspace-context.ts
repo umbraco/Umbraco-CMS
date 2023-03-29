@@ -1,5 +1,5 @@
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { DeepState } from '@umbraco-cms/backoffice/observable-api';
 
 /*
@@ -8,13 +8,13 @@ TODO: We need to figure out if we like to keep using same alias for all workspac
 If so we need to align on a interface that all of these implements. otherwise consumers cant trust the workspace-context.
 */
 export abstract class UmbWorkspaceContext<T> {
-	public host: UmbControllerHostInterface;
+	public host: UmbControllerHostElement;
 	public repository: T;
 
 	#isNew = new DeepState<boolean>(false);
 	isNew = this.#isNew.asObservable();
 
-	constructor(host: UmbControllerHostInterface, repository: T) {
+	constructor(host: UmbControllerHostElement, repository: T) {
 		this.host = host;
 		this.repository = repository;
 		new UmbContextProviderController(host, 'umbWorkspaceContext', this);
