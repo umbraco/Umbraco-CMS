@@ -1,14 +1,14 @@
-import type { RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { MediaDetails } from '../';
 import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
 type ItemDetailType = MediaDetails;
@@ -18,7 +18,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 
 	#host: UmbControllerHostInterface;
 
-	#treeSource: RepositoryTreeDataSource;
+	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTreeStore;
 
 	#detailDataSource: UmbMediaDetailServerDataSource;

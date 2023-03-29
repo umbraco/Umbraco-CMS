@@ -3,12 +3,13 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
-import type { Entity } from '@umbraco-cms/backoffice/models';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './tree-item.element';
+import './tree-item/tree-item.element';
+import './tree-item-base/tree-item-base.element';
 import './context-menu/tree-context-menu-page.service';
 import './context-menu/tree-context-menu.service';
 
@@ -54,10 +55,7 @@ export class UmbTreeElement extends UmbLitElement {
 	private _tree?: ManifestTree;
 
 	@state()
-	private _items: Entity[] = [];
-
-	@state()
-	private _loading = true;
+	private _items: EntityTreeItemResponseModel[] = [];
 
 	private _treeContext?: UmbTreeContextBase;
 
@@ -101,7 +99,7 @@ export class UmbTreeElement extends UmbLitElement {
 		this._treeContext.requestRootItems();
 
 		this.observe(await this._treeContext.rootItems(), (rootItems) => {
-			this._items = rootItems as Entity[];
+			this._items = rootItems;
 		});
 	}
 
@@ -119,15 +117,9 @@ export class UmbTreeElement extends UmbLitElement {
 		return html`
 			${repeat(
 				this._items,
-				(item) => item.key,
-				(item) =>
-					html`<umb-tree-item
-						.key=${item.key}
-						.label=${item.name}
-						.icon=${item.icon}
-						.entityType=${item.type}
-						.hasChildren=${item.hasChildren}
-						.loading=${this._loading}></umb-tree-item>`
+				// TODO: add getUnique to a repository interface
+				(item, index) => index,
+				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
 			)}
 		`;
 	}

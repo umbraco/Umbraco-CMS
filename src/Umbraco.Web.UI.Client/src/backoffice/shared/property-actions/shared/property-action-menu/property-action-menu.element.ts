@@ -26,6 +26,8 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			#popover-trigger {
 				--uui-button-padding-top-factor: 0.5;
 				--uui-button-padding-bottom-factor: 0.1;
+				--uui-button-height: 18px;
+				--uui-button-border-radius: 6px;
 			}
 
 			#dropdown {

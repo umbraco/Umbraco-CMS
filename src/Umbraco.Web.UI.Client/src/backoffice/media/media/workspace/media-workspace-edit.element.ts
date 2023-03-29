@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbMediaWorkspaceContext } from './media-workspace.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-media-workspace-edit')
 export class UmbMediaWorkspaceEditElement extends UmbLitElement {

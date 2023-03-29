@@ -1,4 +1,3 @@
-import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/events';
 import * as monaco from 'monaco-editor';
 import {
 	CodeEditorConstructorOptions,
@@ -12,6 +11,7 @@ import {
 	UmbCodeEditorSelection,
 } from './code-editor.model';
 import themes from './themes';
+import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/events';
 
 //TODO - consider firing change event on blur
 

@@ -28,7 +28,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build --mode staging",
-		"build:libs": "rollup -c rollup-libs.config.js && node utils/move-libs.js",
+		"build:libs": "npm run wc-analyze && npm run wc-analyze:vscode && rollup -c rollup-libs.config.js && node utils/move-libs.js",
 		"build:for:static": "tsc && vite build",
 		"build:for:cms": "tsc && vite build -c vite.cms.config.ts && npm run build:libs",
 		"build:for:cms:watch": "vite build -c vite.cms.config.ts --watch",
@@ -50,6 +50,7 @@
 		"build-storybook": "npm run wc-analyze && storybook build",
 		"generate:icons": "node ./devops/icons/index.js",
 		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",
+		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile vscode-html-custom-data.json",
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
 		"check": "npm run lint && npm run compile && npm run build-storybook"
@@ -59,12 +60,8 @@
 		"npm": ">=9.5 < 10"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.2.0-rc.0",
-		"@umbraco-ui/uui-css": "^1.2.0-rc.0",
-		"@umbraco-ui/uui-modal": "file:umbraco-ui-uui-modal-0.0.0.tgz",
-		"@umbraco-ui/uui-modal-container": "file:umbraco-ui-uui-modal-container-0.0.0.tgz",
-		"@umbraco-ui/uui-modal-dialog": "file:umbraco-ui-uui-modal-dialog-0.0.0.tgz",
-		"@umbraco-ui/uui-modal-sidebar": "file:umbraco-ui-uui-modal-sidebar-0.0.0.tgz",
+		"@umbraco-ui/uui": "^1.2.0-rc.2",
+		"@umbraco-ui/uui-css": "^1.2.0-rc.2",
 		"element-internals-polyfill": "^1.1.19",
 		"lit": "^2.6.1",
 		"lodash-es": "4.17.21",
@@ -79,6 +76,7 @@
 		"@open-wc/testing": "^3.1.7",
 		"@playwright/test": "^1.30.0",
 		"@rollup/plugin-json": "^6.0.0",
+		"@rollup/plugin-node-resolve": "^15.0.1",
 		"@storybook/addon-a11y": "^7.0.0-rc.3",
 		"@storybook/addon-actions": "^7.0.0-rc.3",
 		"@storybook/addon-essentials": "^7.0.0-rc.3",
