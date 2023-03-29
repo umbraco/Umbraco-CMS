@@ -21,5 +21,7 @@ export * from './property-editor-ui-picker-modal.token';
 export * from './property-settings-modal.token';
 export * from './search-modal.token';
 export * from './section-picker-modal.token';
+export * from './template-modal.token';
+export * from './template-picker-modal.token';
 export * from './user-group-picker-modal.token';
 export * from './user-picker-modal.token';

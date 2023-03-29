@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbTemplateCardElement } from '../template-card/template-card.element';
-import { UMB_TEMPLATE_PICKER_MODAL_TOKEN } from '../../modals/template-picker';
-import { UMB_TEMPLATE_MODAL_TOKEN } from '../../modals/template';
+import { UMB_TEMPLATE_PICKER_MODAL } from '../../../../../libs/modal/token/template-picker-modal.token';
+import { UMB_TEMPLATE_MODAL } from '../../../../../libs/modal/token/template-modal.token';
 import { UmbTemplateRepository } from '../../../templating/templates/repository/template.repository';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -104,7 +104,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	#openPicker() {
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this.allowedKeys],
 		});
@@ -132,7 +132,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	#openTemplate(e: CustomEvent) {
 		const key = (e.target as UmbTemplateCardElement).value;
 
-		this._modalContext?.open(UMB_TEMPLATE_MODAL_TOKEN, {
+		this._modalContext?.open(UMB_TEMPLATE_MODAL, {
 			key: key as string,
 			language: 'razor',
 		});
