@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration editor for the nested content value editor.
 /// </summary>
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentConfigurationEditor : ConfigurationEditor<NestedContentConfiguration>
 {
     // Scheduled for removal in v12

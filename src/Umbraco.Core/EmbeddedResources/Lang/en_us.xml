@@ -362,6 +362,7 @@
     <key alias="memberHasPassword">The member already has a password set</key>
     <key alias="memberLockoutNotEnabled">Lockout is not enabled for this member</key>
     <key alias="memberNotInGroup">The member is not in group '%0%'</key>
+    <key alias="2fa">Two-Factor Authentication</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>
@@ -409,7 +410,7 @@
     </key>
     <key alias="elementType">Element Type</key>
     <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block
-      List' or 'Nested Content' property editor.
+      List' or 'Block Grid' property editor.
     </key>
     <key alias="composition">Composition</key>
     <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of
@@ -907,6 +908,8 @@
     <key alias="header">Header</key>
     <key alias="systemField">system field</key>
     <key alias="lastUpdated">Last Updated</key>
+    <key alias="skipToMenu">Skip to menu</key>
+    <key alias="skipToContent">Skip to content</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1496,7 +1499,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp">
-      <![CDATA[This shows the differences between the current version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
+      <![CDATA[This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
+    <key alias="noDiff">There are no differences between the current (draft) version and the selected version</key>
     <key alias="documentRolledBack">Document has been rolled back</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2
       versions at the same time, use the diff view
@@ -1923,7 +1927,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowVaryBySegment">Allow segmentation</key>
     <key alias="elementType">Element Type</key>
     <key alias="elementHeading">Is an Element Type</key>
-    <key alias="elementDescription">An Element Type is meant to be used for instance in Nested Content, and not in the
+    <key alias="elementDescription">An Element Type is meant to be used within other Document Types, and not in the Content
       tree.
     </key>
     <key alias="elementCannotToggle">A Document Type cannot be changed to an Element Type once it has been used to
@@ -2459,7 +2463,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
       <![CDATA[The header <strong>Strict-Transport-Security</strong> was not found. This header should not be present on localhost.]]>
     </key>
-    <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
+    <key alias="xssProtectionCheckHeaderFound">
+      <![CDATA[The header <strong>X-XSS-Protection</strong> was found. <strong>It is recommended not to add this header to your website</strong>.<br />
+    You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ]]></key>
     <key alias="xssProtectionCheckHeaderNotFound">
       <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
     <!-- The following key get these tokens passed in:
@@ -2895,7 +2901,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowBlockInRoot">Allow in root</key>
     <key alias="allowBlockInRootHelp">Make this block available in the root of the layout.</key>
     <key alias="allowBlockInAreas">Allow in areas</key>
-    <key alias="allowBlockInAreasHelp">Make this block available for use within the areas of other Blocks (unless explicit permissions are set for these areas).</key>
+    <key alias="allowBlockInAreasHelp">Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).</key>
     <key alias="areaAllowedBlocksEmpty">By default, all block types are allowed in an Area, Use this option to allow only selected types.</key>
     <key alias="areas">Areas</key>
     <key alias="areasLayoutColumns">Grid Columns for Areas</key>

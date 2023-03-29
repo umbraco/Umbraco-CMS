@@ -1,9 +1,12 @@
 using System.Data.Common;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Migrations;
@@ -54,7 +57,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             IOptionsMonitor<ConnectionStrings> connectionStrings,
             IMigrationPlanExecutor migrationPlanExecutor,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+            IEventAggregator eventAggregator)
         {
             _scopeProvider = scopeProvider;
             _scopeAccessor = scopeAccessor;
@@ -69,6 +73,40 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _migrationPlanExecutor = migrationPlanExecutor;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _databaseProviderMetadata = databaseProviderMetadata;
+        }
+
+        [Obsolete("Use constructor that takes IEventAggregator, this will be removed in V13.")]
+        public DatabaseBuilder(
+            ICoreScopeProvider scopeProvider,
+            IScopeAccessor scopeAccessor,
+            IUmbracoDatabaseFactory databaseFactory,
+            IRuntimeState runtimeState,
+            ILoggerFactory loggerFactory,
+            IKeyValueService keyValueService,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IConfigManipulator configManipulator,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IMigrationPlanExecutor migrationPlanExecutor,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+            : this(
+                scopeProvider,
+                scopeAccessor,
+                databaseFactory,
+                runtimeState,
+                loggerFactory,
+                keyValueService,
+                dbProviderFactoryCreator,
+                configManipulator,
+                globalSettings,
+                connectionStrings,
+                migrationPlanExecutor,
+                databaseSchemaCreatorFactory,
+                databaseProviderMetadata,
+                StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>()
+            )
+        {
         }
 
         #region Status
@@ -373,7 +411,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             {
                 Message =
                     "The database configuration failed with the following message: " + ex.Message +
-                    $"\n Please check log file for additional information (can be found in '{Constants.SystemDirectories.LogFiles}')",
+                    $"\n Please check log file for additional information (can be found in '{nameof(LoggingSettings)}.{nameof(LoggingSettings.Directory)}')",
                 Success = false,
                 Percentage = "90"
             };
