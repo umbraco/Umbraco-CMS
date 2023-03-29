@@ -5,14 +5,14 @@ import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './document-workspace-edit.element';
+import './document-workspace-editor.element';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
 	#workspaceContext = new UmbDocumentWorkspaceContext(this);
-	#element = document.createElement('umb-document-workspace-edit');
+	#element = document.createElement('umb-document-workspace-editor');
 
 	@state()
 	_routes: IRoute[] = [

@@ -12,8 +12,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
 import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-document-workspace-edit')
-export class UmbDocumentWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-document-workspace-editor')
+export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -136,10 +136,10 @@ export class UmbDocumentWorkspaceEditElement extends UmbLitElement {
 	}
 }
 
-export default UmbDocumentWorkspaceEditElement;
+export default UmbDocumentWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-edit': UmbDocumentWorkspaceEditElement;
+		'umb-document-workspace-editor': UmbDocumentWorkspaceEditorElement;
 	}
 }
