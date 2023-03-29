@@ -1767,6 +1767,85 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document/{key}/notifications": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByKeyNotifications",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentNotificationResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByKeyNotifications",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDocumentNotificationsRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/recycle-bin/document/children": {
       "get": {
         "tags": [
@@ -7745,6 +7824,18 @@
           }
         }
       },
+      "DocumentNotificationResponseModel": {
+        "type": "object",
+        "properties": {
+          "actionId": {
+            "type": "string"
+          },
+          "subscribed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentResponseModel": {
         "type": "object",
         "allOf": [
@@ -10509,6 +10600,18 @@
             "$ref": "#/components/schemas/DictionaryItemModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "UpdateDocumentNotificationsRequestModel": {
+        "type": "object",
+        "properties": {
+          "subscribedActionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
         "additionalProperties": false
       },
       "UpdateDocumentRequestModel": {
