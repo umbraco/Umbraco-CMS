@@ -24,17 +24,16 @@ public class MediaBuilderTests : ContentApiTests
                 { Constants.Conventions.Media.Extension, ".my-ext" }
             });
 
-        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
         Assert.NotNull(result);
         Assert.AreEqual("The media", result.Name);
         Assert.AreEqual("theMediaType", result.MediaType);
         Assert.AreEqual("media-url:media-url-segment", result.Url);
-        Assert.AreEqual(key, result.Id);
-        Assert.AreEqual(111, result.Width);
-        Assert.AreEqual(222, result.Height);
-        Assert.AreEqual(".my-ext", result.Extension);
-        Assert.IsEmpty(result.Properties);
+        Assert.AreEqual(3, result.Properties.Count);
+        Assert.AreEqual(111, result.Properties[Constants.Conventions.Media.Width]);
+        Assert.AreEqual(222, result.Properties[Constants.Conventions.Media.Height]);
+        Assert.AreEqual(".my-ext", result.Properties[Constants.Conventions.Media.Extension]);
     }
 
     [Test]
@@ -47,7 +46,7 @@ public class MediaBuilderTests : ContentApiTests
             new Dictionary<string, object>()
         );
 
-        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
         Assert.NotNull(result);
         Assert.IsEmpty(result.Properties);
@@ -62,12 +61,9 @@ public class MediaBuilderTests : ContentApiTests
             "media-url-segment",
             new Dictionary<string, object> { { "myProperty", 123 }, { "anotherProperty", "A value goes here" } });
 
-        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
         Assert.NotNull(result);
-        Assert.IsNull(result.Width);
-        Assert.IsNull(result.Height);
-        Assert.IsNull(result.Extension);
         Assert.AreEqual(2, result.Properties.Count);
         Assert.AreEqual(123, result.Properties["myProperty"]);
         Assert.AreEqual("A value goes here", result.Properties["anotherProperty"]);
