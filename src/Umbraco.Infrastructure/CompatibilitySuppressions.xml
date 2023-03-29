@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
@@ -102,6 +101,13 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Security.BackOfficeUserStore.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.IExternalLoginWithKeyService,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,Umbraco.Cms.Core.Cache.AppCaches)</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Security.BackOfficeUserStore.#ctor(Umbraco.Cms.Core.Scoping.ICoreScopeProvider,Umbraco.Cms.Core.Services.IUserService,Umbraco.Cms.Core.Services.IEntityService,Umbraco.Cms.Core.Services.IExternalLoginWithKeyService,Microsoft.Extensions.Options.IOptionsSnapshot{Umbraco.Cms.Core.Configuration.Models.GlobalSettings},Umbraco.Cms.Core.Mapping.IUmbracoMapper,Umbraco.Cms.Core.Security.BackOfficeErrorDescriber,Umbraco.Cms.Core.Cache.AppCaches,Umbraco.Cms.Core.Services.ITwoFactorLoginService)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
     <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

@@ -61,5 +61,26 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Update.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Create.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Delete.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Filter.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Get.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Invite.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Update.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.PartialUpdates.cs">
+      <DependentUpon>UserServiceCrudTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

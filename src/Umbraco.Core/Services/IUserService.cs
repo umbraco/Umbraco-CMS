@@ -1,5 +1,8 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -41,6 +44,51 @@ public interface IUserService : IMembershipUserService
     ///     This is basically facets of UserStates key = state, value = count
     /// </summary>
     IDictionary<UserState, int> GetUserStates();
+
+    /// <summary>
+    /// Creates a user based in a create model and persists it to the database.
+    /// </summary>
+    /// <remarks>
+    /// This creates both the Umbraco user and the identity user.
+    /// </remarks>
+    /// <param name="performingUserKey">The key of the user performing the operation.</param>
+    /// <param name="model">Model to create the user from.</param>
+    /// <param name="approveUser">Specifies if the user should be enabled be default. Defaults to false.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>.</returns>
+    Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false);
+
+    Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
+
+    Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
+
+    Task<UserOperationStatus> SetAvatarAsync(IUser user, Guid temporaryFileKey);
+
+    Task<UserOperationStatus> DeleteAsync(Guid key);
+
+    Task<UserOperationStatus> DisableAsync(Guid performingUserKey, ISet<Guid> keys);
+
+    Task<UserOperationStatus> EnableAsync(Guid performingUserKey, ISet<Guid> keys);
+
+    Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
+
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackofficeUserPasswordModel model);
+
+    Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
+
+    /// <summary>
+    /// Gets all users that the requesting user is allowed to see.
+    /// </summary>
+    /// <param name="requestingUserKey">The Key of the user requesting the users.</param>
+    /// <returns></returns>
+    Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid requestingUserKey, int skip, int take) => throw new NotImplementedException();
+
+    public Task<Attempt<PagedModel<IUser>, UserOperationStatus>> FilterAsync(
+        Guid requestingUserKey,
+        UserFilter filter,
+        int skip = 0,
+        int take = 100,
+        UserOrder orderBy = UserOrder.UserName,
+        Direction orderDirection = Direction.Ascending) => throw new NotImplementedException();
 
     /// <summary>
     ///     Get paged users
@@ -125,6 +173,8 @@ public interface IUserService : IMembershipUserService
     /// <param name="key">The GUID key of the user.</param>
     /// <returns>The found user, or null if nothing was found.</returns>
     Task<IUser?> GetAsync(Guid key) => Task.FromResult(GetAll(0, int.MaxValue, out _).FirstOrDefault(x=>x.Key == key));
+
+    Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys) => Task.FromResult(GetAll(0, int.MaxValue, out _).Where(x => keys.Contains(x.Key)));
 
     /// <summary>
     ///     Gets a user by Id

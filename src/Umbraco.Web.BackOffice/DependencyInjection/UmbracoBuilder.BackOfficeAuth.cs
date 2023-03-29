@@ -56,6 +56,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
         builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
         builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
+        builder.Services.AddScoped<IBackofficePasswordChanger, BackofficePasswordChanger>();
 
         builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
         builder.AddNotificationHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();

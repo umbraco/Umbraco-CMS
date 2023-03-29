@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Formats.Asn1;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -21,8 +22,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
-    private readonly IUserService _userService;
     private readonly IEntityService _entityService;
+    private readonly IUserService _userService;
 
     public UserGroupService(
         ICoreScopeProvider provider,
@@ -30,14 +31,14 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IEventMessagesFactory eventMessagesFactory,
         IUserGroupRepository userGroupRepository,
         IUserGroupAuthorizationService userGroupAuthorizationService,
-        IUserService userService,
-        IEntityService entityService)
+        IEntityService entityService,
+        IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
         _userGroupAuthorizationService = userGroupAuthorizationService;
-        _userService = userService;
         _entityService = entityService;
+        _userService = userService;
     }
 
     /// <inheritdoc/>
@@ -119,6 +120,21 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Task.FromResult(groups);
     }
 
+    public Task<IEnumerable<IUserGroup>> GetAsync(IEnumerable<Guid> keys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => keys.SqlIn(x.Key));
+
+        IUserGroup[] result = _userGroupRepository
+            .Get(query)
+            .WhereNotNull()
+            .OrderBy(x => x.Name)
+            .ToArray();
+
+        return Task.FromResult<IEnumerable<IUserGroup>>(result);
+    }
+
     /// <inheritdoc/>
     public async Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid key)
     {
@@ -150,6 +166,28 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         return Attempt.Succeed(UserGroupOperationStatus.Success);
+    }
+
+    public async Task UpdateUserGroupsOnUsers(
+        ISet<Guid> userGroupKeys,
+        ISet<Guid> userKeys)
+    {
+        IUser[] users = (await _userService.GetAsync(userKeys)).ToArray();
+
+        IReadOnlyUserGroup[] userGroups = (await GetAsync(userGroupKeys))
+            .Select(x => x.ToReadOnlyGroup())
+            .ToArray();
+
+        foreach(IUser user in users)
+        {
+            user.ClearGroups();
+            foreach (IReadOnlyUserGroup userGroup in userGroups)
+            {
+                user.AddGroup(userGroup);
+            }
+        }
+
+        _userService.Save(users);
     }
 
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
@@ -202,7 +240,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         var checkedGroupMembers = EnsureNonAdminUserIsInSavedUserGroup(performingUser, groupMembersUserIds ?? Enumerable.Empty<int>()).ToArray();
-        IEnumerable<IUser> usersToAdd = _userService.GetUsersById(checkedGroupMembers);
+        IEnumerable<IUser> usersToAdd = _userService.GetUsersById(performingUserId);
 
         // Since this is a brand new creation we don't have to be worried about what users were added and removed
         // simply put all members that are requested to be in the group will be "added"
