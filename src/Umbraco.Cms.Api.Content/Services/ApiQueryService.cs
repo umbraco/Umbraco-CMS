@@ -1,25 +1,28 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Examine;
 using Examine.Search;
-using Umbraco.Cms.Api.Content.Querying.Filters;
-using Umbraco.Cms.Api.Content.Querying.Selectors;
-using Umbraco.Cms.Api.Content.Querying.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using SortType = Examine.Search.SortType;
 
 namespace Umbraco.Cms.Api.Content.Services;
 
 internal sealed class ApiQueryService : IApiQueryService
 {
-    private readonly QueryHandlerCollection _queryHandlers;
     private readonly IExamineManager _examineManager;
+    private readonly SelectorHandlerCollection _selectorHandlers;
+    private readonly FilterHandlerCollection _filterHandlers;
+    private readonly SortHandlerCollection _sortHandlers;
 
-    public ApiQueryService(QueryHandlerCollection queryHandlers, IExamineManager examineManager)
+    public ApiQueryService(
+        IExamineManager examineManager,
+        SelectorHandlerCollection selectorHandlers,
+        FilterHandlerCollection filterHandlers,
+        SortHandlerCollection sortHandlers)
     {
-        _queryHandlers = queryHandlers;
         _examineManager = examineManager;
+        _selectorHandlers = selectorHandlers;
+        _filterHandlers = filterHandlers;
+        _sortHandlers = sortHandlers;
     }
 
     public IEnumerable<Guid> ExecuteQuery(string? fetch, string[] filters, string[] sorts)
@@ -40,10 +43,10 @@ internal sealed class ApiQueryService : IApiQueryService
         }
 
         // Handle Filtering
-        HandleFiltering(filters, baseQuery);
+        HandleFiltering(filters, queryOperation);
 
         // Handle Sorting
-        var sortQuery = HandleSorting(sorts, queryOperation);
+        IOrdering? sortQuery = HandleSorting(sorts, queryOperation);
 
         //ISearchResults? results = sortQuery is not null ? sortQuery.Execute() : queryOperation.Execute();
         ISearchResults? results = sortQuery is not null ? sortQuery.Execute() : DefaultSort(queryOperation)?.Execute();
@@ -55,11 +58,11 @@ internal sealed class ApiQueryService : IApiQueryService
     {
         IBooleanOperation? queryOperation;
 
-        if (fetch is not null &&
-            _queryHandlers.FirstOrDefault(h => h.CanHandle(fetch)) is ISelectorHandler selectorHandler)
+        if (fetch is not null)
         {
-            queryOperation = selectorHandler
-                .BuildSelectorIndexQuery(baseQuery, fetch);
+            ISelectorHandler? selectorHandler = _selectorHandlers.FirstOrDefault(h => h.CanHandle(fetch));
+            SelectorOption? selector = selectorHandler?.BuildSelectorOption(fetch);
+            queryOperation = selector is not null ? baseQuery.Field(selector.FieldName, selector.Value) : null;
         }
         else
         {
@@ -70,13 +73,34 @@ internal sealed class ApiQueryService : IApiQueryService
         return queryOperation;
     }
 
-    private void HandleFiltering(IEnumerable<string> filters, IQuery baseQuery)
+    private void HandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
     {
-        foreach (var filter in filters)
+        foreach (var filterValue in filters)
         {
-            if (_queryHandlers.FirstOrDefault(h => h.CanHandle(filter)) is IFilterHandler filterHandler)
+            IFilterHandler? filterHandler = _filterHandlers.FirstOrDefault(h => h.CanHandle(filterValue));
+            FilterOption? filter = filterHandler?.BuildFilterOption(filterValue);
+
+            if (filter is not null)
             {
-                filterHandler.BuildFilterIndexQuery(baseQuery, filter);
+                switch (filter.Operator)
+                {
+                    case FilterOperation.Is:
+                        //queryOperation.And().Field(filter.FieldName, filter.Value);
+                        queryOperation.And().Field(filter.FieldName,
+                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // doesn't work for explicit word(s) match
+                        break;
+                    case FilterOperation.IsNot:
+                        //queryOperation.Not().Field(filter.FieldName, filter.Value);
+                        queryOperation.Not().Field(filter.FieldName,
+                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // doesn't work for explicit word(s) match
+                        break;
+                    case FilterOperation.Contains:
+                        break;
+                    case FilterOperation.DoesNotContain:
+                        break;
+                    default:
+                        continue;
+                }
             }
         }
     }
@@ -85,12 +109,24 @@ internal sealed class ApiQueryService : IApiQueryService
     {
         IOrdering? orderingQuery = null;
 
-        foreach (var sort in sorts)
+        foreach (var sortValue in sorts)
         {
-            if (_queryHandlers.FirstOrDefault(h => h.CanHandle(sort)) is ISortHandler sortHandler)
+            ISortHandler? sortHandler = _sortHandlers.FirstOrDefault(h => h.CanHandle(sortValue));
+            SortOption? sort = sortHandler?.BuildSortOption(sortValue);
+
+            if (sort is null)
             {
-                orderingQuery = sortHandler.BuildSortIndexQuery(queryCriteria, sort);
+                continue;
             }
+
+            SortType sortType = Enum.Parse<SortType>(sort.SortType.ToString());
+
+            orderingQuery = sort.Direction switch
+            {
+                Direction.Ascending => queryCriteria.OrderBy(new SortableField(sort.FieldName, sortType)),
+                Direction.Descending => queryCriteria.OrderByDescending(new SortableField(sort.FieldName, sortType)),
+                _ => orderingQuery
+            };
         }
 
         return orderingQuery;
