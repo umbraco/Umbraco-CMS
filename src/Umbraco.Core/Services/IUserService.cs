@@ -59,7 +59,7 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
 
-    Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
+    Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
     Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 

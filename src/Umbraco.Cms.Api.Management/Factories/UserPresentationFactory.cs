@@ -86,11 +86,11 @@ public class UserPresentationFactory : IUserPresentationFactory
         return inviteModel;
     }
 
-    public async Task<UserUpdateModel> CreateUpdateModelAsync(IUser existingUser, UpdateUserRequestModel updateModel)
+    public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
     {
         var model = new UserUpdateModel
         {
-            ExistingUser = existingUser,
+            ExistingUserKey = existingUserKey,
             Email = updateModel.Email,
             Name = updateModel.Name,
             UserName = updateModel.UserName,

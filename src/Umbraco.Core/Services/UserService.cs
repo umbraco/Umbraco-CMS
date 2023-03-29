@@ -783,13 +783,24 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model)
+    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model)
     {
-        IUser? performingUser = await GetAsync(performingUserKey);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? existingUser = await userStore.GetAsync(model.ExistingUserKey);
+
+        if (existingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, existingUser);
+        }
+
+        IUser? performingUser = await userStore.GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, model.ExistingUser);
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
         }
 
         // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
@@ -799,32 +810,37 @@ internal class UserService : RepositoryService, IUserService
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
             performingUser,
-            model.ExistingUser,
+            existingUser,
             startContentIds,
             startMediaIds,
             model.UserGroups.Select(x => x.Alias));
 
         if (isAuthorized.Success is false)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, model.ExistingUser);
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Unauthorized, existingUser);
         }
 
-        UserOperationStatus validationStatus = ValidateUserUpdateModel(model);
+        UserOperationStatus validationStatus = ValidateUserUpdateModel(existingUser, model);
         if (validationStatus is not UserOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(validationStatus, model.ExistingUser);
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(validationStatus, existingUser);
         }
 
         // Now that we're all authorized and validated we can actually map over changes and update the user
         // TODO: This probably shouldn't live here, once we have user content start nodes as keys this can be moved to a mapper
         // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
         // TODO: Add auditing
-        IUser updated = MapUserUpdate(model, model.ExistingUser, startContentIds, startMediaIds);
-        UserOperationStatus saveStatus = await SaveAsync(updated);
+        IUser updated = MapUserUpdate(model, existingUser, startContentIds, startMediaIds);
+        UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
 
-        return saveStatus is UserOperationStatus.Success
-            ? Attempt.SucceedWithStatus(UserOperationStatus.Success, updated)
-            : Attempt.FailWithStatus(saveStatus, model.ExistingUser);
+        if (saveStatus is not UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(saveStatus, existingUser);
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
+
     }
 
     public async Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey)
@@ -893,10 +909,10 @@ internal class UserService : RepositoryService, IUserService
         return target;
     }
 
-    private UserOperationStatus ValidateUserUpdateModel(UserUpdateModel model)
+    private UserOperationStatus ValidateUserUpdateModel(IUser existingUser, UserUpdateModel model)
     {
         // We need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed.
-        if (_localLoginSettingProvider.HasDenyLocalLogin() && model.Email != model.ExistingUser.Email)
+        if (_localLoginSettingProvider.HasDenyLocalLogin() && model.Email != existingUser.Email)
         {
             return UserOperationStatus.EmailCannotBeChanged;
         }
@@ -907,7 +923,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         IUser? existing = GetByEmail(model.Email);
-        if (existing is not null && existing.Key != model.ExistingUser.Key)
+        if (existing is not null && existing.Key != existingUser.Key)
         {
             return UserOperationStatus.DuplicateEmail;
         }
@@ -915,13 +931,13 @@ internal class UserService : RepositoryService, IUserService
         // In case the user has updated their username to be a different email, but not their actually email
         // we have to try and get the user by email using their username, and ensure we don't get any collisions.
         existing = GetByEmail(model.UserName);
-        if (existing is not null && existing.Key != model.ExistingUser.Key)
+        if (existing is not null && existing.Key != existingUser.Key)
         {
             return UserOperationStatus.DuplicateUserName;
         }
 
         existing = GetByUsername(model.UserName);
-        if (existing is not null && existing.Key != model.ExistingUser.Key)
+        if (existing is not null && existing.Key != existingUser.Key)
         {
             return UserOperationStatus.DuplicateUserName;
         }

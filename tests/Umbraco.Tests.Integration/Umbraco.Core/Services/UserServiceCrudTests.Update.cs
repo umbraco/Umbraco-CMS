@@ -29,7 +29,7 @@ public partial class UserServiceCrudTests
         var groups = await UserGroupService.GetAsync(user.Groups.Select(x => x.Id).ToArray());
         return new UserUpdateModel
         {
-            ExistingUser = user,
+            ExistingUserKey = user.Key,
             Email = user.Email,
             Name = user.Name,
             UserName = user.Username,

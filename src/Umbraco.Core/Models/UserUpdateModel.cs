@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Models;
 
 public class UserUpdateModel
 {
-    public required IUser ExistingUser { get; set; }
+    public required Guid ExistingUserKey { get; set; }
 
     public string Email { get; set; } = string.Empty;
 
