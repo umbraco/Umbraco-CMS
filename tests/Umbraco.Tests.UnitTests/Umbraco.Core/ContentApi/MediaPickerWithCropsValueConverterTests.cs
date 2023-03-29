@@ -27,7 +27,6 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             new ApiMediaBuilder(
                 new ApiContentNameProvider(),
                 apiUrlProvider,
-                publishedValueFallback,
                 CreateOutputExpansionStrategyAccessor()));
     }
 
@@ -65,9 +64,6 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("My media", result.First().Name);
         Assert.AreEqual("my-media", result.First().Url);
-        Assert.AreEqual(".jpg", result.First().Extension);
-        Assert.AreEqual(200, result.First().Width);
-        Assert.AreEqual(400, result.First().Height);
         Assert.NotNull(result.First().FocalPoint);
         Assert.AreEqual(.2m, result.First().FocalPoint.Left);
         Assert.AreEqual(.4m, result.First().FocalPoint.Top);
@@ -82,8 +78,11 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(10m, result.First().Crops.First().Coordinates.Y1);
         Assert.AreEqual(20m, result.First().Crops.First().Coordinates.Y2);
         Assert.NotNull(result.First().Properties);
-        Assert.AreEqual(1, result.First().Properties.Count);
+        Assert.AreEqual(4, result.First().Properties.Count);
         Assert.AreEqual("My alt text", result.First().Properties["altText"]);
+        Assert.AreEqual(".jpg", result.First().Properties[Constants.Conventions.Media.Extension]);
+        Assert.AreEqual(200, result.First().Properties[Constants.Conventions.Media.Width]);
+        Assert.AreEqual(400, result.First().Properties[Constants.Conventions.Media.Height]);
     }
 
     [Test]
@@ -136,9 +135,6 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         Assert.AreEqual("My media", result.First().Name);
         Assert.AreEqual("my-media", result.First().Url);
-        Assert.AreEqual(".jpg", result.First().Extension);
-        Assert.AreEqual(200, result.First().Width);
-        Assert.AreEqual(400, result.First().Height);
         Assert.NotNull(result.First().FocalPoint);
         Assert.AreEqual(.2m, result.First().FocalPoint.Left);
         Assert.AreEqual(.4m, result.First().FocalPoint.Top);
@@ -153,14 +149,14 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(10m, result.First().Crops.First().Coordinates.Y1);
         Assert.AreEqual(20m, result.First().Crops.First().Coordinates.Y2);
         Assert.NotNull(result.First().Properties);
-        Assert.AreEqual(1, result.First().Properties.Count);
+        Assert.AreEqual(4, result.First().Properties.Count);
         Assert.AreEqual("My alt text", result.First().Properties["altText"]);
+        Assert.AreEqual(".jpg", result.First().Properties[Constants.Conventions.Media.Extension]);
+        Assert.AreEqual(200, result.First().Properties[Constants.Conventions.Media.Width]);
+        Assert.AreEqual(400, result.First().Properties[Constants.Conventions.Media.Height]);
 
         Assert.AreEqual("My other media", result.Last().Name);
         Assert.AreEqual("my-other-media", result.Last().Url);
-        Assert.AreEqual(".png", result.Last().Extension);
-        Assert.AreEqual(800, result.Last().Width);
-        Assert.AreEqual(600, result.Last().Height);
         Assert.NotNull(result.Last().FocalPoint);
         Assert.AreEqual(.8m, result.Last().FocalPoint.Left);
         Assert.AreEqual(.6m, result.Last().FocalPoint.Top);
@@ -175,8 +171,11 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(2m, result.Last().Crops.Last().Coordinates.Y1);
         Assert.AreEqual(1m, result.Last().Crops.Last().Coordinates.Y2);
         Assert.NotNull(result.Last().Properties);
-        Assert.AreEqual(1, result.Last().Properties.Count);
+        Assert.AreEqual(4, result.Last().Properties.Count);
         Assert.AreEqual("My other alt text", result.Last().Properties["altText"]);
+        Assert.AreEqual(".png", result.Last().Properties[Constants.Conventions.Media.Extension]);
+        Assert.AreEqual(800, result.Last().Properties[Constants.Conventions.Media.Width]);
+        Assert.AreEqual(600, result.Last().Properties[Constants.Conventions.Media.Height]);
     }
 
     [TestCase("")]

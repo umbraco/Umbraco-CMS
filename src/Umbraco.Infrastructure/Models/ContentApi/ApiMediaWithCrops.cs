@@ -24,12 +24,6 @@ public class ApiMediaWithCrops : IApiMedia
 
     public string Url => _inner.Url;
 
-    public string? Extension => _inner.Extension;
-
-    public int? Width => _inner.Width;
-
-    public int? Height => _inner.Height;
-
     public IDictionary<string, object?> Properties => _inner.Properties;
 
     public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; }

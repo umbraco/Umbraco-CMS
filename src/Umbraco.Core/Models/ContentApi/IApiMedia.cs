@@ -10,11 +10,5 @@ public interface IApiMedia
 
     public string Url { get; }
 
-    public string? Extension { get; }
-
-    public int? Width { get; }
-
-    public int? Height { get; }
-
     public IDictionary<string, object?> Properties { get; }
 }
