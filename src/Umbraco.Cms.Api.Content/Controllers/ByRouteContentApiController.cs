@@ -46,9 +46,16 @@ public class ByRouteContentApiController : ContentApiControllerBase
             return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
         }
 
-        var redirectPath = _requestRedirectService.GetRedirectPath(path);
-        return redirectPath != null
-            ? RedirectPermanent(redirectPath)
+        IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectPath(path);
+        return redirectRoute != null
+            ? RedirectTo(redirectRoute)
             : NotFound();
+    }
+
+    private IActionResult RedirectTo(IApiContentRoute redirectRoute)
+    {
+        Response.Headers.Add("Location-Start-Item-Path", redirectRoute.StartItem.Path);
+        Response.Headers.Add("Location-Start-Item-Id", redirectRoute.StartItem.Id.ToString("D"));
+        return RedirectPermanent(redirectRoute.Path);
     }
 }

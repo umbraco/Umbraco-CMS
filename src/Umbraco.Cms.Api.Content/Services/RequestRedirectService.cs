@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -37,7 +38,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         _globalSettings = globalSettings.Value;
     }
 
-    public string? GetRedirectPath(string requestedPath)
+    public IApiContentRoute? GetRedirectPath(string requestedPath)
     {
         requestedPath = requestedPath.EnsureStartsWith("/");
 
@@ -71,7 +72,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
             : null;
 
         return content != null
-            ? _apiContentRouteBuilder.Build(content).Path
+            ? _apiContentRouteBuilder.Build(content)
             : null;
     }
 }
