@@ -7,6 +7,7 @@ export * from './create-user-modal.token';
 export * from './current-user-modal.token';
 export * from './debug-modal.token';
 export * from './document-picker-modal.token';
+export * from './document-type-picker-modal.token';
 export * from './embedded-media-modal.token';
 export * from './examine-fields-settings-modal.token';
 export * from './export-dictionary-modal.token';

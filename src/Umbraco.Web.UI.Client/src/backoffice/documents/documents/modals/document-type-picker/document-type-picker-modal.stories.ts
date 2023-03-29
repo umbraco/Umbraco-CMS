@@ -5,7 +5,7 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
 import type { UmbDocumentTypePickerModalElement } from './document-type-picker-modal.element';
-import type { UmbDocumentTypePickerModalData } from './index';
+import type { UmbDocumentTypePickerModalData } from '../../../../../../libs/modal/token/document-type-picker-modal.token';
 
 export default {
 	title: 'API/Modals/Layouts/Content Picker',
