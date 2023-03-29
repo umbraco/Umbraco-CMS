@@ -124,7 +124,9 @@ public static partial class UmbracoBuilderExtensions
             .Append<LottieFiles>();
         builder.SearchableTrees().Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
         builder.BackOfficeAssets();
-        builder.QueryHandlers().Add(() => builder.TypeLoader.GetTypes<IQueryHandler>());
+        builder.SelectorHandlers().Add(() => builder.TypeLoader.GetTypes<ISelectorHandler>());
+        builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
+        builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
     }
 
     /// <summary>
@@ -302,8 +304,20 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<CustomBackOfficeAssetsCollectionBuilder>();
 
     /// <summary>
-    /// Gets the Delivery API query handler collection builder
+    /// Gets the Delivery API selector handler collection builder
     /// </summary>
-    public static QueryHandlerCollectionBuilder QueryHandlers(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<QueryHandlerCollectionBuilder>();
+    public static SelectorHandlerCollectionBuilder SelectorHandlers(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<SelectorHandlerCollectionBuilder>();
+
+    /// <summary>
+    /// Gets the Delivery API filter handler collection builder
+    /// </summary>
+    public static FilterHandlerCollectionBuilder FilterHandlers(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<FilterHandlerCollectionBuilder>();
+
+    /// <summary>
+    /// Gets the Delivery API sort handler collection builder
+    /// </summary>
+    public static SortHandlerCollectionBuilder SortHandlers(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<SortHandlerCollectionBuilder>();
 }
