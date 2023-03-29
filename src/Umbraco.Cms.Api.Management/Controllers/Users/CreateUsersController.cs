@@ -39,11 +39,6 @@ public class CreateUsersController : UsersControllerBase
             return Ok(_presentationFactory.CreateCreationResponseModel(result.Result));
         }
 
-        if (result.Status is UserOperationStatus.UnknownFailure)
-        {
-            return FormatErrorMessageResult(result.Result);
-        }
-
-        return UserOperationStatusResult(result.Status);
+        return UserOperationStatusResult(result.Status, result.Result);
     }
 }

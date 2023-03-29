@@ -28,8 +28,5 @@ public class UnlockUsersController : UsersControllerBase
             return Ok();
         }
 
-        return attempt.Status is UserOperationStatus.UnknownFailure
-            ? FormatErrorMessageResult(attempt.Result)
-            : UserOperationStatusResult(attempt.Status);
-    }
+        return UserOperationStatusResult(attempt.Status, attempt.Result); }
 }

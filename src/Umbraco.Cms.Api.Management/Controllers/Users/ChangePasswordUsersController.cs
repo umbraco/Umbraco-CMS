@@ -38,16 +38,6 @@ public class ChangePasswordUsersController : UsersControllerBase
             return Ok(new ChangePasswordUserResponseModel { ResetPassword = response.Result.ResetPassword });
         }
 
-        if (response.Result.ChangeError is not null)
-        {
-            ValidationResult validationError = response.Result.ChangeError;
-
-            return BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Password change failed")
-                .WithDetail(validationError.ErrorMessage!)
-                .Build());
-        }
-
-        return UserOperationStatusResult(response.Status);
+        return UserOperationStatusResult(response.Status, response.Result);
     }
 }

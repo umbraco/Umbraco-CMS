@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Users;
 [ApiVersion("1.0")]
 public abstract class UsersControllerBase : ManagementApiControllerBase
 {
-    protected IActionResult UserOperationStatusResult(UserOperationStatus status) =>
+    protected IActionResult UserOperationStatusResult(UserOperationStatus status, ErrorMessageResult? errorMessageResult = null) =>
         status switch
         {
             UserOperationStatus.Success => Ok(),
@@ -76,13 +76,11 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Cannot disable invited user")
                 .WithDetail("An invited user cannot be disabled.")
                 .Build()),
+            UserOperationStatus.UnknownFailure => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unknown failure")
+                .WithDetail(errorMessageResult?.Error?.ErrorMessage ?? "The error was unknown")
+                .Build()),
             UserOperationStatus.Forbidden => Forbid(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user operation status."),
         };
-
-    protected IActionResult FormatErrorMessageResult(IErrorMessageResult errorMessageResult) =>
-        BadRequest(new ProblemDetailsBuilder()
-            .WithTitle("An error occured.")
-            .WithDetail(errorMessageResult.ErrorMessage ?? "The error was unknown")
-            .Build());
 }

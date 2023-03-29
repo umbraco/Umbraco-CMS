@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
@@ -160,7 +161,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
         return result.Succeeded
             ? Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserUnlockResult())
-            : Attempt.FailWithStatus(UserOperationStatus.UnknownFailure, new UserUnlockResult { ErrorMessage = result.Errors.ToErrorMessage() });
+            : Attempt.FailWithStatus(UserOperationStatus.UnknownFailure, new UserUnlockResult { Error = new ValidationResult(result.Errors.ToErrorMessage()) });
     }
 
     public override async Task<IdentityResult> ResetAccessFailedCountAsync(BackOfficeIdentityUser user)

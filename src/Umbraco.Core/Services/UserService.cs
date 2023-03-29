@@ -1,4 +1,4 @@
-using System.Formats.Asn1;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
@@ -23,7 +23,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
-using Umbraco.Extensions;
 using UserProfile = Umbraco.Cms.Core.Models.Membership.UserProfile;
 
 namespace Umbraco.Cms.Core.Services;
@@ -637,7 +636,7 @@ internal class UserService : RepositoryService, IUserService
             // But there should be more information in the message.
             return Attempt.FailWithStatus(
                 UserOperationStatus.UnknownFailure,
-                new UserCreationResult { ErrorMessage = identityCreationResult.ErrorMessage });
+                new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
         }
 
         // The user is now created, so we can fetch it to map it to a result model with our generated password.
@@ -717,7 +716,7 @@ internal class UserService : RepositoryService, IUserService
             // But there should be more information in the message.
             return Attempt.FailWithStatus(
                 UserOperationStatus.UnknownFailure,
-                new UserInvitationResult { ErrorMessage = creationResult.ErrorMessage });
+                new UserInvitationResult { Error = new ValidationResult(creationResult.ErrorMessage) });
         }
 
         IUser? invitedUser = await userStore.GetByEmailAsync(model.Email);

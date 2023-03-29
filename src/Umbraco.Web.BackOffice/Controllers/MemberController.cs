@@ -627,10 +627,10 @@ public class MemberController : ContentControllerBase
 
             if (!passwordChangeResult.Success)
             {
-                foreach (var memberName in passwordChangeResult.Result?.ChangeError?.MemberNames ??
+                foreach (var memberName in passwordChangeResult.Result?.Error?.MemberNames ??
                                            Enumerable.Empty<string>())
                 {
-                    ModelState.AddModelError(memberName, passwordChangeResult.Result?.ChangeError?.ErrorMessage ?? string.Empty);
+                    ModelState.AddModelError(memberName, passwordChangeResult.Result?.Error?.ErrorMessage ?? string.Empty);
                 }
 
                 return ValidationProblem(ModelState);

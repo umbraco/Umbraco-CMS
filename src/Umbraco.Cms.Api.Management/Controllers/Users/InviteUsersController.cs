@@ -39,8 +39,6 @@ public class InviteUsersController : UsersControllerBase
             return Ok();
         }
 
-        return result.Status is UserOperationStatus.UnknownFailure
-            ? FormatErrorMessageResult(result.Result)
-            : UserOperationStatusResult(result.Status);
+        return UserOperationStatusResult(result.Status, result.Result);
     }
 }

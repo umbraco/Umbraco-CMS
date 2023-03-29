@@ -47,7 +47,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
         {
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" })
+                Error = new ValidationResult("Cannot set an empty password", new[] { "value" })
             });
         }
 
@@ -58,7 +58,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             // this really shouldn't ever happen... but just in case
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" })
+                Error = new ValidationResult("Password could not be verified", new[] { "oldPassword" })
             });
         }
 
@@ -77,7 +77,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
                 _logger.LogWarning("Could not reset user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel
                 {
-                    ChangeError = new ValidationResult(errors, new[] { "value" })
+                    Error = new ValidationResult(errors, new[] { "value" })
                 });
             }
 
@@ -91,7 +91,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             // no, fail with an error message for "oldPassword"
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" })
+                Error = new ValidationResult("Incorrect password", new[] { "oldPassword" })
             });
         }
 
@@ -104,7 +104,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             _logger.LogWarning("Could not change user password {PasswordErrors}", errors);
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult(errors, new[] { "password" })
+                Error = new ValidationResult(errors, new[] { "password" })
             });
         }
 
