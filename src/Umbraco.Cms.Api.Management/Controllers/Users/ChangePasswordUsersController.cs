@@ -30,7 +30,7 @@ public class ChangePasswordUsersController : UsersControllerBase
             return NotFound();
         }
 
-        var passwordModel = new ChangeBackofficeUserPasswordModel
+        var passwordModel = new ChangeBackOfficeUserPasswordModel
         {
             NewPassword = model.NewPassword,
             OldPassword = model.OldPassword,

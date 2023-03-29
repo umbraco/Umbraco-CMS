@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 /// Manages persistence of users.
 /// </summary>
-public interface IBackofficeUserStore
+public interface IBackOfficeUserStore
 {
     /// <summary>
     /// Saves an <see cref="IUser" />

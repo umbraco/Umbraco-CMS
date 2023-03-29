@@ -282,8 +282,8 @@ internal class UserService : RepositoryService, IUserService
     public IUser? GetByEmail(string email)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
-        return backofficeUserStore.GetByEmailAsync(email).GetAwaiter().GetResult();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        return backOfficeUserStore.GetByEmailAsync(email).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -300,9 +300,9 @@ internal class UserService : RepositoryService, IUserService
             return null;
         }
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        return backofficeUserStore.GetByUserNameAsync(username).GetAwaiter().GetResult();
+        return backOfficeUserStore.GetByUserNameAsync(username).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -312,9 +312,9 @@ internal class UserService : RepositoryService, IUserService
     public void Delete(IUser membershipUser)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        backofficeUserStore.DisableAsync(membershipUser).GetAwaiter().GetResult();
+        backOfficeUserStore.DisableAsync(membershipUser).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -357,9 +357,9 @@ internal class UserService : RepositoryService, IUserService
     public void Save(IUser entity)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        backofficeUserStore.SaveAsync(entity).GetAwaiter().GetResult();
+        backOfficeUserStore.SaveAsync(entity).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -369,9 +369,9 @@ internal class UserService : RepositoryService, IUserService
     public async Task<UserOperationStatus> SaveAsync(IUser entity)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        return await backofficeUserStore.SaveAsync(entity);
+        return await backOfficeUserStore.SaveAsync(entity);
     }
 
     /// <summary>
@@ -627,9 +627,9 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.Unauthorized, new UserCreationResult());
         }
 
-        ICoreBackofficeUserManager backofficeUserManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackofficeUserManager>();
+        ICoreBackOfficeUserManager backOfficeUserManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
 
-        IdentityCreationResult identityCreationResult = await backofficeUserManager.CreateAsync(model);
+        IdentityCreationResult identityCreationResult = await backOfficeUserManager.CreateAsync(model);
 
         if (identityCreationResult.Succeded is false)
         {
@@ -642,8 +642,8 @@ internal class UserService : RepositoryService, IUserService
 
         // The user is now created, so we can fetch it to map it to a result model with our generated password.
         // and set it to being approved
-        IBackofficeUserStore backofficeUserStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
-        IUser? createdUser = await backofficeUserStore.GetByEmailAsync(model.Email);
+        IBackOfficeUserStore backOfficeUserStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IUser? createdUser = await backOfficeUserStore.GetByEmailAsync(model.Email);
 
         if (createdUser is null)
         {
@@ -658,7 +658,7 @@ internal class UserService : RepositoryService, IUserService
             createdUser.AddGroup(userGroup.ToReadOnlyGroup());
         }
 
-        await backofficeUserStore.SaveAsync(createdUser);
+        await backOfficeUserStore.SaveAsync(createdUser);
 
         scope.Complete();
 
@@ -707,8 +707,8 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.CannotInvite, new UserInvitationResult());
         }
 
-        ICoreBackofficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackofficeUserManager>();
-        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        ICoreBackOfficeUserManager userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
         IdentityCreationResult creationResult = await userManager.CreateForInvite(model);
         if (creationResult.Succeded is false)
@@ -933,7 +933,7 @@ internal class UserService : RepositoryService, IUserService
         return keys;
     }
 
-    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackofficeUserPasswordModel model)
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackOfficeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -954,8 +954,8 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.Forbidden, new PasswordChangedModel());
         }
 
-        IBackofficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackofficePasswordChanger>();
-        Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackofficePassword(model);
+        IBackOfficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackOfficePasswordChanger>();
+        Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackOfficePassword(model);
 
         if (result.Success is false)
         {
@@ -1212,7 +1212,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
         IUser[] usersToDisable = (await userStore.GetUsersAsync(keys.ToArray())).ToArray();
 
         if (usersToDisable.Length != keys.Count)
@@ -1253,7 +1253,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
         IUser[] usersToEnable = (await userStore.GetUsersAsync(keys.ToArray())).ToArray();
 
         if (usersToEnable.Length != keys.Count)
@@ -1288,11 +1288,11 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
         string filePath = user.Avatar;
         user.Avatar = null;
-        UserOperationStatus result = await backofficeUserStore.SaveAsync(user);
+        UserOperationStatus result = await backOfficeUserStore.SaveAsync(user);
 
         if (result is not UserOperationStatus.Success)
         {
@@ -1323,8 +1323,8 @@ internal class UserService : RepositoryService, IUserService
         }
 
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
-        ICoreBackofficeUserManager manager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackofficeUserManager>();
-        IBackofficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        ICoreBackOfficeUserManager manager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
         IEnumerable<IUser> usersToUnlock = await userStore.GetUsersAsync(keys);
 
@@ -1447,9 +1447,9 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        return backofficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
+        return backOfficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -1516,9 +1516,9 @@ internal class UserService : RepositoryService, IUserService
     public IUser? GetUserById(int id)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        return backofficeUserStore.GetAsync(id).GetAwaiter().GetResult();
+        return backOfficeUserStore.GetAsync(id).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -1529,25 +1529,25 @@ internal class UserService : RepositoryService, IUserService
     public Task<IUser?> GetAsync(Guid key)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        return backofficeUserStore.GetAsync(key);
+        return backOfficeUserStore.GetAsync(key);
     }
 
     public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        return backofficeUserStore.GetUsersAsync(keys.ToArray());
+        return backOfficeUserStore.GetUsersAsync(keys.ToArray());
     }
 
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackofficeUserStore backofficeUserStore = scope.ServiceProvider.GetRequiredService<IBackofficeUserStore>();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        return backofficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
+        return backOfficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
     }
 
     /// <summary>

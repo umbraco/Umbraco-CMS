@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Security;
 
-public interface ICoreBackofficeUserManager
+public interface ICoreBackOfficeUserManager
 {
     Task<IdentityCreationResult> CreateAsync(UserCreateModel createModel);
 

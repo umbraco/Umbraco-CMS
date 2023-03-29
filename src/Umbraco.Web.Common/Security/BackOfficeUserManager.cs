@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.Common.Security;
 
 public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, UserPasswordConfigurationSettings>,
     IBackOfficeUserManager,
-    ICoreBackofficeUserManager
+    ICoreBackOfficeUserManager
 {
     private readonly IBackOfficeUserPasswordChecker _backOfficeUserPasswordChecker;
     private readonly GlobalSettings _globalSettings;
