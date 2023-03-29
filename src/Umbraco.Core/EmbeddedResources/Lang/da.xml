@@ -389,7 +389,7 @@
     </key>
     <key alias="elementType">Element-type</key>
     <key alias="elementTypeDescription">Definerer skabelonen for et sæt at egenskaber, der kan anvendes som skema i
-      avancerede felter som f.eks. 'Block List' eller 'Nested Content'.
+      avancerede felter som f.eks. 'Block List' eller 'Block Grid'.
     </key>
     <key alias="composition">Komposition</key>
     <key alias="compositionDescription">Definerer et sæt genbrugbare egenskaber, der kan inkluderes i definitionen af
@@ -1647,7 +1647,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.
+    <key alias="elementDescription">En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.
     </key>
     <key alias="elementCannotToggle">En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til
       at oprette en eller flere indholds elementer.

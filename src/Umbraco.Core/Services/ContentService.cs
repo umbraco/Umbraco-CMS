@@ -2936,6 +2936,7 @@ public class ContentService : RepositoryService, IContentService
             // save
             saved.Add(content);
             _documentRepository.Save(content);
+            Audit(AuditType.Sort, userId, content.Id, "Sorting content performed by user");
         }
 
         // first saved, then sorted
@@ -2951,8 +2952,7 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
         }
-
-        Audit(AuditType.Sort, userId, 0, "Sorting content performed by user");
+        
         return OperationResult.Succeed(eventMessages);
     }
 

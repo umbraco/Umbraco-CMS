@@ -410,7 +410,7 @@
     </key>
     <key alias="elementType">Element Type</key>
     <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block
-      List' or 'Nested Content' property editor.
+      List' or 'Block Grid' property editor.
     </key>
     <key alias="composition">Composition</key>
     <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of
@@ -1927,7 +1927,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowVaryBySegment">Allow segmentation</key>
     <key alias="elementType">Element Type</key>
     <key alias="elementHeading">Is an Element Type</key>
-    <key alias="elementDescription">An Element Type is meant to be used for instance in Nested Content, and not in the
+    <key alias="elementDescription">An Element Type is meant to be used within other Document Types, and not in the Content
       tree.
     </key>
     <key alias="elementCannotToggle">A Document Type cannot be changed to an Element Type once it has been used to
