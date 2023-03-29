@@ -3,8 +3,9 @@ import {
 	DocumentTypeResponseModel,
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeContainerResponseModelBaseModel,
+	ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
@@ -18,6 +19,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	#documentTypeRepository: R;
 
+	#documentTypeObservers = new Array<UmbControllerInterface>();
 	#documentTypes = new ArrayState<T>([], (x) => x.key);
 
 	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.key);
@@ -32,9 +34,19 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	 * This will give us all the structure for properties and containers.
 	 */
 	public async loadType(key?: string) {
-		this.#documentTypes.next([]);
-		this.#containers.next([]);
+		this._reset();
 		await this._loadType(key);
+	}
+
+	public async createType(parentKey: string) {
+		this._reset();
+
+		if (!parentKey) return;
+
+		const { data } = await this.#documentTypeRepository.createScaffold(parentKey);
+		if (!data) return;
+
+		this._observeDocumentType(data);
 	}
 
 	private async _loadType(key?: string) {
@@ -43,20 +55,26 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		const { data } = await this.#documentTypeRepository.requestByKey(key);
 		if (!data) return;
 
-		// Load inherited and composed types:
-		await data?.compositions?.forEach(async (composition) => {
-			if (composition.key) {
-				this.loadType(composition.key);
-			}
-		});
+		this._observeDocumentType(data);
+	}
 
-		new UmbObserverController(this.#host, await this.#documentTypeRepository.byKey(key), (docType) => {
-			if (docType) {
-				this.#documentTypes.appendOne(docType);
-				this._initDocumentTypeContainers(docType);
-				this._loadDocumentTypeCompositions(docType);
-			}
-		});
+	public async _observeDocumentType(
+		data: ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel
+	) {
+		if (!data.key) return;
+
+		// Load inherited and composed types:
+		this._loadDocumentTypeCompositions(data);
+
+		this.#documentTypeObservers.push(
+			new UmbObserverController(this.#host, await this.#documentTypeRepository.byKey(data.key), (docType) => {
+				if (docType) {
+					this.#documentTypes.appendOne(docType);
+					this._initDocumentTypeContainers(docType);
+					this._loadDocumentTypeCompositions(docType);
+				}
+			})
+		);
 	}
 
 	private async _loadDocumentTypeCompositions(documentType: T) {
@@ -70,6 +88,8 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 			this.#containers.appendOne(container);
 		});
 	}
+
+	/** Public methods for consuming structure: */
 
 	hasPropertyStructuresOf(containerKey: string | null) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
@@ -122,5 +142,16 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		return this.#containers.getObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});
+	}
+
+	private _reset() {
+		this.#documentTypeObservers.forEach((observer) => observer.destroy());
+		this.#documentTypes.next([]);
+		this.#containers.next([]);
+	}
+	public destroy() {
+		this._reset();
+		this.#documentTypes.complete();
+		this.#containers.complete();
 	}
 }

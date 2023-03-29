@@ -1,6 +1,7 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
+import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -10,12 +11,16 @@ export class UmbWorkspaceDocumentTypeContext
 	extends UmbWorkspaceContext<UmbDocumentTypeRepository>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
-	#data = new ObjectState<EntityType | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.getObservablePart((data) => data?.name);
+	#draft = new ObjectState<EntityType | undefined>(undefined);
+	data = this.#draft.asObservable();
+	name = this.#draft.getObservablePart((data) => data?.name);
+
+	readonly structure;
 
 	constructor(host: UmbControllerHostInterface) {
 		super(host, new UmbDocumentTypeRepository(host));
+
+		this.structure = new UmbWorkspacePropertyStructureManager(this.host, this.repository);
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
@@ -23,7 +28,7 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#draft.getValue();
 	}
 
 	getEntityKey() {
@@ -35,33 +40,40 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	setName(name: string) {
-		this.#data.update({ name });
+		this.#draft.update({ name });
 	}
 
 	// TODO => manage setting icon color
 	setIcon(icon: string) {
-		this.#data.update({ icon });
+		this.#draft.update({ icon });
+	}
+
+	async createScaffold(documentTypeKey: string) {
+		const { data } = await this.repository.createScaffold(documentTypeKey);
+		if (!data) return undefined;
+
+		this.setIsNew(true);
+		//this.#draft.next(data);
+		return data || undefined;
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
-		if (data) {
-			this.#data.next(data);
-		}
-	}
+		this.structure.loadType(entityKey);
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
-		if (!data) return;
-		this.#data.next(data);
+		const { data } = await this.repository.requestByKey(entityKey);
+		if (!data) return undefined;
+
+		this.setIsNew(false);
+		//this.#draft.next(data);
+		return data || undefined;
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		this.repository.save(this.#data.value);
+		if (!this.#draft.value) return;
+		this.repository.save(this.#draft.value);
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#draft.complete();
 	}
 }
