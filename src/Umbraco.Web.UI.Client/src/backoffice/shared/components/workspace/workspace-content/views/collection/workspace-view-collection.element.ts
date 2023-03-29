@@ -36,7 +36,6 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: Figure out how to get the magic string for the workspace context.
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._provideWorkspace();
