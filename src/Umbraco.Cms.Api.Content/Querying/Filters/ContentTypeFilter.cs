@@ -1,5 +1,3 @@
-using System;
-using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -18,9 +16,27 @@ internal sealed class ContentTypeFilter : QueryOptionBase, IFilterHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(ContentTypeSpecifier, StringComparison.OrdinalIgnoreCase);
 
-    public IBooleanOperation? BuildFilterIndexQuery(IQuery query, string filterValueString)
+    public FilterOption BuildFilterOption(string filterValueString)
     {
         var alias = filterValueString.Substring(ContentTypeSpecifier.Length);
-        return query.Field("__NodeTypeAlias", alias);
+
+        var filter = new FilterOption
+        {
+            FieldName = "__NodeTypeAlias",
+            Value = string.Empty
+        };
+
+        if (alias.StartsWith('!'))
+        {
+            filter.Value = alias.Substring(1);
+            filter.Operator = FilterOperation.IsNot;
+        }
+        else
+        {
+            filter.Value = alias;
+            filter.Operator = FilterOperation.Is;
+        }
+
+        return filter;
     }
 }

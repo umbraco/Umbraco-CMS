@@ -1,5 +1,3 @@
-using System;
-using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -18,9 +16,28 @@ internal sealed class NameFilter : QueryOptionBase, IFilterHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(NameSpecifier, StringComparison.OrdinalIgnoreCase);
 
-    public IBooleanOperation? BuildFilterIndexQuery(IQuery query, string filterValueString)
+    public FilterOption BuildFilterOption(string filterValueString)
     {
-        var alias = filterValueString.Substring(NameSpecifier.Length);
-        return query.Field("name", alias);
+        var value = filterValueString.Substring(NameSpecifier.Length);
+
+        var filter = new FilterOption
+        {
+            FieldName = "name",
+            Value = string.Empty
+        };
+
+        if (value.StartsWith('!'))
+        {
+            filter.Value = value.Substring(1);
+            filter.Operator = FilterOperation.IsNot;
+        }
+        else
+        {
+            //filter.Value = $"^{value}$";
+            filter.Value = value;
+            filter.Operator = FilterOperation.Is;
+        }
+
+        return filter;
     }
 }
