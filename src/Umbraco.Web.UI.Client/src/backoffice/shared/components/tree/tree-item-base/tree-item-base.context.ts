@@ -15,6 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 // add type for unique function
 export type UmbTreeItemUniqueFunction<T extends TreeItemPresentationModel> = (x: T) => string | null | undefined;
@@ -54,11 +55,11 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 	#getUniqueFunction: UmbTreeItemUniqueFunction<T>;
+	#actionObserver?: UmbObserverController<ManifestEntityAction[]>;
 
 	constructor(host: UmbControllerHostInterface, getUniqueFunction: UmbTreeItemUniqueFunction<T>) {
 		this.host = host;
 		this.#getUniqueFunction = getUniqueFunction;
-		this.#observeTreeItemActions();
 		this.#consumeContexts();
 		new UmbContextProviderController(host, UMB_TREE_ITEM_CONTEXT_TOKEN, this);
 	}
@@ -77,6 +78,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 		this.type = treeItem.type;
 
 		this.#hasChildren.next(treeItem.hasChildren || false);
+		this.#observeActions();
 		this.#treeItem.next(treeItem);
 	}
 
@@ -160,8 +162,10 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 		});
 	}
 
-	#observeTreeItemActions() {
-		new UmbObserverController(
+	#observeActions() {
+		if (this.#actionObserver) this.#actionObserver.destroy();
+
+		this.#actionObserver = new UmbObserverController(
 			this.host,
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
