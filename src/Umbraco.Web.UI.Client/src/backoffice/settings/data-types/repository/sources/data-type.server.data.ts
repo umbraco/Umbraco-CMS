@@ -6,7 +6,7 @@ import {
 	DataTypeResponseModel,
 	DataTypeModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -16,14 +16,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDataTypeServerDataSource implements UmbDataSource<DataTypeResponseModel> {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbDataTypeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 

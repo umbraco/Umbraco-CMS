@@ -1,9 +1,7 @@
 import { UmbControllerInterface } from './controller.interface';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
 
-export declare class UmbControllerHostInterface extends HTMLElement {
-	//#controllers:UmbController[];
-	//#attached:boolean;
+export declare class UmbControllerHostElement extends HTMLElement {
 	hasController(controller: UmbControllerInterface): boolean;
 	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
 	addController(controller: UmbControllerInterface): void;
@@ -101,7 +99,7 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		}
 	}
 
-	return UmbContextConsumerClass as unknown as HTMLElementConstructor<UmbControllerHostInterface> & T;
+	return UmbContextConsumerClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;
 };
 
 declare global {

@@ -1,11 +1,11 @@
 import { UmbTreeItemContextBase } from '../../../shared/components/tree/tree-item-base/tree-item-base.context';
 import { urlFriendlyPathFromServerFilePath } from '../../utils';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO get unique method from an entity repository static method
 export class UmbFileSystemTreeItemContext extends UmbTreeItemContextBase<FileSystemTreeItemPresentationModel> {
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, (x: FileSystemTreeItemPresentationModel) => x.path);
 	}
 

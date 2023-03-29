@@ -3,7 +3,7 @@ import {
 	PagedFileSystemTreeItemPresentationModel,
 	StylesheetResource,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -16,14 +16,14 @@ import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 export class UmbStylesheetTreeServerDataSource
 	implements UmbTreeDataSource<PagedFileSystemTreeItemPresentationModel, FileSystemTreeItemPresentationModel>
 {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbStylesheetTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbStylesheetTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 

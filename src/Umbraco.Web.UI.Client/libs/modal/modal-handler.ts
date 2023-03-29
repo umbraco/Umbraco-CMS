@@ -10,7 +10,7 @@ import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import type { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
 
 /**
@@ -42,7 +42,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	private _submitPromise: Promise<ModalResult>;
 	private _submitResolver?: (value: ModalResult) => void;
 	private _submitRejecter?: () => void;
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 
@@ -56,7 +56,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	public size: UUIModalSidebarSize = 'small';
 
 	constructor(
-		host: UmbControllerHostInterface,
+		host: UmbControllerHostElement,
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig

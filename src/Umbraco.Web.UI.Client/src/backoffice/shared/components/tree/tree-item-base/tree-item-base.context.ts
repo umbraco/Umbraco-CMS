@@ -1,5 +1,4 @@
 import { map } from 'rxjs';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry/entity-action.models';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
@@ -7,8 +6,9 @@ import {
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbTreeItemContext } from '../tree-item.context.interface';
+import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
 import { BooleanState, DeepState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
@@ -23,7 +23,7 @@ export type UmbTreeItemUniqueFunction<T extends TreeItemPresentationModel> = (x:
 export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeItemPresentationModel>
 	implements UmbTreeItemContext<T>
 {
-	public host: UmbControllerHostInterface;
+	public host: UmbControllerHostElement;
 	public unique?: string;
 	public type?: string;
 
@@ -57,7 +57,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	#getUniqueFunction: UmbTreeItemUniqueFunction<T>;
 	#actionObserver?: UmbObserverController<ManifestEntityAction[]>;
 
-	constructor(host: UmbControllerHostInterface, getUniqueFunction: UmbTreeItemUniqueFunction<T>) {
+	constructor(host: UmbControllerHostElement, getUniqueFunction: UmbTreeItemUniqueFunction<T>) {
 		this.host = host;
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();

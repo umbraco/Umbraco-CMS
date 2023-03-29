@@ -1,6 +1,6 @@
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbTrashEntityAction<
@@ -8,7 +8,7 @@ export class UmbTrashEntityAction<
 > extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalContext;
 
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
 		new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {

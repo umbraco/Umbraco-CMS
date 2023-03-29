@@ -10,7 +10,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-notification-container')
-export class UmbBackofficeNotificationContainer extends UmbLitElement {
+export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -65,6 +65,6 @@ export class UmbBackofficeNotificationContainer extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-notification-container': UmbBackofficeNotificationContainer;
+		'umb-backoffice-notification-container': UmbBackofficeNotificationContainerElement;
 	}
 }

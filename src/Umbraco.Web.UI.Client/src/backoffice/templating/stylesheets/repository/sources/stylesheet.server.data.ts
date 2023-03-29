@@ -1,6 +1,6 @@
 import { StylesheetDetails } from '../..';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * A data source for the Stylesheet that fetches data from the server
@@ -9,14 +9,14 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
  * @implements {UmbStylesheetServerDataSource}
  */
 export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDetails> {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbStylesheetServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 	createScaffold(parentKey: string | null): Promise<DataSourceResponse<StylesheetDetails>> {

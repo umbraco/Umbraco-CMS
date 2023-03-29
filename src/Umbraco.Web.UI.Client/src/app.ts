@@ -20,7 +20,7 @@ import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoff
 import { umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-app')
-export class UmbApp extends UmbLitElement {
+export class UmbAppElement extends UmbLitElement {
 	static styles = css`
 		:host {
 			overflow: hidden;
@@ -156,6 +156,6 @@ export class UmbApp extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-app': UmbApp;
+		'umb-app': UmbAppElement;
 	}
 }

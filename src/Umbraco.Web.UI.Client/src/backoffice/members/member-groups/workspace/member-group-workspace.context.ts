@@ -2,7 +2,7 @@ import { UmbEntityWorkspaceContextInterface } from '../../../../backoffice/share
 import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
 import { UmbMemberGroupRepository } from '../repository/member-group.repository';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MemberGroupDetails;
@@ -14,7 +14,7 @@ export class UmbWorkspaceMemberGroupContext
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbMemberGroupRepository(host));
 	}
 

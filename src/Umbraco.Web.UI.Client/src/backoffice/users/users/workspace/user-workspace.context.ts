@@ -4,7 +4,7 @@ import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/w
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbUserRepository } from '../repository/user.repository';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbUserWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserRepository>
@@ -22,7 +22,7 @@ export class UmbUserWorkspaceContext
 	// TODO: remove this magic connection, instead create the necessary methods to update parts.
 	update = this.#manager.state.update;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbUserRepository(host));
 	}
 

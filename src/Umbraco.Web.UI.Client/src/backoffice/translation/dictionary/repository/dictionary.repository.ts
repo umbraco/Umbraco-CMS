@@ -3,7 +3,7 @@ import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictio
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data';
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store';
 import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
@@ -12,7 +12,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepository<DictionaryDetails> {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDictionaryTreeStore;
@@ -22,7 +22,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source

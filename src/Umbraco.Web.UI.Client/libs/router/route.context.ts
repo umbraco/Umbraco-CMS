@@ -5,7 +5,7 @@ import {
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
@@ -28,7 +28,7 @@ export class UmbRouteContext {
 	#routerBasePath?: string;
 	#activeModalPath?: string;
 
-	constructor(host: UmbControllerHostInterface, private _onGotModals: (contextRoutes: any) => void) {
+	constructor(host: UmbControllerHostElement, private _onGotModals: (contextRoutes: any) => void) {
 		new UmbContextProviderController(host, UMB_ROUTE_CONTEXT_TOKEN, this);
 		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			this.#modalContext = context;

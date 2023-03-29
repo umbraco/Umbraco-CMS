@@ -7,11 +7,10 @@ import {
 	UmbDocumentTypeTreeStore,
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
 } from '../../../documents/document-types/repository/document-type.tree.store';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-type-picker';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-type-picker')
@@ -100,7 +99,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	}
 
 	private async _removeItem(item: DocumentTypeResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

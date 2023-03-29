@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extensions-api';
 
 @defineElement('umb-backoffice-main')
-export class UmbBackofficeMain extends UmbLitElement {
+export class UmbBackofficeMainElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -101,6 +101,6 @@ export class UmbBackofficeMain extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-main': UmbBackofficeMain;
+		'umb-backoffice-main': UmbBackofficeMainElement;
 	}
 }

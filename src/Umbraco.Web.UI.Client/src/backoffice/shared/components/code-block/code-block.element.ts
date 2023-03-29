@@ -8,7 +8,7 @@ import { customElement } from 'lit/decorators.js';
  *
  */
 @customElement('uui-code-block')
-export class UUICodeBlock extends LitElement {
+export class UUICodeBlockElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -54,6 +54,6 @@ export class UUICodeBlock extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'uui-code-block': UUICodeBlock;
+		'uui-code-block': UUICodeBlockElement;
 	}
 }

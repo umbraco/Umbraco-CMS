@@ -43,11 +43,11 @@ As part of the Extension Manifest you can attach a class that will be instanciat
 
 ```ts
 import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/controller';
 import { MyRepository } from './my-repository';
 
 export class MyWorkspaceAction extends UmbWorkspaceActionBase {
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host);
 	}
 

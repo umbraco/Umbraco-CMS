@@ -1,6 +1,6 @@
 import { RelationTypeTreeDataSource } from '.';
 import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -11,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RelationTypeTreeDataSource}
  */
 export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
 	async trashItems(keys: Array<string>) {
@@ -48,10 +48,10 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 
 	/**
 	 * Creates an instance of RelationTypeTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof RelationTypeTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 

@@ -13,7 +13,7 @@ import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-installed-packages-section-view-item')
-export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
+export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	static styles = css`
 		:host {
 			display: flex;
@@ -151,6 +151,6 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItem;
+		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItemElement;
 	}
 }

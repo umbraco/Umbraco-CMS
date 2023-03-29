@@ -9,7 +9,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-sidebar-context-menu')
-export class UmbSectionSidebarContextMenu extends UmbLitElement {
+export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -120,6 +120,6 @@ export class UmbSectionSidebarContextMenu extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section-sidebar-context-menu': UmbSectionSidebarContextMenu;
+		'umb-section-sidebar-context-menu': UmbSectionSidebarContextMenuElement;
 	}
 }

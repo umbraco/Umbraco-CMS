@@ -2,7 +2,7 @@ import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } fr
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store';
 import { MemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
@@ -13,7 +13,7 @@ import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '
 export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRepository<any> {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMemberGroupTreeStore;
@@ -23,7 +23,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		// TODO: figure out how spin up get the correct data source
 		this.#treeSource = new MemberGroupTreeServerDataSource(this.#host);

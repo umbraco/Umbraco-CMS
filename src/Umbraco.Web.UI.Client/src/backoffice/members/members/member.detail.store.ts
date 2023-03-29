@@ -3,7 +3,7 @@ import { umbMemberData } from '../../../core/mocks/data/member.data';
 import type { MemberDetails, MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -16,7 +16,7 @@ export class UmbMemberStore extends UmbStoreBase implements UmbEntityDetailStore
 	#data = new ArrayState<MemberDetails>([], (x) => x.key);
 	public groups = this.#data.asObservable();
 
-	constructor(private host: UmbControllerHostInterface) {
+	constructor(private host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_STORE_CONTEXT_TOKEN.toString());
 	}
 
