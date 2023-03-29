@@ -128,7 +128,6 @@ module.exports = {
 					const sourceValue = node.source.value;
 					if (sourceValue.startsWith('libs/') || libsRegex.test(sourceValue)) {
 						const importPath = sourceValue.replace(libsRegex, (match, p1, p2) => {
-							const levels = p1.match(/\.\.\//g) || [];
 							return `@umbraco-cms/backoffice/${p2}`;
 						});
 						context.report({

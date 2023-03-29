@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
+import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller/controller-host.mixin';
 import { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from 'libs/controller/controller-host.mixin';
 
 // TODO: temp type. Add paged response type to the repository interface
 interface PagedResponse<T> {

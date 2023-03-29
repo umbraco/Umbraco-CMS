@@ -1,3 +1,4 @@
+import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository/tree-repository.interface';
 import type { MediaDetails } from '../';
 import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
@@ -9,7 +10,6 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
 type ItemDetailType = MediaDetails;
 
