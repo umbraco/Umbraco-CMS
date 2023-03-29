@@ -33,15 +33,6 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		`,
 	];
 
-	public load(entityKey: string) {
-		this.#templateWorkspaceContext?.load(entityKey);
-	}
-
-	public create(parentKey: string | null) {
-		this.#isNew = true;
-		this.#templateWorkspaceContext?.createScaffold(parentKey);
-	}
-
 	@state()
 	private _name?: string | null = '';
 
@@ -65,6 +56,11 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 			this.observe(this.#templateWorkspaceContext.content, (content) => {
 				this._content = content;
+			});
+
+			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
+				this.#isNew = isNew;
+				console.log(this.#isNew);
 			});
 		});
 	}
