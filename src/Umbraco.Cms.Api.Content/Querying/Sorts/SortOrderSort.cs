@@ -1,5 +1,6 @@
-using System;
-using Examine.Search;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.ContentApi;
+using SortType = Umbraco.Cms.Core.ContentApi.SortType;
 
 namespace Umbraco.Cms.Api.Content.Querying.Sorts;
 
@@ -11,12 +12,15 @@ internal sealed class SortOrderSort : ISortHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(SortOptionSpecifier, StringComparison.OrdinalIgnoreCase);
 
-    public IOrdering? BuildSortIndexQuery(IBooleanOperation queryCriteria, string sortValueString)
+    public SortOption BuildSortOption(string sortValueString)
     {
         var sortDirection = sortValueString.Substring(SortOptionSpecifier.Length);
 
-        return sortDirection.StartsWith("asc")
-            ? queryCriteria.OrderBy(new SortableField("sortOrder", SortType.Int))
-            : queryCriteria.OrderByDescending(new SortableField("sortOrder", SortType.Int));
+        return new SortOption
+        {
+            FieldName = "sortOrder",
+            Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending,
+            SortType = SortType.Int
+        };
     }
 }
