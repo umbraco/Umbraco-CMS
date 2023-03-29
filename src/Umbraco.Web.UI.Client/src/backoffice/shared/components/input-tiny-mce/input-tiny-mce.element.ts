@@ -2,8 +2,9 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { AstNode, Editor, EditorEvent } from 'tinymce';
+import tinymce, { AstNode, Editor, EditorEvent } from 'tinymce';
 import { firstValueFrom } from 'rxjs';
+
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
@@ -20,7 +21,6 @@ import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.m
 // TODO => determine optimal method for including tiny. Currently using public assets
 // as we need to ship all core plugins to allow implementors to register these. Have not considered
 // other locations for serving these assests - might make better sense in /libs
-import '../../../../../public-assets/tiny-mce/tinymce.min.js';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
@@ -317,7 +317,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			});
 		}
 
-		window.tinymce.init(tinyConfig);
+		tinymce.init(tinyConfig);
 	}
 
 	#cleanupPasteData(args: { content: string }) {
