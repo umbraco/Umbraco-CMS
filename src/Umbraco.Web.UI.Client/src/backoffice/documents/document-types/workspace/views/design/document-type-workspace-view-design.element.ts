@@ -77,9 +77,6 @@ export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
 		`,
 	];
 
-	@state()
-	_documentType?: DocumentTypeResponseModel;
-
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	@state()
@@ -97,10 +94,6 @@ export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
 
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
-
-		this.observe(this._workspaceContext.data, (documentType) => {
-			this._documentType = documentType;
-		});
 	}
 
 	render() {
@@ -121,7 +114,7 @@ export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
 			<div id="wrapper">
 				<uui-box class="group-wrapper">
 					<div class="group-headline" slot="headline">
-						<uui-input label="Group name" value="${this._documentType?.name ?? ''}" size="10">
+						<uui-input label="Group name" value="${''}" size="10">
 							<uui-button slot="append" label="Delete group" compact><uui-icon name="umb:trash"></uui-icon></uui-button>
 						</uui-input>
 					</div>

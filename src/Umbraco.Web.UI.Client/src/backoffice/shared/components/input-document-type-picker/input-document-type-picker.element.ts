@@ -25,14 +25,6 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 			#add-button {
 				width: 100%;
 			}
-
-			#current-node {
-				background-color: var(--uui-color-surface-alt);
-			}
-
-			#wrapper-nodes {
-				margin-left: var(--uui-size-space-6);
-			}
 		`,
 	];
 
@@ -53,9 +45,6 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 			this.selectedKeys = keysString.split(/[ ,]+/);
 		}
 	}
-
-	@property()
-	currentDocumentType?: DocumentTypeResponseModel;
 
 	@state()
 	private _items?: Array<DocumentTypeResponseModel>;
@@ -122,13 +111,8 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	render() {
 		return html`
-			<uui-ref-node id="current-node" .name="${this.currentDocumentType?.name ?? ''} (current)">
-				<uui-icon slot="icon" .name="${this.currentDocumentType?.icon ?? 'umb:document'}"></uui-icon>
-			</uui-ref-node>
-			<div id="wrapper-nodes">
-				<uui-ref-list> ${this._items?.map((item) => this._renderItem(item))} </uui-ref-list>
-				<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
-			</div>
+			<uui-ref-list> ${this._items?.map((item) => this._renderItem(item))} </uui-ref-list>
+			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
 		`;
 	}
 

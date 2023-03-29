@@ -7,8 +7,8 @@ import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-document-type-workspace-edit')
-export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-document-type-workspace-editor')
+export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -40,6 +40,8 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 		`,
 	];
 
+	// TODO: notice this format is not acceptable:
+	@state()
 	private _icon = {
 		color: '#000000',
 		name: 'umb:document-dashed-line',
@@ -47,8 +49,13 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 
 	#workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
+	//@state()
+	//private _documentType?: DocumentTypeResponseModel;
 	@state()
-	private _documentType?: DocumentTypeResponseModel;
+	private _name?: string;
+
+	@state()
+	private _alias?: string;
 
 	private _modalContext?: UmbModalContext;
 
@@ -67,7 +74,7 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 
 	#observeDocumentType() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.data, (data) => (this._documentType = data));
+		//this.observe(this.#workspaceContext.data, (data) => (this._documentType = data));
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -95,13 +102,11 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 			<umb-workspace-layout alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
-						<uui-icon
-							name="${this._documentType?.icon || this._icon.name}"
-							style="color: ${this._icon.color}"></uui-icon>
+						<uui-icon name="${this._icon.name}" style="color: ${this._icon.color}"></uui-icon>
 					</uui-button>
 
-					<uui-input id="name" .value=${this._documentType?.name} @input="${this._handleInput}">
-						<div id="alias" slot="append">${this._documentType?.alias}</div>
+					<uui-input id="name" .value=${this._name} @input="${this._handleInput}">
+						<div id="alias" slot="append">${this._alias}</div>
 					</uui-input>
 				</div>
 
@@ -122,10 +127,10 @@ export class UmbDocumentTypeWorkspaceEditElement extends UmbLitElement {
 	}
 }
 
-export default UmbDocumentTypeWorkspaceEditElement;
+export default UmbDocumentTypeWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-workspace-edit': UmbDocumentTypeWorkspaceEditElement;
+		'umb-document-type-workspace-editor': UmbDocumentTypeWorkspaceEditorElement;
 	}
 }

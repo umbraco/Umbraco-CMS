@@ -26,9 +26,6 @@ export class UmbDocumentTypeWorkspaceViewDetailsElement extends UmbLitElement {
 		`,
 	];
 
-	@state()
-	_documentType?: DocumentTypeResponseModel;
-
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	constructor() {
@@ -43,10 +40,6 @@ export class UmbDocumentTypeWorkspaceViewDetailsElement extends UmbLitElement {
 
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
-
-		this.observe(this._workspaceContext.data, (documentType) => {
-			this._documentType = documentType;
-		});
 	}
 
 	render() {

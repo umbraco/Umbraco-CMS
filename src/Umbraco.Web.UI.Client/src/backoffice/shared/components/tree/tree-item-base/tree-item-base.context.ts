@@ -1,5 +1,4 @@
 import { map } from 'rxjs';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry/entity-action.models';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
@@ -7,6 +6,7 @@ import {
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbTreeItemContext } from '../tree-item.context.interface';
+import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
 import { BooleanState, DeepState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import {

@@ -26,9 +26,6 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		`,
 	];
 
-	@state()
-	_documentType?: DocumentTypeResponseModel;
-
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	constructor() {
@@ -43,10 +40,6 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
-
-		this.observe(this._workspaceContext.data, (documentType) => {
-			this._documentType = documentType;
-		});
 	}
 
 	render() {
@@ -61,8 +54,8 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 						Allow content of the specified types to be created underneath content of this type.
 					</div>
 					<div slot="editor">
-						<umb-input-document-type-picker
-							.currentDocumentType="${this._documentType}"></umb-input-document-type-picker>
+						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
+						<umb-input-document-type-picker></umb-input-document-type-picker>
 					</div>
 				</umb-workspace-property-layout>
 			</uui-box>

@@ -1,9 +1,8 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-document-type-workspace-view-templates')
 export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement {
@@ -35,9 +34,6 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		`,
 	];
 
-	@state()
-	_documentType?: DocumentTypeResponseModel;
-
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	constructor() {
@@ -50,10 +46,6 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
-
-		this.observe(this._workspaceContext.data, (documentType) => {
-			this._documentType = documentType;
-		});
 	}
 
 	async #changeDefaultKey(e: CustomEvent) {
@@ -72,8 +64,8 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
 				<div id="templates" slot="editor">
 					<umb-input-template-picker
-						.defaultKey="${this._documentType?.defaultTemplateKey ?? ''}"
-						.allowedKeys="${this._documentType?.allowedTemplateKeys ?? []}"
+						.defaultKey="${/*this._documentType?.defaultTemplateKey ??*/ ''}"
+						.allowedKeys="${/*this._documentType?.allowedTemplateKeys ??*/ []}"
 						@change-default="${this.#changeDefaultKey}"
 						@change-allowed="${this.#changeAllowedKeys}"></umb-input-template-picker>
 				</div>
