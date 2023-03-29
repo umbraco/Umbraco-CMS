@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
@@ -18,11 +18,22 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 				gap: var(--uui-size-space-4);
 				width: 100%;
 			}
+
 			uui-input {
 				width: 100%;
 			}
+
+			strong {
+				display: flex;
+				align-items: center;
+			}
+
 			#footer {
 				padding: 0 var(--uui-size-layout-1);
+			}
+
+			uui-input:not(:focus) {
+				border: 1px solid transparent;
 			}
 		`,
 	];
@@ -31,6 +42,9 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 
 	@state()
 	_language?: LanguageResponseModel;
+
+	@state()
+	_isNew = false;
 
 	constructor() {
 		super();
@@ -45,6 +59,9 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.data, (data) => {
 			this._language = data;
+		});
+		this.observe(this.#workspaceContext.isNew, (isNew) => {
+			this._isNew = isNew;
 		});
 	}
 
@@ -64,12 +81,16 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 				<uui-button label="Navigate back" href="/section/settings/workspace/language-root" compact>
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</uui-button>
-				<uui-input value=${ifDefined(this._language?.name)} @input="${this.#handleInput}"></uui-input>
+				${this._isNew
+					? html`<strong>Add language</strong>`
+					: html`<uui-input
+							label="Language name"
+							placeholder=${ifDefined(this._language?.name)}
+							@input="${this.#handleInput}"></uui-input>`}
 			</div>
 			<div slot="footer" id="footer">
-				${this._language?.name
-					? html`<a href="/section/settings/workspace/language-root">Languages</a> / ${this._language?.name}`
-					: nothing}
+				<a href="/section/settings/workspace/language-root">Languages</a> /
+				${this._isNew ? 'Create' : this._language?.name}
 			</div>
 		</umb-workspace-layout>`;
 	}

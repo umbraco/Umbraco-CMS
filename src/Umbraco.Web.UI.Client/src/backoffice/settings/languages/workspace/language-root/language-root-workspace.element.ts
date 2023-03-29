@@ -65,6 +65,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	#languageRepository = new UmbLanguageRepository(this);
+	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -88,7 +89,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 					{
 						columnAlias: 'languageName',
 						value: {
-							name: language.name,
+							name: language.name ? language.name : this._cultureNames.of(language.isoCode ?? ''),
 							isoCode: language.isoCode,
 						},
 					},
