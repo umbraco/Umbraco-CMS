@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
-import { UmbControllerHostInterface, UmbControllerHostMixin } from './controller-host.mixin';
+import { UmbControllerHostElement, UmbControllerHostMixin } from './controller-host.mixin';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
 class MyClass {
@@ -11,13 +11,13 @@ class MyClass {
 export class MyHostElement extends UmbControllerHostMixin(HTMLElement) {}
 
 describe('UmbContextProvider', () => {
-	type NewType = UmbControllerHostInterface;
+	type NewType = UmbControllerHostElement;
 
 	let hostElement: NewType;
 	const contextInstance = new MyClass();
 
 	beforeEach(() => {
-		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostInterface;
+		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostElement;
 	});
 
 	describe('Destroyed controllers is gone from host', () => {

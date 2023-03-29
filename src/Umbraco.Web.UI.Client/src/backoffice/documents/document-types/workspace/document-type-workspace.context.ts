@@ -3,7 +3,7 @@ import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/w
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
 import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbWorkspaceDocumentTypeContext
@@ -16,7 +16,7 @@ export class UmbWorkspaceDocumentTypeContext
 
 	readonly structure;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDocumentTypeRepository(host));
 
 		this.structure = new UmbWorkspacePropertyStructureManager(this.host, this.repository);

@@ -4,7 +4,7 @@ import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.t
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
 import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
@@ -13,7 +13,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 type ItemDetailType = MediaDetails;
 
 export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepository<ItemDetailType> {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTreeStore;
@@ -26,7 +26,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	#initResolver?: () => void;
 	#initialized = false;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source

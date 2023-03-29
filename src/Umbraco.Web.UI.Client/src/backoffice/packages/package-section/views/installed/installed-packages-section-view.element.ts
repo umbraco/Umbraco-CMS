@@ -10,7 +10,7 @@ import type { UmbPackageWithMigrationStatus } from '@umbraco-cms/backoffice/mode
 import './installed-packages-section-view-item.element';
 
 @customElement('umb-installed-packages-section-view')
-export class UmbInstalledPackagesSectionView extends UmbLitElement {
+export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -138,10 +138,10 @@ export class UmbInstalledPackagesSectionView extends UmbLitElement {
 	}
 }
 
-export default UmbInstalledPackagesSectionView;
+export default UmbInstalledPackagesSectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installed-packages-section-view': UmbInstalledPackagesSectionView;
+		'umb-installed-packages-section-view': UmbInstalledPackagesSectionViewElement;
 	}
 }

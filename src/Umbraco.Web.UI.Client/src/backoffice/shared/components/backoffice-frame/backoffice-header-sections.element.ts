@@ -8,7 +8,7 @@ import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registr
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-header-sections')
-export class UmbBackofficeHeaderSections extends UmbLitElement {
+export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -145,6 +145,6 @@ export class UmbBackofficeHeaderSections extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-header-sections': UmbBackofficeHeaderSections;
+		'umb-backoffice-header-sections': UmbBackofficeHeaderSectionsElement;
 	}
 }

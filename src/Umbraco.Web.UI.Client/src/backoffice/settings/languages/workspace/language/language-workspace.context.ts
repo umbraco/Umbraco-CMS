@@ -3,7 +3,7 @@ import { UmbWorkspaceContext } from '../../../../shared/components/workspace/wor
 import { UmbEntityWorkspaceContextInterface } from '../../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbLanguageWorkspaceContext
 	extends UmbWorkspaceContext<UmbLanguageRepository, LanguageResponseModel>
@@ -16,7 +16,7 @@ export class UmbLanguageWorkspaceContext
 	#validationErrors = new ObjectState<any | undefined>(undefined);
 	validationErrors = this.#validationErrors.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbLanguageRepository(host));
 	}
 

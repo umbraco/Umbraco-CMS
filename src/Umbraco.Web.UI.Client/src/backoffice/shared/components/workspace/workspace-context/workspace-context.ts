@@ -1,6 +1,6 @@
 import { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface';
 import { UmbContextProviderController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { DeepState } from '@umbraco-cms/backoffice/observable-api';
 import type { BaseEntity } from '@umbraco-cms/backoffice/models';
 
@@ -12,13 +12,13 @@ If so we need to align on a interface that all of these implements. otherwise co
 export abstract class UmbWorkspaceContext<T, EntityType extends BaseEntity>
 	implements UmbEntityWorkspaceContextInterface<EntityType>
 {
-	public host: UmbControllerHostInterface;
+	public host: UmbControllerHostElement;
 	public repository: T;
 
 	#isNew = new DeepState<boolean>(false);
 	isNew = this.#isNew.asObservable();
 
-	constructor(host: UmbControllerHostInterface, repository: T) {
+	constructor(host: UmbControllerHostElement, repository: T) {
 		this.host = host;
 		this.repository = repository;
 		new UmbContextProviderController(host, UMB_ENTITY_WORKSPACE_CONTEXT, this);

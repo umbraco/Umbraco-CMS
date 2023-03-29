@@ -1,17 +1,17 @@
 import { UmbCultureServerDataSource } from './sources/culture.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 export class UmbCultureRepository {
 	#init!: Promise<unknown>;
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#dataSource: UmbCultureServerDataSource;
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		this.#dataSource = new UmbCultureServerDataSource(this.#host);

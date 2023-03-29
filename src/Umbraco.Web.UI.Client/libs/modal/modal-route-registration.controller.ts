@@ -1,7 +1,7 @@
 // TODO: Be aware here we import a class from src!
 import { UMB_ROUTE_CONTEXT_TOKEN } from '../router/route.context';
-import type { UmbControllerHostInterface, UmbControllerInterface } from '../controller';
 import { UmbModalRouteRegistration } from './modal-route-registration';
+import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalConfig, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
@@ -22,7 +22,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	}
 
 	constructor(
-		host: UmbControllerHostInterface,
+		host: UmbControllerHostElement,
 		alias: UmbModalToken<D, R> | string,
 		path: string,
 		uniqueParts?: Map<string, string | undefined> | null,

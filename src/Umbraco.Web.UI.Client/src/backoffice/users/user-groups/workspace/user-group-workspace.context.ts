@@ -4,7 +4,7 @@ import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/w
 import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupDetails>
@@ -19,7 +19,7 @@ export class UmbUserGroupWorkspaceContext
 	public readonly data = this.#manager.state.asObservable();
 	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbUserGroupRepository(host));
 	}
 

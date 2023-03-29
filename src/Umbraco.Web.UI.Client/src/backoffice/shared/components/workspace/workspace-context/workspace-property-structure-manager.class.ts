@@ -5,7 +5,7 @@ import {
 	PropertyTypeContainerResponseModelBaseModel,
 	ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 import { ArrayState, UmbObserverController, MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
@@ -15,7 +15,7 @@ type T = DocumentTypeResponseModel;
 
 // TODO: make general interface for NodeTypeRepository, to replace UmbDocumentTypeRepository:
 export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepository = UmbDocumentTypeRepository> {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#documentTypeRepository: R;
 
@@ -25,7 +25,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.key);
 
-	constructor(host: UmbControllerHostInterface, typeRepository: R) {
+	constructor(host: UmbControllerHostElement, typeRepository: R) {
 		this.#host = host;
 		this.#documentTypeRepository = typeRepository;
 	}

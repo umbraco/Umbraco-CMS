@@ -1,6 +1,6 @@
 import type { DictionaryDetails } from '../../';
 import { DictionaryDetailDataSource } from './dictionary.details.server.data.interface';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
 	CreateDictionaryItemRequestModel,
@@ -16,9 +16,9 @@ import {
  * @implements {DictionaryDetailDataSource}
  */
 export class UmbDictionaryDetailServerDataSource implements DictionaryDetailDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 

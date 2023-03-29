@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_IMPORT_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
 
@@ -12,7 +12,7 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 
 	#modalContext?: UmbModalContext;
 
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
 		new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {

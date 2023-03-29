@@ -8,14 +8,14 @@ import {
 	UmbContextToken,
 	UMB_ENTITY_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 //type EntityType = DocumentModel;
 
 export class UmbWorkspaceVariantContext {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
 	public getWorkspaceContext() {
@@ -37,7 +37,7 @@ export class UmbWorkspaceVariantContext {
 
 	private _currentVariantObserver?: UmbObserverController<ActiveVariant>;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		new UmbContextProviderController(host, UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.toString(), this);

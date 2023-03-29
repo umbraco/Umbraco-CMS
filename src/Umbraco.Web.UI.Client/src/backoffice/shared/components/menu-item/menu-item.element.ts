@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-menu-item')
-export class UmbMenuItem extends UmbLitElement {
+export class UmbMenuItemElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object, attribute: false })
@@ -50,6 +50,6 @@ export class UmbMenuItem extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-menu-item': UmbMenuItem;
+		'umb-menu-item': UmbMenuItemElement;
 	}
 }

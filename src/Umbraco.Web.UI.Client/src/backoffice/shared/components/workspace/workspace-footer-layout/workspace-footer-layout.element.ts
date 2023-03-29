@@ -16,7 +16,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-footer-layout')
-export class UmbWorkspaceFooterLayout extends UmbLitElement {
+export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -71,6 +71,6 @@ export class UmbWorkspaceFooterLayout extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-footer-layout': UmbWorkspaceFooterLayout;
+		'umb-workspace-footer-layout': UmbWorkspaceFooterLayoutElement;
 	}
 }

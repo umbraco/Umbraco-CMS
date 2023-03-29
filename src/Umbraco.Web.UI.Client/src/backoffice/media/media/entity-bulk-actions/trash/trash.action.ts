@@ -1,14 +1,14 @@
 import { html } from 'lit';
 import type { UmbMediaRepository } from '../../repository/media.repository';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
 	#modalContext?: UmbModalContext;
 
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
 		super(host, repositoryAlias, selection);
 
 		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {

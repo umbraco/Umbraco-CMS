@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import './auth-layout.element';
 
 @customElement('umb-login')
-export default class UmbLogin extends LitElement {
+export default class UmbLoginElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -113,6 +113,6 @@ export default class UmbLogin extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-login': UmbLogin;
+		'umb-login': UmbLoginElement;
 	}
 }

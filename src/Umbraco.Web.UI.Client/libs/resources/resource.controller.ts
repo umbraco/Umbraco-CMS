@@ -5,7 +5,7 @@ import {
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
 import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -14,7 +14,7 @@ export class UmbResourceController extends UmbController {
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface, promise: Promise<any>, alias?: string) {
+	constructor(host: UmbControllerHostElement, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
 		this.#promise = promise;

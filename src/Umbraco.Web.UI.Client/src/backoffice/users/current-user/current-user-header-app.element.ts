@@ -7,7 +7,7 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CURRENT_USER_MODAL } from
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-header-app')
-export class UmbCurrentUserHeaderApp extends UmbLitElement {
+export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -58,10 +58,10 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	}
 }
 
-export default UmbCurrentUserHeaderApp;
+export default UmbCurrentUserHeaderAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-header-app': UmbCurrentUserHeaderApp;
+		'umb-current-user-header-app': UmbCurrentUserHeaderAppElement;
 	}
 }

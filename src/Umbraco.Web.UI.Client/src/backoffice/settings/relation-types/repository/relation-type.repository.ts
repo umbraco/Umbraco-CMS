@@ -3,7 +3,7 @@ import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store';
 import { RelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
 import { RelationTypeTreeDataSource } from './sources';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
@@ -19,7 +19,7 @@ type TreeItemType = any;
 export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#treeSource: RelationTypeTreeDataSource;
 	#treeStore?: UmbRelationTypeTreeStore;
@@ -29,7 +29,7 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
