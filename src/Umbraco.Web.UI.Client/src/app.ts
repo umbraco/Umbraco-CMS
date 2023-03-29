@@ -4,6 +4,7 @@ import './core/css/custom-properties.css';
 import 'element-internals-polyfill';
 
 import './core/router/router-slot.element';
+import './core/router/variant-router-slot.element';
 import './core/notification/layouts/default';
 import './core/modal/modal-element.element';
 
@@ -12,7 +13,6 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbIconStore } from './core/stores/icon/icon.store';
-
 import type { Guard, IRoute } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

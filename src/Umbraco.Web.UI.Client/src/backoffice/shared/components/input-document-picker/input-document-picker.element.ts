@@ -5,9 +5,12 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
 import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
-import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-picker';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+	UMB_DOCUMENT_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -123,7 +126,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedKeys],
 		});
@@ -134,7 +137,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private async _removeItem(item: EntityTreeItemResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',

@@ -42,7 +42,138 @@ class MyElement extends UmbElementMixin(LitElement) {
 
 ### Open a modal
 
-A modal is opened by calling the open method on the UmbModalContext. The methods will accept a modal token (or extension alias), an optional dataset, and optional modal options .It returns an instance of UmbModalHandler.
+A modal can be opned in two ways. Either you registrer the modal with a route or at runtime open the modal. Notice the first one will enable users to deep link to the modal, this might be preferable in some cases if not go for the last.
+
+#### Simple Modal Route Registration
+
+A modal can be registred via the UmbModalRouteRegistrationController. The registration will accept a modal token (or extension alias).
+
+Notice we are using a Controller here, this means your element has to be a Controller Host (TODO: Insert link to story about Controller Host also available through the UmbElementMixin)
+
+```ts
+this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL)
+	.onSubmit((submitData) => {
+		console.log('Modal submitted with data'.submitData);
+	})
+	.observeRouteBuilder((routeBuilder) => {
+		this._modalRouteBuilder = routeBuilder;
+	});
+```
+
+The registration holds an instance of its UmbModalHandler when the modal it active.
+The modal registration accepts 4 different callbacks:
+
+- onSetup - called when the modal is opened
+- onSubmit - called when the modal is submitted
+- onReject - called when the modal is rejected
+- observeRouteBuilder - called when the modal route changes, use the given route builder to build a route to open the modal.
+
+#### TODOS:
+
+descripe the addional features of the route Registration:
+
+##### Hints:
+
+- Add unique parts to the path. (How is this cone properly as part of a Property Editor)
+- A modal registred in a dashboard can be relatively simple.
+- A modal registred in a property editor, needs to become specific for the property and the variant of that property.
+
+- Build some data for the setup.
+- Reject a modal by returning false in setup.
+- Use a param as part of setup to determin the data going to the modal.
+
+#### Modal registration for UI as part of a Property Editor
+
+```ts
+
+
+	@property()
+	public set alias(value: string | undefined) {
+		this.myModalRegistration.setUniqueIdentifier('propertyAlias', value);
+	}
+
+	@property()
+	public set variantId(value: string | UmbVariantId | undefined) {
+		this.myModalRegistration.setUniqueIdentifier('variantId', value?.toString());
+	}
+
+	private _items = [
+		{ name: 'Item 1' },
+		{ name: 'Item 2' },
+		{ name: 'Item 3' },
+	]
+
+
+	constructor() {
+		super();
+
+		this.myModalRegistration = new UmbModalRouteRegistrationController(
+			this,
+			MY_MODAL_TOKEN,
+			`:index`,
+			new Map([
+				['propertyAlias', undefined],
+				['variantId', undefined],
+			])
+		)
+		.onSetup((params) => {
+			// Get item index:
+			const indexParam = params.index;
+			if (!indexParam) return false;
+			let index: number | null = parseInt(params.index);
+			if (Number.isNaN(index)) return false;
+
+			// Use the index to find data:
+			let data = null;
+			if (index >= 0 && index < this._items.length) {
+				data = this._items[index];
+			} else {
+				// If not then make a new pick:
+				index = null;
+			}
+
+			return {
+				index: index,
+				itemData: {
+					name: data?.name
+				},
+			};
+		})
+		.onSubmit((submitData) => {
+			if (!submitData) return;
+			this._items[submitData.index] = submitData.itemData;
+		})
+		.observeRouteBuilder((routeBuilder) => {
+			this._modalRouteBuilder = routeBuilder;
+		});
+	}
+
+	render() {
+		return html`
+			${this._items?.map((item, index) =>
+				html`<uui-button look="placeholder" label="Edit item ${index}" .href=${this._modalRouteBuilder?.({ index })}>Add</uui-button>`
+			)}
+		`;
+	}
+```
+
+#### Generate the URL to a Modal Route Registration
+
+The Modal registration has an option to retrive a URL Builder, this is a function that can be used to generate a URL to a modal.
+
+```ts
+const modalLink = _myUrlBuilder?.({ alias: 'my-input-alias' });
+```
+
+The modalLink from above could look like: /umbraco/backoffice/my/location/modal/Our.Modal.SomethingPicker/my-input-alias
+
+Notice the Property Editor registration will add the property alias and variant id to the URL, so it becomes:
+
+/umbraco/backoffice/my/location/modal/Our.Modal.SomethingPicker/my-property-alias/en-us/my-input-alias
+
+#### Open A Modal at own initiative
+
+A modal can be opened by calling the open method on the UmbModalContext. The methods will accept a modal token (or extension alias), an optional dataset, and optional modal options. It returns an instance of UmbModalHandler.
 
 ```ts
 import { html, LitElement } from 'lit';
@@ -53,7 +184,7 @@ class MyElement extends UmbElementMixin(LitElement) {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_ALIAS, (instance) => {
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 			// modalContext is now ready to be used
 		});
@@ -62,7 +193,7 @@ class MyElement extends UmbElementMixin(LitElement) {
 	#onClick() {
 		const data = {'data goes here'};
 		const options {'options go here'};
-		const modalHandler = this.#modalContext?.open(SOME_MODAL_TOKEN), data, options);
+		const modalHandler = this.#modalContext?.open(MY_MODAL_TOKEN), data, options);
 
 		modalHandler?.onSubmit().then((data) => {
 			// if modal submitted, then data is supplied here.

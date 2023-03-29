@@ -3,7 +3,7 @@ import './embedded-media-modal.element';
 
 import { Meta } from '@storybook/web-components';
 import { html } from 'lit';
-import { UmbEmbeddedMediaModalData } from '.';
+import { UmbEmbeddedMediaModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {
 	title: 'API/Modals/Layouts/Embedded Media',

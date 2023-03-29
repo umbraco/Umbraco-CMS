@@ -3,8 +3,7 @@ import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backen
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { createExtensionClass } from 'libs/extensions-api/create-extension-class.function';
+import { umbExtensionsRegistry, createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
