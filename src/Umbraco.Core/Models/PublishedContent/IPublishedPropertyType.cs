@@ -52,6 +52,11 @@ public interface IPublishedPropertyType
     PropertyCacheLevel CacheLevel { get; }
 
     /// <summary>
+    ///     Gets the property cache level for content API representation.
+    /// </summary>
+    PropertyCacheLevel ContentApiCacheLevel { get; }
+
+    /// <summary>
     ///     Gets the property model CLR type.
     /// </summary>
     /// <remarks>

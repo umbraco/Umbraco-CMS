@@ -40,6 +40,7 @@ public class NestedContentValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
         publishedPropertyType.SetupGet(p => p.Alias).Returns("prop1");
         publishedPropertyType.SetupGet(p => p.CacheLevel).Returns(PropertyCacheLevel.Element);
+        publishedPropertyType.SetupGet(p => p.ContentApiCacheLevel).Returns(PropertyCacheLevel.Element);
         publishedPropertyType
             .Setup(p => p.ConvertSourceToInter(It.IsAny<IPublishedElement>(), It.IsAny<object>(), It.IsAny<bool>()))
             .Returns((IPublishedElement owner, object? source, bool preview) => source);

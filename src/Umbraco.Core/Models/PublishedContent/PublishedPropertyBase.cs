@@ -20,6 +20,7 @@ public abstract class PublishedPropertyBase : IPublishedProperty
 
         ValidateCacheLevel(ReferenceCacheLevel, true);
         ValidateCacheLevel(PropertyType.CacheLevel, false);
+        ValidateCacheLevel(PropertyType.ContentApiCacheLevel, false);
     }
 
     /// <summary>

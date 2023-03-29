@@ -52,6 +52,8 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, ICon
         return new HtmlEncodedString(converted ?? string.Empty);
     }
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)

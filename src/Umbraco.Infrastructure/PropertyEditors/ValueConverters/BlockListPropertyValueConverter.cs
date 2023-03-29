@@ -109,6 +109,9 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     }
 
     /// <inheritdoc />
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
+    /// <inheritdoc />
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IEnumerable<ApiBlockListModel>);
 

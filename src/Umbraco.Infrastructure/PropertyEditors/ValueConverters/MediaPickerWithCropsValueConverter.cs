@@ -120,6 +120,8 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
         return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
     }
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMediaWithCrops>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)

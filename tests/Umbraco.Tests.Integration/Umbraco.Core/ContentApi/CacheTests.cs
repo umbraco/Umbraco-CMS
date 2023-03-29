@@ -49,6 +49,7 @@ public class CacheTests
         var propertyType = new Mock<IPublishedPropertyType>();
         var invocationCount = 0;
         propertyType.SetupGet(p => p.CacheLevel).Returns(cacheLevel);
+        propertyType.SetupGet(p => p.ContentApiCacheLevel).Returns(cacheLevel);
         propertyType
             .Setup(p => p.ConvertInterToContentApiObject(It.IsAny<IPublishedElement>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object?>(), It.IsAny<bool>()))
             .Returns(() => $"Content API value: {++invocationCount}");
