@@ -1,5 +1,4 @@
 import type { ManifestBase } from './models';
-import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 
 export interface ManifestTree extends ManifestBase {
 	type: 'tree';
@@ -7,6 +6,5 @@ export interface ManifestTree extends ManifestBase {
 }
 
 export interface MetaTree {
-	storeAlias?: string;
-	repository?: ClassConstructor<unknown>;
+	repositoryAlias: string;
 }

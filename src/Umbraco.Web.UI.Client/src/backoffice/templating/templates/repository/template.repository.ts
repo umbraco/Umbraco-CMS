@@ -8,7 +8,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbTemplateRepository implements UmbTreeRepository, UmbDetailRepository<TemplateResponseModel> {
+export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<TemplateResponseModel> {
 	#init;
 	#host: UmbControllerHostInterface;
 

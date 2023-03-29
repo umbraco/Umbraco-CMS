@@ -1,4 +1,4 @@
-import { UmbContextToken } from '../context-token';
+import { UmbContextToken } from '../token/context-token';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextCallback } from './context-request.event';
 import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';

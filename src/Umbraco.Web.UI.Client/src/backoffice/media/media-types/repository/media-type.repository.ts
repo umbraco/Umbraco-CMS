@@ -7,14 +7,14 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbTreeRepository, RepositoryTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMediaTypeRepository implements UmbTreeRepository {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostInterface;
 
-	#treeSource: RepositoryTreeDataSource;
+	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTypeTreeStore;
 
 	#detailSource: UmbMediaTypeDetailServerDataSource;

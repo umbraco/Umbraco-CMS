@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
-import { UmbContextConsumer } from './consume/context-consumer';
+import { UmbContextConsumer } from '../consume/context-consumer';
+import { UmbContextProvider } from '../provide/context-provider';
 import { UmbContextToken } from './context-token';
-import { UmbContextProvider } from './provide/context-provider';
 
 const testContextAlias = 'my-test-context';
 

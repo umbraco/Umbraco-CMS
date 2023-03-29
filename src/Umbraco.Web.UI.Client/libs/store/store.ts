@@ -9,33 +9,7 @@ export interface UmbDataStore {
 	readonly storeAlias: string;
 }
 
-export interface UmbTreeStore<T> extends UmbDataStore {
-
-	getTreeRoot(): Observable<Array<T>>;
-
-	getTreeItemChildren(key: string): Observable<Array<T>>;
-
-	// Notice: this might not be right to put here as only some content items has ability to be trashed.
-	/**
-	 * @description - Trash data.
-	 * @param {string[]} keys
-	 * @return {*}  {(Promise<void>)}
-	 * @memberof UmbTreeStore
-	 */
-	trash(keys: string[]): Promise<void>;
-
-	// Notice: this might not be right to put here as only some content items has ability to be moved.
-	/**
-	 * @description - Move data.
-	 * @param {string[]} keys
-	 * @return {*}  {(Promise<void>)}
-	 * @memberof UmbTreeStore
-	 */
-	move(keys: string[], destination: string): Promise<void>;
-}
-
 export interface UmbEntityDetailStore<T> extends UmbDataStore {
-
 	/**
 	 * @description - Request scaffold data by entityType and . The data is added to the store and is returned as an Observable.
 	 * @param {string} key
@@ -61,10 +35,7 @@ export interface UmbEntityDetailStore<T> extends UmbDataStore {
 	save(data: T[]): Promise<void>;
 }
 
-
 export interface UmbContentStore<T> extends UmbEntityDetailStore<T> {
-
 	// TODO: make something that is specific for UmbContentStore, or then we should get rid of it. But for now i kept it as we might want this for rollback or other things specific to Content types.
 	save(data: T[]): Promise<void>;
-
 }

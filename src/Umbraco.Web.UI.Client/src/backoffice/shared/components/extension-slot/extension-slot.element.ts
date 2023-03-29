@@ -4,7 +4,11 @@ import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import { createExtensionElement, isManifestElementableType, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import {
+	createExtensionElement,
+	isManifestElementableType,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
@@ -33,6 +37,16 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 	@property({ type: Object, attribute: false })
 	public filter: (manifest: any) => boolean = () => true;
+
+	private _props?: Record<string, any> = {};
+	@property({ type: Object, attribute: false })
+	get props() {
+		return this._props;
+	}
+	set props(newVal) {
+		this._props = newVal;
+		this.#assignPropsToAllComponents();
+	}
 
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement = '';
@@ -77,6 +91,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 							// TODO: Lets make an console.error in this case?
 						}
 						if (component) {
+							this.#assignProps(component);
 							(component as any).manifest = extension;
 							extensionObject.component = component;
 
@@ -94,6 +109,18 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 			}
 		);
 	}
+
+	#assignPropsToAllComponents() {
+		this._extensions.forEach((ext) => this.#assignProps(ext.component));
+	}
+
+	#assignProps = (component: HTMLElement | null) => {
+		if (!component || !this._props) return;
+
+		Object.keys(this._props).forEach((key) => {
+			(component as any)[key] = this._props?.[key];
+		});
+	};
 
 	render() {
 		// TODO: check if we can use repeat directly.

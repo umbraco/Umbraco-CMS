@@ -543,7 +543,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		name: 'All property editors',
 		type: 'document',
 		icon: 'document',
-		hasChildren: true,
+		hasChildren: false,
 	},
 	{
 		$type: 'DocumentTreeItemViewModel',

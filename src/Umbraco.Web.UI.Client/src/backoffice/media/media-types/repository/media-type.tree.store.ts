@@ -1,14 +1,14 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbTreeStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export
  * @class UmbMediaTypeTreeStore
- * @extends {UmbTreeStoreBase}
+ * @extends {UmbEntityTreeStore}
  * @description - Tree Data Store for Media Types
  */
-export class UmbMediaTypeTreeStore extends UmbTreeStoreBase {
+export class UmbMediaTypeTreeStore extends UmbEntityTreeStore {
 	/**
 	 * Creates an instance of UmbMediaTypeTreeStore.
 	 * @param {UmbControllerHostInterface} host
