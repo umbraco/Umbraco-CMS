@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class ContentPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
+public class ContentPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {

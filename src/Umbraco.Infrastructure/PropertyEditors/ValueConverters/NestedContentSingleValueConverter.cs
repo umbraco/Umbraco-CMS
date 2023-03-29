@@ -20,12 +20,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     content.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentSingleValueConverter : NestedContentValueConverterBase, IContentApiPropertyValueConverter
 {
     private readonly IProfilingLogger _proflog;
     private readonly IApiElementBuilder _apiElementBuilder;
 
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V13")]
     public NestedContentSingleValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory,
