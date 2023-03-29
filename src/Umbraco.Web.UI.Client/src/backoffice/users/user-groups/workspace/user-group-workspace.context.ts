@@ -7,7 +7,7 @@ import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserGroupRepository>
+	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupDetails>
 	implements UmbEntityWorkspaceContextInterface<UserGroupDetails | undefined>
 {
 	#manager = new UmbEntityWorkspaceManager<typeof UMB_USER_GROUP_STORE_CONTEXT_TOKEN.TYPE>(

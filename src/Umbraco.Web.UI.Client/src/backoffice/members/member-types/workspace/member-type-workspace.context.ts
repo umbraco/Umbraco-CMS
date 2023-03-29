@@ -8,7 +8,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 type EntityType = any;
 
 export class UmbMemberTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberTypeRepository>
+	extends UmbWorkspaceContext<UmbMemberTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<EntityType | undefined>(undefined);

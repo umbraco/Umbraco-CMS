@@ -8,7 +8,7 @@ import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 type EntityType = DictionaryDetails;
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbWorkspaceContext<UmbDictionaryRepository>
+	extends UmbWorkspaceContext<UmbDictionaryRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<DictionaryDetails | undefined>(undefined);

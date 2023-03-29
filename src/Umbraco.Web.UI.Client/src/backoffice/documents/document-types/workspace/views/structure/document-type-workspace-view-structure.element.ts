@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-type-workspace-view-structure')
 export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement {
@@ -32,8 +33,8 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext<UmbWorkspaceDocumentTypeContext>('umbWorkspaceContext', (documentTypeContext) => {
-			this._workspaceContext = documentTypeContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (documentTypeContext) => {
+			this._workspaceContext = documentTypeContext as UmbWorkspaceDocumentTypeContext;
 			this._observeDocumentType();
 		});
 	}

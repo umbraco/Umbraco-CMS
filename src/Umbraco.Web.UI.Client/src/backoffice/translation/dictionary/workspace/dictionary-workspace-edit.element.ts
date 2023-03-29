@@ -4,6 +4,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-dictionary-workspace-edit')
 export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
@@ -30,8 +31,8 @@ export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbDictionaryWorkspaceContext>('umbWorkspaceContext', (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance as UmbDictionaryWorkspaceContext;
 			this.#observeName();
 		});
 	}

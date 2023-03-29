@@ -5,6 +5,7 @@ import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from 'libs/context-api/token';
 
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
@@ -19,8 +20,8 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext<UmbDataTypeWorkspaceContext>('umbWorkspaceContext', (dataTypeContext) => {
-			this._workspaceContext = dataTypeContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (dataTypeContext) => {
+			this._workspaceContext = dataTypeContext as UmbDataTypeWorkspaceContext;
 			this._observeDataType();
 		});
 	}

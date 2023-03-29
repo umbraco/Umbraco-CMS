@@ -13,6 +13,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from 'libs/context-api/token';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
@@ -55,8 +56,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
 		});
 
 		// TODO: Figure out if this is the best way to consume a context or if it could be strongly typed using UmbContextToken
-		this.consumeContext<UmbDataTypeWorkspaceContext>('umbWorkspaceContext', (_instance) => {
-			this._workspaceContext = _instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (_instance) => {
+			this._workspaceContext = _instance as UmbDataTypeWorkspaceContext;
 			this._observeDataType();
 		});
 	}

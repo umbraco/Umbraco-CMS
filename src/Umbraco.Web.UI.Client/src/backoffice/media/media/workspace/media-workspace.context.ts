@@ -7,7 +7,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = MediaDetails;
 export class UmbMediaWorkspaceContext
-	extends UmbWorkspaceContext<UmbMediaRepository>
+	extends UmbWorkspaceContext<UmbMediaRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<EntityType | undefined>(undefined);

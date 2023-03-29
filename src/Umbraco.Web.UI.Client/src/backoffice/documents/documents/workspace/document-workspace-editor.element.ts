@@ -4,13 +4,13 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '../../../shared/components/workspace/workspace-context/entity-workspace-context.token';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
 import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {

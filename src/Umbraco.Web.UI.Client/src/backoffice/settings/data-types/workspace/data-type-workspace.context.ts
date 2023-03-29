@@ -6,7 +6,7 @@ import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observ
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDataTypeRepository>
+	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
 	implements UmbEntityWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	#data = new ObjectState<DataTypeResponseModel | undefined>(undefined);

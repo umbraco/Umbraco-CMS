@@ -7,7 +7,7 @@ import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 
 type EntityType = MediaTypeDetails;
 export class UmbWorkspaceMediaTypeContext
-	extends UmbWorkspaceContext<UmbMediaTypeRepository>
+	extends UmbWorkspaceContext<UmbMediaTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<MediaTypeDetails | undefined>(undefined);

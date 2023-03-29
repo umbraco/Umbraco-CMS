@@ -7,7 +7,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbWorkspaceDocumentTypeContext
-	extends UmbWorkspaceContext<UmbDocumentTypeRepository>
+	extends UmbWorkspaceContext<UmbDocumentTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	// Draft is located in structure manager

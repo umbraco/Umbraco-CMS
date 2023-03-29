@@ -7,7 +7,7 @@ import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MemberGroupDetails;
 export class UmbWorkspaceMemberGroupContext
-	extends UmbWorkspaceContext<UmbMemberGroupRepository>
+	extends UmbWorkspaceContext<UmbMemberGroupRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<EntityType | undefined>(undefined);

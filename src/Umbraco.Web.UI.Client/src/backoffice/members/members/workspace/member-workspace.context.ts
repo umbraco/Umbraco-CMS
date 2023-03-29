@@ -5,7 +5,7 @@ import type { MemberDetails } from '@umbraco-cms/backoffice/models';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbMemberWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberRepository>
+	extends UmbWorkspaceContext<UmbMemberRepository, MemberDetails>
 	implements UmbEntityWorkspaceContextInterface<MemberDetails | undefined>
 {
 	constructor(host: UmbControllerHostInterface) {

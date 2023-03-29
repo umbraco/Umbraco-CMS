@@ -14,7 +14,7 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentRepository>
+	extends UmbWorkspaceContext<UmbDocumentRepository, EntityType>
 	implements UmbWorkspaceVariableEntityContextInterface<EntityType | undefined>
 {
 	/**

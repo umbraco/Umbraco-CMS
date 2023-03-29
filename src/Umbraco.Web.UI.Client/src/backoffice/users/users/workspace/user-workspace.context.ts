@@ -7,7 +7,7 @@ import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbUserWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserRepository>
+	extends UmbWorkspaceContext<UmbUserRepository, UserDetails>
 	implements UmbEntityWorkspaceContextInterface<UserDetails | undefined>
 {
 	#manager = new UmbEntityWorkspaceManager<typeof UMB_USER_STORE_CONTEXT_TOKEN.TYPE>(

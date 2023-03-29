@@ -7,7 +7,7 @@ import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbRelationTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbRelationTypeRepository>
+	extends UmbWorkspaceContext<UmbRelationTypeRepository, RelationTypeResponseModel>
 	implements UmbEntityWorkspaceContextInterface<RelationTypeResponseModel | undefined>
 {
 	#data = new ObjectState<RelationTypeResponseModel | undefined>(undefined);

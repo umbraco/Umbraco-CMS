@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceMemberGroupContext } from '../../member-group-workspace.context';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-workspace-view-member-group-info')
 export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
@@ -40,8 +41,8 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext<UmbWorkspaceMemberGroupContext>('umbWorkspaceContext', (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance as UmbWorkspaceMemberGroupContext;
 			this.#observeMemberGroup();
 		});
 	}

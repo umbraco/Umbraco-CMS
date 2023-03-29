@@ -12,6 +12,7 @@ import type { UmbEntityWorkspaceContextInterface } from '../../../workspace-cont
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
@@ -27,7 +28,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 	public manifest!: ManifestWorkspaceViewCollection;
 
-	private _workspaceContext?: UmbEntityWorkspaceContextInterface;
+	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 
 	// TODO: add type for the collection context.
 	private _collectionContext?: UmbCollectionContext<FolderTreeItemResponseModel>;
@@ -36,7 +37,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbEntityWorkspaceContextInterface>('umbWorkspaceContext', (nodeContext) => {
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (nodeContext) => {
 			this._workspaceContext = nodeContext;
 			this._provideWorkspace();
 		});
