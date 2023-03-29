@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '../../../shared/components/workspace/workspace-context/entity-workspace-context.token';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
@@ -44,8 +45,8 @@ export class UmbDocumentWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (instance: UmbDocumentWorkspaceContext) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance as UmbDocumentWorkspaceContext;
 			this.#observeVariants();
 			this.#observeSplitViews();
 		});
