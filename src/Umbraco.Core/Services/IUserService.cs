@@ -61,7 +61,7 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
-    Task<UserOperationStatus> SetAvatarAsync(IUser user, Guid temporaryFileKey);
+    Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 
     Task<UserOperationStatus> DeleteAsync(Guid key);
 

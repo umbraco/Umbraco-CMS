@@ -827,9 +827,16 @@ internal class UserService : RepositoryService, IUserService
             : Attempt.FailWithStatus(saveStatus, model.ExistingUser);
     }
 
-    public async Task<UserOperationStatus> SetAvatarAsync(IUser user, Guid temporaryFileKey)
+    public async Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? user = await GetAsync(userKey);
+        if (user is null)
+        {
+            return UserOperationStatus.UserNotFound;
+        }
+
         TemporaryFileModel? avatarTemporaryFile = await _temporaryFileService.GetAsync(temporaryFileKey);
         _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey, ScopeProvider);
 
