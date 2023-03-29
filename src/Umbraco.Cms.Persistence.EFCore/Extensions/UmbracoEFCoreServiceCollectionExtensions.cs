@@ -49,7 +49,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IAmbientEfCoreScopeStack, AmbientEfCoreScopeStack>();
         services.AddUnique<IEFCoreScopeAccessor, EFCoreScopeAccessor>();
         services.AddUnique<IEfCoreScopeProvider, EfCoreScopeProvider>();
-        services.AddUnique<IHttpEFCoreScopeReference, HttpEFCoreScopeReference>();
         services.AddUnique<IAmbientEFCoreScopeContextStack, AmbientEFCoreScopeContextStack>();
         services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
         services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();

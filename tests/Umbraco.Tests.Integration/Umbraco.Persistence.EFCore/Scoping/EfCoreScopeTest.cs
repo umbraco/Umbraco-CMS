@@ -548,37 +548,6 @@ public class EfCoreScopeTest : UmbracoIntegrationTest
         Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
     }
 
-    [Test]
-    public void ScopeReference()
-    {
-        IEfCoreScope scope = EfCoreScopeProvider.CreateScope();
-        IEfCoreScope nested = EfCoreScopeProvider.CreateScope();
-
-        Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
-
-        var scopeRef = new HttpEFCoreScopeReference(EfCoreScopeAccessor);
-        scopeRef.Register();
-        scopeRef.Dispose();
-
-        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-
-        Assert.ThrowsAsync<InvalidOperationException>(async () =>
-        {
-            await scope.ExecuteWithContextAsync<Task>(async db =>
-            {
-                await db.Database.CanConnectAsync();
-            });
-        });
-
-        Assert.ThrowsAsync<InvalidOperationException>(async () =>
-        {
-            await nested.ExecuteWithContextAsync<Task>(async db =>
-            {
-                await db.Database.CanConnectAsync();
-            });
-        });
-    }
-
     [TestCase(true)]
     [TestCase(false)]
     public void ScopeContextEnlist(bool complete)
