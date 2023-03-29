@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 
 /**
  * @element umb-member-group-edit-workspace

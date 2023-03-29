@@ -40,9 +40,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 			}
 
 			#router-slot {
-				display:flex;
-				flex-direction:column;
-				height:100%;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
 			}
 
 			uui-input {

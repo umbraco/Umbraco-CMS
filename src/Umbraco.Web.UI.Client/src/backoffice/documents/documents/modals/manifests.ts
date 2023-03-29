@@ -7,6 +7,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Document Picker Modal',
 		loader: () => import('./document-picker/document-picker-modal.element'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.DocumentTypePicker',
+		name: 'Document Type Picker Modal',
+		loader: () => import('./document-type-picker/document-type-picker-modal.element'),
+	},
 ];
 
 export const manifests = [...modals];
