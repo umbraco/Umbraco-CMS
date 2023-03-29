@@ -94,7 +94,7 @@ export default MyTreeItemElement;
 ```typescript
 // TODO: auto generate this from the interface
 export interface UmbTreeItemContext<T> {
-	host: UmbControllerHostInterface;
+	host: UmbControllerHostElement;
 	unique?: string;
 	type?: string;
 
@@ -127,7 +127,7 @@ We provide a base class for the tree item context. This class provides some defa
 
 ```typescript
 export class UmbMyTreeItemContext extends UmbTreeItemContextBase<MyTreeItemDataModel> {
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, (x: MyTreeItemDataModel) => x.unique);
 	}
 

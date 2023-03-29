@@ -15,8 +15,8 @@ class MyProductStore {
 
 	public readonly products = this.#products.asObservable();
 
-	protected host: UmbControllerHostInterface;
-	constructor(host: UmbControllerHostInterface) {
+	protected host: UmbControllerHostElement;
+	constructor(host: UmbControllerHostElement) {
 		this.host = host;
 
 		// The Store provides it self as a Context-API.

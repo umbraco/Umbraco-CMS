@@ -11,10 +11,10 @@ export interface UmbLanguagePickerModalResult {
 	selection: Array<string>;
 }
 
-export const UMB_LANGUAGE_PICKER_MODAL_TOKEN = new UmbModalToken<
-	UmbLanguagePickerModalData,
-	UmbLanguagePickerModalResult
->('Umb.Modal.LanguagePicker', {
-	type: 'sidebar',
-	size: 'small',
-});
+export const UMB_LANGUAGE_PICKER_MODAL = new UmbModalToken<UmbLanguagePickerModalData, UmbLanguagePickerModalResult>(
+	'Umb.Modal.LanguagePicker',
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);

@@ -1,8 +1,7 @@
 import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentStore } from './document.store';
 import { UmbDocumentTreeStore } from './document.tree.store';
-import { ManifestRepository } from 'libs/extensions-registry/repository.models';
-import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const DOCUMENT_REPOSITORY_ALIAS = 'Umb.Repository.Document';
 

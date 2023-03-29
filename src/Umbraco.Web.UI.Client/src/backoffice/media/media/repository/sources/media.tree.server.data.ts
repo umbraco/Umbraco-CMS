@@ -1,6 +1,6 @@
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel, MediaResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -10,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {MediaTreeDataSource}
  */
 export class MediaTreeServerDataSource implements UmbTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
 	async trashItems(keys: Array<string>) {
@@ -43,10 +43,10 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Creates an instance of MediaTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof MediaTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 

@@ -26,7 +26,7 @@ export type UmbEmbeddedMediaModalResult = {
 	selection: OEmbedResult;
 };
 
-export const UMB_EMBEDDED_MEDIA_MODAL_TOKEN = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>(
+export const UMB_EMBEDDED_MEDIA_MODAL = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult>(
 	'Umb.Modal.EmbeddedMedia',
 	{
 		type: 'sidebar',

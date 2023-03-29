@@ -3,13 +3,13 @@ import { manifests } from './manifests';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
 export class UmbThemeContext {
-	private _host: UmbControllerHostInterface;
+	private _host: UmbControllerHostElement;
 
 	#theme = new StringState('umb-light-theme');
 	public readonly theme = this.#theme.asObservable();
@@ -18,7 +18,7 @@ export class UmbThemeContext {
 
 	#styleElement: HTMLLinkElement | HTMLStyleElement | null = null;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this._host = host;
 
 		new UmbContextProviderController(host, UMB_THEME_CONTEXT_TOKEN, this);

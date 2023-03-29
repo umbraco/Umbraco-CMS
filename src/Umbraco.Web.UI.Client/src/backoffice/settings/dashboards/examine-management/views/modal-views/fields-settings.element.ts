@@ -1,7 +1,7 @@
 import { html, css } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbCreateDocumentModalResultData, UmbExamineFieldsSettingsModalData } from '.';
+import { UmbCreateDocumentModalResultData, UmbExamineFieldsSettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-examine-fields-settings-modal')

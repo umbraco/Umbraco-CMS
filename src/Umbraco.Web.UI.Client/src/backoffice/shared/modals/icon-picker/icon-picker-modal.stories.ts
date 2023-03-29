@@ -5,7 +5,7 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
 import type { UmbIconPickerModalElement } from './icon-picker-modal.element';
-import { UmbIconPickerModalData } from '.';
+import { UmbIconPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {
 	title: 'API/Modals/Layouts/Icon Picker',

@@ -1,20 +1,20 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store';
 import { MemberTreeServerDataSource } from './sources/member.tree.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMemberRepository implements UmbTreeRepository {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 	#dataSource: MemberTreeServerDataSource;
 	#treeStore?: UmbMemberTreeStore;
 	#notificationContext?: UmbNotificationContext;
 	#initResolver?: () => void;
 	#initialized = false;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		// TODO: figure out how spin up get the correct data source
 		this.#dataSource = new MemberTreeServerDataSource(this.#host);

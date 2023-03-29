@@ -2,8 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui-button';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { HealthStatusModel, IndexResponseModel, IndexerResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -118,7 +117,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private async _onRebuildHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: `Rebuild ${this.indexName}`,
 			content: html`
 				This will cause the index to be rebuilt.<br />

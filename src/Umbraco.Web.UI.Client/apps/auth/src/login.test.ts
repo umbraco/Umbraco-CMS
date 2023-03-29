@@ -1,16 +1,16 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-import UmbLogin from './login.element';
+import UmbLoginElement from './login.element';
 
 describe('UmbLogin', () => {
-	let element: UmbLogin;
+	let element: UmbLoginElement;
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-login></umb-login>`);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbLogin);
+		expect(element).to.be.instanceOf(UmbLoginElement);
 	});
 
 	it('passes the a11y audit', async () => {

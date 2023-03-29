@@ -1,14 +1,14 @@
 import { Subject, takeUntil } from 'rxjs';
 import { UmbPackageRepository } from './package.repository';
-import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 export class UmbServerExtensionController extends UmbController {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 	#unobserve = new Subject<void>();
 	#repository: UmbPackageRepository;
 
-	constructor(host: UmbControllerHostInterface, private readonly extensionRegistry: UmbExtensionRegistry) {
+	constructor(host: UmbControllerHostElement, private readonly extensionRegistry: UmbExtensionRegistry) {
 		super(host, UmbServerExtensionController.name);
 		this.#host = host;
 		this.#repository = new UmbPackageRepository(host);

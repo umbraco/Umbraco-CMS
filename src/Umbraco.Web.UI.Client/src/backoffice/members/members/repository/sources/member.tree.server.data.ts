@@ -1,5 +1,5 @@
 import { MemberTreeDataSource } from '.';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * A data source for the Member tree that fetches data from the server
@@ -8,14 +8,14 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
  * @implements {MemberTreeDataSource}
  */
 export class MemberTreeServerDataSource implements MemberTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of MemberTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof MemberTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
