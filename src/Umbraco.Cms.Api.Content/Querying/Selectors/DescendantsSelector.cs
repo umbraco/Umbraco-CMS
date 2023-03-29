@@ -1,5 +1,3 @@
-using System;
-using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -19,12 +17,15 @@ internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(DescendantsSpecifier, StringComparison.OrdinalIgnoreCase);
 
-    /// <inheritdoc />
-    public IBooleanOperation? BuildSelectorIndexQuery(IQuery query, string queryString)
+    public SelectorOption BuildSelectorOption(string selectorValueString)
     {
-        var fieldValue = queryString.Substring(DescendantsSpecifier.Length);
+        var fieldValue = selectorValueString.Substring(DescendantsSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
 
-        return query.Field("ancestorKeys", id.ToString());
+        return new SelectorOption
+        {
+            FieldName = "ancestorKeys",
+            Value = id.ToString() ?? string.Empty
+        };
     }
 }

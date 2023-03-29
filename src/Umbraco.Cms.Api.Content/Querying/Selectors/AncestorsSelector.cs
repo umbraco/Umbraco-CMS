@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -22,10 +18,9 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(AncestorsSpecifier, StringComparison.OrdinalIgnoreCase);
 
-    /// <inheritdoc />
-    public IBooleanOperation? BuildSelectorIndexQuery(IQuery query, string queryString)
+    public SelectorOption? BuildSelectorOption(string selectorValueString)
     {
-        var fieldValue = queryString.Substring(AncestorsSpecifier.Length);
+        var fieldValue = selectorValueString.Substring(AncestorsSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
 
         if (id is null ||
@@ -39,6 +34,10 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         IPublishedContent contentItem = publishedSnapshot.Content.GetById((Guid)id)!; // so it can't be null
         IEnumerable<Guid> ancestorKeys = contentItem.Ancestors().Select(a => a.Key);
 
-        return query.Field("id", string.Join(" ", ancestorKeys)); // Look for any documents that have either of the ids
+        return new SelectorOption
+        {
+            FieldName = "id",
+            Value = string.Join(" ", ancestorKeys)
+        };
     }
 }

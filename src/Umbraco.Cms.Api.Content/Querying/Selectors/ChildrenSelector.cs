@@ -1,5 +1,3 @@
-using System;
-using Examine.Search;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -18,12 +16,15 @@ internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(ChildrenSpecifier, StringComparison.OrdinalIgnoreCase);
 
-    /// <inheritdoc />
-    public IBooleanOperation? BuildSelectorIndexQuery(IQuery query, string queryString)
+    public SelectorOption BuildSelectorOption(string selectorValueString)
     {
-        var fieldValue = queryString.Substring(ChildrenSpecifier.Length);
+        var fieldValue = selectorValueString.Substring(ChildrenSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
 
-        return query.Field("parentKey", id.ToString());
+        return new SelectorOption
+        {
+            FieldName = "parentKey",
+            Value = id.ToString() ?? string.Empty
+        };
     }
 }
