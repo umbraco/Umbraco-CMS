@@ -98,6 +98,8 @@ public class NestedContentSingleValueConverter : NestedContentValueConverterBase
         }
     }
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)

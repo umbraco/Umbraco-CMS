@@ -39,6 +39,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
 
+        public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
         public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(ApiBlockGridModel);
 

@@ -96,6 +96,8 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase, IConten
         return inter.ToString();
     }
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
