@@ -271,7 +271,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// set the default values that will not be modified via configuration
 		const tinyConfig: { [key: string]: any } = {
 			autoresize_bottom_margin: 10,
-			base_url: '/public-assets/tiny-mce',
+			base_url: '/tinymce',
 			body_class: 'umb-rte',
 			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
 			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster,

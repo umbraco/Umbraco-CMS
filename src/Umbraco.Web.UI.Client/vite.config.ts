@@ -19,10 +19,6 @@ export default defineConfig({
 					dest: 'App_Plugins',
 				},
 				{
-					src: 'public-assets/tiny-mce/**.*',
-					dest: 'tiny-mce',
-				},
-				{
 					src: 'public-assets/css/*.css',
 					dest: 'css',
 				}

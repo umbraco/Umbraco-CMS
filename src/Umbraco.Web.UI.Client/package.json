@@ -53,7 +53,9 @@
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile vscode-html-custom-data.json",
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
-		"check": "npm run lint && npm run compile && npm run build-storybook"
+		"check": "npm run lint && npm run compile && npm run build-storybook",
+		"postinstall": "npm run generate:tinymce",
+		"generate:tinymce": "node ./devops/tinymce/index.js"
 	},
 	"engines": {
 		"node": ">=18.14 <19",
@@ -101,6 +103,7 @@
 		"@web/test-runner": "^0.15.0",
 		"@web/test-runner-playwright": "^0.9.0",
 		"babel-loader": "^9.1.2",
+		"clean-css": "^5.3.2",
 		"eslint": "^8.32.0",
 		"eslint-config-prettier": "^8.6.0",
 		"eslint-import-resolver-typescript": "^3.5.3",
@@ -125,6 +128,7 @@
 		"storybook": "^7.0.0-rc.3",
 		"tiny-glob": "^0.2.9",
 		"typescript": "^4.9.5",
+		"uglify-js": "^3.17.4",
 		"vite": "^4.1.4",
 		"vite-plugin-static-copy": "^0.13.0",
 		"vite-tsconfig-paths": "^4.0.5",
