@@ -65,6 +65,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#modalRouter.parent = this.#router;
+		this.#modalRouter.style.display = 'none';
 		this.#router.addEventListener('changestate', this._updateRouterPath.bind(this));
 		//this.#router.appendChild(this.#modalRouter);
 		this.#router.appendChild(document.createElement('slot'));
