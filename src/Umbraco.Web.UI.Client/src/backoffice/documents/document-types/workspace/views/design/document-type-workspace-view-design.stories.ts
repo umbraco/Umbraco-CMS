@@ -1,4 +1,4 @@
-import './workspace-view-document-type-design.element';
+import './document-type-workspace-view-design.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
@@ -6,12 +6,12 @@ import { html } from 'lit';
 //import { data } from '../../../../../core/mocks/data/document-type.data';
 //import { UmbDocumentTypeContext } from '../../document-type.context';
 
-import type { UmbWorkspaceViewDocumentTypeDesignElement } from './workspace-view-document-type-design.element';
+import type { UmbDocumentTypeWorkspaceViewDesignElement } from './document-type-workspace-view-design.element';
 
 export default {
 	title: 'Workspaces/Document Type/Views/Design',
-	component: 'umb-workspace-view-document-type-design',
-	id: 'umb-workspace-view-document-type-design',
+	component: 'umb-document-type-workspace-view-design',
+	id: 'umb-document-type-workspace-view-design',
 	decorators: [
 		(story) => {
 			return html`TODO: make use of mocked workspace context??`;
@@ -22,6 +22,6 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceViewDocumentTypeDesignElement> = () =>
-	html` <umb-workspace-view-document-type-design></umb-workspace-view-document-type-design>`;
+export const AAAOverview: Story<UmbDocumentTypeWorkspaceViewDesignElement> = () =>
+	html` <umb-document-type-workspace-view-design></umb-document-type-workspace-view-design>`;
 AAAOverview.storyName = 'Overview';

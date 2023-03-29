@@ -5,20 +5,21 @@ import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.c
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-workspace-view-document-type-permissions')
-export class UmbWorkspaceViewDocumentTypePermissionsElement extends UmbLitElement {
+@customElement('umb-document-type-workspace-view-structure')
+export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				display: block;
+			uui-box {
 				margin: var(--uui-size-layout-1);
 			}
+
 			uui-label,
 			umb-property-editor-ui-number {
 				display: block;
 			}
 
+			// TODO: is this necessary?
 			uui-toggle {
 				display: flex;
 			}
@@ -50,7 +51,7 @@ export class UmbWorkspaceViewDocumentTypePermissionsElement extends UmbLitElemen
 
 	render() {
 		return html`
-			<uui-box headline="Permissions">
+			<uui-box headline="Structure">
 				<umb-workspace-property-layout alias="Root" label="Allow as Root">
 					<div slot="description">Allow editors to create content of this type in the root of the content tree.</div>
 					<div slot="editor"><uui-toggle label="Allow as root"></uui-toggle></div>
@@ -64,37 +65,24 @@ export class UmbWorkspaceViewDocumentTypePermissionsElement extends UmbLitElemen
 							.currentDocumentType="${this._documentType}"></umb-input-document-type-picker>
 					</div>
 				</umb-workspace-property-layout>
-				<umb-workspace-property-layout alias="VaryByNature" label="Allow vary by culture">
-					<div slot="description">Allow editors to create content of different languages.</div>
-					<div slot="editor"><uui-toggle label="Vary by culture"></uui-toggle></div>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout alias="ElementType" label="Is an Element Type">
+			</uui-box>
+			<uui-box headline="Presentation">
+				<umb-workspace-property-layout alias="Root" label="Collection">
 					<div slot="description">
-						An Element Type is meant to be used for instance in Nested Content, and not in the tree.<br />
-						A Document Type cannot be changed to an Element Type once it has been used to create one or more content
-						items.
+						Use this document as a collection, displaying its children in a Collection View. This could be a list or a
+						table.
 					</div>
-					<div slot="editor"><uui-toggle label="Element type"></uui-toggle></div>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout alias="HistoryCleanup" label="History cleanup">
-					<div slot="description">Allow overriding the global history cleanup settings.</div>
-					<div slot="editor">
-						<uui-toggle .checked="${true}" label="Auto cleanup"></uui-toggle>
-						<uui-label for="versions-newer-than-days">Keep all versions newer than days</uui-label>
-						<umb-property-editor-ui-number id="versions-newer-than-days"></umb-property-editor-ui-number>
-						<uui-label for="latest-version-per-day-days">Keep latest version per day for days</uui-label>
-						<umb-property-editor-ui-number id="latest-version-per-day-days"></umb-property-editor-ui-number>
-					</div>
+					<div slot="editor"><uui-toggle label="Present as a Collection"></uui-toggle></div>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;
 	}
 }
 
-export default UmbWorkspaceViewDocumentTypePermissionsElement;
+export default UmbDocumentTypeWorkspaceViewStructureElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-document-type-permissions': UmbWorkspaceViewDocumentTypePermissionsElement;
+		'umb-document-type-workspace-view-structure': UmbDocumentTypeWorkspaceViewStructureElement;
 	}
 }

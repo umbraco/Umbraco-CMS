@@ -5,8 +5,8 @@ import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.c
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-workspace-view-document-type-templates')
-export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement {
+@customElement('umb-document-type-workspace-view-templates')
+export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -82,10 +82,10 @@ export class UmbWorkspaceViewDocumentTypeTemplatesElement extends UmbLitElement 
 	}
 }
 
-export default UmbWorkspaceViewDocumentTypeTemplatesElement;
+export default UmbDocumentTypeWorkspaceViewTemplatesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-document-type-templates': UmbWorkspaceViewDocumentTypeTemplatesElement;
+		'umb-document-type-workspace-view-templates': UmbDocumentTypeWorkspaceViewTemplatesElement;
 	}
 }
