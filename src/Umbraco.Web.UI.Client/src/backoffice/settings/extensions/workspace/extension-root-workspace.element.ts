@@ -1,19 +1,20 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
 import { isManifestElementNameType, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
-	static styles = [css`
-		uui-box {
-			margin: var(--uui-size-layout-1);
-		}
-	`]
+	static styles = [
+		css`
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 
 	@state()
 	private _extensions?: Array<ManifestTypes> = undefined;
@@ -50,7 +51,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 	}
 
 	async #removeExtension(extension: ManifestTypes) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Unload extension',
 			confirmLabel: 'Unload',
 			content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,

@@ -1,0 +1,57 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Extending the Backoffice/Modals/Intro" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Modals
+
+// TODO: add description about what modals is
+
+- Sidebar
+- Infinite Editors
+- Dialogs
+
+## Define a Manifest for a Modal Type
+
+### Manifest
+
+```json
+{
+	"type": "modal",
+	"alias": "Our.Modal.SomethingPicker",
+	"name": "My Something Picker Modal",
+	"loader": "./my-something-picker-modal-element.js",
+},
+```
+
+## Implement a Modal
+
+### Modal Token
+
+For type safety we recommend that you make a Modal Token, Its posible to go without.
+The Modal Token binds the Modal Type to the Modal Data Type and Modal Result Type.
+
+``
+
+```ts
+import { ModalToken } from '@umbraco-cms/element';
+
+export type OurSomethingPickerModalData = {
+	key: string | null;
+};
+
+export type OurSomethingPickerModalResult = {
+	key: string;
+};
+
+export const MY_SOMETHING_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalResult>(
+	'Our.Modal.SomethingPicker',
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);
+```
+
+### Make a modal registration
+
+# TODO Link to modal documentation here.

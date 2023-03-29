@@ -1,3 +1,4 @@
+import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository/tree-repository.interface';
 import type { MediaDetails } from '../';
 import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
@@ -9,13 +10,10 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
 type ItemDetailType = MediaDetails;
 
 export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepository<ItemDetailType> {
-	#init!: Promise<unknown>;
-
 	#host: UmbControllerHostInterface;
 
 	#treeSource: UmbTreeDataSource;
@@ -26,6 +24,9 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 
 	#notificationContext?: UmbNotificationContext;
 
+	#initResolver?: () => void;
+	#initialized = false;
+
 	constructor(host: UmbControllerHostInterface) {
 		this.#host = host;
 
@@ -33,19 +34,32 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		this.#treeSource = new MediaTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbMediaDetailServerDataSource(this.#host);
 
-		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#treeStore = instance;
-			}),
+		new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#treeStore = instance;
+			this.#checkIfInitialized();
+		});
 
-			new UmbContextConsumerController(this.#host, UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#store = instance;
-			}),
+		new UmbContextConsumerController(this.#host, UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#store = instance;
+			this.#checkIfInitialized();
+		});
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-				this.#notificationContext = instance;
-			}),
-		]);
+		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.#notificationContext = instance;
+			this.#checkIfInitialized();
+		});
+	}
+
+	// TODO: make a generic way to wait for initialization
+	#init = new Promise<void>((resolve) => {
+		this.#initialized ? resolve() : (this.#initResolver = resolve);
+	});
+
+	#checkIfInitialized() {
+		if (this.#treeStore && this.#store && this.#notificationContext) {
+			this.#initialized = true;
+			this.#initResolver?.();
+		}
 	}
 
 	async requestRootTreeItems() {

@@ -1,4 +1,5 @@
 import { map } from 'rxjs';
+import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry/entity-action.models';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
@@ -15,7 +16,6 @@ import {
 } from '@umbraco-cms/backoffice/context-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
 
 // add type for unique function
 export type UmbTreeItemUniqueFunction<T extends TreeItemPresentationModel> = (x: T) => string | null | undefined;

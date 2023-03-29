@@ -2,15 +2,18 @@ import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-ui
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../property-editors/modals/property-editor-ui-picker';
-import { UmbPropertySettingsModalResult } from '.';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
+	UmbPropertySettingsModalResult,
+} from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-property-settings-modal')
-export class UmbPropertySettingsModalElement extends UmbModalBaseElement<undefined, UmbPropertySettingsModalResult> {
+export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object, UmbPropertySettingsModalResult> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -261,7 +264,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<undefin
 	}
 
 	#onOpenPropertyEditorUIPicker() {
-		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN, {
+		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 			selection: [],
 		});
 

@@ -1,5 +1,6 @@
 export * from './observer.controller';
 export * from './observer';
+export * from './basic-state';
 export * from './boolean-state';
 export * from './number-state';
 export * from './string-state';

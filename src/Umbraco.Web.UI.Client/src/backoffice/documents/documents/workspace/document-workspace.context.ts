@@ -45,6 +45,18 @@ export class UmbDocumentWorkspaceContext
 		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
 
 		new UmbObserverController(this.host, this.documentTypeKey, (key) => this.structure.loadType(key));
+
+		/*
+		TODO: Concept for ensure variant values:
+		new UmbObserverController(this.host, this.variants, (variants) => {
+			if (!variants) return;
+			const draft = this.#draft.getValue();
+			if (!draft) return;
+
+			// Gather all properties from all document types.
+			// Loop through all properties for each variant and insert missing value objects.
+		}
+		*/
 	}
 
 	async load(entityKey: string) {
