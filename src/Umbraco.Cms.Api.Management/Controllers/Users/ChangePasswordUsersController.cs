@@ -23,18 +23,11 @@ public class ChangePasswordUsersController : UsersControllerBase
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
     {
-        IUser? existingUser = await _userService.GetAsync(id);
-
-        if (existingUser is null)
-        {
-            return NotFound();
-        }
-
-        var passwordModel = new ChangeBackOfficeUserPasswordModel
+        var passwordModel = new ChangeUserPasswordModel
         {
             NewPassword = model.NewPassword,
             OldPassword = model.OldPassword,
-            User = existingUser,
+            UserKey = id,
         };
 
         // FIXME: use the actual currently logged in user key

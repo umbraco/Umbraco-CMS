@@ -933,29 +933,41 @@ internal class UserService : RepositoryService, IUserService
         return keys;
     }
 
-    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackOfficeUserPasswordModel model)
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
-        IUser? performingUser = await GetAsync(performingUserKey);
+        IUser? user = await userStore.GetAsync(model.UserKey);
+        if (user is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
+        }
+
+        IUser? performingUser = await userStore.GetAsync(performingUserKey);
         if (performingUser is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
         }
 
-        if (performingUser.Username == model.User.Username && string.IsNullOrEmpty(model.OldPassword))
+        if (performingUser.Username == user.Username && string.IsNullOrEmpty(model.OldPassword))
         {
             return Attempt.FailWithStatus(UserOperationStatus.OldPasswordRequired, new PasswordChangedModel());
         }
 
-        if (performingUser.IsAdmin() is false && model.User.IsAdmin())
+        if (performingUser.IsAdmin() is false && user.IsAdmin())
         {
             return Attempt.FailWithStatus(UserOperationStatus.Forbidden, new PasswordChangedModel());
         }
 
         IBackOfficePasswordChanger passwordChanger = serviceScope.ServiceProvider.GetRequiredService<IBackOfficePasswordChanger>();
-        Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackOfficePassword(model);
+        Attempt<PasswordChangedModel?> result = await passwordChanger.ChangeBackOfficePassword(new ChangeBackOfficeUserPasswordModel
+        {
+            NewPassword = model.NewPassword,
+            OldPassword = model.OldPassword,
+            User = user,
+        });
 
         if (result.Success is false)
         {

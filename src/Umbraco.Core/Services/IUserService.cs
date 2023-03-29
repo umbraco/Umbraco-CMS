@@ -71,7 +71,7 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
 
-    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackOfficeUserPasswordModel model);
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model);
 
     Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
 
