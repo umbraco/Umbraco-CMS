@@ -178,6 +178,7 @@ export class UmbDocumentWorkspaceContext
 
 	public destroy(): void {
 		this.#draft.complete();
+		this.structure.destroy();
 	}
 }
 

@@ -4,16 +4,15 @@ import { UmbDocumentTypeRepository } from '../repository/document-type.repositor
 import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbWorkspaceDocumentTypeContext
 	extends UmbWorkspaceContext<UmbDocumentTypeRepository>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
-	#draft = new ObjectState<EntityType | undefined>(undefined);
-	data = this.#draft.asObservable();
-	name = this.#draft.getObservablePart((data) => data?.name);
+	// Draft is located in structure manager
+	readonly data;
+	readonly name;
 
 	readonly structure;
 
@@ -21,6 +20,8 @@ export class UmbWorkspaceDocumentTypeContext
 		super(host, new UmbDocumentTypeRepository(host));
 
 		this.structure = new UmbWorkspacePropertyStructureManager(this.host, this.repository);
+		this.data = this.structure.rootDocumentType;
+		this.name = this.structure.rootDocumentTypeObservablePart((data) => data?.name);
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
@@ -28,11 +29,11 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	getData() {
-		return this.#draft.getValue();
+		return this.structure.getRootDocumentType() || {};
 	}
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData().key;
 	}
 
 	getEntityType() {
@@ -40,12 +41,12 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	setName(name: string) {
-		this.#draft.update({ name });
+		this.structure.updateRootDocumentType({ name });
 	}
 
 	// TODO => manage setting icon color
 	setIcon(icon: string) {
-		this.#draft.update({ icon });
+		this.structure.updateRootDocumentType({ icon });
 	}
 
 	async createScaffold(documentTypeKey: string) {
@@ -67,11 +68,10 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	async save() {
-		if (!this.#draft.value) return;
-		this.repository.save(this.#draft.value);
+		this.repository.save(this.getData());
 	}
 
 	public destroy(): void {
-		this.#draft.complete();
+		this.structure.destroy();
 	}
 }

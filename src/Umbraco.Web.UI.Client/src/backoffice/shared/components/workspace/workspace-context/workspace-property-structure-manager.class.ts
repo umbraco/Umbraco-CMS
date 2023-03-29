@@ -6,7 +6,7 @@ import {
 	ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { ArrayState, UmbObserverController, MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
 
@@ -19,6 +19,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	#documentTypeRepository: R;
 
+	#rootDocumentTypeKey?: string;
 	#documentTypeObservers = new Array<UmbControllerInterface>();
 	#documentTypes = new ArrayState<T>([], (x) => x.key);
 
@@ -35,6 +36,10 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	 */
 	public async loadType(key?: string) {
 		this._reset();
+		if (!key) return {};
+
+		this.#rootDocumentTypeKey = key;
+
 		return await this._loadType(key);
 	}
 
@@ -44,7 +49,9 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		if (!parentKey) return {};
 
 		const { data } = await this.#documentTypeRepository.createScaffold(parentKey);
-		if (!data) return {};
+		if (!data || !data.key) return {};
+
+		this.#rootDocumentTypeKey = data.key;
 
 		await this._observeDocumentType(data);
 		return { data };
@@ -92,6 +99,40 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	}
 
 	/** Public methods for consuming structure: */
+
+	rootDocumentType() {
+		return this.#documentTypes.getObservablePart((x) => x.find((y) => y.key === this.#rootDocumentTypeKey));
+	}
+	getRootDocumentType() {
+		return this.#documentTypes.getValue().find((y) => y.key === this.#rootDocumentTypeKey);
+	}
+	updateRootDocumentType(entry: T) {
+		return this.#documentTypes.updateOne(this.#rootDocumentTypeKey, entry);
+	}
+
+	/*
+	rootDocumentTypeName() {
+		return this.#documentTypes.getObservablePart((docTypes) => {
+			const docType = docTypes.find((x) => x.key === this.#rootDocumentTypeKey);
+			return docType?.name ?? '';
+		});
+	}
+	*/
+
+	rootDocumentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
+		return this.#documentTypes.getObservablePart((docTypes) => {
+			const docType = docTypes.find((x) => x.key === this.#rootDocumentTypeKey);
+			return docType ? mappingFunction(docType) : undefined;
+		});
+	}
+	/*
+	nameOfDocumentType(key: string) {
+		return this.#documentTypes.getObservablePart((docTypes) => {
+			const docType = docTypes.find((x) => x.key === key);
+			return docType?.name ?? '';
+		});
+	}
+	*/
 
 	hasPropertyStructuresOf(containerKey: string | null) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
