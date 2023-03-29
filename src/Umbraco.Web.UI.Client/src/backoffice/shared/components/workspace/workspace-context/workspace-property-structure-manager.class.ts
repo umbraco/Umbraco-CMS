@@ -36,7 +36,6 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	 */
 	public async loadType(key?: string) {
 		this._reset();
-		if (!key) return {};
 
 		this.#rootDocumentTypeKey = key;
 
@@ -49,7 +48,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		if (!parentKey) return {};
 
 		const { data } = await this.#documentTypeRepository.createScaffold(parentKey);
-		if (!data || !data.key) return {};
+		if (!data) return {};
 
 		this.#rootDocumentTypeKey = data.key;
 
@@ -189,6 +188,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	private _reset() {
 		this.#documentTypeObservers.forEach((observer) => observer.destroy());
+		this.#documentTypeObservers = [];
 		this.#documentTypes.next([]);
 		this.#containers.next([]);
 	}
