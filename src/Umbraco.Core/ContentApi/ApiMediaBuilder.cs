@@ -27,8 +27,9 @@ public class ApiMediaBuilder : IApiMediaBuilder
             _apiMediaUrlProvider.GetUrl(media),
             Properties(media));
 
+    // map all media properties except the umbracoFile one, as we've already included the file URL etc. in the output
     private IDictionary<string, object?> Properties(IPublishedContent media) =>
         _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
-            ? outputExpansionStrategy.MapProperties(media.Properties)
+            ? outputExpansionStrategy.MapProperties(media.Properties.Where(p => p.Alias != Constants.Conventions.Media.File))
             : new Dictionary<string, object?>();
 }
