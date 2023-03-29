@@ -85,7 +85,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 					? html`<strong>Add language</strong>`
 					: html`<uui-input
 							label="Language name"
-							placeholder=${ifDefined(this._language?.name)}
+							value=${ifDefined(this._language?.name)}
 							@input="${this.#handleInput}"></uui-input>`}
 			</div>
 			<div slot="footer" id="footer">
