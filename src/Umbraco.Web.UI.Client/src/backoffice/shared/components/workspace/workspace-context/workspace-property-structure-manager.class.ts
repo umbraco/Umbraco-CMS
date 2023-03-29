@@ -35,27 +35,29 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	 */
 	public async loadType(key?: string) {
 		this._reset();
-		await this._loadType(key);
+		return await this._loadType(key);
 	}
 
-	public async createType(parentKey: string) {
+	public async createScaffold(parentKey: string) {
 		this._reset();
 
-		if (!parentKey) return;
+		if (!parentKey) return {};
 
 		const { data } = await this.#documentTypeRepository.createScaffold(parentKey);
-		if (!data) return;
+		if (!data) return {};
 
-		this._observeDocumentType(data);
+		await this._observeDocumentType(data);
+		return { data };
 	}
 
 	private async _loadType(key?: string) {
-		if (!key) return;
+		if (!key) return {};
 
 		const { data } = await this.#documentTypeRepository.requestByKey(key);
-		if (!data) return;
+		if (!data) return {};
 
-		this._observeDocumentType(data);
+		await this._observeDocumentType(data);
+		return { data };
 	}
 
 	public async _observeDocumentType(

@@ -49,7 +49,7 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	async createScaffold(documentTypeKey: string) {
-		const { data } = await this.repository.createScaffold(documentTypeKey);
+		const { data } = await this.structure.createScaffold(documentTypeKey);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -58,9 +58,7 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	async load(entityKey: string) {
-		this.structure.loadType(entityKey);
-
-		const { data } = await this.repository.requestByKey(entityKey);
+		const { data } = await this.structure.loadType(entityKey);
 		if (!data) return undefined;
 
 		this.setIsNew(false);
