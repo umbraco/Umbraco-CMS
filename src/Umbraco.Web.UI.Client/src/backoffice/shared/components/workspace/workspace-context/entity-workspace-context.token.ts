@@ -1,6 +1,6 @@
 import { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface';
+import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { PropertyTypeResponseModelBaseModel } from 'libs/backend-api/src';
 
 type BaseEntityType = {
 	key?: string;
