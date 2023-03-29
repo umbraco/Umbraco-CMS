@@ -69,6 +69,19 @@ describe('ArrayState', () => {
 		});
 	});
 
+	it('partially update an existing item via updateOne method.', (done) => {
+		const newItem = { another: 'myValue2.2' };
+		subject.updateOne('2', newItem);
+
+		const observer = subject.asObservable();
+		observer.subscribe((value) => {
+			expect(value.length).to.be.equal(initialData.length);
+			expect(value[0].another).to.be.equal('myValue1');
+			expect(value[1].another).to.be.equal('myValue2.2');
+			done();
+		});
+	});
+
 	it('getObservablePart for a specific entry of array', (done) => {
 		const subObserver = subject.getObservablePart((data) => data.find((x) => x.key === '2'));
 		subObserver.subscribe((entry) => {
