@@ -11,7 +11,7 @@ export interface UmbImportDictionaryModalResult {
 	parentKey?: string;
 }
 
-export const UMB_IMPORT_DICTIONARY_MODAL_TOKEN = new UmbModalToken<
+export const UMB_IMPORT_DICTIONARY_MODAL = new UmbModalToken<
 	UmbImportDictionaryModalData,
 	UmbImportDictionaryModalResult
 >('Umb.Modal.ImportDictionary', {

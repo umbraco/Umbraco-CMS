@@ -19,7 +19,7 @@ const manifest: ManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-header-app-button')
-export class UmbHeaderAppButton extends LitElement {
+export class UmbHeaderAppButtonElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -45,10 +45,10 @@ export class UmbHeaderAppButton extends LitElement {
 	}
 }
 
-export default UmbHeaderAppButton;
+export default UmbHeaderAppButtonElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-header-app-button': UmbHeaderAppButton;
+		'umb-header-app-button': UmbHeaderAppButtonElement;
 	}
 }

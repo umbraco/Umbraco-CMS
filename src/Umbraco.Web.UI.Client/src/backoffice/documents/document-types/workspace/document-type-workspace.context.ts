@@ -2,7 +2,7 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
@@ -14,7 +14,7 @@ export class UmbWorkspaceDocumentTypeContext
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDocumentTypeRepository(host));
 	}
 

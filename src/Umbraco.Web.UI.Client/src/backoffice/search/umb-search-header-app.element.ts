@@ -5,7 +5,7 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-search-header-app')
-export class UmbSearchHeaderApp extends UmbLitElement {
+export class UmbSearchHeaderAppElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -39,10 +39,10 @@ export class UmbSearchHeaderApp extends UmbLitElement {
 	}
 }
 
-export default UmbSearchHeaderApp;
+export default UmbSearchHeaderAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-search-header-app': UmbSearchHeaderApp;
+		'umb-search-header-app': UmbSearchHeaderAppElement;
 	}
 }

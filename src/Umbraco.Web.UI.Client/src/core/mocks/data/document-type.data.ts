@@ -102,7 +102,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				name: 'Multi URL Picker',
 				description: '',
 				dataTypeKey: 'dt-multiUrlPicker',
-				variesByCulture: false,
+				variesByCulture: true,
 				variesBySegment: false,
 				validation: {
 					mandatory: true,

@@ -1,5 +1,12 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository';
-import { ArrayState, createObservablePart, DeepState, ObjectState, StringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	BasicState,
+	ArrayState,
+	createObservablePart,
+	DeepState,
+	ObjectState,
+	StringState,
+} from '@umbraco-cms/backoffice/observable-api';
 import {
 	DirectionModel,
 	LogLevelCountsReponseModel,
@@ -9,9 +16,8 @@ import {
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { BasicState } from 'libs/observable-api/basic-state';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface PoolingCOnfig {
@@ -24,7 +30,7 @@ export interface LogViewerDateRange {
 }
 
 export class UmbLogViewerWorkspaceContext {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 	#repository: UmbLogViewerRepository;
 
 	get today() {
@@ -88,7 +94,7 @@ export class UmbLogViewerWorkspaceContext {
 
 	currentPage = 1;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		this.#repository = new UmbLogViewerRepository(this.#host);
 	}

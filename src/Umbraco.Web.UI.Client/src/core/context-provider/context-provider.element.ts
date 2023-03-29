@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 @customElement('umb-context-provider')
 export class UmbContextProviderElement extends UmbLitElement {
@@ -10,7 +10,7 @@ export class UmbContextProviderElement extends UmbLitElement {
 	 * @required
 	 */
 	@property({ type: Object, attribute: false })
-	create?: (host: UmbControllerHostInterface) => unknown;
+	create?: (host: UmbControllerHostElement) => unknown;
 
 	/**
 	 * The value to provide to the context.

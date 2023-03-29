@@ -1,6 +1,6 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 
@@ -13,7 +13,7 @@ import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 export class UmbMemberTypeStore extends UmbStoreBase {
 	#data = new ArrayState<MemberTypeDetails>([], (x) => x.key);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 

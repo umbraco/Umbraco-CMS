@@ -2,13 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user.store';
-import { UMB_CURRENT_USER_MODAL_TOKEN } from './modals/current-user';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CURRENT_USER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-header-app')
-export class UmbCurrentUserHeaderApp extends UmbLitElement {
+export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -47,7 +46,7 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	}
 
 	private _handleUserClick() {
-		this._modalContext?.open(UMB_CURRENT_USER_MODAL_TOKEN);
+		this._modalContext?.open(UMB_CURRENT_USER_MODAL);
 	}
 
 	render() {
@@ -59,10 +58,10 @@ export class UmbCurrentUserHeaderApp extends UmbLitElement {
 	}
 }
 
-export default UmbCurrentUserHeaderApp;
+export default UmbCurrentUserHeaderAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-header-app': UmbCurrentUserHeaderApp;
+		'umb-current-user-header-app': UmbCurrentUserHeaderAppElement;
 	}
 }

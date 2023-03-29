@@ -7,8 +7,12 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from '../../current-user-history.store';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store';
-import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../change-password';
-import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalHandler,
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_CHANGE_PASSWORD_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -139,7 +143,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	private _changePassword() {
 		if (!this._modalContext) return;
 
-		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL_TOKEN, {
+		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL, {
 			requireOldPassword: this._currentUserStore?.isAdmin || false,
 		});
 	}

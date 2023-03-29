@@ -2,7 +2,7 @@ import { UmbTemplateRepository } from '../repository/template.repository';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { createObservablePart, DeepState } from '@umbraco-cms/backoffice/observable-api';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository> {
 	#data = new DeepState<TemplateResponseModel | undefined>(undefined);
@@ -10,7 +10,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbTemplateRepository(host));
 	}
 

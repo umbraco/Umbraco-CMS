@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-backoffice-header-apps')
-export class UmbBackofficeHeaderApps extends LitElement {
+export class UmbBackofficeHeaderAppsElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -22,6 +22,6 @@ export class UmbBackofficeHeaderApps extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-header-apps': UmbBackofficeHeaderApps;
+		'umb-backoffice-header-apps': UmbBackofficeHeaderAppsElement;
 	}
 }

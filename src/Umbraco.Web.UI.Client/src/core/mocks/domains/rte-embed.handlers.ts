@@ -1,7 +1,7 @@
-import { rest } from "msw";
-import { OEmbedResult, OEmbedStatus } from "../../../backoffice/shared/modals/embedded-media";
-import { UmbEmbeddedMediaModalElement as ModalElement } from "../../../../src/backoffice/shared/modals/embedded-media/embedded-media-modal.element";
-import { umbracoPath } from "@umbraco-cms/backoffice/utils";
+import { rest } from 'msw';
+import { UmbEmbeddedMediaModalElement as ModalElement } from '../../../backoffice/shared/modals/embedded-media/embedded-media-modal.element';
+import { OEmbedResult, OEmbedStatus } from '@umbraco-cms/backoffice/modal';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
 	rest.get(umbracoPath('/rteembed'), (req, res, ctx) => {

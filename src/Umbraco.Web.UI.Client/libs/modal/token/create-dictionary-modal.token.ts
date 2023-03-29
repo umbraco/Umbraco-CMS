@@ -12,7 +12,7 @@ export interface UmbCreateDictionaryModalResult {
 	name?: string;
 }
 
-export const UMB_CREATE_DICTIONARY_MODAL_TOKEN = new UmbModalToken<
+export const UMB_CREATE_DICTIONARY_MODAL = new UmbModalToken<
 	UmbCreateDictionaryModalData,
 	UmbCreateDictionaryModalResult
 >('Umb.Modal.CreateDictionary', {

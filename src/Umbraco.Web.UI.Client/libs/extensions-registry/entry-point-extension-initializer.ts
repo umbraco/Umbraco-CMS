@@ -1,12 +1,12 @@
 import type { ManifestEntrypoint } from './models';
 import { hasInitExport, loadExtension, UmbExtensionRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbEntryPointExtensionInitializer {
 	#rootHost;
 	#extensionRegistry;
 
-	constructor(rootHost: UmbControllerHostInterface, extensionRegistry: UmbExtensionRegistry) {
+	constructor(rootHost: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry) {
 		this.#rootHost = rootHost;
 		this.#extensionRegistry = extensionRegistry;
 		// TODO: change entrypoint extension to be entryPoint:

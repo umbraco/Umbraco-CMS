@@ -2,7 +2,7 @@ import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export
@@ -15,10 +15,10 @@ export class UmbDocumentTypeStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of UmbDocumentTypeStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDocumentTypeStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 
@@ -50,6 +50,4 @@ export class UmbDocumentTypeStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTypeStore>(
-	'UmbDocumentTypeStore'
-);
+export const UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTypeStore>('UmbDocumentTypeStore');

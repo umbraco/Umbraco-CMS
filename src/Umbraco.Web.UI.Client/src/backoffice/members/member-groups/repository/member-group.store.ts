@@ -1,7 +1,7 @@
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -13,7 +13,7 @@ import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 export class UmbMemberGroupStore extends UmbStoreBase {
 	#data = new ArrayState<MemberGroupDetails>([], (x) => x.key);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString());
 	}
 

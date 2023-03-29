@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-upgrader
  */
 @customElement('umb-upgrader')
-export class UmbUpgrader extends UmbLitElement {
+export class UmbUpgraderElement extends UmbLitElement {
 	@state()
 	private upgradeSettings?: UpgradeSettingsResponseModel;
 
@@ -71,10 +71,10 @@ export class UmbUpgrader extends UmbLitElement {
 	};
 }
 
-export default UmbUpgrader;
+export default UmbUpgraderElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-upgrader': UmbUpgrader;
+		'umb-upgrader': UmbUpgraderElement;
 	}
 }

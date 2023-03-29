@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
 
-import { UmbControllerHostInterface, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbContextToken,
 	UmbContextCallback,
@@ -16,7 +16,7 @@ interface ResolvedContexts {
 	[key: string]: any;
 }
 
-export declare class UmbElementMixinInterface extends UmbControllerHostInterface {
+export declare class UmbElementMixinInterface extends UmbControllerHostElement {
 	observe<T>(source: Observable<T>, callback: (_value: T) => void, unique?: string): UmbObserverController<T>;
 	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
 	consumeContext<R = unknown>(

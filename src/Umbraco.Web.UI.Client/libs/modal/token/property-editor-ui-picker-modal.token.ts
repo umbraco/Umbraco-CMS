@@ -9,7 +9,7 @@ export type UmbPropertyEditorUIPickerModalResult = {
 	selection: Array<string>;
 };
 
-export const UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN = new UmbModalToken<
+export const UMB_PROPERTY_EDITOR_UI_PICKER_MODAL = new UmbModalToken<
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult
 >('Umb.Modal.PropertyEditorUIPicker', {
