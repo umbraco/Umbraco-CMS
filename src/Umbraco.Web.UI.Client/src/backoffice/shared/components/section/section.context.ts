@@ -13,16 +13,6 @@ export class UmbSectionContext {
 	public readonly pathname = this.#manifestPathname.asObservable();
 	public readonly label = this.#manifestLabel.asObservable();
 
-	/*
-	This was not used anywhere
-	private _activeTree = new BehaviorSubject<ManifestTree | undefined>(undefined);
-	public readonly activeTree = this._activeTree.asObservable();
-	*/
-
-	// TODO: what is the best context to put this in?
-	#activeTreeItem = new ObjectState<ActiveTreeItemType | undefined>(undefined);
-	public readonly activeTreeItem = this.#activeTreeItem.asObservable();
-
 	constructor(manifest: ManifestSection) {
 		this.setManifest(manifest);
 	}
@@ -31,17 +21,6 @@ export class UmbSectionContext {
 		this.#manifestAlias.next(manifest?.alias);
 		this.#manifestPathname.next(manifest?.meta?.pathname);
 		this.#manifestLabel.next(manifest ? manifest.meta?.label || manifest.name : undefined);
-	}
-
-	/*
-	This was not used anywhere
-	public setActiveTree(tree: ManifestTree) {
-		this._activeTree.next(tree);
-	}
-	*/
-
-	public setActiveTreeItem(item?: ActiveTreeItemType) {
-		this.#activeTreeItem.next(item);
 	}
 }
 

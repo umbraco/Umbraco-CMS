@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { property } from 'lit/decorators.js';
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
 import {
 	UmbModalContext,
 	UmbModalToken,
