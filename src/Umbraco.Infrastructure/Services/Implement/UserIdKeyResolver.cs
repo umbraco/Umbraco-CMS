@@ -86,7 +86,12 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
             string? guidString = await scope.Database.ExecuteScalarAsync<string?>(query);
             Guid? fetchedKey = guidString is null ? null : new Guid(guidString);
 
-            _idToKey[id] = fetchedKey;
+            // For ids we don't want to cache the null value, since unlike keys, it's pretty likely that we'll see collision
+            if (fetchedKey is not null)
+            {
+                _idToKey[id] = fetchedKey;
+            }
+
             return fetchedKey;
         }
         finally
