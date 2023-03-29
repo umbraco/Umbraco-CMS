@@ -153,7 +153,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
         if (identityUser is null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.NotFound, new UserUnlockResult());
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new UserUnlockResult());
         }
 
         IdentityResult result = await SetLockoutEndDateAsync(identityUser, DateTimeOffset.Now.AddMinutes(-1));
@@ -322,7 +322,7 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
         if (identityUser is null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.NotFound, string.Empty);
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, string.Empty);
         }
 
         var token = await GenerateEmailConfirmationTokenAsync(identityUser);

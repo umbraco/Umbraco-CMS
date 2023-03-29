@@ -835,7 +835,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (avatarTemporaryFile is null)
         {
-            return UserOperationStatus.NotFound;
+            return UserOperationStatus.AvatarFileNotFound;
         }
 
         const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
@@ -1175,7 +1175,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (user is null)
         {
-            return UserOperationStatus.NotFound;
+            return UserOperationStatus.UserNotFound;
         }
 
         // Check user hasn't logged in. If they have they may have made content changes which will mean
@@ -1217,7 +1217,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (usersToDisable.Length != keys.Count)
         {
-            return UserOperationStatus.NotFound;
+            return UserOperationStatus.UserNotFound;
         }
 
         foreach (IUser user in usersToDisable)
@@ -1258,7 +1258,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (usersToEnable.Length != keys.Count)
         {
-            return UserOperationStatus.NotFound;
+            return UserOperationStatus.UserNotFound;
         }
 
         foreach (IUser user in usersToEnable)
@@ -1278,7 +1278,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (user is null)
         {
-            return UserOperationStatus.NotFound;
+            return UserOperationStatus.UserNotFound;
         }
 
         if (string.IsNullOrWhiteSpace(user.Avatar))

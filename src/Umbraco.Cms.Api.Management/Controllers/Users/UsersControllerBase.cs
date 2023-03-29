@@ -64,11 +64,19 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid avatar")
                 .WithDetail("The selected avatar is invalid")
                 .Build()),
-            UserOperationStatus.NotFound => NotFound(),
+            UserOperationStatus.AvatarFileNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Avatar file not found")
+                .WithDetail("The file key did not resolve in to a file")
+                .Build()),
+            UserOperationStatus.UserNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("The was not found")
+                .WithDetail("The specified user was not found.")
+                .Build()),
             UserOperationStatus.CannotDisableInvitedUser => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cannot disable invited user")
                 .WithDetail("An invited user cannot be disabled.")
                 .Build()),
+            UserOperationStatus.Forbidden => Forbid(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user operation status."),
         };
 

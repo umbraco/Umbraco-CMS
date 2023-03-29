@@ -13,7 +13,7 @@ public partial class UserServiceCrudTests
     {
         var userService = CreateUserService();
         var result = await userService.DeleteAsync(Guid.NewGuid());
-        Assert.AreEqual(UserOperationStatus.NotFound, result);
+        Assert.AreEqual(UserOperationStatus.UserNotFound, result);
     }
 
     [Test]
