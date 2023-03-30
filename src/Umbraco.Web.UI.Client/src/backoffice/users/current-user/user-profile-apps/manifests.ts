@@ -6,7 +6,7 @@ export const userProfileApps: Array<ManifestUserProfileApp> = [
 		alias: 'Umb.UserProfileApp.profile',
 		name: 'Profile User Profile App',
 		loader: () => import('./user-profile-app-profile.element'),
-		weight: 0,
+		weight: 900,
 		meta: {
 			label: 'Profile User Profile App',
 			pathname: 'profile',
@@ -17,7 +17,7 @@ export const userProfileApps: Array<ManifestUserProfileApp> = [
 		alias: 'Umb.UserProfileApp.ExternalLoginProviders',
 		name: 'External Login Providers User Profile App',
 		loader: () => import('./user-profile-app-external-login-providers.element'),
-		weight: 100,
+		weight: 800,
 		meta: {
 			label: 'External Login Providers User Profile App',
 			pathname: 'externalLoginProviders',
@@ -39,7 +39,7 @@ export const userProfileApps: Array<ManifestUserProfileApp> = [
 		alias: 'Umb.UserProfileApp.History',
 		name: 'History User Profile App',
 		loader: () => import('./user-profile-app-history.element'),
-		weight: 300,
+		weight: 100,
 		meta: {
 			label: 'History User Profile App',
 			pathname: 'history',
