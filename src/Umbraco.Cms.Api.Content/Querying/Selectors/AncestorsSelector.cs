@@ -18,7 +18,7 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(AncestorsSpecifier, StringComparison.OrdinalIgnoreCase);
 
-    public SelectorOption? BuildSelectorOption(string selectorValueString)
+    public SelectorOption BuildSelectorOption(string selectorValueString)
     {
         var fieldValue = selectorValueString.Substring(AncestorsSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
@@ -27,7 +27,15 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             !_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) ||
             publishedSnapshot?.Content is null)
         {
-            return null;
+            // Setting the Value to "" since that would yield no results.
+            // It won't be appropriate to return null here since if we reached this,
+            // it means that CanHandle() returned true, meaning that this Selector should be able to handle the selector value
+            return new SelectorOption
+            {
+                FieldName = "id",
+                Value = string.Empty
+            };
+            return null; // still return  SelectorOption with Value = string.Empty (sth that yields result) - since CanHandle was true
         }
 
         // With the previous check we made sure that if we reach this, we already made sure that there is a valid content item
