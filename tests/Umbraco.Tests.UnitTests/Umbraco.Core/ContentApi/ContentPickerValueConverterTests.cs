@@ -18,7 +18,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             PublishedSnapshotAccessor,
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
-                new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings()),
+                new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>()),
                 CreateOutputExpansionStrategyAccessor()));
 
     [Test]
@@ -77,12 +77,9 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
 
         var key = Guid.NewGuid();
-        content.SetupGet(c => c.Properties).Returns(new[] { prop1, prop2 });
-        content.SetupGet(c => c.UrlSegment).Returns("page-url-segment");
-        content.SetupGet(c => c.Name).Returns("The page");
-        content.SetupGet(c => c.Key).Returns(key);
-        content.SetupGet(c => c.ContentType).Returns(PublishedContentType);
-        content.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+        var urlSegment = "page-url-segment";
+        var name = "The page";
+        ConfigurePublishedContentMock(content, key, name, urlSegment, PublishedContentType, new[] { prop1, prop2 });
 
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(content.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))

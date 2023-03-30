@@ -13,10 +13,10 @@ public class ByRouteContentApiController : ContentApiControllerBase
 
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
-        IApiContentBuilder apiContentBuilder,
+        IApiContentResponseBuilder apiContentResponseBuilder,
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService)
-        : base(apiPublishedContentCache, apiContentBuilder)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
     {
         _requestRoutingService = requestRoutingService;
         _requestRedirectService = requestRedirectService;
@@ -33,7 +33,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
     /// <returns>The content item or not found result.</returns>
     [HttpGet("item/{*path}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IApiContentResponseBuilder), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "/")
@@ -43,10 +43,10 @@ public class ByRouteContentApiController : ContentApiControllerBase
         IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
         if (contentItem is not null)
         {
-            return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
+            return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
         }
 
-        IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectPath(path);
+        IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectRoute(path);
         return redirectRoute != null
             ? RedirectTo(redirectRoute)
             : NotFound();

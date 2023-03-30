@@ -7,5 +7,5 @@ public interface IRequestRedirectService
     /// <summary>
     ///     Retrieves the redirect URL (if any) for a requested content path
     /// </summary>
-    IApiContentRoute? GetRedirectPath(string requestedPath);
+    IApiContentRoute? GetRedirectRoute(string requestedPath);
 }

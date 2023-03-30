@@ -11,14 +11,16 @@ public class ApiContentRouteBuilder : IApiContentRouteBuilder
 {
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly GlobalSettings _globalSettings;
+    private readonly IVariationContextAccessor _variationContextAccessor;
 
-    public ApiContentRouteBuilder(IPublishedUrlProvider publishedUrlProvider, IOptions<GlobalSettings> globalSettings)
+    public ApiContentRouteBuilder(IPublishedUrlProvider publishedUrlProvider, IOptions<GlobalSettings> globalSettings, IVariationContextAccessor variationContextAccessor)
     {
         _publishedUrlProvider = publishedUrlProvider;
+        _variationContextAccessor = variationContextAccessor;
         _globalSettings = globalSettings.Value;
     }
 
-    public IApiContentRoute Build(IPublishedContent content)
+    public IApiContentRoute Build(IPublishedContent content, string? culture = null)
     {
         if (content.ItemType != PublishedItemType.Content)
         {
@@ -26,9 +28,9 @@ public class ApiContentRouteBuilder : IApiContentRouteBuilder
         }
 
         IPublishedContent root = content.Root();
-        var rootPath = root.UrlSegment ?? string.Empty;
+        var rootPath = root.UrlSegment(_variationContextAccessor, culture) ?? string.Empty;
 
-        var contentPath = _publishedUrlProvider.GetUrl(content, UrlMode.Relative).EnsureStartsWith("/");
+        var contentPath = _publishedUrlProvider.GetUrl(content, UrlMode.Relative, culture).EnsureStartsWith("/");
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
