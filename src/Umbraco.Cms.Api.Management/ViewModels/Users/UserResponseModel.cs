@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Users;
 
 public class UserResponseModel : UserPresentationBase, INamedEntityPresentationModel
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
     public string? LanguageIsoCode { get; set; }
 

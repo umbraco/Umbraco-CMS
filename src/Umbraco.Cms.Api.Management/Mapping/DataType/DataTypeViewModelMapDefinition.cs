@@ -42,7 +42,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(IDataType source, DataTypeResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.ParentKey = _dataTypeService.GetContainer(source.ParentId)?.Key;
         target.Name = source.Name ?? string.Empty;
         target.PropertyEditorAlias = source.EditorAlias;

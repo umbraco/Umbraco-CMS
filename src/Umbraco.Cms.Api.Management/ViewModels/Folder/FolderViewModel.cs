@@ -2,7 +2,7 @@
 
 public class FolderReponseModel : FolderModelBase, INamedEntityPresentationModel
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
-    public Guid? ParentKey { get; set; }
+    public Guid? ParentId { get; set; }
 }

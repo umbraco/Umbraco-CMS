@@ -2,5 +2,6 @@
 
 public class CreateFolderRequestModel : FolderModelBase
 {
-    public Guid? ParentKey { get; set; }
+    public Guid? Id { get; set; }
+    public Guid? ParentId { get; set; }
 }

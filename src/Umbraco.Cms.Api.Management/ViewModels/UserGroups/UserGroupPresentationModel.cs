@@ -5,6 +5,6 @@ public class UserGroupPresentationModel : UserGroupBase, INamedEntityPresentatio
     /// <summary>
     /// The key identifier for the user group.
     /// </summary>
-    public required Guid Key { get; init; }
+    public required Guid Id { get; init; }
 
 }

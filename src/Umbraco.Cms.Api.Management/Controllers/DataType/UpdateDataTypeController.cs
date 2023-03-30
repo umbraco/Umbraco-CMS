@@ -23,14 +23,14 @@ public class UpdateDataTypeController : DataTypeControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{key:guid}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, UpdateDataTypeRequestModel updateDataTypeViewModel)
+    public async Task<IActionResult> Update(Guid id, UpdateDataTypeRequestModel updateDataTypeViewModel)
     {
-        IDataType? current = await _dataTypeService.GetAsync(key);
+        IDataType? current = await _dataTypeService.GetAsync(id);
         if (current == null)
         {
             return NotFound();

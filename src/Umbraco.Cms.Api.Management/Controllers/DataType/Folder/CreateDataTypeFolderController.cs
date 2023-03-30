@@ -17,5 +17,8 @@ public class CreateDataTypeFolderController : DataTypeFolderControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(CreateFolderRequestModel createFolderRequestModel)
-        => await CreateFolderAsync<ByKeyDataTypeFolderController>(createFolderRequestModel, controller => nameof(controller.ByKey));
+    {
+        return await CreateFolderAsync<ByKeyDataTypeFolderController>(createFolderRequestModel,
+            controller => nameof(controller.ByKey));
+    }
 }
