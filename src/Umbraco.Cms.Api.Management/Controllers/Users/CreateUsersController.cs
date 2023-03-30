@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -14,13 +15,16 @@ public class CreateUsersController : UsersControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _presentationFactory;
+    private readonly IUmbracoMapper _mapper;
 
     public CreateUsersController(
         IUserService userService,
-        IUserPresentationFactory presentationFactory)
+        IUserPresentationFactory presentationFactory,
+        IUmbracoMapper mapper)
     {
         _userService = userService;
         _presentationFactory = presentationFactory;
+        _mapper = mapper;
     }
 
     [HttpPost]
@@ -34,11 +38,8 @@ public class CreateUsersController : UsersControllerBase
         // FIXME: use the actual currently logged in user key
         Attempt<UserCreationResult, UserOperationStatus> result = await _userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
 
-        if (result.Success)
-        {
-            return Ok(_presentationFactory.CreateCreationResponseModel(result.Result));
-        }
-
-        return UserOperationStatusResult(result.Status, result.Result);
+        return result.Success
+            ? Ok(_mapper.Map<CreateUserResponseModel>(result.Result))
+            : UserOperationStatusResult(result.Status, result.Result);
     }
 }

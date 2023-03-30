@@ -1,8 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -13,10 +12,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Users;
 public class ChangePasswordUsersController : UsersControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IUmbracoMapper _mapper;
 
-    public ChangePasswordUsersController(IUserService userService)
+    public ChangePasswordUsersController(
+        IUserService userService,
+        IUmbracoMapper mapper)
     {
         _userService = userService;
+        _mapper = mapper;
     }
 
     [HttpPost("change-password/{id:guid}")]
@@ -35,7 +38,7 @@ public class ChangePasswordUsersController : UsersControllerBase
 
         if (response.Success)
         {
-            return Ok(new ChangePasswordUserResponseModel { ResetPassword = response.Result.ResetPassword });
+            return Ok(_mapper.Map<ChangePasswordUserResponseModel>(response.Result));
         }
 
         return UserOperationStatusResult(response.Status, response.Result);

@@ -105,13 +105,6 @@ public class UserPresentationFactory : IUserPresentationFactory
         return model;
     }
 
-    public CreateUserResponseModel CreateCreationResponseModel(UserCreationResult creationResult)
-        => new()
-        {
-            UserKey = creationResult.CreatedUser?.Key ?? Guid.Empty,
-            InitialPassword = creationResult.InitialPassword,
-        };
-
     private SortedSet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {
         IEnumerable<Guid>? keys = ids?
