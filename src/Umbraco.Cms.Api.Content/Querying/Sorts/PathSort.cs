@@ -11,6 +11,7 @@ internal sealed class PathSort : ISortHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(SortOptionSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc/>
     public SortOption BuildSortOption(string sortValueString)
     {
         var sortDirection = sortValueString.Substring(SortOptionSpecifier.Length);

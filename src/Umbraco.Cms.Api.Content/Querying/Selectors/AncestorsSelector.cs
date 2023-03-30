@@ -18,6 +18,7 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(AncestorsSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc/>
     public SelectorOption BuildSelectorOption(string selectorValueString)
     {
         var fieldValue = selectorValueString.Substring(AncestorsSpecifier.Length);

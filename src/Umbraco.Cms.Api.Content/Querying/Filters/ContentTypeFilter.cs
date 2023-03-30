@@ -16,6 +16,7 @@ internal sealed class ContentTypeFilter : QueryOptionBase, IFilterHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(ContentTypeSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc/>
     public FilterOption BuildFilterOption(string filterValueString)
     {
         var alias = filterValueString.Substring(ContentTypeSpecifier.Length);

@@ -17,6 +17,7 @@ internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(DescendantsSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc/>
     public SelectorOption BuildSelectorOption(string selectorValueString)
     {
         var fieldValue = selectorValueString.Substring(DescendantsSpecifier.Length);

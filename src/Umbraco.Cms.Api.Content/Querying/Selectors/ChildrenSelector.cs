@@ -16,6 +16,7 @@ internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(ChildrenSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc/>
     public SelectorOption BuildSelectorOption(string selectorValueString)
     {
         var fieldValue = selectorValueString.Substring(ChildrenSpecifier.Length);

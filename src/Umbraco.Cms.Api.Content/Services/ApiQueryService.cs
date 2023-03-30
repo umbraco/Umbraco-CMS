@@ -24,7 +24,8 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         _sortHandlers = sortHandlers;
     }
 
-    public IEnumerable<Guid> ExecuteQuery(string? fetch, string[] filters, string[] sorts)
+    /// <inheritdoc/>
+    public IEnumerable<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts)
     {
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentAPIIndexName, out IIndex? apiIndex))
         {

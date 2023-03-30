@@ -16,6 +16,7 @@ internal sealed class NameFilter : QueryOptionBase, IFilterHandler
     public bool CanHandle(string queryString)
         => queryString.StartsWith(NameSpecifier, StringComparison.OrdinalIgnoreCase);
 
+    /// <inheritdoc/>
     public FilterOption BuildFilterOption(string filterValueString)
     {
         var value = filterValueString.Substring(NameSpecifier.Length);
