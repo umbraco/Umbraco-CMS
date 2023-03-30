@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.ContentApi;
 
-public interface IApiContentRouteBuilder
+public interface IApiContentResponseBuilder
 {
-    IApiContentRoute Build(IPublishedContent content, string? culture = null);
+    IApiContentResponse Build(IPublishedContent content);
 }

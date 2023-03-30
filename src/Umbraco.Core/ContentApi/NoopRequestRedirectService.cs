@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.ContentApi;
 public sealed class NoopRequestRedirectService : IRequestRedirectService
 {
     /// <inheritdoc />
-    public IApiContentRoute? GetRedirectPath(string requestedPath) => null;
+    public IApiContentRoute? GetRedirectRoute(string requestedPath) => null;
 }

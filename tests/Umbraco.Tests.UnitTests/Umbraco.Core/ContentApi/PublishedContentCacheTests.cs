@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.PublishedCache;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 
 [TestFixture]
-public class PublishedContentCacheTests
+public class PublishedContentCacheTests : ContentApiTests
 {
     private readonly Guid _contentOneId = Guid.Parse("19AEAC73-DB4E-4CFC-AB06-0AD14A89A613");
 
@@ -23,16 +23,12 @@ public class PublishedContentCacheTests
         var contentTypeOneMock = new Mock<IPublishedContentType>();
         contentTypeOneMock.SetupGet(m => m.Alias).Returns("theContentType");
         var contentOneMock = new Mock<IPublishedContent>();
-        contentOneMock.SetupGet(m => m.ContentType).Returns(contentTypeOneMock.Object);
-        contentOneMock.SetupGet(m => m.Key).Returns(_contentOneId);
-        contentOneMock.SetupGet(m => m.UrlSegment).Returns("content-one");
+        ConfigurePublishedContentMock(contentOneMock, _contentOneId, "Content One", "content-one", contentTypeOneMock.Object, Array.Empty<IPublishedProperty>());
 
         var contentTypeTwoMock = new Mock<IPublishedContentType>();
         contentTypeTwoMock.SetupGet(m => m.Alias).Returns("theOtherContentType");
         var contentTwoMock = new Mock<IPublishedContent>();
-        contentTwoMock.SetupGet(m => m.ContentType).Returns(contentTypeTwoMock.Object);
-        contentTwoMock.SetupGet(m => m.Key).Returns(_contentTwoId);
-        contentTwoMock.SetupGet(m => m.UrlSegment).Returns("content-two");
+        ConfigurePublishedContentMock(contentTwoMock, _contentTwoId, "Content Two", "content-two", contentTypeTwoMock.Object, Array.Empty<IPublishedProperty>());
 
         var contentCacheMock = new Mock<IPublishedContentCache>();
         contentCacheMock

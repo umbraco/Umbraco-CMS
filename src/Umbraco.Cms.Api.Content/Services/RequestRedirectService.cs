@@ -38,7 +38,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         _globalSettings = globalSettings.Value;
     }
 
-    public IApiContentRoute? GetRedirectPath(string requestedPath)
+    public IApiContentRoute? GetRedirectRoute(string requestedPath)
     {
         requestedPath = requestedPath.EnsureStartsWith("/");
 
