@@ -44,7 +44,7 @@ export default class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
 		/** when the contents load we need to find any macros declared and load in their content */
 		this.editor.on('SetContent', () => {
 			//get all macro divs and load their content
-			this.editor.dom.select('.umb-macro-holder.mceNonEditable').forEach((macroElement) => {
+			this.editor.dom.select('.umb-macro-holder.mceNonEditable').forEach((macroElement: HTMLElement) => {
 				this.#loadMacroContent(macroElement as HTMLDivElement, null);
 			});
 		});
