@@ -26,6 +26,7 @@ internal sealed class NameFilter : QueryOptionBase, IFilterHandler
             Value = string.Empty
         };
 
+        // TODO: do we support negation?
         if (value.StartsWith('!'))
         {
             filter.Value = value.Substring(1);
@@ -33,7 +34,6 @@ internal sealed class NameFilter : QueryOptionBase, IFilterHandler
         }
         else
         {
-            //filter.Value = $"^{value}$";
             filter.Value = value;
             filter.Operator = FilterOperation.Is;
         }

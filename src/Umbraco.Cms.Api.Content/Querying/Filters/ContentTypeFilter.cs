@@ -26,6 +26,7 @@ internal sealed class ContentTypeFilter : QueryOptionBase, IFilterHandler
             Value = string.Empty
         };
 
+        // TODO: do we support negation?
         if (alias.StartsWith('!'))
         {
             filter.Value = alias.Substring(1);
