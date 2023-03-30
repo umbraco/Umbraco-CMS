@@ -7,12 +7,12 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language.Enitity;
 
-public class LanguageItemsEntityController : LanguageEntityControllerBase
+public class ItemsLanguageEntityController : LanguageEntityControllerBase
 {
     private readonly ILanguageService _languageService;
     private readonly IUmbracoMapper _mapper;
 
-    public LanguageItemsEntityController(ILanguageService languageService, IUmbracoMapper mapper)
+    public ItemsLanguageEntityController(ILanguageService languageService, IUmbracoMapper mapper)
     {
         _languageService = languageService;
         _mapper = mapper;
