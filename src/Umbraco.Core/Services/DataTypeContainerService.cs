@@ -74,7 +74,8 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
                 }
 
 
-                if (_dataTypeContainerRepository.Get(container.Name!, (parentContainer?.Level ?? 0) + 1).Any())
+
+                if (_dataTypeContainerRepository.HasDuplicateName(container.ParentId, container.Name!))
                 {
                     return DataTypeContainerOperationStatus.DuplicateName;
                 }
