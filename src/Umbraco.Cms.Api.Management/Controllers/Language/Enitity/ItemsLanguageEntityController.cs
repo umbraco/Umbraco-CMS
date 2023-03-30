@@ -18,7 +18,7 @@ public class ItemsLanguageEntityController : LanguageEntityControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("items")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<LanguageEntityResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Items()
