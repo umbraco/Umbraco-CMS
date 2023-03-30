@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Entity;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Language.Entity;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 
@@ -8,13 +8,13 @@ public class EntityTypeMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<ILanguage, EntityResponseModel>((_, _) => new EntityResponseModel(), Map);
+        mapper.Define<ILanguage, LanguageEntityResponseModel>((_, _) => new LanguageEntityResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(ILanguage source, EntityResponseModel target, MapperContext context)
+    private static void Map(ILanguage source, LanguageEntityResponseModel target, MapperContext context)
     {
-        target.DisplayName = source.CultureName;
-        target.Id = source.IsoCode;
+        target.Name = source.CultureName;
+        target.IsoCode = source.IsoCode;
     }
 }

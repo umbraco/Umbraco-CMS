@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Controllers.Entity;
-using Umbraco.Cms.Api.Management.ViewModels.Entity;
+using Umbraco.Cms.Api.Management.ViewModels.Language.Entity;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language.Enitity;
 
-public class LanguageItemsEntityController : EntityControllerBase
+public class LanguageItemsEntityController : LanguageEntityControllerBase
 {
     private readonly ILanguageService _languageService;
     private readonly IUmbracoMapper _mapper;
@@ -21,11 +20,11 @@ public class LanguageItemsEntityController : EntityControllerBase
 
     [HttpGet("items")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<EntityResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<LanguageEntityResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Items()
     {
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        List<EntityResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, EntityResponseModel>(languages);
+        List<LanguageEntityResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, LanguageEntityResponseModel>(languages);
         return Ok(entityResponseModels);
     }
 }

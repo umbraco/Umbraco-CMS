@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Entity;
 
-public class TreeEntityModelBase : EntityModelBase
+public class TreeEntityModelBase
 {
     public bool IsContainer { get; set; }
 
