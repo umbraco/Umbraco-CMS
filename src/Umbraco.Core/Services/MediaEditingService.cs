@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+// FIXME: add granular permissions check (for inspiration, check how the old MediaController utilizes IAuthorizationService)
 internal sealed class MediaEditingService
     : ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
@@ -43,7 +44,7 @@ internal sealed class MediaEditingService
 
         IMedia media = result.Result!;
 
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+        var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus<IMedia?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, media)
@@ -58,7 +59,7 @@ internal sealed class MediaEditingService
             return Attempt.FailWithStatus(result.Result, content);
         }
 
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+        var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(content, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content)
@@ -67,14 +68,20 @@ internal sealed class MediaEditingService
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, Guid userKey)
     {
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+        var currentUserId = await GetUserIdAsync(userKey);
         return await HandleDeletionAsync(id, media => ContentService.MoveToRecycleBin(media, currentUserId).Result, false);
     }
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+        var currentUserId = await GetUserIdAsync(userKey);
         return await HandleDeletionAsync(id, media => ContentService.Delete(media, currentUserId).Result, true);
+    }
+
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid id, Guid? parentId, Guid userKey)
+    {
+        var currentUserId = await GetUserIdAsync(userKey);
+        return await HandleMoveAsync(id, parentId, (content, newParentId) => ContentService.Move(content, newParentId, currentUserId).Result);
     }
 
     protected override IMedia Create(string? name, int parentId, IMediaType contentType)
@@ -101,4 +108,6 @@ internal sealed class MediaEditingService
             return ContentEditingOperationStatus.Unknown;
         }
     }
+
+    private async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
 }

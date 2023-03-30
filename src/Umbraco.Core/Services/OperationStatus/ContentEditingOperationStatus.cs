@@ -8,6 +8,7 @@ public enum ContentEditingOperationStatus
     ContentTypeCultureVarianceMismatch,
     NotFound,
     ParentNotFound,
+    ParentInvalid,
     NotAllowed,
     TemplateNotFound,
     TemplateNotAllowed,

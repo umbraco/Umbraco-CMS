@@ -1,0 +1,39 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
+
+namespace Umbraco.Cms.Api.Management.Controllers.Document;
+
+public class MoveDocumentController : DocumentControllerBase
+{
+    private readonly IContentEditingService _contentEditingService;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+
+    public MoveDocumentController(IContentEditingService contentEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    {
+        _contentEditingService = contentEditingService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
+
+    [HttpPut("{key:guid}/move")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Move(Guid key, MoveDocumentRequestModel moveDocumentRequestModel)
+    {
+        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveAsync(
+            key,
+            moveDocumentRequestModel.TargetKey,
+            CurrentUserKey(_backOfficeSecurityAccessor));
+
+        return result.Success
+            ? Ok()
+            : ContentEditingOperationStatusResult(result.Status);
+    }
+}
