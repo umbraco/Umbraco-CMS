@@ -6,16 +6,12 @@ public class SortOption
 
     public Direction Direction { get; set; }
 
-    public SortType SortType { get; set; }
+    public FieldType FieldType { get; set; }
 }
 
-public enum SortType
+public enum FieldType
 {
-    Score,
-    DocumentOrder,
     String,
-    Int,
-    Float,
-    Long,
-    Double
+    Number,
+    Date
 }
