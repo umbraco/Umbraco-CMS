@@ -7917,7 +7917,12 @@
           }
         ],
         "properties": {
-          "parentKey": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
