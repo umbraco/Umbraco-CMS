@@ -9,13 +9,18 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 public class ByRouteContentApiController : ContentApiControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
+    private readonly IRequestRedirectService _requestRedirectService;
 
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentBuilder apiContentBuilder,
-        IRequestRoutingService requestRoutingService)
+        IRequestRoutingService requestRoutingService,
+        IRequestRedirectService requestRedirectService)
         : base(apiPublishedContentCache, apiContentBuilder)
-        => _requestRoutingService = requestRoutingService;
+    {
+        _requestRoutingService = requestRoutingService;
+        _requestRedirectService = requestRedirectService;
+    }
 
     /// <summary>
     ///     Gets a content item by route.
@@ -36,12 +41,21 @@ public class ByRouteContentApiController : ContentApiControllerBase
         var contentRoute = _requestRoutingService.GetContentRoute(path);
 
         IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
-
-        if (contentItem is null)
+        if (contentItem is not null)
         {
-            return NotFound();
+            return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
         }
 
-        return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
+        IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectPath(path);
+        return redirectRoute != null
+            ? RedirectTo(redirectRoute)
+            : NotFound();
+    }
+
+    private IActionResult RedirectTo(IApiContentRoute redirectRoute)
+    {
+        Response.Headers.Add("Location-Start-Item-Path", redirectRoute.StartItem.Path);
+        Response.Headers.Add("Location-Start-Item-Id", redirectRoute.StartItem.Id.ToString("D"));
+        return RedirectPermanent(redirectRoute.Path);
     }
 }
