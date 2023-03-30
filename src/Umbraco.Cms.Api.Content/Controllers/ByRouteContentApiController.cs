@@ -33,7 +33,7 @@ public class ByRouteContentApiController : ContentApiControllerBase
     /// <returns>The content item or not found result.</returns>
     [HttpGet("item/{*path}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IApiContentResponseBuilder), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "/")

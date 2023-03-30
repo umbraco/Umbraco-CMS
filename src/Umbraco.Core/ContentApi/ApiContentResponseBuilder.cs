@@ -15,7 +15,7 @@ public class ApiContentResponseBuilder : ApiContentBuilderBase<IApiContentRespon
     protected override IApiContentResponse Create(IPublishedContent content, Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties)
     {
         var cultures = content.Cultures.Values
-            .Where(publishedCultureInfo => publishedCultureInfo.Culture.IsNullOrWhiteSpace() == false)
+            .Where(publishedCultureInfo => publishedCultureInfo.Culture.IsNullOrWhiteSpace() == false) // filter out invariant cultures
             .ToDictionary(
                 publishedCultureInfo => publishedCultureInfo.Culture,
                 publishedCultureInfo => _apiContentRouteBuilder.Build(content, publishedCultureInfo.Culture));
