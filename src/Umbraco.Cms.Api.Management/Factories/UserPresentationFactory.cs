@@ -94,7 +94,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Email = updateModel.Email,
             Name = updateModel.Name,
             UserName = updateModel.UserName,
-            Language = updateModel.LanguageIsoCode,
+            LanguageIsoCode = updateModel.LanguageIsoCode,
             ContentStartNodeKeys = updateModel.ContentStartNodeIds,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds,
         };

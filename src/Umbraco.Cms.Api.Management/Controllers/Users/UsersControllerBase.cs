@@ -80,6 +80,10 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Unknown failure")
                 .WithDetail(errorMessageResult?.Error?.ErrorMessage ?? "The error was unknown")
                 .Build()),
+            UserOperationStatus.InvalidIsoCode => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid ISO code")
+                .WithDetail("The specified ISO code is invalid.")
+                .Build()),
             UserOperationStatus.Forbidden => Forbid(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user operation status."),
         };

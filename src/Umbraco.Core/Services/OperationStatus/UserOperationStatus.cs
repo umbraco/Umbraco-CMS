@@ -21,5 +21,6 @@ public enum UserOperationStatus
     CannotDisableInvitedUser,
     OldPasswordRequired,
     InvalidAvatar,
+    InvalidIsoCode,
     UnknownFailure,
 }

@@ -45,6 +45,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly MediaFileManager _mediaFileManager;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IShortStringHelper _shortStringHelper;
+    private readonly IISoCodeValidator _iSoCodeValidator;
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
 
@@ -64,7 +65,8 @@ internal class UserService : RepositoryService, IUserService
         MediaFileManager mediaFileManager,
         ITemporaryFileService temporaryFileService,
         IShortStringHelper shortStringHelper,
-        IOptions<ContentSettings> contentSettings)
+        IOptions<ContentSettings> contentSettings,
+        IISoCodeValidator iSoCodeValidator)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -77,6 +79,7 @@ internal class UserService : RepositoryService, IUserService
         _mediaFileManager = mediaFileManager;
         _temporaryFileService = temporaryFileService;
         _shortStringHelper = shortStringHelper;
+        _iSoCodeValidator = iSoCodeValidator;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -893,7 +896,7 @@ internal class UserService : RepositoryService, IUserService
         int[]? startMediaIds)
     {
         target.Name = source.Name;
-        target.Language = source.Language;
+        target.Language = source.LanguageIsoCode;
         target.Email = source.Email;
         target.Username = source.UserName;
         target.StartContentIds = startContentIds;
@@ -910,6 +913,11 @@ internal class UserService : RepositoryService, IUserService
 
     private UserOperationStatus ValidateUserUpdateModel(IUser existingUser, UserUpdateModel model)
     {
+        if (_iSoCodeValidator.IsValid(model.LanguageIsoCode) is false)
+        {
+            return UserOperationStatus.InvalidIsoCode;
+        }
+
         // We need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed.
         if (_localLoginSettingProvider.HasDenyLocalLogin() && model.Email != existingUser.Email)
         {
