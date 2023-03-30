@@ -48,7 +48,7 @@ public abstract class DataTypeFolderControllerBase : FolderManagementControllerB
                 .WithTitle("The name is already used")
                 .WithDetail("The data type folder name must be unique on this parent.")
                 .Build()),
-            DataTypeContainerOperationStatus.InvalidKey => BadRequest(new ProblemDetailsBuilder()
+            DataTypeContainerOperationStatus.DuplicateKey => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("The id is already used")
                 .WithDetail("The data type folder id must be unique.")
                 .Build()),

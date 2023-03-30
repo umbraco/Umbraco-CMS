@@ -20,16 +20,23 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid data type configuration")
                 .WithDetail("The supplied data type configuration was not valid. Please see the log for more details.")
                 .Build()),
-            DataTypeOperationStatus.NotFound => NotFound("The data type could not be found"),
+            DataTypeOperationStatus.NotFound => DataTypeNotFound(),
             DataTypeOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid data type name")
                 .WithDetail("The data type name must be non-empty and no longer than 255 characters.")
+                .Build()),
+            DataTypeOperationStatus.DuplicateKey => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("The id is already used")
+                .WithDetail("The data type id must be unique.")
                 .Build()),
             DataTypeOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the data type operation.")
                 .Build()),
+            DataTypeOperationStatus.PropertyEditorNotFound => NotFound("The targeted property editor was not found."),
             DataTypeOperationStatus.ParentNotFound => NotFound("The targeted parent for the data type operation was not found."),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown data type operation status")
         };
+
+    protected IActionResult DataTypeNotFound() => NotFound("The data type could not be found");
 }

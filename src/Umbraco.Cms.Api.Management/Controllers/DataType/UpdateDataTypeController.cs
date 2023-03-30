@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -13,14 +14,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 public class UpdateDataTypeController : DataTypeControllerBase
 {
     private readonly IDataTypeService _dataTypeService;
-    private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private IDataTypePresentationFactory _dataTypePresentationFactory;
 
-    public UpdateDataTypeController(IDataTypeService dataTypeService, IUmbracoMapper umbracoMapper, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public UpdateDataTypeController(IDataTypeService dataTypeService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypePresentationFactory dataTypePresentationFactory)
     {
         _dataTypeService = dataTypeService;
-        _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _dataTypePresentationFactory = dataTypePresentationFactory;
     }
 
     [HttpPut("{id:guid}")]
@@ -33,12 +34,16 @@ public class UpdateDataTypeController : DataTypeControllerBase
         IDataType? current = await _dataTypeService.GetAsync(id);
         if (current == null)
         {
-            return NotFound();
+            return DataTypeNotFound();
         }
 
-        IDataType updated = _umbracoMapper.Map(updateDataTypeViewModel, current);
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.UpdateAsync(updated, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> attempt = await _dataTypePresentationFactory.CreateAsync(updateDataTypeViewModel, current);
+        if (!attempt.Success)
+        {
+            return DataTypeOperationStatusResult(attempt.Status);
+        }
 
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.UpdateAsync(attempt.Result, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : DataTypeOperationStatusResult(result.Status);

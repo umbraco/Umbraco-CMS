@@ -46,6 +46,8 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     protected Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
 
+    public IDataType? Get(Guid key) => GetMany().FirstOrDefault(x=>x.Key == key);
+
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
         var parentId = -1;

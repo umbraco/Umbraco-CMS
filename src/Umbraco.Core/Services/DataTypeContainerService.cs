@@ -61,7 +61,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
 
                 if (_dataTypeContainerRepository.Get(container.Key) is not null)
                 {
-                    return DataTypeContainerOperationStatus.InvalidKey;
+                    return DataTypeContainerOperationStatus.DuplicateKey;
                 }
 
                 EntityContainer? parentContainer = parentKey.HasValue
