@@ -35,7 +35,6 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
                 FieldName = "id",
                 Value = string.Empty
             };
-            return null; // still return  SelectorOption with Value = string.Empty (sth that yields result) - since CanHandle was true
         }
 
         // With the previous check we made sure that if we reach this, we already made sure that there is a valid content item
