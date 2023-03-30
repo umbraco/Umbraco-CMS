@@ -103,6 +103,8 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IContentAp
         return source;
     }
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
     // member picker is unsupported for content API output to avoid leaking member data by accident.

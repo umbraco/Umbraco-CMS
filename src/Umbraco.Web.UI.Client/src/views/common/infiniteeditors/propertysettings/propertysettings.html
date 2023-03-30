@@ -20,7 +20,8 @@
 
                         <div class="umb-control-group -no-border" ng-if="!model.property.locked">
                             <div class="control-group -no-margin">
-                                <textarea class="editor-label"
+                                <input type="text"
+                                          class="editor-label"
                                           data-element="property-name"
                                           name="propertyLabel"
                                           ng-model="model.property.label"
@@ -28,10 +29,8 @@
                                           placeholder="@placeholders_entername"
                                           umb-auto-focus
                                           focus-on-filled="true"
-                                          umb-auto-resize
                                           required
-                                          ng-keypress="vm.submitOnEnter($event)">
-                                </textarea>
+                                          ng-keypress="vm.submitOnEnter($event)" />
                                 <div ng-messages="propertySettingsForm.propertyLabel.$error" show-validation-on-submit>
                                     <span class="umb-validation-label" ng-message="required">Required label</span>
                                 </div>
@@ -47,11 +46,10 @@
                                     ng-model="model.property.description"
                                     localize="placeholder"
                                     placeholder="@placeholders_enterDescription"
-                                    ng-keypress="vm.submitOnEnter($event)"
                                     umb-auto-resize>
                         </textarea>
                         </div>
-                        
+
                         <ng-form name="dataTypeForm">
                             <div class="umb-control-group control-group" ng-model="model.property.editor" name="selectedEditor" val-require-component ng-if="!model.property.locked">
                                 <umb-button
@@ -82,7 +80,7 @@
                                         allow-change="vm.allowChangeDataType"
                                         on-change="vm.openDataTypePicker(model.property)">
                                     </umb-node-preview>
-                                    
+
                                     <div ng-if="vm.changeDataTypeHelpTextIsVisible" class="mt2 umb-alert umb-alert--info">
                                         <localize key="contentTypeEditor_changeDataTypeHelpText">
                                     </div>

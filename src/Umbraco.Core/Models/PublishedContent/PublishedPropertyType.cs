@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         private volatile bool _initialized;
         private IPropertyValueConverter? _converter;
         private PropertyCacheLevel _cacheLevel;
+        private PropertyCacheLevel _contentApiCacheLevel;
 
         private Type? _modelClrType;
         private Type? _clrType;
@@ -191,7 +192,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
-            _modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
+            _contentApiCacheLevel = _converter is IContentApiPropertyValueConverter contentApiConverter
+                ? contentApiConverter.GetPropertyContentApiCacheLevel(this)
+                : _cacheLevel;
+            _modelClrType = _converter?.GetPropertyValueType(this) ?? typeof(object);
         }
 
         /// <inheritdoc />
@@ -223,6 +227,20 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 }
 
                 return _cacheLevel;
+            }
+        }
+
+        /// <inheritdoc />
+        public PropertyCacheLevel ContentApiCacheLevel
+        {
+            get
+            {
+                if (!_initialized)
+                {
+                    Initialize();
+                }
+
+                return _contentApiCacheLevel;
             }
         }
 

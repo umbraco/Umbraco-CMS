@@ -434,6 +434,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
             .Returns(() => apiElementBuilder.Build(element.Object));
         elementValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
         elementValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        elementValueConverter.Setup(p => p.GetPropertyContentApiCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
         var elementPropertyType = SetupPublishedPropertyType(elementValueConverter.Object, elementPropertyAlias, "My.Element.Property");
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);

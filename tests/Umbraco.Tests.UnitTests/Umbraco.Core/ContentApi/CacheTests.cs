@@ -31,6 +31,7 @@ public class CacheTests : ContentApiTests
         ).Returns(() => $"Content API value: {++invocationCount}");
         propertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
         propertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(cacheLevel);
+        propertyValueConverter.Setup(p => p.GetPropertyContentApiCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(cacheLevel);
 
         var propertyType = SetupPublishedPropertyType(propertyValueConverter.Object, "something", "Some.Thing");
 

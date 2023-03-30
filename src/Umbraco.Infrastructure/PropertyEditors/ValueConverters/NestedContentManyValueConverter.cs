@@ -21,12 +21,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     content.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class NestedContentManyValueConverter : NestedContentValueConverterBase, IContentApiPropertyValueConverter
+[Obsolete("Nested content is obsolete, will be removed in V13")]
+public class NestedContentManyValueConverter : NestedContentValueConverterBase
 {
     private readonly IProfilingLogger _proflog;
     private readonly IApiElementBuilder _apiElementBuilder;
 
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V13")]
     public NestedContentManyValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory,
@@ -40,9 +41,9 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="NestedContentSingleValueConverter" /> class.
+    ///     Initializes a new instance of the <see cref="NestedContentManyValueConverter" /> class.
     /// </summary>
-    public NestedContentManyValueConverter (
+    public NestedContentManyValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory,
         IProfilingLogger proflog,
@@ -113,6 +114,8 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase, 
             return elements;
         }
     }
+
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
 

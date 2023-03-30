@@ -5,6 +5,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ContentApi;
 public interface IContentApiPropertyValueConverter : IPropertyValueConverter
 {
     /// <summary>
+    ///     Gets the property cache level for content API representation.
+    /// </summary>
+    /// <param name="propertyType">The property type.</param>
+    /// <returns>The property cache level.</returns>
+    PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType);
+
+    /// <summary>
     ///     Gets the type of values returned by the converter for content API representation.
     /// </summary>
     /// <param name="propertyType">The property type.</param>

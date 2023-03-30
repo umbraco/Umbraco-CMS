@@ -74,12 +74,18 @@ public sealed class RichTextEditorPastedImages
         // we have already processed to avoid dupes
         var uploadedImages = new Dictionary<string, GuidUdi>();
 
+
         foreach (HtmlNode? img in tmpImages)
         {
             // The data attribute contains the path to the tmp img to persist as a media item
             var tmpImgPath = img.GetAttributeValue(TemporaryImageDataAttribute, string.Empty);
 
             if (string.IsNullOrEmpty(tmpImgPath))
+            {
+                continue;
+            }
+
+            if (IsValidPath(tmpImgPath) == false)
             {
                 continue;
             }
@@ -184,4 +190,6 @@ public sealed class RichTextEditorPastedImages
 
         return htmlDoc.DocumentNode.OuterHtml;
     }
+
+    private bool IsValidPath(string imagePath) => imagePath.StartsWith(Constants.SystemDirectories.TempImageUploads);
 }

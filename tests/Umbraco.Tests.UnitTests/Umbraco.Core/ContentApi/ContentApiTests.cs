@@ -38,6 +38,7 @@ public class ContentApiTests
         ).Returns("Default value");
         contentApiPropertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
         contentApiPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        contentApiPropertyValueConverter.Setup(p => p.GetPropertyContentApiCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
         ContentApiPropertyType = SetupPublishedPropertyType(contentApiPropertyValueConverter.Object, "contentApi", "Content.Api.Editor");
 

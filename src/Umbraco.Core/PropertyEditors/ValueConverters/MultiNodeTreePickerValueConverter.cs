@@ -181,6 +181,8 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         return source;
     }
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
         => GetEntityType(propertyType) switch
         {

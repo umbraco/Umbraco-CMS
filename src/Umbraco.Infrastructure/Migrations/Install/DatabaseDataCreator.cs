@@ -1757,6 +1757,7 @@ internal class DatabaseDataCreator
         {
             // Insert the specified languages, ensuring the first is marked as default.
             bool isDefault = true;
+            short id = 1;
             foreach (var isoCode in languageInstallDefaultDataSettings.Values)
             {
                 if (!TryCreateCulture(isoCode, out CultureInfo? culture))
@@ -1766,12 +1767,14 @@ internal class DatabaseDataCreator
 
                 var dto = new LanguageDto
                 {
+                    Id = id,
                     IsoCode = culture.Name,
                     CultureName = culture.EnglishName,
                     IsDefault = isDefault,
                 };
-                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", true, dto);
+                _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, dto);
                 isDefault = false;
+                id++;
             }
         }
         else
