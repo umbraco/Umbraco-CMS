@@ -738,6 +738,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
             }
 
+
             _dataTypeRepository.Save(dataType);
 
             scope.Notifications.Publish(new DataTypeSavedNotification(dataType, eventMessages).WithStateFrom(savingDataTypeNotification));

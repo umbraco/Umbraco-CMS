@@ -25,6 +25,10 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid data type name")
                 .WithDetail("The data type name must be non-empty and no longer than 255 characters.")
                 .Build()),
+            DataTypeOperationStatus.ParentNotContainer => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("parent id is not a container")
+                .WithDetail("The parent id does not represent a container.")
+                .Build()),
             DataTypeOperationStatus.DuplicateKey => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("The id is already used")
                 .WithDetail("The data type id must be unique.")

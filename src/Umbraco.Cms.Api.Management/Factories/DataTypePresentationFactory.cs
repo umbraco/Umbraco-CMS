@@ -12,36 +12,36 @@ namespace Umbraco.Cms.Api.Management.Factories;
 /// <inheritdoc />
 public class DataTypePresentationFactory : IDataTypePresentationFactory
 {
-    private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeContainerService _dataTypeContainerService;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
 
     public DataTypePresentationFactory(
-        IDataTypeService dataTypeService,
+        IDataTypeContainerService dataTypeContainerService,
         PropertyEditorCollection propertyEditorCollection,
         IDataValueEditorFactory dataValueEditorFactory,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
     {
-        _dataTypeService = dataTypeService;
+        _dataTypeContainerService = dataTypeContainerService;
         _propertyEditorCollection = propertyEditorCollection;
         _dataValueEditorFactory = dataValueEditorFactory;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
     }
 
     /// <inheritdoc />
-    public Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(CreateDataTypeRequestModel requestModel)
+    public async Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(CreateDataTypeRequestModel requestModel)
     {
         if (!_propertyEditorCollection.TryGet(requestModel.PropertyEditorAlias, out IDataEditor? editor))
         {
-            return Task.FromResult(Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.PropertyEditorNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer) ));
+            return Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.PropertyEditorNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer));
         }
 
-        int? parentId = requestModel.ParentId.HasValue ? _dataTypeService.GetContainer(requestModel.ParentId.Value)?.ParentId : Constants.System.Root;
+        Attempt<int, DataTypeOperationStatus> parentAttempt = await GetParentId(requestModel);
 
-        if (parentId is null)
+        if (parentAttempt.Success == false)
         {
-            return Task.FromResult(Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.ParentNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer) ));
+            return Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(parentAttempt.Status, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer));
         }
 
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
@@ -50,7 +50,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             EditorUiAlias = requestModel.PropertyEditorUiAlias,
             DatabaseType = GetEditorValueStorageType(editor),
             ConfigurationData = MapConfigurationData(requestModel, editor),
-            ParentId = parentId.Value,
+            ParentId = parentAttempt.Result,
             CreateDate = DateTime.Now,
         };
 
@@ -60,7 +60,28 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
         }
 
 
-        return Task.FromResult(Attempt.SucceedWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType));
+        return Attempt.SucceedWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType);
+    }
+
+    private async Task<Attempt<int, DataTypeOperationStatus>> GetParentId(CreateDataTypeRequestModel requestModel)
+    {
+        if (requestModel.ParentId.HasValue)
+        {
+            try
+            {
+                var parent = await _dataTypeContainerService.GetAsync(requestModel.ParentId.Value);
+
+                return parent is null
+                    ? Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotFound, 0)
+                    : Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, parent.Id);
+            }
+            catch (ArgumentException)
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotContainer, 0);
+            }
+        }
+
+        return Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, Constants.System.Root);
     }
 
     public Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(UpdateDataTypeRequestModel requestModel, IDataType current)

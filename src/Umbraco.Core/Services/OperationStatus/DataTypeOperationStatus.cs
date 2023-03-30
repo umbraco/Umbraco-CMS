@@ -10,5 +10,6 @@ public enum DataTypeOperationStatus
     DuplicateKey,
     NotFound,
     ParentNotFound,
+    ParentNotContainer,
     PropertyEditorNotFound
 }
