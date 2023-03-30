@@ -2,7 +2,7 @@ import '../confirm/confirm-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import { UmbCodeEditorModalData } from '.';
+import { UmbCodeEditorModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {
 	title: 'API/Modals/Layouts/Code Editor',
@@ -20,5 +20,5 @@ export const Overview: Story<UmbCodeEditorModalData> = () => html`
 	<!-- TODO: figure out if generics are allowed for properties:
 	https://github.com/runem/lit-analyzer/issues/149
 	https://github.com/runem/lit-analyzer/issues/163 -->
-	<umb-code-editor-modal .data=${data}></umb-code-editor-modal>
+	<umb-code-editor-modal .data=${data as any}></umb-code-editor-modal>
 `;

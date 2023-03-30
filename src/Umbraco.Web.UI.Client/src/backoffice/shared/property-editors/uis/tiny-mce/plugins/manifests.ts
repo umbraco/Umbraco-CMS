@@ -1,4 +1,4 @@
-import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
+import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extensions-registry';
 
 const pluginBaseUrl = '/src/backoffice/shared/property-editors/uis/tiny-mce/plugins/';
 const pluginManifests: Array<ManifestTinyMcePlugin> = [
@@ -20,7 +20,6 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 		name: 'Media Picker TinyMCE Plugin',
 		js: `${pluginBaseUrl}tiny-mce-mediapicker.plugin`,
 	},
-
 	{
 		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.EmbeddedMedia',

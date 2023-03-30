@@ -1,6 +1,12 @@
 import { Editor } from 'tinymce';
-import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UmbLinkPickerModalResult, UMB_LINK_PICKER_MODAL, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
+import { TinyMcePluginArguments, TinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UmbLinkPickerModalResult,
+	UMB_LINK_PICKER_MODAL,
+	UmbLinkPickerLink,
+} from '@umbraco-cms/backoffice/modal';
 
 export interface LinkListItem {
 	text: string;
@@ -10,7 +16,6 @@ export interface LinkListItem {
 }
 
 export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
-
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {
@@ -71,7 +76,7 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 
 			if (currentTarget.url?.includes('localLink:')) {
 				currentTarget.udi =
-					currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';			
+					currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';
 			}
 
 			createLinkPickerCallback(currentTarget, anchorElm);

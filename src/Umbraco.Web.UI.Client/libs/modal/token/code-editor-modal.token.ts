@@ -1,10 +1,9 @@
-import { CodeEditorLanguage } from "../../../src/backoffice/shared/components/code-editor/code-editor.model";
 import { UmbModalToken } from "./modal-token";
 
 export interface UmbCodeEditorModalData {
 	headline: string;
 	content: string;
-	language: CodeEditorLanguage;
+	language: string; // TODO => should used CodeEditorLanguage, but model is not part of libs (yet)
 	color?: 'positive' | 'danger';
 	confirmLabel?: string;
 }

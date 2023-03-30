@@ -1,6 +1,6 @@
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../../../../users/current-user/current-user.store';
-import { UmbMediaHelper } from '../../../../../../../libs/utils/media-helper.service';
-import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
+import { TinyMcePluginArguments, TinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UmbMediaPickerModalResult, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
 

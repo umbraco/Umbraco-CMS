@@ -15,6 +15,7 @@ import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } fro
 import type { ManifestMenu } from './menu.models';
 import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.models';
 import type { ManifestTheme } from './theme.models';
+import type { ManifestTinyMcePlugin } from './tinymce-plugin.model';
 import type { ManifestTree } from './tree.models';
 import type { ManifestTreeItem } from './tree-item.models';
 import type { ManifestUserDashboard } from './user-dashboard.models';
@@ -44,6 +45,7 @@ export * from './section-sidebar-app.models';
 export * from './menu.models';
 export * from './menu-item.models';
 export * from './theme.models';
+export * from './tinymce-plugin.model';
 export * from './tree.models';
 export * from './tree-item.models';
 export * from './user-dashboard.models';
@@ -79,6 +81,7 @@ export type ManifestTypes =
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
 	| ManifestTheme
+	| ManifestTinyMcePlugin
 	| ManifestTree
 	| ManifestTreeItem
 	| ManifestUserDashboard

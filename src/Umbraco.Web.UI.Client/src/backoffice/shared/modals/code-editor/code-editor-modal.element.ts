@@ -1,19 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
-import { css, html } from 'lit';
+import { html } from 'lit';
 import { UmbCodeEditorElement as CodeEditorElement } from '../../components/code-editor';
-import { UmbCodeEditorModalData, UmbCodeEditorModalResult } from '.';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
+import { UmbModalHandler, UmbCodeEditorModalData, UmbCodeEditorModalResult } from '@umbraco-cms/backoffice/modal';
 
 // TODO => Integrate with code editor
 @customElement('umb-code-editor-modal')
 export class UmbCodeEditorModalElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
-		css`
-
-		`,
 	];
 
 	@property({ attribute: false })

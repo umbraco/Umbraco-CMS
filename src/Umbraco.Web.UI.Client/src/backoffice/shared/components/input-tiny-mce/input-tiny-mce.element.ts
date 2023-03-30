@@ -9,14 +9,17 @@ import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store';
-import { TinyMcePluginArguments, TinyMcePluginBase } from '../../property-editors/uis/tiny-mce/plugins/tiny-mce-plugin';
+import {
+	TinyMcePluginArguments,
+	TinyMcePluginBase,
+	ManifestTinyMcePlugin,
+} from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import type { ClassConstructor, UserDetails } from '@umbraco-cms/backoffice/models';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { hasDefaultExport, loadExtension, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestTinyMcePlugin } from 'libs/extensions-registry/tinymce-plugin.model';
 
 // TODO => determine optimal method for including tiny. Currently using public assets
 // as we need to ship all core plugins to allow implementors to register these. Have not considered

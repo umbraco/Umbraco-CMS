@@ -1,5 +1,5 @@
 import { AstNode } from 'tinymce';
-import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
+import { TinyMcePluginArguments, TinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
 
