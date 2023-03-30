@@ -2,13 +2,13 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUISelectEvent } from '@umbraco-ui/uui';
-import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../themes/theme.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../themes/theme.context';
 
-@customElement('umb-user-dashboard-test')
-export class UmbUserDashboardTestElement extends UmbLitElement {
+@customElement('umb-user-profile-app-themes')
+export class UmbUserProfileAppThemesElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -47,7 +47,7 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 		});
 	}
 
-	private _handleThemeChange(event: UUISelectEvent) {
+	#handleThemeChange(event: UUISelectEvent) {
 		if (!this.#themeService) return;
 
 		const theme = event.target.value.toString();
@@ -55,7 +55,7 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 		this.#themeService.setThemeByAlias(theme);
 	}
 
-	get options() {
+	get #options() {
 		return this._themes.map((t) => ({ name: t.name, value: t.alias, selected: t.alias === this._themeAlias }));
 	}
 
@@ -64,17 +64,17 @@ export class UmbUserDashboardTestElement extends UmbLitElement {
 			<b>Select Theme</b>
 			<uui-select
 				label="theme select"
-				@change=${this._handleThemeChange}
+				@change=${this.#handleThemeChange}
 				.value=${this._themeAlias}
-				.options=${this.options}></uui-select>
+				.options=${this.#options}></uui-select>
 		`;
 	}
 }
 
-export default UmbUserDashboardTestElement;
+export default UmbUserProfileAppThemesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-dashboard-test': UmbUserDashboardTestElement;
+		'umb-user-profile-app-themes': UmbUserProfileAppThemesElement;
 	}
 }
