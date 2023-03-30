@@ -3,8 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
-import { UmbEntityWorkspaceContextInterface } from '../../../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 

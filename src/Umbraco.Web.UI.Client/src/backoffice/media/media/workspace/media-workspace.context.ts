@@ -1,7 +1,7 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbMediaRepository } from '../repository/media.repository';
-import type { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import type { MediaDetails } from '../';
+import type { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 

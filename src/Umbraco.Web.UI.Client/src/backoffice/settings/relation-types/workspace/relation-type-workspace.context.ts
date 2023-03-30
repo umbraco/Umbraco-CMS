@@ -1,6 +1,6 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository';
-import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';

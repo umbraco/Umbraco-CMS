@@ -1,8 +1,8 @@
 import { UMB_USER_STORE_CONTEXT_TOKEN } from '../repository/user.store';
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbUserRepository } from '../repository/user.repository';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 

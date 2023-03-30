@@ -1,6 +1,6 @@
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
