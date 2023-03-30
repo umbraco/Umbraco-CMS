@@ -37,13 +37,20 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             return Task.FromResult(Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.PropertyEditorNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer) ));
         }
 
+        int? parentId = requestModel.ParentId.HasValue ? _dataTypeService.GetContainer(requestModel.ParentId.Value)?.ParentId : Constants.System.Root;
+
+        if (parentId is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.ParentNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer) ));
+        }
+
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
         {
             Name = requestModel.Name,
             EditorUiAlias = requestModel.PropertyEditorUiAlias,
             DatabaseType = GetEditorValueStorageType(editor),
             ConfigurationData = MapConfigurationData(requestModel, editor),
-            ParentId = MapParentId(requestModel.ParentId),
+            ParentId = parentId.Value,
             CreateDate = DateTime.Now,
         };
 
@@ -74,16 +81,6 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
         return Task.FromResult(Attempt.SucceedWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType));
     }
 
-    private int MapParentId(Guid? parentKey)
-    {
-        if (parentKey == null)
-        {
-            return Constants.System.Root;
-        }
-
-        EntityContainer? container = _dataTypeService.GetContainer(parentKey.Value);
-        return container?.Id ?? throw new InvalidOperationException($"Could not find a parent container with key \"{parentKey}\".");
-    }
 
     private ValueStorageType GetEditorValueStorageType(IDataEditor editor)
     {
