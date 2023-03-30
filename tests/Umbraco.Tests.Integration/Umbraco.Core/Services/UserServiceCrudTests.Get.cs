@@ -68,7 +68,7 @@ public partial class UserServiceCrudTests
     }
 
     [Test]
-    public async Task Only_Admins_Can_See_Admins()
+    public async Task Non_Admins_Cannot_Get_admins()
     {
         var userService = CreateUserService();
         var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
@@ -101,6 +101,36 @@ public partial class UserServiceCrudTests
         var editorAllUsers = editorAllUsersAttempt.Result.Items.ToList();
         Assert.AreEqual(1, editorAllUsers.Count);
         Assert.AreEqual(createEditorAttempt.Result.CreatedUser!.Key, editorAllUsers.First().Key);
+    }
+
+    [Test]
+    public async Task Admins_Can_See_Admins()
+    {
+        var userService = CreateUserService();
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+
+        var editorCreateModel = new UserCreateModel
+        {
+            UserName = "editor@mail.com",
+            Email = "editor@mail.com",
+            Name = "Editor Mc. Gee",
+            UserGroups = new HashSet<IUserGroup> { editorGroup! }
+        };
+
+        var adminCreateModel = new UserCreateModel
+        {
+            UserName = "admin@mail.com",
+            Email = "admin@mail.com",
+            Name = "Admin Mc. Gee",
+            UserGroups = new HashSet<IUserGroup> { adminGroup!, editorGroup }
+        };
+
+        var createEditorAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, editorCreateModel, true);
+        var createAdminAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, adminCreateModel, true);
+
+        Assert.IsTrue(createEditorAttempt.Success);
+        Assert.IsTrue(createAdminAttempt.Success);
 
         var adminAllUsersAttempt = await userService.GetAllAsync(createAdminAttempt.Result.CreatedUser!.Key, 0, 10000);
         Assert.IsTrue(adminAllUsersAttempt.Success);
