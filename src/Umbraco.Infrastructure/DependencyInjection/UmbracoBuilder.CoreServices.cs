@@ -38,6 +38,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.ContentApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
@@ -432,6 +433,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
+        builder.Services.AddSingleton<IApiRichTextParser, ApiRichTextParser>();
 
         return builder;
     }
