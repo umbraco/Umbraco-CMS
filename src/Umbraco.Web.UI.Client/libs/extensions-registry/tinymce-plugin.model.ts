@@ -1,4 +1,3 @@
-import { Editor } from "tinymce";
 import type { ManifestClass } from "./models";
 import { DataTypePropertyPresentationModel } from "@umbraco-cms/backoffice/backend-api";
 import { UmbElementMixinInterface } from "@umbraco-cms/backoffice/element";
@@ -9,6 +8,6 @@ export interface ManifestTinyMcePlugin extends ManifestClass {
 
 export interface TinyMcePluginArguments {
     host: UmbElementMixinInterface;
-	editor: Editor;
+	editor: any; // TODO => should be typed
 	configuration?: Array<DataTypePropertyPresentationModel>;
 }
