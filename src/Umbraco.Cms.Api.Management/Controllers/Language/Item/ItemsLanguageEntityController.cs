@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Language.Entity;
+using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Language.Enitity;
+namespace Umbraco.Cms.Api.Management.Controllers.Language.Item;
 
 public class ItemsLanguageEntityController : LanguageEntityControllerBase
 {
@@ -20,11 +20,11 @@ public class ItemsLanguageEntityController : LanguageEntityControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<LanguageEntityResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<LanguageItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Items()
     {
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
-        List<LanguageEntityResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, LanguageEntityResponseModel>(languages);
+        List<LanguageItemResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, LanguageItemResponseModel>(languages);
         return Ok(entityResponseModels);
     }
 }

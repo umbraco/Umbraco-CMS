@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Language.Entity;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 
-public class LanguageEntityResponseModel
+public class LanguageItemResponseModel
 {
     public string Name { get; set; } = string.Empty;
 

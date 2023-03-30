@@ -5,8 +5,8 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Items;
 
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.DataType}")]
+[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DataType}/{Constants.Web.RoutePath.Item}")]
 [ApiExplorerSettings(GroupName = "Data Type")]
-public class DatatypeEntityControllerBase : ManagementApiControllerBase
+public class DatatypeItemControllerBase : ManagementApiControllerBase
 {
 }

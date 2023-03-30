@@ -9,7 +9,7 @@ internal static class EntityBuilderExtensions
     internal static IUmbracoBuilder AddEntitys(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<EntityTypeMapDefinition>();
+            .Add<ItemTypeMapDefinition>();
 
         return builder;
     }

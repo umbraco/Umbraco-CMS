@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.DataType.Entity;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 
-public class DataTypeEntityResponseModel
+public class DataTypeItemResponseModel
 {
     public string Name { get; set; } = string.Empty;
 

@@ -2,10 +2,10 @@
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Language.Enitity;
+namespace Umbraco.Cms.Api.Management.Controllers.Language.Item;
 
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Language}")]
+[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Language}/{Constants.Web.RoutePath.Item}")]
 [ApiExplorerSettings(GroupName = "Language")]
 public class LanguageEntityControllerBase : ManagementApiControllerBase
 {
