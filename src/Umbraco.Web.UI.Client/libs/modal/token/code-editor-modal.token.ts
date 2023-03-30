@@ -1,5 +1,5 @@
-import { CodeEditorLanguage } from '../../components/code-editor/code-editor.model';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { CodeEditorLanguage } from "../../../src/backoffice/shared/components/code-editor/code-editor.model";
+import { UmbModalToken } from "./modal-token";
 
 export interface UmbCodeEditorModalData {
 	headline: string;
@@ -13,7 +13,7 @@ export interface UmbCodeEditorModalResult {
 	content: string;
 }
 
-export const UMB_CODE_EDITOR_MODAL_TOKEN = new UmbModalToken<UmbCodeEditorModalData, UmbCodeEditorModalResult>(
+export const UMB_CODE_EDITOR_MODAL = new UmbModalToken<UmbCodeEditorModalData, UmbCodeEditorModalResult>(
 	'Umb.Modal.CodeEditor',
 	{
 		type: 'sidebar',

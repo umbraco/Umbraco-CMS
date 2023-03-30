@@ -1,16 +1,6 @@
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { Editor } from 'tinymce';
-import { UmbLinkPickerModalResult, UMB_LINK_PICKER_MODAL_TOKEN } from '../../../../modals/link-picker';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
-
-export interface CurrentTargetData {
-	name?: string;
-	url?: string;
-	target?: string;
-	anchor?: string;
-	udi?: string;
-	id?: string;
-}
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UmbLinkPickerModalResult, UMB_LINK_PICKER_MODAL, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 
 export interface LinkListItem {
 	text: string;
@@ -30,14 +20,14 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 			this.#modalContext = instance;
 		});
 
-		this.#createLinkPicker(this.editor, (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => {
+		this.#createLinkPicker(this.editor, (currentTarget: UmbLinkPickerLink, anchorElement: HTMLAnchorElement) => {
 			this.#openLinkPicker(currentTarget, anchorElement);
 		});
 	}
 
 	#createLinkPicker(
 		editor: Editor,
-		createLinkPickerCallback: (currentTarget: CurrentTargetData, anchorElement: HTMLAnchorElement) => void
+		createLinkPickerCallback: (currentTarget: UmbLinkPickerLink, anchorElement: HTMLAnchorElement) => void
 	) {
 		async function showDialog() {
 			const data: { text?: string; href?: string; target?: string; rel?: string } = {};
@@ -59,7 +49,7 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 				data.text = ' ';
 			}
 
-			let currentTarget: CurrentTargetData = {};
+			let currentTarget: UmbLinkPickerLink = {};
 
 			if (!anchorElm) {
 				createLinkPickerCallback(currentTarget, anchorElm);
@@ -76,23 +66,12 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 			// drop the lead char from the anchor text, if it has a value
 			const anchorVal = anchorElm.dataset.anchor;
 			if (anchorVal) {
-				currentTarget.anchor = anchorVal.substring(1);
+				currentTarget.queryString = anchorVal.substring(1);
 			}
 
 			if (currentTarget.url?.includes('localLink:')) {
-				// if the current link has an anchor, it needs to be considered when getting the udi/id
-				// if an anchor exists, reduce the substring max by its length plus two to offset the removed prefix and trailing curly brace
-				const linkId =
-					currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';
-
-				//we need to check if this is an INT or a UDI
-				const parsedIntId = parseInt(linkId, 10);
-				if (isNaN(parsedIntId)) {
-					//it's a UDI
-					currentTarget.udi = linkId;
-				} else {
-					currentTarget.id = linkId;
-				}
+				currentTarget.udi =
+					currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';			
 			}
 
 			createLinkPickerCallback(currentTarget, anchorElm);
@@ -121,12 +100,13 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 	}
 
 	// TODO => get anchors to provide to link picker?
-	async #openLinkPicker(currentTarget: CurrentTargetData, anchorElement?: HTMLAnchorElement) {
-		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL_TOKEN, {
+	async #openLinkPicker(currentTarget: UmbLinkPickerLink, anchorElement?: HTMLAnchorElement) {
+		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL, {
 			config: {
 				ignoreUserStartNodes: this.configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
 			},
 			link: currentTarget,
+			index: null,
 		});
 
 		if (!modalHandler) return;
@@ -139,25 +119,25 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 
 	#updateLink(linkPickerData: UmbLinkPickerModalResult, anchorElement?: HTMLAnchorElement) {
 		const editor = this.editor;
-		let href = linkPickerData.url;
+		let href = linkPickerData.link.url;
 
 		// if an anchor exists, check that it is appropriately prefixed
 		if (
-			linkPickerData.queryString &&
-			!linkPickerData.queryString.startsWith('?') &&
-			!linkPickerData.queryString.startsWith('#')
+			linkPickerData.link.queryString &&
+			!linkPickerData.link.queryString.startsWith('?') &&
+			!linkPickerData.link.queryString.startsWith('#')
 		) {
-			linkPickerData.queryString =
-				(linkPickerData.queryString.startsWith('=') ? '#' : '?') + linkPickerData.queryString;
+			linkPickerData.link.queryString =
+				(linkPickerData.link.queryString.startsWith('=') ? '#' : '?') + linkPickerData.link.queryString;
 		}
 
 		// the href might be an external url, so check the value for an anchor/qs
 		// href has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
-		if (!linkPickerData.queryString) {
+		if (!linkPickerData.link.queryString) {
 			const urlParts = href?.split(/(#|\?)/);
 			if (urlParts?.length === 3) {
 				href = urlParts[0];
-				linkPickerData.queryString = urlParts[1] + urlParts[2];
+				linkPickerData.link.queryString = urlParts[1] + urlParts[2];
 			}
 		}
 
@@ -172,15 +152,15 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 				rel?: string | null;
 			} = {
 				href,
-				title: linkPickerData.name,
-				target: linkPickerData.target ?? null,
+				title: linkPickerData.link.name,
+				target: linkPickerData.link.target ?? null,
 				'data-anchor': null,
 				//rel: linkPickerData.rel ?? null,
 			};
 
-			if (linkPickerData.queryString?.startsWith('#')) {
-				a['data-anchor'] = linkPickerData.queryString;
-				a.href = a.href + linkPickerData.queryString;
+			if (linkPickerData.link.queryString?.startsWith('#')) {
+				a['data-anchor'] = linkPickerData.link.queryString;
+				a.href = a.href + linkPickerData.link.queryString;
 			}
 
 			return a;
@@ -202,9 +182,9 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 				} else {
 					// Using the target url as a fallback, as href might be confusing with a local link
 					const linkContent =
-						typeof linkPickerData.name !== 'undefined' && linkPickerData.name !== ''
-							? linkPickerData.name
-							: linkPickerData.url;
+						typeof linkPickerData.link.name !== 'undefined' && linkPickerData.link.name !== ''
+							? linkPickerData.link.name
+							: linkPickerData.link.url;
 
 					// only insert if link has content
 					if (linkContent) {
@@ -215,14 +195,14 @@ export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
 			}
 		}
 
-		if (!href && !linkPickerData.queryString) {
+		if (!href && !linkPickerData.link.queryString) {
 			editor.execCommand('unlink');
 			return;
 		}
 
 		//if we have an id, it must be a locallink:id
-		if (linkPickerData.udi) {
-			href = '/{localLink:' + linkPickerData.udi + '}';
+		if (linkPickerData.link.udi) {
+			href = '/{localLink:' + linkPickerData.link.udi + '}';
 
 			insertLink();
 			return;

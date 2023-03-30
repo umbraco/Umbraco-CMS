@@ -1,8 +1,7 @@
 import { AstNode } from 'tinymce';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../modals/confirm';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
 
 interface DialogData {
 	richTextEditor: boolean;
@@ -189,9 +188,9 @@ export default class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
 		return e as HTMLElement;
 	}
 
-	// TODO => depends on macro picker, which doesn't exist
+	// TODO => depends on macro picker, which doesn't exist, just showing a generic modal for now
 	async #showMacroPicker(dialogData: DialogData) {
-		const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Macro picker',
 			content: 'Yet to be implemented',
 		});

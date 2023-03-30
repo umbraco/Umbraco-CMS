@@ -1,10 +1,14 @@
-import { UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult, UMB_EMBEDDED_MEDIA_MODAL_TOKEN } from '../../../../modals/embedded-media';
 import { UmbEmbeddedMediaModalElement as ModalElement } from '../../../../modals/embedded-media/embedded-media-modal.element';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UmbEmbeddedMediaModalData,
+	UmbEmbeddedMediaModalResult,
+	UMB_EMBEDDED_MEDIA_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 
 export default class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
-
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {
@@ -26,7 +30,7 @@ export default class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 		// Check nodename is a DIV and the claslist contains 'umb-embed-holder'
 		const selectedElm = this.editor.selection.getNode();
 		const nodeName = selectedElm.nodeName;
-		
+
 		let modify: UmbEmbeddedMediaModalData = {
 			width: ModalElement.defaultWidth,
 			height: ModalElement.defaultHeight,
@@ -67,20 +71,16 @@ export default class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 		);
 
 		// Only replace if activeElement is an Embed element.
-		if (
-			activeElement?.nodeName.toUpperCase() === 'DIV' &&
-			activeElement.classList.contains('umb-embed-holder')
-		) {
+		if (activeElement?.nodeName.toUpperCase() === 'DIV' && activeElement.classList.contains('umb-embed-holder')) {
 			activeElement.replaceWith(wrapper); // directly replaces the html node
 		} else {
 			this.editor.selection.setNode(wrapper);
 		}
 	}
 
-	// TODO => update when embed modal exists
 	async #showModal(selectedElm: HTMLElement, embeddedMediaModalData: UmbEmbeddedMediaModalData) {
-		const modalHandler = this.#modalContext?.open(UMB_EMBEDDED_MEDIA_MODAL_TOKEN, embeddedMediaModalData);
-		
+		const modalHandler = this.#modalContext?.open(UMB_EMBEDDED_MEDIA_MODAL, embeddedMediaModalData);
+
 		if (!modalHandler) return;
 
 		const result = await modalHandler.onSubmit();

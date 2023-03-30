@@ -1,9 +1,13 @@
-import { UmbCodeEditorModalData, UmbCodeEditorModalResult, UMB_CODE_EDITOR_MODAL_TOKEN } from '../../../../modals/code-editor';
 import { TinyMcePluginArguments, TinyMcePluginBase } from './tiny-mce-plugin';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UmbCodeEditorModalData,
+	UmbCodeEditorModalResult,
+	UMB_CODE_EDITOR_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 
 export default class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
-
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {
@@ -21,11 +25,14 @@ export default class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
 	}
 
 	async #showCodeEditor() {
-		const modalHandler = this.#modalContext?.open<UmbCodeEditorModalData, UmbCodeEditorModalResult>(UMB_CODE_EDITOR_MODAL_TOKEN, {
-			headline: 'Edit source code',
-			content: this.editor.getContent() ?? '',
-			language: 'html',
-		});
+		const modalHandler = this.#modalContext?.open<UmbCodeEditorModalData, UmbCodeEditorModalResult>(
+			UMB_CODE_EDITOR_MODAL,
+			{
+				headline: 'Edit source code',
+				content: this.editor.getContent() ?? '',
+				language: 'html',
+			}
+		);
 
 		if (!modalHandler) return;
 

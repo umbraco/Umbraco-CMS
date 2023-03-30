@@ -22,3 +22,4 @@ export * from './search-modal.token';
 export * from './section-picker-modal.token';
 export * from './user-group-picker-modal.token';
 export * from './user-picker-modal.token';
+export * from './code-editor-modal.token';

@@ -32,6 +32,6 @@ export const UMB_EMBEDDED_MEDIA_MODAL = new UmbModalToken<UmbEmbeddedMediaModalD
 	'Umb.Modal.EmbeddedMedia',
 	{
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium', 
 	}
 );
