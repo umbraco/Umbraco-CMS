@@ -9,7 +9,7 @@ export interface UmbTemplateModalResult {
 	key: string;
 }
 
-export const UMB_TEMPLATE_MODAL_TOKEN = new UmbModalToken<UmbTemplateModalData, UmbTemplateModalResult>(
+export const UMB_TEMPLATE_MODAL = new UmbModalToken<UmbTemplateModalData, UmbTemplateModalResult>(
 	'Umb.Modal.Template',
 	{
 		type: 'sidebar',

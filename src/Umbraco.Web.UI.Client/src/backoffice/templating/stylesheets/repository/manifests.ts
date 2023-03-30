@@ -1,6 +1,6 @@
 import { UmbStylesheetRepository } from './stylesheet.repository';
 import { UmbStylesheetTreeStore } from './stylesheet.tree.store';
-import { ManifestTreeStore, ManifestRepository } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestRepository, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const STYLESHEET_REPOSITORY_ALIAS = 'Umb.Repository.Stylesheet';
 

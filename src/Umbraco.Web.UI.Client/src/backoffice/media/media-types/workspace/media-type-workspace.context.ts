@@ -1,13 +1,13 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 
 type EntityType = MediaTypeDetails;
 export class UmbWorkspaceMediaTypeContext
-	extends UmbWorkspaceContext<UmbMediaTypeRepository>
+	extends UmbWorkspaceContext<UmbMediaTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<MediaTypeDetails | undefined>(undefined);

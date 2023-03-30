@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -55,8 +56,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
 		});
 
 		// TODO: Figure out if this is the best way to consume a context or if it could be strongly typed using UmbContextToken
-		this.consumeContext<UmbDataTypeWorkspaceContext>('umbWorkspaceContext', (_instance) => {
-			this._workspaceContext = _instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (_instance) => {
+			this._workspaceContext = _instance as UmbDataTypeWorkspaceContext;
 			this._observeDataType();
 		});
 	}

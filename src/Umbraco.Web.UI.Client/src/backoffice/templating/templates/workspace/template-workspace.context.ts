@@ -4,7 +4,7 @@ import { createObservablePart, DeepState } from '@umbraco-cms/backoffice/observa
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
-export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository> {
+export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel> {
 	#data = new DeepState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
@@ -12,6 +12,14 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbTemplateRepository(host));
+	}
+
+	getEntityType(): string {
+		return 'template';
+	}
+
+	getEntityKey() {
+		return this.getData()?.key || '';
 	}
 
 	getData() {
@@ -34,10 +42,18 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		}
 	}
 
+	public async save() {
+		throw new Error('Save method not implemented.');
+	}
+
 	async createScaffold(parentKey: string | null) {
 		const { data } = await this.repository.createScaffold(parentKey);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);
+	}
+
+	public destroy() {
+		this.#data.complete();
 	}
 }
