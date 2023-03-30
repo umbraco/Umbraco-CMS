@@ -82,12 +82,9 @@ public class PropertyValueConverterTests : ContentApiTests
     protected Mock<IPublishedContent> SetupPublishedContent(string name, Guid key, PublishedItemType itemType, IPublishedContentType contentType)
     {
         var content = new Mock<IPublishedContent>();
-        content.SetupGet(c => c.Properties).Returns(Array.Empty<PublishedElementPropertyBase>());
-        content.SetupGet(c => c.Key).Returns(key);
-        content.SetupGet(c => c.Name).Returns(name);
+        var urlSegment = "url-segment";
+        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType, Array.Empty<PublishedElementPropertyBase>());
         content.SetupGet(c => c.ItemType).Returns(itemType);
-        content.SetupGet(c => c.ContentType).Returns(contentType);
-        content.SetupGet(c => c.UrlSegment).Returns("url-segment");
         return content;
     }
 

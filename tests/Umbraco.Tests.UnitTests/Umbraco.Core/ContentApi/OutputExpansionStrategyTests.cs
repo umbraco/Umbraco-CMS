@@ -363,11 +363,9 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
     private void SetupContentMock(Mock<IPublishedContent> content, params IPublishedProperty[] properties)
     {
         var key = Guid.NewGuid();
-        content.SetupGet(c => c.Key).Returns(key);
-        content.SetupGet(c => c.UrlSegment).Returns("url-segment");
-        content.SetupGet(c => c.Properties).Returns(properties);
-        content.SetupGet(c => c.ContentType).Returns(_contentType);
-        content.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+        var name = "The page";
+        var urlSegment = "url-segment";
+        ConfigurePublishedContentMock(content, key, name, urlSegment, _contentType, properties);
 
         RegisterContentWithProviders(content.Object);
     }
@@ -441,5 +439,5 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         return new PublishedElementPropertyBase(elementPropertyType, parent, false, PropertyCacheLevel.None);
     }
 
-    private IApiContentRouteBuilder ApiContentRouteBuilder() => new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+    private IApiContentRouteBuilder ApiContentRouteBuilder() => new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>());
 }

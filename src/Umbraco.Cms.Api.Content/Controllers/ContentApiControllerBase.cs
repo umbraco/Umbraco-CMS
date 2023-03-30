@@ -18,11 +18,11 @@ public abstract class ContentApiControllerBase : Controller
 {
     protected IApiPublishedContentCache ApiPublishedContentCache { get; }
 
-    protected IApiContentBuilder ApiContentBuilder { get; }
+    protected IApiContentResponseBuilder ApiContentResponseBuilder { get; }
 
-    protected ContentApiControllerBase(IApiPublishedContentCache apiPublishedContentCache, IApiContentBuilder apiContentBuilder)
+    protected ContentApiControllerBase(IApiPublishedContentCache apiPublishedContentCache, IApiContentResponseBuilder apiContentResponseBuilder)
     {
         ApiPublishedContentCache = apiPublishedContentCache;
-        ApiContentBuilder = apiContentBuilder;
+        ApiContentResponseBuilder = apiContentResponseBuilder;
     }
 }

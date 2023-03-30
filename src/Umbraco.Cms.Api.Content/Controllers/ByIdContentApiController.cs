@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByIdContentApiController : ContentApiControllerBase
 {
-    public ByIdContentApiController(IApiPublishedContentCache apiPublishedContentCache, IApiContentBuilder apiContentBuilder)
-        : base(apiPublishedContentCache, apiContentBuilder)
+    public ByIdContentApiController(IApiPublishedContentCache apiPublishedContentCache, IApiContentResponseBuilder apiContentResponseBuilderBuilder)
+        : base(apiPublishedContentCache, apiContentResponseBuilderBuilder)
     {
     }
 
@@ -32,6 +32,6 @@ public class ByIdContentApiController : ContentApiControllerBase
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
+        return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
     }
 }

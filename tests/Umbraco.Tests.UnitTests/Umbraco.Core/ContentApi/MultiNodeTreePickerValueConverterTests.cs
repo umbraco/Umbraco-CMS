@@ -21,7 +21,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var contentNameProvider = new ApiContentNameProvider();
         var apiUrProvider = new ApiMediaUrlProvider(PublishedUrlProvider);
-        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>());
         return new MultiNodeTreePickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IUmbracoContextAccessor>(),
@@ -101,12 +101,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var prop2 = new PublishedElementPropertyBase(DefaultPropertyType, content.Object, false, PropertyCacheLevel.None);
 
         var key = Guid.NewGuid();
-        content.SetupGet(c => c.Properties).Returns(new[] { prop1, prop2 });
-        content.SetupGet(c => c.UrlSegment).Returns("page-url-segment");
-        content.SetupGet(c => c.Name).Returns("The page");
-        content.SetupGet(c => c.Key).Returns(key);
-        content.SetupGet(c => c.ContentType).Returns(PublishedContentType);
-        content.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+        var urlSegment = "page-url-segment";
+        var name = "The page";
+        ConfigurePublishedContentMock(content, key, name, urlSegment, PublishedContentType, new[] { prop1, prop2 });
 
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(content.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
