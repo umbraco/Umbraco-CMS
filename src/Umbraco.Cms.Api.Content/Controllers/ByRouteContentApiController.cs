@@ -3,24 +3,23 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByRouteContentApiController : ContentApiControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
-    private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IRequestRedirectService _requestRedirectService;
 
     public ByRouteContentApiController(
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IApiContentBuilder apiContentBuilder,
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
         IRequestRoutingService requestRoutingService,
-        IRequestPreviewService requestPreviewService)
-        : base(publishedSnapshotAccessor, apiContentBuilder)
+        IRequestRedirectService requestRedirectService)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
     {
         _requestRoutingService = requestRoutingService;
-        _requestPreviewService = requestPreviewService;
+        _requestRedirectService = requestRedirectService;
     }
 
     /// <summary>
@@ -28,33 +27,35 @@ public class ByRouteContentApiController : ContentApiControllerBase
     /// </summary>
     /// <param name="path">The path to the content item.</param>
     /// <remarks>
-    ///     Optional path for the start node of the content item
-    ///     can be added through a "start-node" header.
+    ///     Optional URL segment for the root content item
+    ///     can be added through the "start-item" header.
     /// </remarks>
     /// <returns>The content item or not found result.</returns>
     [HttpGet("item/{*path}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IApiContentResponseBuilder), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "/")
     {
-        IPublishedContentCache? contentCache = GetContentCache();
-
-        if (contentCache is null)
-        {
-            return BadRequest(ContentCacheNotFoundProblemDetails());
-        }
-
         var contentRoute = _requestRoutingService.GetContentRoute(path);
 
-        IPublishedContent? contentItem = contentCache.GetByRoute(_requestPreviewService.IsPreview(), contentRoute);
-
-        if (contentItem is null)
+        IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
+        if (contentItem is not null)
         {
-            return NotFound();
+            return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
         }
 
-        return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
+        IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectRoute(path);
+        return redirectRoute != null
+            ? RedirectTo(redirectRoute)
+            : NotFound();
+    }
+
+    private IActionResult RedirectTo(IApiContentRoute redirectRoute)
+    {
+        Response.Headers.Add("Location-Start-Item-Path", redirectRoute.StartItem.Path);
+        Response.Headers.Add("Location-Start-Item-Id", redirectRoute.StartItem.Id.ToString("D"));
+        return RedirectPermanent(redirectRoute.Path);
     }
 }

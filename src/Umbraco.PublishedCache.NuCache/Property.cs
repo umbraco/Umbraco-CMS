@@ -317,7 +317,7 @@ internal class Property : PublishedPropertyBase
         object? value;
         lock (_locko)
         {
-            CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
+            CacheValue cacheValues = GetCacheValues(PropertyType.ContentApiCacheLevel).For(culture, segment);
 
             // initial reference cache level always is .Content
             const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;

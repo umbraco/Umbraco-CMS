@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.ContentApi;
 
 public interface IApiContentRouteBuilder
 {
-    IApiContentRoute Build(IPublishedContent content);
+    IApiContentRoute Build(IPublishedContent content, string? culture = null);
 }

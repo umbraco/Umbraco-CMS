@@ -32,4 +32,11 @@ public class ContentApiSettings
     /// </summary>
     /// <value>A <c>string</c> representing the API key.</value>
     public string? ApiKey { get; set; } = null;
+
+    /// <summary>
+    ///     Gets or sets the aliases of the content types that may never be exposed through the Content API. Content of these
+    ///     types will never be returned from any Content API endpoint, nor added to the query index.
+    /// </summary>
+    /// <value>A <c>string</c> representing the API key.</value>
+    public string[] DisallowedContentTypeAliases { get; set; } = Array.Empty<string>();
 }

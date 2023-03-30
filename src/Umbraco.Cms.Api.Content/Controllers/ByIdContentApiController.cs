@@ -1,16 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
 public class ByIdContentApiController : ContentApiControllerBase
 {
-    public ByIdContentApiController(IPublishedSnapshotAccessor publishedSnapshotAccessor, IApiContentBuilder apiContentBuilder)
-        : base(publishedSnapshotAccessor, apiContentBuilder)
+    public ByIdContentApiController(IApiPublishedContentCache apiPublishedContentCache, IApiContentResponseBuilder apiContentResponseBuilderBuilder)
+        : base(apiPublishedContentCache, apiContentResponseBuilderBuilder)
     {
     }
 
@@ -21,25 +19,18 @@ public class ByIdContentApiController : ContentApiControllerBase
     /// <returns>The content item or not found result.</returns>
     [HttpGet("item/{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IApiContent), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IApiContentResponseBuilder), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ById(Guid id)
     {
-        IPublishedContentCache? contentCache = GetContentCache();
-
-        if (contentCache is null)
-        {
-            return BadRequest(ContentCacheNotFoundProblemDetails());
-        }
-
-        IPublishedContent? contentItem = contentCache.GetById(id);
+        IPublishedContent? contentItem = ApiPublishedContentCache.GetById(id);
 
         if (contentItem is null)
         {
             return NotFound();
         }
 
-        return await Task.FromResult(Ok(ApiContentBuilder.Build(contentItem)));
+        return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
     }
 }

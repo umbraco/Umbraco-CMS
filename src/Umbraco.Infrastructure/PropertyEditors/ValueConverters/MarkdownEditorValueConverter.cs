@@ -61,6 +61,8 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase, IContent
         // source should come from ConvertSource and be a string (or null) already
         inter?.ToString() ?? string.Empty;
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
 
     public object ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)

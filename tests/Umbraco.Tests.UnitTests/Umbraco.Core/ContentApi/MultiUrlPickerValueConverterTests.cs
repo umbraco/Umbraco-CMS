@@ -259,7 +259,7 @@ public class MultiUrlPickerValueConverterTests : PropertyValueConverterTests
 
     private MultiUrlPickerValueConverter MultiUrlPickerValueConverter()
     {
-        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings());
+        var routeBuilder = new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>());
         return new MultiUrlPickerValueConverter(
             PublishedSnapshotAccessor,
             Mock.Of<IProfilingLogger>(),

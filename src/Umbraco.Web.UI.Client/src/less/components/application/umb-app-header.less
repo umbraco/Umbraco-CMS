@@ -110,3 +110,27 @@
 .umb-app-header__button:focus .umb-app-header__action-icon {
     opacity: 1;
 }
+
+.umb-app-header__skip-button {
+    position: absolute;
+    top: 7.5px;
+    left: 5px;
+    background-color: #FFF;
+    border: 1px solid #000;
+    display: block;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px,1px,1px,1px);
+    border-radius: 3px;
+    z-index: 1;
+}
+
+.umb-app-header__skip-button:focus {
+    height: auto;
+    width: auto;
+    clip: auto;
+    padding: 10px;
+    line-height: normal;
+    text-decoration: none;
+}

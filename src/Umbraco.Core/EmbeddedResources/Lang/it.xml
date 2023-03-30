@@ -2660,6 +2660,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="labelUsedByMemberTypes">Usato nei tipi di membro</key>
     <key alias="noMemberTypes">Non ci sono riferimenti a tipi di membro.</key>
     <key alias="usedByProperties">Usato da</key>
+    <key alias="labelUsedByItems">Correlato ai seguenti elementi</key>
     <key alias="labelUsedByDocuments">Usato nei documenti</key>
     <key alias="labelUsedByMembers">Usato nei membri</key>
     <key alias="labelUsedByMedia">Usato nei media</key>

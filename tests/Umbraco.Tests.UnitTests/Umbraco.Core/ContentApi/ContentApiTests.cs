@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ContentApi;
 
@@ -37,6 +38,7 @@ public class ContentApiTests
         ).Returns("Default value");
         contentApiPropertyValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
         contentApiPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        contentApiPropertyValueConverter.Setup(p => p.GetPropertyContentApiCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
         ContentApiPropertyType = SetupPublishedPropertyType(contentApiPropertyValueConverter.Object, "contentApi", "Content.Api.Editor");
 
@@ -81,4 +83,26 @@ public class ContentApiTests
         globalSettingsOptionsMock.SetupGet(s => s.Value).Returns(globalSettings);
         return globalSettingsOptionsMock.Object;
     }
+
+    protected void ConfigurePublishedContentMock(Mock<IPublishedContent> content, Guid key, string name, string urlSegment, IPublishedContentType contentType, IEnumerable<IPublishedProperty> properties)
+    {
+        content.SetupGet(c => c.Key).Returns(key);
+        content.SetupGet(c => c.Name).Returns(name);
+        content.SetupGet(c => c.UrlSegment).Returns(urlSegment);
+        content
+            .SetupGet(m => m.Cultures)
+            .Returns(new Dictionary<string, PublishedCultureInfo>()
+            {
+                {
+                    string.Empty,
+                    new PublishedCultureInfo(string.Empty, name, urlSegment, DateTime.Now)
+                }
+            });
+        content.SetupGet(c => c.ContentType).Returns(contentType);
+        content.SetupGet(c => c.Properties).Returns(properties);
+        content.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+    }
+
+    protected string DefaultUrlSegment(string name, string? culture = null)
+        => $"{name.ToLowerInvariant().Replace(" ", "-")}{(culture.IsNullOrWhiteSpace() ? string.Empty : $"-{culture}")}";
 }

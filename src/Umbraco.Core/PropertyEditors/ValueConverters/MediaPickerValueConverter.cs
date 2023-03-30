@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The media picker property value converter.
 /// </summary>
 [DefaultPropertyValueConverter]
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
 {
     // hard-coding "image" here but that's how it works at UI level too
@@ -23,7 +24,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiMediaBuilder _apiMediaBuilder;
 
-    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V13")]
     public MediaPickerValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory)
@@ -120,6 +121,8 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
 
         return source;
     }
+
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
 
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMedia>);
 

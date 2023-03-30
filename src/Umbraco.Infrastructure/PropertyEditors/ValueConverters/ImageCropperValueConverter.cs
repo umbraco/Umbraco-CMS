@@ -68,6 +68,8 @@ public class ImageCropperValueConverter : PropertyValueConverterBase, IContentAp
         return value;
     }
 
+    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
     public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(ApiImageCropperValue);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
