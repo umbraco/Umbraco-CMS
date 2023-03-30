@@ -1,16 +1,12 @@
-using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Persistence.SqlServer.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.SqlServer;
 
 [TestFixture]
 public class SqlAzureDatabaseProviderMetadataTests
 {
-    
-    
     [Test]
     [TestCase("myServer", "myDatabase", "myLogin", "myPassword", true /*ignored*/, ExpectedResult = "Server=tcp:myServer.database.windows.net,1433;Database=myDatabase;User ID=myLogin@myServer;Password=myPassword")]
     [TestCase("myServer", "myDatabase", "myLogin", "myPassword", false, ExpectedResult = "Server=tcp:myServer.database.windows.net,1433;Database=myDatabase;User ID=myLogin@myServer;Password=myPassword")]
@@ -26,7 +22,7 @@ public class SqlAzureDatabaseProviderMetadataTests
             IntegratedAuth = integratedAuth
         });
     }
-    
+
     [Test]
     [TestCase("Server=myServer;Database=myDatabase;Integrated Security=true", ExpectedResult = false)] // SqlServer
     [TestCase("Server=myServer;Database=myDatabase;User Id=myLogin;Password=myPassword", ExpectedResult = false)] // SqlServer

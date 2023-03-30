@@ -27,7 +27,7 @@ public static class DatabaseProviderMetadataExtensions
     /// <returns>
     ///   <c>true</c> if a database can be created for the specified provider name; otherwise, <c>false</c>.
     /// </returns>
-    [Obsolete("Use CanForceCreateDatabase that takes an IUmbracoDatabaseFactory. Scheduled for removable in Umbraco 13.")]
+    [Obsolete("Use CanForceCreateDatabase that takes an IUmbracoDatabaseFactory. Scheduled for removal in Umbraco 13.")]
     public static bool CanForceCreateDatabase(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, string? providerName)
     {
         return databaseProviderMetadata
@@ -40,14 +40,14 @@ public static class DatabaseProviderMetadataExtensions
     /// Determines whether a database can be created for the specified provider name while ignoring the value of <see cref="GlobalSettings.InstallMissingDatabase" />.
     /// </summary>
     /// <param name="databaseProviderMetadata">The database provider metadata.</param>
-    /// <param name="IUmbracoDatabaseFactory">The database factory.</param>
+    /// <param name="umbracoDatabaseFactory">The database factory.</param>
     /// <returns>
     ///   <c>true</c> if a database can be created for the specified database; otherwise, <c>false</c>.
     /// </returns>
     public static bool CanForceCreateDatabase(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, IUmbracoDatabaseFactory umbracoDatabaseFactory)
     {
         // In case more metadata providers can recognize the connection string, we need to check if any can force create.
-        // E.g. Both SqlServer and SqlAzure will recognize an azure connection string, but luckily non can force create.
+        // E.g. Both SqlServer and SqlAzure will recognize an azure connection string, but luckily none of those can force create.
         return databaseProviderMetadata
             .Where(x =>
                 string.Equals(x.ProviderName, umbracoDatabaseFactory.SqlContext.SqlSyntax.ProviderName, StringComparison.InvariantCultureIgnoreCase)

@@ -1,16 +1,12 @@
-using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Persistence.SqlServer.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.SqlServer;
 
 [TestFixture]
 public class SqlLocalDbDatabaseProviderMetadataTests
 {
-    
-    
     [Test]
     [TestCase("ignored", "myDatabase", "ignored", "ignored", true, ExpectedResult = "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\myDatabase.mdf;Integrated Security=True")]
     [TestCase("ignored", "myDatabase2", "ignored", "ignored", false /*ignored*/, ExpectedResult = "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\myDatabase2.mdf;Integrated Security=True")]
@@ -24,10 +20,9 @@ public class SqlLocalDbDatabaseProviderMetadataTests
             Password = password,
             Server = server,
             IntegratedAuth = integratedAuth,
-            
         });
     }
-    
+
     [Test]
     [TestCase("Server=myServer;Database=myDatabase;Integrated Security=true", ExpectedResult = false)] // SqlServer
     [TestCase("Server=myServer;Database=myDatabase;User Id=myLogin;Password=myPassword", ExpectedResult = false)] // SqlServer

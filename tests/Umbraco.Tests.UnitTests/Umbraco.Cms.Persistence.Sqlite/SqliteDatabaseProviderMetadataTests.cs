@@ -1,17 +1,12 @@
-using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Persistence.Sqlite.Services;
-using Umbraco.Cms.Persistence.SqlServer.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.Sqlite;
 
 [TestFixture]
 public class SqliteDatabaseProviderMetadataTests
 {
-    
-    
     [Test]
     [TestCase("ignored", "myDatabase", "ignored", "ignored", true /*ignored*/, ExpectedResult = "Data Source=|DataDirectory|/myDatabase.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True")]
     [TestCase("ignored", "myDatabase2", "ignored", "ignored", false /*ignored*/, ExpectedResult = "Data Source=|DataDirectory|/myDatabase2.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True")]
@@ -27,7 +22,7 @@ public class SqliteDatabaseProviderMetadataTests
             IntegratedAuth = integratedAuth
         });
     }
-    
+
     [Test]
     [TestCase("Server=myServer;Database=myDatabase;Integrated Security=true", ExpectedResult = false)] // SqlServer
     [TestCase("Server=myServer;Database=myDatabase;User Id=myLogin;Password=myPassword", ExpectedResult = false)] // SqlServer
