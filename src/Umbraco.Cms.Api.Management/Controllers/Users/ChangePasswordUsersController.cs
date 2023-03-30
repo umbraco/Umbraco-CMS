@@ -36,11 +36,8 @@ public class ChangePasswordUsersController : UsersControllerBase
         // FIXME: use the actual currently logged in user key
         Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ChangePasswordAsync(Constants.Security.SuperUserKey, passwordModel);
 
-        if (response.Success)
-        {
-            return Ok(_mapper.Map<ChangePasswordUserResponseModel>(response.Result));
-        }
-
-        return UserOperationStatusResult(response.Status, response.Result);
+        return response.Success
+            ? Ok(_mapper.Map<ChangePasswordUserResponseModel>(response.Result))
+            : UserOperationStatusResult(response.Status, response.Result);
     }
 }

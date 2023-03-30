@@ -23,10 +23,8 @@ public class UnlockUsersController : UsersControllerBase
         // FIXME: use the actual currently logged in user key
         Attempt<UserUnlockResult, UserOperationStatus> attempt = await _userService.UnlockAsync(Constants.Security.SuperUserKey, model.UserIds.ToArray());
 
-        if (attempt.Success)
-        {
-            return Ok();
-        }
-
-        return UserOperationStatusResult(attempt.Status, attempt.Result); }
+        return attempt.Success
+            ? Ok()
+            : UserOperationStatusResult(attempt.Status, attempt.Result);
+    }
 }

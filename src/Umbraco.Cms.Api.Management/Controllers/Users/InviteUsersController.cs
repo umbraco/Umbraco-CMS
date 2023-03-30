@@ -34,11 +34,8 @@ public class InviteUsersController : UsersControllerBase
         // FIXME: use the actual currently logged in user key
         Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(Constants.Security.SuperUserKey, userInvite);
 
-        if (result.Success)
-        {
-            return Ok();
-        }
-
-        return UserOperationStatusResult(result.Status, result.Result);
+        return result.Success
+            ? Ok()
+            : UserOperationStatusResult(result.Status, result.Result);
     }
 }
