@@ -2,11 +2,10 @@ using Examine;
 using Examine.Search;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
-using SortType = Examine.Search.SortType;
 
 namespace Umbraco.Cms.Api.Content.Services;
 
-internal sealed class ApiQueryService : IApiQueryService
+internal sealed class ApiQueryService : IApiQueryService // Examine-specific implementation - can be swapped out
 {
     private readonly IExamineManager _examineManager;
     private readonly SelectorHandlerCollection _selectorHandlers;
@@ -37,6 +36,7 @@ internal sealed class ApiQueryService : IApiQueryService
         // Handle Selecting
         IBooleanOperation? queryOperation = HandleSelector(fetch, baseQuery);
 
+        // No Selector could be found, so we return no results
         if (queryOperation is null)
         {
             return Enumerable.Empty<Guid>();
@@ -48,7 +48,6 @@ internal sealed class ApiQueryService : IApiQueryService
         // Handle Sorting
         IOrdering? sortQuery = HandleSorting(sorts, queryOperation);
 
-        //ISearchResults? results = sortQuery is not null ? sortQuery.Execute() : queryOperation.Execute();
         ISearchResults? results = sortQuery is not null ? sortQuery.Execute() : DefaultSort(queryOperation)?.Execute();
 
         return results!.Select(x => Guid.Parse(x.Id));
@@ -67,6 +66,7 @@ internal sealed class ApiQueryService : IApiQueryService
         else
         {
             // TODO: If no params or no fetch value, get everything from the index
+            // This is a temp Examine solution
             queryOperation = baseQuery.Field("__IndexType", "content");
         }
 
@@ -85,17 +85,17 @@ internal sealed class ApiQueryService : IApiQueryService
                 switch (filter.Operator)
                 {
                     case FilterOperation.Is:
-                        //queryOperation.And().Field(filter.FieldName, filter.Value);
                         queryOperation.And().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // doesn't work for explicit word(s) match
+                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // TODO: doesn't work for explicit word(s) match
                         break;
                     case FilterOperation.IsNot:
-                        //queryOperation.Not().Field(filter.FieldName, filter.Value);
                         queryOperation.Not().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // doesn't work for explicit word(s) match
+                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // TODO: doesn't work for explicit word(s) match
                         break;
+                    // TODO: Fix
                     case FilterOperation.Contains:
                         break;
+                    // TODO: Fix
                     case FilterOperation.DoesNotContain:
                         break;
                     default:
@@ -119,7 +119,15 @@ internal sealed class ApiQueryService : IApiQueryService
                 continue;
             }
 
-            SortType sortType = Enum.Parse<SortType>(sort.SortType.ToString());
+            SortType sortType = sort.FieldType switch
+            {
+                FieldType.Number => // TODO: do we need more explicit types like float, long, double
+                    SortType.Int,
+                FieldType.Date =>
+                    // The field definition type should be FieldDefinitionTypes.DateTime
+                    SortType.Long,
+                _ => SortType.String
+            };
 
             orderingQuery = sort.Direction switch
             {
