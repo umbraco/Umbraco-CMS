@@ -416,7 +416,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddContentApiCoreServices(this IUmbracoBuilder builder) // noop implementations (add apiqueryservice noop)
+    private static IUmbracoBuilder AddContentApiCoreServices(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
