@@ -38,7 +38,7 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
     [ProducesResponseType(typeof(HealthCheckResultResponseModel), StatusCodes.Status200OK)]
     public async Task<ActionResult<HealthCheckResultResponseModel>> ExecuteAction(HealthCheckActionRequestModel action)
     {
-        Guid healthCheckKey = action.HealthCheckKey;
+        Guid healthCheckKey = action.HealthCheckId;
 
         Core.HealthChecks.HealthCheck? healthCheck = _healthChecks
             .Where(x => _disabledCheckIds.Contains(healthCheckKey) == false)
@@ -49,7 +49,7 @@ public class ExecuteActionHealthCheckController : HealthCheckControllerBase
             var invalidModelProblem = new ProblemDetails
             {
                 Title = "Health Check Not Found",
-                Detail = $"No health check found with key = {healthCheckKey}",
+                Detail = $"No health check found with id = {healthCheckKey}",
                 Status = StatusCodes.Status400BadRequest,
                 Type = "Error",
             };

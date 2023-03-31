@@ -23,14 +23,14 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeRespon
         return source.PropertyTypes.Select(propertyType =>
                 new TPropertyTypeResponseModel
                 {
-                    Key = propertyType.Key,
-                    ContainerKey = groupKeysByPropertyKeys.ContainsKey(propertyType.Key)
+                    Id = propertyType.Key,
+                    ContainerId = groupKeysByPropertyKeys.ContainsKey(propertyType.Key)
                         ? groupKeysByPropertyKeys[propertyType.Key]
                         : null,
                     Name = propertyType.Name,
                     Alias = propertyType.Alias,
                     Description = propertyType.Description,
-                    DataTypeKey = propertyType.DataTypeKey,
+                    DataTypeId = propertyType.DataTypeKey,
                     VariesByCulture = propertyType.VariesByCulture(),
                     VariesBySegment = propertyType.VariesBySegment(),
                     Validation = new PropertyTypeValidation
@@ -68,8 +68,8 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeRespon
             .Select(propertyGroup =>
                 new TPropertyTypeContainerResponseModel
                 {
-                    Key = propertyGroup.Key,
-                    ParentKey = ParentGroupKey(propertyGroup),
+                    Id = propertyGroup.Key,
+                    ParentId = ParentGroupKey(propertyGroup),
                     Type = propertyGroup.Type.ToString(),
                     SortOrder = propertyGroup.SortOrder,
                     Name = propertyGroup.Name,
@@ -78,13 +78,13 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeRespon
     }
 
     protected IEnumerable<ContentTypeSort> MapAllowedContentTypes(TContentType source)
-        => source.AllowedContentTypes?.Select(contentTypeSort => new ContentTypeSort { Key = contentTypeSort.Key, SortOrder = contentTypeSort.SortOrder }).ToArray()
+        => source.AllowedContentTypes?.Select(contentTypeSort => new ContentTypeSort { Id = contentTypeSort.Key, SortOrder = contentTypeSort.SortOrder }).ToArray()
            ?? Array.Empty<ContentTypeSort>();
 
     protected IEnumerable<ContentTypeComposition> MapCompositions(TContentType source, IEnumerable<IContentTypeComposition> contentTypeComposition)
         => contentTypeComposition.Select(contentType => new ContentTypeComposition
         {
-            Key = contentType.Key,
+            Id = contentType.Key,
             CompositionType = contentType.Id == source.ParentId
                 ? ContentTypeCompositionType.Inheritance
                 : ContentTypeCompositionType.Composition

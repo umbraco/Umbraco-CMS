@@ -25,10 +25,10 @@ public class ChildrenDocumentTreeController : DocumentTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<DocumentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<DocumentTreeItemResponseModel>>> Children(Guid parentKey, int skip = 0, int take = 100, Guid? dataTypeKey = null, string? culture = null)
+    public async Task<ActionResult<PagedViewModel<DocumentTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100, Guid? dataTypeId = null, string? culture = null)
     {
-        IgnoreUserStartNodesForDataType(dataTypeKey);
+        IgnoreUserStartNodesForDataType(dataTypeId);
         RenderForClientCulture(culture);
-        return await GetChildren(parentKey, skip, take);
+        return await GetChildren(parentId, skip, take);
     }
 }

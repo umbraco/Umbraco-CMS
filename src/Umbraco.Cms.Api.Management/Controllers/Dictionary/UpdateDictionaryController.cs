@@ -26,14 +26,14 @@ public class UpdateDictionaryController : DictionaryControllerBase
         _dictionaryPresentationFactory = dictionaryPresentationFactory;
     }
 
-    [HttpPut($"{{{nameof(key)}:guid}}")]
+    [HttpPut($"{{{nameof(id)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, UpdateDictionaryItemRequestModel updateDictionaryItemRequestModel)
+    public async Task<IActionResult> Update(Guid id, UpdateDictionaryItemRequestModel updateDictionaryItemRequestModel)
     {
-        IDictionaryItem? current = await _dictionaryItemService.GetAsync(key);
+        IDictionaryItem? current = await _dictionaryItemService.GetAsync(id);
         if (current == null)
         {
             return NotFound();

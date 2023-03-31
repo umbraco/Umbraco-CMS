@@ -28,7 +28,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
     private void Map(IDataType source, DataTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
-        target.ParentKey = _dataTypeService.GetContainer(source.ParentId)?.Key;
+        target.ParentId = _dataTypeService.GetContainer(source.ParentId)?.Key;
         target.Name = source.Name ?? string.Empty;
         target.PropertyEditorAlias = source.EditorAlias;
         target.PropertyEditorUiAlias = source.EditorUiAlias;

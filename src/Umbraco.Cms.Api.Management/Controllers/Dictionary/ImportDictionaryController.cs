@@ -32,15 +32,15 @@ public class ImportDictionaryController : DictionaryControllerBase
     {
         Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
             .ImportDictionaryItemFromUdtFileAsync(
-                importDictionaryRequestModel.TemporaryFileKey,
-                importDictionaryRequestModel.ParentKey,
+                importDictionaryRequestModel.TemporaryFileId,
+                importDictionaryRequestModel.ParentId,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Status switch
         {
             DictionaryImportOperationStatus.Success => CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
             DictionaryImportOperationStatus.ParentNotFound => NotFound("The parent dictionary item could not be found."),
-            DictionaryImportOperationStatus.TemporaryFileNotFound => NotFound("The temporary file with specified key could not be found."),
+            DictionaryImportOperationStatus.TemporaryFileNotFound => NotFound("The temporary file with specified id could not be found."),
             DictionaryImportOperationStatus.InvalidFileType => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid file type")
                 .WithDetail("The dictionary import only supports UDT files.")

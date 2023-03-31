@@ -2,7 +2,7 @@
 
 public class DataTypeReferenceResponseModel
 {
-    public required Guid Key { get; init; }
+    public required Guid Id { get; init; }
 
     public required string Type { get; init; }
 

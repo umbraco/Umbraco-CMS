@@ -32,7 +32,7 @@ public class MoveDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.MoveAsync(source, moveDataTypeRequestModel.TargetKey, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.MoveAsync(source, moveDataTypeRequestModel.TargetId, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

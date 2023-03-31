@@ -25,7 +25,7 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeIte
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.DataTypeContainer;
 
-    protected override FolderTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override FolderTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
     {
         var dataTypes = _dataTypeService
             .GetAll(entities.Select(entity => entity.Id).ToArray())
@@ -33,7 +33,7 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<FolderTreeIte
 
         return entities.Select(entity =>
         {
-            FolderTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
+            FolderTreeItemResponseModel responseModel = MapTreeItemViewModel(parentId, entity);
             if (dataTypes.TryGetValue(entity.Id, out IDataType? dataType))
             {
                 responseModel.Icon = dataType.Editor?.Icon ?? responseModel.Icon;

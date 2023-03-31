@@ -18,13 +18,13 @@ public class ByKeyTemplateController : TemplateControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet("{key:guid}")]
+    [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(TemplateResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TemplateResponseModel>> ByKey(Guid key)
+    public async Task<ActionResult<TemplateResponseModel>> ByKey(Guid id)
     {
-        ITemplate? template = await _templateService.GetAsync(key);
+        ITemplate? template = await _templateService.GetAsync(id);
         return template == null
             ? NotFound()
             : Ok(_umbracoMapper.Map<TemplateResponseModel>(template));

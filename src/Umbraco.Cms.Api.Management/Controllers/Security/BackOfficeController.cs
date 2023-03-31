@@ -98,7 +98,7 @@ public class BackOfficeController : ManagementApiControllerBase
                 // Update any authentication tokens if succeeded
                 await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
 
-                // sign in the backoffice user associated with the login provider and unique provider key
+                // sign in the backoffice user associated with the login provider and unique provider id
                 BackOfficeIdentityUser? backOfficeUser = await _backOfficeUserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
                 if (backOfficeUser != null)
                 {

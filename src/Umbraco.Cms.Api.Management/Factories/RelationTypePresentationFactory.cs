@@ -19,7 +19,7 @@ public class RelationTypePresentationFactory : IRelationTypePresentationFactory
             createRelationTypeRequestModel.ParentObjectType,
             createRelationTypeRequestModel.ChildObjectType,
             createRelationTypeRequestModel.IsDependency,
-            createRelationTypeRequestModel.Key);
+            createRelationTypeRequestModel.Id);
 
     public void MapUpdateModelToRelationType(UpdateRelationTypeRequestModel updateRelationTypeRequestModel, IRelationType target)
     {

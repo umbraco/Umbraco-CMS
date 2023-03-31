@@ -38,7 +38,7 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
         {
             Comment = auditItem.Comment,
             EntityType = auditItem.EntityType,
-            EntityKey = entitySlim?.Key,
+            EntityId = entitySlim?.Key,
             LogType = auditItem.AuditType,
             Parameters = auditItem.Parameters,
             Timestamp = auditItem.CreateDate,
@@ -50,7 +50,7 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
             throw new ArgumentException($"Could not find user with id {auditItem.UserId}");
         }
 
-        target.UserKey = user.Key;
+        target.UserId = user.Key;
         target.UserAvatars = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         target.UserName = user.Name;
         return target;
@@ -63,7 +63,7 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
             {
                 Comment = auditItem.Comment,
                 EntityType = auditItem.EntityType,
-                EntityKey = entitySlim?.Key,
+                EntityId = entitySlim?.Key,
                 LogType = auditItem.AuditType,
                 Parameters = auditItem.Parameters,
                 Timestamp = auditItem.CreateDate,
@@ -75,7 +75,7 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
             throw new ArgumentException($"Could not find user with id {auditItem.UserId}");
         }
 
-        target.UserKey = user.Key;
+        target.UserId = user.Key;
         return target;
     }
 }

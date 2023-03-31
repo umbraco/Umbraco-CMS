@@ -19,14 +19,14 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet($"{{{nameof(key)}}}")]
+    [HttpGet($"{{{nameof(id)}}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(TemporaryFileResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByKey(Guid key)
+    public async Task<IActionResult> ByKey(Guid id)
     {
-        TemporaryFileModel? model = await _temporaryFileService.GetAsync(key);
+        TemporaryFileModel? model = await _temporaryFileService.GetAsync(id);
         if (model == null)
         {
             return NotFound();

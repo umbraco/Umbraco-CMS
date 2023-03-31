@@ -28,9 +28,9 @@ public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<Recycle
 
     protected override int RecycleBinRootId => Constants.System.RecycleBinContent;
 
-    protected override RecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override RecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentId, IEntitySlim entity)
     {
-        RecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentKey, entity);
+        RecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentId, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
