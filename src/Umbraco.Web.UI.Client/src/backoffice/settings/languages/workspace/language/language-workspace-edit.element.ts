@@ -79,7 +79,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	render() {
 		return html`<umb-workspace-layout alias="Umb.Workspace.Language">
 			<div id="header" slot="header">
-				<uui-button label="Navigate back" href="/section/settings/workspace/language-root" compact>
+				<uui-button label="Navigate back" href="section/settings/workspace/language-root" compact>
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</uui-button>
 				${this._isNew
