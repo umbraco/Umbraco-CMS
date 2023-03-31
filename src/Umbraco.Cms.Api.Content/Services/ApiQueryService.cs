@@ -42,7 +42,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         // Handle Selecting
         IBooleanOperation? queryOperation = HandleSelector(fetch, baseQuery);
 
-        // No Selector could be found, so we return no results
+        // If no Selector could be found, we return no results
         if (queryOperation is null)
         {
             return Enumerable.Empty<Guid>();

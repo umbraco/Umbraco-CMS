@@ -9,7 +9,7 @@ public class ContentApiFieldDefinitionCollection : FieldDefinitionCollection
         new("id", FieldDefinitionTypes.FullText),
         new("parentKey", FieldDefinitionTypes.FullText),
         new("ancestorKeys", FieldDefinitionTypes.FullText),
-        new("name", FieldDefinitionTypes.FullTextSortable), //TODO: sortable
+        new("name", FieldDefinitionTypes.FullTextSortable),
         new("level", FieldDefinitionTypes.Integer),
         new("path", FieldDefinitionTypes.Raw), // TODO: should be sortable
         new("sortOrder", FieldDefinitionTypes.Integer)
