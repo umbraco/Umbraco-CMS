@@ -34,7 +34,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     {
         var responseModel = new UserResponseModel
         {
-            Key = user.Key,
+            Id = user.Key,
             Email = user.Email,
             Name = user.Name ?? string.Empty,
             AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator),

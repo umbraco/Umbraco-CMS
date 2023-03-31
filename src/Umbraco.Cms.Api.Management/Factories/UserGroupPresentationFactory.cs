@@ -43,7 +43,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         return new UserGroupPresentationModel
         {
             Name = userGroup.Name ?? string.Empty,
-            Key = userGroup.Key,
+            Id = userGroup.Key,
             DocumentStartNodeKey = contentStartNodeKey,
             MediaStartNodeKey = mediaStartNodeKey,
             Icon = userGroup.Icon,

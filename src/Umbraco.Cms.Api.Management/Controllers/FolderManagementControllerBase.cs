@@ -29,8 +29,8 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
         return Ok(new FolderReponseModel
         {
             Name = container.Name!,
-            Key = container.Key,
-            ParentKey = parentContainer?.Key
+            Id = container.Key,
+            ParentId = parentContainer?.Key
         });
     }
 
@@ -40,9 +40,14 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
     {
         var container = new EntityContainer(ContainerObjectType) { Name = createFolderRequestModel.Name };
 
+        if (createFolderRequestModel.Id.HasValue)
+        {
+            container.Key = createFolderRequestModel.Id.Value;
+        }
+
         Attempt<EntityContainer, TStatus> result = await CreateContainerAsync(
             container,
-            createFolderRequestModel.ParentKey,
+            createFolderRequestModel.ParentId,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

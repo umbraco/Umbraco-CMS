@@ -2,5 +2,5 @@
 
 public class TemplateResponseModel : TemplateModelBase, INamedEntityPresentationModel
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 }

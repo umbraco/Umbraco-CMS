@@ -6,7 +6,9 @@ public enum DataTypeContainerOperationStatus
     CancelledByNotification,
     InvalidObjectType,
     InvalidId,
+    DuplicateKey,
     NotFound,
     ParentNotFound,
-    NotEmpty
+    NotEmpty,
+    DuplicateName
 }

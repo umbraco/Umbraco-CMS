@@ -117,7 +117,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         {
             Icon = _itemUdiType,
             Name = entity.Name!,
-            Key = entity.Key,
+            Id = entity.Key,
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             IsContainer = entity.IsContainer,

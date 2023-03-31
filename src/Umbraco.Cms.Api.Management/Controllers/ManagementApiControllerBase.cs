@@ -9,8 +9,8 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 public class ManagementApiControllerBase : Controller
 {
-    protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid key)
-        => CreatedAtAction(action, new { key = key });
+    protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid id)
+        => CreatedAtAction(action, new { id = id });
 
     protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, object routeValues)
     {

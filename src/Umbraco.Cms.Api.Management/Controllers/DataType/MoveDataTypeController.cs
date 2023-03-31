@@ -20,13 +20,13 @@ public class MoveDataTypeController : DataTypeControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("{key:guid}/move")]
+    [HttpPost("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid key, MoveDataTypeRequestModel moveDataTypeRequestModel)
+    public async Task<IActionResult> Move(Guid id, MoveDataTypeRequestModel moveDataTypeRequestModel)
     {
-        IDataType? source = await _dataTypeService.GetAsync(key);
+        IDataType? source = await _dataTypeService.GetAsync(id);
         if (source is null)
         {
             return NotFound();

@@ -21,7 +21,7 @@ public class TemplateViewModelMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(ITemplate source, TemplateResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
         target.Alias = source.Alias;
         target.Content = source.Content;
