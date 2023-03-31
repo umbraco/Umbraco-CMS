@@ -1,6 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
+﻿using NPoco.FluentMappings;
+using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -17,6 +19,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IDataType, DataTypeItemResponseModel>((_, _) => new DataTypeItemResponseModel(), Map);
         mapper.Define<IDictionaryItem, DictionaryItemItemResponseModel>((_, _) => new DictionaryItemItemResponseModel(), Map);
         mapper.Define<IDocumentEntitySlim, DocumentItemResponseModel>((_, _) => new DocumentItemResponseModel(), Map);
+        mapper.Define<IContentType, DocumentTypeItemResponseModel>((_, _) => new DocumentTypeItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -48,5 +51,14 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.Icon = source.ContentTypeIcon ?? Constants.Icons.ContentType;
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(IContentType source, DocumentTypeItemResponseModel target, MapperContext context)
+    {
+        target.Name = source.Name ?? string.Empty;
+        target.Id = source.Key;
+        target.Icon = source.Icon ?? Constants.Icons.ContentType;
+        target.IsElement = source.IsElement;
     }
 }
