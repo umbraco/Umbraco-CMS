@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Umbraco.Cms.Api.Common.Builders;
 
@@ -8,6 +9,7 @@ public class ProblemDetailsBuilder
     private string? _title;
     private string? _detail;
     private string? _type;
+    private ModelStateDictionary? _modelState;
 
     public ProblemDetailsBuilder WithTitle(string title)
     {
@@ -27,11 +29,20 @@ public class ProblemDetailsBuilder
         return this;
     }
 
-    public ProblemDetails Build() =>
-        new()
-        {
-            Title = _title,
-            Detail = _detail,
-            Type = _type ?? "Error",
-        };
+    public ProblemDetailsBuilder WithType(ModelStateDictionary modelState)
+    {
+        _modelState = modelState;
+        return this;
+    }
+
+    public ProblemDetails Build()
+    {
+        var model = _modelState is null ? new ProblemDetails() : new ValidationProblemDetails();
+
+        model.Title = _title;
+        model.Detail = _detail;
+        model.Type = _type ?? "Error";
+
+        return model;
+    }
 }
