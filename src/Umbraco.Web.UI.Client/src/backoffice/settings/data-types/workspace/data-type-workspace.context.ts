@@ -1,12 +1,12 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDataTypeRepository>
+	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
 	implements UmbEntityWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	#data = new ObjectState<DataTypeResponseModel | undefined>(undefined);

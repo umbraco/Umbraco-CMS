@@ -6,6 +6,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-language-workspace-thingy')
 export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
@@ -32,8 +33,8 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbLanguageWorkspaceContext>('umbWorkspaceContext', (context) => {
-			this.#workspaceContext = context;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context as UmbLanguageWorkspaceContext;
 			this.#observeData();
 		});
 	}

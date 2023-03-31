@@ -4,7 +4,7 @@ const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
 	alias: 'Umb.MenuItem.DocumentBlueprints',
 	name: 'Document Blueprints Menu Item',
-	weight: 90,
+	weight: 100,
 	meta: {
 		label: 'Document Blueprints',
 		icon: 'umb:blueprint',

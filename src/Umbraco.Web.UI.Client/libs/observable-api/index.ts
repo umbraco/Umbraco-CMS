@@ -11,3 +11,4 @@ export * from './object-state';
 export * from './create-observable-part.function';
 export * from './append-to-frozen-array.function';
 export * from './partial-update-frozen-array.function';
+export * from './mapping-function';

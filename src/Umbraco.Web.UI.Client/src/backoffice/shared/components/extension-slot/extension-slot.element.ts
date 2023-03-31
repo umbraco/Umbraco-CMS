@@ -97,7 +97,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 
 							// sort:
 							// TODO: Make sure its right to have highest last?
-							this._extensions.sort((a, b) => a.weight - b.weight);
+							this._extensions.sort((a, b) => b.weight - a.weight);
 						} else {
 							// Remove cause we could not get the component, so we will get rid of this.
 							//this._extensions.splice(this._extensions.indexOf(extensionObject), 1);

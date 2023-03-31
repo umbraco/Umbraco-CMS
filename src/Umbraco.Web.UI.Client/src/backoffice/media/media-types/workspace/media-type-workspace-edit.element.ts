@@ -4,6 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbWorkspaceMediaTypeContext } from './media-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-media-type-workspace-edit')
 export class UmbMediaTypeWorkspaceEditElement extends UmbLitElement {
@@ -29,8 +30,8 @@ export class UmbMediaTypeWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbWorkspaceMediaTypeContext>('umbWorkspaceContext', (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance as UmbWorkspaceMediaTypeContext;
 			this.#observeName();
 		});
 	}

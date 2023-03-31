@@ -1,14 +1,15 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import '../../../../../shared/property-creator/property-creator.element.ts';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
-@customElement('umb-workspace-view-document-type-design')
-export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
+@customElement('umb-document-type-workspace-view-design')
+export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -77,9 +78,6 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 		`,
 	];
 
-	@state()
-	_documentType?: DocumentTypeResponseModel;
-
 	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
 
 	@state()
@@ -89,18 +87,14 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 		super();
 
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		this.consumeContext<UmbWorkspaceDocumentTypeContext>('umbWorkspaceContext', (documentTypeContext) => {
-			this._workspaceContext = documentTypeContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (documentTypeContext) => {
+			this._workspaceContext = documentTypeContext as UmbWorkspaceDocumentTypeContext;
 			this._observeDocumentType();
 		});
 	}
 
 	private _observeDocumentType() {
 		if (!this._workspaceContext) return;
-
-		this.observe(this._workspaceContext.data, (documentType) => {
-			this._documentType = documentType;
-		});
 	}
 
 	render() {
@@ -121,7 +115,7 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 			<div id="wrapper">
 				<uui-box class="group-wrapper">
 					<div class="group-headline" slot="headline">
-						<uui-input label="Group name" value="${this._documentType?.name ?? ''}" size="10">
+						<uui-input label="Group name" value="${''}" size="10">
 							<uui-button slot="append" label="Delete group" compact><uui-icon name="umb:trash"></uui-icon></uui-button>
 						</uui-input>
 					</div>
@@ -171,10 +165,10 @@ export class UmbWorkspaceViewDocumentTypeDesignElement extends UmbLitElement {
 	}
 }
 
-export default UmbWorkspaceViewDocumentTypeDesignElement;
+export default UmbDocumentTypeWorkspaceViewDesignElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-document-type-design': UmbWorkspaceViewDocumentTypeDesignElement;
+		'umb-document-type-workspace-view-design': UmbDocumentTypeWorkspaceViewDesignElement;
 	}
 }

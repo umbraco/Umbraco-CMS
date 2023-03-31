@@ -1,4 +1,5 @@
 import { DeepState } from './deep-state';
+import { partialUpdateFrozenArray } from './partial-update-frozen-array.function';
 import { pushToUniqueArray } from './push-to-unique-array.function';
 
 /**
@@ -11,8 +12,11 @@ import { pushToUniqueArray } from './push-to-unique-array.function';
  * The ArrayState provides methods to append data when the data is an Object.
  */
 export class ArrayState<T> extends DeepState<T[]> {
-	constructor(initialData: T[], private _getUnique?: (entry: T) => unknown) {
+	private _getUnique?: (entry: T) => unknown;
+
+	constructor(initialData: T[], getUniqueMethod?: (entry: T) => unknown) {
 		super(initialData);
+		this._getUnique = getUniqueMethod;
 	}
 
 	/**
@@ -147,6 +151,34 @@ export class ArrayState<T> extends DeepState<T[]> {
 		} else {
 			this.next([...this.getValue(), ...entries]);
 		}
+		return this;
+	}
+
+	/**
+	 * @method updateOne
+	 * @param {unknown} unique - Unique value to find entry to update.
+	 * @param {Partial<T>} entry - new data to be added in this Subject.
+	 * @return {ArrayState<T>} Reference to it self.
+	 * @description - Update a item with some new data, requires the ArrayState to be constructed with a getUnique method.
+	 * @example <caption>Example append some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.updateOne(2, {value: 'updated-bar'});
+	 */
+	updateOne(unique: unknown, entry: Partial<T>) {
+		if (!this._getUnique) {
+			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
+		}
+		this.next(
+			partialUpdateFrozenArray(
+				this.getValue(),
+				entry,
+				(x) => unique === (this._getUnique as Exclude<typeof this._getUnique, undefined>)(x)
+			)
+		);
 		return this;
 	}
 }
