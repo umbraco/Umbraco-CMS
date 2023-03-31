@@ -428,8 +428,8 @@ stages:
               $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
               dotnet new nugetconfig
               dotnet nuget add source ./nupkg --name Local
-              dotnet new --install Umbraco.Templates::$(cmsVersion)
-              dotnet new umbraco --name UmbracoProject --version $(cmsVersion) --exclude-gitignore --no-restore --no-update-check
+              dotnet new --install Umbraco.Templates::$cmsVersion
+              dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
               dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
