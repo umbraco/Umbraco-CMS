@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -64,7 +66,22 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
         });
 
         swaggerGenOptions.CustomOperationIds(CustomOperationId);
-        swaggerGenOptions.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
+        swaggerGenOptions.DocInclusionPredicate((name, api) =>
+        {
+            if (string.IsNullOrWhiteSpace(api.GroupName))
+            {
+                return false;
+            }
+
+            if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            {
+                var mapToApis = (controllerActionDescriptor.MethodInfo.DeclaringType?.GetCustomAttributes(typeof(MapToApiAttribute), inherit: true) ?? Array.Empty<object>()).Cast<MapToApiAttribute>();
+
+                return mapToApis.Any(x => x.ApiName == name);
+            }
+
+            return false;
+        });
         swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>();
@@ -135,4 +152,5 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
     private static string ActionOrderBy(ApiDescription apiDesc)
         =>
             $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
+
 }

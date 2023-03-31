@@ -1,11 +1,13 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Filters;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.New.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
+[MapToApi(ManagementApiConfiguration.DefaultApiDocumentName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 public class ManagementApiControllerBase : Controller
 {
