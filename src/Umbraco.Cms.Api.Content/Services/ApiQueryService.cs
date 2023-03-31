@@ -11,6 +11,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
     private readonly SelectorHandlerCollection _selectorHandlers;
     private readonly FilterHandlerCollection _filterHandlers;
     private readonly SortHandlerCollection _sortHandlers;
+    private readonly string _fallbackGuidValue;
 
     public ApiQueryService(
         IExamineManager examineManager,
@@ -22,6 +23,10 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         _selectorHandlers = selectorHandlers;
         _filterHandlers = filterHandlers;
         _sortHandlers = sortHandlers;
+
+        // A fallback value is needed for Examine queries in case we don't have a value - we can't pass null or empty string
+        // It is set to a random guid since this would be highly unlikely to yield any results
+        _fallbackGuidValue = Guid.NewGuid().ToString("D");
     }
 
     /// <inheritdoc/>
@@ -62,11 +67,20 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         {
             ISelectorHandler? selectorHandler = _selectorHandlers.FirstOrDefault(h => h.CanHandle(fetch));
             SelectorOption? selector = selectorHandler?.BuildSelectorOption(fetch);
-            queryOperation = selector is not null ? baseQuery.Field(selector.FieldName, selector.Value) : null;
+
+            if (selector is null)
+            {
+                return null;
+            }
+
+            var value = string.IsNullOrWhiteSpace(selector.Value) == false
+                ? selector.Value
+                : _fallbackGuidValue;
+            queryOperation = baseQuery.Field(selector.FieldName, value);
         }
         else
         {
-            // TODO: If no params or no fetch value, get everything from the index
+            // TODO: If no params or no fetch value, get everything from the index - make a default selector and register it by the end of the collection
             // This is a temp Examine solution
             queryOperation = baseQuery.Field("__IndexType", "content");
         }
@@ -83,15 +97,21 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
 
             if (filter is not null)
             {
+                var value = string.IsNullOrWhiteSpace(filter.Value) == false
+                    ? filter.Value
+                    : _fallbackGuidValue;
+
                 switch (filter.Operator)
                 {
                     case FilterOperation.Is:
                         queryOperation.And().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // TODO: doesn't work for explicit word(s) match
+                            (IExamineValue)new ExamineValue(Examineness.Explicit,
+                                value)); // TODO: doesn't work for explicit word(s) match
                         break;
                     case FilterOperation.IsNot:
                         queryOperation.Not().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit, filter.Value)); // TODO: doesn't work for explicit word(s) match
+                            (IExamineValue)new ExamineValue(Examineness.Explicit,
+                                value)); // TODO: doesn't work for explicit word(s) match
                         break;
                     // TODO: Fix
                     case FilterOperation.Contains:
