@@ -90,11 +90,11 @@ As part of the Extension Manifest you can attach a class that will be instanciat
 
 ```ts
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/controller';
 import type { MyRepository } from './my-repository';
 
 export class MyEntityAction extends UmbEntityActionBase<MyRepository> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 	}
 
@@ -113,7 +113,7 @@ import { UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
 import { MyRepository } from './my-repository';
 
 export class MyEntityAction extends UmbEntityActionBase<MyRepository> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
 		new UmbContextConsumerController(this.host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
@@ -176,11 +176,11 @@ As part of the Extension Manifest you can attach a class that will be instanciat
 
 ```ts
 import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/controller';
 import { MyRepository } from './my-repository';
 
 export class MyEntityBulkAction extends UmbEntityBulkActionBase<MyRepository> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
 		super(host, repositoryAlias, selection);
 	}
 

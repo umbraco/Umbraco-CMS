@@ -2,7 +2,7 @@ import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export const UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbRelationTypeStore>('UmbRelationTypeStore');
 
@@ -17,10 +17,10 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of UmbRelationTypeStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbRelationTypeStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 

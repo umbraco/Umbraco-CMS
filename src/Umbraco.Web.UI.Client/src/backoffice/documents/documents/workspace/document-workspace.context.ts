@@ -7,14 +7,14 @@ import { UmbWorkspacePropertyStructureManager } from '../../../shared/components
 import { UmbWorkspaceSplitViewManager } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
 import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { partialUpdateFrozenArray, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 // TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentRepository>
+	extends UmbWorkspaceContext<UmbDocumentRepository, EntityType>
 	implements UmbWorkspaceVariableEntityContextInterface<EntityType | undefined>
 {
 	/**
@@ -38,13 +38,25 @@ export class UmbDocumentWorkspaceContext
 	readonly structure;
 	readonly splitView;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDocumentRepository(host));
 
 		this.structure = new UmbWorkspacePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
 		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
 
 		new UmbObserverController(this.host, this.documentTypeKey, (key) => this.structure.loadType(key));
+
+		/*
+		TODO: Concept for ensure variant values:
+		new UmbObserverController(this.host, this.variants, (variants) => {
+			if (!variants) return;
+			const draft = this.#draft.getValue();
+			if (!draft) return;
+
+			// Gather all properties from all document types.
+			// Loop through all properties for each variant and insert missing value objects.
+		}
+		*/
 	}
 
 	async load(entityKey: string) {
@@ -178,6 +190,7 @@ export class UmbDocumentWorkspaceContext
 
 	public destroy(): void {
 		this.#draft.complete();
+		this.structure.destroy();
 	}
 }
 

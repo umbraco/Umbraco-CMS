@@ -1,5 +1,4 @@
 import type {
-	ContentTreeItemResponseModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
 	PackageManifestResponseModel,
@@ -21,6 +20,15 @@ export interface Entity {
 	hasChildren: boolean;
 	parentKey: string | null;
 }
+
+/** Tried to find a common base of our entities — used by Entity Workspace Context */
+export type BaseEntity = {
+	key?: string;
+	//alias?: string;
+	name?: string;
+	//icon?: string;
+	//properties?: Array<PropertyTypeResponseModelBaseModel>;
+};
 
 export interface UserEntity extends Entity {
 	type: 'user';

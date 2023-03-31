@@ -4,7 +4,7 @@ const menuItem: ManifestMenuItem = {
 	type: 'menuItem',
 	alias: 'Umb.MenuItem.Extensions',
 	name: 'Extensions Menu Item',
-	weight: 100,
+	weight: 0,
 	meta: {
 		label: 'Extensions',
 		icon: 'umb:wand',

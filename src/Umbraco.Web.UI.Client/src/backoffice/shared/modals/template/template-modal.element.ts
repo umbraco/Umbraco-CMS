@@ -4,10 +4,10 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbCodeEditor } from '../../components/code-editor';
-import { UmbTemplateModalData, UmbTemplateModalResult } from '.';
+import { UmbTemplateModalData, UmbTemplateModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbInputEvent } from '@umbraco-cms/backoffice/events';
+import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UmbInputEvent } from 'libs/umb-events/input.event';
-import { TemplateResource, TemplateResponseModel } from 'libs/backend-api/src';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 //TODO: make a default tree-picker that can be used across multiple pickers

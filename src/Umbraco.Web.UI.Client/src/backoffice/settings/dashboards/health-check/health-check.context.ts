@@ -5,7 +5,7 @@ import {
 	HealthCheckResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbHealthCheckContext {
@@ -15,9 +15,9 @@ export class UmbHealthCheckContext {
 	private _results = new BehaviorSubject<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
 	public readonly results = this._results.asObservable();
 
-	public host: UmbControllerHostInterface;
+	public host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.host = host;
 	}
 

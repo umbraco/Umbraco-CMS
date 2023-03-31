@@ -1,4 +1,4 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
@@ -11,9 +11,9 @@ import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
  * @implements {MemberTypeDetailDataSource}
  */
 export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<MemberTypeDetails> {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 

@@ -6,6 +6,7 @@ import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
@@ -39,9 +40,8 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbDocumentWorkspaceContext>('umbWorkspaceContext', (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._workspaceContext = workspaceContext as UmbDocumentWorkspaceContext;
 			this._observeTabs();
 		});
 	}
@@ -68,7 +68,6 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 		this.observe(
 			this._workspaceContext.rootPropertyStructures(),
 			(rootPropertyStructure) => {
-				console.log('rootPropertyStructure', rootPropertyStructure);
 				this._hasRootProperties = rootPropertyStructure.length > 0;
 				this._createRoutes();
 			},

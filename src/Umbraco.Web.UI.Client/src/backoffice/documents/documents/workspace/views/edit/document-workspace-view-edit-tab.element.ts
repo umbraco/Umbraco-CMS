@@ -6,6 +6,7 @@ import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import './document-workspace-view-edit-properties.element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-view-edit-tab')
 export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
@@ -68,9 +69,8 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbDocumentWorkspaceContext>('umbWorkspaceContext', (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._workspaceContext = workspaceContext as UmbDocumentWorkspaceContext;
 			this._observeTabContainers();
 		});
 	}

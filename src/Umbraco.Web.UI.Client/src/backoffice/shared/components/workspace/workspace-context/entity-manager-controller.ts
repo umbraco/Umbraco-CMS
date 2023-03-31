@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
@@ -31,7 +31,7 @@ export class UmbEntityWorkspaceManager<
 
 	private _createAtParentKey?: string | null;
 
-	constructor(host: UmbControllerHostInterface, entityType: string, storeToken: UmbContextToken<StoreType>) {
+	constructor(host: UmbControllerHostElement, entityType: string, storeToken: UmbContextToken<StoreType>) {
 		this._host = host;
 		this._entityType = entityType;
 

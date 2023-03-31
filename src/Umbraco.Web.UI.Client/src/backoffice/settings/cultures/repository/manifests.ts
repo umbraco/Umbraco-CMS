@@ -1,5 +1,5 @@
 import { UmbCultureRepository } from '../repository/culture.repository';
-import { ManifestRepository } from 'libs/extensions-registry/repository.models';
+import { ManifestRepository } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const CULTURE_REPOSITORY_ALIAS = 'Umb.Repository.Culture';
 

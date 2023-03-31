@@ -15,7 +15,7 @@ import { customElement, property, state } from 'lit/decorators.js';
  * @extends {UmbLitElement}
  */
 @customElement('umb-body-layout')
-export class UmbBodyLayout extends LitElement {
+export class UmbBodyLayoutElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -136,6 +136,6 @@ export class UmbBodyLayout extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-body-layout': UmbBodyLayout;
+		'umb-body-layout': UmbBodyLayoutElement;
 	}
 }

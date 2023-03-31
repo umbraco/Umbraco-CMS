@@ -1,6 +1,6 @@
 import { UmbPackageStore, UMB_PACKAGE_STORE_TOKEN } from './package.store';
 import { UmbPackageServerDataSource } from './sources/package.server.data';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
 import { isManifestJSType } from '@umbraco-cms/backoffice/extensions-api';
@@ -18,7 +18,7 @@ export class UmbPackageRepository {
 	#packageSource: UmbPackageServerDataSource;
 	#apiBaseUrl = OpenAPI.BASE;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#packageSource = new UmbPackageServerDataSource(host);
 		this.#init = new Promise((res) => {
 			new UmbContextConsumerController(host, UMB_PACKAGE_STORE_TOKEN, (instance) => {

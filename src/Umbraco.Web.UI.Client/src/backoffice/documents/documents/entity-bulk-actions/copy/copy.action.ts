@@ -1,9 +1,9 @@
 import { UmbDocumentRepository } from '../../repository/document.repository';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbDocumentCopyEntityBulkAction extends UmbEntityBulkActionBase<UmbDocumentRepository> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
 		super(host, repositoryAlias, selection);
 	}
 

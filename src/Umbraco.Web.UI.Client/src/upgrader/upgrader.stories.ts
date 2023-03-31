@@ -3,7 +3,7 @@ import './upgrader-view.element';
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbUpgraderView } from './upgrader-view.element';
+import type { UmbUpgraderViewElement } from './upgrader-view.element';
 
 export default {
 	title: 'Apps/Upgrader/States',
@@ -32,9 +32,9 @@ export default {
 				${story()}
 			</div>`,
 	],
-} satisfies Meta<UmbUpgraderView>;
+} satisfies Meta<UmbUpgraderViewElement>;
 
-type Story = StoryObj<UmbUpgraderView>;
+type Story = StoryObj<UmbUpgraderViewElement>;
 
 export const Overview: Story = {};
 

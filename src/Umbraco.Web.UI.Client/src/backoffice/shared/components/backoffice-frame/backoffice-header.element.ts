@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import {css, CSSResultGroup, html, LitElement, unsafeCSS} from 'lit';
+import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import logoImg from '/umbraco_logomark_white.svg';
 
@@ -7,7 +7,7 @@ import './backoffice-header-sections.element';
 import './backoffice-header-apps.element';
 
 @customElement('umb-backoffice-header')
-export class UmbBackofficeHeader extends LitElement {
+export class UmbBackofficeHeaderElement extends LitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -57,6 +57,6 @@ export class UmbBackofficeHeader extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-header': UmbBackofficeHeader;
+		'umb-backoffice-header': UmbBackofficeHeaderElement;
 	}
 }

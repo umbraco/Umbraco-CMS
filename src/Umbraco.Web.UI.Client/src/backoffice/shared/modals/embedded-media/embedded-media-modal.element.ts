@@ -3,10 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit-html/directives/when.js';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
-import { OEmbedResult, OEmbedStatus, UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalResult } from '.';
+import {
+	OEmbedResult,
+	OEmbedStatus,
+	UmbEmbeddedMediaModalData,
+	UmbEmbeddedMediaModalResult,
+	UmbModalHandler,
+} from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 
 interface UmbEmbeddedMediaModalModel {
 	url?: string;

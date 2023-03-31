@@ -7,11 +7,14 @@ import {
 	UmbDocumentTypeTreeStore,
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
 } from '../../../documents/document-types/repository/document-type.tree.store';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-type-picker';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-type-picker')
@@ -21,14 +24,6 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		css`
 			#add-button {
 				width: 100%;
-			}
-
-			#current-node {
-				background-color: var(--uui-color-surface-alt);
-			}
-
-			#wrapper-nodes {
-				margin-left: var(--uui-size-space-6);
 			}
 		`,
 	];
@@ -50,9 +45,6 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 			this.selectedKeys = keysString.split(/[ ,]+/);
 		}
 	}
-
-	@property()
-	currentDocumentType?: DocumentTypeResponseModel;
 
 	@state()
 	private _items?: Array<DocumentTypeResponseModel>;
@@ -89,7 +81,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this._selectedKeys],
 		});
@@ -100,7 +92,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	}
 
 	private async _removeItem(item: DocumentTypeResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
@@ -119,13 +111,8 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	render() {
 		return html`
-			<uui-ref-node id="current-node" .name="${this.currentDocumentType?.name ?? ''} (current)">
-				<uui-icon slot="icon" .name="${this.currentDocumentType?.icon ?? 'umb:document'}"></uui-icon>
-			</uui-ref-node>
-			<div id="wrapper-nodes">
-				<uui-ref-list> ${this._items?.map((item) => this._renderItem(item))} </uui-ref-list>
-				<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
-			</div>
+			<uui-ref-list> ${this._items?.map((item) => this._renderItem(item))} </uui-ref-list>
+			<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">Add</uui-button>
 		`;
 	}
 

@@ -1,6 +1,6 @@
 import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/store';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export
@@ -11,10 +11,10 @@ import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/control
 export class UmbStylesheetTreeStore extends UmbFileSystemTreeStore {
 	/**
 	 * Creates an instance of UmbStylesheetTreeStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbStylesheetTreeStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 }

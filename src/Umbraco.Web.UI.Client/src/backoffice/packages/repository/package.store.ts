@@ -1,6 +1,6 @@
 import { ReplaySubject } from 'rxjs';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbPackage } from '@umbraco-cms/backoffice/models';
 import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -38,10 +38,10 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of PackageStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof PackageStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_PACKAGE_STORE_TOKEN.toString());
 	}
 

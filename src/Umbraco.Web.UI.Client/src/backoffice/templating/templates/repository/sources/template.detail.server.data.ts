@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { ProblemDetailsModel, TemplateResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -19,14 +19,14 @@ export interface TemplateDetailDataSource {
  * @implements {TemplateDetailDataSource}
  */
 export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbTemplateDetailServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 

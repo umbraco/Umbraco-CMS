@@ -1,9 +1,9 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { TreeItemPresentationModel } from 'libs/backend-api/src';
-import { ManifestTreeItem } from 'libs/extensions-registry/tree-item.models';
 
 @customElement('umb-tree-item')
 export class UmbTreeItemElement extends UmbLitElement {

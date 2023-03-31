@@ -1,21 +1,27 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
+import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbWorkspaceDocumentTypeContext
-	extends UmbWorkspaceContext<UmbDocumentTypeRepository>
+	extends UmbWorkspaceContext<UmbDocumentTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
-	#data = new ObjectState<EntityType | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.getObservablePart((data) => data?.name);
+	// Draft is located in structure manager
+	readonly data;
+	readonly name;
 
-	constructor(host: UmbControllerHostInterface) {
+	readonly structure;
+
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDocumentTypeRepository(host));
+
+		this.structure = new UmbWorkspacePropertyStructureManager(this.host, this.repository);
+		this.data = this.structure.rootDocumentType;
+		this.name = this.structure.rootDocumentTypeObservablePart((data) => data?.name);
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
@@ -23,11 +29,11 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.structure.getRootDocumentType() || {};
 	}
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData().key;
 	}
 
 	getEntityType() {
@@ -35,33 +41,37 @@ export class UmbWorkspaceDocumentTypeContext
 	}
 
 	setName(name: string) {
-		this.#data.update({ name });
+		this.structure.updateRootDocumentType({ name });
 	}
 
 	// TODO => manage setting icon color
 	setIcon(icon: string) {
-		this.#data.update({ icon });
+		this.structure.updateRootDocumentType({ icon });
+	}
+
+	async createScaffold(documentTypeKey: string) {
+		const { data } = await this.structure.createScaffold(documentTypeKey);
+		if (!data) return undefined;
+
+		this.setIsNew(true);
+		//this.#draft.next(data);
+		return data || undefined;
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
-		if (data) {
-			this.#data.next(data);
-		}
-	}
+		const { data } = await this.structure.loadType(entityKey);
+		if (!data) return undefined;
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
-		if (!data) return;
-		this.#data.next(data);
+		this.setIsNew(false);
+		//this.#draft.next(data);
+		return data || undefined;
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		this.repository.save(this.#data.value);
+		this.repository.save(this.getData());
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.structure.destroy();
 	}
 }
