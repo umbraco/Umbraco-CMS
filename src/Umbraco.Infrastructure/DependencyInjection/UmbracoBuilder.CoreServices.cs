@@ -416,7 +416,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddContentApiCoreServices(this IUmbracoBuilder builder)
+    private static IUmbracoBuilder AddContentApiCoreServices(this IUmbracoBuilder builder) // noop implementations (add apiqueryservice noop)
     {
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
@@ -430,6 +430,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
+        builder.Services.AddSingleton<IApiQueryService, NoopApiQueryService>();
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
