@@ -5,11 +5,11 @@ import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } f
 import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
 import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
 
-export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<TemplateResponseModel> {
+export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<any> {
 	#init;
 	#host: UmbControllerHostInterface;
 
