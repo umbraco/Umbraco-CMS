@@ -105,9 +105,11 @@ export class UmbLanguageRepository {
 	 * @memberof UmbLanguageRepository
 	 */
 	async save(language: LanguageResponseModel) {
+		if (!language.isoCode) throw new Error('Language iso code is missing');
+
 		await this.#init;
 
-		const { error } = await this.#dataSource.update(language);
+		const { error } = await this.#dataSource.update(language.isoCode, language);
 
 		if (!error) {
 			const notification = { data: { message: `Language saved` } };

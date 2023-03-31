@@ -9,7 +9,7 @@ const menuItem: ManifestTypes = {
 	meta: {
 		label: 'Data Types',
 		icon: 'umb:folder',
-		entityType: 'data-type',
+		entityType: 'data-type-root',
 		treeAlias: 'Umb.Tree.DataTypes',
 	},
 	conditions: {

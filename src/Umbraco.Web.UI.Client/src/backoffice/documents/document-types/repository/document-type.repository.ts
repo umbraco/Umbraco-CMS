@@ -164,7 +164,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		if (!item || !item.key) throw new Error('Document-Type is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.update(item);
+		const { error } = await this.#detailDataSource.update(item.key, item);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
