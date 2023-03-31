@@ -30,7 +30,7 @@ public class ContentApiValueSetBuilder : IContentApiValueSetBuilder
                 ["id"] = content.Key,
                 ["parentKey"] = ancestorKeys.LastOrDefault(),
                 ["ancestorKeys"] = ancestorKeys.Any() ? string.Join(" ", ancestorKeys) : default(Guid), // ToDo: Store as array if it is faster to search
-                ["name"] = content.Name!, // might be null?
+                ["name"] = content.Name ?? string.Empty,
                 ["level"] = content.Level,
                 ["path"] = content.Path, // CSV of int ids
                 ["sortOrder"] = content.SortOrder
