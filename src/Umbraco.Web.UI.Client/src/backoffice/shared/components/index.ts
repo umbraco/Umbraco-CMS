@@ -41,6 +41,8 @@ import './tree/tree.element';
 import './tree/entity-tree-item/entity-tree-item.element';
 import './tree/tree-menu-item/tree-menu-item.element';
 
+import './menu/menu-item-base/menu-item-base.element';
+
 import './variantable-property/variantable-property.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
 

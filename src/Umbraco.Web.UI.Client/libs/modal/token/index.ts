@@ -25,3 +25,4 @@ export * from './template-modal.token';
 export * from './template-picker-modal.token';
 export * from './user-group-picker-modal.token';
 export * from './user-picker-modal.token';
+export * from './folder-modal.token';

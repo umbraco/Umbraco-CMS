@@ -11,7 +11,7 @@ import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {MemberGroupDetailDataSource}
  */
 // TODO => Provide type when it is available
-export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any> {
+export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, any, any> {
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {
@@ -49,7 +49,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any> 
 	 * @return {*}
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
-	async update(memberGroup: MemberGroupDetails) {
+	async update(key: string, memberGroup: MemberGroupDetails) {
 		if (!memberGroup.key) {
 			const error: ProblemDetailsModel = { title: 'Member Group key is missing' };
 			return { error };

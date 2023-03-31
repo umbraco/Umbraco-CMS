@@ -10,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbTemplateDetailServerDataSource
  * @implements {TemplateDetailDataSource}
  */
-export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetails> {
+export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, MediaDetails> {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -124,7 +124,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(media: MediaDetails) {
+	async update(key: string, media: MediaDetails) {
 		if (!media.key) {
 			const error: ProblemDetailsModel = { title: 'Media key is missing' };
 			return { error };
