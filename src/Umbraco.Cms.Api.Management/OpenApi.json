@@ -1708,6 +1708,59 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document/{key}/copy": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PostDocumentByKeyCopy",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CopyDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/document/{key}/domains": {
       "get": {
         "tags": [
@@ -1763,6 +1816,49 @@
         "responses": {
           "200": {
             "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/document/{key}/move": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MoveDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -3543,6 +3639,49 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/UpdateMediaRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/media/{key}/move": {
+      "put": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "PutMediaByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MoveMediaRequestModel"
                   }
                 ]
               }
@@ -6894,6 +7033,533 @@
           }
         }
       }
+    },
+    "/umbraco/management/api/v1/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateUserRequestModel"
+                  },
+                  {
+                    "$ref": "#/components/schemas/InviteUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CreateUserResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUsers",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedUserResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUsersById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "DeleteUsersById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PutUsersById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/avatar/{id}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "DeleteUsersAvatarById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersAvatarById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/SetAvatarRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/change-password/{id}": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersChangePasswordById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/disable": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersDisable",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DisableUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/enable": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersEnable",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EnableUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/filter": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUsersFilter",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/UserOrderModel"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "userGroupIds",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "userStates",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/UserStateModel"
+              }
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/invite": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersInvite",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/InviteUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/set-user-groups": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersSetUserGroups",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/unlock": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersUnlock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UnlockUsersRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6992,6 +7658,19 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "ChangePasswordUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string"
+          },
+          "oldPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "ConsentLevelPresentationModel": {
         "type": "object",
@@ -7307,6 +7986,23 @@
         },
         "additionalProperties": false
       },
+      "CopyDocumentRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "relateToOriginal": {
+            "type": "boolean"
+          },
+          "includeDescendants": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
         "type": "object",
         "properties": {
@@ -7498,6 +8194,29 @@
             "$ref": "#/components/schemas/TemplateModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "CreateUserRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserPresentationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "CreateUserResponseModel": {
+        "type": "object",
+        "properties": {
+          "userKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "initialPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "CultureReponseModel": {
@@ -7789,6 +8508,20 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "DisableUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
@@ -8084,6 +8817,20 @@
             "$ref": "#/components/schemas/DomainsPresentationModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "EnableUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
         "additionalProperties": false
       },
       "EntityTreeItemResponseModel": {
@@ -8529,6 +9276,21 @@
         },
         "additionalProperties": false
       },
+      "InviteUserRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateUserRequestModel"
+          }
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LanguageModelBaseModel": {
         "type": "object",
         "properties": {
@@ -8822,6 +9584,28 @@
         "additionalProperties": false
       },
       "MoveDictionaryRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MoveDocumentRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MoveMediaRequestModel": {
         "type": "object",
         "properties": {
           "targetKey": {
@@ -9756,6 +10540,30 @@
         },
         "additionalProperties": false
       },
+      "PagedUserResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/UserResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetailsModel": {
         "type": "object",
         "properties": {
@@ -10225,6 +11033,16 @@
         },
         "additionalProperties": false
       },
+      "SetAvatarRequestModel": {
+        "type": "object",
+        "properties": {
+          "fileKey": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "StatusResultTypeModel": {
         "enum": [
           "Success",
@@ -10532,6 +11350,20 @@
         },
         "additionalProperties": false
       },
+      "UnlockUsersRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
         "type": "object",
         "properties": {
@@ -10707,6 +11539,58 @@
         ],
         "additionalProperties": false
       },
+      "UpdateUserGroupsOnUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateUserRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserPresentationBaseModel"
+          }
+        ],
+        "properties": {
+          "languageIsoCode": {
+            "type": "string"
+          },
+          "contentStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "mediaStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "UpgradeSettingsResponseModel": {
         "type": "object",
         "properties": {
@@ -10830,6 +11714,128 @@
         },
         "additionalProperties": false
       },
+      "UserOrderModel": {
+        "enum": [
+          "UserName",
+          "Language",
+          "Name",
+          "Email",
+          "Id",
+          "CreateDate",
+          "UpdateDate",
+          "IsApproved",
+          "IsLockedOut",
+          "LastLoginDate"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "UserPresentationBaseModel": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserPresentationBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "languageIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentStartNodeKeys": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "mediaStartNodeKeys": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "avatarUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "state": {
+            "$ref": "#/components/schemas/UserStateModel"
+          },
+          "failedLoginAttempts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastLoginDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastlockoutDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastPasswordChangeDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "UserResponseModel": "#/components/schemas/UserResponseModel"
+          }
+        }
+      },
       "UserSettingsModel": {
         "type": "object",
         "properties": {
@@ -10853,6 +11859,18 @@
           }
         },
         "additionalProperties": false
+      },
+      "UserStateModel": {
+        "enum": [
+          "Active",
+          "Disabled",
+          "LockedOut",
+          "Invited",
+          "Inactive",
+          "All"
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "ValueModelBaseModel": {
         "required": [
