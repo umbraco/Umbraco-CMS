@@ -111,12 +111,6 @@ stages:
                 }
 
                 dotnet pack $(solution) --configuration $(buildConfiguration) --no-build --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
-          - script: |
-              sha="$(Build.SourceVersion)"
-              sha=${sha:0:7}
-              buildnumber="$(Build.BuildNumber)_$(Build.BuildId)_$sha"
-              echo "##vso[build.updatebuildnumber]$buildnumber"
-            displayName: Update build number
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
