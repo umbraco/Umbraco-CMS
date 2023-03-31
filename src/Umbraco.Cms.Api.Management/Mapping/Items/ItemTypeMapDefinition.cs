@@ -1,5 +1,4 @@
-﻿using NPoco.FluentMappings;
-using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
+﻿using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
@@ -10,7 +9,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Api.Management.Mapping.Entity;
+namespace Umbraco.Cms.Api.Management.Mapping.Items;
 
 public class ItemTypeMapDefinition : IMapDefinition
 {

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.Entity;
+﻿using Umbraco.Cms.Api.Management.Mapping.Items;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 
