@@ -90,7 +90,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 							@input="${this.#handleInput}"></uui-input>`}
 			</div>
 			<div slot="footer" id="footer">
-				<a href="/section/settings/workspace/language-root">Languages</a> /
+				<a href="section/settings/workspace/language-root">Languages</a> /
 				${this._isNew ? 'Create' : this._language?.name}
 			</div>
 		</umb-workspace-layout>`;
