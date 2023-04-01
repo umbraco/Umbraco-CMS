@@ -179,11 +179,20 @@ public class ManifestParser : IManifestParser
             new ValueValidatorConverter(_validators),
             new DashboardAccessRuleConverter())!;
 
-        if (string.IsNullOrEmpty(manifest.Version) &&
-            !string.IsNullOrEmpty(manifest.VersionAssemblyName) &&
-            GetAssemblyVersion(manifest.VersionAssemblyName) is string assemblyVersion)
+        if (string.IsNullOrEmpty(manifest.Version))
         {
-            manifest.Version = assemblyVersion;
+            string? assemblyName = manifest.VersionAssemblyName;
+            if (string.IsNullOrEmpty(assemblyName))
+            {
+                // Fallback to package ID
+                assemblyName = manifest.PackageId;
+            }
+
+            if (!string.IsNullOrEmpty(assemblyName) &&
+                GetAssemblyVersion(assemblyName) is string assemblyVersion)
+            {
+                manifest.Version = assemblyVersion;
+            }
         }
 
         // scripts and stylesheets are raw string, must process here
