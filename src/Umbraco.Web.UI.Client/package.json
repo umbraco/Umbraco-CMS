@@ -63,7 +63,7 @@
 		"@umbraco-ui/uui": "^1.2.0-rc.2",
 		"@umbraco-ui/uui-css": "^1.2.0-rc.2",
 		"element-internals-polyfill": "^1.1.19",
-		"lit": "^2.6.1",
+		"lit": "^2.7.0",
 		"lodash-es": "4.17.21",
 		"monaco-editor": "^0.36.1",
 		"router-slot": "file:router-slot-1.6.1.tgz",
