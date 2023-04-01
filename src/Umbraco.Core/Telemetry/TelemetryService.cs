@@ -84,8 +84,9 @@ internal class TelemetryService : ITelemetryService
 
             packages.Add(new PackageTelemetry
             {
+                Id = manifest.PackageId,
                 Name = manifest.PackageName,
-                Version = manifest.Version ?? string.Empty,
+                Version = manifest.Version,
             });
         }
 
