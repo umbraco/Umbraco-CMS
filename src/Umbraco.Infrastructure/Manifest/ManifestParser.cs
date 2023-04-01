@@ -1,13 +1,16 @@
+using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -26,6 +29,7 @@ public class ManifestParser : IManifestParser
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly IManifestFileProviderFactory _manifestFileProviderFactory;
+    private readonly ITypeFinder _typeFinder;
     private readonly ManifestFilterCollection _filters;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -39,7 +43,7 @@ public class ManifestParser : IManifestParser
     private string _path = null!;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ManifestParser" /> class.
+    /// Initializes a new instance of the <see cref="ManifestParser" /> class.
     /// </summary>
     public ManifestParser(
         AppCaches appCaches,
@@ -52,7 +56,8 @@ public class ManifestParser : IManifestParser
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IDataValueEditorFactory dataValueEditorFactory,
-        IManifestFileProviderFactory manifestFileProviderFactory)
+        IManifestFileProviderFactory manifestFileProviderFactory,
+        ITypeFinder typeFinder)
     {
         if (appCaches == null)
         {
@@ -71,6 +76,36 @@ public class ManifestParser : IManifestParser
         _shortStringHelper = shortStringHelper;
         _dataValueEditorFactory = dataValueEditorFactory;
         _manifestFileProviderFactory = manifestFileProviderFactory;
+        _typeFinder = typeFinder;
+    }
+
+    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
+    public ManifestParser(
+        AppCaches appCaches,
+        ManifestValueValidatorCollection validators,
+        ManifestFilterCollection filters,
+        ILogger<ManifestParser> logger,
+        IIOHelper ioHelper,
+        IHostingEnvironment hostingEnvironment,
+        IJsonSerializer jsonSerializer,
+        ILocalizedTextService localizedTextService,
+        IShortStringHelper shortStringHelper,
+        IDataValueEditorFactory dataValueEditorFactory,
+        IManifestFileProviderFactory manifestFileProviderFactory)
+         : this(
+              appCaches,
+              validators,
+              filters,
+              logger,
+              ioHelper,
+              hostingEnvironment,
+              jsonSerializer,
+              localizedTextService,
+              shortStringHelper,
+              dataValueEditorFactory,
+              manifestFileProviderFactory,
+              StaticServiceProvider.Instance.GetRequiredService<ITypeFinder>())
+    {
     }
 
     [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
@@ -173,11 +208,18 @@ public class ManifestParser : IManifestParser
             throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
         }
 
-        PackageManifest? manifest = JsonConvert.DeserializeObject<PackageManifest>(
+        PackageManifest manifest = JsonConvert.DeserializeObject<PackageManifest>(
             text,
             new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
             new ValueValidatorConverter(_validators),
-            new DashboardAccessRuleConverter());
+            new DashboardAccessRuleConverter())!;
+
+        if (string.IsNullOrEmpty(manifest.Version) &&
+            !string.IsNullOrEmpty(manifest.VersionAssemblyName) &&
+            GetAssemblyVersion(manifest.VersionAssemblyName) is string assemblyVersion)
+        {
+            manifest.Version = assemblyVersion;
+        }
 
         // scripts and stylesheets are raw string, must process here
         for (var i = 0; i < manifest!.Scripts.Length; i++)
@@ -215,6 +257,30 @@ public class ManifestParser : IManifestParser
         }
 
         return manifest;
+    }
+
+    private string? GetAssemblyVersion(string name)
+    {
+        foreach (Assembly assembly in _typeFinder.AssembliesToScan)
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                AssemblyInformationalVersionAttribute? attribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+                if (attribute is not null &&
+                    SemVersion.TryParse(attribute.InformationalVersion, out SemVersion? semVersion) &&
+                    semVersion is not null)
+                {
+                    return semVersion.ToSemanticStringWithoutBuild();
+                }
+                else
+                {
+                    return assemblyName.Version?.ToString(3);
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
