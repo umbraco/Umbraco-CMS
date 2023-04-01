@@ -5,7 +5,6 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -29,7 +28,6 @@ public class ManifestParser : IManifestParser
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly IManifestFileProviderFactory _manifestFileProviderFactory;
-    private readonly ITypeFinder _typeFinder;
     private readonly ManifestFilterCollection _filters;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -56,8 +54,7 @@ public class ManifestParser : IManifestParser
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IDataValueEditorFactory dataValueEditorFactory,
-        IManifestFileProviderFactory manifestFileProviderFactory,
-        ITypeFinder typeFinder)
+        IManifestFileProviderFactory manifestFileProviderFactory)
     {
         if (appCaches == null)
         {
@@ -76,36 +73,6 @@ public class ManifestParser : IManifestParser
         _shortStringHelper = shortStringHelper;
         _dataValueEditorFactory = dataValueEditorFactory;
         _manifestFileProviderFactory = manifestFileProviderFactory;
-        _typeFinder = typeFinder;
-    }
-
-    [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
-    public ManifestParser(
-        AppCaches appCaches,
-        ManifestValueValidatorCollection validators,
-        ManifestFilterCollection filters,
-        ILogger<ManifestParser> logger,
-        IIOHelper ioHelper,
-        IHostingEnvironment hostingEnvironment,
-        IJsonSerializer jsonSerializer,
-        ILocalizedTextService localizedTextService,
-        IShortStringHelper shortStringHelper,
-        IDataValueEditorFactory dataValueEditorFactory,
-        IManifestFileProviderFactory manifestFileProviderFactory)
-         : this(
-              appCaches,
-              validators,
-              filters,
-              logger,
-              ioHelper,
-              hostingEnvironment,
-              jsonSerializer,
-              localizedTextService,
-              shortStringHelper,
-              dataValueEditorFactory,
-              manifestFileProviderFactory,
-              StaticServiceProvider.Instance.GetRequiredService<ITypeFinder>())
-    {
     }
 
     [Obsolete("Use other ctor - Will be removed in Umbraco 13")]
@@ -258,25 +225,26 @@ public class ManifestParser : IManifestParser
 
     private string? GetAssemblyVersion(string name)
     {
-        foreach (Assembly assembly in _typeFinder.AssembliesToScan)
+        Assembly assembly;
+        try
         {
-            AssemblyName assemblyName = assembly.GetName();
-            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase))
-            {
-                AssemblyInformationalVersionAttribute? attribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-                if (attribute is not null &&
-                    SemVersion.TryParse(attribute.InformationalVersion, out SemVersion? semVersion))
-                {
-                    return semVersion.ToSemanticStringWithoutBuild();
-                }
-                else
-                {
-                    return assemblyName.Version?.ToString(3);
-                }
-            }
+            assembly = Assembly.Load(name);
+        }
+        catch
+        {
+            return null;
         }
 
-        return null;
+        AssemblyInformationalVersionAttribute? assemblyInformationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+        if (assemblyInformationalVersionAttribute is not null &&
+            SemVersion.TryParse(assemblyInformationalVersionAttribute.InformationalVersion, out SemVersion? semVersion))
+        {
+            return semVersion.ToSemanticStringWithoutBuild();
+        }
+        else
+        {
+            return assembly.GetName().Version?.ToString(3);
+        }
     }
 
     /// <summary>
