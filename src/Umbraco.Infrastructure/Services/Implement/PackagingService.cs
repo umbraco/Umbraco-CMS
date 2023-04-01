@@ -116,8 +116,7 @@ public class PackagingService : IPackagingService
 
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
         var installedPackages = new Dictionary<string, InstalledPackage>();
 
@@ -126,14 +125,17 @@ public class PackagingService : IPackagingService
         {
             if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
             {
-                installedPackage = new InstalledPackage { PackageName = plan.PackageName };
+                installedPackage = new InstalledPackage
+                {
+                    PackageName = plan.PackageName,
+                    Version = "Unknown",
+                };
+
                 installedPackages.Add(plan.PackageName, installedPackage);
             }
 
             var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-            if (keyValues is null || keyValues.TryGetValue(
-                Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
-                out var currentState) is false)
+            if (keyValues is null || keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var currentState) is false)
             {
                 currentState = null;
             }
@@ -157,14 +159,15 @@ public class PackagingService : IPackagingService
 
             if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
             {
-                installedPackage = new InstalledPackage {
+                installedPackage = new InstalledPackage
+                {
                     PackageName = package.PackageName,
-                    Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version,
                 };
 
                 installedPackages.Add(package.PackageName, installedPackage);
             }
 
+            installedPackage.Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version;
             installedPackage.PackageView = package.PackageView;
         }
 
