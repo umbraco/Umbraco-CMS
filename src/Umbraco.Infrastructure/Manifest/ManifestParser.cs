@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -225,26 +226,27 @@ public class ManifestParser : IManifestParser
 
     private string? GetAssemblyVersion(string name)
     {
-        Assembly assembly;
-        try
+        foreach (Assembly assembly in AssemblyLoadContext.All.SelectMany(x => x.Assemblies))
         {
-            assembly = Assembly.Load(name);
-        }
-        catch
-        {
-            return null;
+            AssemblyName assemblyName = assembly.GetName();
+            if (!string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            AssemblyInformationalVersionAttribute? assemblyInformationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            if (assemblyInformationalVersionAttribute is not null &&
+                SemVersion.TryParse(assemblyInformationalVersionAttribute.InformationalVersion, out SemVersion? semVersion))
+            {
+                return semVersion.ToSemanticStringWithoutBuild();
+            }
+            else
+            {
+                return assemblyName.Version?.ToString(3);
+            }
         }
 
-        AssemblyInformationalVersionAttribute? assemblyInformationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-        if (assemblyInformationalVersionAttribute is not null &&
-            SemVersion.TryParse(assemblyInformationalVersionAttribute.InformationalVersion, out SemVersion? semVersion))
-        {
-            return semVersion.ToSemanticStringWithoutBuild();
-        }
-        else
-        {
-            return assembly.GetName().Version?.ToString(3);
-        }
+        return null;
     }
 
     /// <summary>
