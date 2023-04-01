@@ -167,6 +167,7 @@ public class PackagingService : IPackagingService
                 installedPackages.Add(package.PackageName, installedPackage);
             }
 
+            installedPackage.PackageId = package.PackageId;
             installedPackage.Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version;
             installedPackage.PackageView = package.PackageView;
         }
