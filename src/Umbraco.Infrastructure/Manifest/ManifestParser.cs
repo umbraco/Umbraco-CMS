@@ -20,7 +20,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Manifest;
 
 /// <summary>
-///     Parses the Main.js file and replaces all tokens accordingly.
+/// Parses the Main.js file and replaces all tokens accordingly.
 /// </summary>
 public class ManifestParser : IManifestParser
 {
@@ -198,10 +198,7 @@ public class ManifestParser : IManifestParser
     /// </summary>
     public PackageManifest ParseManifest(string text)
     {
-        if (text == null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        ArgumentNullException.ThrowIfNull(text);
 
         if (string.IsNullOrWhiteSpace(text))
         {
@@ -222,14 +219,14 @@ public class ManifestParser : IManifestParser
         }
 
         // scripts and stylesheets are raw string, must process here
-        for (var i = 0; i < manifest!.Scripts.Length; i++)
+        for (var i = 0; i < manifest.Scripts.Length; i++)
         {
-            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i])!;
+            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i]);
         }
 
         for (var i = 0; i < manifest.Stylesheets.Length; i++)
         {
-            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i])!;
+            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i]);
         }
 
         foreach (ManifestContentAppDefinition contentApp in manifest.ContentApps)
@@ -239,7 +236,7 @@ public class ManifestParser : IManifestParser
 
         foreach (ManifestDashboard dashboard in manifest.Dashboards)
         {
-            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View)!;
+            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
         }
 
         foreach (GridEditor gridEditor in manifest.GridEditors)
@@ -268,8 +265,7 @@ public class ManifestParser : IManifestParser
             {
                 AssemblyInformationalVersionAttribute? attribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
                 if (attribute is not null &&
-                    SemVersion.TryParse(attribute.InformationalVersion, out SemVersion? semVersion) &&
-                    semVersion is not null)
+                    SemVersion.TryParse(attribute.InformationalVersion, out SemVersion? semVersion))
                 {
                     return semVersion.ToSemanticStringWithoutBuild();
                 }
