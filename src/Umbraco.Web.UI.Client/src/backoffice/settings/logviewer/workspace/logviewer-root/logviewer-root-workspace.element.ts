@@ -2,14 +2,13 @@ import './components';
 import { map } from 'rxjs';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
@@ -104,13 +103,9 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 					component: () => {
 						return createExtensionElement(view);
 					},
-					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+					setup: (component: Promise<HTMLElement>) => {
 						// When its using import, we get an element, when using createExtensionElement we get a Promise.
-						if ((component as any).then) {
-							(component as any).then((el: any) => (el.manifest = view));
-						} else {
-							(component as any).manifest = view;
-						}
+						component.then((el: any) => (el.manifest = view));
 					},
 				};
 			});
@@ -151,7 +146,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 								(view) => html`
 									<uui-tab
 										.label="${view.meta.label || view.name}"
-										href="${this._routerPath}/${view.meta.pathname}"
+										href="${this._routerPath}/${view.meta.pathname.replace(':query', '*')}"
 										?active="${view.meta.pathname === this._activePath}">
 										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
 										${view.meta.label || view.name}
