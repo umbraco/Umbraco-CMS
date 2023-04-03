@@ -1,11 +1,12 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.PartialView.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Script.Item;
+using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IFileItemPresentationModelFactory
 {
-    IEnumerable<PartialViewItemResponseModel> CreatePartialViewResponseModels(IEnumerable<string> path);
+    IEnumerable<PartialViewItemResponseModel> CreatePartialViewResponseModels(IEnumerable<string> path, IFileSystem fileSystem);
 
-    IEnumerable<ScriptItemResponseModel> CreateScriptItemResponseModels(IEnumerable<string> paths);
+    IEnumerable<ScriptItemResponseModel> CreateScriptItemResponseModels(IEnumerable<string> paths, IFileSystem fileSystem);
 }

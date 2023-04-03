@@ -8,16 +8,21 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Item;
 
 public class ItemScriptItemController : ScriptItemControllerBase
 {
+    private readonly IFileSystem _fileSystem;
     private readonly IFileItemPresentationModelFactory _fileItemPresentationModelFactory;
 
-    public ItemScriptItemController(FileSystems fileSystems, IFileItemPresentationModelFactory fileItemPresentationModelFactory) => _fileItemPresentationModelFactory = fileItemPresentationModelFactory;
+    public ItemScriptItemController(FileSystems fileSystems, IFileItemPresentationModelFactory fileItemPresentationModelFactory)
+    {
+        _fileSystem = fileSystems.ScriptsFileSystem ?? throw new ArgumentException("Missing scripts file system", nameof(fileSystems));
+        _fileItemPresentationModelFactory = fileItemPresentationModelFactory;
+    }
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ScriptItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "path")] string[] paths)
     {
-        IEnumerable<ScriptItemResponseModel> reponseModels = _fileItemPresentationModelFactory.CreateScriptItemResponseModels(paths);
+        IEnumerable<ScriptItemResponseModel> reponseModels = _fileItemPresentationModelFactory.CreateScriptItemResponseModels(paths, _fileSystem);
         return Ok(reponseModels);
     }
 }
