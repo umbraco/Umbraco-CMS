@@ -11,16 +11,16 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Item;
 
 public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBase
 {
-    private readonly EntityService _entityService;
+    private readonly IEntityService _entityService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public ItemDocumentBlueprintController(EntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
+    public ItemDocumentBlueprintController(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
     {
         _entityService = entityService;
         _documentPresentationFactory = documentPresentationFactory;
     }
 
-    [HttpGet]
+    [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "key")] Guid[] keys)

@@ -1,8 +1,10 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
+﻿using NPoco.FluentMappings;
+using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType.Items;
@@ -28,6 +30,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IEntitySlim, TemplateItemResponseModel>((_, _) => new TemplateItemResponseModel(), Map);
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
+        mapper.Define<IMediaEntitySlim, MediaItemResponseModel>((_, _) => new MediaItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -98,6 +101,14 @@ public class ItemTypeMapDefinition : IMapDefinition
     private static void Map(IRelationType source, RelationTypeItemResponseModel target, MapperContext context)
     {
         target.Icon = Constants.Icons.RelationType;
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(IMediaEntitySlim source, MediaItemResponseModel target, MapperContext context)
+    {
+        target.Icon = source.ContentTypeIcon ?? Constants.Icons.MediaType;
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
     }
