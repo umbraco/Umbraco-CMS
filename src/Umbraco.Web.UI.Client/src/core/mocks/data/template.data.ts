@@ -14,7 +14,7 @@ type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
 const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
 	return {
 		$type: '',
-		key: dbItem.key,
+		id: dbItem.id,
 		name: dbItem.name,
 		alias: dbItem.alias,
 		content: dbItem.content,
@@ -24,7 +24,7 @@ const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
 export const data: Array<TemplateDBItem> = [
 	{
 		$type: '',
-		key: '2bf464b6-3aca-4388-b043-4eb439cc2643',
+		id: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		isContainer: false,
 		parentId: null,
 		name: 'Doc 1',
@@ -48,7 +48,7 @@ export const data: Array<TemplateDBItem> = [
 	},
 	{
 		$type: '',
-		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		isContainer: false,
 		parentId: null,
 		name: 'Test',
@@ -61,7 +61,7 @@ export const data: Array<TemplateDBItem> = [
 	},
 	{
 		$type: '',
-		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
+		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		isContainer: false,
 		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
@@ -87,8 +87,8 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		super(data);
 	}
 
-	getById(key: string): TemplateResponseModel | undefined {
-		const item = this.data.find((item) => item.key === key);
+	getById(id: string): TemplateResponseModel | undefined {
+		const item = this.data.find((item) => item.id === id);
 		return item ? createTemplate(item) : undefined;
 	}
 
@@ -101,7 +101,7 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	create(templateData: TemplateModelBaseModel) {
 		const template = {
 			$type: '',
-			key: uuid(),
+			id: uuid(),
 			...templateData,
 		};
 		this.data.push(template);
@@ -120,15 +120,15 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentId === key);
+	getTreeItemChildren(id: string): PagedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

@@ -4,7 +4,7 @@ import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-
 
 // TODO: add schema
 export const handlers = [
-	rest.post<DocumentTypeResponseModel>('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
+	rest.post<DocumentTypeResponseModel>('/umbraco/management/api/v1/document-type/:id', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 
@@ -13,11 +13,11 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.get('/umbraco/management/api/v1/document-type/details/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get('/umbraco/management/api/v1/document-type/details/:id', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const document = umbDocumentTypeData.getById(key);
+		const document = umbDocumentTypeData.getById(id);
 
 		return res(ctx.status(200), ctx.json([document]));
 	}),
@@ -55,28 +55,28 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/document-type/item', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
 
-		const items = umbDocumentTypeData.getTreeItem(keys);
+		const items = umbDocumentTypeData.getTreeItem(ids);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.get('/umbraco/management/api/v1/document-type/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get('/umbraco/management/api/v1/document-type/:id', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const documentType = umbDocumentTypeData.getById(key);
+		const documentType = umbDocumentTypeData.getById(id);
 
 		return res(ctx.status(200), ctx.json(documentType));
 	}),
 
-	rest.get('/umbraco/management/api/v1/document-type/allowed-children-of/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get('/umbraco/management/api/v1/document-type/allowed-children-of/:id', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const items = umbDocumentTypeData.getAllowedTypesOf(key);
+		const items = umbDocumentTypeData.getAllowedTypesOf(id);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),

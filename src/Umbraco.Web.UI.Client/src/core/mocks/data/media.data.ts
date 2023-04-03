@@ -10,7 +10,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
+		id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		isContainer: false,
 		parentId: null,
 		noAccess: false,
@@ -37,7 +37,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '69431027-8867-45bf-a93b-72bbdabfb177',
+		id: '69431027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: false,
 		parentId: null,
 		noAccess: false,
@@ -64,7 +64,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'folder',
 		hasChildren: true,
-		key: '69461027-8867-45bf-a93b-72bbdabfb177',
+		id: '69461027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: true,
 		parentId: null,
 		noAccess: false,
@@ -79,7 +79,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'folder',
 		hasChildren: true,
-		key: '69461027-8867-45bf-a93b-5224dabfb177',
+		id: '69461027-8867-45bf-a93b-5224dabfb177',
 		isContainer: true,
 		parentId: null,
 		noAccess: false,
@@ -94,7 +94,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '69431027-8867-45s7-a93b-7uibdabfb177',
+		id: '69431027-8867-45s7-a93b-7uibdabfb177',
 		isContainer: false,
 		parentId: '69461027-8867-45bf-a93b-72bbdabfb177',
 		noAccess: false,
@@ -121,7 +121,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '69431027-8867-45s7-a93b-7uibdabf2147',
+		id: '69431027-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
 		parentId: '69461027-8867-45bf-a93b-72bbdabfb177',
 		noAccess: false,
@@ -148,7 +148,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '694hdj27-8867-45s7-a93b-7uibdabf2147',
+		id: '694hdj27-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
 		parentId: '69461027-8867-45bf-a93b-5224dabfb177',
 		noAccess: false,
@@ -175,7 +175,7 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '694hdj27-1237-45s7-a93b-7uibdabfas47',
+		id: '694hdj27-1237-45s7-a93b-7uibdabfas47',
 		isContainer: false,
 		parentId: '69461027-8867-45bf-a93b-5224dabfb177',
 		noAccess: false,
@@ -214,15 +214,15 @@ class UmbMediaData extends UmbEntityData<MediaDetails> {
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedContentTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentId === key);
+	getTreeItemChildren(id: string): PagedContentTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<ContentTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key));
+	getTreeItem(ids: Array<string>): Array<ContentTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id));
 		return items.map((item) => createContentTreeItem(item));
 	}
 }

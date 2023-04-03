@@ -15,7 +15,7 @@ export interface ContentPropertyData {
 
 // Media
 export interface MediaDetails extends ContentTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
+	id: string; // TODO: Remove this when the backend is fixed
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;
 	data: Array<ContentPropertyData>;

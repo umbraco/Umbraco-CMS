@@ -30,9 +30,9 @@ export const handlers = [
 	}),
 
 	rest.get(umbracoPath('/tree/data-type/item'), (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
-		const items = umbDataTypeData.getTreeItem(keys);
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbDataTypeData.getTreeItem(ids);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
@@ -46,16 +46,16 @@ export const handlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.get(umbracoPath('/data-type/folder/:key'), (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get(umbracoPath('/data-type/folder/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const dataType = umbDataTypeData.getById(key);
+		const dataType = umbDataTypeData.getById(id);
 
 		return res(ctx.status(200), ctx.json(dataType));
 	}),
 
-	rest.put(umbracoPath('/data-type/folder/:key'), async (req, res, ctx) => {
+	rest.put(umbracoPath('/data-type/folder/:id'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
@@ -64,12 +64,12 @@ export const handlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.delete(umbracoPath('/data-type/folder/:key'), async (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.delete(umbracoPath('/data-type/folder/:id'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
 		try {
-			umbDataTypeData.deleteFolder(key);
+			umbDataTypeData.deleteFolder(id);
 			return res(ctx.status(200));
 		} catch (error) {
 			return res(
@@ -93,16 +93,16 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.get(umbracoPath('/data-type/:key'), (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get(umbracoPath('/data-type/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const dataType = umbDataTypeData.getById(key);
+		const dataType = umbDataTypeData.getById(id);
 
 		return res(ctx.status(200), ctx.json(dataType));
 	}),
 
-	rest.put(umbracoPath('/data-type/:key'), async (req, res, ctx) => {
+	rest.put(umbracoPath('/data-type/:id'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
@@ -111,11 +111,11 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.delete<string>(umbracoPath('/data-type/:key'), async (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.delete<string>(umbracoPath('/data-type/:id'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		umbDataTypeData.delete([key]);
+		umbDataTypeData.delete([id]);
 
 		return res(ctx.status(200));
 	}),

@@ -14,7 +14,7 @@ export class UmbWorkspacePropertyStructureHelper {
 	private _isRoot?: boolean;
 	private _containerName?: string;
 
-	#propertyStructure = new ArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.key);
+	#propertyStructure = new ArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -62,7 +62,7 @@ export class UmbWorkspacePropertyStructureHelper {
 				this.#host,
 				this.#workspaceContext!.structure.containersByNameAndType(this._containerName, this._containerType),
 				(groupContainers) => {
-					groupContainers.forEach((group) => this._observePropertyStructureOf(group.key));
+					groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
 				},
 				'_observeGroupContainers'
 			);

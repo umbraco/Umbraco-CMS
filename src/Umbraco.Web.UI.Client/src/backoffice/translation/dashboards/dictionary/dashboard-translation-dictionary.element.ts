@@ -109,14 +109,14 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#setTableItems() {
 		this.#tableItems = this.#dictionaryItems.map((dictionary) => {
-			// key is name to allow filtering on the displayed value
+			// id is set to name to allow filtering on the displayed value
 			const tableItem: UmbTableItem = {
 				id: dictionary.name ?? '',
 				icon: 'umb:book-alt',
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<a style="font-weight:bold" href="/section/translation/dictionary-item/edit/${dictionary.key}">
+						value: html`<a style="font-weight:bold" href="/section/translation/dictionary-item/edit/${dictionary.id}">
 							${dictionary.name}</a
 						> `,
 					},
@@ -162,7 +162,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		const { name } = await modalHandler.onSubmit();
 		if (!name) return;
 
-		const result = await this.#repo?.create({ $type: '', name, parentId: null, translations: [], key: '' });
+		const result = await this.#repo?.create({ $type: '', name, parentId: null, translations: [], id: '' });
 
 		// TODO => get location header to route to new item
 		console.log(result);

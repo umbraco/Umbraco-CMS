@@ -4,11 +4,11 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [
-	rest.delete<string[]>('/umbraco/backoffice/relation-type/:key', async (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.delete<string[]>('/umbraco/backoffice/relation-type/:id', async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		umbRelationTypeData.delete([key]);
+		umbRelationTypeData.delete([id]);
 
 		return res(ctx.status(200));
 	}),
@@ -37,22 +37,22 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/relation-type/item', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
-		const items = umbRelationTypeData.getTreeItem(keys);
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbRelationTypeData.getTreeItem(ids);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.get(umbracoPath('/relation-type/:key'), (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get(umbracoPath('/relation-type/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const RelationType = umbRelationTypeData.getById(key);
+		const RelationType = umbRelationTypeData.getById(id);
 
 		return res(ctx.status(200), ctx.json(RelationType));
 	}),
 
-	rest.post(umbracoPath('/relation-type/:key'), async (req, res, ctx) => {
+	rest.post(umbracoPath('/relation-type/:id'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
@@ -61,7 +61,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.put(umbracoPath('/relation-type/:key'), async (req, res, ctx) => {
+	rest.put(umbracoPath('/relation-type/:id'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 

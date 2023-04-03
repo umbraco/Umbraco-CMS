@@ -63,9 +63,7 @@ export class UmbRelationTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	update<K extends idof RelationTypeBaseModel>(id: K, value: RelationTypeBaseModel[K]) {
-		console.log('update', id, value);
-
+	update<K extends keyof RelationTypeBaseModel>(id: K, value: RelationTypeBaseModel[K]) {
 		this.#data.next({ ...this.#data.value, [id]: value });
 	}
 

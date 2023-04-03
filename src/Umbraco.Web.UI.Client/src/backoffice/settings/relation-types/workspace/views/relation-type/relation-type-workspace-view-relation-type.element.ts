@@ -10,16 +10,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-relation-type-workspace-view-relation-type')
 export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
-
 	@state()
 	private _relationType?: RelationTypeResponseModel;
 
@@ -39,10 +29,7 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 			return;
 		}
 
-		console.log('this._workspaceContext.data', this.#workspaceContext);
-
 		this.observe(this.#workspaceContext.data, (relationType) => {
-			console.log('relationType', relationType);
 			if (!relationType) return;
 
 			this._relationType = relationType;
@@ -86,16 +73,26 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	}
 
 	#renderParentProperty() {
-		if (this._relationType?.key) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
+		if (this._relationType?.id) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
 		return html`<uui-select slot="editor"></uui-select>`;
 	}
 
 	#renderChildProperty() {
-		if (this._relationType?.key) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
+		if (this._relationType?.id) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
 		return html`<uui-select slot="editor"></uui-select>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbRelationTypeWorkspaceViewRelationTypeElement;

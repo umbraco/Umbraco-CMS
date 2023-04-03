@@ -20,8 +20,9 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	/**
 	 * List of items.
 	 */
+	// TODO: Could this use a type that we export to ensure TS failure,  or hook this up with a type coming from backend?
 	@property()
-	public list: Array<{ key: string; checked: boolean; value: string }> = [];
+	public list: Array<{ id: string; checked: boolean; value: string }> = [];
 
 	#selected: Array<string> = [];
 	public get selected(): Array<string> {
@@ -62,7 +63,7 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 		if (!this.list) return nothing;
 		return html`<form>
 			<uui-form @change="${this.#setSelection}">
-				${repeat(this.list, (item) => item.key, this.renderCheckbox)}
+				${repeat(this.list, (item) => item.id, this.renderCheckbox)}
 			</uui-form>
 		</form>`;
 	}
