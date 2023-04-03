@@ -19,6 +19,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-workspace-layout
  * @description
  * @slot icon - Slot for icon
+ * @slot header - Slot for workspace header
  * @slot name - Slot for name
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
