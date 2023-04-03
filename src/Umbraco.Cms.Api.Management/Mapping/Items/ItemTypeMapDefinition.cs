@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
-using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;

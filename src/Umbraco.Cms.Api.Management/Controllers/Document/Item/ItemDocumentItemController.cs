@@ -30,7 +30,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
         _documentPresentationFactory = documentPresentationFactory;
     }
 
-    [HttpGet]
+    [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null, string? culture = null)
