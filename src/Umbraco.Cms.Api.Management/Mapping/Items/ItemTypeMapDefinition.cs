@@ -22,7 +22,6 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<ILanguage, LanguageItemResponseModel>((_, _) => new LanguageItemResponseModel(), Map);
         mapper.Define<IDataType, DataTypeItemResponseModel>((_, _) => new DataTypeItemResponseModel(), Map);
         mapper.Define<IDictionaryItem, DictionaryItemItemResponseModel>((_, _) => new DictionaryItemItemResponseModel(), Map);
-        mapper.Define<IDocumentEntitySlim, DocumentItemResponseModel>((_, _) => new DocumentItemResponseModel(), Map);
         mapper.Define<IContentType, DocumentTypeItemResponseModel>((_, _) => new DocumentTypeItemResponseModel(), Map);
         mapper.Define<IMediaType, MediaTypeItemResponseModel>((_, _) => new MediaTypeItemResponseModel(), Map);
         mapper.Define<IEntitySlim, MemberGroupItemReponseModel>((_, _) => new MemberGroupItemReponseModel(), Map);
@@ -52,14 +51,6 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.ItemKey;
         target.Id = source.Key;
         target.Icon = Constants.Icons.Dictionary;
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IDocumentEntitySlim source, DocumentItemResponseModel target, MapperContext context)
-    {
-        target.Name = source.Name ?? string.Empty;
-        target.Id = source.Key;
-        target.Icon = source.ContentTypeIcon ?? Constants.Icons.ContentType;
     }
 
     // Umbraco.Code.MapAll

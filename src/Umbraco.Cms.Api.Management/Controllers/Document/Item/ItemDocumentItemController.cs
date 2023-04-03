@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Core.Mapping;
@@ -13,16 +14,20 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Item;
 public class ItemDocumentItemController : DocumentItemControllerBase
 {
     private readonly IEntityService _entityService;
-    private readonly IUmbracoMapper _mapper;
     private readonly IDataTypeService _dataTypeService;
     private readonly IUserStartNodeEntitiesService _userStartNodeEntitiesService;
+    private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
-    public ItemDocumentItemController(IEntityService entityService, IUmbracoMapper mapper, IDataTypeService dataTypeService, IUserStartNodeEntitiesService userStartNodeEntitiesService)
+    public ItemDocumentItemController(
+        IEntityService entityService,
+        IDataTypeService dataTypeService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDocumentPresentationFactory documentPresentationFactory)
     {
         _entityService = entityService;
-        _mapper = mapper;
         _dataTypeService = dataTypeService;
         _userStartNodeEntitiesService = userStartNodeEntitiesService;
+        _documentPresentationFactory = documentPresentationFactory;
     }
 
     [HttpGet]
@@ -32,6 +37,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     {
         IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, keys).Select(x => x as IDocumentEntitySlim).Where(x => x is not null)!;
 
+        // Filter start nodes
         if (dataTypeKey is not null)
         {
             if (_dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value))
@@ -42,7 +48,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
             }
         }
 
-        List<DocumentItemResponseModel> documentItemResponseModels = _mapper.MapEnumerable<IDocumentEntitySlim, DocumentItemResponseModel>(documents);
+        IEnumerable<DocumentItemResponseModel> documentItemResponseModels = documents.Select(x => _documentPresentationFactory.CreateItemResponseModel(x, culture));
         return Ok(documentItemResponseModels);
     }
 }
