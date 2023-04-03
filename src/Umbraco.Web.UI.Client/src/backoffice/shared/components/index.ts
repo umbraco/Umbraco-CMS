@@ -28,6 +28,7 @@ import './input-media-picker/input-media-picker.element';
 import './input-multi-url-picker/input-multi-url-picker.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
+import './input-upload-field/input-upload-field.element';
 import './input-template-picker/input-template-picker.element';
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';

@@ -464,7 +464,12 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.UploadField',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.UploadField',
-		values: [],
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['jpg', 'jpeg', 'png'],
+			},
+		],
 	},
 	{
 		$type: 'data-type',
