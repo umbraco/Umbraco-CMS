@@ -7,8 +7,8 @@ export interface UmbImportDictionaryModalData {
 }
 
 export interface UmbImportDictionaryModalResult {
-	fileName?: string;
-	parentKey?: string;
+	temporaryFileId?: string;
+	parentId?: string;
 }
 
 export const UMB_IMPORT_DICTIONARY_MODAL = new UmbModalToken<

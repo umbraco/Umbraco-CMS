@@ -1,9 +1,9 @@
 import type { DictionaryDetails } from '../../';
 import {
 	DictionaryItemResponseModel,
-	UploadDictionaryResponseModel,
 	PagedDictionaryOverviewResponseModel,
 	PagedLanguageResponseModel,
+	ImportDictionaryRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -16,7 +16,7 @@ export interface DictionaryDetailDataSource {
 	delete(key: string): Promise<DataSourceResponse>;
 	export(key: string, includeChildren: boolean): Promise<DataSourceResponse<Blob>>;
 	import(fileName: string, parentKey?: string): Promise<DataSourceResponse<any>>;
-	upload(formData: FormData): Promise<DataSourceResponse<UploadDictionaryResponseModel>>;
+	upload(formData: ImportDictionaryRequestModel): Promise<DataSourceResponse<string>>;
 	// TODO - temp only
 	getLanguages(): Promise<DataSourceResponse<PagedLanguageResponseModel>>;
 }

@@ -6,7 +6,7 @@ import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { ImportDictionaryRequestModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepository<DictionaryDetails> {
@@ -197,18 +197,18 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return this.#detailSource.export(key, includeChildren);
 	}
 
-	async import(fileName: string, parentKey?: string) {
+	async import(temporaryFileId: string, parentId?: string) {
 		await this.#init;
 
-		if (!fileName) {
+		if (!temporaryFileId) {
 			const error: ProblemDetailsModel = { title: 'File is missing' };
 			return { error };
 		}
 
-		return this.#detailSource.import(fileName, parentKey);
+		return this.#detailSource.import(temporaryFileId, parentId);
 	}
 
-	async upload(formData: FormData) {
+	async upload(formData: ImportDictionaryRequestModel) {
 		await this.#init;
 
 		if (!formData) {
