@@ -219,10 +219,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			queryString = name + '=' + value;
 		}
 
-		this.#logViewerContext?.setFilterExpression(queryString);
-		this.#logViewerContext?.setCurrentPage(1);
-		this.details.removeAttribute('open');
-		this.#logViewerContext?.getLogs();
+		return queryString;
 	}
 
 	#setOpen(event: Event) {
@@ -259,14 +256,12 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 									${this._propertiesWithSearchMenu.includes(property.name ?? '')
 										? html`<uui-button
 												compact
-												@click=${() => {
-													this._findLogsWithProperty(property);
-												}}
 												look="secondary"
 												label="Find logs with ${property.name}"
 												title="Find logs with ${property.name}"
-												><uui-icon name="umb:search"></uui-icon
-										  ></uui-button>`
+												href=${`section/settings/workspace/logviewer/search/${this._findLogsWithProperty(property)}`}>
+												<uui-icon name="umb:search"></uui-icon>
+										  </uui-button>`
 										: ''}
 								</div>
 							</li>`
