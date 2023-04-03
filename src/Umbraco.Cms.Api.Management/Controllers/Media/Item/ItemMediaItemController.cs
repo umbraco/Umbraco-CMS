@@ -36,6 +36,8 @@ public class ItemMediaItemController : MediaItemControllerBase
         {
             if (_dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value))
             {
+                // FIXME: right now we're faking user id by just passing "-1"
+                // We should use the backoffice security accessor once auth is in place.
                 media = _userStartNodeEntitiesService.UserAccessEntities(media, new[] {"-1"}).OfType<IMediaEntitySlim>();
             }
         }
