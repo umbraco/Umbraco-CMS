@@ -19,7 +19,7 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<any, any, St
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
-	createScaffold(parentKey: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
 		throw new Error('Method not implemented.');
 	}
 

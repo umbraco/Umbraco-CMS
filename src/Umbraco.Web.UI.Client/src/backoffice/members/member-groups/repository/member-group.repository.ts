@@ -54,7 +54,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return { data, error };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		const error: ProblemDetailsModel = { title: 'Not implemented' };
 		return { data: undefined, error };
 	}
@@ -77,9 +77,9 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
 	async treeItems(keys: Array<string>) {

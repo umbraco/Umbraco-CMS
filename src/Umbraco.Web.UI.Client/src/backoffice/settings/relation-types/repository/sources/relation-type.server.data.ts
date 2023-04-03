@@ -51,11 +51,11 @@ export class UmbRelationTypeServerDataSource
 
 	/**
 	 * Creates a new Relation Type scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: RelationTypeResponseModel = {};
 
 		return { data };

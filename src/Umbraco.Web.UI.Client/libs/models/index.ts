@@ -11,14 +11,14 @@ export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 export type ClassConstructor<T> = new (...args: any[]) => T;
 
 // Users
-// TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentKey.
+// TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentId.
 export interface Entity {
 	key: string;
 	name: string;
 	icon: string;
 	type: string;
 	hasChildren: boolean;
-	parentKey: string | null;
+	parentId: string | null;
 }
 
 /** Tried to find a common base of our entities — used by Entity Workspace Context */

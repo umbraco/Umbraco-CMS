@@ -23,10 +23,10 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/relation-type/children', (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
 
-		const children = umbRelationTypeData.getTreeItemChildren(parentKey);
+		const children = umbRelationTypeData.getTreeItemChildren(parentId);
 
 		const response = {
 			total: children.length,

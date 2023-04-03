@@ -154,14 +154,11 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _removeRedirect(r: RedirectUrlResponseModel) {
-		if (!r.key) return;
-		const res = await tryExecuteAndNotify(
-			this,
-			RedirectManagementResource.deleteRedirectManagementByKey({ key: r.key })
-		);
+		if (!r.id) return;
+		const res = await tryExecuteAndNotify(this, RedirectManagementResource.deleteRedirectManagementById({ id: r.id }));
 		if (!res.error) {
 			// or just run a this._getRedirectData() again?
-			this.shadowRoot?.getElementById(`redirect-key-${r.key}`)?.remove();
+			this.shadowRoot?.getElementById(`redirect-key-${r.id}`)?.remove();
 		}
 	}
 

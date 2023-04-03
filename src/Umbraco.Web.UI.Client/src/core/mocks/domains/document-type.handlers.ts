@@ -41,10 +41,10 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/document-type/children', (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
 
-		const children = umbDocumentTypeData.getTreeItemChildren(parentKey);
+		const children = umbDocumentTypeData.getTreeItemChildren(parentId);
 
 		const response = {
 			total: children.length,

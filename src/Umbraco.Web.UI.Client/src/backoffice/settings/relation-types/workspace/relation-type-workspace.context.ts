@@ -28,8 +28,8 @@ export class UmbRelationTypeWorkspaceContext
 		}
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(parentId: string | null) {
+		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);

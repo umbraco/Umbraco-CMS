@@ -26,8 +26,8 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(parentId: string | null) {
+		const { data } = await this.repository.createScaffold(parentId);
 		this.setIsNew(true);
 		this.#data.next(data);
 		return { data };

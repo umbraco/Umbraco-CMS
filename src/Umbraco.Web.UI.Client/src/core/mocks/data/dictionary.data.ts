@@ -6,7 +6,7 @@ import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backen
 export const data: Array<DictionaryDetails> = [
 	{
 		$type: '',
-		parentKey: null,
+		parentId: null,
 		name: 'Hello',
 		key: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		hasChildren: true,
@@ -26,7 +26,7 @@ export const data: Array<DictionaryDetails> = [
 	},
 	{
 		$type: '',
-		parentKey: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		parentId: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		name: 'Hello again',
 		key: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		hasChildren: false,
@@ -56,12 +56,12 @@ class UmbDictionaryData extends UmbEntityData<DictionaryDetails> {
 	}
 
 	getTreeRoot(): Array<EntityTreeItemResponseModel> {
-		const rootItems = this.data.filter((item) => item.parentKey === null);
+		const rootItems = this.data.filter((item) => item.parentId === null);
 		return rootItems.map((item) => createEntityTreeItem(item));
 	}
 
 	getTreeItemChildren(key: string): Array<EntityTreeItemResponseModel> {
-		const childItems = this.data.filter((item) => item.parentKey === key);
+		const childItems = this.data.filter((item) => item.parentId === key);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 

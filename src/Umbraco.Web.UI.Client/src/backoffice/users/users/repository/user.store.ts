@@ -25,14 +25,14 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	getScaffold(entityType: string, parentKey: string | null) {
+	getScaffold(entityType: string, parentId: string | null) {
 		return {
 			key: '',
 			name: '',
 			icon: '',
 			type: 'user',
 			hasChildren: false,
-			parentKey: '',
+			parentId: '',
 			email: '',
 			language: '',
 			status: 'enabled',

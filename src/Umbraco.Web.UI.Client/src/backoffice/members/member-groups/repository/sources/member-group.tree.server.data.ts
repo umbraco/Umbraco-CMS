@@ -32,11 +32,11 @@ export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MemberGroupTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
+	async getChildrenOf(parentId: string | null) {
 		// Not implemented for this tree
 		return {};
 	}

@@ -53,7 +53,7 @@ export class UmbDocumentServerDataSource
 
 	/**
 	 * Creates a new Document scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */

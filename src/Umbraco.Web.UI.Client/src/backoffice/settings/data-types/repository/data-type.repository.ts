@@ -77,17 +77,17 @@ export class UmbDataTypeRepository
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
-		if (!parentKey) throw new Error('Parent key is missing');
+	async requestTreeItemsOf(parentId: string | null) {
+		if (!parentId) throw new Error('Parent key is missing');
 		await this.#init;
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
 	async requestTreeItems(keys: Array<string>) {
@@ -104,10 +104,10 @@ export class UmbDataTypeRepository
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
-		if (parentKey === undefined) throw new Error('Parent key is missing');
+	async treeItemsOf(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent key is missing');
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
 	async treeItems(keys: Array<string>) {
@@ -117,11 +117,11 @@ export class UmbDataTypeRepository
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
-		if (parentKey === undefined) throw new Error('Parent key is missing');
+	async createScaffold(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent key is missing');
 		await this.#init;
 
-		return this.#detailSource.createScaffold(parentKey);
+		return this.#detailSource.createScaffold(parentId);
 	}
 
 	async requestByKey(key: string) {
@@ -210,9 +210,9 @@ export class UmbDataTypeRepository
 	}
 
 	// folder
-	async createFolderScaffold(parentKey: string | null) {
-		if (parentKey === undefined) throw new Error('Parent key is missing');
-		return this.#folderSource.createScaffold(parentKey);
+	async createFolderScaffold(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent key is missing');
+		return this.#folderSource.createScaffold(parentId);
 	}
 
 	// TODO: temp create type until backend is ready. Remove the key addition when new types are generated.
@@ -226,7 +226,7 @@ export class UmbDataTypeRepository
 		if (!error) {
 			const treeItem: FolderTreeItemResponseModel = {
 				$type: 'FolderTreeItemResponseModel',
-				parentKey: folderRequest.parentKey,
+				parentId: folderRequest.parentId,
 				name: folderRequest.name,
 				key: folderRequest.key,
 				isFolder: true,

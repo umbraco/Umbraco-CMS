@@ -20,9 +20,9 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/document/children', (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
-		const response = umbDocumentData.getTreeItemChildren(parentKey);
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
+		const response = umbDocumentData.getTreeItemChildren(parentId);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 

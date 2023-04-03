@@ -6,7 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbFolderDataSource {
-	createScaffold(parentKey: string | null): Promise<DataSourceResponse<FolderReponseModel>>;
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderReponseModel>>;
 	get(unique: string): Promise<DataSourceResponse<FolderReponseModel>>;
 	insert(data: CreateFolderRequestModel): Promise<DataSourceResponse<string>>;
 	update(unique: string, data: CreateFolderRequestModel): Promise<DataSourceResponse<UpdateFolderReponseModel>>;

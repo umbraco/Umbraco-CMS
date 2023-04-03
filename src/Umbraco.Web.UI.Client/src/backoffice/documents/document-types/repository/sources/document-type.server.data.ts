@@ -47,11 +47,11 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 
 	/**
 	 * Creates a new Document scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: DocumentTypeResponseModel = {
 			properties: [],
 		};

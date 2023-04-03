@@ -38,7 +38,7 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		const movedItems = items.map((item) => {
 			return {
 				...item,
-				parentKey: destinationKey,
+				parentId: destinationKey,
 			};
 		});
 

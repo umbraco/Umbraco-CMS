@@ -49,14 +49,14 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Creates a new Data Type scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: DataTypeResponseModel = {
 			$type: '',
-			parentKey: parentKey,
+			parentId: parentId,
 			key: uuidv4(),
 		};
 

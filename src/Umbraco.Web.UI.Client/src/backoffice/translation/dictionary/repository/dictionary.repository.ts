@@ -56,21 +56,21 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
+		if (!parentId) {
 			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
 	async requestTreeItems(keys: Array<string>) {
@@ -91,9 +91,9 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
 	async treeItems(keys: Array<string>) {
@@ -103,15 +103,15 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 	// DETAILS
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
+		if (!parentId) {
 			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { data: undefined, error };
 		}
 
-		return this.#detailSource.createScaffold(parentKey);
+		return this.#detailSource.createScaffold(parentId);
 	}
 
 	async requestByKey(key: string) {

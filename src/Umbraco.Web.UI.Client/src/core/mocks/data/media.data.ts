@@ -12,7 +12,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: false,
 		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -39,7 +39,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: false,
 		key: '69431027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -66,7 +66,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: true,
 		key: '69461027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: true,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [],
@@ -81,7 +81,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: true,
 		key: '69461027-8867-45bf-a93b-5224dabfb177',
 		isContainer: true,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [],
@@ -96,7 +96,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: false,
 		key: '69431027-8867-45s7-a93b-7uibdabfb177',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-72bbdabfb177',
+		parentId: '69461027-8867-45bf-a93b-72bbdabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -123,7 +123,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: false,
 		key: '69431027-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-72bbdabfb177',
+		parentId: '69461027-8867-45bf-a93b-72bbdabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -150,7 +150,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: false,
 		key: '694hdj27-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-5224dabfb177',
+		parentId: '69461027-8867-45bf-a93b-5224dabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -177,7 +177,7 @@ export const data: Array<MediaDetails> = [
 		hasChildren: false,
 		key: '694hdj27-1237-45s7-a93b-7uibdabfas47',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-5224dabfb177',
+		parentId: '69461027-8867-45bf-a93b-5224dabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -208,14 +208,14 @@ class UmbMediaData extends UmbEntityData<MediaDetails> {
 	}
 
 	getTreeRoot(): PagedContentTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(key: string): PagedContentTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+		const items = this.data.filter((item) => item.parentId === key);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };

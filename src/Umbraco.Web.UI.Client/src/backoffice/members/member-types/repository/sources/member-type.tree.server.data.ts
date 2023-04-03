@@ -32,11 +32,11 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MemberTypeTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
+	async getChildrenOf(parentId: string | null) {
 		const error: ProblemDetailsModel = { title: 'Not implemented for Member Type' };
 		return { error };
 	}

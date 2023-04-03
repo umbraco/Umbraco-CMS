@@ -25,7 +25,7 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 
 	/**
 	 * @description - Creates a new Dictionary scaffold
-	 * @param {string} parentKey
+	 * @param {string} parentId
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */

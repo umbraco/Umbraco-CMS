@@ -61,12 +61,12 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) {
 			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { error };
 		}
@@ -74,7 +74,7 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 		return tryExecuteAndNotify(
 			this.#host,
 			DocumentResource.getTreeDocumentChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}

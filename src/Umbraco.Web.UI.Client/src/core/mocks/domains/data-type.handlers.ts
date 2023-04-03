@@ -16,10 +16,10 @@ export const handlers = [
 	}),
 
 	rest.get(umbracoPath('/tree/data-type/children'), (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
 
-		const children = umbDataTypeData.getTreeItemChildren(parentKey);
+		const children = umbDataTypeData.getTreeItemChildren(parentId);
 
 		const response = {
 			total: children.length,

@@ -11,10 +11,10 @@ export const handlers = [
 	}),
 
 	rest.get(umbracoPath('/tree/template/children'), (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
 
-		const response = umbTemplateData.getTreeItemChildren(parentKey);
+		const response = umbTemplateData.getTreeItemChildren(parentId);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 

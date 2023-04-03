@@ -46,8 +46,8 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		throw new Error('Save method not implemented.');
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(parentId: string | null) {
+		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);

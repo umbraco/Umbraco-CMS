@@ -33,12 +33,12 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const scaffold: FolderReponseModel = {
 			$type: 'FolderReponseModel',
 			name: '',
 			key: uuidv4(),
-			parentKey,
+			parentId,
 		};
 
 		return { data: scaffold };

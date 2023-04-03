@@ -37,9 +37,9 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		this.#templateWorkspaceContext.load(entityKey);
 	}
 
-	public create(parentKey: string | null) {
+	public create(parentId: string | null) {
 		this.#isNew = true;
-		this.#templateWorkspaceContext.createScaffold(parentKey);
+		this.#templateWorkspaceContext.createScaffold(parentId);
 	}
 
 	@state()

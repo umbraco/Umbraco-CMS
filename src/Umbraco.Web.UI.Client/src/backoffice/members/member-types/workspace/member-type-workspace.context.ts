@@ -38,7 +38,7 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -64,8 +64,8 @@ export class UmbMemberTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	public destroy(): void {

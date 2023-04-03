@@ -77,7 +77,7 @@ export class UmbWorkspacePropertyStructureHelper {
 			this.#workspaceContext.structure.propertyStructuresOf(groupKey),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.key before inserting them:
-				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerKey !== groupKey);
+				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerId !== groupKey);
 
 				properties?.forEach((property) => {
 					if (!_propertyStructure.find((x) => x.alias === property.alias)) {

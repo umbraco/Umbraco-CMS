@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbFolderRepository {
-	createFolderScaffold(parentKey: string | null): Promise<{
+	createFolderScaffold(parentId: string | null): Promise<{
 		data?: FolderReponseModel;
 		error?: ProblemDetailsModel;
 	}>;

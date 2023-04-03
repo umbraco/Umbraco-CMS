@@ -26,7 +26,7 @@ export const data: Array<TemplateDBItem> = [
 		$type: '',
 		key: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Doc 1',
 		type: 'template',
 		icon: 'icon-layout',
@@ -37,7 +37,7 @@ export const data: Array<TemplateDBItem> = [
 		@{
 			if (Model?.Areas.Any() != true) { return; }
 		}
-		
+
 		<div class="umb-block-grid__area-container"
 			 style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? Model.GridColumns?.ToString() ?? "12");">
 			@foreach (var area in Model.Areas)
@@ -50,7 +50,7 @@ export const data: Array<TemplateDBItem> = [
 		$type: '',
 		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Test',
 		type: 'template',
 		icon: 'icon-layout',
@@ -63,7 +63,7 @@ export const data: Array<TemplateDBItem> = [
 		$type: '',
 		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		isContainer: false,
-		parentKey: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
 		type: 'template',
 		icon: 'icon-layout',
@@ -114,14 +114,14 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	}
 
 	getTreeRoot(): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(key: string): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+		const items = this.data.filter((item) => item.parentId === key);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };

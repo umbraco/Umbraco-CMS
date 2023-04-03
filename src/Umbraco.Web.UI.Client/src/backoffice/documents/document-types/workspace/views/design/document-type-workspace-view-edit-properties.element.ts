@@ -11,16 +11,16 @@ import './document-type-workspace-view-edit-property.element';
 
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	private _containerKey: string | undefined;
+	private _containerId: string | undefined;
 
-	public get containerKey(): string | undefined {
-		return this._containerKey;
+	public get containerId(): string | undefined {
+		return this._containerId;
 	}
-	public set containerKey(value: string | undefined) {
-		if (value === this._containerKey) return;
-		const oldValue = this._containerKey;
-		this._containerKey = value;
-		this.requestUpdate('containerKey', oldValue);
+	public set containerId(value: string | undefined) {
+		if (value === this._containerId) return;
+		const oldValue = this._containerId;
+		this._containerId = value;
+		this.requestUpdate('containerId', oldValue);
 	}
 
 	@property({ type: String, attribute: 'container-name', reflect: false })
@@ -56,7 +56,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	}
 
 	async #onAddProperty() {
-		const property = await this._propertyStructureHelper.addProperty(this._containerKey);
+		const property = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!property) return;
 
 		// Take key and parse to modal:

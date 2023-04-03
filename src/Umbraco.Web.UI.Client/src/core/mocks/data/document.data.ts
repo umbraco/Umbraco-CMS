@@ -539,7 +539,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isTrashed: false,
 		key: 'all-property-editors-document-key',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'All property editors',
 		type: 'document',
 		icon: 'document',
@@ -554,7 +554,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isTrashed: false,
 		key: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Article in english',
 		type: 'document',
 		icon: 'document',
@@ -569,7 +569,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isTrashed: false,
 		key: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 		isContainer: false,
-		parentKey: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		parentId: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		name: 'Blog post B',
 		type: 'document',
 		icon: 'document',
@@ -583,7 +583,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: false,
 		key: 'f6n7a5b2-e7c1-463a-956bc-6ck5b9bdf447',
 		isContainer: false,
-		parentKey: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
+		parentId: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
 		noAccess: false,
 		isProtected: false,
 		isPublished: false,
@@ -598,7 +598,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		hasChildren: false,
 		key: 'simple-document-key',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isProtected: false,
 		isPublished: false,
@@ -619,14 +619,14 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	getTreeRoot(): PagedDocumentTreeItemResponseModel {
-		const items = this.treeData.filter((item) => item.parentKey === null);
+		const items = this.treeData.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(key: string): PagedDocumentTreeItemResponseModel {
-		const items = this.treeData.filter((item) => item.parentKey === key);
+		const items = this.treeData.filter((item) => item.parentId === key);
 		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };

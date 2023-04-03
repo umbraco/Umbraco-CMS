@@ -76,7 +76,7 @@ export const treeData: Array<EntityTreeItemResponseModel> = [
 		key: 'e0d39ff5-71d8-453f-b682-9d8d31ee5e06',
 		$type: 'EntityTreeItemViewModel',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Relate Document On Copy',
 		icon: 'umb:trafic',
 		type: 'relation-type',
@@ -85,7 +85,7 @@ export const treeData: Array<EntityTreeItemResponseModel> = [
 		key: 'ac68cde6-763f-4231-a751-1101b57defd2',
 		$type: 'EntityTreeItemViewModel',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Relate Parent Document On Delete',
 		icon: 'umb:trafic',
 		type: 'relation-type',
@@ -94,7 +94,7 @@ export const treeData: Array<EntityTreeItemResponseModel> = [
 		key: '6f9b800c-762c-42d4-85d9-bf40a77d689e',
 		$type: 'EntityTreeItemViewModel',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Relate Parent Media Folder On Delete',
 		icon: 'umb:trafic',
 		type: 'relation-type',
@@ -103,7 +103,7 @@ export const treeData: Array<EntityTreeItemResponseModel> = [
 		key: 'd421727d-43de-4205-b4c6-037404f309ad',
 		$type: 'EntityTreeItemViewModel',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Related Media',
 		icon: 'umb:trafic',
 		type: 'relation-type',
@@ -112,7 +112,7 @@ export const treeData: Array<EntityTreeItemResponseModel> = [
 		key: 'e9a0a28e-2d5b-4229-ac00-66f2df230513',
 		$type: 'EntityTreeItemViewModel',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Related Document',
 		icon: 'umb:trafic',
 		type: 'relation-type',
@@ -137,7 +137,7 @@ class UmbRelationTypeData extends UmbEntityData<RelationTypeResponseModel> {
 
 	//TODO Can relation types have children?
 	getTreeItemChildren(key: string): Array<EntityTreeItemResponseModel> {
-		const childItems = this.treeData.filter((item) => item.parentKey === key);
+		const childItems = this.treeData.filter((item) => item.parentId === key);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 

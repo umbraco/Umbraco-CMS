@@ -12,7 +12,7 @@ export const data: Array<MemberTypeDetails> = [
 		hasChildren: false,
 		key: 'd59be02f-1df9-4228-aa1e-01917d806cda',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		alias: 'memberType1',
 		properties: [],
 	},
@@ -25,14 +25,14 @@ class UmbMemberTypeData extends UmbData<MemberTypeDetails> {
 	}
 
 	getTreeRoot(): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(key: string): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+		const items = this.data.filter((item) => item.parentId === key);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };

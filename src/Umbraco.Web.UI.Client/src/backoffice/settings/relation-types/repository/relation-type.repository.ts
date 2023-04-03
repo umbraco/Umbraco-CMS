@@ -67,7 +67,7 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 	}
 
 	//TODO RelationTypes can't have children. But this method is required by the tree interface.
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		const error: ProblemDetailsModel = { title: 'Not implemented' };
 		return { data: undefined, error };
 	}
@@ -90,9 +90,9 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
 	async treeItems(keys: Array<string>) {
@@ -102,14 +102,14 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
+		if (!parentId) {
 			throw new Error('Parent key is missing');
 		}
 
-		return this.#detailDataSource.createScaffold(parentKey);
+		return this.#detailDataSource.createScaffold(parentId);
 	}
 
 	async requestByKey(key: string) {

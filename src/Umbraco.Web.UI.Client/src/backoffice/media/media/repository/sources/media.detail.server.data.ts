@@ -45,11 +45,11 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 
 	/**
 	 * Creates a new Media scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: MediaDetails = {
 			$type: '',
 			key: '',
@@ -57,7 +57,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 			icon: '',
 			type: '',
 			hasChildren: false,
-			parentKey: parentKey ?? '',
+			parentId: parentId ?? '',
 			isTrashed: false,
 			properties: [
 				{

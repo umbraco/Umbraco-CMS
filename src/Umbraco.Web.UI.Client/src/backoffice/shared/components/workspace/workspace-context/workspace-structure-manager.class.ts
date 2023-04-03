@@ -70,12 +70,12 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		return promiseResult;
 	}
 
-	public async createScaffold(parentKey: string) {
+	public async createScaffold(parentId: string) {
 		this._reset();
 
-		if (!parentKey) return {};
+		if (!parentId) return {};
 
-		const { data } = await this.#documentTypeRepository.createScaffold(parentKey);
+		const { data } = await this.#documentTypeRepository.createScaffold(parentId);
 		if (!data) return {};
 
 		this.#rootDocumentTypeKey = data.key;
@@ -152,7 +152,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	async createContainer(
 		documentTypeKey: string | null,
-		parentKey: string | null = null,
+		parentId: string | null = null,
 		type: PropertyContainerTypes = 'Group',
 		sortOrder?: number
 	) {
@@ -161,7 +161,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 		const container: PropertyTypeContainerResponseModelBaseModel = {
 			key: generateGuid(),
-			parentKey: parentKey,
+			parentId: parentId,
 			name: 'New',
 			type: type,
 			sortOrder: sortOrder ?? 0,
@@ -175,23 +175,23 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		return container;
 	}
 
-	async removeContainer(documentTypeKey: string | null, containerKey: string | null = null) {
+	async removeContainer(documentTypeKey: string | null, containerId: string | null = null) {
 		await this.#init;
 		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeKey!;
 
 		const frozenContainers = this.#documentTypes.getValue().find((x) => x.key === documentTypeKey)?.containers ?? [];
-		const containers = frozenContainers.filter((x) => x.key !== containerKey);
+		const containers = frozenContainers.filter((x) => x.key !== containerId);
 
 		this.#documentTypes.updateOne(documentTypeKey, { containers });
 	}
 
-	async createProperty(documentTypeKey: string | null, containerKey: string | null = null, sortOrder?: number) {
+	async createProperty(documentTypeKey: string | null, containerId: string | null = null, sortOrder?: number) {
 		await this.#init;
 		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeKey!;
 
 		const property: PropertyTypeResponseModelBaseModel = {
 			key: generateGuid(),
-			containerKey: containerKey,
+			containerId: containerId,
 			//sortOrder: sortOrder ?? 0,
 		};
 
@@ -242,11 +242,11 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	}
 	*/
 
-	hasPropertyStructuresOf(containerKey: string | null) {
+	hasPropertyStructuresOf(containerId: string | null) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
 			return (
 				docTypes.find((docType) => {
-					return docType.properties?.find((property) => property.containerKey === containerKey);
+					return docType.properties?.find((property) => property.containerId === containerId);
 				}) !== undefined
 			);
 		});
@@ -254,12 +254,12 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	rootPropertyStructures() {
 		return this.propertyStructuresOf(null);
 	}
-	propertyStructuresOf(containerKey: string | null) {
+	propertyStructuresOf(containerId: string | null) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
 			const props: DocumentTypePropertyTypeResponseModel[] = [];
 			docTypes.forEach((docType) => {
 				docType.properties?.forEach((property) => {
-					if (property.containerKey === containerKey) {
+					if (property.containerId === containerId) {
 						props.push(property);
 					}
 				});
@@ -270,26 +270,26 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	rootContainers(containerType: PropertyContainerTypes) {
 		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.parentKey === null && x.type === containerType);
+			return data.filter((x) => x.parentId === null && x.type === containerType);
 		});
 	}
 
 	hasRootContainers(containerType: PropertyContainerTypes) {
 		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.parentKey === null && x.type === containerType).length > 0;
+			return data.filter((x) => x.parentId === null && x.type === containerType).length > 0;
 		});
 	}
 
 	containersOfParentKey(
-		parentKey: PropertyTypeContainerResponseModelBaseModel['parentKey'],
+		parentId: PropertyTypeContainerResponseModelBaseModel['parentId'],
 		containerType: PropertyContainerTypes
 	) {
 		return this.#containers.getObservablePart((data) => {
-			return data.filter((x) => x.parentKey === parentKey && x.type === containerType);
+			return data.filter((x) => x.parentId === parentId && x.type === containerType);
 		});
 	}
 
-	// TODO: Maybe this must take parentKey into account as well?
+	// TODO: Maybe this must take parentId into account as well?
 	containersByNameAndType(name: string, containerType: PropertyContainerTypes) {
 		return this.#containers.getObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);

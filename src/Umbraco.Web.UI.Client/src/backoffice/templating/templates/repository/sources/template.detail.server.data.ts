@@ -42,7 +42,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 
 	/**
 	 * Creates a new Template scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */

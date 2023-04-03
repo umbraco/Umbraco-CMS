@@ -17,12 +17,12 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: IRoute[] = [
 		{
-			path: 'create/:parentKey/:documentTypeKey',
+			path: 'create/:parentId/:documentTypeKey',
 			component: () => this.#element,
 			setup: async (component: HTMLElement, info: IRoutingInfo) => {
 				// TODO: use parent key:
 				// TODO: Notice the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
-				const parentKey = info.match.params.parentKey;
+				const parentId = info.match.params.parentId;
 				const documentTypeKey = info.match.params.documentTypeKey;
 				this.#workspaceContext.createScaffold(documentTypeKey);
 			},

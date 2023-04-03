@@ -23,14 +23,14 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 		super(host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	getScaffold(entityType: string, parentKey: string | null) {
+	getScaffold(entityType: string, parentId: string | null) {
 		return {
 			key: '',
 			name: '',
 			icon: '',
 			type: 'user-group',
 			hasChildren: false,
-			parentKey: '',
+			parentId: '',
 			sections: [],
 			permissions: [],
 			users: [],

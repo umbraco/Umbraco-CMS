@@ -62,16 +62,16 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	async #getPackageCreated() {
 		if (!this.entityKey) return;
-		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedByKey({ key: this.entityKey }));
+		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedById({ id: this.entityKey }));
 		if (!data) return;
 		this._package = data as PackageDefinitionResponseModel;
 	}
 
 	async #download() {
-		if (!this._package?.key) return;
+		if (!this._package?.id) return;
 		const response = await tryExecuteAndNotify(
 			this,
-			PackageResource.getPackageCreatedByKeyDownload({ key: this._package.key })
+			PackageResource.getPackageCreatedByIdDownload({ id: this._package.id })
 		);
 	}
 
@@ -94,10 +94,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	async #update() {
 		if (!this.#nameDefined()) return;
-		if (!this._package?.key) return;
+		if (!this._package?.id) return;
 		const response = await tryExecuteAndNotify(
 			this,
-			PackageResource.putPackageCreatedByKey({ key: this._package.key, requestBody: this._package })
+			PackageResource.putPackageCreatedById({ id: this._package.id, requestBody: this._package })
 		);
 
 		if (response.error) return;
@@ -135,13 +135,13 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	#renderActions() {
 		return html`<div slot="actions">
-			${this._package?.key
+			${this._package?.id
 				? html`<uui-button @click="${this.#download}" color="" look="secondary" label="Download package">
 						Download
 				  </uui-button>`
 				: nothing}
 			<uui-button
-				@click="${this._package.key ? this.#update : this.#save}"
+				@click="${this._package.id ? this.#update : this.#save}"
 				color="positive"
 				look="primary"
 				label="Save changes to package">

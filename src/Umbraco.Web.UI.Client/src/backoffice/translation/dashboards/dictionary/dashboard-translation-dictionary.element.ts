@@ -162,7 +162,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		const { name } = await modalHandler.onSubmit();
 		if (!name) return;
 
-		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });
+		const result = await this.#repo?.create({ $type: '', name, parentId: null, translations: [], key: '' });
 
 		// TODO => get location header to route to new item
 		console.log(result);

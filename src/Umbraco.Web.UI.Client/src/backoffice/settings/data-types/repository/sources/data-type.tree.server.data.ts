@@ -32,17 +32,17 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) throw new Error('Parent key is missing');
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) throw new Error('Parent key is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getTreeDataTypeChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}

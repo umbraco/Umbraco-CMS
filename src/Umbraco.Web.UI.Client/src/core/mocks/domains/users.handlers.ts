@@ -57,7 +57,7 @@ export const handlers = [
 			updateDate: new Date().toISOString(),
 			createDate: new Date().toISOString(),
 			failedLoginAttempts: 0,
-			parentKey: '',
+			parentId: '',
 			hasChildren: false,
 			type: 'user',
 			icon: 'umb:icon-user',

@@ -118,24 +118,24 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	private _handleOpenItem(mediaItem: EntityTreeItemResponseModel) {
 		//TODO: Fix when we have dynamic routing
-		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.key);
+		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.id);
 	}
 
 	private _handleSelect(mediaItem: EntityTreeItemResponseModel) {
-		if (mediaItem.key) {
-			this._collectionContext?.select(mediaItem.key);
+		if (mediaItem.id) {
+			this._collectionContext?.select(mediaItem.id);
 		}
 	}
 
 	private _handleDeselect(mediaItem: EntityTreeItemResponseModel) {
-		if (mediaItem.key) {
-			this._collectionContext?.deselect(mediaItem.key);
+		if (mediaItem.id) {
+			this._collectionContext?.deselect(mediaItem.id);
 		}
 	}
 
 	private _isSelected(mediaItem: EntityTreeItemResponseModel) {
-		if (mediaItem.key) {
-			return this._selection.includes(mediaItem.key);
+		if (mediaItem.id) {
+			return this._selection.includes(mediaItem.id);
 		}
 		return false;
 	}
@@ -167,7 +167,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				${this._mediaItems
 					? repeat(
 							this._mediaItems,
-							(file, index) => (file.key || '') + index,
+							(file, index) => (file.id || '') + index,
 							(file) => this._renderMediaItem(file)
 					  )
 					: ''}

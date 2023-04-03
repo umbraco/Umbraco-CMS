@@ -11,7 +11,7 @@ export const data: Array<MediaTypeDetails> = [
 		hasChildren: false,
 		key: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		isFolder: false,
 		icon: '',
 		alias: 'mediaType1',
@@ -24,7 +24,7 @@ export const data: Array<MediaTypeDetails> = [
 		hasChildren: false,
 		key: '22da1b0b-c310-4730-9912-c30b3eb9802e',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		isFolder: false,
 		icon: '',
 		alias: 'mediaType2',
@@ -42,14 +42,14 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
 	}
 
 	getTreeRoot(): PagedFolderTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(key: string): PagedFolderTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+		const items = this.data.filter((item) => item.parentId === key);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
