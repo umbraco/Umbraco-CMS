@@ -6,22 +6,31 @@ import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
+import './language-workspace-edit.element';
+
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this);
+	#element = document.createElement('umb-language-workspace-edit');
 
 	#routerPath? = '';
 
-	// TODO: add create route
 	@state()
 	_routes = [
 		{
 			path: 'edit/:isoCode',
-			component: () => import('./language-workspace-edit.element'),
+			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
 				this.#languageWorkspaceContext.load(info.match.params.isoCode);
+			},
+		},
+		{
+			path: 'create',
+			component: () => this.#element,
+			setup: async () => {
+				this.#languageWorkspaceContext.createScaffold();
 			},
 		},
 	];
