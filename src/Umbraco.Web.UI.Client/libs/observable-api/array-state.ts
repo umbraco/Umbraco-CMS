@@ -50,12 +50,12 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * @param {unknown[]} uniques - The unique values to remove.
 	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
-	 * @example <caption>Example remove entry with key '1' and '2'</caption>
+	 * @example <caption>Example remove entry with id '1' and '2'</caption>
 	 * const data = [
-	 * 	{ key: 1, value: 'foo'},
-	 * 	{ key: 2, value: 'bar'}
+	 * 	{ id: 1, value: 'foo'},
+	 * 	{ id: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.key);
+	 * const myState = new ArrayState(data, (x) => x.id);
 	 * myState.remove([1, 2]);
 	 */
 	remove(uniques: unknown[]) {
@@ -79,12 +79,12 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * @param {unknown} unique - The unique value to remove.
 	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
-	 * @example <caption>Example remove entry with key '1'</caption>
+	 * @example <caption>Example remove entry with id '1'</caption>
 	 * const data = [
-	 * 	{ key: 1, value: 'foo'},
-	 * 	{ key: 2, value: 'bar'}
+	 * 	{ id: 1, value: 'foo'},
+	 * 	{ id: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.key);
+	 * const myState = new ArrayState(data, (x) => x.id);
 	 * myState.removeOne(1);
 	 */
 	removeOne(unique: unknown) {
