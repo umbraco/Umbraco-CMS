@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -13,13 +14,15 @@ public class ChangePasswordUsersController : UsersControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUmbracoMapper _mapper;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public ChangePasswordUsersController(
         IUserService userService,
-        IUmbracoMapper mapper)
+        IUmbracoMapper mapper, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _mapper = mapper;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpPost("change-password/{id:guid}")]
@@ -33,8 +36,7 @@ public class ChangePasswordUsersController : UsersControllerBase
             UserKey = id,
         };
 
-        // FIXME: use the actual currently logged in user key
-        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ChangePasswordAsync(Constants.Security.SuperUserKey, passwordModel);
+        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ChangePasswordAsync(CurrentUserKey(_backOfficeSecurityAccessor), passwordModel);
 
         return response.Success
             ? Ok(_mapper.Map<ChangePasswordUserResponseModel>(response.Result))

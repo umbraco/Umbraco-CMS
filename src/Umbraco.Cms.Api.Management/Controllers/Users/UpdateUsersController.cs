@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -13,13 +14,15 @@ public class UpdateUsersController : UsersControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateUsersController(
         IUserService userService,
-        IUserPresentationFactory userPresentationFactory)
+        IUserPresentationFactory userPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _userPresentationFactory = userPresentationFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpPut("{id:guid}")]
@@ -30,8 +33,7 @@ public class UpdateUsersController : UsersControllerBase
         // This is because we need to compare the updated values with what the user already has, for audit purposes.
         UserUpdateModel updateModel = await _userPresentationFactory.CreateUpdateModelAsync(id, model);
 
-        // FIXME: use the actual currently logged in user key
-        Attempt<IUser?, UserOperationStatus> result = await _userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+        Attempt<IUser?, UserOperationStatus> result = await _userService.UpdateAsync(CurrentUserKey(_backOfficeSecurityAccessor), updateModel);
 
         return result.Success
             ? Ok()

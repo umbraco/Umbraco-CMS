@@ -34,8 +34,7 @@ public class GetAllUsersController : UsersControllerBase
     [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(int skip = 0, int take = 100)
     {
-        // FIXME: use the actual currently logged in user key
-        Attempt<PagedModel<IUser>?, UserOperationStatus> attempt = await _userService.GetAllAsync(Constants.Security.SuperUserKey, skip, take);
+        Attempt<PagedModel<IUser>?, UserOperationStatus> attempt = await _userService.GetAllAsync(CurrentUserKey(_backOfficeSecurityAccessor), skip, take);
 
         if (attempt.Success is false)
         {
