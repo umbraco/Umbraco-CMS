@@ -2,7 +2,7 @@ import { UUICheckboxElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, queryAll, state } from 'lit/decorators.js';
-import _ from 'lodash';
+import { debounce } from 'lodash-es';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
 import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -67,7 +67,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 		this.#logViewerContext.getLogs();
 	}
 
-	setLogLevelDebounce = _.debounce(this.#setLogLevel, 300);
+	setLogLevelDebounce = debounce(this.#setLogLevel, 300);
 
 	#selectAllLogLevels() {
 		this._logLevelSelectorCheckboxes.forEach((checkbox) => (checkbox.checked = true));
@@ -81,7 +81,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	#renderLogLevelSelector() {
 		return html`
-			<div slot="dropdown" id="log-level-selector" @change=${this.setLogLevelDebounce}>
+			<div slot="dropdown" id="log-level-selector" @change=${() => this.setLogLevelDebounce()}>
 				${Object.values(LogLevelModel).map(
 					(logLevel) =>
 						html`<uui-checkbox class="log-level-menu-item" .value=${logLevel} label="${logLevel}"
