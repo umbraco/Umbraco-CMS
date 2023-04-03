@@ -3,6 +3,8 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { queryParentRouterSlot } from '@umbraco-cms/internal/router';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -40,10 +42,17 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		`,
 	];
 
+	private get params() {
+		return queryParentRouterSlot(this)!.match!.params;
+	}
+
 	@state()
 	private _canShowLogs = false;
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
+
+	#canShowLogsObserver?: UmbObserverController<boolean | null>;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
@@ -52,9 +61,20 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		});
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		if (this.params.query) {
+			const searchQuery = decodeURIComponent(this.params.query);
+			this.#logViewerContext?.setFilterExpression(searchQuery);
+		}
+	}
+
 	#observeCanShowLogs() {
+		if (this.#canShowLogsObserver) this.#canShowLogsObserver.destroy();
 		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.canShowLogs, (canShowLogs) => {
+
+		this.#canShowLogsObserver = this.observe(this.#logViewerContext.canShowLogs, (canShowLogs) => {
 			this._canShowLogs = canShowLogs ?? false;
 		});
 	}
