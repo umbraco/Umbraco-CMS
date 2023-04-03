@@ -2,7 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
+import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
@@ -32,7 +32,9 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			}
 
 			#alias {
-				padding: 0 var(--uui-size-space-3);
+				height: calc(100% - 2px);
+				--uui-input-border-width: 0;
+				--uui-button-height: calc(100% -2px);
 			}
 
 			#icon {
@@ -48,7 +50,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		name: 'umb:document-dashed-line',
 	};
 
-	#workspaceContext?: UmbWorkspaceDocumentTypeContext;
+	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	//@state()
 	//private _documentType?: DocumentTypeResponseModel;
@@ -64,7 +66,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as UmbWorkspaceDocumentTypeContext;
+			this.#workspaceContext = instance as UmbDocumentTypeWorkspaceContext;
 			this.#observeDocumentType();
 		});
 
@@ -76,10 +78,12 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	#observeDocumentType() {
 		if (!this.#workspaceContext) return;
 		//this.observe(this.#workspaceContext.data, (data) => (this._documentType = data));
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
+		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias));
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
-	private _handleInput(event: UUIInputEvent) {
+	private _handleNameInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
@@ -87,6 +91,18 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 				this.#workspaceContext?.setName(target.value);
 			}
 		}
+	}
+
+	// TODO. find a way where we don't have to do this for all workspaces.
+	private _handleAliasInput(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this.#workspaceContext?.setAlias(target.value);
+			}
+		}
+		event.stopPropagation();
 	}
 
 	private async _handleIconClick() {
@@ -106,8 +122,9 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 						<uui-icon name="${this._icon.name}" style="color: ${this._icon.color}"></uui-icon>
 					</uui-button>
 
-					<uui-input id="name" .value=${this._name} @input="${this._handleInput}">
-						<div id="alias" slot="append">${this._alias}</div>
+					<uui-input id="name" .value=${this._name} @input="${this._handleNameInput}">
+						<uui-input-lock id="alias" slot="append" .value=${this._alias} @input="${this._handleAliasInput}"></uui-input
+						></uui-input-lock>
 					</uui-input>
 				</div>
 

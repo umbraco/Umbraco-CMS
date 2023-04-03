@@ -20,7 +20,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Design',
 		name: 'Document Type Workspace Design View',
-		loader: () => import('./views/design/document-type-workspace-view-design.element'),
+		loader: () => import('./views/design/document-type-workspace-view-edit.element'),
 		weight: 1000,
 		meta: {
 			label: 'Design',
