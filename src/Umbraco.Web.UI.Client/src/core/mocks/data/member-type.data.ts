@@ -10,7 +10,7 @@ export const data: Array<MemberTypeDetails> = [
 		type: 'member-type',
 		icon: 'icon-user',
 		hasChildren: false,
-		key: 'd59be02f-1df9-4228-aa1e-01917d806cda',
+		id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
 		isContainer: false,
 		parentId: null,
 		alias: 'memberType1',
@@ -39,7 +39,7 @@ class UmbMemberTypeData extends UmbData<MemberTypeDetails> {
 	}
 
 	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+		const items = this.data.filter((item) => keys.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

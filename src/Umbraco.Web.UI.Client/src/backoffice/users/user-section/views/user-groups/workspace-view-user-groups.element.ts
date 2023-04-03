@@ -31,11 +31,11 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 				height: 100%;
 				display: flex;
 				flex-direction: column;
-				margin:var(--uui-size-layout-1);
+				margin: var(--uui-size-layout-1);
 			}
 
 			umb-table {
-				padding:0;
+				padding: 0;
 			}
 		`,
 	];
@@ -99,7 +99,7 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 	private _createTableItems(userGroups: Array<UserGroupDetails>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
-				key: userGroup.key,
+				key: userGroup.id,
 				icon: userGroup.icon,
 				data: [
 					{

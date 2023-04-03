@@ -11,7 +11,7 @@ import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
  * @description - Data Store for Member Types
  */
 export class UmbMemberTypeStore extends UmbStoreBase {
-	#data = new ArrayState<MemberTypeDetails>([], (x) => x.key);
+	#data = new ArrayState<MemberTypeDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN.toString());

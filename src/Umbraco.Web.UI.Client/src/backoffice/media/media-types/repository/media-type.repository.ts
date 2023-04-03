@@ -135,7 +135,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 		// TODO: should we show a notification if the media type is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!mediaType || !mediaType.key) {
+		if (!mediaType || !mediaType.id) {
 			const error: ProblemDetailsModel = { title: 'Media Type is missing' };
 			return { error };
 		}
@@ -151,7 +151,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a media type is updated in the store while someone is editing it.
 		this.#store?.append(mediaType);
-		this.#treeStore?.updateItem(mediaType.key, { name: mediaType.name });
+		this.#treeStore?.updateItem(mediaType.id, { name: mediaType.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };

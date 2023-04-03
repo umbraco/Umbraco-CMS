@@ -137,7 +137,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 			return { error };
 		}
 
-		const { error } = await this.#detailSource.update(memberGroup.key, memberGroup);
+		const { error } = await this.#detailSource.update(memberGroup.id, memberGroup);
 
 		if (!error) {
 			const notification = { data: { message: `Member group '${memberGroup.name} saved` } };
@@ -145,7 +145,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		}
 
 		this.#store?.append(memberGroup);
-		this.#treeStore?.updateItem(memberGroup.key, { name: memberGroup.name });
+		this.#treeStore?.updateItem(memberGroup.id, { name: memberGroup.name });
 
 		return { error };
 	}

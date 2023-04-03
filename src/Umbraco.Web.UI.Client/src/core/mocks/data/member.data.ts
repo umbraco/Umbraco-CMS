@@ -13,7 +13,7 @@ export const data: Array<MemberDetails> = [
 		type: 'member',
 		icon: 'umb:user',
 		hasChildren: false,
-		key: 'aaa08ccd-4179-464c-b634-6969149dd9f9',
+		id: 'aaa08ccd-4179-464c-b634-6969149dd9f9',
 		isContainer: false,
 		parentId: null,
 	},
@@ -43,7 +43,7 @@ class UmbMemberData extends UmbEntityData<MemberDetails> {
 	}
 
 	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+		const items = this.data.filter((item) => keys.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

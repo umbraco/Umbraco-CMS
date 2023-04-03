@@ -12,7 +12,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  */
 export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	// TODO: use the right type:
-	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.key);
+	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString());
@@ -32,7 +32,7 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 				this.#data.append(data);
 			});
 
-		return this.#data.getObservablePart((documents) => documents.find((document) => document.key === key));
+		return this.#data.getObservablePart((documents) => documents.find((document) => document.id === key));
 	}
 
 	getScaffold(entityType: string, parentId: string | null) {

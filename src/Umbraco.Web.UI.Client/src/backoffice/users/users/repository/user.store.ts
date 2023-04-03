@@ -15,7 +15,7 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<UserDetails> {
-	#users = new ArrayState<UserDetails>([], (x) => x.key);
+	#users = new ArrayState<UserDetails>([], (x) => x.id);
 	public users = this.#users.asObservable();
 
 	#totalUsers = new NumberState(0);
@@ -27,7 +27,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 
 	getScaffold(entityType: string, parentId: string | null) {
 		return {
-			key: '',
+			id: '',
 			name: '',
 			icon: '',
 			type: 'user',
@@ -74,7 +74,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 			});
 
 		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
-			users.find((user: UmbUserStoreItemType) => user.key === key)
+			users.find((user: UmbUserStoreItemType) => user.id === key)
 		);
 	}
 
@@ -93,7 +93,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 			});
 
 		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
-			users.filter((user: UmbUserStoreItemType) => keys.includes(user.key))
+			users.filter((user: UmbUserStoreItemType) => keys.includes(user.id))
 		);
 	}
 
@@ -124,7 +124,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.status = 'enabled';
@@ -147,10 +147,10 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
-				if (userKeys.includes(user.key)) {
+				if (userKeys.includes(user.id)) {
 					user.userGroups.push(userGroup);
 				} else {
 					user.userGroups = user.userGroups.filter((group) => group !== userGroup);
@@ -174,7 +174,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
@@ -197,7 +197,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const disabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => disabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => disabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.status = 'disabled';

@@ -49,7 +49,7 @@ export const handlers = [
 		if (!data) return;
 
 		const newUser: UserDetails = {
-			key: uuidv4(),
+			id: uuidv4(),
 			name: data.name,
 			email: data.email,
 			status: 'invited',

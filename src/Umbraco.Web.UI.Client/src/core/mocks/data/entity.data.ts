@@ -12,15 +12,15 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	}
 
 	getByKey(key: string) {
-		return this.data.find((item) => item.key === key);
+		return this.data.find((item) => item.id === key);
 	}
 
 	getByKeys(keys: Array<string>) {
-		return this.data.filter((item) => keys.includes(item.key));
+		return this.data.filter((item) => keys.includes(item.id));
 	}
 
 	save(saveItem: T) {
-		const foundIndex = this.data.findIndex((item) => item.key === saveItem.key);
+		const foundIndex = this.data.findIndex((item) => item.id === saveItem.id);
 		if (foundIndex !== -1) {
 			// update
 			this.data[foundIndex] = saveItem;
@@ -66,13 +66,13 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	}
 
 	delete(keys: Array<string>) {
-		const deletedKeys = this.data.filter((item) => keys.includes(item.key)).map((item) => item.key);
-		this.data = this.data.filter((item) => keys.indexOf(item.key) === -1);
+		const deletedKeys = this.data.filter((item) => keys.includes(item.id)).map((item) => item.id);
+		this.data = this.data.filter((item) => keys.indexOf(item.id) === -1);
 		return deletedKeys;
 	}
 
 	protected updateData(updateItem: T) {
-		const itemIndex = this.data.findIndex((item) => item.key === updateItem.key);
+		const itemIndex = this.data.findIndex((item) => item.id === updateItem.id);
 		const item = this.data[itemIndex];
 		if (!item) return;
 

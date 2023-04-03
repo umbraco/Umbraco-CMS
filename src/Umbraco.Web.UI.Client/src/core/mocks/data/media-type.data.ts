@@ -9,7 +9,7 @@ export const data: Array<MediaTypeDetails> = [
 		name: 'Media Type 1',
 		type: 'media-type',
 		hasChildren: false,
-		key: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
+		id: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
 		isContainer: false,
 		parentId: null,
 		isFolder: false,
@@ -22,7 +22,7 @@ export const data: Array<MediaTypeDetails> = [
 		name: 'Media Type 2',
 		type: 'media-type',
 		hasChildren: false,
-		key: '22da1b0b-c310-4730-9912-c30b3eb9802e',
+		id: '22da1b0b-c310-4730-9912-c30b3eb9802e',
 		isContainer: false,
 		parentId: null,
 		isFolder: false,
@@ -56,7 +56,7 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
 	}
 
 	getTreeItem(keys: Array<string>): Array<FolderTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+		const items = this.data.filter((item) => keys.includes(item.id ?? ''));
 		return items.map((item) => createFolderTreeItem(item));
 	}
 }

@@ -63,7 +63,7 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 		return html`
 			<uui-box headline="General">
 				<umb-workspace-property-layout label="Key" orientation="vertical">
-					<div slot="editor">${this._memberGroup?.key}</div>
+					<div slot="editor">${this._memberGroup?.id}</div>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;

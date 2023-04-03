@@ -49,18 +49,18 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async update(mediaType: MediaTypeDetails) {
-		if (!mediaType.key) {
+		if (!mediaType.id) {
 			const error: ProblemDetailsModel = { title: 'MediaType key is missing' };
 			return { error };
 		}
 
-		const payload = { key: mediaType.key, requestBody: mediaType };
+		const payload = { key: mediaType.id, requestBody: mediaType };
 		//return tryExecuteAndNotify(this.#host, MediaTypeResource.putMediaTypeByKey(payload));
 
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/media-type/${mediaType.key}`, {
+			fetch(`/umbraco/management/api/v1/media-type/${mediaType.id}`, {
 				method: 'PUT',
 				body: JSON.stringify(payload),
 				headers: {

@@ -13,7 +13,7 @@ class UmbUsersData extends UmbEntityData<UserDetails> {
 
 	updateUserGroup(keys: string[], userGroup: string) {
 		this.data.forEach((user) => {
-			if (keys.includes(user.key)) {
+			if (keys.includes(user.id)) {
 				user.userGroups = [...user.userGroups, userGroup];
 			} else {
 				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
@@ -22,31 +22,31 @@ class UmbUsersData extends UmbEntityData<UserDetails> {
 			this.updateData(user);
 		});
 
-		return this.data.map((user) => user.key);
+		return this.data.map((user) => user.id);
 	}
 
 	enable(keys: string[]) {
-		const users = this.data.filter((user) => keys.includes(user.key));
+		const users = this.data.filter((user) => keys.includes(user.id));
 		users.forEach((user) => {
 			user.status = 'enabled';
 			this.updateData(user);
 		});
-		return users.map((user) => user.key);
+		return users.map((user) => user.id);
 	}
 
 	disable(keys: string[]) {
-		const users = this.data.filter((user) => keys.includes(user.key));
+		const users = this.data.filter((user) => keys.includes(user.id));
 		users.forEach((user) => {
 			user.status = 'disabled';
 			this.updateData(user);
 		});
-		return users.map((user) => user.key);
+		return users.map((user) => user.id);
 	}
 }
 
 export const data: Array<UserDetails> = [
 	{
-		key: 'a953e376-89f8-46d1-bed9-1b47743aa38a',
+		id: 'a953e376-89f8-46d1-bed9-1b47743aa38a',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -66,7 +66,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 	{
-		key: 'bca6c733-a63d-4353-a271-9a8b6bcca8bd',
+		id: 'bca6c733-a63d-4353-a271-9a8b6bcca8bd',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -90,7 +90,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '9f63996f-71e9-49be-bc21-5a69ea97e72e',
+		id: '9f63996f-71e9-49be-bc21-5a69ea97e72e',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -114,7 +114,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ff1d1bff-b6d2-444b-950a-68b5eec46277',
+		id: 'ff1d1bff-b6d2-444b-950a-68b5eec46277',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -138,7 +138,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'c9cf849f-0536-4e38-a91a-02c8c45a6f47',
+		id: 'c9cf849f-0536-4e38-a91a-02c8c45a6f47',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -158,7 +158,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: 'd9cbd4cd-6950-42b2-be57-1f5829c6dd19',
+		id: 'd9cbd4cd-6950-42b2-be57-1f5829c6dd19',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -178,7 +178,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: '515b2c5c-c195-43f2-8e52-4733572030c7',
+		id: '515b2c5c-c195-43f2-8e52-4733572030c7',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -204,7 +204,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'db8a0800-28b3-4f0b-9152-37debea6b8d7',
+		id: 'db8a0800-28b3-4f0b-9152-37debea6b8d7',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -228,7 +228,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '3fe38c9b-b5a3-4897-8507-3f062a25659e',
+		id: '3fe38c9b-b5a3-4897-8507-3f062a25659e',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -248,7 +248,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: '09e99152-bc3e-449f-9fa1-322ab3390b7d',
+		id: '09e99152-bc3e-449f-9fa1-322ab3390b7d',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -272,7 +272,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '5680bd61-9b58-4ecb-ae06-bdfacebe05f2',
+		id: '5680bd61-9b58-4ecb-ae06-bdfacebe05f2',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -292,7 +292,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 	{
-		key: '1c2cb6b5-1b96-47c0-a2b7-f5dd6bd3d325',
+		id: '1c2cb6b5-1b96-47c0-a2b7-f5dd6bd3d325',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -316,7 +316,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ac6cc4e4-ab38-4920-8646-63c7652fc97a',
+		id: 'ac6cc4e4-ab38-4920-8646-63c7652fc97a',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -336,7 +336,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '2668f09b-320c-48a7-a78a-95047026ec0e'],
 	},
 	{
-		key: 'a5e5bbe4-acb4-4c40-b15a-eab510338620',
+		id: 'a5e5bbe4-acb4-4c40-b15a-eab510338620',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -360,7 +360,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'c775af23-4aec-4d24-a2d1-5b0d666c9eb4',
+		id: 'c775af23-4aec-4d24-a2d1-5b0d666c9eb4',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -384,7 +384,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '3333e2dc-b8a6-4db3-af00-ac1c1e1d5d9c',
+		id: '3333e2dc-b8a6-4db3-af00-ac1c1e1d5d9c',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -404,7 +404,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: '506126e3-2b96-4746-bd0a-1e6b2283021f',
+		id: '506126e3-2b96-4746-bd0a-1e6b2283021f',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -424,7 +424,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: 'caf10593-3710-4417-af3d-7015f88f5fe3',
+		id: 'caf10593-3710-4417-af3d-7015f88f5fe3',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -448,7 +448,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'e2492eeb-bcc2-4c95-8893-27c45c895c9c',
+		id: 'e2492eeb-bcc2-4c95-8893-27c45c895c9c',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -473,7 +473,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '8c93b359-a719-4453-991c-e2d5bcc965c3',
+		id: '8c93b359-a719-4453-991c-e2d5bcc965c3',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -497,7 +497,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '4cd22c7c-baeb-463f-89e5-e0a6bb3ea27e',
+		id: '4cd22c7c-baeb-463f-89e5-e0a6bb3ea27e',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -521,7 +521,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ccd03e29-e924-4240-a1e4-b0114c66aae9',
+		id: 'ccd03e29-e924-4240-a1e4-b0114c66aae9',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -547,7 +547,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '7ffa97ca-0702-4bcf-8e32-751bae9aa156',
+		id: '7ffa97ca-0702-4bcf-8e32-751bae9aa156',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -571,7 +571,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'e139ec4b-b49a-48c0-a1a3-1c2e8e95366d',
+		id: 'e139ec4b-b49a-48c0-a1a3-1c2e8e95366d',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -595,7 +595,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '30d29d56-cbb2-41fd-9154-94b0f0d9a385',
+		id: '30d29d56-cbb2-41fd-9154-94b0f0d9a385',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -619,7 +619,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '3ecac483-c4df-4971-a357-a0be03c520ca',
+		id: '3ecac483-c4df-4971-a357-a0be03c520ca',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -639,7 +639,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', '2668f09b-320c-48a7-a78a-95047026ec0e'],
 	},
 	{
-		key: '2dae8bf8-5fdd-4efa-a493-cbec11b179e2',
+		id: '2dae8bf8-5fdd-4efa-a493-cbec11b179e2',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -663,7 +663,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '0397dd89-72c5-4d0b-a544-dc1c9c0a932d',
+		id: '0397dd89-72c5-4d0b-a544-dc1c9c0a932d',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -688,7 +688,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '4f2f64c1-1b9b-4217-80c7-7760962215af',
+		id: '4f2f64c1-1b9b-4217-80c7-7760962215af',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -713,7 +713,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '6cefa1e1-4302-4003-81df-3fa4759245a4',
+		id: '6cefa1e1-4302-4003-81df-3fa4759245a4',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -738,7 +738,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '2ba9ae27-7860-42ea-b628-c5484b64b2c6',
+		id: '2ba9ae27-7860-42ea-b628-c5484b64b2c6',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -758,7 +758,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: 'f4bee7c8-7a94-4937-8e6e-ceb55c9ec8b4',
+		id: 'f4bee7c8-7a94-4937-8e6e-ceb55c9ec8b4',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -778,7 +778,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: '3ccfeec3-1c96-4205-ae90-3297702d0d59',
+		id: '3ccfeec3-1c96-4205-ae90-3297702d0d59',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -802,7 +802,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'cb0e3a46-1e99-4dc3-a206-462c3d985916',
+		id: 'cb0e3a46-1e99-4dc3-a206-462c3d985916',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -826,7 +826,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'eb5af046-f2af-490f-a195-b0faff73f538',
+		id: 'eb5af046-f2af-490f-a195-b0faff73f538',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -846,7 +846,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', '397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2'],
 	},
 	{
-		key: '42037971-4e06-41a8-be76-04313571fe54',
+		id: '42037971-4e06-41a8-be76-04313571fe54',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -866,7 +866,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', '397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2'],
 	},
 	{
-		key: 'd71ba775-2920-42de-b5a1-09104e81cf27',
+		id: 'd71ba775-2920-42de-b5a1-09104e81cf27',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -892,7 +892,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ed94e56b-64d5-43d0-9c9c-7149a0b26657',
+		id: 'ed94e56b-64d5-43d0-9c9c-7149a0b26657',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -916,7 +916,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '8acfe50e-2e15-460d-b368-0510d08fea4c',
+		id: '8acfe50e-2e15-460d-b368-0510d08fea4c',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -941,7 +941,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '73401c00-3b05-465b-ab59-8def5af4ec54',
+		id: '73401c00-3b05-465b-ab59-8def5af4ec54',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -965,7 +965,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ffed1abb-aee0-45f1-9915-5ea7da165011',
+		id: 'ffed1abb-aee0-45f1-9915-5ea7da165011',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -989,7 +989,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '754fafb2-ec86-4313-8c5a-26a0a460df70',
+		id: '754fafb2-ec86-4313-8c5a-26a0a460df70',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1013,7 +1013,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'eae3c035-1b9d-4d1d-b626-89a7c3b3bc39',
+		id: 'eae3c035-1b9d-4d1d-b626-89a7c3b3bc39',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1037,7 +1037,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '4bbf5669-99ec-4e60-b159-2198990ee8f1',
+		id: '4bbf5669-99ec-4e60-b159-2198990ee8f1',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1057,7 +1057,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: 'bc17c986-9869-49f4-baee-d888bf013f27',
+		id: 'bc17c986-9869-49f4-baee-d888bf013f27',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1082,7 +1082,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'f015b8a7-35b7-4859-a506-253ee95f92f4',
+		id: 'f015b8a7-35b7-4859-a506-253ee95f92f4',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1107,7 +1107,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'b5fd8d4f-eecc-4bea-b841-b4ba3621e8ba',
+		id: 'b5fd8d4f-eecc-4bea-b841-b4ba3621e8ba',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1131,7 +1131,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '0bfe956a-5293-48bf-8c43-fd9be5c8dd19',
+		id: '0bfe956a-5293-48bf-8c43-fd9be5c8dd19',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1155,7 +1155,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'f2914aaa-de0a-4285-b820-88d22ae7a566',
+		id: 'f2914aaa-de0a-4285-b820-88d22ae7a566',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1179,7 +1179,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'f5489ee0-589d-47e5-8c11-b5e2ef027519',
+		id: 'f5489ee0-589d-47e5-8c11-b5e2ef027519',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1203,7 +1203,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '293074af-8188-4151-b025-2b43f6aa6c2c',
+		id: '293074af-8188-4151-b025-2b43f6aa6c2c',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1223,7 +1223,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: '93765192-b40f-4bf2-8c06-1d5ffb6989ae',
+		id: '93765192-b40f-4bf2-8c06-1d5ffb6989ae',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1243,7 +1243,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: '59f1023c-7ce6-4c78-a1ee-dcb4625b9281',
+		id: '59f1023c-7ce6-4c78-a1ee-dcb4625b9281',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1263,7 +1263,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', '397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2'],
 	},
 	{
-		key: '42592a81-f584-4b77-b312-b8e268203c22',
+		id: '42592a81-f584-4b77-b312-b8e268203c22',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1283,7 +1283,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', '2668f09b-320c-48a7-a78a-95047026ec0e'],
 	},
 	{
-		key: '8ad78a84-8183-4833-9f8b-07b3ea8a881c',
+		id: '8ad78a84-8183-4833-9f8b-07b3ea8a881c',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1307,7 +1307,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '3f7bc8b5-df8b-4a79-a8bf-f379c63b8d01',
+		id: '3f7bc8b5-df8b-4a79-a8bf-f379c63b8d01',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1331,7 +1331,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '09901602-688a-4c83-a977-51c16950a2c1',
+		id: '09901602-688a-4c83-a977-51c16950a2c1',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1355,7 +1355,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '060972c7-9b23-4788-8dc3-c2fcec1d002e',
+		id: '060972c7-9b23-4788-8dc3-c2fcec1d002e',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1379,7 +1379,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ccf7639c-09d9-4de6-88ec-be51be7f9d69',
+		id: 'ccf7639c-09d9-4de6-88ec-be51be7f9d69',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1403,7 +1403,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '2c6b24a4-c0d2-4efe-8a09-68b61d2a17ef',
+		id: '2c6b24a4-c0d2-4efe-8a09-68b61d2a17ef',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1427,7 +1427,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ff7a2003-f8d7-4fbc-96cb-ee221bdc01c9',
+		id: 'ff7a2003-f8d7-4fbc-96cb-ee221bdc01c9',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1447,7 +1447,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: 'b7f7b275-f62d-44ba-a6b0-0e7e83fe4e49',
+		id: 'b7f7b275-f62d-44ba-a6b0-0e7e83fe4e49',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1471,7 +1471,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '18a9a6bc-ae4c-49b0-8afd-43bc214053f4',
+		id: '18a9a6bc-ae4c-49b0-8afd-43bc214053f4',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1495,7 +1495,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '14fa1c36-1252-433e-a1ad-63cf5c9aba62',
+		id: '14fa1c36-1252-433e-a1ad-63cf5c9aba62',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1521,7 +1521,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '7cb9327f-6aeb-47af-80b3-4b85abde1f5f',
+		id: '7cb9327f-6aeb-47af-80b3-4b85abde1f5f',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1545,7 +1545,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '0574e903-ba72-49ee-b838-4eb200e68612',
+		id: '0574e903-ba72-49ee-b838-4eb200e68612',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1570,7 +1570,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '6e4515d6-4a67-4f47-8783-1d074c1d1f75',
+		id: '6e4515d6-4a67-4f47-8783-1d074c1d1f75',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1594,7 +1594,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '4faa2064-6776-4cc0-8bc1-3ceaa5884a0f',
+		id: '4faa2064-6776-4cc0-8bc1-3ceaa5884a0f',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1614,7 +1614,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '2668f09b-320c-48a7-a78a-95047026ec0e'],
 	},
 	{
-		key: '0cccec0d-d7c4-47bc-97b0-bd55dca42dd7',
+		id: '0cccec0d-d7c4-47bc-97b0-bd55dca42dd7',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1639,7 +1639,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'd6ffe266-f024-45c2-a1cd-f39bdbc00a5b',
+		id: 'd6ffe266-f024-45c2-a1cd-f39bdbc00a5b',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1663,7 +1663,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '72d3047a-8c48-4425-ad11-a4a64281e7e5',
+		id: '72d3047a-8c48-4425-ad11-a4a64281e7e5',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1687,7 +1687,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ebfe0335-6926-433d-90de-82f9661955f9',
+		id: 'ebfe0335-6926-433d-90de-82f9661955f9',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1711,7 +1711,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'e6e833fb-a872-4364-893c-b6bfc9802043',
+		id: 'e6e833fb-a872-4364-893c-b6bfc9802043',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1735,7 +1735,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'abd4d295-9ebb-4a0d-bc07-e2a662671e18',
+		id: 'abd4d295-9ebb-4a0d-bc07-e2a662671e18',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1759,7 +1759,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '29d42fe1-b465-4dfe-8d29-10286474d625',
+		id: '29d42fe1-b465-4dfe-8d29-10286474d625',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1783,7 +1783,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '690535f5-194a-4e32-b569-608fbf279059',
+		id: '690535f5-194a-4e32-b569-608fbf279059',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1807,7 +1807,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '13b5e542-e779-48df-b7f9-2c7def0e2e55',
+		id: '13b5e542-e779-48df-b7f9-2c7def0e2e55',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1831,7 +1831,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'af5bfaaf-1597-4ad1-aa1e-206f78a91674',
+		id: 'af5bfaaf-1597-4ad1-aa1e-206f78a91674',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1851,7 +1851,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['397f3a8b-4ca3-4b01-9dd3-94e5c9eaa9b2', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: '8f39464a-2e49-498b-b8b8-cf2926978e83',
+		id: '8f39464a-2e49-498b-b8b8-cf2926978e83',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1876,7 +1876,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'ac4785f1-b6f5-4d2d-99e6-f62a96947f8c',
+		id: 'ac4785f1-b6f5-4d2d-99e6-f62a96947f8c',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1896,7 +1896,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: 'd89ada67-eca1-475a-9273-0c69b56116da',
+		id: 'd89ada67-eca1-475a-9273-0c69b56116da',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1921,7 +1921,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '03ced59c-40b3-482a-8470-b12f56974a0f',
+		id: '03ced59c-40b3-482a-8470-b12f56974a0f',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1946,7 +1946,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'dcfba56e-5f3c-446b-a4ef-18da66df8181',
+		id: 'dcfba56e-5f3c-446b-a4ef-18da66df8181',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1970,7 +1970,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '63be3c07-9178-4c2e-810a-6bbdbbe16dcb',
+		id: '63be3c07-9178-4c2e-810a-6bbdbbe16dcb',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -1995,7 +1995,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'c57661ef-8f66-4502-91cb-2069a186ce79',
+		id: 'c57661ef-8f66-4502-91cb-2069a186ce79',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2019,7 +2019,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'b5fbd289-2900-4328-8d1f-0a6780be3585',
+		id: 'b5fbd289-2900-4328-8d1f-0a6780be3585',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2043,7 +2043,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '9ca26535-5288-4b37-8e3b-96b3530de3d1',
+		id: '9ca26535-5288-4b37-8e3b-96b3530de3d1',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2067,7 +2067,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '19998fc5-2902-4646-9cf2-395404da2b2a',
+		id: '19998fc5-2902-4646-9cf2-395404da2b2a',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2092,7 +2092,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '468a904c-f87c-4079-920b-74c6aa3a5242',
+		id: '468a904c-f87c-4079-920b-74c6aa3a5242',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2117,7 +2117,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '60336828-85ed-4b5a-abf6-869d6902ad93',
+		id: '60336828-85ed-4b5a-abf6-869d6902ad93',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2142,7 +2142,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '2b0c8ffe-4bcb-4df6-b519-3358a5c90480',
+		id: '2b0c8ffe-4bcb-4df6-b519-3358a5c90480',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2166,7 +2166,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'c967ff49-f967-449b-9aab-e5ca72255a61',
+		id: 'c967ff49-f967-449b-9aab-e5ca72255a61',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2191,7 +2191,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '594040ce-c6f7-49e7-8f4a-ffa8c42a2102',
+		id: '594040ce-c6f7-49e7-8f4a-ffa8c42a2102',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2211,7 +2211,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['b847398a-6875-4d7a-9f6d-231256b81471', '9a9ad4e9-3b5b-4fe7-b0d9-e301b9675949'],
 	},
 	{
-		key: '33806fc1-d4a9-4ddb-8d57-3c087ea1f489',
+		id: '33806fc1-d4a9-4ddb-8d57-3c087ea1f489',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2235,7 +2235,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: 'a59a5259-9393-4c49-a5be-56a475b27640',
+		id: 'a59a5259-9393-4c49-a5be-56a475b27640',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2259,7 +2259,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '9e96841c-131d-420a-bdc8-4ba087f0f11c',
+		id: '9e96841c-131d-420a-bdc8-4ba087f0f11c',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2283,7 +2283,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '84eaae2a-9aa8-4745-b4c3-fad2f5632e85',
+		id: '84eaae2a-9aa8-4745-b4c3-fad2f5632e85',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2308,7 +2308,7 @@ export const data: Array<UserDetails> = [
 		],
 	},
 	{
-		key: '6fe86358-f3fd-4f7d-8d28-e867562569f2',
+		id: '6fe86358-f3fd-4f7d-8d28-e867562569f2',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2328,7 +2328,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: '365fd725-81c7-48f0-be68-4dbcf15f1ca9',
+		id: '365fd725-81c7-48f0-be68-4dbcf15f1ca9',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
@@ -2348,7 +2348,7 @@ export const data: Array<UserDetails> = [
 		userGroups: ['2668f09b-320c-48a7-a78a-95047026ec0e', 'b847398a-6875-4d7a-9f6d-231256b81471'],
 	},
 	{
-		key: 'b6028623-995e-4eee-8142-723141030692',
+		id: 'b6028623-995e-4eee-8142-723141030692',
 		type: 'user',
 		hasChildren: false,
 		parentId: '',
