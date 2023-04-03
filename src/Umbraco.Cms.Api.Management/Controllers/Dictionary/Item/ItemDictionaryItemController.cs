@@ -19,7 +19,7 @@ public class ItemDictionaryItemController : DictionaryItemControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
+    [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
