@@ -60,7 +60,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		if (!property) return;
 
 		// Take key and parse to modal:
-		console.log('property key:', property.key!);
+		console.log('property key:', property.id!);
 
 		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
