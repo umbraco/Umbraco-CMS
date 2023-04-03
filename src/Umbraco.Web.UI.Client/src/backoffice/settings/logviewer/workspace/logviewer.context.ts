@@ -122,7 +122,7 @@ export class UmbLogViewerWorkspaceContext {
 		if (data) {
 			this.#savedSearches.next(data);
 		} else {
-			//falback to some default searches like in the old backoffice
+			//falback to some default searches resembling Umbraco <= 12
 			this.#savedSearches.next({
 				items: [
 					{
@@ -180,14 +180,12 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	async validateLogSize() {
-		const { data, error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
+		const { error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
 		if (error) {
 			this.#canShowLogs.next(false);
-			console.info('LogViewer: ', error);
 			return;
 		}
 		this.#canShowLogs.next(true);
-		console.info('LogViewer:showinfg logs');
 	}
 
 	setCurrentPage(page: number) {
