@@ -2,10 +2,10 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUISelectEvent } from '@umbraco-ui/uui';
+import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../themes/theme.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../themes/theme.context';
 
 @customElement('umb-user-profile-app-themes')
 export class UmbUserProfileAppThemesElement extends UmbLitElement {
