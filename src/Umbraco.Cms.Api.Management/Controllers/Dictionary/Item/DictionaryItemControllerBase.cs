@@ -5,7 +5,7 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Item;
 
 [ApiController]
-[VersionedApiBackOfficeRoute($"dictionary")]
+[VersionedApiBackOfficeRoute("dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
 public class DictionaryItemControllerBase : ManagementApiControllerBase
 {
