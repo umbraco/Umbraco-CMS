@@ -98,6 +98,11 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 			const isoCode = target.value.toString();
 			const cultureName = target.selectedCultureName;
 
+			// If there is no cultureName, it was probably an unknown event that triggered the change event, so ignore it.
+			if (!cultureName) {
+				return;
+			}
+
 			if (!isoCode) {
 				// If the isoCode is empty, we reset the value to the original value.
 				// Provides a way better UX
