@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
 
 export const UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbPartialViewsTreeStore>(
@@ -13,7 +13,7 @@ export const UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<Umb
  * @class UmbPartialViewsTreeStore
  * @extends {UmbEntityTreeStore}
  */
-export class UmbPartialViewsTreeStore extends UmbEntityTreeStore {
+export class UmbPartialViewsTreeStore extends UmbFileSystemTreeStore {
 	/**
 	 * Creates an instance of UmbPartialViewsTreeStore.
 	 * @param {UmbControllerHostInterface} host

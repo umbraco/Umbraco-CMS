@@ -11,7 +11,7 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: true,
 		name: 'blockgrid',
 		type: 'partial-view',
-		icon: 'icon-folder',
+		icon: 'umb:folder',
 		hasChildren: true,
 	},
 	{
@@ -19,7 +19,7 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: true,
 		name: 'blocklist',
 		type: 'partial-view',
-		icon: 'icon-folder',
+		icon: 'umb:folder',
 		hasChildren: true,
 	},
 	{
@@ -27,7 +27,7 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		isFolder: true,
 		name: 'grid',
 		type: 'partial-view',
-		icon: 'icon-folder',
+		icon: 'umb:folder',
 		hasChildren: true,
 	},
 ];
