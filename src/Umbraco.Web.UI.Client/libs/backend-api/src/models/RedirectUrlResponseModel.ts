@@ -3,10 +3,11 @@
 /* eslint-disable */
 
 export type RedirectUrlResponseModel = {
-    key?: string;
+    id?: string;
     originalUrl?: string;
     destinationUrl?: string;
     created?: string;
-    contentKey?: string;
+    contentId?: string;
     culture?: string | null;
 };
+

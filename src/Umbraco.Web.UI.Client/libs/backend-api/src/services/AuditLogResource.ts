@@ -17,16 +17,16 @@ export class AuditLogResource {
      * @throws ApiError
      */
     public static getAuditLog({
-orderDirection,
-sinceDate,
-skip,
-take = 100,
-}: {
-orderDirection?: DirectionModel,
-sinceDate?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedAuditLogWithUsernameResponseModel> {
+        orderDirection,
+        sinceDate,
+        skip,
+        take = 100,
+    }: {
+        orderDirection?: DirectionModel,
+        sinceDate?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAuditLogWithUsernameResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/audit-log',
@@ -43,24 +43,24 @@ take?: number,
      * @returns PagedAuditLogResponseModel Success
      * @throws ApiError
      */
-    public static getAuditLogByKey({
-key,
-orderDirection,
-sinceDate,
-skip,
-take = 100,
-}: {
-key: string,
-orderDirection?: DirectionModel,
-sinceDate?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedAuditLogResponseModel> {
+    public static getAuditLogById({
+        id,
+        orderDirection,
+        sinceDate,
+        skip,
+        take = 100,
+    }: {
+        id: string,
+        orderDirection?: DirectionModel,
+        sinceDate?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAuditLogResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/audit-log/{key}',
+            url: '/umbraco/management/api/v1/audit-log/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             query: {
                 'orderDirection': orderDirection,
@@ -76,16 +76,16 @@ take?: number,
      * @throws ApiError
      */
     public static getAuditLogTypeByLogType({
-logType,
-sinceDate,
-skip,
-take = 100,
-}: {
-logType: AuditTypeModel,
-sinceDate?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedAuditLogResponseModel> {
+        logType,
+        sinceDate,
+        skip,
+        take = 100,
+    }: {
+        logType: AuditTypeModel,
+        sinceDate?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAuditLogResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/audit-log/type/{logType}',

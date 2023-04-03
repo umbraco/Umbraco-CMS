@@ -6,14 +6,15 @@ import type { PropertyTypeAppearanceModel } from './PropertyTypeAppearanceModel'
 import type { PropertyTypeValidationModel } from './PropertyTypeValidationModel';
 
 export type PropertyTypeResponseModelBaseModel = {
-    key?: string;
-    containerKey?: string | null;
+    id?: string;
+    containerId?: string | null;
     alias?: string;
     name?: string;
     description?: string | null;
-    dataTypeKey?: string;
+    dataTypeId?: string;
     variesByCulture?: boolean;
     variesBySegment?: boolean;
     validation?: PropertyTypeValidationModel;
     appearance?: PropertyTypeAppearanceModel;
 };
+
