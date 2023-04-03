@@ -87,7 +87,7 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		super(data);
 	}
 
-	getByKey(key: string): TemplateResponseModel | undefined {
+	getById(key: string): TemplateResponseModel | undefined {
 		const item = this.data.find((item) => item.key === key);
 		return item ? createTemplate(item) : undefined;
 	}

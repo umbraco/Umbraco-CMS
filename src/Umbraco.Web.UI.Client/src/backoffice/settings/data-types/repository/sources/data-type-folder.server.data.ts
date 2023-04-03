@@ -29,7 +29,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Creates a Data Type folder with the given key from the server
-	 * @param {string} key
+	 * @param {string} parentId
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
@@ -37,7 +37,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		const scaffold: FolderReponseModel = {
 			$type: 'FolderReponseModel',
 			name: '',
-			key: uuidv4(),
+			id: uuidv4(),
 			parentId,
 		};
 
@@ -46,16 +46,16 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Fetches a Data Type folder with the given key from the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async get(key: string) {
-		if (!key) throw new Error('Key is missing');
+	async get(id: string) {
+		if (!id) throw new Error('Key is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.getDataTypeFolderByKey({
-				key,
+			DataTypeResource.getDataTypeFolderById({
+				id: id,
 			})
 		);
 	}
@@ -82,13 +82,13 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async update(key: string, folder: FolderModelBaseModel) {
-		if (!key) throw new Error('Key is missing');
-		if (!key) throw new Error('Folder data is missing');
+	async update(id: string, folder: FolderModelBaseModel) {
+		if (!id) throw new Error('Key is missing');
+		if (!id) throw new Error('Folder data is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.putDataTypeFolderByKey({
-				key,
+			DataTypeResource.putDataTypeFolderById({
+				id: id,
 				requestBody: folder,
 			})
 		);
@@ -96,16 +96,16 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 
 	/**
 	 * Deletes a Data Type folder with the given key on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) throw new Error('Key is missing');
+	async delete(id: string) {
+		if (!id) throw new Error('Key is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.deleteDataTypeFolderByKey({
-				key,
+			DataTypeResource.deleteDataTypeFolderById({
+				id: id,
 			})
 		);
 	}

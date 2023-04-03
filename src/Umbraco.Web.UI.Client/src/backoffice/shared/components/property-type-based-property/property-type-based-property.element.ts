@@ -99,9 +99,9 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		this._dataTypeObserver?.destroy();
 		if (dataTypeKey) {
 			// Its not technically needed to have await here, this is only to ensure that the data is loaded before we observe it, and thereby only updating the DOM with the latest data.
-			await this._dataTypeRepository.requestByKey(dataTypeKey);
+			await this._dataTypeRepository.requestById(dataTypeKey);
 			this._dataTypeObserver = this.observe(
-				await this._dataTypeRepository.byKey(dataTypeKey),
+				await this._dataTypeRepository.byId(dataTypeKey),
 				(dataType) => {
 					this._dataTypeData = dataType?.values || [];
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;

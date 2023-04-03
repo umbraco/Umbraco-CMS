@@ -23,7 +23,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	// TODO: this should be async because it can only return the id if the data is loaded.
-	getEntityKey() {
+	getEntityId() {
 		return this.getData()?.id || '';
 	}
 
@@ -47,7 +47,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+		const { data } = await this.repository.requestById(entityKey);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);

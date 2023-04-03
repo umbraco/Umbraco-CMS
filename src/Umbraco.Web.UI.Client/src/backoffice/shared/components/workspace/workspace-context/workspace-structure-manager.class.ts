@@ -94,7 +94,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	private async _loadType(id?: string) {
 		if (!id) return {};
 
-		const { data } = await this.#documentTypeRepository.requestByKey(id);
+		const { data } = await this.#documentTypeRepository.requestById(id);
 		if (!data) return {};
 
 		await this._observeDocumentType(data);
@@ -110,7 +110,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		this._loadDocumentTypeCompositions(data);
 
 		this.#documentTypeObservers.push(
-			new UmbObserverController(this.#host, await this.#documentTypeRepository.byKey(data.id), (docType) => {
+			new UmbObserverController(this.#host, await this.#documentTypeRepository.byId(data.id), (docType) => {
 				if (docType) {
 					// TODO: Handle if there was changes made to the specific document type in this context.
 					/*

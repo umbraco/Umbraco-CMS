@@ -38,7 +38,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const response = umbTemplateData.getByKey(key);
+		const response = umbTemplateData.getById(key);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 

@@ -20,7 +20,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 			path: 'create/:parentId/:documentTypeKey',
 			component: () => this.#element,
 			setup: async (component: HTMLElement, info: IRoutingInfo) => {
-				// TODO: use parent key:
+				// TODO: use parent id:
 				// TODO: Notice the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
 				const parentId = info.match.params.parentId;
 				const documentTypeKey = info.match.params.documentTypeKey;
@@ -28,11 +28,11 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 			},
 		},
 		{
-			path: 'edit/:key',
+			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				const key = info.match.params.key;
-				this.#workspaceContext.load(key);
+				const id = info.match.params.id;
+				this.#workspaceContext.load(id);
 			},
 		},
 	];

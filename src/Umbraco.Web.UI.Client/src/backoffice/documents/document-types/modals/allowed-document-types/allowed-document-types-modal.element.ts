@@ -21,9 +21,9 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 
 	async firstUpdated() {
 		// TODO: show error
-		if (!this.data?.key) return;
+		if (!this.data?.id) return;
 
-		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(this.data.key);
+		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(this.data.id);
 
 		if (data) {
 			this._allowedDocumentTypes = data;
@@ -37,8 +37,8 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const target = event.target as HTMLButtonElement;
-		const documentTypeKey = target.dataset.key;
-		if (!documentTypeKey) throw new Error('No document type key found');
+		const documentTypeKey = target.dataset.id;
+		if (!documentTypeKey) throw new Error('No document type id found');
 		this.modalHandler?.submit({ documentTypeKey });
 	}
 
@@ -50,7 +50,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 					${this._allowedDocumentTypes.map(
 						(item) =>
 							html`
-								<uui-menu-item data-key=${ifDefined(item.key)} @click=${this.#onClick} label="${ifDefined(item.name)}">
+								<uui-menu-item data-id=${ifDefined(item.id)} @click=${this.#onClick} label="${ifDefined(item.name)}">
 									${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
 								</uui-menu-item>
 							`

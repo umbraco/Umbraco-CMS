@@ -47,7 +47,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const RelationType = umbRelationTypeData.getByKey(key);
+		const RelationType = umbRelationTypeData.getById(key);
 
 		return res(ctx.status(200), ctx.json(RelationType));
 	}),

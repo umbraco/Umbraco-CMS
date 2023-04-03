@@ -643,7 +643,7 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeIt
 
 	// TODO: this could be reused across other types that support folders
 	deleteFolder(id: string) {
-		const item = this.getByKey(id) as FolderTreeItemResponseModel;
+		const item = this.getById(id) as FolderTreeItemResponseModel;
 		if (!item) throw new Error(`Item with id ${id} not found`);
 		if (!item.isFolder) throw new Error(`Item with id ${id} is not a folder`);
 		this.data = this.data.filter((item) => item.id !== id);

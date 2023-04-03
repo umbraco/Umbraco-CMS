@@ -50,7 +50,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const dataType = umbDataTypeData.getByKey(key);
+		const dataType = umbDataTypeData.getById(key);
 
 		return res(ctx.status(200), ctx.json(dataType));
 	}),
@@ -97,7 +97,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const dataType = umbDataTypeData.getByKey(key);
+		const dataType = umbDataTypeData.getById(key);
 
 		return res(ctx.status(200), ctx.json(dataType));
 	}),

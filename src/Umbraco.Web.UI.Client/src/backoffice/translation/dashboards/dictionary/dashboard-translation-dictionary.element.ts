@@ -111,7 +111,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		this.#tableItems = this.#dictionaryItems.map((dictionary) => {
 			// key is name to allow filtering on the displayed value
 			const tableItem: UmbTableItem = {
-				key: dictionary.name ?? '',
+				id: dictionary.name ?? '',
 				icon: 'umb:book-alt',
 				data: [
 					{
@@ -148,7 +148,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#filter(e: { target: HTMLInputElement }) {
 		this._tableItemsFiltered = e.target.value
-			? this.#tableItems.filter((t) => t.key.includes(e.target.value))
+			? this.#tableItems.filter((t) => t.id.includes(e.target.value))
 			: this.#tableItems;
 	}
 

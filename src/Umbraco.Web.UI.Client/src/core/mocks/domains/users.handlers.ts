@@ -20,7 +20,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const user = umbUsersData.getByKey(key);
+		const user = umbUsersData.getById(key);
 
 		return res(ctx.status(200), ctx.json(user));
 	}),
@@ -28,7 +28,7 @@ export const handlers = [
 	rest.get('/umbraco/backoffice/users/getByKeys', (req, res, ctx) => {
 		const keys = req.url.searchParams.getAll('key');
 		if (keys.length === 0) return;
-		const users = umbUsersData.getByKeys(keys);
+		const users = umbUsersData.getByIds(keys);
 
 		return res(ctx.status(200), ctx.json(users));
 	}),

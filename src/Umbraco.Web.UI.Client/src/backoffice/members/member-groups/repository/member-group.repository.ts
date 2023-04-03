@@ -94,7 +94,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return this.#detailSource.createScaffold();
 	}
 
-	async requestByKey(key: string) {
+	async requestById(key: string) {
 		await this.#init;
 
 		// TODO: should we show a notification if the key is missing?

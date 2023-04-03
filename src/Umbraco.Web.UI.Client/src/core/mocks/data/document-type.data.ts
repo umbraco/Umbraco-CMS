@@ -10,7 +10,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 	{
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
-		id: 'all-property-editors-document-type-key',
+		id: 'all-property-editors-document-type-id',
 		alias: 'blogPost',
 		name: 'Blog Post',
 		description: null,
@@ -22,7 +22,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		properties: [
 			{
 				id: '2',
-				containerId: 'all-properties-group-key',
+				containerId: 'all-properties-group-id',
 				alias: 'colorPicker',
 				name: 'Color Picker',
 				description: '',
@@ -1023,7 +1023,7 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		name: 'All property editors document type',
 		type: 'document-type',
 		hasChildren: false,
-		id: 'all-property-editors-document-type-key',
+		id: 'all-property-editors-document-type-id',
 		isContainer: false,
 		parentId: null,
 		icon: '',
@@ -1107,7 +1107,7 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 	}
 
 	getAllowedTypesOf(id: string): Array<DocumentTypeTreeItemResponseModel> {
-		const documentType = this.getByKey(id);
+		const documentType = this.getById(id);
 		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.id) ?? [];
 		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
 		return items.map((item) => createDocumentTypeTreeItem(item));

@@ -22,7 +22,7 @@ export class UmbWorkspaceMediaTypeContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
+	getEntityId() {
 		return this.getData()?.id || '';
 	}
 

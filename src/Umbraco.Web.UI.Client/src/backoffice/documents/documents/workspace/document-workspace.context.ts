@@ -28,7 +28,7 @@ export class UmbDocumentWorkspaceContext
 	 * The document is the current state/draft version of the document.
 	 */
 	#draft = new ObjectState<EntityType | undefined>(undefined);
-	readonly unique = this.#draft.getObservablePart((data) => data?.key);
+	readonly unique = this.#draft.getObservablePart((data) => data?.id);
 	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
 
 	readonly variants = this.#draft.getObservablePart((data) => data?.variants || []);
@@ -44,7 +44,7 @@ export class UmbDocumentWorkspaceContext
 		this.structure = new UmbWorkspacePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
 		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
 
-		new UmbObserverController(this.host, this.documentTypeKey, (key) => this.structure.loadType(key));
+		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
 
 		/*
 		TODO: Concept for ensure variant values:
@@ -60,7 +60,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+		const { data } = await this.repository.requestById(entityKey);
 		if (!data) return undefined;
 
 		this.setIsNew(false);
@@ -89,8 +89,8 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	getEntityKey() {
-		return this.getData().key;
+	getEntityId() {
+		return this.getData().id;
 	}
 
 	getEntityType() {
@@ -165,7 +165,7 @@ export class UmbDocumentWorkspaceContext
 		if (!this.#draft.value) return;
 		if (this.getIsNew()) {
 			// TODO: typescript hack until we get the create type
-			const value = this.#draft.value as CreateDocumentRequestModel & { key: string };
+			const value = this.#draft.value as CreateDocumentRequestModel & { id: string };
 			await this.repository.create(value);
 		} else {
 			await this.repository.save(this.#draft.value);
@@ -174,8 +174,8 @@ export class UmbDocumentWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	/*

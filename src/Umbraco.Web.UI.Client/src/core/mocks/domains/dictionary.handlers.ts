@@ -50,7 +50,7 @@ export const handlers = [
 		const id = req.params.id as string;
 		if (!id) return;
 
-		const dictionary = umbDictionaryData.getByKey(id);
+		const dictionary = umbDictionaryData.getById(id);
 		console.log(dictionary);
 		return res(ctx.status(200), ctx.json(dictionary));
 	}),
@@ -161,7 +161,7 @@ export const handlers = [
 		if (!id) return;
 
 		const includeChildren = req.url.searchParams.get('includeChildren');
-		const item = umbDictionaryData.getByKey(id);
+		const item = umbDictionaryData.getById(id);
 
 		alert(
 			`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`

@@ -33,11 +33,11 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 		// TODO: find a way to make this reuseable across:
 		this._workspaces?.map((workspace: ManifestWorkspace) => {
 			routes.push({
-				path: `${workspace.meta.entityType}/:key`,
+				path: `${workspace.meta.entityType}/:id`,
 				component: () => createExtensionElement(workspace),
 				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
 					component.then((el: HTMLElement) => {
-						(el as any).entityKey = info.match.params.key;
+						(el as any).entityKey = info.match.params.id;
 					});
 				},
 			});

@@ -12,5 +12,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbDocumentTypeWorkspaceElement> = () =>
-	html` <umb-document-type-workspace id="${ifDefined(treeData[0].key)}"></umb-document-type-workspace>`;
+	html` <umb-document-type-workspace id="${ifDefined(treeData[0].id)}"></umb-document-type-workspace>`;
 AAAOverview.storyName = 'Overview';

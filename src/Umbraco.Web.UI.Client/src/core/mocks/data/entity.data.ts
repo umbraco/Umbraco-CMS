@@ -11,12 +11,12 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return this.data.slice(skip, skip + take);
 	}
 
-	getByKey(key: string) {
-		return this.data.find((item) => item.id === key);
+	getById(id: string) {
+		return this.data.find((item) => item.id === id);
 	}
 
-	getByKeys(keys: Array<string>) {
-		return this.data.filter((item) => keys.includes(item.id));
+	getByIds(ids: Array<string>) {
+		return this.data.filter((item) => ids.includes(item.id));
 	}
 
 	save(saveItem: T) {
@@ -33,8 +33,8 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return saveItem;
 	}
 
-	move(keys: Array<string>, destinationKey: string) {
-		const items = this.getByKeys(keys);
+	move(ids: Array<string>, destinationKey: string) {
+		const items = this.getByIds(ids);
 		const movedItems = items.map((item) => {
 			return {
 				...item,
@@ -46,11 +46,11 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return movedItems;
 	}
 
-	trash(keys: Array<string>) {
+	trash(ids: Array<string>) {
 		const trashedItems: Array<T> = [];
 
-		keys.forEach((key) => {
-			const item = this.getByKey(key);
+		ids.forEach((key) => {
+			const item = this.getById(key);
 			if (!item) return;
 
 			// TODO: how do we handle trashed items?
@@ -65,9 +65,9 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return trashedItems;
 	}
 
-	delete(keys: Array<string>) {
-		const deletedKeys = this.data.filter((item) => keys.includes(item.id)).map((item) => item.id);
-		this.data = this.data.filter((item) => keys.indexOf(item.id) === -1);
+	delete(ids: Array<string>) {
+		const deletedKeys = this.data.filter((item) => ids.includes(item.id)).map((item) => item.id);
+		this.data = this.data.filter((item) => ids.indexOf(item.id) === -1);
 		return deletedKeys;
 	}
 
@@ -76,6 +76,7 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		const item = this.data[itemIndex];
 		if (!item) return;
 
+		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
 		const itemKeys = Object.keys(item);
 		const newItem = {};
 

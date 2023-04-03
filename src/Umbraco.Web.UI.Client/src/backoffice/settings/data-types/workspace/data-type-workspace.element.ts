@@ -13,10 +13,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 
 	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
-	#routerPath? = '';
-
 	#element = document.createElement('umb-data-type-workspace-edit-element');
-	#key = '';
 
 	@state()
 	_routes: IRoute[] = [
@@ -29,21 +26,17 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 			},
 		},
 		{
-			path: 'edit/:key',
+			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				const key = info.match.params.key;
-				this.#workspaceContext.load(key);
+				const id = info.match.params.id;
+				this.#workspaceContext.load(id);
 			},
 		},
 	];
 
 	render() {
-		return html`<umb-router-slot
-			.routes=${this._routes}
-			@init=${(event: UmbRouterSlotInitEvent) => {
-				this.#routerPath = event.target.absoluteRouterPath;
-			}}></umb-router-slot>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

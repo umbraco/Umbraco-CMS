@@ -42,7 +42,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	}
 
 	protected _provideWorkspace() {
-		const entityKey = this._workspaceContext?.getEntityKey();
+		const entityKey = this._workspaceContext?.getEntityId();
 		const entityType = this._workspaceContext?.getEntityType();
 
 		if (entityKey != null && entityType != null) {

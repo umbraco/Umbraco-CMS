@@ -33,7 +33,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	requestByKey(key: string) {
+	requestById(key: string) {
 		//return tryExecuteAndNotify(this.#host, MemberTypeResource.getMemberTypeByKey({ key }));
 		// TODO => use backend cli when available.
 		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${key}`)) as any;

@@ -19,7 +19,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async load(id: string) {
-		const { data } = await this.repository.requestByKey(id);
+		const { data } = await this.repository.requestById(id);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
@@ -37,7 +37,7 @@ export class UmbDataTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
+	getEntityId() {
 		return this.getData()?.id || '';
 	}
 

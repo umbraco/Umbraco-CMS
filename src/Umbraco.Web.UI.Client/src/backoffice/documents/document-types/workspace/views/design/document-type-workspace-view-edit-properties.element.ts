@@ -59,8 +59,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		const property = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!property) return;
 
-		// Take key and parse to modal:
-		console.log('property key:', property.id!);
+		// Take id and parse to modal:
+		console.log('property id:', property.id!);
 
 		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
@@ -77,7 +77,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 					html`<document-type-workspace-view-edit-property
 						.property=${property}
 						@partial-property-update=${(event: CustomEvent) => {
-							this._propertyStructureHelper.partialUpdateProperty(property.key, event.detail);
+							this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
 						}}></document-type-workspace-view-edit-property>`
 			)}<uui-button id="add" look="placeholder" @click=${this.#onAddProperty}> Add property </uui-button>`;
 	}

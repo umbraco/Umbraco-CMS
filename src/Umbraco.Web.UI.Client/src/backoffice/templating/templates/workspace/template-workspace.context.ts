@@ -18,7 +18,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		return 'template';
 	}
 
-	getEntityKey() {
+	getEntityId() {
 		return this.getData()?.id || '';
 	}
 
@@ -35,7 +35,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+		const { data } = await this.repository.requestById(entityKey);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);

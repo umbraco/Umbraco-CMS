@@ -17,7 +17,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const document = umbDocumentTypeData.getByKey(key);
+		const document = umbDocumentTypeData.getById(key);
 
 		return res(ctx.status(200), ctx.json([document]));
 	}),
@@ -67,7 +67,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const documentType = umbDocumentTypeData.getByKey(key);
+		const documentType = umbDocumentTypeData.getById(key);
 
 		return res(ctx.status(200), ctx.json(documentType));
 	}),

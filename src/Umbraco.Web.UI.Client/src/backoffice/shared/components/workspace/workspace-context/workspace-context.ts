@@ -32,7 +32,7 @@ export abstract class UmbWorkspaceContext<T, EntityType extends BaseEntity>
 		this.#isNew.next(isNew);
 	}
 
-	abstract getEntityKey(): string | undefined; // COnsider if this should go away now that we have getUnique()
+	abstract getEntityId(): string | undefined; // COnsider if this should go away now that we have getUnique()
 	abstract getEntityType(): string; // TODO: consider of this should be on the repository because a repo is responsible for one entity type
 	abstract getData(): EntityType | undefined;
 	abstract save(): Promise<void>;

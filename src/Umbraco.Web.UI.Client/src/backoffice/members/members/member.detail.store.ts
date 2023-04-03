@@ -38,7 +38,7 @@ export class UmbMemberStore extends UmbStoreBase implements UmbEntityDetailStore
 		// });
 
 		// temp until Resource is updated
-		const member = umbMemberData.getByKey(id);
+		const member = umbMemberData.getById(id);
 		if (member) {
 			this.#data.appendOne(member);
 		}

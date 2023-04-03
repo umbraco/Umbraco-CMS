@@ -18,7 +18,7 @@ export const handlers = [
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const userGroup = umbUserGroupsData.getByKey(key);
+		const userGroup = umbUserGroupsData.getById(key);
 
 		return res(ctx.status(200), ctx.json(userGroup));
 	}),
@@ -26,7 +26,7 @@ export const handlers = [
 	rest.get('/umbraco/backoffice/user-groups/getByKeys', (req, res, ctx) => {
 		const keys = req.url.searchParams.getAll('key');
 		if (keys.length === 0) return;
-		const userGroups = umbUserGroupsData.getByKeys(keys);
+		const userGroups = umbUserGroupsData.getByIds(keys);
 
 		return res(ctx.status(200), ctx.json(userGroups));
 	}),
