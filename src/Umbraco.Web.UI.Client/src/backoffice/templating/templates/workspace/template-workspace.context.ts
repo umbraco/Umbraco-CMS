@@ -19,7 +19,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	}
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData()?.id || '';
 	}
 
 	getData() {

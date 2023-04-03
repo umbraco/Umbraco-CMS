@@ -15,7 +15,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 @customElement('umb-template-modal')
 export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModalData, UmbTemplateModalResult> {
 	@state()
-	_key = '';
+	_id = '';
 
 	@state()
 	_template?: TemplateResponseModel;
@@ -26,16 +26,16 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	connectedCallback() {
 		super.connectedCallback();
 
-		if (!this.data?.key) return;
+		if (!this.data?.id) return;
 
 		// TODO: use the template workspace instead of a custom modal. This is still to be made available as infinite editors(Modals).
 		alert('This should be using the Template Workspace instead of a custom build modal.');
-		this._key = this.data.key;
+		this._id = this.data.id;
 		this.#getTemplate();
 	}
 
 	async #getTemplate() {
-		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateByKey({ key: this._key }));
+		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateByKey({ id: this._id }));
 		if (!data) return;
 
 		this._template = data;
@@ -44,18 +44,18 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	async #saveTemplate() {
 		const { error } = await tryExecuteAndNotify(
 			this,
-			TemplateResource.putTemplateByKey({ key: this._key, requestBody: this._template })
+			TemplateResource.putTemplateByKey({ id: this._id, requestBody: this._template })
 		);
 		if (!error) {
-			console.log(`template (${this._key}) saved successfully`);
+			console.log(`template (${this._id}) saved successfully`);
 		}
 	}
 
 	private _submit() {
-		if (!this._template?.key) return;
+		if (!this._template?.id) return;
 
 		this.#saveTemplate();
-		this.modalHandler?.submit({ key: this._template.key });
+		this.modalHandler?.submit({ id: this._template.id });
 	}
 
 	private _close() {

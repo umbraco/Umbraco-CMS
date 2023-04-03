@@ -16,7 +16,7 @@ export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGro
  * @description - Data Store for User Groups
  */
 export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailStore<UserGroupDetails> {
-	#groups = new ArrayState<UserGroupDetails>([], (x) => x.key);
+	#groups = new ArrayState<UserGroupDetails>([], (x) => x.id);
 	public groups = this.#groups.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -25,7 +25,7 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 
 	getScaffold(entityType: string, parentId: string | null) {
 		return {
-			key: '',
+			id: '',
 			name: '',
 			icon: '',
 			type: 'user-group',
@@ -49,27 +49,27 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 		return this.groups;
 	}
 
-	getByKey(key: string) {
+	getByKey(id: string) {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/user-groups/details/${key}`)
+		fetch(`/umbraco/backoffice/user-groups/details/${id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#groups.append([data]);
 			});
 
-		return this.#groups.getObservablePart((userGroups) => userGroups.find((userGroup) => userGroup.key === key));
+		return this.#groups.getObservablePart((userGroups) => userGroups.find((userGroup) => userGroup.id === id));
 	}
 
-	getByKeys(keys: Array<string>) {
-		const params = keys.map((key) => `key=${key}`).join('&');
+	getByKeys(ids: Array<string>) {
+		const params = ids.map((id) => `id=${id}`).join('&');
 		fetch(`/umbraco/backoffice/user-groups/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#groups.append(data);
 			});
 
-		return this.#groups.getObservablePart((items) => items.filter((node) => keys.includes(node.key)));
+		return this.#groups.getObservablePart((items) => items.filter((node) => ids.includes(node.id)));
 	}
 
 	async save(userGroups: Array<UserGroupDetails>) {
@@ -78,7 +78,7 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 		// TODO: implement so user group store updates the users, but these needs to save as well..?
 		/*
 		if (this._userStore && userGroup.users) {
-			await this._userStore.updateUserGroup(userGroup.users, userGroup.key);
+			await this._userStore.updateUserGroup(userGroup.users, userGroup.id);
 		}
 		*/
 

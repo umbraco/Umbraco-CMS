@@ -69,15 +69,15 @@ export class UmbWorkspacePropertyStructureHelper {
 		}
 	}
 
-	private _observePropertyStructureOf(groupKey?: string | null) {
-		if (!this.#workspaceContext || groupKey === undefined) return;
+	private _observePropertyStructureOf(groupId?: string | null) {
+		if (!this.#workspaceContext || groupId === undefined) return;
 
 		new UmbObserverController(
 			this.#host,
-			this.#workspaceContext.structure.propertyStructuresOf(groupKey),
+			this.#workspaceContext.structure.propertyStructuresOf(groupId),
 			(properties) => {
-				// If this need to be able to remove properties, we need to clean out the ones of this group.key before inserting them:
-				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerId !== groupKey);
+				// If this need to be able to remove properties, we need to clean out the ones of this group.id before inserting them:
+				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerId !== groupId);
 
 				properties?.forEach((property) => {
 					if (!_propertyStructure.find((x) => x.alias === property.alias)) {
@@ -93,7 +93,7 @@ export class UmbWorkspacePropertyStructureHelper {
 				// Fire update to subscribers:
 				this.#propertyStructure.next(_propertyStructure);
 			},
-			'_observePropertyStructureOfGroup' + groupKey
+			'_observePropertyStructureOfGroup' + groupId
 		);
 	}
 

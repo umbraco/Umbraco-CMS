@@ -140,7 +140,7 @@ export class UmbDataTypeRepository
 	async byKey(key: string) {
 		if (!key) throw new Error('Key is missing');
 		await this.#init;
-		return this.#detailStore!.byKey(key);
+		return this.#detailStore!.byId(key);
 	}
 
 	// Could potentially be general methods:

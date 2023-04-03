@@ -25,7 +25,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {

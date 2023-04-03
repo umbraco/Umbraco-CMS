@@ -13,14 +13,14 @@ export class UmbRelationTypeWorkspaceContext
 	#data = new ObjectState<RelationTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
-	key = this.#data.getObservablePart((data) => data?.key);
+	id = this.#data.getObservablePart((data) => data?.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbRelationTypeRepository(host));
 	}
 
-	async load(key: string) {
-		const { data } = await this.repository.requestByKey(key);
+	async load(id: string) {
+		const { data } = await this.repository.requestByKey(id);
 
 		if (data) {
 			this.setIsNew(false);
@@ -40,7 +40,7 @@ export class UmbRelationTypeWorkspaceContext
 	}
 
 	getEntityKey() {
-		return this.getData()?.key || '';
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -63,14 +63,14 @@ export class UmbRelationTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	update<K extends keyof RelationTypeBaseModel>(key: K, value: RelationTypeBaseModel[K]) {
-		console.log('update', key, value);
+	update<K extends idof RelationTypeBaseModel>(id: K, value: RelationTypeBaseModel[K]) {
+		console.log('update', id, value);
 
-		this.#data.next({ ...this.#data.value, [key]: value });
+		this.#data.next({ ...this.#data.value, [id]: value });
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	public destroy(): void {
