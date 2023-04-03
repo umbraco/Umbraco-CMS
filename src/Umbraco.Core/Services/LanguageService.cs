@@ -15,7 +15,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     private readonly ILanguageRepository _languageRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IISoCodeValidator _isoCodeValidator;
+    private readonly IIsoCodeValidator _isoCodeValidator;
 
     public LanguageService(
         ICoreScopeProvider provider,
@@ -24,7 +24,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         ILanguageRepository languageRepository,
         IAuditRepository auditRepository,
         IUserIdKeyResolver userIdKeyResolver,
-        IISoCodeValidator isoCodeValidator)
+        IIsoCodeValidator isoCodeValidator)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _languageRepository = languageRepository;

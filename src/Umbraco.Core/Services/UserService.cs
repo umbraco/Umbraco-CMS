@@ -45,7 +45,7 @@ internal class UserService : RepositoryService, IUserService
     private readonly MediaFileManager _mediaFileManager;
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IShortStringHelper _shortStringHelper;
-    private readonly IISoCodeValidator _iSoCodeValidator;
+    private readonly IIsoCodeValidator _isoCodeValidator;
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
 
@@ -66,7 +66,7 @@ internal class UserService : RepositoryService, IUserService
         ITemporaryFileService temporaryFileService,
         IShortStringHelper shortStringHelper,
         IOptions<ContentSettings> contentSettings,
-        IISoCodeValidator iSoCodeValidator)
+        IIsoCodeValidator isoCodeValidator)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -79,7 +79,7 @@ internal class UserService : RepositoryService, IUserService
         _mediaFileManager = mediaFileManager;
         _temporaryFileService = temporaryFileService;
         _shortStringHelper = shortStringHelper;
-        _iSoCodeValidator = iSoCodeValidator;
+        _isoCodeValidator = isoCodeValidator;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -913,7 +913,7 @@ internal class UserService : RepositoryService, IUserService
 
     private UserOperationStatus ValidateUserUpdateModel(IUser existingUser, UserUpdateModel model)
     {
-        if (_iSoCodeValidator.IsValid(model.LanguageIsoCode) is false)
+        if (_isoCodeValidator.IsValid(model.LanguageIsoCode) is false)
         {
             return UserOperationStatus.InvalidIsoCode;
         }

@@ -3,7 +3,7 @@
 /// <summary>
 /// A validator for validating if an ISO code string can be is valid.
 /// </summary>
-public interface IISoCodeValidator
+public interface IIsoCodeValidator
 {
     /// <summary>
     /// Validates that a string is a valid ISO code.

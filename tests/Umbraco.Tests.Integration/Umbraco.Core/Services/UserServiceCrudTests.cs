@@ -81,7 +81,7 @@ public partial class UserServiceCrudTests : UmbracoIntegrationTest
             GetRequiredService<ITemporaryFileService>(),
             GetRequiredService<IShortStringHelper>(),
             GetRequiredService<IOptions<ContentSettings>>(),
-            GetRequiredService<IISoCodeValidator>());
+            GetRequiredService<IIsoCodeValidator>());
     }
 
 

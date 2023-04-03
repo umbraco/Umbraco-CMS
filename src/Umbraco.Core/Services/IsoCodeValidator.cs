@@ -3,7 +3,7 @@
 namespace Umbraco.Cms.Core.Services;
 
 /// <inheritdoc />
-public class IsoCodeValidator : IISoCodeValidator
+public class IsoCodeValidator : IIsoCodeValidator
 {
     /// <inheritdoc />
     public bool IsValid(string isoCode)
