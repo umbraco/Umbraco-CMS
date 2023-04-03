@@ -22,7 +22,7 @@ public class ItemTemplateItemController : TemplateItemControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<TemplateItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
     {
         IEnumerable<IEntitySlim> templates = _entityService.GetAll(UmbracoObjectTypes.Template, keys);

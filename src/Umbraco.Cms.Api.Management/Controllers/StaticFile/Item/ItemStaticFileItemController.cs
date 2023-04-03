@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.Script.Item;
 using Umbraco.Cms.Api.Management.ViewModels.StaticFile.Item;
 using Umbraco.Cms.Core.IO;
 
@@ -20,7 +19,7 @@ public class ItemStaticFileItemController : ManagementApiControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ScriptItemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<StaticFileItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "path")] string[] paths)
     {
         IEnumerable<StaticFileItemResponseModel> responseModels = _presentationModelFactory.CreateStaticFileItemResponseModels(paths, _physicalFileSystem);

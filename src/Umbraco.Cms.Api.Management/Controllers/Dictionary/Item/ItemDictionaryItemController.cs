@@ -21,7 +21,7 @@ public class ItemDictionaryItemController : DictionaryItemControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<DictionaryItemItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
     {
         IEnumerable<IDictionaryItem> dictionaryItems = await _dictionaryItemService.GetManyAsync(keys);
