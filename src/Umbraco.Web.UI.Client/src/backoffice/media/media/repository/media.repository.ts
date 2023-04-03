@@ -179,7 +179,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 			throw new Error('Template is missing');
 		}
 
-		const { error } = await this.#detailDataSource.update(document);
+		const { error } = await this.#detailDataSource.update(document.key, document);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };

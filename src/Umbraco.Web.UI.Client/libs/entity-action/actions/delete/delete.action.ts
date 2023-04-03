@@ -4,7 +4,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbDeleteEntityAction<
-	T extends { delete(unique: string): Promise<void>; requestItems(uniques: Array<string>): any }
+	T extends { delete(unique: string): Promise<void>; requestTreeItems(uniques: Array<string>): any }
 > extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalContext;
 
@@ -19,7 +19,7 @@ export class UmbDeleteEntityAction<
 	async execute() {
 		if (!this.repository || !this.#modalContext) return;
 
-		const { data } = await this.repository.requestItems([this.unique]);
+		const { data } = await this.repository.requestTreeItems([this.unique]);
 
 		if (data) {
 			const item = data[0];

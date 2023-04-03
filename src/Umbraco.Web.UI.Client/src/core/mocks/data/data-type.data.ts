@@ -1,9 +1,21 @@
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
-import type { FolderTreeItemResponseModel, DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	FolderTreeItemResponseModel,
+	DataTypeResponseModel,
+	CreateFolderRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-// TODO: investigate why we don't get an entity type as part of the DataTypeModel
-export const data: Array<DataTypeResponseModel & { type: 'data-type' }> = [
+// TODO: investigate why we don't get an type as part of the DataTypeModel
+export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | FolderTreeItemResponseModel> = [
+	{
+		$type: 'data-type',
+		type: 'data-type',
+		name: 'Folder 1',
+		key: 'dt-folder1',
+		parentKey: null,
+		isFolder: true,
+	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
@@ -452,7 +464,12 @@ export const data: Array<DataTypeResponseModel & { type: 'data-type' }> = [
 		parentKey: null,
 		propertyEditorAlias: 'Umbraco.UploadField',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.UploadField',
-		values: [],
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['jpg', 'jpeg', 'png'],
+			},
+		],
 	},
 	{
 		$type: 'data-type',
@@ -590,7 +607,7 @@ export const data: Array<DataTypeResponseModel & { type: 'data-type' }> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel> {
+class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeItemResponseModel> {
 	constructor() {
 		super(data);
 	}
@@ -608,6 +625,28 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel> {
 	getTreeItem(keys: Array<string>): Array<FolderTreeItemResponseModel> {
 		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
 		return items.map((item) => createFolderTreeItem(item));
+	}
+
+	createFolder(folder: CreateFolderRequestModel & { key: string | undefined }) {
+		const newFolder: FolderTreeItemResponseModel = {
+			name: folder.name,
+			key: folder.key,
+			parentKey: folder.parentKey,
+			$type: 'data-type',
+			type: 'data-type',
+			isFolder: true,
+			isContainer: false,
+		};
+
+		this.data.push(newFolder);
+	}
+
+	// TODO: this could be reused across other types that support folders
+	deleteFolder(key: string) {
+		const item = this.getByKey(key) as FolderTreeItemResponseModel;
+		if (!item) throw new Error(`Item with key ${key} not found`);
+		if (!item.isFolder) throw new Error(`Item with key ${key} is not a folder`);
+		this.data = this.data.filter((item) => item.key !== key);
 	}
 }
 

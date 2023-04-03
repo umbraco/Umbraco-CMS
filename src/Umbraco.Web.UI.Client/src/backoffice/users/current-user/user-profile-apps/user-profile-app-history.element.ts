@@ -1,12 +1,12 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbCurrentUserHistoryItem,
 	UmbCurrentUserHistoryStore,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from '../current-user-history.store';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-profile-app-history')
 export class UmbUserProfileAppHistoryElement extends UmbLitElement {

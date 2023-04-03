@@ -13,7 +13,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeServerDataSource implements UmbDataSource<DocumentTypeResponseModel> {
+export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, DocumentTypeResponseModel> {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -82,7 +82,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<DocumentTy
 		}
 		//return tryExecuteAndNotify(this.#host, DocumentTypeResource.postDocument(payload));
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentTypeResponseModel>(
+		return tryExecuteAndNotify<string>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document-type', {
 				method: 'POST',
@@ -100,13 +100,8 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<DocumentTy
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	// TODO: Error mistake in this:
-	async update(document: DocumentTypeResponseModel) {
-		if (!document.key) {
-			const error: ProblemDetailsModel = { title: 'Document key is missing' };
-			return { error };
-		}
-		//const payload = { key: document.key, requestBody: document };
+	async update(key: string, document: any) {
+		if (!key) throw new Error('Key is missing');
 
 		let body: string;
 
@@ -123,31 +118,6 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<DocumentTy
 			fetch(`/umbraco/management/api/v1/document-type/${document.key}`, {
 				method: 'PUT',
 				body: body,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any
-		);
-	}
-
-	/**
-	 * Trash a Document on the server
-	 * @param {Document} Document
-	 * @return {*}
-	 * @memberof UmbDocumentTypeServerDataSource
-	 */
-	async trash(key: string) {
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
-		}
-
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentTypeResponseModel>(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/document-type/${key}`, {
-				method: 'DELETE',
-				body: JSON.stringify([key]),
 				headers: {
 					'Content-Type': 'application/json',
 				},

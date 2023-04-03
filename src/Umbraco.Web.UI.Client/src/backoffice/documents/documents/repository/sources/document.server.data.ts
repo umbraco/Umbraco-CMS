@@ -5,6 +5,8 @@ import {
 	ProblemDetailsModel,
 	DocumentResponseModel,
 	ContentStateModel,
+	CreateDocumentRequestModel,
+	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -15,7 +17,9 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentServerDataSource implements UmbDataSource<DocumentResponseModel> {
+export class UmbDocumentServerDataSource
+	implements UmbDataSource<CreateDocumentRequestModel, UpdateDocumentRequestModel, DocumentResponseModel>
+{
 	#host: UmbControllerHostElement;
 
 	/**
@@ -83,12 +87,8 @@ export class UmbDocumentServerDataSource implements UmbDataSource<DocumentRespon
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async insert(document: DocumentResponseModel) {
-		if (!document.key) {
-			//const error: ProblemDetails = { title: 'Document key is missing' };
-			return Promise.reject();
-		}
-		//const payload = { key: document.key, requestBody: document };
+	async insert(document: CreateDocumentRequestModel & { key: string }) {
+		if (!document.key) throw new Error('Key is missing');
 
 		let body: string;
 
@@ -100,7 +100,7 @@ export class UmbDocumentServerDataSource implements UmbDataSource<DocumentRespon
 		}
 		//return tryExecuteAndNotify(this.#host, DocumentResource.postDocument(payload));
 		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentResponseModel>(
+		return tryExecuteAndNotify<string>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document/save', {
 				method: 'POST',
@@ -118,8 +118,7 @@ export class UmbDocumentServerDataSource implements UmbDataSource<DocumentRespon
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	// TODO: Error mistake in this:
-	async update(document: DocumentResponseModel) {
+	async update(key: string, document: DocumentResponseModel) {
 		if (!document.key) {
 			const error: ProblemDetailsModel = { title: 'Document key is missing' };
 			return { error };

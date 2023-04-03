@@ -5,7 +5,11 @@ import { DocumentTreeServerDataSource } from './sources/document.tree.server.dat
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	ProblemDetailsModel,
+	DocumentResponseModel,
+	CreateDocumentRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemType = DocumentResponseModel;
@@ -133,7 +137,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 
 	// Could potentially be general methods:
 
-	async create(item: ItemType) {
+	async create(item: CreateDocumentRequestModel & { key: string }) {
 		await this.#init;
 
 		if (!item || !item.key) {
@@ -162,7 +166,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 			throw new Error('Document is missing');
 		}
 
-		const { error } = await this.#detailDataSource.update(item);
+		const { error } = await this.#detailDataSource.update(item.key, item);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
