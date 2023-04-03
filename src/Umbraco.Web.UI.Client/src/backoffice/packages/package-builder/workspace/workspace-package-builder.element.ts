@@ -69,10 +69,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	async #download() {
 		if (!this._package?.id) return;
-		const response = await tryExecuteAndNotify(
-			this,
-			PackageResource.getPackageCreatedByIdDownload({ id: this._package.id })
-		);
+		await tryExecuteAndNotify(this, PackageResource.getPackageCreatedByIdDownload({ id: this._package.id }));
 	}
 
 	#nameDefined() {
