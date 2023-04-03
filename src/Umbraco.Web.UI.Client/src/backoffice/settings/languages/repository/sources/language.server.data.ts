@@ -55,7 +55,6 @@ export class UmbLanguageServerDataSource
 			name: '',
 			isDefault: false,
 			isMandatory: false,
-			fallbackIsoCode: '',
 			isoCode: '',
 		};
 
