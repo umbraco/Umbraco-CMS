@@ -611,6 +611,13 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserCreationResult());
         }
 
+        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
+
+        if (userGroups.Length != model.UserGroupKeys.Count)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new UserCreationResult());
+        }
+
         UserOperationStatus result = ValidateUserCreateModel(model);
         if (result != UserOperationStatus.Success)
         {
@@ -622,7 +629,7 @@ internal class UserService : RepositoryService, IUserService
             null,
             null,
             null,
-            model.UserGroups.Select(x => x.Alias));
+            userGroups.Select(x => x.Alias));
 
         if (authorizationAttempt.Success is false)
         {
@@ -655,7 +662,7 @@ internal class UserService : RepositoryService, IUserService
 
         createdUser.IsApproved = approveUser;
 
-        foreach (IUserGroup userGroup in model.UserGroups)
+        foreach (IUserGroup userGroup in userGroups)
         {
             createdUser.AddGroup(userGroup.ToReadOnlyGroup());
         }
@@ -685,6 +692,13 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserInvitationResult());
         }
 
+        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToArray();
+
+        if (userGroups.Length != model.UserGroupKeys.Count)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new UserInvitationResult());
+        }
+
         UserOperationStatus validationResult = ValidateUserCreateModel(model);
 
         if (validationResult is not UserOperationStatus.Success)
@@ -697,7 +711,7 @@ internal class UserService : RepositoryService, IUserService
             null,
             null,
             null,
-            model.UserGroups.Select(x => x.Alias));
+            userGroups.Select(x => x.Alias));
 
         if (authorizationAttempt.Success is false)
         {
@@ -732,7 +746,7 @@ internal class UserService : RepositoryService, IUserService
 
         invitedUser.InvitedDate = DateTime.Now;
         invitedUser.ClearGroups();
-        foreach(IUserGroup userGroup in model.UserGroups)
+        foreach(IUserGroup userGroup in userGroups)
         {
             invitedUser.AddGroup(userGroup.ToReadOnlyGroup());
         }
@@ -766,6 +780,10 @@ internal class UserService : RepositoryService, IUserService
         {
             return UserOperationStatus.UserNameIsNotEmail;
         }
+        if (!IsEmailValid(model.Email))
+        {
+            return UserOperationStatus.InvalidEmail;
+        }
 
         if (GetByEmail(model.Email) is not null)
         {
@@ -777,7 +795,7 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.DuplicateUserName;
         }
 
-        if(model.UserGroups.Count == 0)
+        if(model.UserGroupKeys.Count == 0)
         {
             return UserOperationStatus.NoUserGroup;
         }
@@ -805,17 +823,35 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
         }
 
+        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToHashSet();
+
+        if (userGroups.Count != model.UserGroupKeys.Count)
+        {
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUserGroup, existingUser);
+        }
+
         // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
         // but I'd rather keep the ids out of the service API as much as possible.
         int[]? startContentIds = GetIdsFromKeys(model.ContentStartNodeKeys, UmbracoObjectTypes.Document);
+
+        if (startContentIds is null || startContentIds.Length != model.ContentStartNodeKeys.Count)
+        {
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ContentStartNodeNotFound, existingUser);
+        }
+
         int[]? startMediaIds = GetIdsFromKeys(model.MediaStartNodeKeys, UmbracoObjectTypes.Media);
+
+        if (startMediaIds is null || startMediaIds.Length != model.MediaStartNodeKeys.Count)
+        {
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
+        }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
             performingUser,
             existingUser,
             startContentIds,
             startMediaIds,
-            model.UserGroups.Select(x => x.Alias));
+            userGroups.Select(x => x.Alias));
 
         if (isAuthorized.Success is false)
         {
@@ -832,7 +868,7 @@ internal class UserService : RepositoryService, IUserService
         // TODO: This probably shouldn't live here, once we have user content start nodes as keys this can be moved to a mapper
         // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
         // TODO: Add auditing
-        IUser updated = MapUserUpdate(model, existingUser, startContentIds, startMediaIds);
+        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds);
         UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
 
         if (saveStatus is not UserOperationStatus.Success)
@@ -891,6 +927,7 @@ internal class UserService : RepositoryService, IUserService
 
     private IUser MapUserUpdate(
         UserUpdateModel source,
+        ISet<IUserGroup> sourceUserGroups,
         IUser target,
         int[]? startContentIds,
         int[]? startMediaIds)
@@ -903,7 +940,7 @@ internal class UserService : RepositoryService, IUserService
         target.StartMediaIds = startMediaIds;
 
         target.ClearGroups();
-        foreach (IUserGroup group in source.UserGroups)
+        foreach (IUserGroup group in sourceUserGroups)
         {
             target.AddGroup(group.ToReadOnlyGroup());
         }
@@ -929,6 +966,11 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.UserNameIsNotEmail;
         }
 
+        if (!IsEmailValid(model.Email))
+        {
+            return UserOperationStatus.InvalidEmail;
+        }
+
         IUser? existing = GetByEmail(model.Email);
         if (existing is not null && existing.Key != existingUser.Key)
         {
@@ -951,6 +993,8 @@ internal class UserService : RepositoryService, IUserService
 
         return UserOperationStatus.Success;
     }
+
+    private static bool IsEmailValid(string email) => new EmailAddressAttribute().IsValid(email);
 
     private int[]? GetIdsFromKeys(IEnumerable<Guid>? guids, UmbracoObjectTypes type)
     {

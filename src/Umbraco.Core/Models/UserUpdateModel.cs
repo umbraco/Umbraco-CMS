@@ -1,6 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
-
-namespace Umbraco.Cms.Core.Models;
+﻿namespace Umbraco.Cms.Core.Models;
 
 public class UserUpdateModel
 {
@@ -18,5 +16,5 @@ public class UserUpdateModel
 
     public SortedSet<Guid> MediaStartNodeKeys { get; set; } = new();
 
-    public IEnumerable<IUserGroup> UserGroups { get; set; } = Enumerable.Empty<IUserGroup>();
+    public ISet<Guid> UserGroupKeys { get; set; } = new HashSet<Guid>();
 }

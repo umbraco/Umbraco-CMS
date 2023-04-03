@@ -64,9 +64,21 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid avatar")
                 .WithDetail("The selected avatar is invalid")
                 .Build()),
+            UserOperationStatus.InvalidEmail => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid email")
+                .WithDetail("The email is invalid")
+                .Build()),
             UserOperationStatus.AvatarFileNotFound => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Avatar file not found")
                 .WithDetail("The file key did not resolve in to a file")
+                .Build()),
+            UserOperationStatus.ContentStartNodeNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content Start Node not found")
+                .WithDetail("Some of the provided content start nodes was not found.")
+                .Build()),
+            UserOperationStatus.MediaStartNodeNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Media Start Node not found")
+                .WithDetail("Some of the provided media start nodes was not found.")
                 .Build()),
             UserOperationStatus.UserNotFound => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("The was not found")

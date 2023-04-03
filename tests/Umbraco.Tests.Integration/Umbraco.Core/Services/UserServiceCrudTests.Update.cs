@@ -36,7 +36,7 @@ public partial class UserServiceCrudTests
             LanguageIsoCode = user.Language,
             ContentStartNodeKeys = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             MediaStartNodeKeys = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
-            UserGroups = groups,
+            UserGroupKeys = groups.Select(x=>x.Key).ToHashSet(),
         };
     }
 
@@ -51,7 +51,7 @@ public partial class UserServiceCrudTests
             Email = email,
             UserName = userName,
             Name = "Test Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var createExistingUser = await userService.CreateAsync(Constants.Security.SuperUserKey, createUserModel, true);
@@ -138,7 +138,7 @@ public partial class UserServiceCrudTests
             Email = email,
             UserName = email,
             Name = "Test Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
@@ -171,7 +171,7 @@ public partial class UserServiceCrudTests
             Email = existingEmail,
             UserName = existingUserName,
             Name = "Test Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);

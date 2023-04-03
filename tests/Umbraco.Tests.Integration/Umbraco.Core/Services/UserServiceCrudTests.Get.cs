@@ -20,7 +20,7 @@ public partial class UserServiceCrudTests
         {
             Email = "not@super.com",
             UserName = "not@super.com",
-            UserGroups = new HashSet<IUserGroup> { editorGroup!, adminGroup! },
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
             Name = "Not A Super User"
         };
 
@@ -49,7 +49,7 @@ public partial class UserServiceCrudTests
         {
             Email = "not@super.com",
             UserName = "not@super.com",
-            UserGroups = new HashSet<IUserGroup> { editorGroup! },
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
             Name = "Not A Super User"
         };
 
@@ -79,7 +79,7 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { editorGroup! }
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var adminCreateModel = new UserCreateModel
@@ -87,7 +87,7 @@ public partial class UserServiceCrudTests
             UserName = "admin@mail.com",
             Email = "admin@mail.com",
             Name = "Admin Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { adminGroup!, editorGroup }
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
         };
 
         var createEditorAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, editorCreateModel, true);
@@ -115,7 +115,7 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { editorGroup! }
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var adminCreateModel = new UserCreateModel
@@ -123,7 +123,7 @@ public partial class UserServiceCrudTests
             UserName = "admin@mail.com",
             Email = "admin@mail.com",
             Name = "Admin Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { adminGroup!, editorGroup }
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
         };
 
         var createEditorAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, editorCreateModel, true);
@@ -151,7 +151,7 @@ public partial class UserServiceCrudTests
             UserName = "firstEditor@mail.com",
             Email = "firstEditor@mail.com",
             Name = "First Editor",
-            UserGroups = new HashSet<IUserGroup> { editorGroup! }
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var firstEditorResult = await userService.CreateAsync(Constants.Security.SuperUserKey, firstEditorCreateModel, true);
@@ -162,7 +162,7 @@ public partial class UserServiceCrudTests
             UserName = "secondEditor@mail.com",
             Email = "secondEditor@mail.com",
             Name = "Second Editor",
-            UserGroups = new HashSet<IUserGroup> {editorGroup}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var secondEditorResult = await userService.CreateAsync(Constants.Security.SuperUserKey, secondEditorCreateModel, true);

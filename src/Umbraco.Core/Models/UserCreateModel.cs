@@ -10,5 +10,5 @@ public class UserCreateModel
 
     public string Name { get; set; } = string.Empty;
 
-    public HashSet<IUserGroup> UserGroups { get; set; } = new();
+    public ISet<Guid> UserGroupKeys { get; set; } = new HashSet<Guid>();
 }

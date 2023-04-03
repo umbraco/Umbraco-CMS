@@ -18,7 +18,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -46,7 +46,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -70,7 +70,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { adminUserGroup }
+            UserGroupKeys = new HashSet<Guid> { adminUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -92,7 +92,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -115,7 +115,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -139,7 +139,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();

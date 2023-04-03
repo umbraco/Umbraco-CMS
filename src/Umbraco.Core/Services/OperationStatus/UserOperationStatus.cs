@@ -9,6 +9,7 @@ public enum UserOperationStatus
     EmailCannotBeChanged,
     NoUserGroup,
     DuplicateUserName,
+    InvalidEmail,
     DuplicateEmail,
     Unauthorized,
     Forbidden,
@@ -22,5 +23,7 @@ public enum UserOperationStatus
     OldPasswordRequired,
     InvalidAvatar,
     InvalidIsoCode,
+    ContentStartNodeNotFound,
+    MediaStartNodeNotFound,
     UnknownFailure,
 }

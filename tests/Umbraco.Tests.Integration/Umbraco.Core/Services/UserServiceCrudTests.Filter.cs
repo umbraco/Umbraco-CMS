@@ -23,7 +23,7 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key }
         };
 
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
@@ -51,7 +51,7 @@ public partial class UserServiceCrudTests
         {
             Email = "not@super.com",
             UserName = "not@super.com",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!, adminGroup!},
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
             Name = "Not A Super User"
         };
 
@@ -84,7 +84,7 @@ public partial class UserServiceCrudTests
         {
             Email = "not@super.com",
             UserName = "not@super.com",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!},
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
             Name = "Not A Super User"
         };
 
@@ -115,7 +115,7 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var adminCreateModel = new UserCreateModel
@@ -123,7 +123,7 @@ public partial class UserServiceCrudTests
             UserName = "admin@mail.com",
             Email = "admin@mail.com",
             Name = "Admin Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> {adminGroup!, editorGroup}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
         };
 
         var createEditorAttempt =
@@ -154,7 +154,7 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var adminCreateModel = new UserCreateModel
@@ -162,7 +162,7 @@ public partial class UserServiceCrudTests
             UserName = "admin@mail.com",
             Email = "admin@mail.com",
             Name = "Admin Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> {adminGroup!, editorGroup}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
         };
 
         var createEditorAttempt =
@@ -197,35 +197,35 @@ public partial class UserServiceCrudTests
                 UserName = "editor@email.com",
                 Email = "editor@email.com",
                 Name = "Editor",
-                UserGroups = new HashSet<IUserGroup> {editorGroup!}
+                UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
             },
             new()
             {
                 UserName = "admin@email.com",
                 Email = "admin@email.com",
                 Name = "Admin",
-                UserGroups = new HashSet<IUserGroup> {adminGroup!}
+                UserGroupKeys = new HashSet<Guid> { adminGroup.Key },
             },
             new()
             {
                 UserName = "write@email.com",
                 Email = "write@email.com",
                 Name = "Write",
-                UserGroups = new HashSet<IUserGroup> {writerGroup}
+                UserGroupKeys = new HashSet<Guid> { writerGroup.Key },
             },
             new()
             {
                 UserName = "translator@email.com",
                 Email = "translator@email.com",
                 Name = "Translator",
-                UserGroups = new HashSet<IUserGroup> {translatorGroup}
+                UserGroupKeys = new HashSet<Guid> { translatorGroup.Key },
             },
             new()
             {
                 UserName = "EverythingButAdmin@email.com",
                 Email = "EverythingButAdmin@email.com",
                 Name = "Everything But Admin",
-                UserGroups = new HashSet<IUserGroup> {editorGroup, writerGroup, translatorGroup}
+                UserGroupKeys = new HashSet<Guid> { editorGroup.Key, writerGroup.Key, translatorGroup.Key },
             }
         };
 
