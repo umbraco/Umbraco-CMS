@@ -12,7 +12,7 @@ internal static class EntityBuilderExtensions
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<ItemTypeMapDefinition>();
-        builder.Services.AddUnique<IPartialViewPresentationModelFactory, PartialViewPresentationModelFactory>();
+        builder.Services.AddUnique<IFileItemPresentationModelFactory, FileItemPresentationModelFactory>();
 
         return builder;
     }
