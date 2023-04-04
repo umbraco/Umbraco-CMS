@@ -4,9 +4,9 @@ namespace Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 
 public class AuditLogBaseModel
 {
-    public Guid UserKey { get; set; }
+    public Guid UserId { get; set; }
 
-    public Guid? EntityKey { get; set; }
+    public Guid? EntityId { get; set; }
 
     public DateTime Timestamp { get; set; }
 

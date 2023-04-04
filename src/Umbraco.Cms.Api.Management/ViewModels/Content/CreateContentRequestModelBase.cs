@@ -5,5 +5,5 @@ public abstract class CreateContentRequestModelBase<TValueModel, TVariantModel>
     where TValueModel : ValueModelBase
     where TVariantModel : VariantModelBase
 {
-    public Guid? ParentKey { get; set; }
+    public Guid? ParentId { get; set; }
 }

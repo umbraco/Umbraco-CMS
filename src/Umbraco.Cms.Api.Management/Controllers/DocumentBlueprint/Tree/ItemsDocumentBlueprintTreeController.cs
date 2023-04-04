@@ -16,6 +16,6 @@ public class ItemsDocumentBlueprintTreeController : DocumentBlueprintTreeControl
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<DocumentBlueprintTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
-        => await GetItems(keys);
+    public async Task<ActionResult<IEnumerable<DocumentBlueprintTreeItemResponseModel>>> Items([FromQuery(Name = "id")] Guid[] ids)
+        => await GetItems(ids);
 }

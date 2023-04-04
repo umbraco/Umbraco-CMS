@@ -43,9 +43,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         return new UserGroupPresentationModel
         {
             Name = userGroup.Name ?? string.Empty,
-            Key = userGroup.Key,
-            DocumentStartNodeKey = contentStartNodeKey,
-            MediaStartNodeKey = mediaStartNodeKey,
+            Id = userGroup.Key,
+            DocumentStartNodeId = contentStartNodeKey,
+            MediaStartNodeId = mediaStartNodeKey,
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
@@ -169,9 +169,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
     private Attempt<UserGroupOperationStatus> AssignStartNodesToUserGroup(UserGroupBase source, IUserGroup target)
     {
-        if (source.DocumentStartNodeKey is not null)
+        if (source.DocumentStartNodeId is not null)
         {
-            var contentId = GetIdFromKey(source.DocumentStartNodeKey.Value, UmbracoObjectTypes.Document);
+            var contentId = GetIdFromKey(source.DocumentStartNodeId.Value, UmbracoObjectTypes.Document);
 
             if (contentId is null)
             {
@@ -181,9 +181,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             target.StartContentId = contentId;
         }
 
-        if (source.MediaStartNodeKey is not null)
+        if (source.MediaStartNodeId is not null)
         {
-            var mediaId = GetIdFromKey(source.MediaStartNodeKey.Value, UmbracoObjectTypes.Media);
+            var mediaId = GetIdFromKey(source.MediaStartNodeId.Value, UmbracoObjectTypes.Media);
 
             if (mediaId is null)
             {

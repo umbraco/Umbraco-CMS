@@ -15,7 +15,7 @@ public class UsersViewModelsMapDefinition : IMapDefinition
 
     private void Map(UserCreationResult source, CreateUserResponseModel target, MapperContext context)
     {
-        target.UserKey = source.CreatedUser?.Key ?? Guid.Empty;
+        target.UserId = source.CreatedUser?.Key ?? Guid.Empty;
         target.InitialPassword = source.InitialPassword;
     }
 

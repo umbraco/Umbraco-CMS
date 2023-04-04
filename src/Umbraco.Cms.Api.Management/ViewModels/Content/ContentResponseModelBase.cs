@@ -5,7 +5,7 @@ public abstract class ContentResponseModelBase<TValueResponseModelBase, TVariant
     where TValueResponseModelBase : ValueModelBase
     where TVariantResponseModel : VariantResponseModelBase
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
-    public Guid ContentTypeKey { get; set; }
+    public Guid ContentTypeId { get; set; }
 }

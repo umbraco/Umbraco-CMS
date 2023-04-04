@@ -16,9 +16,9 @@ public class ItemsDictionaryTreeController : DictionaryTreeControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<FolderTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<FolderTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<ActionResult<IEnumerable<FolderTreeItemResponseModel>>> Items([FromQuery(Name = "id")] Guid[] ids)
     {
-        IDictionaryItem[] dictionaryItems = (await DictionaryItemService.GetManyAsync(keys)).ToArray();
+        IDictionaryItem[] dictionaryItems = (await DictionaryItemService.GetManyAsync(ids)).ToArray();
 
         EntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModels(null, dictionaryItems);
 

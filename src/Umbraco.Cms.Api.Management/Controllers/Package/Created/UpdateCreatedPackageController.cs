@@ -29,16 +29,16 @@ public class UpdateCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Updates a package.
     /// </summary>
-    /// <param name="key">The key of the package.</param>
+    /// <param name="id">The id of the package.</param>
     /// <param name="updatePackageRequestModel">The model containing the data for updating a package.</param>
     /// <returns>The created package.</returns>
-    [HttpPut("{key:guid}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(Guid key, UpdatePackageRequestModel updatePackageRequestModel)
+    public async Task<IActionResult> Update(Guid id, UpdatePackageRequestModel updatePackageRequestModel)
     {
-        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(key);
+        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);
 
         if (package is null)
         {

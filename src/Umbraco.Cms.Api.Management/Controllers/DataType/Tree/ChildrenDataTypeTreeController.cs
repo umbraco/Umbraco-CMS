@@ -16,9 +16,9 @@ public class ChildrenDataTypeTreeController : DataTypeTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<FolderTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<FolderTreeItemResponseModel>>> Children(Guid parentKey, int skip = 0, int take = 100, bool foldersOnly = false)
+    public async Task<ActionResult<PagedViewModel<FolderTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100, bool foldersOnly = false)
     {
         RenderFoldersOnly(foldersOnly);
-        return await GetChildren(parentKey, skip, take);
+        return await GetChildren(parentId, skip, take);
     }
 }

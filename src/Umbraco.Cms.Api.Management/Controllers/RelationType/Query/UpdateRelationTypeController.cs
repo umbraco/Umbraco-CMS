@@ -27,20 +27,20 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{key:guid}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(RelationTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, UpdateRelationTypeRequestModel updateRelationTypeSavingViewModel)
+    public async Task<IActionResult> Update(Guid id, UpdateRelationTypeRequestModel updateRelationTypeSavingViewModel)
     {
-        IRelationType? persistedRelationType = _relationService.GetRelationTypeById(key);
+        IRelationType? persistedRelationType = _relationService.GetRelationTypeById(id);
 
         if (persistedRelationType is null)
         {
             ProblemDetails problemDetails = new ProblemDetailsBuilder()
                 .WithTitle("Could not find relation type")
-                .WithDetail($"Relation type with key {key} could not be found")
+                .WithDetail($"Relation type with id {id} could not be found")
                 .Build();
             return NotFound(problemDetails);
         }

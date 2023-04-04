@@ -2,7 +2,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 
 public class TemporaryFileResponseModel
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
     public DateTime? AvailableUntil { get; set; }
 

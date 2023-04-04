@@ -19,17 +19,17 @@ public class ByKeyCreatedPackageController : CreatedPackageControllerBase
     }
 
     /// <summary>
-    ///     Gets a package by key.
+    ///     Gets a package by id.
     /// </summary>
-    /// <param name="key">The key of the package.</param>
+    /// <param name="id">The id of the package.</param>
     /// <returns>The package or not found result.</returns>
-    [HttpGet("{key:guid}")]
+    [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(PackageDefinitionResponseModel), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PackageDefinitionResponseModel>> ByKey(Guid key)
+    public async Task<ActionResult<PackageDefinitionResponseModel>> ByKey(Guid id)
     {
-        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(key);
+        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);
 
         if (package is null)
         {

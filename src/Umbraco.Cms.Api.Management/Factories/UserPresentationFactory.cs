@@ -31,7 +31,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     {
         var responseModel = new UserResponseModel
         {
-            Key = user.Key,
+            Id = user.Key,
             Email = user.Email,
             Name = user.Name ?? string.Empty,
             AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator),
@@ -41,8 +41,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             UpdateDate = user.UpdateDate,
             State = user.UserState,
             UserGroupIds = new SortedSet<Guid>(user.Groups.Select(x => x.Key)),
-            ContentStartNodeKeys = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
-            MediaStartNodeKeys = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
+            ContentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
+            MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastlockoutDate = user.LastLockoutDate,

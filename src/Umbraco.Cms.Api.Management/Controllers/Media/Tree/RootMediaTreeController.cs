@@ -24,9 +24,9 @@ public class RootMediaTreeController : MediaTreeControllerBase
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ContentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<ContentTreeItemResponseModel>>> Root(int skip = 0, int take = 100, Guid? dataTypeKey = null)
+    public async Task<ActionResult<PagedViewModel<ContentTreeItemResponseModel>>> Root(int skip = 0, int take = 100, Guid? dataTypeId = null)
     {
-        IgnoreUserStartNodesForDataType(dataTypeKey);
+        IgnoreUserStartNodesForDataType(dataTypeId);
         return await GetRoot(skip, take);
     }
 }

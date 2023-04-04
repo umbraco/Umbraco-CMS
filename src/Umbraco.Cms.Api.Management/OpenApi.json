@@ -61,15 +61,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/audit-log/{key}": {
+    "/umbraco/management/api/v1/audit-log/{id}": {
       "get": {
         "tags": [
           "Audit Log"
         ],
-        "operationId": "GetAuditLogByKey",
+        "operationId": "GetAuditLogById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -270,15 +270,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/data-type/{key}": {
+    "/umbraco/management/api/v1/data-type/{id}": {
       "get": {
         "tags": [
           "Data Type"
         ],
-        "operationId": "GetDataTypeByKey",
+        "operationId": "GetDataTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -311,10 +311,10 @@
         "tags": [
           "Data Type"
         ],
-        "operationId": "DeleteDataTypeByKey",
+        "operationId": "DeleteDataTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -346,10 +346,10 @@
         "tags": [
           "Data Type"
         ],
-        "operationId": "PutDataTypeByKey",
+        "operationId": "PutDataTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -391,15 +391,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/data-type/{key}/copy": {
+    "/umbraco/management/api/v1/data-type/{id}/copy": {
       "post": {
         "tags": [
           "Data Type"
         ],
-        "operationId": "PostDataTypeByKeyCopy",
+        "operationId": "PostDataTypeByIdCopy",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -441,15 +441,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/data-type/{key}/move": {
+    "/umbraco/management/api/v1/data-type/{id}/move": {
       "post": {
         "tags": [
           "Data Type"
         ],
-        "operationId": "PostDataTypeByKeyMove",
+        "operationId": "PostDataTypeByIdMove",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -481,15 +481,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/data-type/{key}/references": {
+    "/umbraco/management/api/v1/data-type/{id}/references": {
       "get": {
         "tags": [
           "Data Type"
         ],
-        "operationId": "GetDataTypeByKeyReferences",
+        "operationId": "GetDataTypeByIdReferences",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -558,15 +558,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/data-type/folder/{key}": {
+    "/umbraco/management/api/v1/data-type/folder/{id}": {
       "get": {
         "tags": [
           "Data Type"
         ],
-        "operationId": "GetDataTypeFolderByKey",
+        "operationId": "GetDataTypeFolderById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -599,10 +599,10 @@
         "tags": [
           "Data Type"
         ],
-        "operationId": "DeleteDataTypeFolderByKey",
+        "operationId": "DeleteDataTypeFolderById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -624,10 +624,10 @@
         "tags": [
           "Data Type"
         ],
-        "operationId": "PutDataTypeFolderByKey",
+        "operationId": "PutDataTypeFolderById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -667,7 +667,7 @@
         "operationId": "GetTreeDataTypeChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -723,7 +723,7 @@
         "operationId": "GetTreeDataTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -903,15 +903,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/{key}": {
+    "/umbraco/management/api/v1/dictionary/{id}": {
       "get": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryByKey",
+        "operationId": "GetDictionaryById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -944,10 +944,10 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "DeleteDictionaryByKey",
+        "operationId": "DeleteDictionaryById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -979,10 +979,10 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "PutDictionaryByKey",
+        "operationId": "PutDictionaryById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1024,15 +1024,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/{key}/export": {
+    "/umbraco/management/api/v1/dictionary/{id}/export": {
       "get": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryByKeyExport",
+        "operationId": "GetDictionaryByIdExport",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1067,15 +1067,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/{key}/move": {
+    "/umbraco/management/api/v1/dictionary/{id}/move": {
       "post": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "PostDictionaryByKeyMove",
+        "operationId": "PostDictionaryByIdMove",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1174,7 +1174,7 @@
         "operationId": "GetTreeDictionaryChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1222,7 +1222,7 @@
         "operationId": "GetTreeDictionaryItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -1305,7 +1305,7 @@
         "operationId": "GetTreeDocumentBlueprintItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -1377,15 +1377,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document-type/{key}": {
+    "/umbraco/management/api/v1/document-type/{id}": {
       "get": {
         "tags": [
           "Document Type"
         ],
-        "operationId": "GetDocumentTypeByKey",
+        "operationId": "GetDocumentTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1423,7 +1423,7 @@
         "operationId": "GetTreeDocumentTypeChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1479,7 +1479,7 @@
         "operationId": "GetTreeDocumentTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -1601,15 +1601,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document/{key}": {
+    "/umbraco/management/api/v1/document/{id}": {
       "get": {
         "tags": [
           "Document"
         ],
-        "operationId": "GetDocumentByKey",
+        "operationId": "GetDocumentById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1642,10 +1642,10 @@
         "tags": [
           "Document"
         ],
-        "operationId": "DeleteDocumentByKey",
+        "operationId": "DeleteDocumentById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1670,10 +1670,10 @@
         "tags": [
           "Document"
         ],
-        "operationId": "PutDocumentByKey",
+        "operationId": "PutDocumentById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1708,15 +1708,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document/{key}/domains": {
+    "/umbraco/management/api/v1/document/{id}/domains": {
       "get": {
         "tags": [
           "Document"
         ],
-        "operationId": "GetDocumentByKeyDomains",
+        "operationId": "GetDocumentByIdDomains",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1735,10 +1735,10 @@
         "tags": [
           "Document"
         ],
-        "operationId": "PutDocumentByKeyDomains",
+        "operationId": "PutDocumentByIdDomains",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1767,6 +1767,85 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document/{id}/notifications": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentByIdNotifications",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentNotificationResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByIdNotifications",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDocumentNotificationsRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/recycle-bin/document/children": {
       "get": {
         "tags": [
@@ -1775,7 +1854,7 @@
         "operationId": "GetRecycleBinDocumentChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1869,7 +1948,7 @@
         "operationId": "GetTreeDocumentChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1895,7 +1974,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1932,7 +2011,7 @@
         "operationId": "GetTreeDocumentItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -1943,7 +2022,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2005,7 +2084,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3149,15 +3228,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/media-type/{key}": {
+    "/umbraco/management/api/v1/media-type/{id}": {
       "get": {
         "tags": [
           "Media Type"
         ],
-        "operationId": "GetMediaTypeByKey",
+        "operationId": "GetMediaTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3195,7 +3274,7 @@
         "operationId": "GetTreeMediaTypeChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3251,7 +3330,7 @@
         "operationId": "GetTreeMediaTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3376,15 +3455,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/media/{key}": {
+    "/umbraco/management/api/v1/media/{id}": {
       "get": {
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaByKey",
+        "operationId": "GetMediaById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3417,10 +3496,10 @@
         "tags": [
           "Media"
         ],
-        "operationId": "DeleteMediaByKey",
+        "operationId": "DeleteMediaById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3445,10 +3524,10 @@
         "tags": [
           "Media"
         ],
-        "operationId": "PutMediaByKey",
+        "operationId": "PutMediaById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3491,7 +3570,7 @@
         "operationId": "GetRecycleBinMediaChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3585,7 +3664,7 @@
         "operationId": "GetTreeMediaChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3611,7 +3690,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3641,7 +3720,7 @@
         "operationId": "GetTreeMediaItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3652,7 +3731,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3710,7 +3789,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3740,7 +3819,7 @@
         "operationId": "GetTreeMemberGroupItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3835,7 +3914,7 @@
         "operationId": "GetTreeMemberTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -4156,15 +4235,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/package/created/{key}": {
+    "/umbraco/management/api/v1/package/created/{id}": {
       "get": {
         "tags": [
           "Package"
         ],
-        "operationId": "GetPackageCreatedByKey",
+        "operationId": "GetPackageCreatedById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4197,10 +4276,10 @@
         "tags": [
           "Package"
         ],
-        "operationId": "DeletePackageCreatedByKey",
+        "operationId": "DeletePackageCreatedById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4222,10 +4301,10 @@
         "tags": [
           "Package"
         ],
-        "operationId": "PutPackageCreatedByKey",
+        "operationId": "PutPackageCreatedById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4257,15 +4336,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/package/created/{key}/download": {
+    "/umbraco/management/api/v1/package/created/{id}/download": {
       "get": {
         "tags": [
           "Package"
         ],
-        "operationId": "GetPackageCreatedByKeyDownload",
+        "operationId": "GetPackageCreatedByIdDownload",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4647,15 +4726,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/redirect-management/{key}": {
+    "/umbraco/management/api/v1/redirect-management/{id}": {
       "get": {
         "tags": [
           "Redirect Management"
         ],
-        "operationId": "GetRedirectManagementByKey",
+        "operationId": "GetRedirectManagementById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4697,10 +4776,10 @@
         "tags": [
           "Redirect Management"
         ],
-        "operationId": "DeleteRedirectManagementByKey",
+        "operationId": "DeleteRedirectManagementById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4806,15 +4885,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/relation-type/{key}": {
+    "/umbraco/management/api/v1/relation-type/{id}": {
       "get": {
         "tags": [
           "Relation Type"
         ],
-        "operationId": "GetRelationTypeByKey",
+        "operationId": "GetRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4847,10 +4926,10 @@
         "tags": [
           "Relation Type"
         ],
-        "operationId": "DeleteRelationTypeByKey",
+        "operationId": "DeleteRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4879,10 +4958,10 @@
         "tags": [
           "Relation Type"
         ],
-        "operationId": "PutRelationTypeByKey",
+        "operationId": "PutRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4950,7 +5029,7 @@
         "operationId": "GetTreeRelationTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -5118,15 +5197,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/relation/type/{key}": {
+    "/umbraco/management/api/v1/relation/type/{id}": {
       "get": {
         "tags": [
           "Relation"
         ],
-        "operationId": "GetRelationTypeByKey",
+        "operationId": "GetRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5883,15 +5962,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/template/{key}": {
+    "/umbraco/management/api/v1/template/{id}": {
       "get": {
         "tags": [
           "Template"
         ],
-        "operationId": "GetTemplateByKey",
+        "operationId": "GetTemplateById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5924,10 +6003,10 @@
         "tags": [
           "Template"
         ],
-        "operationId": "DeleteTemplateByKey",
+        "operationId": "DeleteTemplateById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5959,10 +6038,10 @@
         "tags": [
           "Template"
         ],
-        "operationId": "PutTemplateByKey",
+        "operationId": "PutTemplateById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6100,7 +6179,7 @@
         "operationId": "GetTreeTemplateChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -6148,7 +6227,7 @@
         "operationId": "GetTreeTemplateItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -6247,7 +6326,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "Key": {
+                  "Id": {
                     "type": "string",
                     "format": "uuid"
                   },
@@ -6258,7 +6337,7 @@
                 }
               },
               "encoding": {
-                "Key": {
+                "Id": {
                   "style": "form"
                 },
                 "File": {
@@ -6295,15 +6374,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/temporaryfile/{key}": {
+    "/umbraco/management/api/v1/temporaryfile/{id}": {
       "get": {
         "tags": [
           "Temporary File"
         ],
-        "operationId": "GetTemporaryfileByKey",
+        "operationId": "GetTemporaryfileById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6353,10 +6432,10 @@
         "tags": [
           "Temporary File"
         ],
-        "operationId": "DeleteTemporaryfileByKey",
+        "operationId": "DeleteTemporaryfileById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6392,15 +6471,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/{key}": {
+    "/umbraco/management/api/v1/tracked-reference/{id}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceByKey",
+        "operationId": "GetTrackedReferenceById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6449,15 +6528,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/descendants/{parentKey}": {
+    "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceDescendantsByParentKey",
+        "operationId": "GetTrackedReferenceDescendantsByParentId",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6512,7 +6591,7 @@
         "operationId": "GetTrackedReferenceItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -6715,15 +6794,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups/{key}": {
+    "/umbraco/management/api/v1/user-groups/{id}": {
       "get": {
         "tags": [
           "User Groups"
         ],
-        "operationId": "GetUserGroupsByKey",
+        "operationId": "GetUserGroupsById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6756,10 +6835,10 @@
         "tags": [
           "User Groups"
         ],
-        "operationId": "DeleteUserGroupsByKey",
+        "operationId": "DeleteUserGroupsById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6781,10 +6860,10 @@
         "tags": [
           "User Groups"
         ],
-        "operationId": "PutUserGroupsByKey",
+        "operationId": "PutUserGroupsById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6815,6 +6894,533 @@
           }
         }
       }
+    },
+    "/umbraco/management/api/v1/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateUserRequestModel"
+                  },
+                  {
+                    "$ref": "#/components/schemas/InviteUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CreateUserResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUsers",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedUserResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUsersById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "DeleteUsersById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PutUsersById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/avatar/{id}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "DeleteUsersAvatarById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersAvatarById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/SetAvatarRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/change-password/{id}": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersChangePasswordById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/disable": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersDisable",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DisableUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/enable": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersEnable",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/EnableUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/filter": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUsersFilter",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/UserOrderModel"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "userGroupIds",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "userStates",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/UserStateModel"
+              }
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/invite": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersInvite",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/InviteUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/set-user-groups": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersSetUserGroups",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/users/unlock": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "PostUsersUnlock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UnlockUsersRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6822,11 +7428,11 @@
       "AuditLogBaseModel": {
         "type": "object",
         "properties": {
-          "userKey": {
+          "userId": {
             "type": "string",
             "format": "uuid"
           },
-          "entityKey": {
+          "entityId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -6914,6 +7520,19 @@
         "type": "integer",
         "format": "int32"
       },
+      "ChangePasswordUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string"
+          },
+          "oldPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ConsentLevelPresentationModel": {
         "type": "object",
         "properties": {
@@ -6949,11 +7568,11 @@
               ]
             }
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "contentTypeKey": {
+          "contentTypeId": {
             "type": "string",
             "format": "uuid"
           }
@@ -7022,7 +7641,7 @@
       "ContentTypeCompositionModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7043,7 +7662,7 @@
       "ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7118,7 +7737,7 @@
       "ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7193,7 +7812,7 @@
       "ContentTypeSortModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7220,7 +7839,7 @@
       "CopyDataTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7251,7 +7870,7 @@
               ]
             }
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7282,7 +7901,7 @@
               ]
             }
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7298,7 +7917,12 @@
           }
         ],
         "properties": {
-          "parentKey": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7314,7 +7938,7 @@
           }
         ],
         "properties": {
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7330,11 +7954,11 @@
           }
         ],
         "properties": {
-          "contentTypeKey": {
+          "contentTypeId": {
             "type": "string",
             "format": "uuid"
           },
-          "templateKey": {
+          "templateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7350,7 +7974,12 @@
           }
         ],
         "properties": {
-          "parentKey": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7380,7 +8009,7 @@
           }
         ],
         "properties": {
-          "contentTypeKey": {
+          "contentTypeId": {
             "type": "string",
             "format": "uuid"
           }
@@ -7404,7 +8033,7 @@
           }
         ],
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7419,6 +8048,29 @@
             "$ref": "#/components/schemas/TemplateModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "CreateUserRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserPresentationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "CreateUserResponseModel": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "initialPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "CultureReponseModel": {
@@ -7486,7 +8138,7 @@
       "DataTypeReferenceResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7520,11 +8172,11 @@
           "$type": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7653,7 +8305,7 @@
           "$type": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           }
@@ -7685,11 +8337,11 @@
             "type": "string",
             "nullable": true
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7711,6 +8363,20 @@
         "type": "integer",
         "format": "int32"
       },
+      "DisableUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
           "$type"
@@ -7725,7 +8391,7 @@
           "$type": {
             "type": "string"
           },
-          "documentTypeKey": {
+          "documentTypeId": {
             "type": "string",
             "format": "uuid"
           },
@@ -7745,6 +8411,18 @@
           }
         }
       },
+      "DocumentNotificationResponseModel": {
+        "type": "object",
+        "properties": {
+          "actionId": {
+            "type": "string"
+          },
+          "subscribed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentResponseModel": {
         "type": "object",
         "allOf": [
@@ -7763,7 +8441,7 @@
               ]
             }
           },
-          "templateKey": {
+          "templateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7829,14 +8507,14 @@
           }
         ],
         "properties": {
-          "allowedTemplateKeys": {
+          "allowedTemplateIds": {
             "type": "array",
             "items": {
               "type": "string",
               "format": "uuid"
             }
           },
-          "defaultTemplateKey": {
+          "defaultTemplateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7995,6 +8673,20 @@
         ],
         "additionalProperties": false
       },
+      "EnableUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "EntityTreeItemResponseModel": {
         "required": [
           "$type"
@@ -8009,14 +8701,14 @@
           "$type": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
           "isContainer": {
             "type": "boolean"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8090,11 +8782,11 @@
           "$type": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8138,7 +8830,7 @@
       "HealthCheckActionRequestModel": {
         "type": "object",
         "properties": {
-          "healthCheckKey": {
+          "healthCheckId": {
             "type": "string",
             "format": "uuid"
           },
@@ -8248,7 +8940,7 @@
       "HealthCheckModelBaseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           }
@@ -8338,11 +9030,11 @@
       "ImportDictionaryRequestModel": {
         "type": "object",
         "properties": {
-          "temporaryFileKey": {
+          "temporaryFileId": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8434,6 +9126,21 @@
           },
           "telemetryLevel": {
             "$ref": "#/components/schemas/TelemetryLevelModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InviteUserRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateUserRequestModel"
+          }
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -8722,7 +9429,7 @@
       "MoveDataTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8733,7 +9440,7 @@
       "MoveDictionaryRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8805,7 +9512,7 @@
           }
         ],
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -8857,7 +9564,7 @@
           "contentLoadChildNodes": {
             "type": "boolean"
           },
-          "mediaKeys": {
+          "mediaIds": {
             "type": "array",
             "items": {
               "type": "string",
@@ -9665,6 +10372,30 @@
         },
         "additionalProperties": false
       },
+      "PagedUserResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/UserResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetailsModel": {
         "type": "object",
         "properties": {
@@ -9722,11 +10453,11 @@
       "PropertyTypeContainerResponseModelBaseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9748,11 +10479,11 @@
       "PropertyTypeResponseModelBaseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "containerKey": {
+          "containerId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9767,7 +10498,7 @@
             "type": "string",
             "nullable": true
           },
-          "dataTypeKey": {
+          "dataTypeId": {
             "type": "string",
             "format": "uuid"
           },
@@ -9824,7 +10555,7 @@
           "$type": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -9843,7 +10574,7 @@
           "isContainer": {
             "type": "boolean"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9868,7 +10599,7 @@
       "RedirectUrlResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -9882,7 +10613,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "contentKey": {
+          "contentId": {
             "type": "string",
             "format": "uuid"
           },
@@ -9908,7 +10639,7 @@
       "RelationItemResponseModel": {
         "type": "object",
         "properties": {
-          "nodeKey": {
+          "nodeId": {
             "type": "string",
             "format": "uuid"
           },
@@ -10012,7 +10743,7 @@
           }
         ],
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -10134,6 +10865,16 @@
         },
         "additionalProperties": false
       },
+      "SetAvatarRequestModel": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "StatusResultTypeModel": {
         "enum": [
           "Success",
@@ -10214,7 +10955,7 @@
       "TemplateQueryExecuteModel": {
         "type": "object",
         "properties": {
-          "rootContentKey": {
+          "rootContentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -10383,7 +11124,7 @@
           "$type": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           }
@@ -10408,7 +11149,7 @@
       "TemporaryFileResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -10437,6 +11178,20 @@
           },
           "hasChildren": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UnlockUsersRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         },
         "additionalProperties": false
@@ -10511,6 +11266,18 @@
         ],
         "additionalProperties": false
       },
+      "UpdateDocumentNotificationsRequestModel": {
+        "type": "object",
+        "properties": {
+          "subscribedActionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateDocumentRequestModel": {
         "type": "object",
         "allOf": [
@@ -10519,7 +11286,7 @@
           }
         ],
         "properties": {
-          "templateKey": {
+          "templateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -10604,6 +11371,58 @@
         ],
         "additionalProperties": false
       },
+      "UpdateUserGroupsOnUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateUserRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserPresentationBaseModel"
+          }
+        ],
+        "properties": {
+          "languageIsoCode": {
+            "type": "string"
+          },
+          "contentStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "mediaStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "UpgradeSettingsResponseModel": {
         "type": "object",
         "properties": {
@@ -10651,12 +11470,12 @@
           "hasAccessToAllLanguages": {
             "type": "boolean"
           },
-          "documentStartNodeKey": {
+          "documentStartNodeId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "mediaStartNodeKey": {
+          "mediaStartNodeId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -10685,7 +11504,7 @@
           "$type": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           }
@@ -10727,6 +11546,128 @@
         },
         "additionalProperties": false
       },
+      "UserOrderModel": {
+        "enum": [
+          "UserName",
+          "Language",
+          "Name",
+          "Email",
+          "Id",
+          "CreateDate",
+          "UpdateDate",
+          "IsApproved",
+          "IsLockedOut",
+          "LastLoginDate"
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "UserPresentationBaseModel": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "userGroupIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserResponseModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserPresentationBaseModel"
+          }
+        ],
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "languageIsoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "mediaStartNodeIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "avatarUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "state": {
+            "$ref": "#/components/schemas/UserStateModel"
+          },
+          "failedLoginAttempts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastLoginDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastlockoutDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "lastPasswordChangeDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "UserResponseModel": "#/components/schemas/UserResponseModel"
+          }
+        }
+      },
       "UserSettingsModel": {
         "type": "object",
         "properties": {
@@ -10750,6 +11691,18 @@
           }
         },
         "additionalProperties": false
+      },
+      "UserStateModel": {
+        "enum": [
+          "Active",
+          "Disabled",
+          "LockedOut",
+          "Invited",
+          "Inactive",
+          "All"
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "ValueModelBaseModel": {
         "required": [

@@ -21,7 +21,7 @@ public class SetAvatarUsersController : UsersControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SetAvatar(Guid id, SetAvatarRequestModel model)
     {
-        UserOperationStatus result = await _userService.SetAvatarAsync(id, model.FileKey);
+        UserOperationStatus result = await _userService.SetAvatarAsync(id, model.FileId);
 
         return result is UserOperationStatus.Success
             ? Ok()

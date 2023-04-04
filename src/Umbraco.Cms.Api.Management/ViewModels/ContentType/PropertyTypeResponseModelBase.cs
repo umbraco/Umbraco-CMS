@@ -2,9 +2,9 @@
 
 public abstract class PropertyTypeResponseModelBase
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
-    public Guid? ContainerKey { get; set; }
+    public Guid? ContainerId { get; set; }
 
     public string Alias { get; set; } = string.Empty;
 
@@ -12,7 +12,7 @@ public abstract class PropertyTypeResponseModelBase
 
     public string? Description { get; set; }
 
-    public Guid DataTypeKey { get; set; }
+    public Guid DataTypeId { get; set; }
 
     public bool VariesByCulture { get; set; }
 

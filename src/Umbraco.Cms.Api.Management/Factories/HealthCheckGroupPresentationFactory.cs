@@ -65,7 +65,7 @@ public class HealthCheckGroupPresentationFactory : IHealthCheckGroupPresentation
 
         var healthCheckViewModel = new HealthCheckWithResultPresentationModel
         {
-            Key = healthCheck.Id,
+            Id = healthCheck.Id,
             Results = _umbracoMapper.MapEnumerable<HealthCheckStatus, HealthCheckResultResponseModel>(results)
         };
 

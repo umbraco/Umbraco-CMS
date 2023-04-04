@@ -27,14 +27,14 @@ public class UpdateMediaController : MediaControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{key:guid}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, UpdateMediaRequestModel updateRequestModel)
+    public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel updateRequestModel)
     {
-        IMedia? media = await _mediaEditingService.GetAsync(key);
+        IMedia? media = await _mediaEditingService.GetAsync(id);
         if (media == null)
         {
             return MediaNotFound();

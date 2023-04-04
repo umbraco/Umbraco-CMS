@@ -522,7 +522,18 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidId, dataType);
             }
 
-            return await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+            if (_dataTypeRepository.Get(dataType.Key) is not null)
+            {
+                return Attempt.FailWithStatus(DataTypeOperationStatus.DuplicateKey, dataType);
+            }
+
+            var result = await SaveAsync(dataType, () => DataTypeOperationStatus.Success, userKey, AuditType.New);
+
+            scope.Complete();
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -726,6 +737,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 return Attempt.FailWithStatus(DataTypeOperationStatus.InvalidName, dataType);
             }
+
 
             _dataTypeRepository.Save(dataType);
 

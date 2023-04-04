@@ -2,7 +2,7 @@
 
 public class ContentTypeSort
 {
-    public required Guid Key { get; init; }
+    public required Guid Id { get; init; }
 
     public required int SortOrder { get; init; }
 }
