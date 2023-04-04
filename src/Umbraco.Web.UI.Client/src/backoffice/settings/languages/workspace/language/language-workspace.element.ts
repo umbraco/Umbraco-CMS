@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo, ModuleResolver } from 'router-slot';
+import { IRoutingInfo } from 'router-slot';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
