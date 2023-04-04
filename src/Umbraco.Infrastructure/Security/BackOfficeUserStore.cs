@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Security;
 public class BackOfficeUserStore :
     UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>,
     IUserSessionStore<BackOfficeIdentityUser>,
-    IBackofficeUserStore
+    IBackOfficeUserStore
 {
     private readonly AppCaches _appCaches;
     private readonly IEntityService _entityService;

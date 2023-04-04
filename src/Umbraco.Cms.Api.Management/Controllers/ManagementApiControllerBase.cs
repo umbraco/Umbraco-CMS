@@ -39,5 +39,8 @@ public class ManagementApiControllerBase : Controller
     }
 
     protected static Guid CurrentUserKey(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        => backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? Core.Constants.Security.SuperUserKey;
+    {
+        //FIXME - Throw if no current user, when we are able to get the current user
+        return backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? Core.Constants.Security.SuperUserKey;
+    }
 }
