@@ -11,16 +11,16 @@ import './document-type-workspace-view-edit-property.element';
 
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	private _containerKey: string | undefined;
+	private _containerId: string | undefined;
 
-	public get containerKey(): string | undefined {
-		return this._containerKey;
+	public get containerId(): string | undefined {
+		return this._containerId;
 	}
-	public set containerKey(value: string | undefined) {
-		if (value === this._containerKey) return;
-		const oldValue = this._containerKey;
-		this._containerKey = value;
-		this.requestUpdate('containerKey', oldValue);
+	public set containerId(value: string | undefined) {
+		if (value === this._containerId) return;
+		const oldValue = this._containerId;
+		this._containerId = value;
+		this.requestUpdate('containerId', oldValue);
 	}
 
 	@property({ type: String, attribute: 'container-name', reflect: false })
@@ -56,11 +56,11 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	}
 
 	async #onAddProperty() {
-		const property = await this._propertyStructureHelper.addProperty(this._containerKey);
+		const property = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!property) return;
 
-		// Take key and parse to modal:
-		console.log('property key:', property.key!);
+		// Take id and parse to modal:
+		console.log('property id:', property.id!);
 
 		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
@@ -77,7 +77,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 					html`<document-type-workspace-view-edit-property
 						.property=${property}
 						@partial-property-update=${(event: CustomEvent) => {
-							this._propertyStructureHelper.partialUpdateProperty(property.key, event.detail);
+							this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
 						}}></document-type-workspace-view-edit-property>`
 			)}<uui-button id="add" look="placeholder" @click=${this.#onAddProperty}> Add property </uui-button>`;
 	}

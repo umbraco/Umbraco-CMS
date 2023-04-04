@@ -60,34 +60,34 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getItems(keys);
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -95,14 +95,14 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS
@@ -112,16 +112,16 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return this.#detailSource.createScaffold();
 	}
 
-	async requestByKey(key: string) {
+	async requestById(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
-		const { data, error } = await this.#detailSource.requestByKey(key);
+		const { data, error } = await this.#detailSource.requestById(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -129,15 +129,15 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return { data, error };
 	}
 
-	async delete(key: string) {
+	async delete(id: string) {
 		await this.#init;
 
-		if (!key) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		const { error } = await this.#detailSource.delete(key);
+		const { error } = await this.#detailSource.delete(id);
 
 		if (!error) {
 			const notification = { data: { message: `Member type deleted` } };
@@ -147,8 +147,8 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a member type is deleted from the store while someone is editing it.
-		this.#store?.remove([key]);
-		this.#treeStore?.removeItem(key);
+		this.#store?.remove([id]);
+		this.#treeStore?.removeItem(id);
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
@@ -159,7 +159,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 
 		// TODO: should we show a notification if the MemberType is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!detail || !detail.key) {
+		if (!detail || !detail.id) {
 			const error: ProblemDetailsModel = { title: 'Member type is missing' };
 			return { error };
 		}
@@ -175,7 +175,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a member type is updated in the store while someone is editing it.
 		this.#store?.append(detail);
-		this.#treeStore?.updateItem(detail.key, { name: detail.name });
+		this.#treeStore?.updateItem(detail.id, { name: detail.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };

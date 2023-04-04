@@ -23,13 +23,13 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 	}
 
 	/**
-	 * Fetches a Media with the given key from the server
-	 * @param {string} key
+	 * Fetches a Media with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async get(key: string) {
-		if (!key) {
+	async get(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -37,7 +37,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 		return tryExecuteAndNotify(
 			this.#host,
 			// TODO: use backend cli when available.
-			fetch(`/umbraco/management/api/v1/media/details/${key}`)
+			fetch(`/umbraco/management/api/v1/media/details/${id}`)
 				.then((res) => res.json())
 				.then((res) => res[0] || undefined)
 		);
@@ -45,26 +45,26 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 
 	/**
 	 * Creates a new Media scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: MediaDetails = {
 			$type: '',
-			key: '',
+			id: '',
 			name: '',
 			icon: '',
 			type: '',
 			hasChildren: false,
-			parentKey: parentKey ?? '',
+			parentId: parentId ?? '',
 			isTrashed: false,
 			properties: [
 				{
 					alias: '',
 					label: '',
 					description: '',
-					dataTypeKey: '',
+					dataTypeId: '',
 				},
 			],
 			data: [
@@ -90,11 +90,11 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
 	async insert(media: MediaDetails) {
-		if (!media.key) {
-			//const error: ProblemDetails = { title: 'Media key is missing' };
+		if (!media.id) {
+			//const error: ProblemDetails = { title: 'Media id is missing' };
 			return Promise.reject();
 		}
-		//const payload = { key: media.key, requestBody: media };
+		//const payload = { id: media.id, requestBody: media };
 
 		let body: string;
 
@@ -124,12 +124,12 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(key: string, media: MediaDetails) {
-		if (!media.key) {
-			const error: ProblemDetailsModel = { title: 'Media key is missing' };
+	async update(id: string, media: MediaDetails) {
+		if (!media.id) {
+			const error: ProblemDetailsModel = { title: 'Media id is missing' };
 			return { error };
 		}
-		//const payload = { key: media.key, requestBody: media };
+		//const payload = { id: media.id, requestBody: media };
 
 		let body: string;
 
@@ -158,8 +158,8 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async trash(key: string) {
-		if (!key) {
+	async trash(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -168,7 +168,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/trash', {
 				method: 'POST',
-				body: JSON.stringify([key]),
+				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -178,12 +178,12 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 
 	/**
 	 * Deletes a Template on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -193,7 +193,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 		try {
 			await fetch('/umbraco/management/api/v1/media/delete', {
 				method: 'POST',
-				body: JSON.stringify([key]),
+				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},

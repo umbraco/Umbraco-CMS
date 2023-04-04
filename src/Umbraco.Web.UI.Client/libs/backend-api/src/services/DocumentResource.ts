@@ -2,10 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateDocumentRequestModel } from '../models/CreateDocumentRequestModel';
+import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
 import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
 import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
+import type { UpdateDocumentNotificationsRequestModel } from '../models/UpdateDocumentNotificationsRequestModel';
 import type { UpdateDocumentRequestModel } from '../models/UpdateDocumentRequestModel';
 import type { UpdateDomainsRequestModel } from '../models/UpdateDomainsRequestModel';
 
@@ -20,10 +22,10 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static postDocument({
-requestBody,
-}: {
-requestBody?: CreateDocumentRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateDocumentRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document',
@@ -41,16 +43,16 @@ requestBody?: CreateDocumentRequestModel,
      * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<DocumentResponseModel> {
+    public static getDocumentById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<DocumentResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/document/{key}',
+            url: '/umbraco/management/api/v1/document/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -62,16 +64,16 @@ key: string,
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteDocumentByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+    public static deleteDocumentById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/document/{key}',
+            url: '/umbraco/management/api/v1/document/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 400: `Bad Request`,
@@ -84,18 +86,18 @@ key: string,
      * @returns any Success
      * @throws ApiError
      */
-    public static putDocumentByKey({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: UpdateDocumentRequestModel,
-}): CancelablePromise<any> {
+    public static putDocumentById({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDocumentRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/document/{key}',
+            url: '/umbraco/management/api/v1/document/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -110,16 +112,16 @@ requestBody?: UpdateDocumentRequestModel,
      * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentByKeyDomains({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+    public static getDocumentByIdDomains({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/document/{key}/domains',
+            url: '/umbraco/management/api/v1/document/{id}/domains',
             path: {
-                'key': key,
+                'id': id,
             },
         });
     }
@@ -128,21 +130,67 @@ key: string,
      * @returns any Success
      * @throws ApiError
      */
-    public static putDocumentByKeyDomains({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: UpdateDomainsRequestModel,
-}): CancelablePromise<any> {
+    public static putDocumentByIdDomains({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDomainsRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/document/{key}/domains',
+            url: '/umbraco/management/api/v1/document/{id}/domains',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentByIdNotifications({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<Array<DocumentNotificationResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/{id}/notifications',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putDocumentByIdNotifications({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDocumentNotificationsRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/document/{id}/notifications',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                404: `Not Found`,
+            },
         });
     }
 
@@ -151,19 +199,19 @@ requestBody?: UpdateDomainsRequestModel,
      * @throws ApiError
      */
     public static getRecycleBinDocumentChildren({
-parentKey,
-skip,
-take = 100,
-}: {
-parentKey?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedRecycleBinItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/children',
             query: {
-                'parentKey': parentKey,
+                'parentId': parentId,
                 'skip': skip,
                 'take': take,
             },
@@ -178,12 +226,12 @@ take?: number,
      * @throws ApiError
      */
     public static getRecycleBinDocumentRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedRecycleBinItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/root',
@@ -202,26 +250,26 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeDocumentChildren({
-parentKey,
-skip,
-take = 100,
-dataTypeKey,
-culture,
-}: {
-parentKey?: string,
-skip?: number,
-take?: number,
-dataTypeKey?: string,
-culture?: string,
-}): CancelablePromise<PagedDocumentTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+        dataTypeId,
+        culture,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+        dataTypeId?: string,
+        culture?: string,
+    }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/children',
             query: {
-                'parentKey': parentKey,
+                'parentId': parentId,
                 'skip': skip,
                 'take': take,
-                'dataTypeKey': dataTypeKey,
+                'dataTypeId': dataTypeId,
                 'culture': culture,
             },
         });
@@ -232,20 +280,20 @@ culture?: string,
      * @throws ApiError
      */
     public static getTreeDocumentItem({
-key,
-dataTypeKey,
-culture,
-}: {
-key?: Array<string>,
-dataTypeKey?: string,
-culture?: string,
-}): CancelablePromise<Array<DocumentTreeItemResponseModel>> {
+        id,
+        dataTypeId,
+        culture,
+    }: {
+        id?: Array<string>,
+        dataTypeId?: string,
+        culture?: string,
+    }): CancelablePromise<Array<DocumentTreeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/item',
             query: {
-                'key': key,
-                'dataTypeKey': dataTypeKey,
+                'id': id,
+                'dataTypeId': dataTypeId,
                 'culture': culture,
             },
         });
@@ -256,23 +304,23 @@ culture?: string,
      * @throws ApiError
      */
     public static getTreeDocumentRoot({
-skip,
-take = 100,
-dataTypeKey,
-culture,
-}: {
-skip?: number,
-take?: number,
-dataTypeKey?: string,
-culture?: string,
-}): CancelablePromise<PagedDocumentTreeItemResponseModel> {
+        skip,
+        take = 100,
+        dataTypeId,
+        culture,
+    }: {
+        skip?: number,
+        take?: number,
+        dataTypeId?: string,
+        culture?: string,
+    }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/root',
             query: {
                 'skip': skip,
                 'take': take,
-                'dataTypeKey': dataTypeKey,
+                'dataTypeId': dataTypeId,
                 'culture': culture,
             },
         });

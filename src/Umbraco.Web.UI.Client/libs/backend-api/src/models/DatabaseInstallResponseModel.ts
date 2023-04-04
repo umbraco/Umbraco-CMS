@@ -12,3 +12,4 @@ export type DatabaseInstallResponseModel = {
     useIntegratedAuthentication?: boolean;
     connectionString?: string | null;
 };
+

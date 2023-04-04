@@ -28,7 +28,7 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 	];
 
 	@state()
-	_key?: string;
+	_id?: string;
 
 	#umbWorkspaceContext?: UmbMediaWorkspaceContext;
 
@@ -37,23 +37,23 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#umbWorkspaceContext = instance as UmbMediaWorkspaceContext;
-			this.#observeKey();
+			this.#observeId();
 		});
 	}
 
-	#observeKey() {
+	#observeId() {
 		if (!this.#umbWorkspaceContext) return;
-		this.observe(this.#umbWorkspaceContext.data, (data) => (this._key = data?.key));
+		this.observe(this.#umbWorkspaceContext.data, (data) => (this._id = data?.id));
 	}
 
 	render() {
-		if (!this._key) return nothing;
+		if (!this._id) return nothing;
 		return html` <umb-workspace-layout alias="Umb.Workspace.Media">
 			<div id="header" slot="header">TODO: MISSING INPUT COMPONENT</div>
 			<umb-workspace-action-menu
 				slot="action-menu"
 				entity-type="media"
-				unique="${this._key}"></umb-workspace-action-menu>
+				unique="${this._id}"></umb-workspace-action-menu>
 		</umb-workspace-layout>`;
 	}
 }

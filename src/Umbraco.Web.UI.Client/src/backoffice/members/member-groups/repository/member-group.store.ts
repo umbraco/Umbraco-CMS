@@ -11,7 +11,7 @@ import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
  * @description - Data Store for Member Groups
  */
 export class UmbMemberGroupStore extends UmbStoreBase {
-	#data = new ArrayState<MemberGroupDetails>([], (x) => x.key);
+	#data = new ArrayState<MemberGroupDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString());

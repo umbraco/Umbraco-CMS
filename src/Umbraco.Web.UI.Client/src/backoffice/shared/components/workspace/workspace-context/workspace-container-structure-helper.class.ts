@@ -20,7 +20,7 @@ export class UmbWorkspaceContainerStructureHelper {
 	private _ownerContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
-	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.key);
+	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
 	readonly containers = this.#containers.asObservable();
 
 	#hasProperties = new BooleanState(false);
@@ -104,11 +104,11 @@ export class UmbWorkspaceContainerStructureHelper {
 		this._ownerContainers.forEach((container) => {
 			new UmbObserverController(
 				this.#host,
-				this.#workspaceContext!.structure.hasPropertyStructuresOf(container.key!),
+				this.#workspaceContext!.structure.hasPropertyStructuresOf(container.id!),
 				(hasProperties) => {
 					this.#hasProperties.next(hasProperties);
 				},
-				'_observeOwnerHasProperties_' + container.key
+				'_observeOwnerHasProperties_' + container.id
 			);
 		});
 	}
@@ -119,9 +119,9 @@ export class UmbWorkspaceContainerStructureHelper {
 		this._ownerContainers.forEach((container) => {
 			new UmbObserverController(
 				this.#host,
-				this.#workspaceContext!.structure.containersOfParentKey(container.key, this._childType!),
+				this.#workspaceContext!.structure.containersOfParentKey(container.id, this._childType!),
 				this._insertGroupContainers,
-				'_observeGroupsOf_' + container.key
+				'_observeGroupsOf_' + container.id
 			);
 		});
 	}

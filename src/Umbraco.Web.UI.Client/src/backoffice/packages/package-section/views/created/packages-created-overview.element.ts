@@ -95,7 +95,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			<uui-ref-list>
 				${repeat(
 					this._createdPackages,
-					(item) => item.key,
+					(item) => item.id,
 					(item) => this.#renderPackageItem(item)
 				)}
 			</uui-ref-list>
@@ -113,8 +113,8 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	}
 
 	#packageBuilder(p: PackageDefinitionResponseModel) {
-		if (!p.key) return;
-		window.history.pushState({}, '', `/section/packages/view/created/package-builder/${p.key}`);
+		if (!p.id) return;
+		window.history.pushState({}, '', `/section/packages/view/created/package-builder/${p.id}`);
 	}
 
 	#renderPagination() {
@@ -133,7 +133,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	}
 
 	async #deletePackage(p: PackageDefinitionResponseModel) {
-		if (!p.key) return;
+		if (!p.id) return;
 		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${p.name}?`,
@@ -143,9 +143,9 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 		await modalHandler?.onSubmit();
 
-		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedByKey({ key: p.key }));
+		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedById({ id: p.id }));
 		if (error) return;
-		const index = this._createdPackages.findIndex((x) => x.key === p.key);
+		const index = this._createdPackages.findIndex((x) => x.id === p.id);
 		this._createdPackages.splice(index, 1);
 		this.requestUpdate();
 	}

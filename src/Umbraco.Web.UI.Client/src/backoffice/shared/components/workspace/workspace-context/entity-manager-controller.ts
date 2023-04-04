@@ -10,7 +10,7 @@ import { ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/obse
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
 
-// Extend entityType base type?, so we are sure to have parentKey?
+// Extend entityType base type?, so we are sure to have parentId?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
 export class UmbEntityWorkspaceManager<
 	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
@@ -88,10 +88,10 @@ export class UmbEntityWorkspaceManager<
 		this._observeStore();
 	};
 
-	create = (parentKey: string | null) => {
+	create = (parentId: string | null) => {
 		this.#isNew = true;
 		this._entityKey = uuidv4();
-		this._createAtParentKey = parentKey;
+		this._createAtParentKey = parentId;
 	};
 
 	save = (): Promise<void> => {

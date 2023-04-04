@@ -3,9 +3,10 @@
 /* eslint-disable */
 
 export type PropertyTypeContainerResponseModelBaseModel = {
-    key?: string;
-    parentKey?: string | null;
+    id?: string;
+    parentId?: string | null;
     name?: string | null;
     type?: string;
     sortOrder?: number;
 };
+

@@ -9,7 +9,7 @@ import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
  * @description - General Tree Data Store
  */
 export class UmbEntityTreeStore extends UmbStoreBase implements UmbTreeStore<EntityTreeItemResponseModel> {
-	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
+	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.id);
 
 	/**
 	 * Appends items to the store
@@ -22,46 +22,46 @@ export class UmbEntityTreeStore extends UmbStoreBase implements UmbTreeStore<Ent
 
 	/**
 	 * Updates an item in the store
-	 * @param {string} key
+	 * @param {string} id
 	 * @param {Partial<EntityTreeItemResponseModel>} data
 	 * @memberof UmbEntityTreeStore
 	 */
-	updateItem(key: string, data: Partial<EntityTreeItemResponseModel>) {
-		this.#data.next(partialUpdateFrozenArray(this.#data.getValue(), data, (entry) => entry.key === key));
+	updateItem(id: string, data: Partial<EntityTreeItemResponseModel>) {
+		this.#data.next(partialUpdateFrozenArray(this.#data.getValue(), data, (entry) => entry.id === id));
 	}
 
 	/**
 	 * Removes an item from the store
-	 * @param {string} key
+	 * @param {string} id
 	 * @memberof UmbEntityTreeStore
 	 */
-	removeItem(key: string) {
-		this.#data.removeOne(key);
+	removeItem(id: string) {
+		this.#data.removeOne(id);
 	}
 
 	/**
 	 * An observable to observe the root items
 	 * @memberof UmbEntityTreeStore
 	 */
-	rootItems = this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === null));
+	rootItems = this.#data.getObservablePart((items) => items.filter((item) => item.parentId === null));
 
 	/**
 	 * Returns an observable to observe the children of a given parent
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbEntityTreeStore
 	 */
-	childrenOf(parentKey: string | null) {
-		return this.#data.getObservablePart((items) => items.filter((item) => item.parentKey === parentKey));
+	childrenOf(parentId: string | null) {
+		return this.#data.getObservablePart((items) => items.filter((item) => item.parentId === parentId));
 	}
 
 	/**
-	 * Returns an observable to observe the items with the given keys
-	 * @param {Array<string>} keys
+	 * Returns an observable to observe the items with the given ids
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof UmbEntityTreeStore
 	 */
-	items(keys: Array<string>) {
-		return this.#data.getObservablePart((items) => items.filter((item) => keys.includes(item.key ?? '')));
+	items(ids: Array<string>) {
+		return this.#data.getObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
 	}
 }

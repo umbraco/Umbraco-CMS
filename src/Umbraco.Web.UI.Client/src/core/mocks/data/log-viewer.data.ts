@@ -1,9 +1,13 @@
 import { logs } from './logs.data';
 import { UmbData } from './data';
-import { LogMessageResponseModel, LogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	LogMessageResponseModel,
+	LogTemplateResponseModel,
+	SavedLogSearchResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
-class UmbLogviewerSearchesData extends UmbData<SavedLogSearchResponseModel> {
+class UmbLogViewerSearchesData extends UmbData<SavedLogSearchResponseModel> {
 	constructor(data: SavedLogSearchResponseModel[]) {
 		super(data);
 	}
@@ -405,8 +409,8 @@ export const logLevels = {
 	],
 };
 
-export const umbLogviewerData = {
-	searches: new UmbLogviewerSearchesData(savedSearches),
+export const umbLogViewerData = {
+	searches: new UmbLogViewerSearchesData(savedSearches),
 	templates: new UmbLogviewerTemplatesData(messageTemplates),
 	logs: new UmbLogviewerMessagesData(logs),
 	logLevels: logLevels,

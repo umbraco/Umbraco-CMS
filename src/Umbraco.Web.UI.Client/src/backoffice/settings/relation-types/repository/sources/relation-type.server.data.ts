@@ -30,32 +30,32 @@ export class UmbRelationTypeServerDataSource
 	}
 
 	/**
-	 * Fetches a Relation Type with the given key from the server
-	 * @param {string} key
+	 * Fetches a Relation Type with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async get(key: string) {
-		if (!key) {
+	async get(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
-			RelationTypeResource.getRelationTypeByKey({
-				key,
+			RelationTypeResource.getRelationTypeById({
+				id,
 			})
 		);
 	}
 
 	/**
 	 * Creates a new Relation Type scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: RelationTypeResponseModel = {};
 
 		return { data };
@@ -68,7 +68,7 @@ export class UmbRelationTypeServerDataSource
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	async insert(relationType: CreateRelationTypeRequestModel) {
-		if (!relationType.key) throw new Error('RelationType key is missing');
+		if (!relationType.id) throw new Error('RelationType id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
@@ -84,13 +84,13 @@ export class UmbRelationTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async update(key: string, relationType: UpdateRelationTypeRequestModel) {
-		if (!key) throw new Error('RelationType key is missing');
+	async update(id: string, relationType: UpdateRelationTypeRequestModel) {
+		if (!id) throw new Error('RelationType id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
-			RelationTypeResource.putRelationTypeByKey({
-				key,
+			RelationTypeResource.putRelationTypeById({
+				id,
 				requestBody: relationType,
 			})
 		);
@@ -98,20 +98,20 @@ export class UmbRelationTypeServerDataSource
 
 	/**
 	 * Deletes a Relation Type on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'RelationType key is missing' };
+	async delete(id: string) {
+		if (!id) {
+			const error: ProblemDetailsModel = { title: 'RelationType id is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
-			RelationTypeResource.deleteRelationTypeByKey({
-				key,
+			RelationTypeResource.deleteRelationTypeById({
+				id,
 			})
 		);
 	}

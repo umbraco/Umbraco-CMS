@@ -31,41 +31,41 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof TemplateTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			TemplateResource.getTreeTemplateChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} id
 	 * @return {*}
 	 * @memberof TemplateTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+	async getItems(ids: Array<string>) {
+		if (!ids) {
+			const error: ProblemDetailsModel = { title: 'Ids are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			TemplateResource.getTreeTemplateItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

@@ -11,7 +11,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  * @description - Data Store for Template Details
  */
 export class UmbDocumentStore extends UmbStoreBase {
-	#data = new ArrayState<DocumentResponseModel>([], (x) => x.key);
+	#data = new ArrayState<DocumentResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbDocumentDetailStore.
@@ -36,8 +36,8 @@ export class UmbDocumentStore extends UmbStoreBase {
 	 * @param {DocumentModel} document
 	 * @memberof UmbDocumentStore
 	 */
-	byKey(key: DocumentResponseModel['key']) {
-		return this.#data.getObservablePart((x) => x.find((y) => y.key === key));
+	byKey(id: DocumentResponseModel['id']) {
+		return this.#data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**
@@ -45,7 +45,7 @@ export class UmbDocumentStore extends UmbStoreBase {
 	 * @param {string[]} uniques
 	 * @memberof UmbDocumentDetailStore
 	 */
-	remove(uniques: Array<DocumentResponseModel['key']>) {
+	remove(uniques: Array<DocumentResponseModel['id']>) {
 		this.#data.remove(uniques);
 	}
 }

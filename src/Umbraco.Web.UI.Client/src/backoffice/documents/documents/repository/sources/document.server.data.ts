@@ -32,37 +32,37 @@ export class UmbDocumentServerDataSource
 	}
 
 	/**
-	 * Fetches a Document with the given key from the server
-	 * @param {string} key
+	 * Fetches a Document with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async get(key: string) {
-		if (!key) {
+	async get(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.getDocumentByKey({
-				key,
+			DocumentResource.getDocumentById({
+				id,
 			})
 		);
 	}
 
 	/**
 	 * Creates a new Document scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(documentTypeKey: string) {
+	async createScaffold(documentTypeId: string) {
 		const data: DocumentResponseModel = {
 			urls: [],
-			templateKey: null,
-			key: uuidv4(),
-			contentTypeKey: documentTypeKey,
+			templateId: null,
+			id: uuidv4(),
+			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
 				{
@@ -87,8 +87,8 @@ export class UmbDocumentServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async insert(document: CreateDocumentRequestModel & { key: string }) {
-		if (!document.key) throw new Error('Key is missing');
+	async insert(document: CreateDocumentRequestModel & { id: string }) {
+		if (!document.id) throw new Error('Id is missing');
 
 		let body: string;
 
@@ -118,12 +118,12 @@ export class UmbDocumentServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async update(key: string, document: DocumentResponseModel) {
-		if (!document.key) {
-			const error: ProblemDetailsModel = { title: 'Document key is missing' };
+	async update(id: string, document: DocumentResponseModel) {
+		if (!document.id) {
+			const error: ProblemDetailsModel = { title: 'Document id is missing' };
 			return { error };
 		}
-		//const payload = { key: document.key, requestBody: document };
+		//const payload = { id: document.id, requestBody: document };
 
 		let body: string;
 
@@ -153,8 +153,8 @@ export class UmbDocumentServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async trash(key: string) {
-		if (!key) {
+	async trash(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -164,7 +164,7 @@ export class UmbDocumentServerDataSource
 			this.#host,
 			fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',
-				body: JSON.stringify([key]),
+				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -174,12 +174,12 @@ export class UmbDocumentServerDataSource
 
 	/**
 	 * Deletes a Document on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -189,7 +189,7 @@ export class UmbDocumentServerDataSource
 		try {
 			await fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',
-				body: JSON.stringify([key]),
+				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},

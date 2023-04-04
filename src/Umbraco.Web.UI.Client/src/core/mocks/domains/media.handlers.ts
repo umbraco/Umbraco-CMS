@@ -4,12 +4,12 @@ import type { MediaDetails } from '../../../backoffice/media/media';
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/management/api/v1/media/details/:key', (req, res, ctx) => {
+	rest.get('/umbraco/management/api/v1/media/details/:id', (req, res, ctx) => {
 		console.warn('Please move to schema');
-		const key = req.params.key as string;
-		if (!key) return;
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const media = umbMediaData.getByKey(key);
+		const media = umbMediaData.getById(id);
 
 		return res(ctx.status(200), ctx.json([media]));
 	}),
@@ -26,13 +26,13 @@ export const handlers = [
 	rest.post('/umbraco/management/api/v1/media/move', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
-		const moved = umbMediaData.move(data.keys, data.destination);
+		const moved = umbMediaData.move(data.ids, data.destination);
 		return res(ctx.status(200), ctx.json(moved));
 	}),
 
 	rest.post<string[]>('/umbraco/management/api/v1/media/trash', async (req, res, ctx) => {
-		const keys = await req.json();
-		const trashed = umbMediaData.trash(keys);
+		const ids = await req.json();
+		const trashed = umbMediaData.trash(ids);
 		return res(ctx.status(200), ctx.json(trashed));
 	}),
 
@@ -42,17 +42,17 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/media/children', (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
-		const response = umbMediaData.getTreeItemChildren(parentKey);
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
+		const response = umbMediaData.getTreeItemChildren(parentId);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/media/item', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
 
-		const items = umbMediaData.getTreeItem(keys);
+		const items = umbMediaData.getTreeItem(ids);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),

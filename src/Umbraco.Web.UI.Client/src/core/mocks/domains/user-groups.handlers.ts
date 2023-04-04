@@ -14,19 +14,19 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/backoffice/user-groups/details/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get('/umbraco/backoffice/user-groups/details/:id', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const userGroup = umbUserGroupsData.getByKey(key);
+		const userGroup = umbUserGroupsData.getById(id);
 
 		return res(ctx.status(200), ctx.json(userGroup));
 	}),
 
 	rest.get('/umbraco/backoffice/user-groups/getByKeys', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (keys.length === 0) return;
-		const userGroups = umbUserGroupsData.getByKeys(keys);
+		const ids = req.url.searchParams.getAll('id');
+		if (ids.length === 0) return;
+		const userGroups = umbUserGroupsData.getByIds(ids);
 
 		return res(ctx.status(200), ctx.json(userGroups));
 	}),

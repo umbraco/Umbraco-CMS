@@ -8,7 +8,8 @@ export type UserGroupBaseModel = {
     sections?: Array<string>;
     languages?: Array<string>;
     hasAccessToAllLanguages?: boolean;
-    documentStartNodeKey?: string | null;
-    mediaStartNodeKey?: string | null;
+    documentStartNodeId?: string | null;
+    mediaStartNodeId?: string | null;
     permissions?: Array<string>;
 };
+

@@ -116,6 +116,7 @@ module.exports = {
 				category: 'Naming',
 				recommended: true,
 			},
+			schema: [],
 		},
 		create: function (context) {
 			return {

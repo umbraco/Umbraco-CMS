@@ -12,7 +12,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  */
 export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	// TODO: use the right type:
-	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.key);
+	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString());
@@ -32,10 +32,10 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 				this.#data.append(data);
 			});
 
-		return this.#data.getObservablePart((documents) => documents.find((document) => document.key === key));
+		return this.#data.getObservablePart((documents) => documents.find((document) => document.id === key));
 	}
 
-	getScaffold(entityType: string, parentKey: string | null) {
+	getScaffold(entityType: string, parentId: string | null) {
 		return {} as DocumentBlueprintDetails;
 	}
 
@@ -79,17 +79,17 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	 * @memberof UmbDocumentBlueprintStore
 	 * @return {*}  {Promise<void>}
 	 */
-	async delete(keys: string[]) {
+	async delete(ids: string[]) {
 		// TODO: use backend cli when available.
 		await fetch('/umbraco/backoffice/document-blueprint/delete', {
 			method: 'POST',
-			body: JSON.stringify(keys),
+			body: JSON.stringify(ids),
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
 
-		this.#data.remove(keys);
+		this.#data.remove(ids);
 	}
 }
 

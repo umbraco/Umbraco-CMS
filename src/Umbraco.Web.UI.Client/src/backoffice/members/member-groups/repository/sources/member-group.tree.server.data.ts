@@ -32,11 +32,11 @@ export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MemberGroupTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
+	async getChildrenOf(parentId: string | null) {
 		// Not implemented for this tree
 		return {};
 	}
@@ -47,8 +47,8 @@ export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
 	 * @return {*}
 	 * @memberof MemberGroupTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys || keys.length === 0) {
+	async getItems(ids: Array<string>) {
+		if (!ids || ids.length === 0) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
@@ -56,7 +56,7 @@ export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
 		return tryExecuteAndNotify(
 			this.#host,
 			MemberGroupResource.getTreeMemberGroupItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

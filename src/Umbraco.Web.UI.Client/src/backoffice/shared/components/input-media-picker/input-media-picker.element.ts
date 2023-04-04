@@ -73,20 +73,20 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	// TODO: do we need both selectedKeys and value? If we just use value we follow the same pattern as native form controls.
-	private _selectedKeys: Array<string> = [];
+	private _selectedIds: Array<string> = [];
 	public get selectedKeys(): Array<string> {
-		return this._selectedKeys;
+		return this._selectedIds;
 	}
-	public set selectedKeys(keys: Array<string>) {
-		this._selectedKeys = keys;
-		super.value = keys.join(',');
+	public set selectedKeys(ids: Array<string>) {
+		this._selectedIds = ids;
+		super.value = ids.join(',');
 		this._observePickedMedias();
 	}
 
 	@property()
-	public set value(keysString: string) {
-		if (keysString !== this._value) {
-			this.selectedKeys = keysString.split(/[ ,]+/);
+	public set value(idsString: string) {
+		if (idsString !== this._value) {
+			this.selectedKeys = idsString.split(/[ ,]+/);
 		}
 	}
 
@@ -103,12 +103,12 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._selectedKeys.length < this.min
+			() => !!this.min && this._selectedIds.length < this.min
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this._selectedKeys.length > this.max
+			() => !!this.max && this._selectedIds.length > this.max
 		);
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
@@ -129,7 +129,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		this._pickedItemsObserver?.destroy();
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		const { asObservable } = await this._repository.requestTreeItems(this._selectedKeys);
+		const { asObservable } = await this._repository.requestTreeItems(this._selectedIds);
 
 		if (!asObservable) return;
 
@@ -142,7 +142,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
 		const modalHandler = this._modalContext?.open(UMB_MEDIA_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
-			selection: [...this._selectedKeys],
+			selection: [...this._selectedIds],
 		});
 
 		modalHandler?.onSubmit().then(({ selection }: any) => {
@@ -159,7 +159,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		});
 
 		modalHandler?.onSubmit().then(() => {
-			const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+			const newSelection = this._selectedIds.filter((value) => value !== item.id);
 			this._setSelection(newSelection);
 		});
 	}
@@ -187,7 +187,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
-				detail=${ifDefined(item.key)}
+				detail=${ifDefined(item.id)}
 				file-ext="jpg">
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">

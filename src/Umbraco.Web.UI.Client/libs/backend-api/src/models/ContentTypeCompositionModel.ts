@@ -5,6 +5,7 @@
 import type { ContentTypeCompositionTypeModel } from './ContentTypeCompositionTypeModel';
 
 export type ContentTypeCompositionModel = {
-    key?: string;
+    id?: string;
     compositionType?: ContentTypeCompositionTypeModel;
 };
+

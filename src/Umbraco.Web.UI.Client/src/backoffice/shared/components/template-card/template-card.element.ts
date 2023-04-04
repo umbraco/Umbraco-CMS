@@ -15,6 +15,51 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-template-card')
 export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
+	@property({ type: String })
+	name = '';
+
+	@property({ type: Boolean, reflect: true })
+	default = false;
+
+	_id = '';
+	@property({ type: String })
+	public set id(newId: string) {
+		this._id = newId;
+		super.value = newId;
+	}
+	public get id() {
+		return this._id;
+	}
+
+	protected getFormElement() {
+		return undefined;
+	}
+
+	#setSelection(e: KeyboardEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		//this.selected = true;
+		this.dispatchEvent(new CustomEvent('change-default', { bubbles: true, composed: true }));
+	}
+	#openTemplate(e: KeyboardEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+		this.dispatchEvent(new CustomEvent('open', { bubbles: true, composed: true }));
+	}
+
+	render() {
+		return html`<div id="card">
+			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
+				<uui-icon class="logo" name="umb:layout"></uui-icon>
+				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
+			</button>
+			<uui-button id="bottom" label="Default template" ?disabled="${this.default}" @click="${this.#setSelection}">
+				${this.default ? '(Default template)' : 'Set default'}
+			</uui-button>
+			<slot name="actions"></slot>
+		</div>`;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -114,51 +159,6 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 			}
 		`,
 	];
-
-	@property({ type: String })
-	name = '';
-
-	@property({ type: Boolean, reflect: true })
-	default = false;
-
-	_key = '';
-	@property({ type: String })
-	public set key(newKey: string) {
-		this._key = newKey;
-		super.value = newKey;
-	}
-	public get key() {
-		return this._key;
-	}
-
-	protected getFormElement() {
-		return undefined;
-	}
-
-	#setSelection(e: KeyboardEvent) {
-		e.preventDefault();
-		e.stopPropagation();
-		//this.selected = true;
-		this.dispatchEvent(new CustomEvent('change-default', { bubbles: true, composed: true }));
-	}
-	#openTemplate(e: KeyboardEvent) {
-		e.preventDefault();
-		e.stopPropagation();
-		this.dispatchEvent(new CustomEvent('open', { bubbles: true, composed: true }));
-	}
-
-	render() {
-		return html`<div id="card">
-			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
-				<uui-icon class="logo" name="umb:layout"></uui-icon>
-				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
-			</button>
-			<uui-button id="bottom" label="Default template" ?disabled="${this.default}" @click="${this.#setSelection}">
-				${this.default ? '(Default template)' : 'Set default'}
-			</uui-button>
-			<slot name="actions"></slot>
-		</div>`;
-	}
 }
 
 export default UmbTemplateCardElement;

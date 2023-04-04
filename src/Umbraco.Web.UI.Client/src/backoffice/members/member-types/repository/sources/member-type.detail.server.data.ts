@@ -33,7 +33,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	requestByKey(key: string) {
+	requestById(key: string) {
 		//return tryExecuteAndNotify(this.#host, MemberTypeResource.getMemberTypeByKey({ key }));
 		// TODO => use backend cli when available.
 		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${key}`)) as any;
@@ -46,18 +46,18 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async save(memberType: MemberTypeDetails) {
-		if (!memberType.key) {
+		if (!memberType.id) {
 			const error: ProblemDetailsModel = { title: 'MemberType key is missing' };
 			return { error };
 		}
 
-		const payload = { key: memberType.key, requestBody: memberType };
+		const payload = { key: memberType.id, requestBody: memberType };
 		//return tryExecuteAndNotify(this.#host, MemberTypeResource.putMemberTypeByKey(payload));
 
 		// TODO => use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/member-type/${memberType.key}`, {
+			fetch(`/umbraco/management/api/v1/member-type/${memberType.id}`, {
 				method: 'PUT',
 				body: JSON.stringify(payload),
 				headers: {

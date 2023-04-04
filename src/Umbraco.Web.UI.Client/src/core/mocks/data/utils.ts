@@ -16,9 +16,9 @@ export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => 
 		type: item.type,
 		icon: item.icon,
 		hasChildren: item.hasChildren,
-		key: item.key,
+		id: item.id,
 		isContainer: item.isContainer,
-		parentKey: item.parentKey,
+		parentId: item.parentId,
 	};
 };
 

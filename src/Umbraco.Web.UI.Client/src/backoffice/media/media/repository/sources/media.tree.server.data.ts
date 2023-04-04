@@ -13,13 +13,13 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
-	async trashItems(keys: Array<string>) {
+	async trashItems(ids: Array<string>) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/trash', {
 				method: 'POST',
-				body: JSON.stringify(keys),
+				body: JSON.stringify(ids),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -27,13 +27,13 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 		);
 	}
 
-	async moveItems(keys: Array<string>, destination: string) {
+	async moveItems(ids: Array<string>, destination: string) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/move', {
 				method: 'POST',
-				body: JSON.stringify({ keys, destination }),
+				body: JSON.stringify({ ids, destination }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -61,12 +61,12 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MediaTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) {
 			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
 			return { error };
 		}
@@ -74,19 +74,19 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 		return tryExecuteAndNotify(
 			this.#host,
 			MediaResource.getTreeMediaChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof MediaTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys) {
+	async getItems(ids: Array<string>) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
@@ -94,7 +94,7 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 		return tryExecuteAndNotify(
 			this.#host,
 			MediaResource.getTreeMediaItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

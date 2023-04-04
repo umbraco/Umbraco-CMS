@@ -2,6 +2,12 @@
 	"ignorePatterns": ["vite.*.ts"],
 	"root": true,
 	"plugins": ["eslint-plugin-local-rules"],
+	"parserOptions": {
+		"ecmaVersion": "latest"
+	},
+	"env": {
+		"es6": true
+	},
 	"overrides": [
 		{
 			"files": ["**/*.ts"],

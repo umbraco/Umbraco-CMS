@@ -5,6 +5,7 @@
 import type { DictionaryItemModelBaseModel } from './DictionaryItemModelBaseModel';
 
 export type DictionaryItemResponseModel = (DictionaryItemModelBaseModel & {
-$type: string;
-key?: string;
+    $type: string;
+    id?: string;
 });
+

@@ -119,7 +119,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		});
 	}
 
-	#removeTemplate(key: string) {
+	#removeTemplate(id: string) {
 		/*
 		TODO: We need to follow up on this experience.
 		Could we test if this document type is in use, if so we should have a dialog notifying the user(Dialog, are you sure...) about that we might will break something?
@@ -129,14 +129,14 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		this.allowedKeys = this.allowedKeys.filter((x) => x !== key);
+		this.allowedKeys = this.allowedKeys.filter((x) => x !== id);
 	}
 
 	#openTemplate(e: CustomEvent) {
-		const key = (e.target as UmbTemplateCardElement).value;
+		const id = (e.target as UmbTemplateCardElement).value;
 
 		this._modalContext?.open(UMB_TEMPLATE_MODAL, {
-			key: key as string,
+			id: id as string,
 			language: 'razor',
 		});
 	}
@@ -148,14 +148,14 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 					<umb-template-card
 						class="template-card"
 						.name="${template.name ?? ''}"
-						.key="${template.key ?? ''}"
+						.id="${template.id ?? ''}"
 						@change-default="${this.#changeDefault}"
 						@open="${this.#openTemplate}"
-						?default="${template.key === this.defaultKey}">
+						?default="${template.id === this.defaultKey}">
 						<uui-button
 							slot="actions"
 							label="Remove document ${template.name}"
-							@click="${() => this.#removeTemplate(template.key ?? '')}"
+							@click="${() => this.#removeTemplate(template.id ?? '')}"
 							compact>
 							<uui-icon name="umb:trash"> </uui-icon>
 						</uui-button>

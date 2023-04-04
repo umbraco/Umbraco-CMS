@@ -20,7 +20,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
+	getEntityId() {
 		return this.getData()?.path || '';
 	}
 

@@ -45,7 +45,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	// TODO: Convert to uniques:
-	getEntityKey() {
+	getEntityId() {
 		return this.#data.getValue()?.isoCode;
 	}
 

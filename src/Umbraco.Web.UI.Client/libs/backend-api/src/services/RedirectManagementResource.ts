@@ -16,14 +16,14 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static getRedirectManagement({
-filter,
-skip,
-take,
-}: {
-filter?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedRedirectUrlResponseModel> {
+        filter,
+        skip,
+        take,
+    }: {
+        filter?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedRedirectUrlResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management',
@@ -42,20 +42,20 @@ take?: number,
      * @returns PagedRedirectUrlResponseModel Success
      * @throws ApiError
      */
-    public static getRedirectManagementByKey({
-key,
-skip,
-take,
-}: {
-key: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedRedirectUrlResponseModel> {
+    public static getRedirectManagementById({
+        id,
+        skip,
+        take,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedRedirectUrlResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/redirect-management/{key}',
+            url: '/umbraco/management/api/v1/redirect-management/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             query: {
                 'skip': skip,
@@ -68,16 +68,16 @@ take?: number,
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteRedirectManagementByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+    public static deleteRedirectManagementById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/redirect-management/{key}',
+            url: '/umbraco/management/api/v1/redirect-management/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
         });
     }
@@ -98,10 +98,10 @@ key: string,
      * @throws ApiError
      */
     public static postRedirectManagementStatus({
-status,
-}: {
-status?: RedirectStatusModel,
-}): CancelablePromise<any> {
+        status,
+    }: {
+        status?: RedirectStatusModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/redirect-management/status',

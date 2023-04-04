@@ -13,13 +13,13 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
-	async trashItems(keys: Array<string>) {
+	async trashItems(ids: Array<string>) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',
-				body: JSON.stringify(keys),
+				body: JSON.stringify(ids),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -27,13 +27,13 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 		);
 	}
 
-	async moveItems(keys: Array<string>, destination: string) {
+	async moveItems(ids: Array<string>, destination: string) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document/move', {
 				method: 'POST',
-				body: JSON.stringify({ keys, destination }),
+				body: JSON.stringify({ ids, destination }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -61,20 +61,20 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DocumentResource.getTreeDocumentChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
@@ -85,16 +85,16 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+	async getItems(ids: Array<string>) {
+		if (!ids) {
+			const error: ProblemDetailsModel = { title: 'Ids are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DocumentResource.getTreeDocumentItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}
