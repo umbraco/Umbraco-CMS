@@ -19,7 +19,7 @@ public class DictionaryMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -Translations
     private void Map(IDictionaryItem source, DictionaryItemResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.Name = source.ItemKey;
     }
 

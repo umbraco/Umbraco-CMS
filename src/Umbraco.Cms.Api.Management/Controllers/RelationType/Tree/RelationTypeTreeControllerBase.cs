@@ -28,7 +28,7 @@ public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTre
         {
             Icon = Constants.Icons.RelationType,
             Name = relationType.Name!,
-            Key = relationType.Key,
+            Id = relationType.Key,
             Type = Constants.UdiEntityType.RelationType,
             HasChildren = false,
             IsContainer = false,

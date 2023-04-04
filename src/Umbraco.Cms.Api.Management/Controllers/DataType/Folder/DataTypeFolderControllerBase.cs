@@ -44,6 +44,14 @@ public abstract class DataTypeFolderControllerBase : FolderManagementControllerB
         {
             DataTypeContainerOperationStatus.NotFound => NotFound("The data type folder could not be found"),
             DataTypeContainerOperationStatus.ParentNotFound => NotFound("The data type parent folder could not be found"),
+            DataTypeContainerOperationStatus.DuplicateName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("The name is already used")
+                .WithDetail("The data type folder name must be unique on this parent.")
+                .Build()),
+            DataTypeContainerOperationStatus.DuplicateKey => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("The id is already used")
+                .WithDetail("The data type folder id must be unique.")
+                .Build()),
             DataTypeContainerOperationStatus.NotEmpty => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("The folder is not empty")
                 .WithDetail("The data type folder must be empty to perform this action.")

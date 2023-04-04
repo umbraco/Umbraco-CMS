@@ -2,5 +2,5 @@
 
 public class DictionaryItemResponseModel : DictionaryItemModelBase, INamedEntityPresentationModel
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 }

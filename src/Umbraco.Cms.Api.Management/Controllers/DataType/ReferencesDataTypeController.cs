@@ -19,13 +19,13 @@ public class ReferencesDataTypeController : DataTypeControllerBase
         _dataTypeReferencePresentationFactory = dataTypeReferencePresentationFactory;
     }
 
-    [HttpGet("{key:guid}/references")]
+    [HttpGet("{id:guid}/references")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeReferenceResponseModel[]), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> References(Guid key)
+    public async Task<IActionResult> References(Guid id)
     {
-        Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus> result = await _dataTypeService.GetReferencesAsync(key);
+        Attempt<IReadOnlyDictionary<Udi, IEnumerable<string>>, DataTypeOperationStatus> result = await _dataTypeService.GetReferencesAsync(id);
         if (result.Success == false)
         {
             return DataTypeOperationStatusResult(result.Status);

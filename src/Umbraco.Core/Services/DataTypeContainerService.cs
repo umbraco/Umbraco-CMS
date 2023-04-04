@@ -59,6 +59,11 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
                     return DataTypeContainerOperationStatus.InvalidId;
                 }
 
+                if (_dataTypeContainerRepository.Get(container.Key) is not null)
+                {
+                    return DataTypeContainerOperationStatus.DuplicateKey;
+                }
+
                 EntityContainer? parentContainer = parentKey.HasValue
                     ? _dataTypeContainerRepository.Get(parentKey.Value)
                     : null;
@@ -66,6 +71,13 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
                 if (parentKey.HasValue && parentContainer == null)
                 {
                     return DataTypeContainerOperationStatus.ParentNotFound;
+                }
+
+
+
+                if (_dataTypeContainerRepository.HasDuplicateName(container.ParentId, container.Name!))
+                {
+                    return DataTypeContainerOperationStatus.DuplicateName;
                 }
 
                 container.ParentId = parentContainer?.Id ?? Constants.System.Root;

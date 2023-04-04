@@ -7,6 +7,9 @@ public enum DataTypeOperationStatus
     InvalidConfiguration,
     InvalidName,
     InvalidId,
+    DuplicateKey,
     NotFound,
-    ParentNotFound
+    ParentNotFound,
+    ParentNotContainer,
+    PropertyEditorNotFound
 }
