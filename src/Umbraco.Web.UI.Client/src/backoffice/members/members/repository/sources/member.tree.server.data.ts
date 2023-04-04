@@ -33,8 +33,8 @@ export class MemberTreeServerDataSource implements MemberTreeDataSource {
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof MemberTreeServerDataSource
 	 */

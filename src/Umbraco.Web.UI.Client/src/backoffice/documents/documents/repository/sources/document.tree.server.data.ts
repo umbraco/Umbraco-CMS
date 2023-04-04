@@ -60,7 +60,7 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
+	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
@@ -80,8 +80,8 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
 	 */

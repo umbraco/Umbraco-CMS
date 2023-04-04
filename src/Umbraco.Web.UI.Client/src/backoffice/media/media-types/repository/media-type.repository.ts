@@ -60,7 +60,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
@@ -111,10 +111,10 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 	async requestDetails(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Id is missing' };
 			return { error };
 		}
 		const { data, error } = await this.#detailSource.get(id);
