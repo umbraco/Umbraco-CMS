@@ -56,21 +56,18 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(path: string | null) {
+		if (!path) throw new Error('Cannot request tree item with missing path');
+
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
-			return { data: undefined, error };
-		}
-
-		const { data, error } = await this.#treeDataSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeDataSource.getChildrenOf({ path });
 
 		if (data) {
-			this.#treeStore?.appendItems(data.items);
+			this.#treeStore!.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
 	}
 
 	async requestTreeItems(keys: Array<string>) {
@@ -91,124 +88,41 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentPath: string | null) {
+		if (!parentPath) throw new Error('Parent Path is missing');
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentPath);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(paths: Array<string>) {
+		if (!paths) throw new Error('Paths are missing');
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(paths);
+	}
+
+	// DETAILS
+	async requestByKey(path: string) {
+		if (!path) throw new Error('Path is missing');
+		await this.#init;
+		const { data, error } = await this.#detailDataSource.get(path);
+		return { data, error };
 	}
 
 	// DETAILS:
 
 	async createScaffold(parentKey: string | null) {
-		// await this.#init;
-
-		// if (!parentKey) {
-		// 	throw new Error('Parent key is missing');
-		// }
-
-		// // TODO: add parent key to create scaffold
-		// return this.#detailDataSource.createScaffold();
 		return Promise.reject(new Error('Not implemented'));
 	}
-
-	async requestByKey(key: string) {
-		// await this.#init;
-
-		// // TODO: should we show a notification if the key is missing?
-		// // Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		// if (!key) {
-		// 	const error: ProblemDetailsModel = { title: 'Key is missing' };
-		// 	return { error };
-		// }
-		// const { data, error } = await this.#detailDataSource.get(key);
-
-		// if (data) {
-		// 	this.#store?.append(data);
-		// }
-
-		// return { data, error };
-		return Promise.reject(new Error('Not implemented'));
-	}
-
-	// Could potentially be general methods:
 
 	async create(patrial: any) {
-		// await this.#init;
-
-		// if (!template || !template.key) {
-		// 	throw new Error('Template is missing');
-		// }
-
-		// const { error } = await this.#detailDataSource.insert(template);
-
-		// if (!error) {
-		// 	const notification = { data: { message: `Template created` } };
-		// 	this.#notificationContext?.peek('positive', notification);
-		// }
-
-		// // TODO: we currently don't use the detail store for anything.
-		// // Consider to look up the data before fetching from the server
-		// this.#store?.append(template);
-		// // TODO: Update tree store with the new item? or ask tree to request the new item?
-
-		// return { error };
-
 		return Promise.reject(new Error('Not implemented'));
 	}
 
 	async save(patrial: any) {
-		// await this.#init;
-
-		// if (!template || !template.key) {
-		// 	throw new Error('Template is missing');
-		// }
-
-		// const { error } = await this.#detailDataSource.update(template);
-
-		// if (!error) {
-		// 	const notification = { data: { message: `Template saved` } };
-		// 	this.#notificationContext?.peek('positive', notification);
-		// }
-
-		// // TODO: we currently don't use the detail store for anything.
-		// // Consider to look up the data before fetching from the server
-		// // Consider notify a workspace if a template is updated in the store while someone is editing it.
-		// this.#store?.append(template);
-		// this.#treeStore?.updateItem(template.key, { name: template.name });
-		// // TODO: would be nice to align the stores on methods/methodNames.
-
-		// return { error };
 		return Promise.reject(new Error('Not implemented'));
 	}
 
-	// General:
-
 	async delete(key: string) {
-		// await this.#init;
-
-		// if (!key) {
-		// 	throw new Error('Template key is missing');
-		// }
-
-		// const { error } = await this.#detailDataSource.delete(key);
-
-		// if (!error) {
-		// 	const notification = { data: { message: `Template deleted` } };
-		// 	this.#notificationContext?.peek('positive', notification);
-		// }
-
-		// // TODO: we currently don't use the detail store for anything.
-		// // Consider to look up the data before fetching from the server.
-		// // Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		// this.#store?.remove([key]);
-		// this.#treeStore?.removeItem(key);
-		// // TODO: would be nice to align the stores on methods/methodNames.
-
-		// return { error };
 		return Promise.reject(new Error('Not implemented'));
 	}
 }

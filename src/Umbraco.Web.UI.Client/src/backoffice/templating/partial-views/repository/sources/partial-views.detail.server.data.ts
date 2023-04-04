@@ -1,17 +1,8 @@
-import { ProblemDetailsModel, TemplateResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewDetails } from '../../config';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
-export interface PartialViewDetailDataSource {
-	//createScaffold(): Promise<DataSourceResponse<TemplateResponseModel>>;
-	get(key: string): Promise<DataSourceResponse<TemplateResponseModel>>;
-	//insert(template: TemplateResponseModel): Promise<DataSourceResponse>;
-	update(template: TemplateResponseModel): Promise<DataSourceResponse>;
-	delete(key: string): Promise<DataSourceResponse>;
-}
-
-export class UmbPartialViewDetailServerDataSource implements PartialViewDetailDataSource {
+export class UmbPartialViewDetailServerDataSource implements UmbDataSource<PartialViewDetails> {
 	#host: UmbControllerHostInterface;
 
 	/**
@@ -23,29 +14,29 @@ export class UmbPartialViewDetailServerDataSource implements PartialViewDetailDa
 		this.#host = host;
 	}
 
-	get(key: string) {
-		// return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateByKey({ key }));
-		return Promise.reject(new Error('Not implemented'));
+	createScaffold(parentKey: string | null): Promise<DataSourceResponse<PartialViewDetails>> {
+		throw new Error('Method not implemented.');
 	}
 
-	async update(partial: any) {
-		// if (!template.key) {
-		// 	const error: ProblemDetailsModel = { title: 'Template key is missing' };
-		// 	return { error };
-		// }
-
-		// const payload = { key: template.key, requestBody: template };
-		// return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateByKey(payload));
-		return Promise.reject(new Error('Not implemented'));
+	/**
+	 * Fetches a Stylesheet with the given path from the server
+	 * @param {string} path
+	 * @return {*}
+	 * @memberof UmbStylesheetServerDataSource
+	 */
+	async get(path: string) {
+		if (!path) throw new Error('Path is missing');
+		console.log('GET PATRIAL WITH PATH', path);
+		return { data: undefined, error: undefined };
 	}
 
-	async delete(key: string) {
-		// if (!key) {
-		// 	const error: ProblemDetailsModel = { title: 'Key is missing' };
-		// 	return { error };
-		// }
-
-		// return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateByKey({ key }));
-		return Promise.reject(new Error('Not implemented'));
+	insert(data: any): Promise<DataSourceResponse<PartialViewDetails>> {
+		throw new Error('Method not implemented.');
+	}
+	update(data: PartialViewDetails): Promise<DataSourceResponse<PartialViewDetails>> {
+		throw new Error('Method not implemented.');
+	}
+	delete(key: string): Promise<DataSourceResponse<PartialViewDetails>> {
+		throw new Error('Method not implemented.');
 	}
 }

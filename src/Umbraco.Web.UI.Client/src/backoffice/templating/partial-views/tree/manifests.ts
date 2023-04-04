@@ -1,8 +1,5 @@
-import { PARTIAL_VIEW_ENTITY_TYPE } from '..';
-import { PARTIAL_VIEW_REPOSITORY_ALIAS } from '../repository/manifests';
+import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS, PARTIAL_VIEW_TREE_ALIAS } from '../config';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
-
-export const PARTIAL_VIEW_TREE_ALIAS = 'Umb.Tree.PartialViews';
 
 const tree: ManifestTree = {
 	type: 'tree',

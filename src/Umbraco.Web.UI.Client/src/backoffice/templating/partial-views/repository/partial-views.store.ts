@@ -3,6 +3,7 @@ import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS } from '../config';
 
 /**
  * @export
@@ -41,4 +42,6 @@ export class UmbPartialViewsStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbPartialViewsStore>('UmbPartialViewStore');
+export const UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbPartialViewsStore>(
+	UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS
+);
