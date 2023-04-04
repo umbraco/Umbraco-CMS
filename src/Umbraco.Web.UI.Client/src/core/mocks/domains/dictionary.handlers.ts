@@ -51,7 +51,6 @@ export const handlers = [
 		if (!id) return;
 
 		const dictionary = umbDictionaryData.getById(id);
-		console.log(dictionary);
 		return res(ctx.status(200), ctx.json(dictionary));
 	}),
 
