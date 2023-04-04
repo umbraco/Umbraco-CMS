@@ -56,6 +56,49 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddUmbracoEfCoreContext<T>(this IServiceCollection services, IConfiguration configuration) where T : DbContext
+    {
+        services.AddDbContext<T>(
+            options =>
+            {
+                string? connectionString = configuration.GetUmbracoConnectionString("umbracoDbDSN", out string? providerName);
+                if (!connectionString.IsNullOrWhiteSpace())
+                {
+                    if (providerName == "Microsoft.Data.Sqlite")
+                    {
+                        options.UseSqlite(connectionString);
+                    }
+                    else if (providerName == "Microsoft.Data.SqlClient")
+                    {
+                        options.UseSqlServer(connectionString);
+                    }
+                }
+            },
+            optionsLifetime: ServiceLifetime.Singleton);
+
+        services.AddDbContextFactory<T>(options =>
+        {
+            string? connectionString = configuration.GetUmbracoConnectionString("umbracoDbDSN", out string? providerName);
+            if (!connectionString.IsNullOrWhiteSpace())
+            {
+                if (providerName == "Microsoft.Data.Sqlite")
+                {
+                    options.UseSqlite(connectionString);
+                }
+                else if (providerName == "Microsoft.Data.SqlClient")
+                {
+                    options.UseSqlServer(connectionString);
+                }
+            }
+        });
+
+        services.AddUnique<IAmbientEfCoreScopeStack<T>, AmbientEfCoreScopeStack<T>>();
+        services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
+        services.AddUnique<IEfCoreScopeProvider<T>, EfCoreScopeProvider<T>>();
+
+        return services;
+    }
+
     private static void DefaultOptionsAction(DbContextOptionsBuilder options, IConfiguration configuration)
     {
         string? connectionString = configuration.GetUmbracoConnectionString("umbracoDbDSN", out string? providerName);
