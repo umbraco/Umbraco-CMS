@@ -68,7 +68,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 			<uui-button
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${`section/settings/workspace/logviewer/search/${searchListItem.query}`}>
+				href=${`section/settings/workspace/logviewer/search/?lq=${searchListItem.query}`}>
 				<uui-icon name="umb:search"></uui-icon>${searchListItem.name}
 			</uui-button>
 		</li>`;
@@ -90,7 +90,9 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 									html`<uui-table-row>
 										<uui-table-cell>
 											<a
-												href=${`section/settings/workspace/logviewer/search/@MessageTemplate='${template.messageTemplate}'`}>
+												href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
+													`@MessageTemplate='${template.messageTemplate}'`
+												)}`}>
 												<span>${template.messageTemplate}</span> <span>${template.count}</span>
 											</a>
 										</uui-table-cell>

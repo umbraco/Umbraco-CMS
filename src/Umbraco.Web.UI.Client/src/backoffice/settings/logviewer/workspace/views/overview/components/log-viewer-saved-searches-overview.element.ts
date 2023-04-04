@@ -62,7 +62,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 			<uui-button
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${`section/settings/workspace/logviewer/search/${searchListItem.query}`}>
+				href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(searchListItem.query ?? '')}`}>
 				<uui-icon name="umb:search"></uui-icon>${searchListItem.name}
 			</uui-button>
 		</li>`;
@@ -71,7 +71,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	render() {
 		return html` <uui-box id="saved-searches" headline="Saved searches">
 			<ul>
-				${this.#renderSearchItem({ name: 'All logs', query: '*' })} ${this._savedSearches.map(this.#renderSearchItem)}
+				${this.#renderSearchItem({ name: 'All logs', query: '' })} ${this._savedSearches.map(this.#renderSearchItem)}
 			</ul>
 		</uui-box>`;
 	}
