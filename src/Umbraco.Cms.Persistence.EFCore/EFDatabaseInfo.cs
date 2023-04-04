@@ -38,16 +38,15 @@ public class EFDatabaseInfo : DatabaseInfoBase
             {
                 // Check if umbracoKeyValue table exists
                 bool keyValueTableExists;
-
                 if (db.Database.IsSqlite())
                 {
-                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>(
-                        $"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
+                    keyValueTableExists = await db.Database.ExecuteScalarAsync<int>(
+                        $"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '%umbracoKeyValue%';") > 0;
                 }
                 else
                 {
-                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>(
-                                              $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") >
+                    keyValueTableExists = await db.Database.ExecuteScalarAsync<int>(
+                                              $"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE '%umbracoKeyValue%' AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") >
                                           0;
                 }
 

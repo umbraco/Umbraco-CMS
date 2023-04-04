@@ -45,7 +45,8 @@ public class InitialState : Migration
             bool keyValueTableExists = false;
             if (migrationBuilder.IsSqlServer())
             {
-                keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = umbracoKeyValue AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+                keyValueTableExists = await db.Database.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE '%umbracoKeyValue%' AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())") > 0;
+
                 if (keyValueTableExists is false)
                 {
                     UpSqlServer(migrationBuilder);
@@ -53,7 +54,8 @@ public class InitialState : Migration
             }
             else if (migrationBuilder.IsSqlite())
             {
-                keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='umbracoKeyValue';") > 0;
+                keyValueTableExists = await db.Database.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '%umbracoKeyValue%';") > 0;
+
                 if (keyValueTableExists is false)
                 {
                     UpSqlite(migrationBuilder);
