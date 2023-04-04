@@ -49,13 +49,13 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		if (!this._workspaceContext) return;
 	}
 
-	async #changeDefaultKey(e: CustomEvent) {
-		// save new default key
-		console.log('workspace: default template key', e);
+	async #changeDefaultId(e: CustomEvent) {
+		// save new default id
+		console.log('workspace: default template id', e);
 	}
 
 	#changeAllowedKeys(e: CustomEvent) {
-		// save new allowed keys
+		// save new allowed ids
 		console.log('workspace: allowed templates changed', e);
 	}
 
@@ -67,7 +67,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 					<umb-input-template-picker
 						.defaultKey="${/*this._documentType?.defaultTemplateId ??*/ ''}"
 						.allowedKeys="${/*this._documentType?.allowedTemplateIds ??*/ []}"
-						@change-default="${this.#changeDefaultKey}"
+						@change-default="${this.#changeDefaultId}"
 						@change-allowed="${this.#changeAllowedKeys}"></umb-input-template-picker>
 				</div>
 			</umb-workspace-property-layout>

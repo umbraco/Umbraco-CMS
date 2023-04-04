@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -18,18 +18,18 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	#routerPath? = '';
 
 	@state()
-	_routes = [
+	_routes: IRoute[] = [
 		{
 			path: 'edit/:isoCode',
 			component: () => this.#element,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (_component, info) => {
 				this.#languageWorkspaceContext.load(info.match.params.isoCode);
 			},
 		},
 		{
 			path: 'create',
 			component: () => this.#element,
-			setup: async () => {
+			setup: () => {
 				this.#languageWorkspaceContext.createScaffold();
 			},
 		},

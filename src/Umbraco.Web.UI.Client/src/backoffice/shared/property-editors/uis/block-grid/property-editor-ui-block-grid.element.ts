@@ -1,11 +1,11 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbVariantId } from '../../../../shared/variants/variant-id.class';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../../shared/components/workspace/workspace-variant/workspace-variant.context';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../../shared/components/workspace-property/workspace-property.context';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -56,7 +56,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+					setup: (component, info) => {
 						console.log('block route', info);
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-1';
@@ -69,7 +69,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+					setup: (component, info) => {
 						console.log('block route', info);
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-2';

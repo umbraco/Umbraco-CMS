@@ -33,7 +33,7 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 			this.#host,
 			fetch('/umbraco/management/api/v1/document-type/move', {
 				method: 'POST',
-				body: JSON.stringify({ keys: ids, destination }),
+				body: JSON.stringify({ ids: ids, destination }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -60,14 +60,14 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
+	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { error };
 		}
 
@@ -80,7 +80,7 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
+	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource

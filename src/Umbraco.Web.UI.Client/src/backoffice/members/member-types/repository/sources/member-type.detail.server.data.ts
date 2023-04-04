@@ -28,15 +28,15 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	}
 
 	/**
-	 * @description - Fetches a MemberType with the given key from the server
-	 * @param {string} key
+	 * @description - Fetches a MemberType with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	requestById(key: string) {
-		//return tryExecuteAndNotify(this.#host, MemberTypeResource.getMemberTypeByKey({ key }));
+	requestById(id: string) {
+		//return tryExecuteAndNotify(this.#host, MemberTypeResource.getMemberTypeByKey({ id }));
 		// TODO => use backend cli when available.
-		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${key}`)) as any;
+		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${id}`)) as any;
 	}
 
 	/**
@@ -47,11 +47,11 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 */
 	async save(memberType: MemberTypeDetails) {
 		if (!memberType.id) {
-			const error: ProblemDetailsModel = { title: 'MemberType key is missing' };
+			const error: ProblemDetailsModel = { title: 'MemberType id is missing' };
 			return { error };
 		}
 
-		const payload = { key: memberType.id, requestBody: memberType };
+		const payload = { id: memberType.id, requestBody: memberType };
 		//return tryExecuteAndNotify(this.#host, MemberTypeResource.putMemberTypeByKey(payload));
 
 		// TODO => use backend cli when available.
@@ -94,21 +94,21 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 
 	/**
 	 * @description - Deletes a MemberType on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		//return await tryExecuteAndNotify(this.#host, MemberTypeResource.deleteMemberTypeByKey({ key }));
+		//return await tryExecuteAndNotify(this.#host, MemberTypeResource.deleteMemberTypeByKey({ id }));
 		// TODO => use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/member-type/${key}`, {
+			fetch(`/umbraco/management/api/v1/member-type/${id}`, {
 				method: 'DELETE',
 			})
 		) as any;

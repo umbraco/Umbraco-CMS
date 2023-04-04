@@ -1,12 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
 import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -86,7 +86,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				routes.push({
 					path: new UmbVariantId(variantA).toString() + '_&_' + new UmbVariantId(variantB).toString(),
 					component: this.splitViewElement,
-					setup: (component: HTMLElement | Promise<HTMLElement>, info: IRoutingInfo) => {
+					setup: (_component, info) => {
 						// Set split view/active info..
 						const variantSplit = info.match.fragments.consumed.split('_&_');
 						variantSplit.forEach((part, index) => {
@@ -102,7 +102,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			routes.push({
 				path: new UmbVariantId(variant).toString(),
 				component: this.splitViewElement,
-				setup: (component: HTMLElement | Promise<HTMLElement>, info: IRoutingInfo) => {
+				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
 					this.#workspaceContext?.splitView.removeActiveVariant(1);
 					this._handleVariantFolderPart(0, info.match.fragments.consumed);

@@ -16,7 +16,7 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/media/item', (req, res, ctx) => {
-		const ids = req.url.searchParams.getAll('key');
+		const ids = req.url.searchParams.getAll('id');
 		if (!ids) return;
 
 		const items = umbMediaData.getTreeItem(ids);

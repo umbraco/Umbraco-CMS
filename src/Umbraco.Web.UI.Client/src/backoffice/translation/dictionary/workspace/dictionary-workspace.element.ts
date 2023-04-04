@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context';
 import { UmbDictionaryWorkspaceEditElement } from './dictionary-workspace-edit.element';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dictionary-workspace')
@@ -14,11 +14,11 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 	#element = new UmbDictionaryWorkspaceEditElement();
 
 	@state()
-	_routes: any[] = [
+	_routes: IRoute[] = [
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},

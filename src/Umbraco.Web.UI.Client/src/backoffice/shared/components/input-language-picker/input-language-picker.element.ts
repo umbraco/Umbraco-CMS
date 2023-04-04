@@ -68,16 +68,16 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	public get selectedIsoCodes(): Array<string> {
 		return this._selectedIsoCodes;
 	}
-	public set selectedIsoCodes(keys: Array<string>) {
-		this._selectedIsoCodes = keys;
-		super.value = keys.join(',');
+	public set selectedIsoCodes(isoCodes: Array<string>) {
+		this._selectedIsoCodes = isoCodes;
+		super.value = isoCodes.join(',');
 		this._observePickedItems();
 	}
 
 	@property()
-	public set value(keysString: string) {
-		if (keysString !== this._value) {
-			this.selectedIsoCodes = keysString.split(/[ ,]+/);
+	public set value(isoCodesString: string) {
+		if (isoCodesString !== this._value) {
+			this.selectedIsoCodes = isoCodesString.split(/[ ,]+/);
 		}
 	}
 

@@ -40,8 +40,8 @@ export class UmbWorkspaceMemberGroupContext
 		return;
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestById(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.#data.next(data);
 		}

@@ -65,7 +65,7 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
+	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof RelationTypeTreeServerDataSource

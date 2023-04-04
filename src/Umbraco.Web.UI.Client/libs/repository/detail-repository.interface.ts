@@ -19,7 +19,7 @@ export interface UmbDetailRepository<DetailType> {
 		error?: ProblemDetailsModel;
 	}>;
 
-	delete(key: string): Promise<{
+	delete(id: string): Promise<{
 		error?: ProblemDetailsModel;
 	}>;
 }

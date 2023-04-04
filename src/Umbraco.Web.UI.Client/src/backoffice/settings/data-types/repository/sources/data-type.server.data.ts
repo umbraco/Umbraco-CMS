@@ -32,7 +32,7 @@ export class UmbDataTypeServerDataSource
 	}
 
 	/**
-	 * Fetches a Data Type with the given key from the server
+	 * Fetches a Data Type with the given id from the server
 	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
@@ -71,7 +71,7 @@ export class UmbDataTypeServerDataSource
 	 */
 	async insert(dataType: CreateDataTypeRequestModel & { id: string }) {
 		if (!dataType) throw new Error('Data Type is missing');
-		if (!dataType.id) throw new Error('Data Type key is missing');
+		if (!dataType.id) throw new Error('Data Type id is missing');
 
 		tryExecuteAndNotify(
 			this.#host,

@@ -61,12 +61,12 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	// TODO: do we need both selectedKeys and value? If we just use value we follow the same pattern as native form controls.
+	// TODO: do we need both selectedIds and value? If we just use value we follow the same pattern as native form controls.
 	private _selectedIds: Array<string> = [];
-	public get selectedKeys(): Array<string> {
+	public get selectedIds(): Array<string> {
 		return this._selectedIds;
 	}
-	public set selectedKeys(ids: Array<string>) {
+	public set selectedIds(ids: Array<string>) {
 		this._selectedIds = ids;
 		super.value = ids.join(',');
 		this._observePickedDocuments();
@@ -75,7 +75,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	@property()
 	public set value(idsString: string) {
 		if (idsString !== this._value) {
-			this.selectedKeys = idsString.split(/[ ,]+/);
+			this.selectedIds = idsString.split(/[ ,]+/);
 		}
 	}
 
@@ -125,7 +125,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedIds, as we don't want the modal to manipulate our data:
+		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
 		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIds],
@@ -150,7 +150,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _setSelection(newSelection: Array<string>) {
-		this.selectedKeys = newSelection;
+		this.selectedIds = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 

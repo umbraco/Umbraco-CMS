@@ -22,17 +22,17 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		`,
 	];
 
-	private _ownerTabKey?: string | undefined;
+	private _ownerTabId?: string | undefined;
 
 	@property({ type: String })
-	public get ownerTabKey(): string | undefined {
-		return this._ownerTabKey;
+	public get ownerTabId(): string | undefined {
+		return this._ownerTabId;
 	}
-	public set ownerTabKey(value: string | undefined) {
-		if (value === this._ownerTabKey) return;
-		const oldValue = this._ownerTabKey;
-		this._ownerTabKey = value;
-		this.requestUpdate('ownerTabKey', oldValue);
+	public set ownerTabId(value: string | undefined) {
+		if (value === this._ownerTabId) return;
+		const oldValue = this._ownerTabId;
+		this._ownerTabId = value;
+		this.requestUpdate('ownerTabId', oldValue);
 	}
 
 	private _tabName?: string | undefined;
@@ -78,7 +78,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	#onAddGroup = () => {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
-		this._groupStructureHelper.addGroup(this._ownerTabKey);
+		this._groupStructureHelper.addGroup(this._ownerTabId);
 	};
 
 	render() {

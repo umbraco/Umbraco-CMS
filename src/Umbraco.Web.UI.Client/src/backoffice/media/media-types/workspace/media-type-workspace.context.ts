@@ -38,8 +38,8 @@ export class UmbWorkspaceMediaTypeContext
 		// TODO => Implement setPropertyValue
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestDetails(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestDetails(entityId);
 		if (data) {
 			this.#data.next(data);
 		}

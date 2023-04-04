@@ -13,7 +13,7 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UmbIconStore } from './core/stores/icon/icon.store';
-import type { Guard, IRoute } from '@umbraco-cms/internal/router';
+import type { Guard, IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
@@ -89,7 +89,7 @@ export class UmbAppElement extends UmbLitElement {
 			// we have collected whilst coming up through the DOM
 			// and pass it back down to the callback in
 			// the <umb-debug> component that originally fired the event
-			if(event.callback){
+			if (event.callback) {
 				event.callback(event.instances);
 			}
 
@@ -97,12 +97,11 @@ export class UmbAppElement extends UmbLitElement {
 			// Why? Can't send contexts data directly - browser seems to not serialize it and says its null
 			// But a simple object works fine for browser extension to consume
 			const data = {
-				contexts: contextData(event.instances)
+				contexts: contextData(event.instances),
 			};
 
 			// Emit this new event for the browser extension to listen for
 			this.dispatchEvent(new CustomEvent('umb:debug-contexts:data', { detail: data, bubbles: true }));
-			
 		});
 	}
 

@@ -34,8 +34,8 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestById(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
