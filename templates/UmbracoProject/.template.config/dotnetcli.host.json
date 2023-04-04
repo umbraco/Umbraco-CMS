@@ -2,12 +2,13 @@
   "$schema": "https://json.schemastore.org/dotnetcli.host.json",
   "symbolInfo": {
     "Framework": {
-      "longName": "framework",
+      "longName": "Framework",
+      "shortName": "F",
       "isHidden": true
     },
     "UmbracoVersion": {
       "longName": "version",
-      "shortName": ""
+      "shortName": "v"
     },
     "UseHttpsRedirect": {
       "longName": "use-https-redirect",
