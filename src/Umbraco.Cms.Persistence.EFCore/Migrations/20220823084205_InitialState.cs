@@ -73,7 +73,7 @@ public class InitialState : Migration
                     await db.SaveChangesAsync();
                 }
             }
-        });
+        }).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />

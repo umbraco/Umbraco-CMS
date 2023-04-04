@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 
@@ -25,18 +24,12 @@ internal class EFDatabaseSchemaCreator : IDatabaseSchemaCreator
     {
         await _dbContextFactory.ExecuteWithContextAsync<Task>(async db =>
         {
-            // Transactions do not work on Sqlite, so only start one on sqlserver
-            if (db.Database.IsSqlServer())
-            {
-                using (IDbContextTransaction transaction = await db.Database.BeginTransactionAsync())
-                {
-                    await db.Database.MigrateAsync();
-                    await transaction.CommitAsync();
-                }
-            }
-            else
+            //TODO transaction cannot work with SQLite
+            // using (var transaction = await db.Database.BeginTransactionAsync())
             {
                 await db.Database.MigrateAsync();
+
+                // await transaction.CommitAsync();
             }
         });
 
