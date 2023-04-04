@@ -19,7 +19,7 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+		const { data } = await this.repository.requestById(entityKey);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
@@ -37,8 +37,8 @@ export class UmbMemberTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -64,8 +64,8 @@ export class UmbMemberTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	public destroy(): void {

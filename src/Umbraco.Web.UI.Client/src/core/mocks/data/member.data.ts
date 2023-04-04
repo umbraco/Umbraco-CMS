@@ -13,9 +13,9 @@ export const data: Array<MemberDetails> = [
 		type: 'member',
 		icon: 'umb:user',
 		hasChildren: false,
-		key: 'aaa08ccd-4179-464c-b634-6969149dd9f9',
+		id: 'aaa08ccd-4179-464c-b634-6969149dd9f9',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 	},
 ];
 
@@ -29,21 +29,21 @@ class UmbMemberData extends UmbEntityData<MemberDetails> {
 	}
 
 	getTreeRoot(): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): PagedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

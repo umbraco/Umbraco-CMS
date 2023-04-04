@@ -15,7 +15,7 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<UserDetails> {
-	#users = new ArrayState<UserDetails>([], (x) => x.key);
+	#users = new ArrayState<UserDetails>([], (x) => x.id);
 	public users = this.#users.asObservable();
 
 	#totalUsers = new NumberState(0);
@@ -25,14 +25,14 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	getScaffold(entityType: string, parentKey: string | null) {
+	getScaffold(entityType: string, parentId: string | null) {
 		return {
-			key: '',
+			id: '',
 			name: '',
 			icon: '',
 			type: 'user',
 			hasChildren: false,
-			parentKey: '',
+			parentId: '',
 			email: '',
 			language: '',
 			status: 'enabled',
@@ -59,33 +59,33 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 	}
 
 	/**
-	 * @description - Request a User by key. The User is added to the store and is returned as an Observable.
-	 * @param {string} key
+	 * @description - Request a User by id. The User is added to the store and is returned as an Observable.
+	 * @param {string} id
 	 * @return {*}  {(Observable<DataTypeModel | null>)}
 	 * @memberof UmbDataTypeStore
 	 */
-	getByKey(key: string) {
+	getByKey(id: string) {
 		// TODO: use Fetcher API.
 		// TODO: only fetch if the data type is not in the store?
-		fetch(`/umbraco/backoffice/users/details/${key}`)
+		fetch(`/umbraco/backoffice/users/details/${id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#users.appendOne(data);
 			});
 
 		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
-			users.find((user: UmbUserStoreItemType) => user.key === key)
+			users.find((user: UmbUserStoreItemType) => user.id === id)
 		);
 	}
 
 	/**
-	 * @description - Request Users by keys.
-	 * @param {string} key
+	 * @description - Request Users by ids.
+	 * @param {string} id
 	 * @return {*}  {(Observable<UserDetails | null>)}
 	 * @memberof UmbDataTypeStore
 	 */
-	getByKeys(keys: Array<string>) {
-		const params = keys.map((key) => `key=${key}`).join('&');
+	getByKeys(ids: Array<string>) {
+		const params = ids.map((id) => `id=${id}`).join('&');
 		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
@@ -93,7 +93,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 			});
 
 		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
-			users.filter((user: UmbUserStoreItemType) => keys.includes(user.key))
+			users.filter((user: UmbUserStoreItemType) => ids.includes(user.id))
 		);
 	}
 
@@ -124,7 +124,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.status = 'enabled';
@@ -147,10 +147,10 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
-				if (userKeys.includes(user.key)) {
+				if (userKeys.includes(user.id)) {
 					user.userGroups.push(userGroup);
 				} else {
 					user.userGroups = user.userGroups.filter((group) => group !== userGroup);
@@ -174,7 +174,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
@@ -197,7 +197,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const disabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => disabledKeys.includes(user.key));
+			const storedUsers = this.#users.getValue().filter((user) => disabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.status = 'disabled';
@@ -265,7 +265,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 
 	// public updateUser(user: UserItem) {
 	// 	const users = this._users.getValue();
-	// 	const index = users.findIndex((u) => u.key === user.key);
+	// 	const index = users.findIndex((u) => u.id === user.id);
 	// 	if (index === -1) return;
 	// 	users[index] = { ...users[index], ...user };
 	// 	console.log('updateUser', user, users[index]);
@@ -277,7 +277,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 	// 	const users = this._users.getValue();
 	// 	const user = {
 	// 		id: this._users.getValue().length + 1,
-	// 		key: uuidv4(),
+	// 		id: uuidv4(),
 	// 		name: name,
 	// 		email: email,
 	// 		status: 'invited',
@@ -294,9 +294,9 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 	// 	return user;
 	// }
 
-	// public deleteUser(key: string) {
+	// public deleteUser(id: string) {
 	// 	const users = this._users.getValue();
-	// 	const index = users.findIndex((u) => u.key === key);
+	// 	const index = users.findIndex((u) => u.id === id);
 	// 	if (index === -1) return;
 	// 	users.splice(index, 1);
 	// 	this._users.next(users);

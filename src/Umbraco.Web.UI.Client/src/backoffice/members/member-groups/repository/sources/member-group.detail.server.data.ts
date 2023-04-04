@@ -50,17 +50,17 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
 	async update(key: string, memberGroup: MemberGroupDetails) {
-		if (!memberGroup.key) {
+		if (!memberGroup.id) {
 			const error: ProblemDetailsModel = { title: 'Member Group key is missing' };
 			return { error };
 		}
 
-		const payload = { key: memberGroup.key, requestBody: memberGroup };
+		const payload = { key: memberGroup.id, requestBody: memberGroup };
 		//return tryExecuteAndNotify(this.#host, MemberGroupResource.putMemberGroupByKey(payload));
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/member-group/${memberGroup.key}`, {
+			fetch(`/umbraco/management/api/v1/member-group/${memberGroup.id}`, {
 				method: 'PUT',
 				body: JSON.stringify(payload),
 				headers: {

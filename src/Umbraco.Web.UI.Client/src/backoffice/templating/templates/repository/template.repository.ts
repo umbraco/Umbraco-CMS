@@ -56,34 +56,34 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeDataSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeDataSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeDataSource.getItems(keys);
+		const { data, error } = await this.#treeDataSource.getItems(ids);
 
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -91,39 +91,39 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			throw new Error('Parent key is missing');
+		if (!parentId) {
+			throw new Error('Parent id is missing');
 		}
 
-		// TODO: add parent key to create scaffold
+		// TODO: add parent id to create scaffold
 		return this.#detailDataSource.createScaffold();
 	}
 
-	async requestByKey(key: string) {
+	async requestById(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
-		const { data, error } = await this.#detailDataSource.get(key);
+		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -137,7 +137,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	async create(template: TemplateResponseModel) {
 		await this.#init;
 
-		if (!template || !template.key) {
+		if (!template || !template.id) {
 			throw new Error('Template is missing');
 		}
 
@@ -159,7 +159,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	async save(template: TemplateResponseModel) {
 		await this.#init;
 
-		if (!template || !template.key) {
+		if (!template || !template.id) {
 			throw new Error('Template is missing');
 		}
 
@@ -174,7 +174,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a template is updated in the store while someone is editing it.
 		this.#store?.append(template);
-		this.#treeStore?.updateItem(template.key, { name: template.name });
+		this.#treeStore?.updateItem(template.id, { name: template.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
@@ -182,14 +182,14 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 
 	// General:
 
-	async delete(key: string) {
+	async delete(id: string) {
 		await this.#init;
 
-		if (!key) {
-			throw new Error('Template key is missing');
+		if (!id) {
+			throw new Error('Template id is missing');
 		}
 
-		const { error } = await this.#detailDataSource.delete(key);
+		const { error } = await this.#detailDataSource.delete(id);
 
 		if (!error) {
 			const notification = { data: { message: `Template deleted` } };
@@ -199,8 +199,8 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#store?.remove([key]);
-		this.#treeStore?.removeItem(key);
+		this.#store?.remove([id]);
+		this.#treeStore?.removeItem(id);
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };

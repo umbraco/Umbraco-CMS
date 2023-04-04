@@ -4,11 +4,12 @@
 
 export type RecycleBinItemResponseModel = {
     $type: string;
-    key?: string;
+    id?: string;
     name?: string;
     type?: string;
     icon?: string;
     hasChildren?: boolean;
     isContainer?: boolean;
-    parentKey?: string | null;
+    parentId?: string | null;
 };
+

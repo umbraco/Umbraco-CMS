@@ -28,8 +28,8 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly compositions;
 
 	// Document type specific:
-	readonly allowedTemplateKeys;
-	readonly defaultTemplateKey;
+	readonly allowedTemplateIds;
+	readonly defaultTemplateId;
 	readonly cleanup;
 
 	readonly structure;
@@ -53,9 +53,9 @@ export class UmbDocumentTypeWorkspaceContext
 		this.compositions = this.structure.rootDocumentTypeObservablePart((data) => data?.compositions);
 
 		// Document type specific:
-		this.allowedTemplateKeys = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedTemplateKeys);
-		this.defaultTemplateKey = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateKey);
-		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateKey);
+		this.allowedTemplateIds = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedTemplateIds);
+		this.defaultTemplateId = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
@@ -66,8 +66,8 @@ export class UmbDocumentTypeWorkspaceContext
 		return this.structure.getRootDocumentType() || {};
 	}
 
-	getEntityKey() {
-		return this.getData().key;
+	getEntityId() {
+		return this.getData().id;
 	}
 
 	getEntityType() {
@@ -86,8 +86,8 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateRootDocumentType({ icon });
 	}
 
-	async createScaffold(documentTypeKey: string) {
-		const { data } = await this.structure.createScaffold(documentTypeKey);
+	async createScaffold(parentId: string) {
+		const { data } = await this.structure.createScaffold(parentId);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -95,8 +95,8 @@ export class UmbDocumentTypeWorkspaceContext
 		return data || undefined;
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.structure.loadType(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.structure.loadType(entityId);
 		if (!data) return undefined;
 
 		this.setIsNew(false);

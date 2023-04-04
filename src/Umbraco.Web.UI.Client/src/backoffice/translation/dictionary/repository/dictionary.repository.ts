@@ -6,7 +6,7 @@ import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { ImportDictionaryRequestModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepository<DictionaryDetails> {
@@ -56,34 +56,34 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getItems(keys);
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -91,39 +91,39 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
-		return this.#detailSource.createScaffold(parentKey);
+		return this.#detailSource.createScaffold(parentId);
 	}
 
-	async requestByKey(key: string) {
+	async requestById(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
+		if (!id) {
+			const error: ProblemDetailsModel = { title: 'Id is missing' };
 			return { error };
 		}
-		const { data, error } = await this.#detailSource.get(key);
+		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -136,9 +136,9 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return this.#detailSource.list(skip, take);
 	}
 
-	async delete(key: string) {
+	async delete(id: string) {
 		await this.#init;
-		return this.#detailSource.delete(key);
+		return this.#detailSource.delete(id);
 	}
 
 	async save(dictionary: DictionaryDetails) {
@@ -146,7 +146,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 		// TODO: should we show a notification if the dictionary is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!dictionary || !dictionary.key) {
+		if (!dictionary || !dictionary.id) {
 			const error: ProblemDetailsModel = { title: 'Dictionary is missing' };
 			return { error };
 		}
@@ -162,7 +162,7 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a dictionary is updated in the store while someone is editing it.
 		this.#detailStore?.append(dictionary);
-		this.#treeStore?.updateItem(dictionary.key, { name: dictionary.name });
+		this.#treeStore?.updateItem(dictionary.id, { name: dictionary.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
@@ -186,29 +186,29 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return { data, error };
 	}
 
-	async export(key: string, includeChildren = false) {
+	async export(id: string, includeChildren = false) {
 		await this.#init;
 
-		if (!key) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return this.#detailSource.export(key, includeChildren);
+		return this.#detailSource.export(id, includeChildren);
 	}
 
-	async import(fileName: string, parentKey?: string) {
+	async import(temporaryFileId: string, parentId?: string) {
 		await this.#init;
 
-		if (!fileName) {
+		if (!temporaryFileId) {
 			const error: ProblemDetailsModel = { title: 'File is missing' };
 			return { error };
 		}
 
-		return this.#detailSource.import(fileName, parentKey);
+		return this.#detailSource.import(temporaryFileId, parentId);
 	}
 
-	async upload(formData: FormData) {
+	async upload(formData: ImportDictionaryRequestModel) {
 		await this.#init;
 
 		if (!formData) {

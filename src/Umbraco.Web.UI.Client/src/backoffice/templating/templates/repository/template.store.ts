@@ -11,7 +11,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
  * @description - Data Store for Templates
  */
 export class UmbTemplateStore extends UmbStoreBase {
-	#data = new ArrayState<TemplateResponseModel>([], (x) => x.key);
+	#data = new ArrayState<TemplateResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbTemplateStore.

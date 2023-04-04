@@ -95,17 +95,17 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 	}
 
 	private _selectRowHandler(user: UserEntity) {
-		this._usersContext?.select(user.key);
+		this._usersContext?.select(user.id);
 	}
 
 	private _deselectRowHandler(user: UserEntity) {
-		this._usersContext?.deselect(user.key);
+		this._usersContext?.deselect(user.id);
 	}
 
-	private _getUserGroupNames(keys: Array<string>) {
-		return keys
+	private _getUserGroupNames(ids: Array<string>) {
+		return ids
 			.map((key: string) => {
-				return this._userGroups.find((x) => x.key === key)?.name;
+				return this._userGroups.find((x) => x.id === key)?.name;
 			})
 			.join(', ');
 	}
@@ -120,8 +120,8 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 				.name=${user.name}
 				selectable
 				?select-only=${this._selection.length > 0}
-				?selected=${this._isSelected(user.key)}
-				@open=${() => this._handleOpenCard(user.key)}
+				?selected=${this._isSelected(user.id)}
+				@open=${() => this._handleOpenCard(user.id)}
 				@selected=${() => this._selectRowHandler(user)}
 				@unselected=${() => this._deselectRowHandler(user)}>
 				${user.status && user.status !== 'enabled'
@@ -149,7 +149,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 			<div id="user-grid">
 				${repeat(
 					this._users,
-					(user) => user.key,
+					(user) => user.id,
 					(user) => this.renderUserCard(user)
 				)}
 			</div>

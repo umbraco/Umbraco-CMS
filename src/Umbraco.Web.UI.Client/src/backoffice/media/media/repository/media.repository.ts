@@ -73,34 +73,34 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getItems(keys);
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -108,38 +108,38 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			throw new Error('Parent key is missing');
+		if (!parentId) {
+			throw new Error('Parent id is missing');
 		}
 
-		return this.#detailDataSource.createScaffold(parentKey);
+		return this.#detailDataSource.createScaffold(parentId);
 	}
 
-	async requestByKey(key: string) {
+	async requestById(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
-		const { data, error } = await this.#detailDataSource.get(key);
+		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -153,7 +153,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	async create(template: ItemDetailType) {
 		await this.#init;
 
-		if (!template || !template.key) {
+		if (!template || !template.id) {
 			throw new Error('Template is missing');
 		}
 
@@ -175,11 +175,11 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	async save(document: ItemDetailType) {
 		await this.#init;
 
-		if (!document || !document.key) {
+		if (!document || !document.id) {
 			throw new Error('Template is missing');
 		}
 
-		const { error } = await this.#detailDataSource.update(document.key, document);
+		const { error } = await this.#detailDataSource.update(document.id, document);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
@@ -190,7 +190,7 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a template is updated in the store while someone is editing it.
 		this.#store?.append(document);
-		this.#treeStore?.updateItem(document.key, { name: document.name });
+		this.#treeStore?.updateItem(document.id, { name: document.name });
 
 		// TODO: would be nice to align the stores on methods/methodNames.
 
@@ -198,14 +198,14 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	}
 
 	// General:
-	async delete(key: string) {
+	async delete(id: string) {
 		await this.#init;
 
-		if (!key) {
-			throw new Error('Document key is missing');
+		if (!id) {
+			throw new Error('Document id is missing');
 		}
 
-		const { error } = await this.#detailDataSource.delete(key);
+		const { error } = await this.#detailDataSource.delete(id);
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
@@ -215,23 +215,23 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#store?.remove([key]);
-		this.#treeStore?.removeItem(key);
+		this.#store?.remove([id]);
+		this.#treeStore?.removeItem(id);
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
 
-	async trash(keys: Array<string>) {
-		console.log('media trash: ' + keys);
+	async trash(ids: Array<string>) {
+		console.log('media trash: ' + ids);
 		alert('implement trash');
 	}
 
-	async move(keys: Array<string>, destination: string) {
+	async move(ids: Array<string>, destination: string) {
 		// TODO: use backend cli when available.
 		const res = await fetch('/umbraco/management/api/v1/media/move', {
 			method: 'POST',
-			body: JSON.stringify({ keys, destination }),
+			body: JSON.stringify({ ids, destination }),
 			headers: {
 				'Content-Type': 'application/json',
 			},

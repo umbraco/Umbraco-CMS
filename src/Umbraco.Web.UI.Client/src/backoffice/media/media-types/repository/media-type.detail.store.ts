@@ -11,7 +11,7 @@ import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
  * @description - Details Data Store for Media Types
  */
 export class UmbMediaTypeStore extends UmbStoreBase {
-	#data = new ArrayState<MediaTypeDetails>([], (x) => x.key);
+	#data = new ArrayState<MediaTypeDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN.toString());

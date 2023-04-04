@@ -105,7 +105,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 		if (!this._invitedUser) return;
 
 		this._closeModal();
-		history.pushState(null, '', 'section/users/view/users/user/' + this._invitedUser?.key); //TODO: URL Should be dynamic
+		history.pushState(null, '', 'section/users/view/users/user/' + this._invitedUser?.id); //TODO: URL Should be dynamic
 	}
 
 	private _renderForm() {

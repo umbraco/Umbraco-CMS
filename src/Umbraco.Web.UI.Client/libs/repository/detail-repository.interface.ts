@@ -1,12 +1,12 @@
 import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbDetailRepository<DetailType> {
-	createScaffold(parentKey: string | null): Promise<{
+	createScaffold(parentId: string | null): Promise<{
 		data?: DetailType;
 		error?: ProblemDetailsModel;
 	}>;
 
-	requestByKey(key: string): Promise<{
+	requestById(id: string): Promise<{
 		data?: DetailType;
 		error?: ProblemDetailsModel;
 	}>;

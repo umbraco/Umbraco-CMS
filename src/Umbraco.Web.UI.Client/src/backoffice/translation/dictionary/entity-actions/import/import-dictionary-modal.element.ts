@@ -6,7 +6,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
-import { UploadDictionaryResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DictionaryItemResponseModel, ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-import-dictionary-modal')
@@ -27,7 +27,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	private _form!: HTMLFormElement;
 
 	@state()
-	private _uploadedDictionary?: UploadDictionaryResponseModel;
+	private _uploadedDictionaryTempId?: string;
 
 	@state()
 	private _showUploadView = true;
@@ -44,11 +44,11 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	#detailRepo = new UmbDictionaryRepository(this);
 
 	async #importDictionary() {
-		if (!this._uploadedDictionary?.fileName) return;
+		if (!this._uploadedDictionaryTempId) return;
 
 		this.modalHandler?.submit({
-			fileName: this._uploadedDictionary.fileName,
-			parentKey: this._selection[0],
+			temporaryFileId: this._uploadedDictionaryTempId,
+			parentId: this._selection[0],
 		});
 	}
 
@@ -66,11 +66,21 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		if (!this._form.checkValidity()) return;
 
 		const formData = new FormData(this._form);
-		const { data } = await this.#detailRepo.upload(formData);
 
-		this._uploadedDictionary = data;
+		const uploadData: ImportDictionaryRequestModel = {
+			temporaryFileId: formData.get('file')?.toString() ?? '',
+		};
 
-		if (!this._uploadedDictionary) {
+		// TODO: fix this upload experience. We need to update our form so it gets temporary file id from the server:
+		const { data } = await this.#detailRepo.upload(uploadData);
+
+		if (!data) return;
+
+		this._uploadedDictionaryTempId = data;
+		// TODO: We need to find another way to gather the data of the uploaded dictionary, to represent the dictionaryItems? See further below.
+		//this._uploadedDictionary = data;
+
+		if (!this._uploadedDictionaryTempId) {
 			this._showErrorView = true;
 			this._showImportView = false;
 			return;
@@ -113,6 +123,8 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 	/// TODO => Tree view needs isolation and single-select option
 	#renderImportView() {
+		//TODO: gather this data in some other way, we cannot use the feedback from the server anymore. can we use info about the file directly? or is a change to the end point required?
+		/*
 		if (!this._uploadedDictionary?.dictionaryItems) return;
 
 		return html`
@@ -140,6 +152,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				look="primary"
 				@click=${this.#importDictionary}></uui-button>
 		`;
+		*/
 	}
 
 	// TODO => Determine what to display when dictionary import/upload fails

@@ -11,7 +11,7 @@ import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
  * @description - Data Store for Dictionary
  */
 export class UmbDictionaryStore extends UmbStoreBase {
-	#data = new ArrayState<DictionaryDetails>([], (x) => x.key);
+	#data = new ArrayState<DictionaryDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DICTIONARY_STORE_CONTEXT_TOKEN.toString());

@@ -80,7 +80,7 @@ export class UmbInputPickerUserGroupElement extends UmbInputListBaseElement {
 							<span>${userGroup.name}</span>
 						</div>
 						<uui-button
-							@click=${() => this.removeFromSelection(userGroup.key)}
+							@click=${() => this.removeFromSelection(userGroup.id)}
 							label="remove"
 							color="danger"></uui-button>
 					</div>

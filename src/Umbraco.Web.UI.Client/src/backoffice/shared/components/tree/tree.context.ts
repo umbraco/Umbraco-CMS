@@ -93,9 +93,9 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		return this.repository!.requestRootTreeItems();
 	}
 
-	public async requestChildrenOf(parentKey: string | null) {
+	public async requestChildrenOf(parentId: string | null) {
 		await this.#init;
-		return this.repository!.requestTreeItemsOf(parentKey);
+		return this.repository!.requestTreeItemsOf(parentId);
 	}
 
 	public async rootItems() {
@@ -103,8 +103,8 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		return this.repository!.rootTreeItems();
 	}
 
-	public async childrenOf(parentKey: string | null) {
+	public async childrenOf(parentId: string | null) {
 		await this.#init;
-		return this.repository!.treeItemsOf(parentKey);
+		return this.repository!.treeItemsOf(parentId);
 	}
 }

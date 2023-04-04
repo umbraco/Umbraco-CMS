@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { when } from 'lit/directives/when.js';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -7,7 +7,7 @@ import { repeat } from 'lit/directives/repeat.js';
 
 // TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
 export interface UmbTableItem {
-	key: string;
+	id: string;
 	icon?: string;
 	entityType?: string;
 	data: Array<UmbTableItemData>;
@@ -171,7 +171,7 @@ export class UmbTableElement extends LitElement {
 
 	private _handleRowCheckboxChange(event: Event, item: UmbTableItem) {
 		const checkboxElement = event.target as HTMLInputElement;
-		checkboxElement.checked ? this._selectRow(item.key) : this._deselectRow(item.key);
+		checkboxElement.checked ? this._selectRow(item.id) : this._deselectRow(item.id);
 	}
 
 	private _handleAllRowsCheckboxChange(event: Event) {
@@ -198,7 +198,7 @@ export class UmbTableElement extends LitElement {
 	}
 
 	private _selectAllRows() {
-		this.selection = this.items.map((item: UmbTableItem) => item.key);
+		this.selection = this.items.map((item: UmbTableItem) => item.id);
 		this._selectionMode = true;
 		this.dispatchEvent(new UmbTableSelectedEvent());
 	}
@@ -215,7 +215,7 @@ export class UmbTableElement extends LitElement {
 			<uui-table-head>
 				${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
 			</uui-table-head>
-			${repeat(this.items, (item) => item.key, this._renderRow)}
+			${repeat(this.items, (item) => item.id, this._renderRow)}
 		</uui-table>`;
 	}
 
@@ -259,9 +259,9 @@ export class UmbTableElement extends LitElement {
 		return html`<uui-table-row
 			?selectable="${this.config.allowSelection}"
 			?select-only=${this._selectionMode}
-			?selected=${this._isSelected(item.key)}
-			@selected=${() => this._selectRow(item.key)}
-			@unselected=${() => this._deselectRow(item.key)}>
+			?selected=${this._isSelected(item.id)}
+			@selected=${() => this._selectRow(item.id)}
+			@unselected=${() => this._deselectRow(item.id)}>
 			${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
 		</uui-table-row>`;
 	};
@@ -277,7 +277,7 @@ export class UmbTableElement extends LitElement {
 					label="Select Row"
 					@click=${(e: PointerEvent) => e.stopPropagation()}
 					@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
-					?checked="${this._isSelected(item.key)}">
+					?checked="${this._isSelected(item.id)}">
 				</uui-checkbox>`
 			)}
 		</uui-table-cell>`;

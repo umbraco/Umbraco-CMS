@@ -21,12 +21,12 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath('/language/:key'), (req, res, ctx) => {
-		const key = req.params.key as string;
+	rest.get(umbracoPath('/language/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
 
-		if (!key) return;
+		if (!id) return;
 
-		const item = umbLanguagesData.getByKey(key);
+		const item = umbLanguagesData.getByKey(id);
 		return res(ctx.status(200), ctx.json(item));
 	}),
 
@@ -53,7 +53,7 @@ export const handlers = [
 		}
 	}),
 
-	rest.put<LanguageResponseModel>(umbracoPath('/language/:key'), async (req, res, ctx) => {
+	rest.put<LanguageResponseModel>(umbracoPath('/language/:id'), async (req, res, ctx) => {
 		const data = await req.json();
 
 		if (!data) return;
@@ -63,7 +63,7 @@ export const handlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.delete(umbracoPath('/language/:key'), async (req, res, ctx) => {
+	rest.delete(umbracoPath('/language/:id'), async (req, res, ctx) => {
 		return res(ctx.status(200));
 	}),
 ];

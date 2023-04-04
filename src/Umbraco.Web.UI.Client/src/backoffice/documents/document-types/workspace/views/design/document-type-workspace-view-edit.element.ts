@@ -92,7 +92,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 					component: () => import('./document-type-workspace-view-edit-tab.element'),
 					setup: (component: Promise<HTMLElement>) => {
 						(component as any).tabName = tabName;
-						(component as any).ownerTabKey = tab.key;
+						(component as any).ownerTabKey = tab.id;
 					},
 				});
 			});
@@ -118,9 +118,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 		this._routes = routes;
 	}
 
-	#remove(tabKey: string | undefined) {
-		if (!tabKey) return;
-		this._workspaceContext?.structure.removeContainer(null, tabKey);
+	#remove(tabId: string | undefined) {
+		if (!tabId) return;
+		this._workspaceContext?.structure.removeContainer(null, tabId);
 	}
 	async #addTab() {
 		this._workspaceContext?.structure.createContainer(null, null, 'Tab');
@@ -140,7 +140,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 				: ''}
 			${repeat(
 				this._tabs,
-				(tab) => tab.key,
+				(tab) => tab.id,
 				(tab) => {
 					// TODO: make better url folder name:
 					const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
@@ -152,7 +152,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 										label="Remove tab"
 										class="trash"
 										slot="append"
-										@click=${() => this.#remove(tab.key)}
+										@click=${() => this.#remove(tab.id)}
 										compact>
 										<uui-icon name="umb:trash"></uui-icon>
 									</uui-button>

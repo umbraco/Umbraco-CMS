@@ -49,9 +49,9 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		const result = await this.repository?.create({
 			$type: '',
 			name,
-			parentKey: this.unique,
+			parentId: this.unique,
 			translations: [],
-			key: '',
+			id: '',
 		});
 
 		// TODO => get location header to route to new item

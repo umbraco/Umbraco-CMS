@@ -15,14 +15,14 @@ export class StaticFileResource {
      * @throws ApiError
      */
     public static getTreeStaticFileChildren({
-path,
-skip,
-take = 100,
-}: {
-path?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        path,
+        skip,
+        take = 100,
+    }: {
+        path?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/static-file/children',
@@ -39,10 +39,10 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeStaticFileItem({
-path,
-}: {
-path?: Array<string>,
-}): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/static-file/item',
@@ -57,12 +57,12 @@ path?: Array<string>,
      * @throws ApiError
      */
     public static getTreeStaticFileRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/static-file/root',

@@ -16,7 +16,7 @@ export class UmbMemberWorkspaceContext
 		return 'member';
 	}
 
-	getEntityKey() {
+	getEntityId() {
 		return '1234';
 	}
 

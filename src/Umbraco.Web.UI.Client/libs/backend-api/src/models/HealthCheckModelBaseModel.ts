@@ -3,5 +3,6 @@
 /* eslint-disable */
 
 export type HealthCheckModelBaseModel = {
-    key?: string;
+    id?: string;
 };
+

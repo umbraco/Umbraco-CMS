@@ -13,7 +13,7 @@ export const UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTr
  * @description - Tree Data Store for Media
  */
 export class UmbMediaTreeStore extends UmbEntityTreeStore {
-	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.key);
+	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbMediaTreeStore.

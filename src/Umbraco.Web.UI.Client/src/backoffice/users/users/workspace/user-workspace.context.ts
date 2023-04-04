@@ -31,7 +31,7 @@ export class UmbUserWorkspaceContext
 	}
 	getEntityType = this.#manager.getEntityType;
 	getUnique = this.#manager.getEntityKey;
-	getEntityKey = this.#manager.getEntityKey;
+	getEntityId = this.#manager.getEntityKey;
 	getStore = this.#manager.getStore;
 	getData = this.#manager.getData as any; // TODO: fix type mismatch, this will mos likely be handled when switching to repositories.
 	load = this.#manager.load;

@@ -5,6 +5,7 @@
 import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
 
 export type TemplateResponseModel = (TemplateModelBaseModel & {
-$type: string;
-key?: string;
+    $type: string;
+    id?: string;
 });
+
