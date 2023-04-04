@@ -1,10 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
+import { PropertyValueMap, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context';
+import {
+	UmbLogViewerWorkspaceContext,
+	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
+	LogViewerDateRange,
+} from '../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { queryParentRouterSlot } from '@umbraco-cms/internal/router';
+import { query } from '@umbraco-cms/backoffice/router';
+import type { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -42,10 +47,6 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		`,
 	];
 
-	private get params() {
-		return queryParentRouterSlot(this)!.match!.params;
-	}
-
 	@state()
 	private _canShowLogs = false;
 
@@ -61,13 +62,51 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	onChangeState = () => {
+		if (!this.#logViewerContext) return;
 
-		if (this.params.query) {
-			const searchQuery = decodeURIComponent(this.params.query);
-			this.#logViewerContext?.setFilterExpression(searchQuery);
+		const searchQuery = query();
+
+		if (searchQuery.lq) {
+			const sanitizedQuery = decodeURIComponent(searchQuery.lq);
+			this.#logViewerContext.setFilterExpression(sanitizedQuery);
 		}
+
+		if (searchQuery.loglevels) {
+			const loglevels = [...searchQuery.loglevels];
+
+			// Filter out invalid log levels that do not exist in LogLevelModel
+			const validLogLevels = loglevels.filter((loglevel) => {
+				return ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'].includes(loglevel);
+			});
+
+			this.#logViewerContext.setLogLevelsFilter(validLogLevels as LogLevelModel[]);
+		}
+
+		const dateRange: Partial<LogViewerDateRange> = {};
+
+		if (searchQuery.startDate) {
+			dateRange.startDate = searchQuery.startDate;
+		}
+
+		if (searchQuery.endDate) {
+			dateRange.endDate = searchQuery.endDate;
+		}
+
+		this.#logViewerContext.setDateRange(dateRange);
+
+		console.log('query', searchQuery);
+	};
+
+	firstUpdated(props: PropertyValueMap<unknown>) {
+		super.firstUpdated(props);
+		window.addEventListener('changestate', this.onChangeState);
+		this.onChangeState();
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		window.removeEventListener('changestate', this.onChangeState);
 	}
 
 	#observeCanShowLogs() {
