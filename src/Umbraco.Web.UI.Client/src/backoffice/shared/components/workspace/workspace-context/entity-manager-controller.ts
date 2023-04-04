@@ -27,7 +27,7 @@ export class UmbEntityWorkspaceManager<
 
 	#isNew = false;
 	private _entityType;
-	private _entityKey!: string;
+	private _entityId!: string;
 
 	private _createAtParentKey?: string | null;
 
@@ -47,7 +47,7 @@ export class UmbEntityWorkspaceManager<
 	}
 
 	private _observeStore() {
-		if (!this._store || !this._entityKey) {
+		if (!this._store || !this._entityId) {
 			return;
 		}
 
@@ -58,7 +58,7 @@ export class UmbEntityWorkspaceManager<
 			this._storeSubscription?.destroy();
 			this._storeSubscription = new UmbObserverController(
 				this._host,
-				this._store.getByKey(this._entityKey),
+				this._store.getByKey(this._entityId),
 				(content) => {
 					if (!content) return; // TODO: Handle nicely if there is no content data.
 					this.state.next(content as any);
@@ -71,7 +71,7 @@ export class UmbEntityWorkspaceManager<
 		return this._entityType;
 	};
 	getEntityKey = (): string => {
-		return this._entityKey;
+		return this._entityId;
 	};
 
 	getStore = () => {
@@ -82,15 +82,15 @@ export class UmbEntityWorkspaceManager<
 		return this.state.getValue();
 	};
 
-	load = (entityKey: string) => {
+	load = (entityId: string) => {
 		this.#isNew = false;
-		this._entityKey = entityKey;
+		this._entityId = entityId;
 		this._observeStore();
 	};
 
 	create = (parentId: string | null) => {
 		this.#isNew = true;
-		this._entityKey = uuidv4();
+		this._entityId = uuidv4();
 		this._createAtParentKey = parentId;
 	};
 

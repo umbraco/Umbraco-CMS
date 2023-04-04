@@ -10,7 +10,7 @@ import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel = EntityTreeItemResponseModel> {
 	private _host: UmbControllerHostElement;
 	private _entityType: string | null;
-	private _entityKey: string | null;
+	private _entityId: string | null;
 
 	#repository?: UmbTreeRepository<any>;
 
@@ -32,13 +32,13 @@ export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel =
 	constructor(
 		host: UmbControllerHostElement,
 		entityType: string | null,
-		entityKey: string | null,
+		entityId: string | null,
 		storeAlias?: string,
 		repositoryAlias?: string
 	) {
 		this._entityType = entityType;
 		this._host = host;
-		this._entityKey = entityKey;
+		this._entityId = entityId;
 
 		if (storeAlias) {
 			new UmbContextConsumerController(this._host, storeAlias, (_instance) => {
@@ -88,10 +88,10 @@ export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel =
 
 		this._dataObserver?.destroy();
 
-		if (this._entityKey) {
+		if (this._entityId) {
 			this._dataObserver = new UmbObserverController(
 				this._host,
-				this._store.getTreeItemChildren(this._entityKey),
+				this._store.getTreeItemChildren(this._entityId),
 				(nodes) => {
 					if (nodes) {
 						this.#data.next(nodes);
@@ -114,9 +114,9 @@ export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel =
 
 		this._dataObserver?.destroy();
 
-		if (this._entityKey) {
+		if (this._entityId) {
 			// TODO: we should be able to get an observable from this call. either return a observable or a asObservable() method.
-			const observable = (await this.#repository.requestTreeItemsOf(this._entityKey)).asObservable?.();
+			const observable = (await this.#repository.requestTreeItemsOf(this._entityId)).asObservable?.();
 
 			if (observable) {
 				this._dataObserver = new UmbObserverController(this._host, observable as Observable<DataType[]>, (nodes) => {

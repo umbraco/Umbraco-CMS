@@ -79,7 +79,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 				component: () => createExtensionElement(workspace),
 				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
 					component.then((el: HTMLElement) => {
-						(el as any).entityKey = info.match.params.id;
+						(el as any).entityId = info.match.params.id;
 					});
 				},
 			});

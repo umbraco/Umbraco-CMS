@@ -38,7 +38,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	];
 
 	@property()
-	entityKey?: string;
+	entityId?: string;
 
 	@state()
 	private _package: PackageDefinitionResponseModel = {};
@@ -57,12 +57,12 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		if (this.entityKey) this.#getPackageCreated();
+		if (this.entityId) this.#getPackageCreated();
 	}
 
 	async #getPackageCreated() {
-		if (!this.entityKey) return;
-		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedById({ id: this.entityKey }));
+		if (!this.entityId) return;
+		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedById({ id: this.entityId }));
 		if (!data) return;
 		this._package = data as PackageDefinitionResponseModel;
 	}
