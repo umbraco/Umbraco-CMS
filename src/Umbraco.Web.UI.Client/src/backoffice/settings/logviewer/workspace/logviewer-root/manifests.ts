@@ -40,7 +40,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		weight: 200,
 		meta: {
 			label: 'Search',
-			pathname: 'search/:query',
+			pathname: 'search',
 			icon: 'umb:search',
 		},
 		conditions: {
