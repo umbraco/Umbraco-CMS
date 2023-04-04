@@ -4,11 +4,11 @@ using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
-public class MigrationService : IMigrationService
+internal class MigrationService : IMigrationService
 {
     private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
 
-    internal MigrationService(UmbracoDbContextFactory umbracoDbContextFactory)
+    public MigrationService(UmbracoDbContextFactory umbracoDbContextFactory)
     {
         _umbracoDbContextFactory = umbracoDbContextFactory;
     }
