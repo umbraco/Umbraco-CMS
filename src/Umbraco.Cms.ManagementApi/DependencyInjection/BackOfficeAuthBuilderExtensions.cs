@@ -17,9 +17,9 @@ public static class BackOfficeAuthBuilderExtensions
 {
     public static IUmbracoBuilder AddBackOfficeAuthentication(this IUmbracoBuilder builder)
     {
-        builder
-            .AddDbContext()
-            .AddOpenIddict();
+        // builder
+        //     .AddDbContext()
+        //     .AddOpenIddict();
 
         return builder;
     }
