@@ -101,9 +101,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 			this._routes = this._workspaceViews.map((view) => {
 				return {
 					path: `${view.meta.pathname}`,
-					component: () => {
-						return createExtensionElement(view);
-					},
+					component: () => createExtensionElement(view),
 					setup: (component) => {
 						(component as any).manifest = view;
 					},
@@ -146,7 +144,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 								(view) => html`
 									<uui-tab
 										.label="${view.meta.label || view.name}"
-										href="${this._routerPath}/${view.meta.pathname.replace(':query', '*')}"
+										href="${this._routerPath}/${view.meta.pathname}"
 										?active="${view.meta.pathname === this._activePath}">
 										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
 										${view.meta.label || view.name}
