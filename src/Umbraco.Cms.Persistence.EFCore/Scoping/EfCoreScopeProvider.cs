@@ -12,7 +12,7 @@ using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> where TDbContext : DbContext
+internal class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> where TDbContext : DbContext
 {
     private readonly IAmbientEfCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
     private readonly ILoggerFactory _loggerFactory;
