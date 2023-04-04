@@ -66,7 +66,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				<div id="templates" slot="editor">
 					<umb-input-template-picker
 						.defaultKey="${/*this._documentType?.defaultTemplateKey ??*/ ''}"
-						.allowedKeys="${/*this._documentType?.allowedTemplateKeys ??*/ []}"
+						.allowedKeys="${/*this._documentType?.allowedTemplateIds ??*/ []}"
 						@change-default="${this.#changeDefaultKey}"
 						@change-allowed="${this.#changeAllowedKeys}"></umb-input-template-picker>
 				</div>

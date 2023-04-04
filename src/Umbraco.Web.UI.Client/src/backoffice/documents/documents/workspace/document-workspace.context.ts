@@ -29,11 +29,11 @@ export class UmbDocumentWorkspaceContext
 	 */
 	#draft = new ObjectState<EntityType | undefined>(undefined);
 	readonly unique = this.#draft.getObservablePart((data) => data?.id);
-	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
+	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeId);
 
 	readonly variants = this.#draft.getObservablePart((data) => data?.variants || []);
 	readonly urls = this.#draft.getObservablePart((data) => data?.urls || []);
-	readonly templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
+	readonly templateId = this.#draft.getObservablePart((data) => data?.templateId || null);
 
 	readonly structure;
 	readonly splitView;

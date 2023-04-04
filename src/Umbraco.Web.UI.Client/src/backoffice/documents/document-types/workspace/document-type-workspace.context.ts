@@ -28,7 +28,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly compositions;
 
 	// Document type specific:
-	readonly allowedTemplateKeys;
+	readonly allowedTemplateIds;
 	readonly defaultTemplateKey;
 	readonly cleanup;
 
@@ -53,7 +53,7 @@ export class UmbDocumentTypeWorkspaceContext
 		this.compositions = this.structure.rootDocumentTypeObservablePart((data) => data?.compositions);
 
 		// Document type specific:
-		this.allowedTemplateKeys = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedTemplateKeys);
+		this.allowedTemplateIds = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedTemplateIds);
 		this.defaultTemplateKey = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateKey);
 		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateKey);
 	}
