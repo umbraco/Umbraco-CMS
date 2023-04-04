@@ -6,10 +6,7 @@ internal class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDbContext
 {
     private readonly IAmbientEfCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
 
-    public EFCoreScopeAccessor(IAmbientEfCoreScopeStack<TDbContext> ambientEfCoreScopeStack)
-    {
-        _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
-    }
+    public EFCoreScopeAccessor(IAmbientEfCoreScopeStack<TDbContext> ambientEfCoreScopeStack) => _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
 
     public EfCoreScope<TDbContext>? AmbientScope => (EfCoreScope<TDbContext>?)_ambientEfCoreScopeStack.AmbientScope;
 
