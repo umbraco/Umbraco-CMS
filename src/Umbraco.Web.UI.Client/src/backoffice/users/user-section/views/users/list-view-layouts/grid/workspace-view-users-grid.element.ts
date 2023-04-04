@@ -102,8 +102,8 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 		this._usersContext?.deselect(user.id);
 	}
 
-	private _getUserGroupNames(keys: Array<string>) {
-		return keys
+	private _getUserGroupNames(ids: Array<string>) {
+		return ids
 			.map((key: string) => {
 				return this._userGroups.find((x) => x.id === key)?.name;
 			})
