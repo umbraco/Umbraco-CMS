@@ -51,7 +51,7 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 			name,
 			parentId: this.unique,
 			translations: [],
-			key: '',
+			id: '',
 		});
 
 		// TODO => get location header to route to new item

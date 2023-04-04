@@ -33,8 +33,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	public set property(value: PropertyTypeResponseModelBaseModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
-		if (this._property?.dataTypeKey !== oldProperty?.dataTypeKey) {
-			this._observeDataType(this._property?.dataTypeKey);
+		if (this._property?.dataTypeId !== oldProperty?.dataTypeId) {
+			this._observeDataType(this._property?.dataTypeId);
 			this._observeProperty();
 		}
 	}
@@ -95,13 +95,13 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		);
 	}
 
-	private async _observeDataType(dataTypeKey?: string) {
+	private async _observeDataType(dataTypeId?: string) {
 		this._dataTypeObserver?.destroy();
-		if (dataTypeKey) {
+		if (dataTypeId) {
 			// Its not technically needed to have await here, this is only to ensure that the data is loaded before we observe it, and thereby only updating the DOM with the latest data.
-			await this._dataTypeRepository.requestById(dataTypeKey);
+			await this._dataTypeRepository.requestById(dataTypeId);
 			this._dataTypeObserver = this.observe(
-				await this._dataTypeRepository.byId(dataTypeKey),
+				await this._dataTypeRepository.byId(dataTypeId),
 				(dataType) => {
 					this._dataTypeData = dataType?.values || [];
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;

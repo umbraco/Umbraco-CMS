@@ -28,7 +28,7 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 
 		if (data && data.contentTypeId) {
 			const modalHandler = this.#modalContext?.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
-				key: data.contentTypeId,
+				id: data.contentTypeId,
 			});
 
 			const { documentTypeKey } = await modalHandler.onSubmit();

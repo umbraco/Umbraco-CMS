@@ -14,12 +14,12 @@ export const Overview: Story = {
 	args: {
 		list: [
 			{
-				id: 'isAwesome',
+				key: 'isAwesome',
 				value: 'Umbraco is awesome?',
 				checked: true,
 			},
 			{
-				id: 'attendingCodeGarden',
+				key: 'attendingCodeGarden',
 				value: 'Attending CodeGarden?',
 				checked: false,
 			},

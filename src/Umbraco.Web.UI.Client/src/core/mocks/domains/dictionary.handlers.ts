@@ -178,7 +178,7 @@ export const handlers = [
 	rest.post('/umbraco/management/api/v1/dictionary/import', async (req, res, ctx) => {
 		const file = req.url.searchParams.get('file');
 
-		if (!file) return;
+		if (!file || !importResponse.id) return;
 
 		importResponse.parentId = req.url.searchParams.get('parentId') ?? null;
 		umbDictionaryData.save(importResponse);

@@ -64,7 +64,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 					alias: '',
 					label: '',
 					description: '',
-					dataTypeKey: '',
+					dataTypeId: '',
 				},
 			],
 			data: [

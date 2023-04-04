@@ -5,7 +5,7 @@ export interface ContentProperty {
 	alias: string;
 	label: string;
 	description: string;
-	dataTypeKey: string;
+	dataTypeId: string;
 }
 
 export interface ContentPropertyData {

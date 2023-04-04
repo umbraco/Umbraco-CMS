@@ -20,7 +20,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaHeadline',
 				label: 'Media Headline',
 				description: 'Text string property',
-				dataTypeKey: 'dt-textBox',
+				dataTypeId: 'dt-textBox',
 			},
 		],
 		data: [
@@ -47,7 +47,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -104,7 +104,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -131,7 +131,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -158,7 +158,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -185,7 +185,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [

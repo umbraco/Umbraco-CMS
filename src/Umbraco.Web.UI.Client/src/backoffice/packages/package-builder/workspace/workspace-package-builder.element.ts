@@ -216,11 +216,9 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<div slot="editor">
 				<umb-input-media-picker
-					.selectedKeys=${this._package.mediaKeys ?? []}
+					.selectedKeys=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
-						(this._package.mediaKeys = (
-							e.target as UmbInputMediaPickerElement
-						).selectedKeys)}"></umb-input-media-picker>
+						(this._package.mediaIds = (e.target as UmbInputMediaPickerElement).selectedKeys)}"></umb-input-media-picker>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.mediaLoadChildNodes ?? false}"

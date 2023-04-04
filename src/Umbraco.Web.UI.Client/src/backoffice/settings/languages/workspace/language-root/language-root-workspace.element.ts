@@ -83,7 +83,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	#createTableItems(languages: Array<LanguageResponseModel>) {
 		this._tableItems = languages.map((language) => {
 			return {
-				key: language.isoCode ?? '',
+				id: language.isoCode ?? '',
 				icon: 'umb:globe',
 				data: [
 					{

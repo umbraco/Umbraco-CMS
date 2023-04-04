@@ -35,7 +35,7 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	}
 
 	async #getTemplate() {
-		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateByKey({ id: this._id }));
+		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateById({ id: this._id }));
 		if (!data) return;
 
 		this._template = data;
@@ -44,7 +44,7 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	async #saveTemplate() {
 		const { error } = await tryExecuteAndNotify(
 			this,
-			TemplateResource.putTemplateByKey({ id: this._id, requestBody: this._template })
+			TemplateResource.putTemplateById({ id: this._id, requestBody: this._template })
 		);
 		if (!error) {
 			console.log(`template (${this._id}) saved successfully`);

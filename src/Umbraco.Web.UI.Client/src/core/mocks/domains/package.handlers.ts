@@ -100,7 +100,7 @@ const packageArray: PackageDefinitionResponseModel[] = [
 		name: 'My Package',
 		//contentNodeId?: string | null;
 		//contentLoadChildNodes?: boolean;
-		//mediaKeys?: Array<string>;
+		//mediaIds?: Array<string>;
 		//mediaLoadChildNodes?: boolean;
 		//documentTypes?: Array<string>;
 		//mediaTypes?: Array<string>;

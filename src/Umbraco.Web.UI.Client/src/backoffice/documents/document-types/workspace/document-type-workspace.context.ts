@@ -29,7 +29,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// Document type specific:
 	readonly allowedTemplateIds;
-	readonly defaultTemplateKey;
+	readonly defaultTemplateId;
 	readonly cleanup;
 
 	readonly structure;
@@ -54,8 +54,8 @@ export class UmbDocumentTypeWorkspaceContext
 
 		// Document type specific:
 		this.allowedTemplateIds = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedTemplateIds);
-		this.defaultTemplateKey = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateKey);
-		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateKey);
+		this.defaultTemplateId = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
 	}
 
 	public setPropertyValue(alias: string, value: unknown) {
