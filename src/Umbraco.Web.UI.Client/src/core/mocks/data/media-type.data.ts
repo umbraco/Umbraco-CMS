@@ -48,15 +48,15 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedFolderTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentId === key);
+	getTreeItemChildren(id: string): PagedFolderTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<FolderTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.id ?? ''));
+	getTreeItem(ids: Array<string>): Array<FolderTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createFolderTreeItem(item));
 	}
 }

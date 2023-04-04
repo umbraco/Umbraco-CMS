@@ -56,8 +56,8 @@ export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * @return {*}
 	 * @memberof MediaTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys || keys.length === 0) {
+	async getItems(ids: Array<string>) {
+		if (!ids || ids.length === 0) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
@@ -65,7 +65,7 @@ export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
 		return tryExecuteAndNotify(
 			this.#host,
 			MediaTypeResource.getTreeMediaTypeItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

@@ -37,7 +37,7 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		if (!parentId) throw new Error('Parent key is missing');
+		if (!parentId) throw new Error('Parent id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
@@ -53,12 +53,12 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys) throw new Error('Keys are missing');
+	async getItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getTreeDataTypeItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

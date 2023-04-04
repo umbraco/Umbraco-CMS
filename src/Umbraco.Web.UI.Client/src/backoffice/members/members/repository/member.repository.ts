@@ -58,15 +58,15 @@ export class UmbMemberRepository implements UmbTreeRepository {
 		return { data: undefined, error };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#dataSource.getItems(keys);
+		const { data, error } = await this.#dataSource.getItems(ids);
 
 		return { data, error };
 	}
@@ -81,8 +81,8 @@ export class UmbMemberRepository implements UmbTreeRepository {
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 }

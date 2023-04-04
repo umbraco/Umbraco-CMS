@@ -73,17 +73,17 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getItems(keys);
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -96,9 +96,9 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS
@@ -108,16 +108,16 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return this.#detailSource.createScaffold();
 	}
 
-	async requestDetails(key: string) {
+	async requestDetails(id: string) {
 		await this.#init;
 
 		// TODO: should we show a notification if the key is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
-		const { data, error } = await this.#detailSource.get(key);
+		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -125,9 +125,9 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return { data, error };
 	}
 
-	async delete(key: string) {
+	async delete(id: string) {
 		await this.#init;
-		return this.#detailSource.delete(key);
+		return this.#detailSource.delete(id);
 	}
 
 	async save(mediaType: MediaTypeDetails) {

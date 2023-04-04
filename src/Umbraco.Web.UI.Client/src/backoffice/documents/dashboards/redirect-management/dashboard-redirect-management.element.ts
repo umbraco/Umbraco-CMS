@@ -158,7 +158,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		const res = await tryExecuteAndNotify(this, RedirectManagementResource.deleteRedirectManagementById({ id: r.id }));
 		if (!res.error) {
 			// or just run a this._getRedirectData() again?
-			this.shadowRoot?.getElementById(`redirect-key-${r.id}`)?.remove();
+			//this.shadowRoot?.getElementById(`redirect-key-${r.id}`)?.remove();
+			// No no, never manipulate DOM manipulate the data for the DOM:
+			this._redirectData = this._redirectData?.filter((x) => x.id !== r.id);
 		}
 	}
 
@@ -214,7 +216,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (data) {
 			this._total = data?.total;
 			this._redirectData = data?.items;
-			if (this._filter?.length) this._buttonState = 'success';
+			if (this._filter?.length) {
+				this._buttonState = 'success';
+			}
 		}
 	}
 
@@ -278,6 +282,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private renderTable() {
+		// TODO: Instead of map, use repeat lit util:
 		return html`<uui-box style="--uui-box-default-padding: 0;">
 				<uui-table>
 					<uui-table-head>
@@ -288,7 +293,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<uui-table-head-cell style="width:10%;">Actions</uui-table-head-cell>
 					</uui-table-head>
 					${this._redirectData?.map((data) => {
-						return html` <uui-table-row id="redirect-key-${data.key}">
+						return html` <uui-table-row id="redirect-key-${data.id}">
 							<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
 							<uui-table-cell>
 								<a href="${data.originalUrl || '#'}" target="_blank"> ${data.originalUrl}</a>

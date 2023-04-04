@@ -11,9 +11,9 @@ class UmbUsersData extends UmbEntityData<UserDetails> {
 		return this.data;
 	}
 
-	updateUserGroup(keys: string[], userGroup: string) {
+	updateUserGroup(ids: string[], userGroup: string) {
 		this.data.forEach((user) => {
-			if (keys.includes(user.id)) {
+			if (ids.includes(user.id)) {
 				user.userGroups = [...user.userGroups, userGroup];
 			} else {
 				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
@@ -25,8 +25,8 @@ class UmbUsersData extends UmbEntityData<UserDetails> {
 		return this.data.map((user) => user.id);
 	}
 
-	enable(keys: string[]) {
-		const users = this.data.filter((user) => keys.includes(user.id));
+	enable(ids: string[]) {
+		const users = this.data.filter((user) => ids.includes(user.id));
 		users.forEach((user) => {
 			user.status = 'enabled';
 			this.updateData(user);
@@ -34,8 +34,8 @@ class UmbUsersData extends UmbEntityData<UserDetails> {
 		return users.map((user) => user.id);
 	}
 
-	disable(keys: string[]) {
-		const users = this.data.filter((user) => keys.includes(user.id));
+	disable(ids: string[]) {
+		const users = this.data.filter((user) => ids.includes(user.id));
 		users.forEach((user) => {
 			user.status = 'disabled';
 			this.updateData(user);

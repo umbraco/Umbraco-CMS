@@ -79,17 +79,17 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	 * @memberof UmbDocumentBlueprintStore
 	 * @return {*}  {Promise<void>}
 	 */
-	async delete(keys: string[]) {
+	async delete(ids: string[]) {
 		// TODO: use backend cli when available.
 		await fetch('/umbraco/backoffice/document-blueprint/delete', {
 			method: 'POST',
-			body: JSON.stringify(keys),
+			body: JSON.stringify(ids),
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
 
-		this.#data.remove(keys);
+		this.#data.remove(ids);
 	}
 }
 

@@ -47,16 +47,16 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * @return {*}
 	 * @memberof MemberTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys || keys.length === 0) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+	async getItems(ids: Array<string>) {
+		if (!ids || ids.length === 0) {
+			const error: ProblemDetailsModel = { title: 'Ids are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			MemberTypeResource.getTreeMemberTypeItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}
