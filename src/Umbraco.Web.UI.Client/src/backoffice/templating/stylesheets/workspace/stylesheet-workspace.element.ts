@@ -1,10 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { serverFilePathFromUrlFriendlyPath } from '../../utils';
 import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element';
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-stylesheet-workspace')
@@ -24,11 +24,11 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 	#element = new UmbStylesheetWorkspaceEditElement();
 
 	@state()
-	_routes: any[] = [
+	_routes: IRoute[] = [
 		{
 			path: 'edit/:path',
 			component: () => this.#element,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (_component, info) => {
 				const path = info.match.params.path;
 				const serverPath = serverFilePathFromUrlFriendlyPath(path);
 				this.#workspaceContext.load(serverPath);

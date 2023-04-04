@@ -3,7 +3,8 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbRouterSlotInitEvent, IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 import './relation-type-workspace-edit.element';
 
@@ -27,7 +28,7 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 		{
 			path: 'create/:parentId',
 			component: () => this.#element,
-			setup: async (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (_component, info) => {
 				const parentId = info.match.params.parentId;
 				this.#workspaceContext.createScaffold(parentId);
 			},
@@ -35,7 +36,7 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},

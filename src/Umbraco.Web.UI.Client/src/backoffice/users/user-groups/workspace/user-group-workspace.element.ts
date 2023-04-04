@@ -7,7 +7,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement {
@@ -47,11 +47,11 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	}
 
 	@state()
-	_routes: any[] = [
+	_routes: IRoute[] = [
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},

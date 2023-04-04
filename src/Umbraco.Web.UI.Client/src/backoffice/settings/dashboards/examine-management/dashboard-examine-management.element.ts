@@ -3,7 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
-import type { IRoute, IRoutingInfo, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -26,7 +27,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		{
 			path: `/index/:indexerName`,
 			component: () => import('./views/section-view-examine-indexers'),
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				const element = component as UmbDashboardExamineIndexElement;
 				element.indexName = info.match.params.indexerName;
 			},
@@ -34,7 +35,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		{
 			path: `/searcher/:searcherName`,
 			component: () => import('./views/section-view-examine-searchers'),
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				const element = component as UmbDashboardExamineSearcherElement;
 				element.searcherName = info.match.params.searcherName;
 			},
