@@ -104,7 +104,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 						return createExtensionElement(view);
 					},
 					setup: (component: Promise<HTMLElement>) => {
-						// When its using import, we get an element, when using createExtensionElement we get a Promise.
 						component.then((el: any) => (el.manifest = view));
 					},
 				};

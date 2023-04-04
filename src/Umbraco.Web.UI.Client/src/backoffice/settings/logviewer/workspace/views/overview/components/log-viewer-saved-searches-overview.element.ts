@@ -60,9 +60,6 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
 		return html` <li>
 			<uui-button
-				@click=${() => {
-					//this.#setCurrentQuery(searchListItem.query ?? '');
-				}}
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
 				href=${`section/settings/workspace/logviewer/search/${searchListItem.query}`}>
