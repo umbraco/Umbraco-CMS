@@ -3,9 +3,9 @@ import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
 import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variable-entity-context.interface';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
-import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
+import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
 import { UmbWorkspaceSplitViewManager } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
-import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { partialUpdateFrozenArray, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -14,7 +14,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentRepository>
+	extends UmbWorkspaceContext<UmbDocumentRepository, EntityType>
 	implements UmbWorkspaceVariableEntityContextInterface<EntityType | undefined>
 {
 	/**
@@ -164,7 +164,9 @@ export class UmbDocumentWorkspaceContext
 	async save() {
 		if (!this.#draft.value) return;
 		if (this.getIsNew()) {
-			await this.repository.create(this.#draft.value);
+			// TODO: typescript hack until we get the create type
+			const value = this.#draft.value as CreateDocumentRequestModel & { key: string };
+			await this.repository.create(value);
 		} else {
 			await this.repository.save(this.#draft.value);
 		}
@@ -190,6 +192,7 @@ export class UmbDocumentWorkspaceContext
 
 	public destroy(): void {
 		this.#draft.complete();
+		this.structure.destroy();
 	}
 }
 

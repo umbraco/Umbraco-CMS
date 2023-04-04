@@ -5,6 +5,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * @element umb-relation-type-workspace-edit-element
@@ -48,8 +49,8 @@ export class UmbRelationTypeWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext<UmbRelationTypeWorkspaceContext>('umbWorkspaceContext', (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance as UmbRelationTypeWorkspaceContext;
 			this.#observeRelationType();
 		});
 	}

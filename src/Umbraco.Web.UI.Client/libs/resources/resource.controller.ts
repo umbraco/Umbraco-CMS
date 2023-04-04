@@ -39,8 +39,17 @@ export class UmbResourceController extends UmbController {
 	 */
 	static toProblemDetailsModel(error: unknown): ProblemDetailsModel | undefined {
 		if (error instanceof ApiError) {
-			const errorDetails = error.body as ProblemDetailsModel;
-			return errorDetails;
+			try {
+				const errorDetails = (
+					typeof error.body === 'string' ? JSON.parse(error.body) : error.body
+				) as ProblemDetailsModel;
+				return errorDetails;
+			} catch {
+				return {
+					title: error.name,
+					detail: error.message,
+				};
+			}
 		} else if (error instanceof Error) {
 			return {
 				title: error.name,

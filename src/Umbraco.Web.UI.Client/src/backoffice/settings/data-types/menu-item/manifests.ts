@@ -5,11 +5,11 @@ const menuItem: ManifestTypes = {
 	kind: 'tree',
 	alias: 'Umb.MenuItem.DataTypes',
 	name: 'Data Types Menu Item',
-	weight: 40,
+	weight: 600,
 	meta: {
 		label: 'Data Types',
 		icon: 'umb:folder',
-		entityType: 'data-type',
+		entityType: 'data-type-root',
 		treeAlias: 'Umb.Tree.DataTypes',
 	},
 	conditions: {

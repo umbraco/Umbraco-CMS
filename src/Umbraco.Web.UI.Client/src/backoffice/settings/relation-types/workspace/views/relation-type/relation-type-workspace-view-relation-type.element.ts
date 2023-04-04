@@ -6,6 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-relation-type-workspace-view-relation-type')
 export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitElement {
@@ -27,8 +28,8 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	constructor() {
 		super();
 
-		this.consumeContext<UmbRelationTypeWorkspaceContext>('umbWorkspaceContext', (instance) => {
-			this.#workspaceContext = instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance as UmbRelationTypeWorkspaceContext;
 			this._observeRelationType();
 		});
 	}

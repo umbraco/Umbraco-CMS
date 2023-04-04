@@ -5,7 +5,7 @@ const menuItem: ManifestTypes = {
 	kind: 'tree',
 	alias: 'Umb.MenuItem.DocumentTypes',
 	name: 'Document Types Menu Item',
-	weight: 10,
+	weight: 900,
 	meta: {
 		treeAlias: 'Umb.Tree.DocumentTypes',
 		label: 'Document Types',

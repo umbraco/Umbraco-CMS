@@ -5,7 +5,7 @@ const menuItem: ManifestTypes = {
 	kind: 'tree',
 	alias: 'Umb.MenuItem.RelationTypes',
 	name: 'Relation Types Menu Item',
-	weight: 40,
+	weight: 500,
 	meta: {
 		treeAlias: 'Umb.Tree.RelationTypes',
 		label: 'Relation Types',

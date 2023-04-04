@@ -166,7 +166,7 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 			throw new Error('Relation Type is missing');
 		}
 
-		const { error } = await this.#detailDataSource.update(item);
+		const { error } = await this.#detailDataSource.update(item.key, item);
 
 		if (!error) {
 			const notification = { data: { message: `Relation Type saved` } };
