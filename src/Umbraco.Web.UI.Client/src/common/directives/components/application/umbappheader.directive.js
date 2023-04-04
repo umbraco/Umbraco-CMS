@@ -127,6 +127,20 @@
                 }
             };
 
+            scope.skipToMenu = function() {
+                document.querySelector('#applications a').focus();
+            };
+
+            scope.skipToContent = function() {
+                var focusableElements = document.querySelectorAll('.umb-app-content a, .umb-app-content button');
+                for(var i=0; i < focusableElements.length; i++){
+                    if(focusableElements[i].offsetParent !== null) {
+                        focusableElements[i].focus();
+                        break;
+                    }
+                }
+            };
+
         }
 
         var directive = {
