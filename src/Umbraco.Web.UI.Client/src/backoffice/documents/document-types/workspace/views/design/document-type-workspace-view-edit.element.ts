@@ -92,7 +92,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 					component: () => import('./document-type-workspace-view-edit-tab.element'),
 					setup: (component: Promise<HTMLElement>) => {
 						(component as any).tabName = tabName;
-						(component as any).ownerTabKey = tab.id;
+						(component as any).ownerTabId = tab.id;
 					},
 				});
 			});
