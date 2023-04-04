@@ -16,8 +16,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class EfCoreLockTests : UmbracoIntegrationTest
 {
-    private IEfCoreScopeProvider EFScopeProvider =>
-        GetRequiredService<IEfCoreScopeProvider>();
+    private IEfCoreScopeProvider<UmbracoEFContext> EFScopeProvider =>
+        GetRequiredService<IEfCoreScopeProvider<UmbracoEFContext>>();
 
     [SetUp]
     protected async Task SetUp()

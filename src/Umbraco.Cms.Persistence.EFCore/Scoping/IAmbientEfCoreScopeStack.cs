@@ -1,10 +1,12 @@
-﻿namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+﻿using Microsoft.EntityFrameworkCore;
 
-internal interface IAmbientEfCoreScopeStack : IEFCoreScopeAccessor
+namespace Umbraco.Cms.Persistence.EFCore.Scoping;
+
+internal interface IAmbientEfCoreScopeStack<TDbContext> : IEFCoreScopeAccessor<TDbContext> where TDbContext : DbContext
 {
-    public IEfCoreScope? AmbientScope { get; }
+    public IEfCoreScope<TDbContext>? AmbientScope { get; }
 
-    IEfCoreScope Pop();
+    IEfCoreScope<TDbContext> Pop();
 
-    void Push(IEfCoreScope scope);
+    void Push(IEfCoreScope<TDbContext> scope);
 }

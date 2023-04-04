@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Sync;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -18,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 public class EfCoreScopeRepositoryCacheTest : UmbracoIntegrationTest
 {
     private IUserRepository UserRepository => GetRequiredService<IUserRepository>();
-    private IEfCoreScopeProvider EfCoreScopeProvider => GetRequiredService<IEfCoreScopeProvider>();
+    private IEfCoreScopeProvider<UmbracoEFContext> EfCoreScopeProvider => GetRequiredService<IEfCoreScopeProvider<UmbracoEFContext>>();
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {

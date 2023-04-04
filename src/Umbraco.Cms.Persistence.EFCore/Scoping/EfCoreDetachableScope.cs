@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -6,20 +7,21 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-internal class EfCoreDetachableScope : EfCoreScope
+internal class EfCoreDetachableScope<TDbContext> : EfCoreScope<TDbContext> where TDbContext : DbContext
 {
-    private readonly IEFCoreScopeAccessor _efCoreScopeAccessor;
-    private readonly EfCoreScopeProvider _efCoreScopeProvider;
+    private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
+    private readonly EfCoreScopeProvider<TDbContext> _efCoreScopeProvider;
 
     public EfCoreDetachableScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
-        IEFCoreScopeAccessor efCoreScopeAccessor,
+        IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         FileSystems fileSystems,
-        IEfCoreScopeProvider efCoreScopeProvider,
+        IEfCoreScopeProvider<TDbContext> efCoreScopeProvider,
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
+        IDbContextFactory<TDbContext> dbContextFactory,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
         : base(
@@ -31,6 +33,7 @@ internal class EfCoreDetachableScope : EfCoreScope
             efCoreScopeProvider,
             scopeContext,
             eventAggregator,
+            dbContextFactory,
             repositoryCacheMode,
             scopeFileSystems)
     {
@@ -40,7 +43,7 @@ internal class EfCoreDetachableScope : EfCoreScope
         }
 
         _efCoreScopeAccessor = efCoreScopeAccessor;
-        _efCoreScopeProvider = (EfCoreScopeProvider)efCoreScopeProvider;
+        _efCoreScopeProvider = (EfCoreScopeProvider<TDbContext>)efCoreScopeProvider;
 
         Detachable = true;
 
@@ -51,12 +54,13 @@ internal class EfCoreDetachableScope : EfCoreScope
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
         IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
-        IEFCoreScopeAccessor efCoreScopeAccessor,
+        IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         FileSystems fileSystems,
-        IEfCoreScopeProvider efCoreScopeProvider,
-        EfCoreScope parentScope,
+        IEfCoreScopeProvider<TDbContext> efCoreScopeProvider,
+        EfCoreScope<TDbContext> parentScope,
         IScopeContext? scopeContext,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IDbContextFactory<TDbContext> dbContextFactory)
         : base(
             parentScope,
             distributedLockingMechanismFactory,
@@ -66,10 +70,11 @@ internal class EfCoreDetachableScope : EfCoreScope
             fileSystems,
             efCoreScopeProvider,
             scopeContext,
-            eventAggregator) =>
+            eventAggregator,
+            dbContextFactory) =>
         throw new NotImplementedException();
 
-    public EfCoreScope? OriginalScope { get; set; }
+    public EfCoreScope<TDbContext>? OriginalScope { get; set; }
 
     public IScopeContext? OriginalContext { get; set; }
 

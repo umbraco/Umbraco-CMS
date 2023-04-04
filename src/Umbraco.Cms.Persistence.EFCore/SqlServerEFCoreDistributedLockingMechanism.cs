@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Extensions;
 
@@ -18,14 +19,14 @@ public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMec
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly ILogger<SqlServerEFCoreDistributedLockingMechanism> _logger;
-    private readonly Lazy<IEFCoreScopeAccessor> _scopeAccessor; // Hooray it's a circular dependency.
+    private readonly Lazy<IEFCoreScopeAccessor<UmbracoEFContext>> _scopeAccessor; // Hooray it's a circular dependency.
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism" /> class.
     /// </summary>
     public SqlServerEFCoreDistributedLockingMechanism(
         ILogger<SqlServerEFCoreDistributedLockingMechanism> logger,
-        Lazy<IEFCoreScopeAccessor> scopeAccessor,
+        Lazy<IEFCoreScopeAccessor<UmbracoEFContext>> scopeAccessor,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
@@ -113,7 +114,7 @@ public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMec
 
         private void ObtainReadLock()
         {
-            IEfCoreScope? scope = _parent._scopeAccessor.Value.AmbientScope;
+            IEfCoreScope<UmbracoEFContext>? scope = _parent._scopeAccessor.Value.AmbientScope;
 
             if (scope is null)
             {
@@ -150,7 +151,7 @@ public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMec
 
         private void ObtainWriteLock()
         {
-            IEfCoreScope? scope = _parent._scopeAccessor.Value.AmbientScope;
+            IEfCoreScope<UmbracoEFContext>? scope = _parent._scopeAccessor.Value.AmbientScope;
             if (scope is null)
             {
                 throw new PanicException("No ambient scope");

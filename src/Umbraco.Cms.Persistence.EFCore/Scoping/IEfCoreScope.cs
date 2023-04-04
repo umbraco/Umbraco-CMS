@@ -4,7 +4,7 @@ using Umbraco.Cms.Persistence.EFCore.Entities;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-public interface IEfCoreScope : ICoreScope
+public interface IEfCoreScope<TDbContext> : ICoreScope
 {
     /// <summary>
     /// Executes the given function on the database.
@@ -12,7 +12,7 @@ public interface IEfCoreScope : ICoreScope
     /// <param name="method">Function to execute.</param>
     /// <typeparam name="T">Type to use and return.</typeparam>
     /// <returns></returns>
-    Task<T> ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task<T>> method);
+    Task<T> ExecuteWithContextAsync<T>(Func<TDbContext, Task<T>> method);
 
     public IScopeContext? ScopeContext { get; set; }
 
@@ -22,7 +22,7 @@ public interface IEfCoreScope : ICoreScope
     /// <param name="method">Function to execute.</param>
     /// <typeparam name="T">Type to use and return.</typeparam>
     /// <returns></returns>
-    Task ExecuteWithContextAsync<T>(Func<UmbracoEFContext, Task> method);
+    Task ExecuteWithContextAsync<T>(Func<TDbContext, Task> method);
 
     /// <summary>
     ///     Gets the scope notification publisher

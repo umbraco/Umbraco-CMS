@@ -1,17 +1,18 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-public class AmbientEfCoreScopeStack : IAmbientEfCoreScopeStack
+public class AmbientEfCoreScopeStack<TDbContext> : IAmbientEfCoreScopeStack<TDbContext> where TDbContext : DbContext
 {
 
-    private static AsyncLocal<ConcurrentStack<IEfCoreScope>> _stack = new();
+    private static AsyncLocal<ConcurrentStack<IEfCoreScope<TDbContext>>> _stack = new();
 
-    public IEfCoreScope? AmbientScope
+    public IEfCoreScope<TDbContext>? AmbientScope
     {
         get
         {
-            if (_stack.Value?.TryPeek(out IEfCoreScope? ambientScope) ?? false)
+            if (_stack.Value?.TryPeek(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
             {
                 return ambientScope;
             }
@@ -20,9 +21,9 @@ public class AmbientEfCoreScopeStack : IAmbientEfCoreScopeStack
         }
     }
 
-    public IEfCoreScope Pop()
+    public IEfCoreScope<TDbContext> Pop()
     {
-        if (_stack.Value?.TryPop(out IEfCoreScope? ambientScope) ?? false)
+        if (_stack.Value?.TryPop(out IEfCoreScope<TDbContext>? ambientScope) ?? false)
         {
             return ambientScope;
         }
@@ -30,9 +31,9 @@ public class AmbientEfCoreScopeStack : IAmbientEfCoreScopeStack
         throw new InvalidOperationException("No AmbientScope was found.");
     }
 
-    public void Push(IEfCoreScope scope)
+    public void Push(IEfCoreScope<TDbContext> scope)
     {
-        _stack.Value ??= new ConcurrentStack<IEfCoreScope>();
+        _stack.Value ??= new ConcurrentStack<IEfCoreScope<TDbContext>>();
 
         _stack.Value.Push(scope);
     }

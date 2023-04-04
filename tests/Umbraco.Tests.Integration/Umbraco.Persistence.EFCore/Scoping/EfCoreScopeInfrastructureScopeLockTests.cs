@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -14,8 +15,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class EfCoreScopeInfrastructureScopeLockTests : UmbracoIntegrationTest
 {
-    private IEfCoreScopeProvider EfCoreScopeProvider =>
-        GetRequiredService<IEfCoreScopeProvider>();
+    private IEfCoreScopeProvider<UmbracoEFContext> EfCoreScopeProvider =>
+        GetRequiredService<IEfCoreScopeProvider<UmbracoEFContext>>();
 
     private IScopeProvider InfrastructureScopeProvider =>
         GetRequiredService<IScopeProvider>();
@@ -31,7 +32,7 @@ public class EfCoreScopeInfrastructureScopeLockTests : UmbracoIntegrationTest
     [Test]
     public async Task ScopesCanShareNonEagerLocks()
     {
-        using IEfCoreScope parentScope = EfCoreScopeProvider.CreateScope();
+        using IEfCoreScope<UmbracoEFContext> parentScope = EfCoreScopeProvider.CreateScope();
         await parentScope.ExecuteWithContextAsync<Task>(async database =>
         {
             parentScope.Locks.WriteLock(parentScope.InstanceId, Constants.Locks.Servers);
@@ -53,7 +54,7 @@ public class EfCoreScopeInfrastructureScopeLockTests : UmbracoIntegrationTest
     [Test]
     public async Task ScopesCanShareEagerLocks()
     {
-        using IEfCoreScope parentScope = EfCoreScopeProvider.CreateScope();
+        using IEfCoreScope<UmbracoEFContext> parentScope = EfCoreScopeProvider.CreateScope();
         await parentScope.ExecuteWithContextAsync<Task>(async database =>
         {
             parentScope.Locks.EagerWriteLock(parentScope.InstanceId, Constants.Locks.Servers);

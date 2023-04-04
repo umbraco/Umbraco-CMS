@@ -1,18 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-internal class EFCoreScopeAccessor : IEFCoreScopeAccessor
+internal class EFCoreScopeAccessor<TDbContext> : IEFCoreScopeAccessor<TDbContext> where TDbContext : DbContext
 {
-    private readonly IAmbientEfCoreScopeStack _ambientEfCoreScopeStack;
+    private readonly IAmbientEfCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
 
-    public EFCoreScopeAccessor(IAmbientEfCoreScopeStack ambientEfCoreScopeStack)
+    public EFCoreScopeAccessor(IAmbientEfCoreScopeStack<TDbContext> ambientEfCoreScopeStack)
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
     }
 
-    public EfCoreScope? AmbientScope => (EfCoreScope?)_ambientEfCoreScopeStack.AmbientScope;
+    public EfCoreScope<TDbContext>? AmbientScope => (EfCoreScope<TDbContext>?)_ambientEfCoreScopeStack.AmbientScope;
 
-    IEfCoreScope? IEFCoreScopeAccessor.AmbientScope => _ambientEfCoreScopeStack.AmbientScope;
+    IEfCoreScope<TDbContext>? IEFCoreScopeAccessor<TDbContext>.AmbientScope => _ambientEfCoreScopeStack.AmbientScope;
 }

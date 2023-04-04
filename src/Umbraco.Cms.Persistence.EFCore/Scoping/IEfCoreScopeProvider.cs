@@ -2,15 +2,15 @@
 
 namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 
-public interface IEfCoreScopeProvider
+public interface IEfCoreScopeProvider<TDbContext>
 {
-    IEfCoreScope CreateScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
+    IEfCoreScope<TDbContext> CreateScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
 
-    IEfCoreScope CreateDetachedScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
+    IEfCoreScope<TDbContext> CreateDetachedScope(RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null);
 
-    void AttachScope(IEfCoreScope other);
+    void AttachScope(IEfCoreScope<TDbContext> other);
 
-    IEfCoreScope DetachScope();
+    IEfCoreScope<TDbContext> DetachScope();
 
     IScopeContext? AmbientScopeContext { get; }
 }

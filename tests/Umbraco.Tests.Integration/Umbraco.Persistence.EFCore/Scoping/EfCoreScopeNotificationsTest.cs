@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -19,7 +20,7 @@ public class EfCoreScopeNotificationsTest : UmbracoIntegrationTest
         builder.AddNotificationHandler<TestDoNotSendNotification, TestDoNotSendNotificationHandler>();
     }
 
-    private IEfCoreScopeProvider EfCoreScopeProvider => GetRequiredService<IEfCoreScopeProvider>();
+    private IEfCoreScopeProvider<UmbracoEFContext> EfCoreScopeProvider => GetRequiredService<IEfCoreScopeProvider<UmbracoEFContext>>();
 
     [Test]
     public void Scope_Can_Send_Notification()

@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Extensions;
 
@@ -17,11 +18,11 @@ public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechan
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly ILogger<SqliteEFCoreDistributedLockingMechanism> _logger;
-    private readonly Lazy<IEFCoreScopeAccessor> _efCoreScopeAccessor;
+    private readonly Lazy<IEFCoreScopeAccessor<UmbracoEFContext>> _efCoreScopeAccessor;
 
     public SqliteEFCoreDistributedLockingMechanism(
         ILogger<SqliteEFCoreDistributedLockingMechanism> logger,
-        Lazy<IEFCoreScopeAccessor> efCoreScopeAccessor,
+        Lazy<IEFCoreScopeAccessor<UmbracoEFContext>> efCoreScopeAccessor,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IOptionsMonitor<ConnectionStrings> connectionStrings)
     {
@@ -133,7 +134,7 @@ public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechan
         // lock occurs for entire database as opposed to row/table.
         private void ObtainWriteLock()
         {
-            IEfCoreScope? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
+            IEfCoreScope<UmbracoEFContext>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
 
             if (efCoreScope is null)
             {

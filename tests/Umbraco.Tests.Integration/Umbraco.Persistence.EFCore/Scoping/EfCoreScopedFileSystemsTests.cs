@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -25,8 +26,8 @@ public class EfCoreScopedFileSystemsTests : UmbracoIntegrationTest
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
-    private IEfCoreScopeProvider EfCoreScopeProvider => GetRequiredService<IEfCoreScopeProvider>();
-    private IEFCoreScopeAccessor EfCoreScopeAccessor => GetRequiredService<IEFCoreScopeAccessor>();
+    private IEfCoreScopeProvider<UmbracoEFContext> EfCoreScopeProvider => GetRequiredService<IEfCoreScopeProvider<UmbracoEFContext>>();
+    private IEFCoreScopeAccessor<UmbracoEFContext> EfCoreScopeAccessor => GetRequiredService<IEFCoreScopeAccessor<UmbracoEFContext>>();
 
     private void ClearFiles(IIOHelper ioHelper)
     {

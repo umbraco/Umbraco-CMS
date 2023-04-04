@@ -46,9 +46,9 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();
         services.AddSingleton<UmbracoDbContextFactory>();
         services.AddUnique<IUmbracoEfCoreDatabaseFactory, UmbracoEfCoreDatabaseFactory>();
-        services.AddUnique<IAmbientEfCoreScopeStack, AmbientEfCoreScopeStack>();
-        services.AddUnique<IEFCoreScopeAccessor, EFCoreScopeAccessor>();
-        services.AddUnique<IEfCoreScopeProvider, EfCoreScopeProvider>();
+        services.AddUnique<IAmbientEfCoreScopeStack<UmbracoEFContext>, AmbientEfCoreScopeStack<UmbracoEFContext>>();
+        services.AddUnique<IEFCoreScopeAccessor<UmbracoEFContext>, EFCoreScopeAccessor<UmbracoEFContext>>();
+        services.AddUnique<IEfCoreScopeProvider<UmbracoEFContext>, EfCoreScopeProvider<UmbracoEFContext>>();
         services.AddUnique<IAmbientEFCoreScopeContextStack, AmbientEFCoreScopeContextStack>();
         services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism>();
         services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism>();

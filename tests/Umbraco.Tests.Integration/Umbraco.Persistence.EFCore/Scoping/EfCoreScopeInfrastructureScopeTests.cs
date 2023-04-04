@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Persistence.EFCore.Entities;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -11,13 +12,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
 public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
 {
-    private IEfCoreScopeProvider EfCoreScopeProvider =>
-        GetRequiredService<IEfCoreScopeProvider>();
+    private IEfCoreScopeProvider<UmbracoEFContext> EfCoreScopeProvider =>
+        GetRequiredService<IEfCoreScopeProvider<UmbracoEFContext>>();
 
     private IScopeProvider InfrastructureScopeProvider =>
         GetRequiredService<IScopeProvider>();
 
-    private EFCoreScopeAccessor EfCoreScopeAccessor => (EFCoreScopeAccessor)GetRequiredService<IEFCoreScopeAccessor>();
+    private EFCoreScopeAccessor<UmbracoEFContext> EfCoreScopeAccessor => (EFCoreScopeAccessor<UmbracoEFContext>)GetRequiredService<IEFCoreScopeAccessor<UmbracoEFContext>>();
 
     private IScopeAccessor InfrastructureScopeAccessor => GetRequiredService<IScopeAccessor>();
 
@@ -25,9 +26,9 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
     public void CanCreateNestedInfrastructureScope()
     {
         Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
-        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
         {
-            Assert.IsInstanceOf<EfCoreScope>(scope);
+            Assert.IsInstanceOf<EfCoreScope<UmbracoEFContext>>(scope);
             Assert.IsNotNull(EfCoreScopeAccessor.AmbientScope);
             Assert.IsNotNull(InfrastructureScopeAccessor.AmbientScope);
             Assert.AreSame(scope, EfCoreScopeAccessor.AmbientScope);
@@ -46,7 +47,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
     [Test]
     public async Task? TransactionWithEfCoreScopeAsParent()
     {
-        using (IEfCoreScope parentScope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> parentScope = EfCoreScopeProvider.CreateScope())
         {
             await parentScope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -74,7 +75,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
         }
 
         // Check that its not rolled back
-        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -91,7 +92,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
         {
             parentScope.Database.Execute("CREATE TABLE tmp3 (id INT, name NVARCHAR(64))");
 
-            using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+            using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
             {
                 await scope.ExecuteWithContextAsync<Task>(async database =>
                 {
@@ -109,7 +110,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
         }
 
         // Check that its not rolled back
-        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -122,7 +123,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
     [Test]
     public async Task EFCoreAsParent_DontCompleteWhenChildScopeDoesNotComplete()
     {
-        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -131,7 +132,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
             scope.Complete();
         }
 
-        using (IEfCoreScope parentScope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> parentScope = EfCoreScopeProvider.CreateScope())
         {
             using (IScope scope = InfrastructureScopeProvider.CreateScope())
             {
@@ -151,7 +152,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
         }
 
         // Check that its rolled back
-        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -165,7 +166,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
     [Test]
     public async Task InfrastructureScopeAsParent_DontCompleteWhenChildScopeDoesNotComplete()
     {
-        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
@@ -177,7 +178,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
 
         using (IScope parentScope = InfrastructureScopeProvider.CreateScope())
         {
-            using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+            using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
             {
                 await scope.ExecuteWithContextAsync<Task>(async database =>
                 {
@@ -195,7 +196,7 @@ public class EfCoreScopeInfrastructureScopeTests : UmbracoIntegrationTest
         }
 
         // Check that its rolled back
-        using (IEfCoreScope scope = EfCoreScopeProvider.CreateScope())
+        using (IEfCoreScope<UmbracoEFContext> scope = EfCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
