@@ -30,6 +30,46 @@ export const data: Array<FileSystemTreeItemPresentationModel> = [
 		icon: 'umb:folder',
 		hasChildren: true,
 	},
+	{
+		path: 'blockgrid/area.cshtml',
+		isFolder: false,
+		name: 'area.cshtml',
+		type: 'partial-view',
+		icon: 'umb:article',
+		hasChildren: false,
+	},
+	{
+		path: 'blockgrid/items.cshtml',
+		isFolder: false,
+		name: 'items.cshtml',
+		type: 'partial-view',
+		icon: 'umb:article',
+		hasChildren: false,
+	},
+	{
+		path: 'blocklist/default.cshtml',
+		isFolder: false,
+		name: 'default.cshtml',
+		type: 'partial-view',
+		icon: 'umb:article',
+		hasChildren: false,
+	},
+	{
+		path: 'grid/editors',
+		isFolder: false,
+		name: 'editors',
+		type: 'partial-view',
+		icon: 'umb:folder',
+		hasChildren: false,
+	},
+	{
+		path: 'grid/default.cshtml',
+		isFolder: false,
+		name: 'items.cshtml',
+		type: 'partial-view',
+		icon: 'umb:article',
+		hasChildren: false,
+	},
 ];
 
 // Temp mocked database
