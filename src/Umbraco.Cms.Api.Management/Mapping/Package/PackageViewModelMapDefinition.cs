@@ -32,19 +32,19 @@ public class PackageViewModelMapDefinition : IMapDefinition
         target.Stylesheets = source.Stylesheets;
         target.Scripts = source.Scripts;
         target.DataTypes = source.DataTypes;
-        target.MediaUdis = source.MediaKeys.Select(x => new GuidUdi(Constants.UdiEntityType.Media, x)).ToList();
+        target.MediaUdis = source.MediaIds.Select(x => new GuidUdi(Constants.UdiEntityType.Media, x)).ToList();
         target.MediaLoadChildNodes = source.MediaLoadChildNodes;
     }
 
     // Umbraco.Code.MapAll
     private static void Map(PackageDefinition source, PackageDefinitionResponseModel target, MapperContext context)
     {
-        target.Key = source.PackageId;
+        target.Id = source.PackageId;
         target.Name = source.Name;
         target.PackagePath = source.PackagePath;
         target.ContentNodeId = source.ContentNodeId;
         target.ContentLoadChildNodes = source.ContentLoadChildNodes;
-        target.MediaKeys = source.MediaUdis.Select(x => x.Guid).ToList();
+        target.MediaIds = source.MediaUdis.Select(x => x.Guid).ToList();
         target.MediaLoadChildNodes = source.MediaLoadChildNodes;
         target.DocumentTypes = source.DocumentTypes;
         target.MediaTypes = source.MediaTypes;

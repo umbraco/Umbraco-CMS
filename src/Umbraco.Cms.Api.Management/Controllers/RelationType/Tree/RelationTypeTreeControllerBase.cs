@@ -32,6 +32,6 @@ public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTre
             Type = Constants.UdiEntityType.RelationType,
             HasChildren = false,
             IsContainer = false,
-            ParentKey = parentKey
+            ParentId = parentKey
         }).ToArray();
 }

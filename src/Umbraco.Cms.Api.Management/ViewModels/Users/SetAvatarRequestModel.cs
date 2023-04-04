@@ -2,5 +2,5 @@
 
 public class SetAvatarRequestModel
 {
-    public Guid FileKey { get; set; }
+    public Guid FileId { get; set; }
 }

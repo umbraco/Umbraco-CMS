@@ -22,12 +22,12 @@ public class UpdateDomainsController : DocumentControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpPut("{key:guid}/domains")]
-    public async Task<IActionResult> UpdateDomainsAsync(Guid key, UpdateDomainsRequestModel updateModel)
+    [HttpPut("{id:guid}/domains")]
+    public async Task<IActionResult> UpdateDomainsAsync(Guid id, UpdateDomainsRequestModel updateModel)
     {
         DomainsUpdateModel domainsUpdateModel = _umbracoMapper.Map<DomainsUpdateModel>(updateModel)!;
 
-        Attempt<IEnumerable<IDomain>, DomainOperationStatus> result = await _domainService.UpdateDomainsAsync(key, domainsUpdateModel);
+        Attempt<IEnumerable<IDomain>, DomainOperationStatus> result = await _domainService.UpdateDomainsAsync(id, domainsUpdateModel);
 
         return result.Status switch
         {

@@ -10,12 +10,12 @@ public class DictionaryOverviewResponseModel
     /// <summary>
     ///     Gets or sets the key.
     /// </summary>
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     ///     Gets or sets the parent key.
     /// </summary>
-    public Guid? ParentKey { get; set; }
+    public Guid? ParentId { get; set; }
 
     /// <summary>
     ///     Sets the translations.

@@ -27,16 +27,16 @@ public class ByIdTrackedReferenceController : TrackedReferenceControllerBase
     ///     Used by info tabs on content, media etc. and for the delete and unpublish of single items.
     ///     This is basically finding parents of relations.
     /// </remarks>
-    [HttpGet("{key:guid}")]
+    [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RelationItemResponseModel>>> Get(
-        Guid key,
+        Guid id,
         long skip = 0,
         long take = 20,
         bool filterMustBeIsDependency = false)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(key, skip, take, filterMustBeIsDependency);
+        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, filterMustBeIsDependency);
 
         var pagedViewModel = new PagedViewModel<RelationItemResponseModel>
         {

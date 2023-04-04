@@ -19,8 +19,8 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueModel, 
     // Umbraco.Code.MapAll -Urls
     private void Map(IMedia source, MediaResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
-        target.ContentTypeKey = source.ContentType.Key;
+        target.Id = source.Key;
+        target.ContentTypeId = source.ContentType.Key;
         target.Values = MapValueViewModels(source);
         target.Variants = MapVariantViewModels(source);
     }

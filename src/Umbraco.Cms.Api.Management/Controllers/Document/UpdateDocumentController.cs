@@ -27,14 +27,14 @@ public class UpdateDocumentController : DocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{key:guid}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, UpdateDocumentRequestModel requestModel)
+    public async Task<IActionResult> Update(Guid id, UpdateDocumentRequestModel requestModel)
     {
-        IContent? content = await _contentEditingService.GetAsync(key);
+        IContent? content = await _contentEditingService.GetAsync(id);
         if (content == null)
         {
             return DocumentNotFound();

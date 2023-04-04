@@ -19,14 +19,14 @@ public class DeleteDictionaryController : DictionaryControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpDelete($"{{{nameof(key)}:guid}}")]
+    [HttpDelete($"{{{nameof(id)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = await _dictionaryItemService.DeleteAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IDictionaryItem?, DictionaryItemOperationStatus> result = await _dictionaryItemService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

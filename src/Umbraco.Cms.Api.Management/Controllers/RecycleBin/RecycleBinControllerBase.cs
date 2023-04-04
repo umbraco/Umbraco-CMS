@@ -71,7 +71,7 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             IsContainer = entity.IsContainer,
-            ParentKey = parentKey
+            ParentId = parentKey
         };
 
         return viewModel;

@@ -20,7 +20,7 @@ public abstract class FolderManagementControllerBase<TStatus> : ManagementApiCon
         EntityContainer? container = await GetContainerAsync(key);
         if (container == null)
         {
-            return NotFound($"Could not find the folder with key: {key}");
+            return NotFound($"Could not find the folder with id: {key}");
         }
 
         EntityContainer? parentContainer = await GetParentContainerAsync(container);

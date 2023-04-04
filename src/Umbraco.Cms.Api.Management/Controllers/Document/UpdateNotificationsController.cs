@@ -20,12 +20,12 @@ public class UpdateNotificationsController : DocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{key:guid}/notifications")]
+    [HttpPut("{id:guid}/notifications")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateNotifications(Guid key, UpdateDocumentNotificationsRequestModel updateModel)
+    public async Task<IActionResult> UpdateNotifications(Guid id, UpdateDocumentNotificationsRequestModel updateModel)
     {
-        IContent? content = await _contentEditingService.GetAsync(key);
+        IContent? content = await _contentEditingService.GetAsync(id);
         if (content == null)
         {
             return DocumentNotFound();

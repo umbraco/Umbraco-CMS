@@ -44,8 +44,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             UpdateDate = user.UpdateDate,
             State = user.UserState,
             UserGroupIds = new SortedSet<Guid>(user.Groups.Select(x => x.Key)),
-            ContentStartNodeKeys = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
-            MediaStartNodeKeys = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
+            ContentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
+            MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastlockoutDate = user.LastLockoutDate,
@@ -108,7 +108,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     public CreateUserResponseModel CreateCreationResponseModel(UserCreationResult creationResult)
         => new()
         {
-            UserKey = creationResult.CreatedUser?.Key ?? Guid.Empty,
+            UserId = creationResult.CreatedUser?.Key ?? Guid.Empty,
             InitialPassword = creationResult.InitialPassword,
         };
 

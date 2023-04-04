@@ -17,13 +17,13 @@ public class TemporaryFileViewModelsMapDefinition : IMapDefinition
     {
         target.OpenReadStream = () => source.File.OpenReadStream();
         target.FileName = source.File.FileName;
-        target.Key = source.Key;
+        target.Key = source.Id;
     }
 
     // Umbraco.Code.MapAll
     private void Map(TemporaryFileModel source, TemporaryFileResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.AvailableUntil = source.AvailableUntil;
         target.FileName = source.FileName;
     }

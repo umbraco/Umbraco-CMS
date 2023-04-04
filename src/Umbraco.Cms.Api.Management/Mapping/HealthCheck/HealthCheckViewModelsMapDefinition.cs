@@ -26,7 +26,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
     private static void Map(HealthCheckActionRequestModel source, HealthCheckAction target, MapperContext context)
     {
         target.Alias = source.Alias;
-        target.HealthCheckId = source.HealthCheckKey;
+        target.HealthCheckId = source.HealthCheckId;
         target.Name = source.Name;
         target.Description = source.Description;
         target.ValueRequired = source.ValueRequired;
@@ -40,7 +40,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
     {
         if (source.HealthCheckId is not null)
         {
-            target.HealthCheckKey = (Guid)source.HealthCheckId;
+            target.HealthCheckId = (Guid)source.HealthCheckId;
         }
 
         target.Alias = source.Alias;
@@ -64,7 +64,7 @@ public class HealthCheckViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private static void Map(Core.HealthChecks.HealthCheck source, HealthCheckViewModel target, MapperContext context)
     {
-        target.Key = source.Id;
+        target.Id = source.Id;
         target.Name = source.Name;
         target.Description = source.Description;
     }

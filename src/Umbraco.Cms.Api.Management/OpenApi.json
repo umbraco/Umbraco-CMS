@@ -61,15 +61,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/audit-log/{key}": {
+    "/umbraco/management/api/v1/audit-log/{id}": {
       "get": {
         "tags": [
           "Audit Log"
         ],
-        "operationId": "GetAuditLogByKey",
+        "operationId": "GetAuditLogById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -659,46 +659,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/data-type/item": {
-      "get": {
-        "tags": [
-          "Data Type"
-        ],
-        "operationId": "GetDataTypeItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DataTypeItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/tree/data-type/children": {
       "get": {
         "tags": [
@@ -707,7 +667,7 @@
         "operationId": "GetTreeDataTypeChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -748,6 +708,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/data-type/item": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetTreeDataTypeItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -900,15 +903,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/{key}": {
+    "/umbraco/management/api/v1/dictionary/{id}": {
       "get": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryByKey",
+        "operationId": "GetDictionaryById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -941,10 +944,10 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "DeleteDictionaryByKey",
+        "operationId": "DeleteDictionaryById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -976,10 +979,10 @@
         "tags": [
           "Dictionary"
         ],
-        "operationId": "PutDictionaryByKey",
+        "operationId": "PutDictionaryById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1021,15 +1024,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/{key}/export": {
+    "/umbraco/management/api/v1/dictionary/{id}/export": {
       "get": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "GetDictionaryByKeyExport",
+        "operationId": "GetDictionaryByIdExport",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1064,15 +1067,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/{key}/move": {
+    "/umbraco/management/api/v1/dictionary/{id}/move": {
       "post": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "PostDictionaryByKeyMove",
+        "operationId": "PostDictionaryByIdMove",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1163,46 +1166,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/dictionary/item": {
-      "get": {
-        "tags": [
-          "Dictionary"
-        ],
-        "operationId": "GetDictionaryItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DictionaryItemItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/tree/dictionary/children": {
       "get": {
         "tags": [
@@ -1211,7 +1174,7 @@
         "operationId": "GetTreeDictionaryChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1244,6 +1207,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/dictionary/item": {
+      "get": {
+        "tags": [
+          "Dictionary"
+        ],
+        "operationId": "GetTreeDictionaryItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -1291,15 +1297,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document-blueprint/item": {
+    "/umbraco/management/api/v1/tree/document-blueprint/item": {
       "get": {
         "tags": [
           "Document Blueprint"
         ],
-        "operationId": "GetDocumentBlueprintItem",
+        "operationId": "GetTreeDocumentBlueprintItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -1320,7 +1326,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/DocumentBlueprintResponseModel"
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
                       }
                     ]
                   }
@@ -1371,15 +1377,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document-type/{key}": {
+    "/umbraco/management/api/v1/document-type/{id}": {
       "get": {
         "tags": [
           "Document Type"
         ],
-        "operationId": "GetDocumentTypeByKey",
+        "operationId": "GetDocumentTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1409,46 +1415,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document-type/item": {
-      "get": {
-        "tags": [
-          "Document Type"
-        ],
-        "operationId": "GetDocumentTypeItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentTypeItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/tree/document-type/children": {
       "get": {
         "tags": [
@@ -1457,7 +1423,7 @@
         "operationId": "GetTreeDocumentTypeChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1498,6 +1464,46 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedDocumentTypeTreeItemResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/document-type/item": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetTreeDocumentTypeItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -1595,15 +1601,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document/{key}": {
+    "/umbraco/management/api/v1/document/{id}": {
       "get": {
         "tags": [
           "Document"
         ],
-        "operationId": "GetDocumentByKey",
+        "operationId": "GetDocumentById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1636,10 +1642,10 @@
         "tags": [
           "Document"
         ],
-        "operationId": "DeleteDocumentByKey",
+        "operationId": "DeleteDocumentById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1664,10 +1670,10 @@
         "tags": [
           "Document"
         ],
-        "operationId": "PutDocumentByKey",
+        "operationId": "PutDocumentById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1702,15 +1708,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document/{key}/domains": {
+    "/umbraco/management/api/v1/document/{id}/domains": {
       "get": {
         "tags": [
           "Document"
         ],
-        "operationId": "GetDocumentByKeyDomains",
+        "operationId": "GetDocumentByIdDomains",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1729,10 +1735,10 @@
         "tags": [
           "Document"
         ],
-        "operationId": "PutDocumentByKeyDomains",
+        "operationId": "PutDocumentByIdDomains",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1761,15 +1767,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document/{key}/notifications": {
+    "/umbraco/management/api/v1/document/{id}/notifications": {
       "get": {
         "tags": [
           "Document"
         ],
-        "operationId": "GetDocumentByKeyNotifications",
+        "operationId": "GetDocumentByIdNotifications",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1805,10 +1811,10 @@
         "tags": [
           "Document"
         ],
-        "operationId": "PutDocumentByKeyNotifications",
+        "operationId": "PutDocumentByIdNotifications",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -1840,61 +1846,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/document/item": {
-      "get": {
-        "tags": [
-          "Document"
-        ],
-        "operationId": "GetDocumentItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          },
-          {
-            "name": "dataTypeKey",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "culture",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/DocumentItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/recycle-bin/document/children": {
       "get": {
         "tags": [
@@ -1903,7 +1854,7 @@
         "operationId": "GetRecycleBinDocumentChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1997,7 +1948,7 @@
         "operationId": "GetTreeDocumentChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2023,7 +1974,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2045,6 +1996,61 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedDocumentTreeItemResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/document/item": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetTreeDocumentItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "dataTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -2078,7 +2084,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2798,33 +2804,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/language/item": {
-      "get": {
-        "tags": [
-          "Language"
-        ],
-        "operationId": "GetLanguageItem",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/LanguageItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/log-viewer/level": {
       "get": {
         "tags": [
@@ -3249,15 +3228,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/media-type/{key}": {
+    "/umbraco/management/api/v1/media-type/{id}": {
       "get": {
         "tags": [
           "Media Type"
         ],
-        "operationId": "GetMediaTypeByKey",
+        "operationId": "GetMediaTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3287,46 +3266,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/media-type/item": {
-      "get": {
-        "tags": [
-          "Media Type"
-        ],
-        "operationId": "GetMediaTypeItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTypeItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/tree/media-type/children": {
       "get": {
         "tags": [
@@ -3335,7 +3274,7 @@
         "operationId": "GetTreeMediaTypeChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3376,6 +3315,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedFolderTreeItemResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/media-type/item": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetTreeMediaTypeItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -3473,15 +3455,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/media/{key}": {
+    "/umbraco/management/api/v1/media/{id}": {
       "get": {
         "tags": [
           "Media"
         ],
-        "operationId": "GetMediaByKey",
+        "operationId": "GetMediaById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3514,10 +3496,10 @@
         "tags": [
           "Media"
         ],
-        "operationId": "DeleteMediaByKey",
+        "operationId": "DeleteMediaById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3542,10 +3524,10 @@
         "tags": [
           "Media"
         ],
-        "operationId": "PutMediaByKey",
+        "operationId": "PutMediaById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -3580,54 +3562,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/media/item": {
-      "get": {
-        "tags": [
-          "Media"
-        ],
-        "operationId": "GetMediaItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          },
-          {
-            "name": "dataTypeKey",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/recycle-bin/media/children": {
       "get": {
         "tags": [
@@ -3636,7 +3570,7 @@
         "operationId": "GetRecycleBinMediaChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3730,7 +3664,7 @@
         "operationId": "GetTreeMediaChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3756,7 +3690,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3786,7 +3720,7 @@
         "operationId": "GetTreeMediaItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3797,7 +3731,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3855,7 +3789,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3877,15 +3811,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/member-group/item": {
+    "/umbraco/management/api/v1/tree/member-group/item": {
       "get": {
         "tags": [
           "Member Group"
         ],
-        "operationId": "GetMemberGroupItem",
+        "operationId": "GetTreeMemberGroupItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3906,7 +3840,22 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/MemberGroupItemReponseModel"
+                        "$ref": "#/components/schemas/EntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       }
                     ]
                   }
@@ -3957,15 +3906,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/member-type/item": {
+    "/umbraco/management/api/v1/tree/member-type/item": {
       "get": {
         "tags": [
           "Member Type"
         ],
-        "operationId": "GetMemberTypeItem",
+        "operationId": "GetTreeMemberTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3986,7 +3935,22 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/MemberTypeItemResponseModel"
+                        "$ref": "#/components/schemas/EntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
                       }
                     ]
                   }
@@ -4271,15 +4235,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/package/created/{key}": {
+    "/umbraco/management/api/v1/package/created/{id}": {
       "get": {
         "tags": [
           "Package"
         ],
-        "operationId": "GetPackageCreatedByKey",
+        "operationId": "GetPackageCreatedById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4312,10 +4276,10 @@
         "tags": [
           "Package"
         ],
-        "operationId": "DeletePackageCreatedByKey",
+        "operationId": "DeletePackageCreatedById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4337,10 +4301,10 @@
         "tags": [
           "Package"
         ],
-        "operationId": "PutPackageCreatedByKey",
+        "operationId": "PutPackageCreatedById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4372,15 +4336,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/package/created/{key}/download": {
+    "/umbraco/management/api/v1/package/created/{id}/download": {
       "get": {
         "tags": [
           "Package"
         ],
-        "operationId": "GetPackageCreatedByKeyDownload",
+        "operationId": "GetPackageCreatedByIdDownload",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4474,45 +4438,6 @@
         }
       }
     },
-    "/umbraco/management/api/v1/partial-view/item": {
-      "get": {
-        "tags": [
-          "Partial View"
-        ],
-        "operationId": "GetPartialViewItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/PartialViewItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/tree/partial-view/children": {
       "get": {
         "tags": [
@@ -4553,6 +4478,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/partial-view/item": {
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetTreePartialViewItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -4762,15 +4726,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/redirect-management/{key}": {
+    "/umbraco/management/api/v1/redirect-management/{id}": {
       "get": {
         "tags": [
           "Redirect Management"
         ],
-        "operationId": "GetRedirectManagementByKey",
+        "operationId": "GetRedirectManagementById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4812,10 +4776,10 @@
         "tags": [
           "Redirect Management"
         ],
-        "operationId": "DeleteRedirectManagementByKey",
+        "operationId": "DeleteRedirectManagementById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4921,15 +4885,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/relation-type/{key}": {
+    "/umbraco/management/api/v1/relation-type/{id}": {
       "get": {
         "tags": [
           "Relation Type"
         ],
-        "operationId": "GetRelationTypeByKey",
+        "operationId": "GetRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4962,10 +4926,10 @@
         "tags": [
           "Relation Type"
         ],
-        "operationId": "DeleteRelationTypeByKey",
+        "operationId": "DeleteRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -4994,10 +4958,10 @@
         "tags": [
           "Relation Type"
         ],
-        "operationId": "PutRelationTypeByKey",
+        "operationId": "PutRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5057,15 +5021,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/relation-type/item": {
+    "/umbraco/management/api/v1/tree/relation-type/item": {
       "get": {
         "tags": [
           "Relation Type"
         ],
-        "operationId": "GetRelationTypeItem",
+        "operationId": "GetTreeRelationTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "type": "array",
@@ -5086,7 +5050,10 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/RelationTypeItemResponseModel"
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -5230,15 +5197,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/relation/type/{key}": {
+    "/umbraco/management/api/v1/relation/type/{id}": {
       "get": {
         "tags": [
           "Relation"
         ],
-        "operationId": "GetRelationTypeByKey",
+        "operationId": "GetRelationTypeById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5272,45 +5239,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedRelationResponseModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/script/item": {
-      "get": {
-        "tags": [
-          "Script"
-        ],
-        "operationId": "GetScriptItem",
-        "parameters": [
-          {
-            "name": "path",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/ScriptItemResponseModel"
-                      }
-                    ]
-                  }
                 }
               }
             }
@@ -5358,6 +5286,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/script/item": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "GetTreeScriptItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -5645,6 +5612,45 @@
         }
       }
     },
+    "/umbraco/management/api/v1/tree/static-file/item": {
+      "get": {
+        "tags": [
+          "Static File"
+        ],
+        "operationId": "GetTreeStaticFileItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/static-file/root": {
       "get": {
         "tags": [
@@ -5678,45 +5684,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/stylesheet/item": {
-      "get": {
-        "tags": [
-          "Stylesheet"
-        ],
-        "operationId": "GetStylesheetItem",
-        "parameters": [
-          {
-            "name": "path",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/ScriptItemResponseModel"
-                      }
-                    ]
-                  }
                 }
               }
             }
@@ -5764,6 +5731,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedFileSystemTreeItemPresentationModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/stylesheet/item": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "GetTreeStylesheetItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/FileSystemTreeItemPresentationModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -5956,15 +5962,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/template/{key}": {
+    "/umbraco/management/api/v1/template/{id}": {
       "get": {
         "tags": [
           "Template"
         ],
-        "operationId": "GetTemplateByKey",
+        "operationId": "GetTemplateById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5997,10 +6003,10 @@
         "tags": [
           "Template"
         ],
-        "operationId": "DeleteTemplateByKey",
+        "operationId": "DeleteTemplateById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6032,10 +6038,10 @@
         "tags": [
           "Template"
         ],
-        "operationId": "PutTemplateByKey",
+        "operationId": "PutTemplateById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6073,46 +6079,6 @@
           },
           "404": {
             "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/template/item": {
-      "get": {
-        "tags": [
-          "Template"
-        ],
-        "operationId": "GetTemplateItem",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/TemplateItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -6213,7 +6179,7 @@
         "operationId": "GetTreeTemplateChildren",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -6246,6 +6212,61 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/tree/template/item": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTreeTemplateItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/EntityTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/ContentTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -6305,7 +6326,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "Key": {
+                  "Id": {
                     "type": "string",
                     "format": "uuid"
                   },
@@ -6316,7 +6337,7 @@
                 }
               },
               "encoding": {
-                "Key": {
+                "Id": {
                   "style": "form"
                 },
                 "File": {
@@ -6353,15 +6374,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/temporaryfile/{key}": {
+    "/umbraco/management/api/v1/temporaryfile/{id}": {
       "get": {
         "tags": [
           "Temporary File"
         ],
-        "operationId": "GetTemporaryfileByKey",
+        "operationId": "GetTemporaryfileById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6411,10 +6432,10 @@
         "tags": [
           "Temporary File"
         ],
-        "operationId": "DeleteTemporaryfileByKey",
+        "operationId": "DeleteTemporaryfileById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6450,15 +6471,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/{key}": {
+    "/umbraco/management/api/v1/tracked-reference/{id}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceByKey",
+        "operationId": "GetTrackedReferenceById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6507,15 +6528,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/tracked-reference/descendants/{parentKey}": {
+    "/umbraco/management/api/v1/tracked-reference/descendants/{parentId}": {
       "get": {
         "tags": [
           "Tracked Reference"
         ],
-        "operationId": "GetTrackedReferenceDescendantsByParentKey",
+        "operationId": "GetTrackedReferenceDescendantsByParentId",
         "parameters": [
           {
-            "name": "parentKey",
+            "name": "parentId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6570,7 +6591,7 @@
         "operationId": "GetTrackedReferenceItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -6773,15 +6794,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups/{key}": {
+    "/umbraco/management/api/v1/user-groups/{id}": {
       "get": {
         "tags": [
           "User Groups"
         ],
-        "operationId": "GetUserGroupsByKey",
+        "operationId": "GetUserGroupsById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6814,10 +6835,10 @@
         "tags": [
           "User Groups"
         ],
-        "operationId": "DeleteUserGroupsByKey",
+        "operationId": "DeleteUserGroupsById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -6839,10 +6860,10 @@
         "tags": [
           "User Groups"
         ],
-        "operationId": "PutUserGroupsByKey",
+        "operationId": "PutUserGroupsById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -7400,45 +7421,6 @@
           }
         }
       }
-    },
-    "/item": {
-      "get": {
-        "tags": [
-          "v1"
-        ],
-        "operationId": "GetItem",
-        "parameters": [
-          {
-            "name": "path",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/StaticFileItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -7446,11 +7428,11 @@
       "AuditLogBaseModel": {
         "type": "object",
         "properties": {
-          "userKey": {
+          "userId": {
             "type": "string",
             "format": "uuid"
           },
-          "entityKey": {
+          "entityId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7586,11 +7568,11 @@
               ]
             }
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "contentTypeKey": {
+          "contentTypeId": {
             "type": "string",
             "format": "uuid"
           }
@@ -7659,7 +7641,7 @@
       "ContentTypeCompositionModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7680,7 +7662,7 @@
       "ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7755,7 +7737,7 @@
       "ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7830,7 +7812,7 @@
       "ContentTypeSortModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -7857,7 +7839,7 @@
       "CopyDataTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7888,7 +7870,7 @@
               ]
             }
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7919,7 +7901,7 @@
               ]
             }
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7956,7 +7938,7 @@
           }
         ],
         "properties": {
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -7972,11 +7954,11 @@
           }
         ],
         "properties": {
-          "contentTypeKey": {
+          "contentTypeId": {
             "type": "string",
             "format": "uuid"
           },
-          "templateKey": {
+          "templateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8027,7 +8009,7 @@
           }
         ],
         "properties": {
-          "contentTypeKey": {
+          "contentTypeId": {
             "type": "string",
             "format": "uuid"
           }
@@ -8051,7 +8033,7 @@
           }
         ],
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8080,7 +8062,7 @@
       "CreateUserResponseModel": {
         "type": "object",
         "properties": {
-          "userKey": {
+          "userId": {
             "type": "string",
             "format": "uuid"
           },
@@ -8101,15 +8083,6 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
-      },
-      "DataTypeItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
         "additionalProperties": false
       },
       "DataTypeModelBaseModel": {
@@ -8165,7 +8138,7 @@
       "DataTypeReferenceResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -8203,7 +8176,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8299,15 +8272,6 @@
         },
         "additionalProperties": false
       },
-      "DictionaryItemItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "DictionaryItemModelBaseModel": {
         "type": "object",
         "properties": {
@@ -8373,11 +8337,11 @@
             "type": "string",
             "nullable": true
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8413,15 +8377,6 @@
         },
         "additionalProperties": false
       },
-      "DocumentBlueprintResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
           "$type"
@@ -8436,7 +8391,7 @@
           "$type": {
             "type": "string"
           },
-          "documentTypeKey": {
+          "documentTypeId": {
             "type": "string",
             "format": "uuid"
           },
@@ -8455,15 +8410,6 @@
             "DocumentBlueprintTreeItemResponseModel": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
           }
         }
-      },
-      "DocumentItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
       },
       "DocumentNotificationResponseModel": {
         "type": "object",
@@ -8495,7 +8441,7 @@
               ]
             }
           },
-          "templateKey": {
+          "templateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8535,20 +8481,6 @@
           }
         }
       },
-      "DocumentTypeItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "properties": {
-          "isElement": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
       "DocumentTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "allOf": [
@@ -8575,14 +8507,14 @@
           }
         ],
         "properties": {
-          "allowedTemplateKeys": {
+          "allowedTemplateIds": {
             "type": "array",
             "items": {
               "type": "string",
               "format": "uuid"
             }
           },
-          "defaultTemplateKey": {
+          "defaultTemplateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8776,7 +8708,7 @@
           "isContainer": {
             "type": "boolean"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8806,21 +8738,6 @@
             "items": {
               "type": "string"
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "FileItemResponseModelBaseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -8913,7 +8830,7 @@
       "HealthCheckActionRequestModel": {
         "type": "object",
         "properties": {
-          "healthCheckKey": {
+          "healthCheckId": {
             "type": "string",
             "format": "uuid"
           },
@@ -9023,7 +8940,7 @@
       "HealthCheckModelBaseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           }
@@ -9113,11 +9030,11 @@
       "ImportDictionaryRequestModel": {
         "type": "object",
         "properties": {
-          "temporaryFileKey": {
+          "temporaryFileId": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9224,34 +9141,6 @@
           "message": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ItemResponseModelBaseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "icon": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LanguageItemResponseModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "isoCode": {
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -9401,24 +9290,6 @@
         },
         "additionalProperties": false
       },
-      "MediaItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "MediaTypeItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "MediaTypePropertyTypeContainerResponseModel": {
         "type": "object",
         "allOf": [
@@ -9515,24 +9386,6 @@
           }
         }
       },
-      "MemberGroupItemReponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "MemberTypeItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "ModelsBuilderResponseModel": {
         "type": "object",
         "properties": {
@@ -9576,7 +9429,7 @@
       "MoveDataTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9587,7 +9440,7 @@
       "MoveDictionaryRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9659,7 +9512,7 @@
           }
         ],
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -9711,7 +9564,7 @@
           "contentLoadChildNodes": {
             "type": "boolean"
           },
-          "mediaKeys": {
+          "mediaIds": {
             "type": "array",
             "items": {
               "type": "string",
@@ -10543,15 +10396,6 @@
         },
         "additionalProperties": false
       },
-      "PartialViewItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FileItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "ProblemDetailsModel": {
         "type": "object",
         "properties": {
@@ -10609,11 +10453,11 @@
       "PropertyTypeContainerResponseModelBaseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -10635,11 +10479,11 @@
       "PropertyTypeResponseModelBaseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
-          "containerKey": {
+          "containerId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -10654,7 +10498,7 @@
             "type": "string",
             "nullable": true
           },
-          "dataTypeKey": {
+          "dataTypeId": {
             "type": "string",
             "format": "uuid"
           },
@@ -10730,7 +10574,7 @@
           "isContainer": {
             "type": "boolean"
           },
-          "parentKey": {
+          "parentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -10755,7 +10599,7 @@
       "RedirectUrlResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -10769,7 +10613,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "contentKey": {
+          "contentId": {
             "type": "string",
             "format": "uuid"
           },
@@ -10795,7 +10639,7 @@
       "RelationItemResponseModel": {
         "type": "object",
         "properties": {
-          "nodeKey": {
+          "nodeId": {
             "type": "string",
             "format": "uuid"
           },
@@ -10891,15 +10735,6 @@
         },
         "additionalProperties": false
       },
-      "RelationTypeItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "RelationTypeResponseModel": {
         "type": "object",
         "allOf": [
@@ -10908,7 +10743,7 @@
           }
         ],
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -10984,15 +10819,6 @@
         ],
         "additionalProperties": false
       },
-      "ScriptItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FileItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
       "SearchResultResponseModel": {
         "type": "object",
         "properties": {
@@ -11042,20 +10868,11 @@
       "SetAvatarRequestModel": {
         "type": "object",
         "properties": {
-          "fileKey": {
+          "fileId": {
             "type": "string",
             "format": "uuid"
           }
         },
-        "additionalProperties": false
-      },
-      "StaticFileItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FileItemResponseModelBaseModel"
-          }
-        ],
         "additionalProperties": false
       },
       "StatusResultTypeModel": {
@@ -11067,15 +10884,6 @@
         ],
         "type": "integer",
         "format": "int32"
-      },
-      "StylesheetItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FileItemResponseModelBaseModel"
-          }
-        ],
-        "additionalProperties": false
       },
       "TelemetryLevelModel": {
         "enum": [
@@ -11109,15 +10917,6 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/TelemetryRepresentationBaseModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "TemplateItemResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -11156,7 +10955,7 @@
       "TemplateQueryExecuteModel": {
         "type": "object",
         "properties": {
-          "rootContentKey": {
+          "rootContentId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -11350,7 +11149,7 @@
       "TemporaryFileResponseModel": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid"
           },
@@ -11487,7 +11286,7 @@
           }
         ],
         "properties": {
-          "templateKey": {
+          "templateId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -11671,12 +11470,12 @@
           "hasAccessToAllLanguages": {
             "type": "boolean"
           },
-          "documentStartNodeKey": {
+          "documentStartNodeId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "mediaStartNodeKey": {
+          "mediaStartNodeId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -11808,7 +11607,7 @@
             "type": "string",
             "nullable": true
           },
-          "contentStartNodeKeys": {
+          "contentStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -11816,7 +11615,7 @@
               "format": "uuid"
             }
           },
-          "mediaStartNodeKeys": {
+          "mediaStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {

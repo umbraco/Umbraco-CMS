@@ -15,13 +15,13 @@ public class DeleteUserGroupController : UserGroupsControllerBase
         _userGroupService = userGroupService;
     }
 
-    [HttpDelete("{key:guid}")]
+    [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(key);
+        Attempt<UserGroupOperationStatus> result = await _userGroupService.DeleteAsync(id);
 
         return result.Success
             ? Ok()

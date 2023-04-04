@@ -17,11 +17,11 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
 
-    // Umbraco.Code.MapAll -Urls -TemplateKey
+    // Umbraco.Code.MapAll -Urls -TemplateId
     private void Map(IContent source, DocumentResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
-        target.ContentTypeKey = source.ContentType.Key;
+        target.Id = source.Key;
+        target.ContentTypeId = source.ContentType.Key;
         target.Values = MapValueViewModels(source);
         target.Variants = MapVariantViewModels(
             source,

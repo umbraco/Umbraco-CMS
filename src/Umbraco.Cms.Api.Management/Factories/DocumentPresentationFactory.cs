@@ -35,7 +35,7 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
 
         responseModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
 
-        responseModel.TemplateKey = content.TemplateId.HasValue
+        responseModel.TemplateId = content.TemplateId.HasValue
             ? _fileService.GetTemplate(content.TemplateId.Value)?.Key
             : null;
 

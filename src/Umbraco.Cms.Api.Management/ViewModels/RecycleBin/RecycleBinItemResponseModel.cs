@@ -14,6 +14,6 @@ public class RecycleBinItemResponseModel : INamedEntityPresentationModel
 
     public bool IsContainer { get; set; }
 
-    public Guid? ParentKey { get; set; }
+    public Guid? ParentId { get; set; }
 }
 
