@@ -209,7 +209,7 @@ public class RuntimeState : IRuntimeState
                     // cannot connect to configured database, this is bad, fail
                     _logger.LogDebug("Could not connect to database.");
 
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory.ProviderName))
+                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.Install;
