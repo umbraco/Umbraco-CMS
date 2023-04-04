@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
-public class EFCoreDatabaseDataCreator : IDatabaseDataCreator
+internal class EFCoreDatabaseDataCreator : IDatabaseDataCreator
 {
     private readonly UmbracoDbContextFactory _dbContextFactory;
 

@@ -4,7 +4,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
-public class EFDatabaseSchemaCreatorFactory: IDatabaseSchemaCreatorFactory
+internal class EFDatabaseSchemaCreatorFactory: IDatabaseSchemaCreatorFactory
 {
     private readonly ILogger<EFDatabaseSchemaCreator> _logger;
     private readonly UmbracoDbContextFactory _dbContextFactory;

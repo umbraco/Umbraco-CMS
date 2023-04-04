@@ -15,7 +15,6 @@ internal class EfCoreDetachableScope<TDbContext> : EfCoreScope<TDbContext> where
     public EfCoreDetachableScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
-        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         FileSystems fileSystems,
         IEfCoreScopeProvider<TDbContext> efCoreScopeProvider,
@@ -27,7 +26,6 @@ internal class EfCoreDetachableScope<TDbContext> : EfCoreScope<TDbContext> where
         : base(
             distributedLockingMechanismFactory,
             loggerFactory,
-            efCoreDatabaseFactory,
             efCoreScopeAccessor,
             fileSystems,
             efCoreScopeProvider,
@@ -53,7 +51,6 @@ internal class EfCoreDetachableScope<TDbContext> : EfCoreScope<TDbContext> where
     public EfCoreDetachableScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
-        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         FileSystems fileSystems,
         IEfCoreScopeProvider<TDbContext> efCoreScopeProvider,
@@ -65,7 +62,6 @@ internal class EfCoreDetachableScope<TDbContext> : EfCoreScope<TDbContext> where
             parentScope,
             distributedLockingMechanismFactory,
             loggerFactory,
-            efCoreDatabaseFactory,
             efCoreScopeAccessor,
             fileSystems,
             efCoreScopeProvider,

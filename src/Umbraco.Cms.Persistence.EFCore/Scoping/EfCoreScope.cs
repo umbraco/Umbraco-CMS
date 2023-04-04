@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     where TDbContext : DbContext
 {
-    private readonly IUmbracoEfCoreDatabaseFactory _efCoreDatabaseFactory;
     private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
     private readonly EfCoreScopeProvider<TDbContext> _efCoreScopeProvider;
     private readonly IScope? _innerScope;
@@ -24,7 +23,6 @@ internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     protected EfCoreScope(
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
-        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         FileSystems scopedFileSystem,
         IEfCoreScopeProvider<TDbContext> efCoreScopeProvider,
@@ -35,7 +33,6 @@ internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         bool? scopeFileSystems = null)
         : base(distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
     {
-        _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider<TDbContext>)efCoreScopeProvider;
         ScopeContext = scopeContext;
@@ -46,7 +43,6 @@ internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         IScope parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
-        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         FileSystems scopedFileSystem,
         IEfCoreScopeProvider<TDbContext> efCoreScopeProvider,
@@ -57,7 +53,6 @@ internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         bool? scopeFileSystems = null)
         : base(parentScope, distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
     {
-        _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider<TDbContext>)efCoreScopeProvider;
         ScopeContext = scopeContext;
@@ -69,7 +64,6 @@ internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         EfCoreScope<TDbContext> parentScope,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         ILoggerFactory loggerFactory,
-        IUmbracoEfCoreDatabaseFactory efCoreDatabaseFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         FileSystems scopedFileSystem,
         IEfCoreScopeProvider<TDbContext> efCoreScopeProvider,
@@ -80,7 +74,6 @@ internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         bool? scopeFileSystems = null)
         : base(parentScope, distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
     {
-        _efCoreDatabaseFactory = efCoreDatabaseFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _efCoreScopeProvider = (EfCoreScopeProvider<TDbContext>)efCoreScopeProvider;
         ScopeContext = scopeContext;
@@ -238,7 +231,6 @@ internal class EfCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             {
                 _dbContext?.Dispose();
                 _dbContext = null;
-                _efCoreDatabaseFactory.Dispose();
             }
         }
     }

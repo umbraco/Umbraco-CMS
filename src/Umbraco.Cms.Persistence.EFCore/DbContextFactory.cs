@@ -6,7 +6,7 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 namespace Umbraco.Cms.Persistence.EFCore;
 
 
-public class UmbracoDbContextFactory : DbContextFactory<UmbracoEFContext>
+internal class UmbracoDbContextFactory : DbContextFactory<UmbracoEFContext>
 {
     public UmbracoDbContextFactory(IServiceScopeFactory scopeFactory) : base(scopeFactory)
     {

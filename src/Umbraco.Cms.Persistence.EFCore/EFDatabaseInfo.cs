@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
-public class EFDatabaseInfo : DatabaseInfoBase
+internal class EFDatabaseInfo : DatabaseInfoBase
 {
     private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
     private readonly PendingPackageMigrations _pendingPackageMigrations;

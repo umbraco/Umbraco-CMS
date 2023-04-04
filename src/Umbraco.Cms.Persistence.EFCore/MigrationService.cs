@@ -8,7 +8,7 @@ public class MigrationService : IMigrationService
 {
     private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
 
-    public MigrationService(UmbracoDbContextFactory umbracoDbContextFactory)
+    internal MigrationService(UmbracoDbContextFactory umbracoDbContextFactory)
     {
         _umbracoDbContextFactory = umbracoDbContextFactory;
     }

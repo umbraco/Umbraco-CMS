@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
-public class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechanism
+internal class SqliteEFCoreDistributedLockingMechanism : IDistributedLockingMechanism
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;

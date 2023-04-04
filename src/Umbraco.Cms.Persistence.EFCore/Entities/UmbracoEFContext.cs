@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Umbraco.Cms.Persistence.EFCore.Entities
 {
-    public partial class UmbracoEFContext : DbContext
+    internal partial class UmbracoEFContext : DbContext
     {
         public UmbracoEFContext()
         {

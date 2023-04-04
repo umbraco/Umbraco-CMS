@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
-public class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMechanism
+internal class SqlServerEFCoreDistributedLockingMechanism : IDistributedLockingMechanism
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;

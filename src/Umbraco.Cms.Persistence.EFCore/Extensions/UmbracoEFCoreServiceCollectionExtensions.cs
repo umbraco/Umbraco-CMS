@@ -45,7 +45,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         services.AddUnique<IDatabaseSchemaCreatorFactory, EFDatabaseSchemaCreatorFactory>();
         services.AddUnique<IDatabaseDataCreator, EFCoreDatabaseDataCreator>();
         services.AddSingleton<UmbracoDbContextFactory>();
-        services.AddUnique<IUmbracoEfCoreDatabaseFactory, UmbracoEfCoreDatabaseFactory>();
         services.AddUnique<IAmbientEfCoreScopeStack<UmbracoEFContext>, AmbientEfCoreScopeStack<UmbracoEFContext>>();
         services.AddUnique<IEFCoreScopeAccessor<UmbracoEFContext>, EFCoreScopeAccessor<UmbracoEFContext>>();
         services.AddUnique<IEfCoreScopeProvider<UmbracoEFContext>, EfCoreScopeProvider<UmbracoEFContext>>();

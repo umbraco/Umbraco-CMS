@@ -15,7 +15,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> where TDbContext : DbContext
 {
     private readonly IAmbientEfCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
-    private readonly IUmbracoEfCoreDatabaseFactory _umbracoEfCoreDatabaseFactory;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
     private readonly IAmbientEFCoreScopeContextStack _ambientEfCoreScopeContextStack;
@@ -29,7 +28,6 @@ public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> 
     public EfCoreScopeProvider()
         : this(
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEfCoreScopeStack<TDbContext>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IUmbracoEfCoreDatabaseFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<ILoggerFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor<TDbContext>>(),
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeContextStack>(),
@@ -43,7 +41,6 @@ public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> 
 
     internal EfCoreScopeProvider(
         IAmbientEfCoreScopeStack<TDbContext> ambientEfCoreScopeStack,
-        IUmbracoEfCoreDatabaseFactory umbracoEfCoreDatabaseFactory,
         ILoggerFactory loggerFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
         IAmbientEFCoreScopeContextStack ambientEfCoreScopeContextStack,
@@ -54,7 +51,6 @@ public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> 
         IDbContextFactory<TDbContext> dbContextFactory)
     {
         _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
-        _umbracoEfCoreDatabaseFactory = umbracoEfCoreDatabaseFactory;
         _loggerFactory = loggerFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
         _ambientEfCoreScopeContextStack = ambientEfCoreScopeContextStack;
@@ -72,7 +68,6 @@ public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> 
         new EfCoreDetachableScope<TDbContext>(
             _distributedLockingMechanismFactory,
             _loggerFactory,
-            _umbracoEfCoreDatabaseFactory,
             _efCoreScopeAccessor,
             _fileSystems,
             this,
@@ -161,7 +156,6 @@ public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> 
                 parentScope,
                 _distributedLockingMechanismFactory,
                 _loggerFactory,
-                _umbracoEfCoreDatabaseFactory,
                 _efCoreScopeAccessor,
                 _fileSystems,
                 this,
@@ -184,7 +178,6 @@ public class EfCoreScopeProvider<TDbContext> : IEfCoreScopeProvider<TDbContext> 
             (EfCoreScope<TDbContext>)_ambientEfCoreScopeStack.AmbientScope,
             _distributedLockingMechanismFactory,
             _loggerFactory,
-            _umbracoEfCoreDatabaseFactory,
             _efCoreScopeAccessor,
             _fileSystems,
             this,
