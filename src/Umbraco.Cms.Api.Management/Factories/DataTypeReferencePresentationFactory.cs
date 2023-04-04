@@ -47,7 +47,7 @@ public class DataTypeReferencePresentationFactory : IDataTypeReferencePresentati
                 IEnumerable<string> propertyAliases = propertyAliasesByGuid[contentType.Key];
                 yield return new DataTypeReferenceResponseModel
                 {
-                    Key = contentType.Key,
+                    Id = contentType.Key,
                     Type = usagesByEntityType.Key,
                     Properties = contentType
                         .PropertyTypes

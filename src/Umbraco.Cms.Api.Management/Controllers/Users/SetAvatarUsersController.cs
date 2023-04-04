@@ -28,7 +28,7 @@ public class SetAvatarUsersController : UsersControllerBase
             return NotFound();
         }
 
-        UserOperationStatus result = await _userService.SetAvatarAsync(user, model.FileKey);
+        UserOperationStatus result = await _userService.SetAvatarAsync(user, model.FileId);
 
         return result is UserOperationStatus.Success
             ? Ok()

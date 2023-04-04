@@ -20,18 +20,18 @@ public class DeleteCreatedPackageController : CreatedPackageControllerBase
     }
 
     /// <summary>
-    ///     Deletes a package with a given key.
+    ///     Deletes a package with a given id.
     /// </summary>
-    /// <param name="key">The key of the package.</param>
+    /// <param name="id">The id of the package.</param>
     /// <returns>The result of the deletion.</returns>
-    [HttpDelete("{key:guid}")]
+    [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(Guid id)
     {
         Attempt<PackageDefinition?, PackageOperationStatus> result =
-            await _packagingService.DeleteCreatedPackageAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
+            await _packagingService.DeleteCreatedPackageAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

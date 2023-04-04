@@ -18,12 +18,12 @@ public class NotificationsController : DocumentControllerBase
         _documentNotificationPresentationFactory = documentNotificationPresentationFactory;
     }
 
-    [HttpGet("{key:guid}/notifications")]
+    [HttpGet("{id:guid}/notifications")]
     [ProducesResponseType(typeof(IEnumerable<DocumentNotificationResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Notifications(Guid key)
+    public async Task<IActionResult> Notifications(Guid id)
     {
-        IContent? content = await _contentEditingService.GetAsync(key);
+        IContent? content = await _contentEditingService.GetAsync(id);
         return content != null
             ? Ok(await _documentNotificationPresentationFactory.CreateNotificationModelsAsync(content))
             : DocumentNotFound();

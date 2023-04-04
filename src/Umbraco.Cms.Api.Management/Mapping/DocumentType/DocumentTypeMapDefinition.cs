@@ -15,7 +15,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
     // Umbraco.Code.MapAll
     private void Map(IContentType source, DocumentTypeResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.Alias = source.Alias;
         target.Name = source.Name ?? string.Empty;
         target.Description = source.Description;
@@ -31,10 +31,10 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
 
         if (source.AllowedTemplates != null)
         {
-            target.AllowedTemplateKeys = source.AllowedTemplates.Select(template => template.Key);
+            target.AllowedTemplateIds = source.AllowedTemplates.Select(template => template.Key);
         }
 
-        target.DefaultTemplateKey = source.DefaultTemplate?.Key;
+        target.DefaultTemplateId = source.DefaultTemplate?.Key;
 
         if (source.HistoryCleanup != null)
         {

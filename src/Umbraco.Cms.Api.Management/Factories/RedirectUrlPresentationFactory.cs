@@ -25,10 +25,10 @@ public class RedirectUrlPresentationFactory : IRedirectUrlPresentationFactory
         {
             OriginalUrl = originalUrl,
             DestinationUrl = destinationUrl,
-            ContentKey = source.ContentKey,
+            ContentId = source.ContentKey,
             Created = source.CreateDateUtc,
             Culture = source.Culture,
-            Key = source.Key,
+            Id = source.Key,
         };
     }
 

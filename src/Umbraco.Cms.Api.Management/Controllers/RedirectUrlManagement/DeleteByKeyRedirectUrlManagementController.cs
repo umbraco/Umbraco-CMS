@@ -13,11 +13,11 @@ public class DeleteByKeyRedirectUrlManagementController : RedirectUrlManagementB
         _redirectUrlService = redirectUrlService;
     }
 
-    [HttpDelete("{key:guid}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteByKey(Guid key)
+    public async Task<IActionResult> DeleteByKey(Guid id)
     {
-        _redirectUrlService.Delete(key);
+        _redirectUrlService.Delete(id);
         return Ok();
     }
 }

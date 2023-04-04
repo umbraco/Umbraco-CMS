@@ -15,6 +15,6 @@ public class ItemsDocumentTypeTreeController : DocumentTypeTreeControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<DocumentTypeTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys)
-        => await GetItems(keys);
+    public async Task<ActionResult<IEnumerable<DocumentTypeTreeItemResponseModel>>> Items([FromQuery(Name = "id")] Guid[] ids)
+        => await GetItems(ids);
 }

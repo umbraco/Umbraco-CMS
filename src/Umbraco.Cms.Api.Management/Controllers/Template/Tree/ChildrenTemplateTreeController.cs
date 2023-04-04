@@ -16,6 +16,6 @@ public class ChildrenTemplateTreeController : TemplateTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<EntityTreeItemResponseModel>>> Children(Guid parentKey, int skip = 0, int take = 100)
-        => await GetChildren(parentKey, skip, take);
+    public async Task<ActionResult<PagedViewModel<EntityTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100)
+        => await GetChildren(parentId, skip, take);
 }

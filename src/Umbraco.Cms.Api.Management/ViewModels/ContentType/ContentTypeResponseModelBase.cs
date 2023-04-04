@@ -4,7 +4,7 @@ public abstract class ContentTypeResponseModelBase<TPropertyType, TPropertyTypeC
     where TPropertyType : PropertyTypeResponseModelBase
     where TPropertyTypeContainer : PropertyTypeContainerResponseModelBase
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
     public string Alias { get; set; } = string.Empty;
 

@@ -19,14 +19,14 @@ public class MoveToRecycleBinMediaController : MediaControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpDelete("{key:guid}")]
+    [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> MoveToRecycleBin(Guid key)
+    public async Task<IActionResult> MoveToRecycleBin(Guid id)
     {
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveToRecycleBinAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveToRecycleBinAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : ContentEditingOperationStatusResult(result.Status);

@@ -7,7 +7,7 @@ public class PackageDefinitionResponseModel : PackageModelBase
     /// <summary>
     ///     Gets or sets the key.
     /// </summary>
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     ///     Gets or sets the full path to the package's XML file.

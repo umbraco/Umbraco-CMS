@@ -24,9 +24,9 @@ public class ChildrenMediaTreeController : MediaTreeControllerBase
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ContentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<ContentTreeItemResponseModel>>> Children(Guid parentKey, int skip = 0, int take = 100, Guid? dataTypeKey = null)
+    public async Task<ActionResult<PagedViewModel<ContentTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100, Guid? dataTypeId = null)
     {
-        IgnoreUserStartNodesForDataType(dataTypeKey);
-        return await GetChildren(parentKey, skip, take);
+        IgnoreUserStartNodesForDataType(dataTypeId);
+        return await GetChildren(parentId, skip, take);
     }
 }

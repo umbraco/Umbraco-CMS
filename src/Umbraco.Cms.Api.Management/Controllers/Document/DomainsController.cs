@@ -17,10 +17,10 @@ public class DomainsController : DocumentControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet("{key:guid}/domains")]
-    public async Task<IActionResult> DomainsAsync(Guid key)
+    [HttpGet("{id:guid}/domains")]
+    public async Task<IActionResult> DomainsAsync(Guid id)
     {
-        IDomain[] assignedDomains = (await _domainService.GetAssignedDomainsAsync(key, true))
+        IDomain[] assignedDomains = (await _domainService.GetAssignedDomainsAsync(id, true))
             .OrderBy(d => d.SortOrder)
             .ToArray();
 

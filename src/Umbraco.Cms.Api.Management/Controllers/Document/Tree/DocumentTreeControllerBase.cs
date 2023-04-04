@@ -44,9 +44,9 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
     protected void RenderForClientCulture(string? culture) => _culture = culture;
 
-    protected override DocumentTreeItemResponseModel MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override DocumentTreeItemResponseModel MapTreeItemViewModel(Guid? parentId, IEntitySlim entity)
     {
-        DocumentTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+        DocumentTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentId, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {

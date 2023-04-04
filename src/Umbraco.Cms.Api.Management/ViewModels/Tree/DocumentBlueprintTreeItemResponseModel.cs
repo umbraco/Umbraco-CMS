@@ -2,7 +2,7 @@
 
 public class DocumentBlueprintTreeItemResponseModel : EntityTreeItemResponseModel
 {
-    public Guid DocumentTypeKey { get; set; }
+    public Guid DocumentTypeId { get; set; }
 
     public string DocumentTypeAlias { get; set; } = string.Empty;
 

@@ -31,7 +31,7 @@ public class CreateTemporaryFileController : TemporaryFileControllerBase
         Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result = await _temporaryFileService.CreateAsync(createModel);
 
         return result.Success
-            ? CreatedAtAction<ByKeyTemporaryFileController>(controller => nameof(controller.ByKey), new { key = result.Result!.Key })
+            ? CreatedAtAction<ByKeyTemporaryFileController>(controller => nameof(controller.ByKey), new { id = result.Result!.Key })
             : TemporaryFileStatusResult(result.Status);
     }
 }

@@ -13,14 +13,14 @@ public class DeleteTemporaryFileController : TemporaryFileControllerBase
 
     public DeleteTemporaryFileController(ITemporaryFileService temporaryFileService) => _temporaryFileService = temporaryFileService;
 
-    [HttpDelete($"{{{nameof(key)}}}")]
+    [HttpDelete($"{{{nameof(id)}}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result = await _temporaryFileService.DeleteAsync(key);
+        Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result = await _temporaryFileService.DeleteAsync(id);
 
         return result.Success
             ? Ok()

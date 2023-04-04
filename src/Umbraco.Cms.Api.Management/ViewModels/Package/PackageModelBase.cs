@@ -20,7 +20,7 @@ public class PackageModelBase
     /// <summary>
     ///     Gets or sets the list of media keys for the selected media items.
     /// </summary>
-    public IList<Guid> MediaKeys { get; set; } = new List<Guid>();
+    public IList<Guid> MediaIds { get; set; } = new List<Guid>();
 
     /// <summary>
     ///     Gets or sets a value indicating whether to load all child nodes of the selected media items.
