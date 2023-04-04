@@ -51,7 +51,6 @@ export const handlers = [
 		if (!key) return;
 
 		const dictionary = umbDictionaryData.getByKey(key);
-		console.log(dictionary);
 		return res(ctx.status(200), ctx.json(dictionary));
 	}),
 
@@ -77,7 +76,6 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		data.parentKey = data.parentId;
 		data.icon = 'umb:book-alt';
 		data.hasChildren = false;
 		data.type = 'dictionary-item';
@@ -181,7 +179,7 @@ export const handlers = [
 
 		if (!file) return;
 
-		importResponse.parentKey = req.url.searchParams.get('parentId') ?? null;
+		importResponse.parentKey = req.url.searchParams.get('parentKey') ?? null;
 		umbDictionaryData.save(importResponse);
 
 		// build the path to the new item => reflects the expected server response

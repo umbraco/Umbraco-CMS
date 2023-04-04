@@ -165,7 +165,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });
 
 		// TODO => get location header to route to new item
-		console.log(result);
 	}
 
 	render() {
