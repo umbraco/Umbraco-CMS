@@ -99,7 +99,7 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 	private _createTableItems(userGroups: Array<UserGroupDetails>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
-				key: userGroup.id,
+				id: userGroup.id,
 				icon: userGroup.icon,
 				data: [
 					{
