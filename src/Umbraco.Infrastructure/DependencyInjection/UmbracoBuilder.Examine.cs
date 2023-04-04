@@ -1,11 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
@@ -56,7 +58,12 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
         builder.AddNotificationHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
-        builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
+        // Add notification handler with factory to ensure that the non-obsolete constructor is used.
+        builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>(
+            factory => new RebuildOnStartupHandler(
+                factory.GetRequiredService<ISyncBootStateAccessor>(),
+                factory.GetRequiredService<IIndexRebuilder>(),
+                factory.GetRequiredService<IRuntimeState>()));
 
         return builder;
     }

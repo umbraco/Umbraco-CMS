@@ -28,6 +28,16 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
+    public static IUmbracoBuilder AddNotificationHandler<TNotification, TNotificationHandler>(
+        this IUmbracoBuilder builder,
+        Func<IServiceProvider, INotificationHandler<TNotification>> factory)
+        where TNotificationHandler : INotificationHandler<TNotification>
+        where TNotification : INotification
+    {
+        builder.Services.AddNotificationHandler<TNotification, TNotificationHandler>(factory);
+        return builder;
+    }
+
     /// <summary>
     ///     Registers a notification async handler against the Umbraco service collection.
     /// </summary>
@@ -45,15 +55,21 @@ public static partial class UmbracoBuilderExtensions
     }
 
     internal static IServiceCollection AddNotificationHandler<TNotification, TNotificationHandler>(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        Func<IServiceProvider, object>? factory = null)
         where TNotificationHandler : INotificationHandler<TNotification>
         where TNotification : INotification
     {
         // Register the handler as transient. This ensures that anything can be injected into it.
-        var descriptor = new UniqueServiceDescriptor(
-            typeof(INotificationHandler<TNotification>),
-            typeof(TNotificationHandler),
-            ServiceLifetime.Transient);
+        UniqueServiceDescriptor descriptor = factory == null
+            ? new UniqueServiceDescriptor(
+                typeof(INotificationHandler<TNotification>),
+                typeof(TNotificationHandler),
+                ServiceLifetime.Transient)
+            : new UniqueServiceDescriptor(
+                typeof(INotificationHandler<TNotification>),
+                factory,
+                ServiceLifetime.Transient);
 
         if (!services.Contains(descriptor))
         {

@@ -22,6 +22,16 @@ public sealed class UniqueServiceDescriptor : ServiceDescriptor, IEquatable<Uniq
     {
     }
 
+    public UniqueServiceDescriptor(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime)
+        : base(serviceType, factory, lifetime)
+    {
+    }
+
+    public UniqueServiceDescriptor(Type serviceType, object instance)
+        : base(serviceType, instance)
+    {
+    }
+
     /// <inheritdoc />
     public bool Equals(UniqueServiceDescriptor? other) => other != null && Lifetime == other.Lifetime &&
                                                           EqualityComparer<Type>.Default.Equals(
