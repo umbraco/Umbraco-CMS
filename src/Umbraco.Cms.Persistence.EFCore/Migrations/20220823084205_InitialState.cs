@@ -54,7 +54,7 @@ public class InitialState : Migration
             }
             else if (migrationBuilder.IsSqlite())
             {
-                keyValueTableExists = await db.Database.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '%umbracoKeyValue%';") > 0;
+                keyValueTableExists = await db.Database.ExecuteScalarAsync<long>($"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '%umbracoKeyValue%';") > 0;
 
                 if (keyValueTableExists is false)
                 {
