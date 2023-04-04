@@ -31,14 +31,14 @@ export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
+	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof DictionaryTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { error };
 		}
 

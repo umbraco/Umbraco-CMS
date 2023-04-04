@@ -293,7 +293,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<uui-table-head-cell style="width:10%;">Actions</uui-table-head-cell>
 					</uui-table-head>
 					${this._redirectData?.map((data) => {
-						return html` <uui-table-row id="redirect-key-${data.id}">
+						return html` <uui-table-row>
 							<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
 							<uui-table-cell>
 								<a href="${data.originalUrl || '#'}" target="_blank"> ${data.originalUrl}</a>

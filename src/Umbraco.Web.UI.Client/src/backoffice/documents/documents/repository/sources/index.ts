@@ -3,5 +3,5 @@ import { UmbDataSource, DataSourceResponse } from '@umbraco-cms/backoffice/repos
 
 export interface UmbDocumentDataSource extends UmbDataSource<any, any, DocumentResponseModel> {
 	createScaffold(documentTypeKey: string): Promise<DataSourceResponse<DocumentResponseModel>>;
-	trash(key: string): Promise<DataSourceResponse<DocumentResponseModel>>;
+	trash(id: string): Promise<DataSourceResponse<DocumentResponseModel>>;
 }

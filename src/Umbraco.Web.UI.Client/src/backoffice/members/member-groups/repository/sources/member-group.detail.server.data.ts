@@ -32,15 +32,15 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 	}
 
 	/**
-	 * @description - Fetches a MemberGroup with the given key from the server
-	 * @param {string} key
+	 * @description - Fetches a MemberGroup with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
-	get(key: string) {
-		//return tryExecuteAndNotify(this.#host, MemberGroupResource.getMemberGroup({ key })) as any;
+	get(id: string) {
+		//return tryExecuteAndNotify(this.#host, MemberGroupResource.getMemberGroup({ id })) as any;
 		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${key}`)) as any;
+		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${id}`)) as any;
 	}
 
 	/**
@@ -49,13 +49,13 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 	 * @return {*}
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
-	async update(key: string, memberGroup: MemberGroupDetails) {
+	async update(id: string, memberGroup: MemberGroupDetails) {
 		if (!memberGroup.id) {
-			const error: ProblemDetailsModel = { title: 'Member Group key is missing' };
+			const error: ProblemDetailsModel = { title: 'Member Group id is missing' };
 			return { error };
 		}
 
-		const payload = { key: memberGroup.id, requestBody: memberGroup };
+		const payload = { id: memberGroup.id, requestBody: memberGroup };
 		//return tryExecuteAndNotify(this.#host, MemberGroupResource.putMemberGroupByKey(payload));
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
@@ -97,31 +97,31 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 
 	/**
 	 * @description - Deletes a MemberGroup on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
-	async trash(key: string) {
-		return this.delete(key);
+	async trash(id: string) {
+		return this.delete(id);
 	}
 
 	/**
 	 * @description - Deletes a MemberGroup on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		//return await tryExecuteAndNotify(this.#host, MemberGroupResource.deleteMemberGroupByKey({ key }));
+		//return await tryExecuteAndNotify(this.#host, MemberGroupResource.deleteMemberGroupByKey({ id }));
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/member-group/${key}`, {
+			fetch(`/umbraco/management/api/v1/member-group/${id}`, {
 				method: 'DELETE',
 			})
 		) as any;

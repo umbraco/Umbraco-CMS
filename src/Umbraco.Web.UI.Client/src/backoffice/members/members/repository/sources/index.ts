@@ -6,5 +6,5 @@ import type {
 
 export interface MemberTreeDataSource {
 	getRootItems(): Promise<DataSourceResponse<PagedEntityTreeItemResponseModel>>;
-	getItems(key: Array<string>): Promise<DataSourceResponse<EntityTreeItemResponseModel[]>>;
+	getItems(id: Array<string>): Promise<DataSourceResponse<EntityTreeItemResponseModel[]>>;
 }

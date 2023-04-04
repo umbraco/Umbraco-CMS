@@ -97,10 +97,10 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 	async requestById(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
+			const error: ProblemDetailsModel = { title: 'Id is missing' };
 			return { error };
 		}
 		const { data, error } = await this.#detailSource.get(id);

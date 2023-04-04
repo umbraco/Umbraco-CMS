@@ -28,8 +28,8 @@ export class UmbMemberWorkspaceContext
 		console.log('save');
 	}
 
-	async load(key: string) {
-		console.log('load', key);
+	async load(id: string) {
+		console.log('load', id);
 	}
 
 	public destroy(): void {

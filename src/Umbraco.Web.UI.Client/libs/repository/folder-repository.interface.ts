@@ -29,7 +29,7 @@ export interface UmbFolderRepository {
 		error?: ProblemDetailsModel;
 	}>;
 
-	deleteFolder(key: string): Promise<{
+	deleteFolder(id: string): Promise<{
 		error?: ProblemDetailsModel;
 	}>;
 }

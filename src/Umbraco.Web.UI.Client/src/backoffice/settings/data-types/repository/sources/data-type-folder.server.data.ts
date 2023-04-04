@@ -28,7 +28,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	}
 
 	/**
-	 * Creates a Data Type folder with the given key from the server
+	 * Creates a Data Type folder with the given id from the server
 	 * @param {string} parentId
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
@@ -45,7 +45,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	}
 
 	/**
-	 * Fetches a Data Type folder with the given key from the server
+	 * Fetches a Data Type folder with the given id from the server
 	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
@@ -95,7 +95,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	}
 
 	/**
-	 * Deletes a Data Type folder with the given key on the server
+	 * Deletes a Data Type folder with the given id on the server
 	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource

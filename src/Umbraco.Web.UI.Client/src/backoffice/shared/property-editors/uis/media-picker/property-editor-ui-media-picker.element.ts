@@ -35,7 +35,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputMediaPickerElement).selectedKeys;
+		this.value = (event.target as UmbInputMediaPickerElement).selectedIds;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -43,7 +43,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		return html`
 			<umb-input-media-picker
 				@change=${this._onChange}
-				.selectedKeys=${this._value}
+				.selectedIds=${this._value}
 				.min=${this._limitMin}
 				.max=${this._limitMax}
 				>Add</umb-input-media-picker

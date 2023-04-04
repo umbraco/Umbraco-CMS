@@ -19,20 +19,20 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	}
 
 	/**
-	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
-	 * @param {string} key
+	 * @description - Request a Data Type by id. The Data Type is added to the store and is returned as an Observable.
+	 * @param {string} id
 	 * @return {*}  {(Observable<DocumentBlueprintDetails | undefined>)}
 	 * @memberof UmbDocumentBlueprintStore
 	 */
-	getByKey(key: string) {
+	getById(id: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document-blueprint/details/${key}`)
+		fetch(`/umbraco/management/api/v1/document-blueprint/details/${id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);
 			});
 
-		return this.#data.getObservablePart((documents) => documents.find((document) => document.id === key));
+		return this.#data.getObservablePart((documents) => documents.find((document) => document.id === id));
 	}
 
 	getScaffold(entityType: string, parentId: string | null) {
@@ -75,7 +75,7 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	// TODO: How can we avoid having this in both stores?
 	/**
 	 * @description - Delete a Data Type.
-	 * @param {string[]} keys
+	 * @param {string[]} ids
 	 * @memberof UmbDocumentBlueprintStore
 	 * @return {*}  {Promise<void>}
 	 */

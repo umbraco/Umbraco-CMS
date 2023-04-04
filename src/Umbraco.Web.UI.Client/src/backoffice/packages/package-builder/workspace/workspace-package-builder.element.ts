@@ -38,7 +38,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	];
 
 	@property()
-	entityKey?: string;
+	entityId?: string;
 
 	@state()
 	private _package: PackageDefinitionResponseModel = {};
@@ -57,12 +57,12 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		if (this.entityKey) this.#getPackageCreated();
+		if (this.entityId) this.#getPackageCreated();
 	}
 
 	async #getPackageCreated() {
-		if (!this.entityKey) return;
-		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedById({ id: this.entityKey }));
+		if (!this.entityId) return;
+		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedById({ id: this.entityId }));
 		if (!data) return;
 		this._package = data as PackageDefinitionResponseModel;
 	}
@@ -200,7 +200,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 					.value=${this._package.contentNodeId ?? ''}
 					max="1"
 					@change="${(e: CustomEvent) =>
-						(this._package.contentNodeId = (e.target as UmbInputDocumentPickerElement).selectedKeys[0])}">
+						(this._package.contentNodeId = (e.target as UmbInputDocumentPickerElement).selectedIds[0])}">
 				</umb-input-document-picker>
 				<uui-checkbox
 					label="Include child nodes"
@@ -216,9 +216,9 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<div slot="editor">
 				<umb-input-media-picker
-					.selectedKeys=${this._package.mediaIds ?? []}
+					.selectedIds=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
-						(this._package.mediaIds = (e.target as UmbInputMediaPickerElement).selectedKeys)}"></umb-input-media-picker>
+						(this._package.mediaIds = (e.target as UmbInputMediaPickerElement).selectedIds)}"></umb-input-media-picker>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.mediaLoadChildNodes ?? false}"

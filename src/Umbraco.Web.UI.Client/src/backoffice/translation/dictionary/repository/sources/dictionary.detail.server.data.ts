@@ -66,7 +66,7 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 */
 	async update(dictionary: DictionaryDetails) {
 		if (!dictionary.id) {
-			const error: ProblemDetailsModel = { title: 'Dictionary key is missing' };
+			const error: ProblemDetailsModel = { title: 'Dictionary id is missing' };
 			return { error };
 		}
 

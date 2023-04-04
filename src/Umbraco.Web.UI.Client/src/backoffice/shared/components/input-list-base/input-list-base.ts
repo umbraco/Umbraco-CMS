@@ -51,8 +51,8 @@ export class UmbInputListBaseElement extends UmbLitElement {
 		});
 	}
 
-	protected removeFromSelection(key: string) {
-		this.value = this.value.filter((k) => k !== key);
+	protected removeFromSelection(id: string) {
+		this.value = this.value.filter((k) => k !== id);
 		this.selectionUpdated();
 	}
 

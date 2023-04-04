@@ -85,13 +85,13 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 		this.observe(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
-	private _isSelected(key: string) {
-		return this._selection.includes(key);
+	private _isSelected(id: string) {
+		return this._selection.includes(id);
 	}
 
 	//TODO How should we handle url stuff?
-	private _handleOpenCard(key: string) {
-		history.pushState(null, '', 'section/users/view/users/user/' + key); //TODO Change to a tag with href and make dynamic
+	private _handleOpenCard(id: string) {
+		history.pushState(null, '', 'section/users/view/users/user/' + id); //TODO Change to a tag with href and make dynamic
 	}
 
 	private _selectRowHandler(user: UserEntity) {
@@ -104,8 +104,8 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 
 	private _getUserGroupNames(ids: Array<string>) {
 		return ids
-			.map((key: string) => {
-				return this._userGroups.find((x) => x.id === key)?.name;
+			.map((id: string) => {
+				return this._userGroups.find((x) => x.id === id)?.name;
 			})
 			.join(', ');
 	}

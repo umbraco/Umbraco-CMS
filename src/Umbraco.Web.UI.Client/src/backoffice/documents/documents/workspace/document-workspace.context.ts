@@ -59,8 +59,8 @@ export class UmbDocumentWorkspaceContext
 		*/
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestById(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (!data) return undefined;
 
 		this.setIsNew(false);

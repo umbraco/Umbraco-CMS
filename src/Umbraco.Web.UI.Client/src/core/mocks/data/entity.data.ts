@@ -49,8 +49,8 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	trash(ids: Array<string>) {
 		const trashedItems: Array<T> = [];
 
-		ids.forEach((key) => {
-			const item = this.getById(key);
+		ids.forEach((id) => {
+			const item = this.getById(id);
 			if (!item) return;
 
 			// TODO: how do we handle trashed items?
