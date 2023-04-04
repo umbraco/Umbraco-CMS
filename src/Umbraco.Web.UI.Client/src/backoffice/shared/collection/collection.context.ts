@@ -156,12 +156,12 @@ export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel =
 		this.#selection.next([]);
 	}
 
-	public select(key: string) {
-		this.#selection.appendOne(key);
+	public select(id: string) {
+		this.#selection.appendOne(id);
 	}
 
-	public deselect(key: string) {
-		this.#selection.filter((k) => k !== key);
+	public deselect(id: string) {
+		this.#selection.filter((k) => k !== id);
 	}
 
 	// TODO: how can we make sure to call this.

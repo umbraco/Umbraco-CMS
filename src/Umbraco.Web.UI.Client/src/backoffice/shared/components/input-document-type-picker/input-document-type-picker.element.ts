@@ -80,7 +80,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	}
 
 	private _openPicker() {
-		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedIds, as we don't want the modal to manipulate our data:
+		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
 		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this._selectedIds],

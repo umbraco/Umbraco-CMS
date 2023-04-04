@@ -12,8 +12,8 @@ class UmbLanguagesData extends UmbData<LanguageResponseModel> {
 		return this.data.slice(skip, take);
 	}
 
-	getByKey(key: string) {
-		return this.data.find((item) => item.isoCode === key);
+	getByKey(isoCode: string) {
+		return this.data.find((item) => item.isoCode === isoCode);
 	}
 
 	insert(language: LanguageResponseModel) {
