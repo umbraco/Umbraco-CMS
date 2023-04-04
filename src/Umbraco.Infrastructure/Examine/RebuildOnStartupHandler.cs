@@ -38,6 +38,17 @@ public sealed class RebuildOnStartupHandler : INotificationHandler<UmbracoReques
         _runtimeState = runtimeState;
     }
 
+    [Obsolete("Use the constructor specifying the IIndexRebuilder instead")]
+    public RebuildOnStartupHandler(
+        ISyncBootStateAccessor syncBootStateAccessor,
+        ExamineIndexRebuilder backgroundIndexRebuilder,
+        IRuntimeState runtimeState)
+    {
+        _syncBootStateAccessor = syncBootStateAccessor;
+        _backgroundIndexRebuilder = backgroundIndexRebuilder;
+        _runtimeState = runtimeState;
+    }
+
     /// <summary>
     ///     On first http request schedule an index rebuild for any empty indexes (or all if it's a cold boot)
     /// </summary>
