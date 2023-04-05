@@ -145,7 +145,7 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 							console.groupEnd();
 						}
 					},
-				} satisfies IRoute;
+				};
 			});
 
 			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
