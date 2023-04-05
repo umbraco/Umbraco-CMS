@@ -44,6 +44,7 @@ public class ManagementApiComposer : IComposer
             .AddUsers()
             .AddUserGroups()
             .AddPackages()
+            .AddEntitys()
             .AddBackOfficeAuthentication()
             .AddApiVersioning()
             .AddSwaggerGen();
