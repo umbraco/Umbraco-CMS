@@ -18,7 +18,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -46,7 +46,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -70,7 +70,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { adminUserGroup }
+            UserGroupKeys = new HashSet<Guid> { adminUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -92,7 +92,7 @@ public partial class UserServiceCrudTests
             UserName = "test@email.com",
             Email = "test@email.com",
             Name = "Test User",
-            UserGroups = new HashSet<IUserGroup> { editorUserGroup }
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
         };
 
         var userService = CreateUserService();
@@ -103,5 +103,52 @@ public partial class UserServiceCrudTests
         var invitedUser = userInviteAttempt.Result.InvitedUser;
         var disableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { invitedUser!.Key });
         Assert.AreEqual(UserOperationStatus.CannotDisableInvitedUser, disableStatus);
+    }
+
+    [Test]
+    public async Task Enable_Missing_User_Fails_With_Not_Found()
+    {
+        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+
+        var userCreateModel = new UserCreateModel
+        {
+            UserName = "test@email.com",
+            Email = "test@email.com",
+            Name = "Test User",
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
+        };
+
+        var userService = CreateUserService();
+        var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, false);
+
+        Assert.IsTrue(createAttempt.Success);
+        var user = createAttempt.Result.CreatedUser;
+        Assert.AreEqual(UserState.Disabled, user!.UserState);
+
+        var enableStatus = await userService.EnableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key, Guid.NewGuid() });
+        Assert.AreEqual(UserOperationStatus.UserNotFound, enableStatus);
+    }
+
+    [Test]
+    public async Task Disable_Missing_User_Fails_With_Not_Found()
+    {
+        var editorUserGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+
+        var userCreateModel = new UserCreateModel
+        {
+            UserName = "test@email.com",
+            Email = "test@email.com",
+            Name = "Test User",
+            UserGroupKeys = new HashSet<Guid> { editorUserGroup.Key },
+        };
+
+        var userService = CreateUserService();
+        var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
+
+        Assert.IsTrue(createAttempt.Success);
+        var user = createAttempt.Result.CreatedUser;
+
+        var enableStatus = await userService.DisableAsync(Constants.Security.SuperUserKey, new HashSet<Guid> { user.Key, Guid.NewGuid() });
+        Assert.AreEqual(UserOperationStatus.UserNotFound, enableStatus);
     }
 }

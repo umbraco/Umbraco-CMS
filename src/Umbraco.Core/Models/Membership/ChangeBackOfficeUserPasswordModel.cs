@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.Membership;
 
-public class ChangeBackofficeUserPasswordModel
+public class ChangeBackOfficeUserPasswordModel
 {
     public required string NewPassword { get; set; }
 

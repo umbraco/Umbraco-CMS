@@ -14,20 +14,17 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly AppCaches _appCaches;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
-    private readonly IUserGroupService _userGroupService;
 
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator,
-        IUserGroupService userGroupService)
+        IImageUrlGenerator imageUrlGenerator)
     {
         _entityService = entityService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
-        _userGroupService = userGroupService;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -57,14 +54,12 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     public async Task<UserCreateModel> CreateCreationModelAsync(CreateUserRequestModel requestModel)
     {
-        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroupIds);
-
         var createModel = new UserCreateModel
         {
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroups = new HashSet<IUserGroup>(groups),
+            UserGroupKeys = requestModel.UserGroupIds,
         };
 
         return createModel;
@@ -72,45 +67,35 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     public async Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
     {
-        IEnumerable<IUserGroup> groups = await _userGroupService.GetAsync(requestModel.UserGroupIds);
-
         var inviteModel = new UserInviteModel
         {
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,
-            UserGroups = new HashSet<IUserGroup>(groups),
+            UserGroupKeys = requestModel.UserGroupIds,
             Message = requestModel.Message,
         };
 
         return inviteModel;
     }
 
-    public async Task<UserUpdateModel> CreateUpdateModelAsync(IUser existingUser, UpdateUserRequestModel updateModel)
+    public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
     {
         var model = new UserUpdateModel
         {
-            ExistingUser = existingUser,
+            ExistingUserKey = existingUserKey,
             Email = updateModel.Email,
             Name = updateModel.Name,
             UserName = updateModel.UserName,
-            Language = updateModel.LanguageIsoCode,
+            LanguageIsoCode = updateModel.LanguageIsoCode,
             ContentStartNodeKeys = updateModel.ContentStartNodeIds,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds,
         };
 
-        IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(updateModel.UserGroupIds);
-        model.UserGroups = userGroups;
+        model.UserGroupKeys = updateModel.UserGroupIds;
 
         return model;
     }
-
-    public CreateUserResponseModel CreateCreationResponseModel(UserCreationResult creationResult)
-        => new()
-        {
-            UserId = creationResult.CreatedUser?.Key ?? Guid.Empty,
-            InitialPassword = creationResult.InitialPassword,
-        };
 
     private SortedSet<Guid> GetKeysFromIds(IEnumerable<int>? ids, UmbracoObjectTypes type)
     {

@@ -23,7 +23,7 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key }
         };
 
         var createAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
@@ -51,7 +51,7 @@ public partial class UserServiceCrudTests
         {
             Email = "not@super.com",
             UserName = "not@super.com",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!, adminGroup!},
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
             Name = "Not A Super User"
         };
 
@@ -84,7 +84,7 @@ public partial class UserServiceCrudTests
         {
             Email = "not@super.com",
             UserName = "not@super.com",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!},
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
             Name = "Not A Super User"
         };
 
@@ -104,7 +104,7 @@ public partial class UserServiceCrudTests
     }
 
     [Test]
-    public async Task Only_Admins_Can_Filter_Admins()
+    public async Task Non_Admins_Cannot_Filter_Admins()
     {
         var userService = CreateUserService();
         var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
@@ -115,7 +115,7 @@ public partial class UserServiceCrudTests
             UserName = "editor@mail.com",
             Email = "editor@mail.com",
             Name = "Editor Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> {editorGroup!}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
         };
 
         var adminCreateModel = new UserCreateModel
@@ -123,7 +123,7 @@ public partial class UserServiceCrudTests
             UserName = "admin@mail.com",
             Email = "admin@mail.com",
             Name = "Admin Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> {adminGroup!, editorGroup}
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
         };
 
         var createEditorAttempt =
@@ -140,7 +140,40 @@ public partial class UserServiceCrudTests
         Assert.IsTrue(editorFilterAttempt.Success);
         var editorAllUsers = editorFilterAttempt.Result.Items.ToList();
         Assert.AreEqual(0, editorAllUsers.Count);
+    }
 
+    [Test]
+    public async Task Admins_Can_Filter_Admins()
+    {
+        var userService = CreateUserService();
+        var adminGroup = await UserGroupService.GetAsync(Constants.Security.AdminGroupAlias);
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupAlias);
+
+        var editorCreateModel = new UserCreateModel
+        {
+            UserName = "editor@mail.com",
+            Email = "editor@mail.com",
+            Name = "Editor Mc. Gee",
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
+        };
+
+        var adminCreateModel = new UserCreateModel
+        {
+            UserName = "admin@mail.com",
+            Email = "admin@mail.com",
+            Name = "Admin Mc. Gee",
+            UserGroupKeys = new HashSet<Guid> { editorGroup.Key, adminGroup.Key },
+        };
+
+        var createEditorAttempt =
+            await userService.CreateAsync(Constants.Security.SuperUserKey, editorCreateModel, true);
+        var createAdminAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, adminCreateModel, true);
+
+        Assert.IsTrue(createEditorAttempt.Success);
+        Assert.IsTrue(createAdminAttempt.Success);
+
+        var filter = new UserFilter {IncludedUserGroups = new SortedSet<Guid> {adminGroup!.Key}};
+ 
         var adminFilterAttempt =
             await userService.FilterAsync(createAdminAttempt.Result.CreatedUser!.Key, filter, 0, 10000);
         Assert.IsTrue(adminFilterAttempt.Success);
@@ -148,6 +181,7 @@ public partial class UserServiceCrudTests
         Assert.AreEqual(1, adminAllUsers.Count);
         Assert.IsNotNull(adminAllUsers.FirstOrDefault(x => x.Key == createAdminAttempt.Result.CreatedUser!.Key));
     }
+
 
     private async Task CreateTestUsers(IUserService userService)
     {
@@ -163,35 +197,35 @@ public partial class UserServiceCrudTests
                 UserName = "editor@email.com",
                 Email = "editor@email.com",
                 Name = "Editor",
-                UserGroups = new HashSet<IUserGroup> {editorGroup!}
+                UserGroupKeys = new HashSet<Guid> { editorGroup.Key },
             },
             new()
             {
                 UserName = "admin@email.com",
                 Email = "admin@email.com",
                 Name = "Admin",
-                UserGroups = new HashSet<IUserGroup> {adminGroup!}
+                UserGroupKeys = new HashSet<Guid> { adminGroup.Key },
             },
             new()
             {
                 UserName = "write@email.com",
                 Email = "write@email.com",
                 Name = "Write",
-                UserGroups = new HashSet<IUserGroup> {writerGroup}
+                UserGroupKeys = new HashSet<Guid> { writerGroup.Key },
             },
             new()
             {
                 UserName = "translator@email.com",
                 Email = "translator@email.com",
                 Name = "Translator",
-                UserGroups = new HashSet<IUserGroup> {translatorGroup}
+                UserGroupKeys = new HashSet<Guid> { translatorGroup.Key },
             },
             new()
             {
                 UserName = "EverythingButAdmin@email.com",
                 Email = "EverythingButAdmin@email.com",
                 Name = "Everything But Admin",
-                UserGroups = new HashSet<IUserGroup> {editorGroup, writerGroup, translatorGroup}
+                UserGroupKeys = new HashSet<Guid> { editorGroup.Key, writerGroup.Key, translatorGroup.Key },
             }
         };
 

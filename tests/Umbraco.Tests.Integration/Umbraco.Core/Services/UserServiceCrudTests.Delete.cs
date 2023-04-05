@@ -13,7 +13,7 @@ public partial class UserServiceCrudTests
     {
         var userService = CreateUserService();
         var result = await userService.DeleteAsync(Guid.NewGuid());
-        Assert.AreEqual(UserOperationStatus.NotFound, result);
+        Assert.AreEqual(UserOperationStatus.UserNotFound, result);
     }
 
     [Test]
@@ -25,7 +25,7 @@ public partial class UserServiceCrudTests
             Email = "test@test.com",
             UserName = "test@test.com",
             Name = "test@test.com",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var userService = CreateUserService();
@@ -54,7 +54,7 @@ public partial class UserServiceCrudTests
             Email = "test@test.com",
             UserName = "test@test.com",
             Name = "test@test.com",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var userService = CreateUserService();
