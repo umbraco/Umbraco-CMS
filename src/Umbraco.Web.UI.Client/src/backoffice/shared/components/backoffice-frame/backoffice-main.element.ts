@@ -67,7 +67,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				setup: (component) => {
 					(component as UmbSectionElement).manifest = section;
 				},
-			} satisfies IRoute;
+			};
 		});
 
 		this._routes.push({
