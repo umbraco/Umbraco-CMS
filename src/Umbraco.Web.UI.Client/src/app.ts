@@ -10,10 +10,11 @@ import './core/modal/modal-element.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 import { UmbIconStore } from './core/stores/icon/icon.store';
 import type { Guard, IRoute } from '@umbraco-cms/backoffice/router';
+import { pathWithoutBasePath, queryString } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
@@ -37,8 +38,7 @@ export class UmbAppElement extends UmbLitElement {
 	@property({ type: String })
 	private umbracoUrl?: string;
 
-	@state()
-	private _routes: IRoute<any>[] = [
+	private _routes: IRoute[] = [
 		{
 			path: 'install',
 			component: () => import('./installer/installer.element'),
@@ -68,7 +68,7 @@ export class UmbAppElement extends UmbLitElement {
 		this._setup();
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		super.connectedCallback();
 
 		OpenAPI.BASE =
@@ -79,8 +79,7 @@ export class UmbAppElement extends UmbLitElement {
 
 		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
 
-		await this._setInitStatus();
-		this._redirect();
+		this._setInitStatus();
 
 		// Listen for the debug event from the <umb-debug> component
 		this.addEventListener(umbDebugContextEventType, (event: any) => {
@@ -106,30 +105,44 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	private async _setup() {
+		await this._setInitStatus();
 		this._iconRegistry.attach(this);
 	}
 
 	private async _setInitStatus() {
 		const { data } = await tryExecuteAndNotify(this, ServerResource.getServerStatus());
 		this._runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
+		this._redirect();
 	}
 
 	private _redirect() {
 		switch (this._runtimeLevel) {
 			case RuntimeLevelModel.INSTALL:
-				history.replaceState(null, '', '/install');
+				history.replaceState(null, '', 'install');
 				break;
 
 			case RuntimeLevelModel.UPGRADE:
-				history.replaceState(null, '', '/upgrade');
+				history.replaceState(null, '', 'upgrade');
 				break;
 
 			case RuntimeLevelModel.RUN: {
-				const pathname =
-					window.location.pathname === '/install' || window.location.pathname === '/upgrade'
-						? '/'
-						: window.location.pathname;
-				history.replaceState(null, '', pathname);
+				const pathname = pathWithoutBasePath();
+
+				// If we are on the installer or upgrade page, redirect to the root
+				// but if not, keep the current path but replace state anyway to initialize the router
+				let finalPath = pathname === 'install' || pathname === 'upgrade' ? '/' : pathname;
+
+				const qs = queryString();
+
+				if (qs) {
+					finalPath += qs;
+				}
+
+				if (location.hash) {
+					finalPath += `#${location.hash}`;
+				}
+
+				history.replaceState(null, '', finalPath);
 				break;
 			}
 
