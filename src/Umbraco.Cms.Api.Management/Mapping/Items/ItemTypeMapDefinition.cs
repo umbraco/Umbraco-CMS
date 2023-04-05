@@ -45,7 +45,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
-        target.Icon = source.Editor?.Icon ?? Constants.Icons.DataType;
+        target.Icon = source.Editor?.Icon;
     }
 
     // Umbraco.Code.MapAll
@@ -53,7 +53,6 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.ItemKey;
         target.Id = source.Key;
-        target.Icon = Constants.Icons.Dictionary;
     }
 
     // Umbraco.Code.MapAll
@@ -61,7 +60,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
-        target.Icon = source.Icon ?? Constants.Icons.ContentType;
+        target.Icon = source.Icon;
         target.IsElement = source.IsElement;
     }
 
@@ -70,7 +69,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
-        target.Icon = source.Icon ?? Constants.Icons.ContentType;
+        target.Icon = source.Icon;
     }
 
     // Umbraco.Code.MapAll
@@ -78,7 +77,6 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
-        target.Icon = Constants.Icons.MemberGroup;
     }
 
     // Umbraco.Code.MapAll
@@ -86,7 +84,6 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
-        target.Icon = Constants.Icons.Template;
     }
 
     // Umbraco.Code.MapAll
@@ -94,13 +91,12 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
-        target.Icon = source.Icon ?? Constants.Icons.MemberType;
+        target.Icon = source.Icon;
     }
 
     // Umbraco.Code.MapAll
     private static void Map(IRelationType source, RelationTypeItemResponseModel target, MapperContext context)
     {
-        target.Icon = Constants.Icons.RelationType;
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
     }
@@ -108,7 +104,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private static void Map(IMediaEntitySlim source, MediaItemResponseModel target, MapperContext context)
     {
-        target.Icon = source.ContentTypeIcon ?? Constants.Icons.MediaType;
+        target.Icon = source.ContentTypeIcon;
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
     }

@@ -4,4 +4,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 
 public class MediaItemResponseModel : ItemResponseModelBase
 {
+    public string? Icon { get; set; }
 }

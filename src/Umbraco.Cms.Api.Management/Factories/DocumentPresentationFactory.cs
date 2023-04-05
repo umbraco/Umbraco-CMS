@@ -48,7 +48,7 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
         {
             Name = entity.Name ?? string.Empty,
             Id = entity.Key,
-            Icon = entity.ContentTypeIcon ?? Constants.Icons.ContentType,
+            Icon = entity.ContentTypeIcon,
         };
 
         if (culture == null || !entity.Variations.VariesByCulture())
@@ -68,7 +68,6 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
     {
         var responseModel = new DocumentBlueprintResponseModel()
         {
-            Icon = Constants.Icons.Blueprint,
             Id = entity.Key,
         };
 
