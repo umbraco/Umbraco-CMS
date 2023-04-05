@@ -57,6 +57,8 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
             localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
     }
 
+    public int GetCount() => _memberTypeService.Count();
+
     /// <summary>
     ///     Gets the member type a given id
     /// </summary>
@@ -150,17 +152,16 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     ///     be looked up via the db, they need to be passed in.
     /// </param>
     /// <returns></returns>
-    public IActionResult GetAvailableCompositeMemberTypes(
-        int contentTypeId,
-        [FromQuery] string[] filterContentTypes,
-        [FromQuery] string[] filterPropertyTypes)
+    [HttpPost]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
+    public IActionResult GetAvailableCompositeMemberTypes(GetAvailableCompositionsFilter filter)
     {
         ActionResult<IEnumerable<Tuple<EntityBasic?, bool>>> actionResult = PerformGetAvailableCompositeContentTypes(
-            contentTypeId,
+            filter.ContentTypeId,
             UmbracoObjectTypes.MemberType,
-            filterContentTypes,
-            filterPropertyTypes,
-            false);
+            filter.FilterContentTypes,
+            filter.FilterPropertyTypes,
+            filter.IsElement);
 
         if (!(actionResult.Result is null))
         {
@@ -169,6 +170,23 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
 
         var result = actionResult.Value?
             .Select(x => new { contentType = x.Item1, allowed = x.Item2 });
+        return Ok(result);
+    }
+
+    /// <summary>
+    ///     Returns where a particular composition has been used
+    ///     This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request
+    ///     body
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
+    public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
+    {
+        var result =
+            PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MemberType).Value?
+                .Select(x => new { contentType = x });
         return Ok(result);
     }
 
