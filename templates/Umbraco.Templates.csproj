@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
+    <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">
       <Link>UmbracoProject\Program.cs</Link>

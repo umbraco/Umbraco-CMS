@@ -6,13 +6,14 @@
     "CMS",
     "Umbraco",
     "Package",
-    "Plugin"
+    "Plugin",
+    "Razor Class Library"
   ],
-  "name": "Umbraco Package",
-  "description": "An empty Umbraco package/plugin project ready to get started.",
-  "groupIdentity": "Umbraco.Templates.UmbracoPackage",
-  "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
-  "shortName": "umbracopackage",
+  "name": "Umbraco Package RCL",
+  "description": "An empty Umbraco package/plugin (Razor Class Library).",
+  "groupIdentity": "Umbraco.Templates.UmbracoPackageRcl",
+  "identity": "Umbraco.Templates.UmbracoPackageRcl.CSharp",
+  "shortName": "umbracopackage-rcl",
   "tags": {
     "language": "C#",
     "type": "project"
@@ -41,7 +42,7 @@
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "*",
+      "defaultValue": "11.0.0",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
     "SkipRestore": {
@@ -51,39 +52,12 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "Namespace": {
-      "type": "derived",
-      "valueSource": "name",
-      "valueTransform": "safe_namespace",
-      "fileRename": "UmbracoPackage",
-      "replaces": "UmbracoPackage"
-    },
-    "MsBuildName": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "name",
-        "steps": [
-          {
-            "regex": "\\s",
-            "replacement": ""
-          },
-          {
-            "regex": "\\.",
-            "replacement": ""
-          },
-          {
-            "regex": "-",
-            "replacement": ""
-          },
-          {
-            "regex": "^[^a-zA-Z_]+",
-            "replacement": ""
-          }
-        ]
-      },
-      "replaces": "UmbracoPackageMsBuild"
+    "SupportPagesAndViews": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "displayName": "Support pages and views",
+      "description": "Whether to support adding traditional Razor pages and Views to this library."
     }
   },
   "primaryOutputs": [
