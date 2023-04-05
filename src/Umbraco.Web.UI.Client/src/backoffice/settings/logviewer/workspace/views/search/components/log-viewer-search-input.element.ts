@@ -2,9 +2,11 @@ import { UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umb
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
+import { Subject, debounceTime } from 'rxjs';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
 import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
@@ -92,6 +94,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	@state()
 	private _inputQuery = '';
 
+	private inputQuery$ = new Subject<string>();
+
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
 	constructor() {
@@ -100,6 +104,11 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
 			this.#logViewerContext.getLogs();
+		});
+
+		this.inputQuery$.pipe(debounceTime(250)).subscribe((query) => {
+			this.#logViewerContext?.setFilterExpression(query);
+			this.#persist(query);
 		});
 	}
 
@@ -129,21 +138,26 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#setQuery(event: Event) {
 		const target = event.target as UUIInputElement;
-		this._inputQuery = target.value as string;
-		this.#logViewerContext?.setFilterExpression(this._inputQuery);
+		this.inputQuery$.next(target.value as string);
 	}
 
 	#setQueryFromSavedSearch(query: string) {
-		this._inputQuery = query;
-		this.#logViewerContext?.setFilterExpression(query);
-		this.#logViewerContext?.setCurrentPage(1);
-
-		this.#logViewerContext?.getLogs();
+		this.inputQuery$.next(query);
 		this._savedSearchesPopover.open = false;
 	}
 
+	#persist(filter: string) {
+		let q = getQuery();
+
+		q = {
+			...q,
+			lq: filter,
+		};
+
+		window.history.pushState({}, '', `${path()}?${toQueryString(q)}`);
+	}
+
 	#clearQuery() {
-		this._inputQuery = '';
 		this.#logViewerContext?.setFilterExpression('');
 		this.#logViewerContext?.getLogs();
 	}
