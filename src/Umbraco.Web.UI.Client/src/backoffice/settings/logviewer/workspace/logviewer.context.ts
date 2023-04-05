@@ -18,6 +18,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { query } from '@umbraco-cms/backoffice/router';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface PoolingCOnfig {
@@ -102,6 +103,49 @@ export class UmbLogViewerWorkspaceContext {
 	async init() {
 		this.validateLogSize();
 	}
+
+	reset() {
+		this.#logs.next({ items: [], total: 0 });
+		this.setCurrentPage(1);
+	}
+
+	onChangeState = () => {
+		this.reset();
+
+		const searchQuery = query();
+
+		if (searchQuery.lq) {
+			const sanitizedQuery = decodeURIComponent(searchQuery.lq);
+			this.setFilterExpression(sanitizedQuery);
+		}
+
+		if (searchQuery.loglevels) {
+			const loglevels = searchQuery.loglevels.split(',') as LogLevelModel[];
+
+			// Filter out invalid log levels that do not exist in LogLevelModel
+			const validLogLevels = loglevels.filter((loglevel) => {
+				return ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'].includes(loglevel);
+			});
+
+			this.setLogLevelsFilter(validLogLevels);
+		}
+
+		const dateRange: Partial<LogViewerDateRange> = {};
+
+		if (searchQuery.startDate) {
+			dateRange.startDate = searchQuery.startDate;
+		}
+
+		if (searchQuery.endDate) {
+			dateRange.endDate = searchQuery.endDate;
+		}
+
+		this.setDateRange(dateRange);
+
+		this.setCurrentPage(searchQuery.page ? Number(searchQuery.page) : 1);
+
+		this.getLogs();
+	};
 
 	setDateRange(dateRange: Partial<LogViewerDateRange>) {
 		let { startDate, endDate } = dateRange;

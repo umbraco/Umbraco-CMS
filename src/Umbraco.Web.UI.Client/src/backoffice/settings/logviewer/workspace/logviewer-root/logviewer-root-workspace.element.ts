@@ -1,6 +1,6 @@
 import './components';
 import { map } from 'rxjs';
-import { css, html, nothing } from 'lit';
+import { PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { repeat } from 'lit/directives/repeat.js';
@@ -64,12 +64,24 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#logViewerContext.init();
+		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
+	}
+
+	firstUpdated(props: PropertyValueMap<unknown>) {
+		super.firstUpdated(props);
+
+		window.addEventListener('changestate', this.#logViewerContext.onChangeState);
+		this.#logViewerContext.onChangeState();
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
 		this._observeWorkspaceViews();
-		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		window.removeEventListener('changestate', this.#logViewerContext.onChangeState);
 	}
 
 	load(): void {
