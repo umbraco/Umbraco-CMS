@@ -60,6 +60,8 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
     }
 
+    public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));
+
     /// <inheritdoc />
     public async Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, Guid userKey)
         => await SaveAsync(
