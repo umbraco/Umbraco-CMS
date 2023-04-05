@@ -6,6 +6,14 @@
 function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, localizationService) {
 
     return {
+        getCount: function () {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "memberTypeApiBaseUrl",
+                       "GetCount")),
+               'Failed to retrieve count');
+        },
 
         getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes, filterPropertyTypes) {
             if (!filterContentTypes) {
@@ -15,29 +23,33 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                 filterPropertyTypes = [];
             }
 
-            var query = "";
-            filterContentTypes.forEach(fct => query += `filterContentTypes=${fct}&`);
-
-            // if filterContentTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
-            if (filterContentTypes.length === 0) {
-                query += "filterContentTypes=&";
-            }
-
-            filterPropertyTypes.forEach(fpt => query += `filterPropertyTypes=${fpt}&`);
-
-            // if filterPropertyTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
-            if (filterPropertyTypes.length === 0) {
-                query += "filterPropertyTypes=&";
-            }
-            query += "contentTypeId=" + contentTypeId;
+            var query = {
+                contentTypeId: contentTypeId,
+                filterContentTypes: filterContentTypes,
+                filterPropertyTypes: filterPropertyTypes
+            };
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
+                $http.post(
                    umbRequestHelper.getApiUrl(
                        "memberTypeApiBaseUrl",
-                       "GetAvailableCompositeMemberTypes",
-                       query)),
+                       "GetAvailableCompositeMemberTypes"),
+                       query),
                'Failed to retrieve data for content type id ' + contentTypeId);
+        },
+
+        getWhereCompositionIsUsedInContentTypes: function (contentTypeId) {
+            var query = {
+                contentTypeId: contentTypeId
+            };
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "memberTypeApiBaseUrl",
+                        "GetWhereCompositionIsUsedInContentTypes"),
+                    query),
+                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
         //return all member types
