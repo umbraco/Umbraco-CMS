@@ -90,7 +90,11 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 			<div slot="dropdown" id="log-level-selector" @change=${() => this.setLogLevelDebounce()}>
 				${Object.values(LogLevelModel).map(
 					(logLevel) =>
-						html`<uui-checkbox class="log-level-menu-item" .value=${logLevel} label="${logLevel}"
+						html`<uui-checkbox
+							class="log-level-menu-item"
+							.checked=${this._logLevelFilter.includes(logLevel)}
+							.value=${logLevel}
+							label="${logLevel}"
 							><umb-log-viewer-level-tag .level=${logLevel}></umb-log-viewer-level-tag
 						></uui-checkbox>`
 				)}
