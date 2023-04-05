@@ -21,7 +21,7 @@ public class ItemMediaTypeItemController : MediaTypeItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<IActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
     {
         IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetAll(keys);
         List<MediaTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes);

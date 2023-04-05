@@ -21,7 +21,7 @@ public class ItemDocumentTypeItemController : DocumentTypeItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<IActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
     {
         IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll(keys);
         List<DocumentTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IContentType, DocumentTypeItemResponseModel>(contentTypes);

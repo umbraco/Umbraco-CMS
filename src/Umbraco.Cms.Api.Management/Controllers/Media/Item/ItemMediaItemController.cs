@@ -29,9 +29,9 @@ public class ItemMediaItemController : MediaItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null)
+    public async Task<ActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys, Guid? dataTypeKey = null)
     {
-        IEnumerable<IMediaEntitySlim> media = _entityService.GetAll(UmbracoObjectTypes.Media, keys).OfType<IMediaEntitySlim>();
+        IEnumerable<IMediaEntitySlim> media = _entityService.GetAll(UmbracoObjectTypes.Media, keys.ToArray()).OfType<IMediaEntitySlim>();
         if (dataTypeKey is not null)
         {
             if (_dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value))

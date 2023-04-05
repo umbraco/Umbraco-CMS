@@ -21,7 +21,7 @@ public class ItemRelationTypeItemController : RelationTypeItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<RelationTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<IActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
     {
         // relation service does not allow fetching a collection of relation types by their ids; instead it relies
         // heavily on caching, which means this is as fast as it gets - even if it looks less than performant

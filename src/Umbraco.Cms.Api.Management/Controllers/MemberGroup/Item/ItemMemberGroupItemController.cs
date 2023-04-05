@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using J2N.Collections.Generic.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Core.Mapping;
@@ -22,9 +23,9 @@ public class ItemMemberGroupItemController : MemberGroupItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberGroupItemReponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<IActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
     {
-        IEnumerable<IEntitySlim> memberGroups = _entityService.GetAll(UmbracoObjectTypes.MemberGroup, keys);
+        IEnumerable<IEntitySlim> memberGroups = _entityService.GetAll(UmbracoObjectTypes.MemberGroup, keys.ToArray());
         List<MemberGroupItemReponseModel> responseModel = _mapper.MapEnumerable<IEntitySlim, MemberGroupItemReponseModel>(memberGroups);
         return Ok(responseModel);
     }

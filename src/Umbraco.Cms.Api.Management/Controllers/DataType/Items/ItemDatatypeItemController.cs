@@ -21,7 +21,7 @@ public class ItemDatatypeItemController : DatatypeItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<ActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
     {
         var dataTypes = new List<IDataType>();
         foreach (Guid key in keys)

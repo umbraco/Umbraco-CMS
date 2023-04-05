@@ -23,9 +23,9 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "key")] Guid[] keys)
+    public async Task<ActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
     {
-        IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, keys).Select(x => x as IDocumentEntitySlim).WhereNotNull();
+        IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, keys.ToArray()).Select(x => x as IDocumentEntitySlim).WhereNotNull();
         IEnumerable<DocumentBlueprintResponseModel> responseModels = documents.Select(x => _documentPresentationFactory.CreateBlueprintItemResponseModel(x));
         return Ok(responseModels);
     }

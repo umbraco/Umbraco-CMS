@@ -20,7 +20,7 @@ public class ItemScriptItemController : ScriptItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ScriptItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "path")] string[] paths)
+    public async Task<IActionResult> Item([FromQuery(Name = "path")] SortedSet<string> paths)
     {
         IEnumerable<ScriptItemResponseModel> reponseModels = _fileItemPresentationModelFactory.CreateScriptItemResponseModels(paths, _fileSystem);
         return Ok(reponseModels);
