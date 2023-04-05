@@ -131,6 +131,7 @@
             scope.close = function() {
                 if(scope.onClose) {
                     scope.onClose();
+                    focusLockService.removeInertAttribute();
                 }
             };
 

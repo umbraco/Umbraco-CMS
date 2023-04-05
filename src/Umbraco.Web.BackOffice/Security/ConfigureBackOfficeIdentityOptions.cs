@@ -1,8 +1,10 @@
 using System.Security.Claims;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security;
@@ -13,9 +15,21 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
 {
     private readonly UserPasswordConfigurationSettings _userPasswordConfiguration;
+    private readonly SecuritySettings _securitySettings;
 
-    public ConfigureBackOfficeIdentityOptions(IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration) =>
+    [Obsolete("Use the constructor that accepts SecuritySettings. Will be removed in V13.")]
+    public ConfigureBackOfficeIdentityOptions(IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration)
+        : this(userPasswordConfiguration, StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
+    }
+
+    public ConfigureBackOfficeIdentityOptions(
+        IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration,
+        IOptions<SecuritySettings> securitySettings)
+    {
         _userPasswordConfiguration = userPasswordConfiguration.Value;
+        _securitySettings = securitySettings.Value;
+    }
 
     public void Configure(BackOfficeIdentityOptions options)
     {
@@ -31,8 +45,7 @@ public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackO
         options.ClaimsIdentity.SecurityStampClaimType = Constants.Security.SecurityStampClaimType;
 
         options.Lockout.AllowedForNewUsers = true;
-        // TODO: Implement this
-        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(_securitySettings.UserDefaultLockoutTimeInMinutes);
 
         options.Password.ConfigurePasswordOptions(_userPasswordConfiguration);
 

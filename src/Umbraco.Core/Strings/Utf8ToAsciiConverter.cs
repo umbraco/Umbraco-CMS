@@ -11,21 +11,27 @@ namespace Umbraco.Cms.Core.Strings;
 /// </remarks>
 public static class Utf8ToAsciiConverter
 {
+    [Obsolete("Use ToAsciiString(ReadOnlySpan<char>..) instead")]
+    public static string ToAsciiString(string text, char fail = '?')
+    {
+        return ToAsciiString(text.AsSpan(), fail);
+    }
+
     /// <summary>
     ///     Converts an Utf8 string into an Ascii string.
     /// </summary>
     /// <param name="text">The text to convert.</param>
     /// <param name="fail">The character to use to replace characters that cannot properly be converted.</param>
     /// <returns>The converted text.</returns>
-    public static string ToAsciiString(string text, char fail = '?')
+    public static string ToAsciiString(ReadOnlySpan<char> text, char fail = '?')
     {
-        var input = text.ToCharArray();
-
         // this is faster although it uses more memory
         // but... we should be filtering short strings only...
-        var output = new char[input.Length * 3]; // *3 because of things such as OE
-        var len = ToAscii(input, output, fail);
-        return new string(output, 0, len);
+
+        var totalSize = text.Length * 3;
+        Span<char> output = totalSize <= 1024 ? stackalloc char[totalSize] : new char[totalSize]; // *3 because of things such as OE
+        var len = ToAscii(text, output, fail);
+        return new string(output[..len]);
 
         // var output = new StringBuilder(input.Length + 16); // default is 16, start with at least input length + little extra
         // ToAscii(input, output);
@@ -66,7 +72,7 @@ public static class Utf8ToAsciiConverter
     /// <returns>The number of characters in the output array.</returns>
     /// <remarks>The caller must ensure that the output array is big enough.</remarks>
     /// <exception cref="OverflowException">The output array is not big enough.</exception>
-    private static int ToAscii(char[] input, char[] output, char fail = '?')
+    private static int ToAscii(ReadOnlySpan<char> input, Span<char> output, char fail = '?')
     {
         var opos = 0;
 
@@ -121,7 +127,7 @@ public static class Utf8ToAsciiConverter
     ///     <para>Input should contain Utf8 characters exclusively and NOT Unicode.</para>
     ///     <para>Removes controls, normalizes whitespaces, replaces symbols by '?'.</para>
     /// </remarks>
-    private static void ToAscii(char[] input, int ipos, char[] output, ref int opos, char fail = '?')
+    private static void ToAscii(ReadOnlySpan<char> input, int ipos, Span<char> output, ref int opos, char fail = '?')
     {
         var c = input[ipos];
 

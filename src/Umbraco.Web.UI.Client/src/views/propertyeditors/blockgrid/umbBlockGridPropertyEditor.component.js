@@ -708,7 +708,7 @@
                         } else 
                         if(allowance.elementTypeKey) {
                             const blockType = vm.availableBlockTypes.find(x => x.blockConfigModel.contentElementTypeKey === allowance.elementTypeKey);
-                            if(allowedElementTypes.indexOf(blockType) === -1) {
+                            if(blockType && allowedElementTypes.indexOf(blockType) === -1) {
                                 allowedElementTypes.push(blockType);
                             }
                         }
@@ -1021,10 +1021,11 @@
         function updateClipboard(firstTime) {
 
             var oldAmount = vm.clipboardItems.length;
+            var entriesForPaste;
 
             vm.clipboardItems = [];
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.ELEMENT_TYPE,

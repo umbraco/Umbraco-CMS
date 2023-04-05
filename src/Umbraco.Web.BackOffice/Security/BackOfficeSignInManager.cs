@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 

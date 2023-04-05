@@ -13,6 +13,7 @@ public class RegisterModel : PostRedirectModel
         MemberTypeAlias = Constants.Conventions.MemberTypes.DefaultAlias;
         UsernameIsEmail = true;
         MemberProperties = new List<MemberPropertyModel>();
+        AutomaticLogIn = true;
     }
 
     [Required]
@@ -59,4 +60,9 @@ public class RegisterModel : PostRedirectModel
     ///     Flag to determine if the username should be the email address, if true then the Username property is ignored
     /// </summary>
     public bool UsernameIsEmail { get; set; }
+
+    /// <summary>
+    ///     Flag to determine if the member should be logged in automatically after successful registration
+    /// </summary>
+    public bool AutomaticLogIn { get; set; }
 }
