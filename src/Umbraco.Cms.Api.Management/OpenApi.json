@@ -667,7 +667,7 @@
         "operationId": "GetDataTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -1172,7 +1172,7 @@
         "operationId": "GetDictionaryItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -1301,7 +1301,7 @@
         "operationId": "GetDocumentBlueprintItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -1420,7 +1420,7 @@
         "operationId": "GetDocumentTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -1852,7 +1852,7 @@
         "operationId": "GetDocumentItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -1864,7 +1864,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3313,7 +3313,7 @@
         "operationId": "GetMediaTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -3607,7 +3607,7 @@
         "operationId": "GetMediaItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -3619,7 +3619,7 @@
             }
           },
           {
-            "name": "dataTypeKey",
+            "name": "dataTypeId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -3905,7 +3905,7 @@
         "operationId": "GetMemberGroupItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -3986,7 +3986,7 @@
         "operationId": "GetMemberTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -4504,7 +4504,7 @@
         "operationId": "GetPartialViewItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -5088,7 +5088,7 @@
         "operationId": "GetRelationTypeItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
@@ -6111,7 +6111,7 @@
         "operationId": "GetTemplateItem",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
