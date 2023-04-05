@@ -670,6 +670,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -1174,6 +1175,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -1302,6 +1304,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -1420,6 +1423,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -1851,6 +1855,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -2804,6 +2809,19 @@
           "Language"
         ],
         "operationId": "GetLanguageItem",
+        "parameters": [
+          {
+            "name": "isoCode",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -3298,6 +3316,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -3591,6 +3610,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -3888,6 +3908,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -3968,6 +3989,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -4485,6 +4507,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string"
@@ -5068,6 +5091,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -5290,6 +5314,7 @@
             "name": "path",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string"
@@ -5696,6 +5721,7 @@
             "name": "path",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string"
@@ -6088,6 +6114,7 @@
             "name": "key",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string",
@@ -7412,6 +7439,7 @@
             "name": "path",
             "in": "query",
             "schema": {
+              "uniqueItems": true,
               "type": "array",
               "items": {
                 "type": "string"
@@ -8110,6 +8138,12 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "DataTypeModelBaseModel": {
@@ -8463,6 +8497,12 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "DocumentNotificationResponseModel": {
@@ -8545,6 +8585,10 @@
         "properties": {
           "isElement": {
             "type": "boolean"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -9237,9 +9281,6 @@
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "icon": {
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -9408,6 +9449,12 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "MediaTypeItemResponseModel": {
@@ -9417,6 +9464,12 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "MediaTypePropertyTypeContainerResponseModel": {
@@ -9531,6 +9584,12 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "ModelsBuilderResponseModel": {
