@@ -29,12 +29,12 @@ public class ItemMediaItemController : MediaItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys, Guid? dataTypeKey = null)
+    public async Task<ActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids, Guid? dataTypeId = null)
     {
-        IEnumerable<IMediaEntitySlim> media = _entityService.GetAll(UmbracoObjectTypes.Media, keys.ToArray()).OfType<IMediaEntitySlim>();
-        if (dataTypeKey is not null)
+        IEnumerable<IMediaEntitySlim> media = _entityService.GetAll(UmbracoObjectTypes.Media, ids.ToArray()).OfType<IMediaEntitySlim>();
+        if (dataTypeId is not null)
         {
-            if (_dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value))
+            if (_dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value))
             {
                 // FIXME: right now we're faking user id by just passing "-1"
                 // We should use the backoffice security accessor once auth is in place.

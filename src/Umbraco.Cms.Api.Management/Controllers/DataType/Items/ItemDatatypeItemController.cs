@@ -21,12 +21,12 @@ public class ItemDatatypeItemController : DatatypeItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
+    public async Task<ActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
     {
         var dataTypes = new List<IDataType>();
-        foreach (Guid key in keys)
+        foreach (Guid id in ids)
         {
-            IDataType? dataType = await _dataTypeService.GetAsync(key);
+            IDataType? dataType = await _dataTypeService.GetAsync(id);
             if (dataType is not null)
             {
                 dataTypes.Add(dataType);

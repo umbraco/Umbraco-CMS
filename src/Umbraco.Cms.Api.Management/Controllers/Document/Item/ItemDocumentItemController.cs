@@ -32,14 +32,14 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys, Guid? dataTypeKey = null, string? culture = null)
+    public async Task<ActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids, Guid? dataTypeId = null, string? culture = null)
     {
-        IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, keys.ToArray()).Select(x => x as IDocumentEntitySlim).Where(x => x is not null)!;
+        IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, ids.ToArray()).Select(x => x as IDocumentEntitySlim).Where(x => x is not null)!;
 
         // Filter start nodes
-        if (dataTypeKey is not null)
+        if (dataTypeId is not null)
         {
-            if (_dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value))
+            if (_dataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeId.Value))
             {
                 // FIXME: right now we're faking user id by just passing "-1"
                 // We should use the backoffice security accessor once auth is in place.

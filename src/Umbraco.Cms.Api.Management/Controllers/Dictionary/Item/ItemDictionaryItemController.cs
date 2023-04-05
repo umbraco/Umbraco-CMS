@@ -22,9 +22,9 @@ public class ItemDictionaryItemController : DictionaryItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DictionaryItemItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
+    public async Task<ActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
     {
-        IEnumerable<IDictionaryItem> dictionaryItems = await _dictionaryItemService.GetManyAsync(keys.ToArray());
+        IEnumerable<IDictionaryItem> dictionaryItems = await _dictionaryItemService.GetManyAsync(ids.ToArray());
 
         List<DictionaryItemItemResponseModel> responseModels = _mapper.MapEnumerable<IDictionaryItem, DictionaryItemItemResponseModel>(dictionaryItems);
         return Ok(responseModels);

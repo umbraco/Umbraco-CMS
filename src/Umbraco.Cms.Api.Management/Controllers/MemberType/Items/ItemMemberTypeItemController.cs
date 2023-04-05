@@ -21,9 +21,9 @@ public class ItemMemberTypeItemController : MemberTypeItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MemberTypeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
     {
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetAll(keys);
+        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetAll(ids);
         List<MemberTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(memberTypes);
         return Ok(responseModels);
     }

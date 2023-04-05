@@ -23,9 +23,9 @@ public class ItemTemplateItemController : TemplateItemControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<TemplateItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Item([FromQuery(Name = "key")] SortedSet<Guid> keys)
+    public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
     {
-        IEnumerable<IEntitySlim> templates = _entityService.GetAll(UmbracoObjectTypes.Template, keys.ToArray());
+        IEnumerable<IEntitySlim> templates = _entityService.GetAll(UmbracoObjectTypes.Template, ids.ToArray());
         List<TemplateItemResponseModel> responseModels = _mapper.MapEnumerable<IEntitySlim, TemplateItemResponseModel>(templates);
         return Ok(responseModels);
     }
