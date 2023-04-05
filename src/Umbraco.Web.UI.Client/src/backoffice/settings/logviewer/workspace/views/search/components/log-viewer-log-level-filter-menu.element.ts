@@ -6,6 +6,7 @@ import { debounce } from 'lodash-es';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
 import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { path, query, toQueryString } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-log-viewer-log-level-filter-menu')
 export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
@@ -58,13 +59,18 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	#setLogLevel() {
 		if (!this.#logViewerContext) return;
-		this.#logViewerContext?.setCurrentPage(1);
 
 		const logLevels = Array.from(this._logLevelSelectorCheckboxes)
 			.filter((checkbox) => checkbox.checked)
 			.map((checkbox) => checkbox.value as LogLevelModel);
-		this.#logViewerContext?.setLogLevelsFilter(logLevels);
-		this.#logViewerContext.getLogs();
+
+		let q = query();
+
+		if (logLevels.length) {
+			q = { ...q, loglevels: logLevels.join(',') };
+		}
+
+		window.history.pushState({}, '', `${path()}?${toQueryString(q)}`);
 	}
 
 	setLogLevelDebounce = debounce(this.#setLogLevel, 300);
