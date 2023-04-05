@@ -14,7 +14,7 @@ import { customElement, property } from 'lit/decorators.js';
 
 import { UmbIconStore } from './core/stores/icon/icon.store';
 import type { Guard, IRoute } from '@umbraco-cms/backoffice/router';
-import { pathWithoutBasePath, queryString } from '@umbraco-cms/backoffice/router';
+import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
@@ -126,21 +126,11 @@ export class UmbAppElement extends UmbLitElement {
 				break;
 
 			case RuntimeLevelModel.RUN: {
-				const pathname = pathWithoutBasePath();
+				const pathname = pathWithoutBasePath({ start: true, end: false });
 
 				// If we are on the installer or upgrade page, redirect to the root
 				// but if not, keep the current path but replace state anyway to initialize the router
-				let finalPath = pathname === 'install' || pathname === 'upgrade' ? '/' : pathname;
-
-				const qs = queryString();
-
-				if (qs) {
-					finalPath += qs;
-				}
-
-				if (location.hash) {
-					finalPath += `#${location.hash}`;
-				}
+				const finalPath = pathname === '/install' || pathname === '/upgrade' ? '/' : location.href;
 
 				history.replaceState(null, '', finalPath);
 				break;
