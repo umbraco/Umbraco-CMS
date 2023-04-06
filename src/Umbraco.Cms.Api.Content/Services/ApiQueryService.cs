@@ -32,7 +32,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
     /// <inheritdoc/>
     public IEnumerable<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts)
     {
-        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentAPIIndexName, out IIndex? apiIndex))
+        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentApiIndexName, out IIndex? apiIndex))
         {
             return Enumerable.Empty<Guid>();
         }

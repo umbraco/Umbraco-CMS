@@ -14,7 +14,7 @@ public class ContentApiIndexPopulator : IndexPopulator
     {
         _contentService = contentService;
         _contentValueSetBuilder = contentValueSetBuilder;
-        RegisterIndex(Constants.UmbracoIndexes.ContentAPIIndexName);
+        RegisterIndex(Constants.UmbracoIndexes.ContentApiIndexName);
     }
 
     protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)

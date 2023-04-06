@@ -273,7 +273,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         public override void Execute() =>
             Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _content, _isPublished);
 
-        // FIXME: Content API index needs updating here
+        // TODO: Content API index needs updating here
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue,
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
             => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
