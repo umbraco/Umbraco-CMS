@@ -1,16 +1,10 @@
 using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Querying.Filters;
 
-internal sealed class ContentTypeFilter : QueryOptionBase, IFilterHandler
+internal sealed class ContentTypeFilter : IFilterHandler
 {
     private const string ContentTypeSpecifier = "contentType:";
-
-    public ContentTypeFilter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, requestRoutingService)
-    {
-    }
 
     /// <inheritdoc />
     public bool CanHandle(string queryString)

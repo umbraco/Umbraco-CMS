@@ -1,16 +1,10 @@
 using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Querying.Filters;
 
-internal sealed class NameFilter : QueryOptionBase, IFilterHandler
+internal sealed class NameFilter : IFilterHandler
 {
     private const string NameSpecifier = "name:";
-
-    public NameFilter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
-        : base(publishedSnapshotAccessor, requestRoutingService)
-    {
-    }
 
     /// <inheritdoc />
     public bool CanHandle(string queryString)
