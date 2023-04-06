@@ -81,6 +81,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         else
         {
             // TODO: If no params or no fetch value, get everything from the index - make a default selector and register it by the end of the collection
+            // TODO: This selects everything without regard to the current start-item header - make sure we honour that if it is present
             // This is a temp Examine solution
             queryOperation = baseQuery.Field("__IndexType", "content");
         }
