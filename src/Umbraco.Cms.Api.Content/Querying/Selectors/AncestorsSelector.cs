@@ -15,13 +15,13 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
 
     /// <inheritdoc />
-    public bool CanHandle(string queryString)
-        => queryString.StartsWith(AncestorsSpecifier, StringComparison.OrdinalIgnoreCase);
+    public bool CanHandle(string query)
+        => query.StartsWith(AncestorsSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public SelectorOption BuildSelectorOption(string selectorValueString)
+    public SelectorOption BuildSelectorOption(string selector)
     {
-        var fieldValue = selectorValueString.Substring(AncestorsSpecifier.Length);
+        var fieldValue = selector.Substring(AncestorsSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
 
         if (id is null ||

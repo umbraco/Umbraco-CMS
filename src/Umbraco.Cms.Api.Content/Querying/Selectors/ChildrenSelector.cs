@@ -13,13 +13,13 @@ internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
     }
 
     /// <inheritdoc />
-    public bool CanHandle(string queryString)
-        => queryString.StartsWith(ChildrenSpecifier, StringComparison.OrdinalIgnoreCase);
+    public bool CanHandle(string query)
+        => query.StartsWith(ChildrenSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public SelectorOption BuildSelectorOption(string selectorValueString)
+    public SelectorOption BuildSelectorOption(string selector)
     {
-        var fieldValue = selectorValueString.Substring(ChildrenSpecifier.Length);
+        var fieldValue = selector.Substring(ChildrenSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
 
         return new SelectorOption

@@ -14,13 +14,13 @@ internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
     }
 
     /// <inheritdoc />
-    public bool CanHandle(string queryString)
-        => queryString.StartsWith(DescendantsSpecifier, StringComparison.OrdinalIgnoreCase);
+    public bool CanHandle(string query)
+        => query.StartsWith(DescendantsSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public SelectorOption BuildSelectorOption(string selectorValueString)
+    public SelectorOption BuildSelectorOption(string selector)
     {
-        var fieldValue = selectorValueString.Substring(DescendantsSpecifier.Length);
+        var fieldValue = selector.Substring(DescendantsSpecifier.Length);
         Guid? id = GetGuidFromQuery(fieldValue);
 
         return new SelectorOption

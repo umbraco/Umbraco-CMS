@@ -6,9 +6,9 @@ namespace Umbraco.Cms.Core.ContentApi;
 public interface ISortHandler : IQueryHandler
 {
     /// <summary>
-    ///     Builds a <see cref="SortOption"/> for the sort query parameter.
+    ///     Builds a <see cref="SortOption"/> for the sort query.
     /// </summary>
-    /// <param name="sortValueString">The sort value from the query string.</param>
+    /// <param name="sort">The sort query (i.e. "name:asc").</param>
     /// <returns>A <see cref="SortOption"/> that can be used when building specific sorting queries.</returns>
-    SortOption BuildSortOption(string sortValueString);
+    SortOption BuildSortOption(string sort);
 }

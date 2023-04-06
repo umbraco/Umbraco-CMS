@@ -7,15 +7,15 @@ internal sealed class NameFilter : IFilterHandler
     private const string NameSpecifier = "name:";
 
     /// <inheritdoc />
-    public bool CanHandle(string queryString)
-        => queryString.StartsWith(NameSpecifier, StringComparison.OrdinalIgnoreCase);
+    public bool CanHandle(string query)
+        => query.StartsWith(NameSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public FilterOption BuildFilterOption(string filterValueString)
+    public FilterOption BuildFilterOption(string filter)
     {
-        var value = filterValueString.Substring(NameSpecifier.Length);
+        var value = filter.Substring(NameSpecifier.Length);
 
-        var filter = new FilterOption
+        var filterOption = new FilterOption
         {
             FieldName = "name",
             Value = string.Empty
@@ -24,15 +24,15 @@ internal sealed class NameFilter : IFilterHandler
         // TODO: do we support negation?
         if (value.StartsWith('!'))
         {
-            filter.Value = value.Substring(1);
-            filter.Operator = FilterOperation.IsNot;
+            filterOption.Value = value.Substring(1);
+            filterOption.Operator = FilterOperation.IsNot;
         }
         else
         {
-            filter.Value = value;
-            filter.Operator = FilterOperation.Is;
+            filterOption.Value = value;
+            filterOption.Operator = FilterOperation.Is;
         }
 
-        return filter;
+        return filterOption;
     }
 }

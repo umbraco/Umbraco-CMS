@@ -6,9 +6,9 @@ namespace Umbraco.Cms.Core.ContentApi;
 public interface ISelectorHandler : IQueryHandler
 {
     /// <summary>
-    ///     Builds a <see cref="SelectorOption"/> for the fetch query parameter.
+    ///     Builds a <see cref="SelectorOption"/> for the selector query.
     /// </summary>
-    /// <param name="selectorValueString">The selector (fetch) value from the query string.</param>
+    /// <param name="selector">The selector query (i.e. "children:articles").</param>
     /// <returns>A <see cref="SelectorOption"/> that can be used when building specific search query for requesting a subset of the items.</returns>
-    SelectorOption BuildSelectorOption(string selectorValueString);
+    SelectorOption BuildSelectorOption(string selector);
 }

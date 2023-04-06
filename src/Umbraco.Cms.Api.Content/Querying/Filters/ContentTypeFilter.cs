@@ -7,15 +7,15 @@ internal sealed class ContentTypeFilter : IFilterHandler
     private const string ContentTypeSpecifier = "contentType:";
 
     /// <inheritdoc />
-    public bool CanHandle(string queryString)
-        => queryString.StartsWith(ContentTypeSpecifier, StringComparison.OrdinalIgnoreCase);
+    public bool CanHandle(string query)
+        => query.StartsWith(ContentTypeSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public FilterOption BuildFilterOption(string filterValueString)
+    public FilterOption BuildFilterOption(string filter)
     {
-        var alias = filterValueString.Substring(ContentTypeSpecifier.Length);
+        var alias = filter.Substring(ContentTypeSpecifier.Length);
 
-        var filter = new FilterOption
+        var filterOption = new FilterOption
         {
             FieldName = "__NodeTypeAlias",
             Value = string.Empty
@@ -24,15 +24,15 @@ internal sealed class ContentTypeFilter : IFilterHandler
         // TODO: do we support negation?
         if (alias.StartsWith('!'))
         {
-            filter.Value = alias.Substring(1);
-            filter.Operator = FilterOperation.IsNot;
+            filterOption.Value = alias.Substring(1);
+            filterOption.Operator = FilterOperation.IsNot;
         }
         else
         {
-            filter.Value = alias;
-            filter.Operator = FilterOperation.Is;
+            filterOption.Value = alias;
+            filterOption.Operator = FilterOperation.Is;
         }
 
-        return filter;
+        return filterOption;
     }
 }

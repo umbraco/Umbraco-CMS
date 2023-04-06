@@ -6,9 +6,9 @@ namespace Umbraco.Cms.Core.ContentApi;
 public interface IFilterHandler : IQueryHandler
 {
     /// <summary>
-    ///     Builds a <see cref="FilterOption"/> for the filter query parameter.
+    ///     Builds a <see cref="FilterOption"/> for the filter query.
     /// </summary>
-    /// <param name="filterValueString">The filter value from the query string.</param>
+    /// <param name="filter">The filter query (i.e. "contentType:article").</param>
     /// <returns>A <see cref="FilterOption"/> that can be used when building specific filter queries.</returns>
-    FilterOption BuildFilterOption(string filterValueString);
+    FilterOption BuildFilterOption(string filter);
 }

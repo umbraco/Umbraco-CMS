@@ -8,13 +8,13 @@ internal sealed class PathSort : ISortHandler
     private const string SortOptionSpecifier = "path:";
 
     /// <inheritdoc />
-    public bool CanHandle(string queryString)
-        => queryString.StartsWith(SortOptionSpecifier, StringComparison.OrdinalIgnoreCase);
+    public bool CanHandle(string query)
+        => query.StartsWith(SortOptionSpecifier, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
-    public SortOption BuildSortOption(string sortValueString)
+    public SortOption BuildSortOption(string sort)
     {
-        var sortDirection = sortValueString.Substring(SortOptionSpecifier.Length);
+        var sortDirection = sort.Substring(SortOptionSpecifier.Length);
 
         return new SortOption
         {
