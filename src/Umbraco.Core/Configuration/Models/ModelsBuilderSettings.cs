@@ -15,6 +15,7 @@ public class ModelsBuilderSettings
     internal const string StaticModelsMode = "InMemoryAuto";
     internal const string StaticModelsDirectory = "~/umbraco/models";
     internal const bool StaticAcceptUnsafeModelsDirectory = false;
+    internal const bool PropertyWrapper = false;
     internal const int StaticDebugLevel = 0;
     private bool _flagOutOfDateModels = true;
 
@@ -72,7 +73,14 @@ public class ModelsBuilderSettings
     /// </remarks>
     [DefaultValue(StaticAcceptUnsafeModelsDirectory)]
     public bool AcceptUnsafeModelsDirectory { get; set; } = StaticAcceptUnsafeModelsDirectory;
-
+    /// <summary>
+    /// Gets or sets a value indicating whether to generate models with Property Models
+    /// </summary>
+    /// <remarks>
+    /// When turned on, certain combinations of property aliases can cause compile errors on the generated models.
+    /// </remarks>
+    [DefaultValue(PropertyWrapper)]
+    public bool GenerateModelsWithPropertyWrapper { get; set; } = PropertyWrapper;
     /// <summary>
     ///     Gets or sets a value indicating the debug log level.
     /// </summary>

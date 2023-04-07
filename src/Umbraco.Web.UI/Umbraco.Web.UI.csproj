@@ -17,6 +17,31 @@
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Example\" />
+    <Folder Include="umbraco\Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="umbraco\Data\TEMP\InMemoryAuto\**" />
+    <Compile Remove="umbraco\Data\TEMP\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="umbraco\Data\TEMP\InMemoryAuto\**" />
+    <EmbeddedResource Remove="umbraco\Data\TEMP\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="umbraco\Data\TEMP\InMemoryAuto\**" />
+    <Content Remove="umbraco\Data\TEMP\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="umbraco\Data\TEMP\InMemoryAuto\**" />
+    <None Remove="umbraco\Data\TEMP\**" />
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>

@@ -447,32 +447,13 @@ public class TextBuilder : Builder
         }
 
         sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
-
-        if (mixinStatic)
+        if (Config.GenerateModelsWithPropertyWrapper)
         {
-            sb.Append("\t\tpublic virtual ");
-            WriteClrType(sb, property.ClrTypeName);
-            sb.AppendFormat(
-                " {0} => {1}(this, _publishedValueFallback);\n",
-                property.ClrName, MixinStaticGetterName(property.ClrName));
+            WritePropertyWrapper(mixinStatic, sb, property);
         }
         else
         {
-            sb.Append("\t\tpublic virtual ");
-            WriteClrType(sb, property.ClrTypeName);
-            sb.AppendFormat(
-                " {0} => this.Value",
-                property.ClrName);
-            if (property.ModelClrType != typeof(object))
-            {
-                sb.Append("<");
-                WriteClrType(sb, property.ClrTypeName);
-                sb.Append(">");
-            }
-
-            sb.AppendFormat(
-                "(_publishedValueFallback, \"{0}\");\n",
-                property.Alias);
+            WriteLegacyProperty(mixinStatic, sb, property);
         }
 
         if (property.Errors != null)
@@ -518,6 +499,72 @@ public class TextBuilder : Builder
         sb.AppendFormat(
             "(publishedValueFallback, \"{0}\");\n",
             property.Alias);
+    }
+
+    private void WriteLegacyProperty(bool mixinStatic, StringBuilder sb, PropertyModel property)
+    {
+        if (mixinStatic)
+        {
+            sb.Append("\t\tpublic virtual ");
+            WriteClrType(sb, property.ClrTypeName);
+            sb.AppendFormat(
+                " {0} => {1}(this, _publishedValueFallback);\n",
+                property.ClrName, MixinStaticGetterName(property.ClrName));
+        }
+        else
+        {
+            sb.Append("\t\tpublic virtual ");
+            WriteClrType(sb, property.ClrTypeName);
+            sb.AppendFormat(
+                " {0} => this.Value",
+                property.ClrName);
+            if (property.ModelClrType != typeof(object))
+            {
+                sb.Append("<");
+                WriteClrType(sb, property.ClrTypeName);
+                sb.Append(">");
+            }
+
+            sb.AppendFormat(
+                "(_publishedValueFallback, \"{0}\");\n",
+                property.Alias);
+        }
+    }
+
+    private void WritePropertyWrapper(bool mixinStatic, StringBuilder sb, PropertyModel property)
+    {
+        if (mixinStatic)
+        {
+            sb.Append("\t\tpublic virtual ");
+            WriteClrType(sb, property.ClrTypeName);
+            sb.AppendFormat(
+                " {0} => {1}(this, _publishedValueFallback);\n",
+                property.ClrName, MixinStaticGetterName(property.ClrName));
+        }
+        else
+        {
+            sb.Append("\t\tpublic virtual IPublishedModelProperty<");
+            WriteClrType(sb, property.ClrTypeName);
+            sb.Append(">");
+
+
+            sb.AppendFormat(
+                " {0}",
+                property.ClrName);
+            sb.Append("=> new  PublishedModelProperty<");
+            WriteClrType(sb, property.ClrTypeName);
+            sb.Append(">()");
+            sb.AppendFormat(@"{{ Alias = ""{0}"", Value = this.Value",
+                property.Alias);
+            if (property.ModelClrType != typeof(object))
+            {
+                sb.Append("<");
+                WriteClrType(sb, property.ClrTypeName);
+                sb.Append(">");
+            }
+            sb.AppendFormat(@"(_publishedValueFallback, ""{0}"") }};",
+                property.Alias);
+        }
     }
 
     private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
