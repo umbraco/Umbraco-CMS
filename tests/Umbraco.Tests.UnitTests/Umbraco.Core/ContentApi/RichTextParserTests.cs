@@ -233,7 +233,7 @@ public class RichTextParserTests
 
         var routeBuilderMock = new Mock<IApiContentRouteBuilder>();
         routeBuilderMock
-            .Setup(m => m.Build(contentMock.Object))
+            .Setup(m => m.Build(contentMock.Object, null))
             .Returns(new ApiContentRoute("/some-content-path", new ApiContentStartItem(_contentRootKey, "the-root-path")));
 
         var urlProviderMock = new Mock<IPublishedUrlProvider>();
