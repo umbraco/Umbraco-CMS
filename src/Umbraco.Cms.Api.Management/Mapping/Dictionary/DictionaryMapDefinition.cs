@@ -19,7 +19,7 @@ public class DictionaryMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -Translations
     private void Map(IDictionaryItem source, DictionaryItemResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.Name = source.ItemKey;
     }
 
@@ -41,16 +41,16 @@ public class DictionaryMapDefinition : IMapDefinition
     private void Map(CreateDictionaryItemRequestModel source, IDictionaryItem target, MapperContext context)
     {
         target.ItemKey = source.Name;
-        target.ParentId = source.ParentKey;
+        target.ParentId = source.ParentId;
         target.DeleteDate = null;
     }
 
     // Umbraco.Code.MapAll
     private void Map(IDictionaryItem source, DictionaryOverviewResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.Name = source.ItemKey;
-        target.ParentKey = source.ParentId;
+        target.ParentId = source.ParentId;
         target.TranslatedIsoCodes = source
             .Translations
             .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)

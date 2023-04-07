@@ -67,11 +67,11 @@ public abstract class RecycleBinControllerBase<TItem> : Controller
         {
             Icon = _itemUdiType,
             Name = entity.Name!,
-            Key = entity.Key,
+            Id = entity.Key,
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             IsContainer = entity.IsContainer,
-            ParentKey = parentKey
+            ParentId = parentKey
         };
 
         return viewModel;

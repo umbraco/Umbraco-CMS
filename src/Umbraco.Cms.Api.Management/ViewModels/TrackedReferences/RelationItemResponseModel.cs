@@ -2,7 +2,7 @@
 
 public class RelationItemResponseModel
 {
-    public Guid NodeKey { get; set; }
+    public Guid NodeId { get; set; }
 
     public string? NodeName { get; set; }
 

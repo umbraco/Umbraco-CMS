@@ -22,12 +22,12 @@ public class ByRelationTypeKeyRelationController : RelationControllerBase
         _relationPresentationFactory = relationPresentationFactory;
     }
 
-    [HttpGet("type/{key:guid}")]
+    [HttpGet("type/{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<RelationResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ByRelationTypeKey(Guid key, int skip = 0, int take = 100)
+    public async Task<IActionResult> ByRelationTypeKey(Guid id, int skip = 0, int take = 100)
     {
-        Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKey(key, skip, take);
+        Attempt<PagedModel<IRelation>, RelationOperationStatus> relationsAttempt = await _relationService.GetPagedByRelationTypeKey(id, skip, take);
 
         if (relationsAttempt.Success is false)
         {

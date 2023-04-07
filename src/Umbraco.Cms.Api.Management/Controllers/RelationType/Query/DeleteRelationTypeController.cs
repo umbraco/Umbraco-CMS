@@ -19,13 +19,13 @@ public class DeleteRelationTypeController : RelationTypeControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpDelete("{key:guid}")]
+    [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid key)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        Attempt<IRelationType?, RelationTypeOperationStatus> result = await _relationService.DeleteAsync(key, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IRelationType?, RelationTypeOperationStatus> result = await _relationService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success ? await Task.FromResult(Ok()) : RelationTypeOperationStatusResult(result.Status);
     }
 }

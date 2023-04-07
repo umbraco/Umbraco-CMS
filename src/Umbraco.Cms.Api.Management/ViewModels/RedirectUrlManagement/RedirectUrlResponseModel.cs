@@ -2,7 +2,7 @@
 
 public class RedirectUrlResponseModel
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
     public required string OriginalUrl { get; set; }
 
@@ -10,7 +10,7 @@ public class RedirectUrlResponseModel
 
     public DateTime Created { get; set; }
 
-    public Guid ContentKey { get; set; }
+    public Guid ContentId { get; set; }
 
     public string? Culture { get; set; }
 }

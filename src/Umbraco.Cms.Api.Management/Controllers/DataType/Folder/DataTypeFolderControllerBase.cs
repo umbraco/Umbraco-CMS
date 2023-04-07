@@ -24,26 +24,34 @@ public abstract class DataTypeFolderControllerBase : FolderManagementControllerB
 
     protected override Guid ContainerObjectType => Constants.ObjectTypes.DataType;
 
-    protected override async Task<EntityContainer?> GetContainerAsync(Guid key)
-        => await _dataTypeContainerService.GetAsync(key);
+    protected override async Task<EntityContainer?> GetContainerAsync(Guid id)
+        => await _dataTypeContainerService.GetAsync(id);
 
     protected override async Task<EntityContainer?> GetParentContainerAsync(EntityContainer container)
         => await _dataTypeContainerService.GetParentAsync(container);
 
-    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, Guid userKey)
-        => await _dataTypeContainerService.CreateAsync(container, parentId, userKey);
+    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> CreateContainerAsync(EntityContainer container, Guid? parentId, Guid userId)
+        => await _dataTypeContainerService.CreateAsync(container, parentId, userId);
 
-    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> UpdateContainerAsync(EntityContainer container, Guid userKey)
-        => await _dataTypeContainerService.UpdateAsync(container, userKey);
+    protected override async Task<Attempt<EntityContainer, DataTypeContainerOperationStatus>> UpdateContainerAsync(EntityContainer container, Guid userId)
+        => await _dataTypeContainerService.UpdateAsync(container, userId);
 
-    protected override async Task<Attempt<EntityContainer?, DataTypeContainerOperationStatus>> DeleteContainerAsync(Guid id, Guid userKey)
-        => await _dataTypeContainerService.DeleteAsync(id, userKey);
+    protected override async Task<Attempt<EntityContainer?, DataTypeContainerOperationStatus>> DeleteContainerAsync(Guid id, Guid userId)
+        => await _dataTypeContainerService.DeleteAsync(id, userId);
 
     protected override IActionResult OperationStatusResult(DataTypeContainerOperationStatus status)
         => status switch
         {
             DataTypeContainerOperationStatus.NotFound => NotFound("The data type folder could not be found"),
             DataTypeContainerOperationStatus.ParentNotFound => NotFound("The data type parent folder could not be found"),
+            DataTypeContainerOperationStatus.DuplicateName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("The name is already used")
+                .WithDetail("The data type folder name must be unique on this parent.")
+                .Build()),
+            DataTypeContainerOperationStatus.DuplicateKey => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("The id is already used")
+                .WithDetail("The data type folder id must be unique.")
+                .Build()),
             DataTypeContainerOperationStatus.NotEmpty => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("The folder is not empty")
                 .WithDetail("The data type folder must be empty to perform this action.")

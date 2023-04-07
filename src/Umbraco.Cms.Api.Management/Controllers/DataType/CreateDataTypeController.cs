@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -13,13 +14,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 public class CreateDataTypeController : DataTypeControllerBase
 {
     private readonly IDataTypeService _dataTypeService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IDataTypePresentationFactory _dataTypePresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateDataTypeController(IDataTypeService dataTypeService, IUmbracoMapper umbracoMapper, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public CreateDataTypeController(IDataTypeService dataTypeService, IDataTypePresentationFactory dataTypePresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _dataTypeService = dataTypeService;
-        _umbracoMapper = umbracoMapper;
+        _dataTypePresentationFactory = dataTypePresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -30,11 +31,21 @@ public class CreateDataTypeController : DataTypeControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateDataTypeRequestModel createDataTypeRequestModel)
     {
-        IDataType? created = _umbracoMapper.Map<IDataType>(createDataTypeRequestModel)!;
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(created, CurrentUserKey(_backOfficeSecurityAccessor));
+        var attempt = await _dataTypePresentationFactory.CreateAsync(createDataTypeRequestModel);
+        if (!attempt.Success)
+        {
+            return DataTypeOperationStatusResult(attempt.Status);
+        }
+
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CreateAsync(attempt.Result, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), created.Key)
+            ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)
             : DataTypeOperationStatusResult(result.Status);
+
+
+
+
+
     }
 }

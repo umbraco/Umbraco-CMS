@@ -17,7 +17,7 @@ public class TrackedReferenceViewModelsMapDefinition : IMapDefinition
         target.ContentTypeAlias = source.ContentTypeAlias;
         target.ContentTypeIcon = source.ContentTypeIcon;
         target.ContentTypeName = source.ContentTypeName;
-        target.NodeKey = source.NodeKey;
+        target.NodeId = source.NodeKey;
         target.NodeName = source.NodeName;
         target.NodeType = source.NodeType;
         target.RelationTypeIsBidirectional = source.RelationTypeIsBidirectional;

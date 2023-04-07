@@ -41,15 +41,15 @@ public class UserGroupBase
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
     /// </summary>
-    public Guid? DocumentStartNodeKey { get; init; }
+    public Guid? DocumentStartNodeId { get; init; }
 
     /// <summary>
-    /// The Key of the media that should act as root node for the user group
+    /// The Id of the media that should act as root node for the user group
     /// <remarks>
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
     /// </summary>
-    public Guid? MediaStartNodeKey { get; init; }
+    public Guid? MediaStartNodeId { get; init; }
 
     /// <summary>
     /// Ad-hoc list of permissions provided, and maintained by the front-end. The server has no concept of what these mean.

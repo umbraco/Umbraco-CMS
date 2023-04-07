@@ -59,9 +59,9 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model);
 
-    Task<Attempt<IUser, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
+    Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
-    Task<UserOperationStatus> SetAvatarAsync(IUser user, Guid temporaryFileKey);
+    Task<UserOperationStatus> SetAvatarAsync(Guid userKey, Guid temporaryFileKey);
 
     Task<UserOperationStatus> DeleteAsync(Guid key);
 
@@ -71,7 +71,7 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys);
 
-    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeBackofficeUserPasswordModel model);
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model);
 
     Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
 

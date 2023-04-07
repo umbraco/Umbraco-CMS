@@ -20,14 +20,14 @@ public class MoveDictionaryController : DictionaryControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("{key:guid}/move")]
+    [HttpPost("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid key, MoveDictionaryRequestModel moveDictionaryRequestModel)
+    public async Task<IActionResult> Move(Guid id, MoveDictionaryRequestModel moveDictionaryRequestModel)
     {
-        IDictionaryItem? source = await _dictionaryItemService.GetAsync(key);
+        IDictionaryItem? source = await _dictionaryItemService.GetAsync(id);
         if (source == null)
         {
             return NotFound();
@@ -35,7 +35,7 @@ public class MoveDictionaryController : DictionaryControllerBase
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = await _dictionaryItemService.MoveAsync(
             source,
-            moveDictionaryRequestModel.TargetKey,
+            moveDictionaryRequestModel.TargetId,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

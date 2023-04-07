@@ -21,13 +21,13 @@ public class ByKeyUserGroupController : UserGroupsControllerBase
         _userGroupPresentationFactory = userGroupPresentationFactory;
     }
 
-    [HttpGet("{key:guid}")]
+    [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(UserGroupPresentationModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserGroupPresentationModel>> ByKey(Guid key)
+    public async Task<ActionResult<UserGroupPresentationModel>> ByKey(Guid id)
     {
-        IUserGroup? userGroup = await _userGroupService.GetAsync(key);
+        IUserGroup? userGroup = await _userGroupService.GetAsync(id);
 
         if (userGroup is null)
         {

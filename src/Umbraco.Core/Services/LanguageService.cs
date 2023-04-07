@@ -15,6 +15,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     private readonly ILanguageRepository _languageRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IIsoCodeValidator _isoCodeValidator;
 
     public LanguageService(
         ICoreScopeProvider provider,
@@ -22,12 +23,14 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         IEventMessagesFactory eventMessagesFactory,
         ILanguageRepository languageRepository,
         IAuditRepository auditRepository,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IIsoCodeValidator isoCodeValidator)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _languageRepository = languageRepository;
         _auditRepository = auditRepository;
         _userIdKeyResolver = userIdKeyResolver;
+        _isoCodeValidator = isoCodeValidator;
     }
 
     /// <inheritdoc />
@@ -56,6 +59,8 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             return await Task.FromResult(_languageRepository.GetMany());
         }
     }
+
+    public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));
 
     /// <inheritdoc />
     public async Task<Attempt<ILanguage, LanguageOperationStatus>> UpdateAsync(ILanguage language, Guid userKey)
@@ -153,11 +158,12 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         string auditMessage,
         Guid userKey)
     {
-        if (IsValidIsoCode(language.IsoCode) == false)
+        if (_isoCodeValidator.IsValid(language.IsoCode) == false)
         {
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidIsoCode, language);
         }
-        if (language.FallbackIsoCode is not null && IsValidIsoCode(language.FallbackIsoCode) == false)
+
+        if (language.FallbackIsoCode is not null && _isoCodeValidator.IsValid(language.FallbackIsoCode) == false)
         {
             return Attempt.FailWithStatus(LanguageOperationStatus.InvalidFallbackIsoCode, language);
         }
@@ -254,19 +260,6 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
             }
 
             isoCode = languagesByIsoCode[isoCode].FallbackIsoCode; // else keep chaining
-        }
-    }
-
-    private static bool IsValidIsoCode(string isoCode)
-    {
-        try
-        {
-            var culture = CultureInfo.GetCultureInfo(isoCode);
-            return culture.Name == isoCode && culture.CultureTypes.HasFlag(CultureTypes.UserCustomCulture) == false;
-        }
-        catch (CultureNotFoundException)
-        {
-            return false;
         }
     }
 }

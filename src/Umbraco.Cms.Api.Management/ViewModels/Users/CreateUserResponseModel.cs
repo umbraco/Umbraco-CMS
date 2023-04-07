@@ -2,7 +2,7 @@
 
 public class CreateUserResponseModel
 {
-    public Guid UserKey { get; set; }
+    public Guid UserId { get; set; }
 
     public string? InitialPassword { get; set; }
 }

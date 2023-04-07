@@ -34,11 +34,11 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             {
                 Icon = Constants.Icons.Dictionary,
                 Name = dictionaryItem.ItemKey,
-                Key = dictionaryItem.Key,
+                Id = dictionaryItem.Key,
                 Type = Constants.UdiEntityType.DictionaryItem,
                 HasChildren = hasChildren,
                 IsContainer = false,
-                ParentKey = parentKey
+                ParentId = parentKey
             };
         }
 

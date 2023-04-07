@@ -2,5 +2,5 @@
 
 public class CreateRelationTypeRequestModel : RelationTypeBaseModel
 {
-    public Guid? Key { get; set; }
+    public Guid? Id { get; set; }
 }

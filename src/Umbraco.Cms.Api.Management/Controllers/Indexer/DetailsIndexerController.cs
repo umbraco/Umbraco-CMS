@@ -27,7 +27,7 @@ public class DetailsIndexerController : IndexerControllerBase
     /// <returns></returns>
     /// <remarks>
     ///     This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
-    ///     have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
+    ///     have a listener for the index op complete so we'll just check if that id is no longer there in the runtime cache
     /// </remarks>
     [HttpGet("{indexName}")]
     [MapToApiVersion("1.0")]

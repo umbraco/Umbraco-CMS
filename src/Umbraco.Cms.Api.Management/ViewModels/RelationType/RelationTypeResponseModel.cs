@@ -2,7 +2,7 @@
 
 public class RelationTypeResponseModel : RelationTypeBaseModel
 {
-    public Guid Key { get; set; }
+    public Guid Id { get; set; }
 
     public string? Alias { get; set; }
 

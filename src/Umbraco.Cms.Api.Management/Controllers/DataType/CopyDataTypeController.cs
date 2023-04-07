@@ -20,19 +20,19 @@ public class CopyDataTypeController : DataTypeControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("{key:guid}/copy")]
+    [HttpPost("{id:guid}/copy")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Copy(Guid key, CopyDataTypeRequestModel copyDataTypeRequestModel)
+    public async Task<IActionResult> Copy(Guid id, CopyDataTypeRequestModel copyDataTypeRequestModel)
     {
-        IDataType? source = await _dataTypeService.GetAsync(key);
+        IDataType? source = await _dataTypeService.GetAsync(id);
         if (source is null)
         {
             return NotFound();
         }
 
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CopyAsync(source, copyDataTypeRequestModel.TargetKey, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CopyAsync(source, copyDataTypeRequestModel.TargetId, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)

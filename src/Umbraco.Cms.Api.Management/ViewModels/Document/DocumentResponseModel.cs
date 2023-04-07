@@ -6,5 +6,5 @@ public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel
 {
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Array.Empty<ContentUrlInfo>();
 
-    public Guid? TemplateKey { get; set; }
+    public Guid? TemplateId { get; set; }
 }

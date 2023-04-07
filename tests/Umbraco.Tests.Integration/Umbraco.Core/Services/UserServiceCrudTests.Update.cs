@@ -29,14 +29,14 @@ public partial class UserServiceCrudTests
         var groups = await UserGroupService.GetAsync(user.Groups.Select(x => x.Id).ToArray());
         return new UserUpdateModel
         {
-            ExistingUser = user,
+            ExistingUserKey = user.Key,
             Email = user.Email,
             Name = user.Name,
             UserName = user.Username,
-            Language = user.Language,
+            LanguageIsoCode = user.Language,
             ContentStartNodeKeys = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             MediaStartNodeKeys = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
-            UserGroups = groups,
+            UserGroupKeys = groups.Select(x=>x.Key).ToHashSet(),
         };
     }
 
@@ -51,7 +51,7 @@ public partial class UserServiceCrudTests
             Email = email,
             UserName = userName,
             Name = "Test Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var createExistingUser = await userService.CreateAsync(Constants.Security.SuperUserKey, createUserModel, true);
@@ -138,7 +138,7 @@ public partial class UserServiceCrudTests
             Email = email,
             UserName = email,
             Name = "Test Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
@@ -171,7 +171,7 @@ public partial class UserServiceCrudTests
             Email = existingEmail,
             UserName = existingUserName,
             Name = "Test Mc. Gee",
-            UserGroups = new HashSet<IUserGroup> { userGroup! }
+            UserGroupKeys = new HashSet<Guid> { userGroup.Key }
         };
 
         var createExisting = await userService.CreateAsync(Constants.Security.SuperUserKey, createModel, true);
@@ -185,5 +185,33 @@ public partial class UserServiceCrudTests
         var updateAttempt = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
         Assert.IsFalse(updateAttempt.Success);
         Assert.AreEqual(UserOperationStatus.DuplicateUserName, updateAttempt.Status);
+    }
+
+    [Test]
+    [TestCase("en-US", true)]
+    [TestCase("Very much not an ISO Code (:", false)]
+    [TestCase("da-ZA", false)]
+    public async Task Iso_Code_Is_Validated(string isoCode, bool shouldSucceed)
+    {
+        var userService = CreateUserService();
+
+        var (updateModel, _) = await CreateUserForUpdate(userService);
+
+        updateModel.LanguageIsoCode = isoCode;
+
+        var result = await userService.UpdateAsync(Constants.Security.SuperUserKey, updateModel);
+
+        if (shouldSucceed is false)
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(UserOperationStatus.InvalidIsoCode, result.Status);
+            return;
+        }
+
+        Assert.IsTrue(result.Success);
+        // We'll get the user again to ensure that the changes has been persisted
+        var updatedUser = await userService.GetAsync(result.Result.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.AreEqual(isoCode, updatedUser.Language);
     }
 }

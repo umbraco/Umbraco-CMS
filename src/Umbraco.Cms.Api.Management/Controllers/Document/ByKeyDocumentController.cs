@@ -18,13 +18,13 @@ public class ByKeyDocumentController : DocumentControllerBase
         _documentPresentationFactory = documentPresentationFactory;
     }
 
-    [HttpGet("{key:guid}")]
+    [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid key)
+    public async Task<IActionResult> ByKey(Guid id)
     {
-        IContent? content = await _contentEditingService.GetAsync(key);
+        IContent? content = await _contentEditingService.GetAsync(id);
         if (content == null)
         {
             return DocumentNotFound();

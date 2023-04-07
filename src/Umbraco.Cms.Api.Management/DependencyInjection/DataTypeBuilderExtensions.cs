@@ -11,6 +11,7 @@ internal static class DataTypeBuilderExtensions
     internal static IUmbracoBuilder AddDataTypes(this IUmbracoBuilder builder)
     {
         builder.Services.AddTransient<IDataTypeReferencePresentationFactory, DataTypeReferencePresentationFactory>();
+        builder.Services.AddTransient<IDataTypePresentationFactory, DataTypePresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<DataTypeViewModelMapDefinition>();
 

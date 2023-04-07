@@ -14,7 +14,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     // Umbraco.Code.MapAll
     private void Map(IMediaType source, MediaTypeResponseModel target, MapperContext context)
     {
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.Alias = source.Alias;
         target.Name = source.Name ?? string.Empty;
         target.Description = source.Description;
