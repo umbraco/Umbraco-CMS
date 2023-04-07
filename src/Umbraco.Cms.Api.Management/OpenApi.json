@@ -1844,6 +1844,102 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document/{key}/copy": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PostDocumentByKeyCopy",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CopyDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/document/{key}/move": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MoveDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/document/item": {
       "get": {
         "tags": [
@@ -3580,6 +3676,49 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/UpdateMediaRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/media/{key}/move": {
+      "put": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "PutMediaByKeyMove",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MoveMediaRequestModel"
                   }
                 ]
               }
@@ -7893,6 +8032,23 @@
         },
         "additionalProperties": false
       },
+      "CopyDocumentRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "relateToOriginal": {
+            "type": "boolean"
+          },
+          "includeDescendants": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
         "type": "object",
         "properties": {
@@ -9647,6 +9803,28 @@
         "type": "object",
         "properties": {
           "targetId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MoveDocumentRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MoveMediaRequestModel": {
+        "type": "object",
+        "properties": {
+          "targetKey": {
             "type": "string",
             "format": "uuid",
             "nullable": true
