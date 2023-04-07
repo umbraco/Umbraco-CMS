@@ -13,18 +13,22 @@ public class ContentApiJsonTypeResolver : DefaultJsonTypeInfoResolver
     {
         JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);
 
-        if (jsonTypeInfo.Type == typeof(IApiContent))
-        {
-            jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
-            {
-                UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
-                DerivedTypes =
-                {
-                    new JsonDerivedType(typeof(ApiContent))
-                }
-            };
+         if (jsonTypeInfo.Type == typeof(IApiContent))
+         {
+             ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(ApiContent));
+         }
+         else if (jsonTypeInfo.Type == typeof(IApiContentResponse))
+         {
+             ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(ApiContentResponse));
         }
 
         return jsonTypeInfo;
     }
+
+    private void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, Type derivedType)
+        => jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+        {
+            UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
+            DerivedTypes = { new JsonDerivedType(derivedType) }
+        };
 }

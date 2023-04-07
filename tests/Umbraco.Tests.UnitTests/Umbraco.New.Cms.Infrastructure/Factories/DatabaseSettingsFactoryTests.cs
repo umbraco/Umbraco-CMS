@@ -177,6 +177,8 @@ public class DatabaseSettingsFactoryTests
         public Func<DatabaseModel, string> GenerateConnectionStringDelegate { get; set; } =
             _ => "ConnectionString";
 
+        public bool CanRecognizeConnectionString(string? connectionString) => false;
+
         public string? GenerateConnectionString(DatabaseModel databaseModel) => GenerateConnectionStringDelegate(databaseModel);
     }
 }
