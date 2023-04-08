@@ -815,6 +815,18 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         return "general_email";
       case "username":
         return "general_username";
+      case "failedPasswordAttempts":
+        return "user_failedPasswordAttempts";
+      case "approved":
+        return "user_stateApproved";
+      case "lockedOut":
+        return "user_stateLockedOut";
+      case "lastLockoutDate":
+        return "user_lastLockoutDate";
+      case "lastLoginDate":
+        return "user_lastLogin";
+      case "lastPasswordChangeDate":
+        return "user_lastPasswordChangeDate";
     }
     return alias;
   }
