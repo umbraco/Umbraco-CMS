@@ -1,8 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
+import type { MediaTypeItemResponseModel } from '../models/MediaTypeItemResponseModel';
 import type { MediaTypeResponseModel } from '../models/MediaTypeResponseModel';
 import type { PagedFolderTreeItemResponseModel } from '../models/PagedFolderTreeItemResponseModel';
 
@@ -34,6 +33,24 @@ export class MediaTypeResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMediaTypeItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MediaTypeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media-type/item',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
      * @returns PagedFolderTreeItemResponseModel Success
      * @throws ApiError
      */
@@ -56,24 +73,6 @@ export class MediaTypeResource {
                 'skip': skip,
                 'take': take,
                 'foldersOnly': foldersOnly,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeMediaTypeItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/media-type/item',
-            query: {
-                'id': id,
             },
         });
     }

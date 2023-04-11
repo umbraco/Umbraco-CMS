@@ -2,9 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateRelationTypeRequestModel } from '../models/CreateRelationTypeRequestModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { RelationTypeItemResponseModel } from '../models/RelationTypeItemResponseModel';
 import type { RelationTypeResponseModel } from '../models/RelationTypeResponseModel';
 import type { UpdateRelationTypeRequestModel } from '../models/UpdateRelationTypeRequestModel';
 
@@ -107,14 +106,14 @@ export class RelationTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTreeRelationTypeItem({
+    public static getRelationTypeItem({
         id,
     }: {
         id?: Array<string>,
-    }): CancelablePromise<Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>> {
+    }): CancelablePromise<Array<RelationTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/tree/relation-type/item',
+            url: '/umbraco/management/api/v1/relation-type/item',
             query: {
                 'id': id,
             },
