@@ -2,16 +2,15 @@ import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.de
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data';
 import { UmbPartialViewsStore, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN } from './partial-views.store';
 import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDetailRepository } from 'libs/repository/detail-repository.interface';
-import { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
+import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<any> {
 	#init;
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#treeDataSource: UmbPartialViewsTreeServerDataSource;
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
@@ -21,7 +20,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		this.#treeDataSource = new UmbPartialViewsTreeServerDataSource(this.#host);
@@ -40,6 +39,10 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 				this.#notificationContext = instance;
 			}),
 		]);
+	}
+	
+	requestById(id: string): Promise<{ data?: any; error?: ProblemDetailsModel | undefined }> {
+		throw new Error('Method not implemented.');
 	}
 
 	// TREE:

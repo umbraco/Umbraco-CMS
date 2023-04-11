@@ -30,6 +30,36 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 				width: 100%;
 				margin: 1em;
 			}
+
+			#code-editor-menu-container uui-icon {
+				margin-right: var(--uui-size-space-3);
+			}
+
+			#insert-menu {
+				margin: 0;
+				padding: 0;
+				margin-top: var(--uui-size-space-3);
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				min-width: calc(100% + var(--uui-size-8, 24px));
+			}
+
+			#insert-menu > li,
+			ul {
+				padding: 0;
+				width: 100%;
+				list-style: none;
+			}
+
+			.insert-menu-item {
+				width: 100%;
+			}
+
+			#code-editor-menu-container {
+				display: flex;
+				justify-content: flex-end;
+				gap: var(--uui-size-space-3);
+			}
 		`,
 	];
 
@@ -91,9 +121,26 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		return html`<umb-workspace-layout alias="Umb.Workspace.Template">
 			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-box>
-				<uui-button color="danger" look="primary" slot="header" @click=${this.#insertCode}
-					>Insert "My hovercraft is full of eels"</uui-button
-				>
+				<div slot="header" id="code-editor-menu-container">
+					<umb-button-with-dropdown look="secondary" placement="bottom-start" id="insert-button" label="Insert">
+						<uui-icon name="umb:add"></uui-icon>Insert
+						<ul id="insert-menu" slot="dropdown">
+							<li>
+								<uui-menu-item class="insert-menu-item" target="_blank" label="Value" title="Value"> </uui-menu-item>
+							</li>
+							<li>
+								<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>
+							</li>
+							<li>
+								<uui-menu-item class="insert-menu-item" label="Dictionary item" title="Dictionary item">
+								</uui-menu-item>
+							</li>
+						</ul>
+					</umb-button-with-dropdown>
+					<uui-button look="secondary" id="query-builder-button" label="Query builder">
+						<uui-icon name="umb:wand"></uui-icon>Query builder
+					</uui-button>
+				</div>
 
 				<umb-code-editor
 					language="razor"
