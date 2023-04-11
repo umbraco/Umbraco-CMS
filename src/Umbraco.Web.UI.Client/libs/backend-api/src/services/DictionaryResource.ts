@@ -2,9 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateDictionaryItemRequestModel } from '../models/CreateDictionaryItemRequestModel';
+import type { DictionaryItemItemResponseModel } from '../models/DictionaryItemItemResponseModel';
 import type { DictionaryItemResponseModel } from '../models/DictionaryItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
@@ -205,6 +204,24 @@ export class DictionaryResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDictionaryItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DictionaryItemItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/dictionary/item',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
      * @returns PagedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
@@ -224,24 +241,6 @@ export class DictionaryResource {
                 'parentId': parentId,
                 'skip': skip,
                 'take': take,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeDictionaryItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/dictionary/item',
-            query: {
-                'id': id,
             },
         });
     }

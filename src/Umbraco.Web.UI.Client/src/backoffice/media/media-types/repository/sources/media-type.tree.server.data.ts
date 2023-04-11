@@ -64,7 +64,7 @@ export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.getTreeMediaTypeItem({
+			MediaTypeResource.getMediaTypeItem({
 				id: ids,
 			})
 		);

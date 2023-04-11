@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DocumentTypeItemResponseModel } from '../models/DocumentTypeItemResponseModel';
 import type { DocumentTypeResponseModel } from '../models/DocumentTypeResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
 import type { PagedDocumentTypeTreeItemResponseModel } from '../models/PagedDocumentTypeTreeItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -33,6 +33,24 @@ export class DocumentTypeResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DocumentTypeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/item',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
      * @returns PagedDocumentTypeTreeItemResponseModel Success
      * @throws ApiError
      */
@@ -55,24 +73,6 @@ export class DocumentTypeResource {
                 'skip': skip,
                 'take': take,
                 'foldersOnly': foldersOnly,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeDocumentTypeItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<DocumentTypeTreeItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/document-type/item',
-            query: {
-                'id': id,
             },
         });
     }

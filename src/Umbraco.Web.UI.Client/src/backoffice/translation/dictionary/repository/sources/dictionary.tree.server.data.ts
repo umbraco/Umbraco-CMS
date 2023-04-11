@@ -64,7 +64,7 @@ export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.getTreeDictionaryItem({
+			DictionaryResource.getDictionaryItem({
 				id: ids,
 			})
 		);
