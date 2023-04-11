@@ -57,7 +57,7 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 		if (!ids) throw new Error('Ids are missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.getTreeDataTypeItem({
+			DataTypeResource.getDataTypeItem({
 				id: ids,
 			})
 		);

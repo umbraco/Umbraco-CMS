@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -23,7 +23,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: any[] = [
+		const routes: IRoute[] = [
 			{
 				path: 'overview',
 				component: () => import('./packages-created-overview.element'),
@@ -35,10 +35,10 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 			routes.push({
 				path: `${workspace.meta.entityType}/:id`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
-					component.then((el: HTMLElement) => {
-						(el as any).entityId = info.match.params.id;
-					});
+				setup: (component, info) => {
+					if (component) {
+						(component as any).entityId = info.match.params.id;
+					}
 				},
 			});
 			routes.push({

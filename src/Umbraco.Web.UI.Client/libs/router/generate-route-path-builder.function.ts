@@ -1,4 +1,4 @@
-import type { ISlashOptions } from '@umbraco-cms/internal/router';
+import type { ISlashOptions } from '@umbraco-cms/backoffice/router';
 
 const PARAM_IDENTIFIER = /:([^\\/]+)/g;
 

@@ -1,14 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ContentTreeItemResponseModel } from '../models/ContentTreeItemResponseModel';
 import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
-import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
-import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { EntityTreeItemResponseModel } from '../models/EntityTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
 import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteModel';
 import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryResultResponseModel';
 import type { TemplateQuerySettingsResponseModel } from '../models/TemplateQuerySettingsResponseModel';
@@ -117,6 +112,24 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getTemplateItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<TemplateItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/template/item',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static postTemplateQueryExecute({
         requestBody,
     }: {
@@ -175,24 +188,6 @@ export class TemplateResource {
                 'parentId': parentId,
                 'skip': skip,
                 'take': take,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeTemplateItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel)>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/template/item',
-            query: {
-                'id': id,
             },
         });
     }

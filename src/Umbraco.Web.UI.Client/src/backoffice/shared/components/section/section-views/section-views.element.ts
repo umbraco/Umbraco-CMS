@@ -3,7 +3,8 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map, of } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import type { ManifestDashboard, ManifestSectionView } from '@umbraco-cms/backoffice/extensions-registry';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -21,7 +22,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				height:var(--umb-header-layout-height);
+				height: var(--umb-header-layout-height);
 				box-sizing: border-box;
 			}
 
@@ -52,7 +53,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _activePath?: string;
 
 	@state()
-	private _routes: Array<any> = [];
+	private _routes: Array<IRoute> = [];
 
 	private _sectionContext?: UmbSectionContext;
 	private _extensionsObserver?: UmbObserverController<ManifestSectionView[]>;

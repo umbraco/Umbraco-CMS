@@ -126,7 +126,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		if (!this._createdUser) return;
 
 		this._closeModal();
-		history.pushState(null, '', '/section/users/view/users/user/' + this._createdUser?.id); //TODO: URL Should be dynamic
+		history.pushState(null, '', 'section/users/view/users/user/' + this._createdUser?.id); //TODO: URL Should be dynamic
 	}
 
 	private _renderForm() {

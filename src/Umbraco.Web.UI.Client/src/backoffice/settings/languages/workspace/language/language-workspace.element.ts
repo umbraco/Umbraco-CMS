@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -22,20 +22,20 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 
 	#routerPath? = '';
 
-	#getComponentElement = () => {
+	#getComponentElement = async () => {
 		if (this.#editorElement) {
 			return this.#editorElement;
 		}
-		return import('./language-workspace-edit.element');
+		this.#editorElement = (await import('./language-workspace-edit.element')) as unknown as HTMLElement;
+		return this.#editorElement;
 	};
 
 	@state()
-	_routes = [
+	_routes: IRoute[] = [
 		{
 			path: 'edit/:isoCode',
 			component: this.#getComponentElement,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				this.#editorElement = component;
+			setup: (_component, info) => {
 				this.removeControllerByUnique('_observeIsNew');
 				this.#languageWorkspaceContext.load(info.match.params.isoCode);
 			},
@@ -43,8 +43,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 		{
 			path: 'create',
 			component: this.#getComponentElement,
-			setup: async (component: HTMLElement) => {
-				this.#editorElement = component;
+			setup: async () => {
 				this.#languageWorkspaceContext.createScaffold();
 
 				// Navigate to edit route when language is created:

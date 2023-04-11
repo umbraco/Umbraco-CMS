@@ -42,7 +42,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	private _edit() {
 		if (!this._currentUser) return;
 
-		history.pushState(null, '', '/section/users/view/users/user/' + this._currentUser.id); //TODO Change to a tag with href and make dynamic
+		history.pushState(null, '', 'section/users/view/users/user/' + this._currentUser.id); //TODO Change to a tag with href and make dynamic
 		//TODO Implement modal routing for the current-user-modal, so that the modal closes when navigating to the edit profile page
 	}
 	private _changePassword() {

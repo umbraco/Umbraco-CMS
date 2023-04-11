@@ -1,5 +1,5 @@
-import type { IRoute } from 'router-slot/model';
-import { RouterSlot } from 'router-slot';
+// eslint-disable-next-line local-rules/no-external-imports
+import { RouterSlot } from 'router-slot/router-slot';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '../lit-element';
@@ -36,10 +36,10 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 	@property()
 	public get routes(): UmbRoute[] | undefined {
-		return (this.#router as any).routes;
+		return this.#router.routes;
 	}
 	public set routes(value: UmbRoute[] | undefined) {
-		this.#router.routes = (value as IRoute[]) || [];
+		this.#router.routes = value || [];
 	}
 
 	private _routerPath?: string;
@@ -57,7 +57,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	}
 
 	#routeContext = new UmbRouteContext(this, (contextRoutes) => {
-		(this.#modalRouter as any).routes = contextRoutes;
+		this.#modalRouter.routes = contextRoutes;
 		// Force a render?
 		this.#modalRouter.render();
 	});

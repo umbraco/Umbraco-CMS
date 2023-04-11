@@ -55,7 +55,7 @@ export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.getTreeMemberGroupItem({
+			MemberGroupResource.getMemberGroupItem({
 				id: ids,
 			})
 		);

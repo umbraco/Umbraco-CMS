@@ -102,7 +102,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#navigateBack() {
-		window.history.pushState({}, '', '/section/packages/view/created');
+		window.history.pushState({}, '', 'section/packages/view/created');
 	}
 
 	render() {

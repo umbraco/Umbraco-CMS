@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateDocumentRequestModel } from '../models/CreateDocumentRequestModel';
+import type { DocumentItemResponseModel } from '../models/DocumentItemResponseModel';
 import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
-import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
 import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
 import type { UpdateDocumentNotificationsRequestModel } from '../models/UpdateDocumentNotificationsRequestModel';
@@ -195,6 +195,30 @@ export class DocumentResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentItem({
+        id,
+        dataTypeId,
+        culture,
+    }: {
+        id?: Array<string>,
+        dataTypeId?: string,
+        culture?: string,
+    }): CancelablePromise<Array<DocumentItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/item',
+            query: {
+                'id': id,
+                'dataTypeId': dataTypeId,
+                'culture': culture,
+            },
+        });
+    }
+
+    /**
      * @returns PagedRecycleBinItemResponseModel Success
      * @throws ApiError
      */
@@ -269,30 +293,6 @@ export class DocumentResource {
                 'parentId': parentId,
                 'skip': skip,
                 'take': take,
-                'dataTypeId': dataTypeId,
-                'culture': culture,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeDocumentItem({
-        id,
-        dataTypeId,
-        culture,
-    }: {
-        id?: Array<string>,
-        dataTypeId?: string,
-        culture?: string,
-    }): CancelablePromise<Array<DocumentTreeItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/document/item',
-            query: {
-                'id': id,
                 'dataTypeId': dataTypeId,
                 'culture': culture,
             },

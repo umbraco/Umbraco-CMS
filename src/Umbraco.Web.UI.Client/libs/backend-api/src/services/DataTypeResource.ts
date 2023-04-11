@@ -4,11 +4,10 @@
 import type { CopyDataTypeRequestModel } from '../models/CopyDataTypeRequestModel';
 import type { CreateDataTypeRequestModel } from '../models/CreateDataTypeRequestModel';
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
+import type { DataTypeItemResponseModel } from '../models/DataTypeItemResponseModel';
 import type { DataTypeReferenceResponseModel } from '../models/DataTypeReferenceResponseModel';
 import type { DataTypeResponseModel } from '../models/DataTypeResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
 import type { FolderReponseModel } from '../models/FolderReponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { MoveDataTypeRequestModel } from '../models/MoveDataTypeRequestModel';
 import type { PagedFolderTreeItemResponseModel } from '../models/PagedFolderTreeItemResponseModel';
 import type { UpdateDataTypeRequestModel } from '../models/UpdateDataTypeRequestModel';
@@ -269,6 +268,24 @@ export class DataTypeResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDataTypeItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DataTypeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/data-type/item',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
      * @returns PagedFolderTreeItemResponseModel Success
      * @throws ApiError
      */
@@ -291,24 +308,6 @@ export class DataTypeResource {
                 'skip': skip,
                 'take': take,
                 'foldersOnly': foldersOnly,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeDataTypeItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/data-type/item',
-            query: {
-                'id': id,
             },
         });
     }

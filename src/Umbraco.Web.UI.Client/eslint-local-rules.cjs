@@ -43,7 +43,7 @@ module.exports = {
 			type: 'suggestion',
 			docs: {
 				description:
-					'Ensures that any API resources from the `@umbraco-cms/backend-api` module are not used directly. Instead you should use the `tryExecuteAndNotify` function from the `@umbraco-cms/resources` module.',
+					'Ensures that any API resources from the `@umbraco-cms/backoffice/backend-api` module are not used directly. Instead you should use the `tryExecuteAndNotify` function from the `@umbraco-cms/resources` module.',
 				category: 'Best Practices',
 				recommended: true,
 			},
@@ -107,6 +107,7 @@ module.exports = {
 			};
 		},
 	},
+
 	/** @type {import('eslint').Rule.RuleModule} */
 	'enforce-element-suffix-on-element-class-name': {
 		meta: {
@@ -138,6 +139,7 @@ module.exports = {
 			};
 		},
 	},
+
 	// TODO: Its not bullet proof, but it will catch most/some cases.
 	/** @type {import('eslint').Rule.RuleModule} */
 	'prefer-umbraco-cms-imports': {
@@ -165,6 +167,37 @@ module.exports = {
 							message: `Use import alias @umbraco-cms/backoffice instead of relative path "${sourceValue}".`,
 							fix: function (fixer) {
 								return fixer.replaceTextRange(node.source.range, `'${importPath}'`);
+							},
+						});
+					}
+				},
+			};
+		},
+	},
+
+	/** @type {import('eslint').Rule.RuleModule} */
+	'no-external-imports': {
+		meta: {
+			type: 'problem',
+			docs: {
+				description:
+					'Ensures that the application does not rely on imports from external packages. Instead, use the @umbraco-cms/backoffice libs.',
+				recommended: true,
+			},
+			fixable: 'code',
+			schema: [],
+		},
+		create: function (context) {
+			return {
+				ImportDeclaration: function (node) {
+					// Check for imports from "router-slot"
+					if (node.source.value.startsWith('router-slot')) {
+						context.report({
+							node,
+							message:
+								'Use the `@umbraco-cms/backoffice/router` package instead of importing directly from "router-slot" because we might change that dependency in the future.',
+							fix: (fixer) => {
+								return fixer.replaceTextRange(node.source.range, `'@umbraco-cms/backoffice/router'`);
 							},
 						});
 					}

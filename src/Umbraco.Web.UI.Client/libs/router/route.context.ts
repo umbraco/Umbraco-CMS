@@ -1,12 +1,13 @@
-import type { IRoutingInfo, ISlashOptions } from 'router-slot';
-import { UmbRoute } from './route.interface';
-import { generateRoutePathBuilder } from '.';
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRoutingInfo } from 'router-slot/model';
+import type { UmbRoute } from './route.interface';
+import { generateRoutePathBuilder } from './generate-route-path-builder.function';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
@@ -48,7 +49,7 @@ export class UmbRouteContext {
 		return {
 			path: this.#getModalRoutePath(modalRegistration),
 			component: EmptyDiv,
-			setup: (component: HTMLElement, info: IRoutingInfo<any, any>) => {
+			setup: (component, info) => {
 				if (!this.#modalContext) return;
 				const modalHandler = modalRegistration.routeSetup(this.#modalContext, info.match.params);
 				if (modalHandler) {

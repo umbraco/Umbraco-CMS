@@ -1,3 +1,1 @@
-import type { IRoute } from 'router-slot/model';
-
-export type UmbRoute = IRoute;
+export type { IRoute as UmbRoute } from 'router-slot/model';
