@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Routing;
@@ -43,6 +44,12 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
 
                 // When we are signed in with the cookie, assign the principal to the current HttpContext
                 ctx.HttpContext.SetPrincipalForRequest(ctx.Principal);
+
+                return Task.CompletedTask;
+            },
+            OnRedirectToAccessDenied = ctx =>
+            {
+                ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
 
                 return Task.CompletedTask;
             },
