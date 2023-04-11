@@ -1,7 +1,7 @@
 import type { MediaDetails } from '../../';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -10,26 +10,26 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbTemplateDetailServerDataSource
  * @implements {TemplateDetailDataSource}
  */
-export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetails> {
-	#host: UmbControllerHostInterface;
+export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, MediaDetails> {
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbMediaDetailServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
 	/**
-	 * Fetches a Media with the given key from the server
-	 * @param {string} key
+	 * Fetches a Media with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async get(key: string) {
-		if (!key) {
+	async get(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -37,7 +37,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 		return tryExecuteAndNotify(
 			this.#host,
 			// TODO: use backend cli when available.
-			fetch(`/umbraco/management/api/v1/media/details/${key}`)
+			fetch(`/umbraco/management/api/v1/media/details/${id}`)
 				.then((res) => res.json())
 				.then((res) => res[0] || undefined)
 		);
@@ -45,26 +45,26 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 
 	/**
 	 * Creates a new Media scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: MediaDetails = {
 			$type: '',
-			key: '',
+			id: '',
 			name: '',
 			icon: '',
 			type: '',
 			hasChildren: false,
-			parentKey: parentKey ?? '',
+			parentId: parentId ?? '',
 			isTrashed: false,
 			properties: [
 				{
 					alias: '',
 					label: '',
 					description: '',
-					dataTypeKey: '',
+					dataTypeId: '',
 				},
 			],
 			data: [
@@ -90,11 +90,11 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
 	async insert(media: MediaDetails) {
-		if (!media.key) {
-			//const error: ProblemDetails = { title: 'Media key is missing' };
+		if (!media.id) {
+			//const error: ProblemDetails = { title: 'Media id is missing' };
 			return Promise.reject();
 		}
-		//const payload = { key: media.key, requestBody: media };
+		//const payload = { id: media.id, requestBody: media };
 
 		let body: string;
 
@@ -124,12 +124,12 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(media: MediaDetails) {
-		if (!media.key) {
-			const error: ProblemDetailsModel = { title: 'Media key is missing' };
+	async update(id: string, media: MediaDetails) {
+		if (!media.id) {
+			const error: ProblemDetailsModel = { title: 'Media id is missing' };
 			return { error };
 		}
-		//const payload = { key: media.key, requestBody: media };
+		//const payload = { id: media.id, requestBody: media };
 
 		let body: string;
 
@@ -158,8 +158,8 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async trash(key: string) {
-		if (!key) {
+	async trash(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -168,7 +168,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/trash', {
 				method: 'POST',
-				body: JSON.stringify([key]),
+				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -178,12 +178,12 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 
 	/**
 	 * Deletes a Template on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
@@ -193,7 +193,7 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<MediaDetail
 		try {
 			await fetch('/umbraco/management/api/v1/media/delete', {
 				method: 'POST',
-				body: JSON.stringify([key]),
+				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},

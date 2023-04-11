@@ -25,19 +25,19 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: IRoute[] = [
 		{
-			path: 'create/:parentKey',
+			path: 'create/:parentId',
 			component: () => this.#element,
 			setup: async (component: HTMLElement, info: IRoutingInfo) => {
-				const parentKey = info.match.params.parentKey;
-				this.#workspaceContext.createScaffold(parentKey);
+				const parentId = info.match.params.parentId;
+				this.#workspaceContext.createScaffold(parentId);
 			},
 		},
 		{
-			path: 'edit/:key',
+			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				const key = info.match.params.key;
-				this.#workspaceContext.load(key);
+				const id = info.match.params.id;
+				this.#workspaceContext.load(id);
 			},
 		},
 	];

@@ -12,8 +12,8 @@ class UmbLanguagesData extends UmbData<LanguageResponseModel> {
 		return this.data.slice(skip, take);
 	}
 
-	getByKey(key: string) {
-		return this.data.find((item) => item.isoCode === key);
+	getByKey(isoCode: string) {
+		return this.data.find((item) => item.isoCode === isoCode);
 	}
 
 	insert(language: LanguageResponseModel) {
@@ -49,15 +49,15 @@ class UmbLanguagesData extends UmbData<LanguageResponseModel> {
 		return this.data;
 	}
 
-	delete(keys: Array<string>) {
-		keys.forEach((key) => {
-			const foundIndex = this.data.findIndex((item) => item.isoCode === key);
+	delete(isoCodes: Array<string>) {
+		isoCodes.forEach((isoCode) => {
+			const foundIndex = this.data.findIndex((item) => item.isoCode === isoCode);
 			if (foundIndex !== -1) {
 				this.data.splice(foundIndex, 1);
 			}
 		});
 
-		return keys;
+		return isoCodes;
 	}
 
 	updateData(updateItem: LanguageResponseModel) {

@@ -8,6 +8,7 @@ import type { DocumentVariantResponseModel } from './DocumentVariantResponseMode
 export type ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel = {
     values?: Array<DocumentValueModel>;
     variants?: Array<DocumentVariantResponseModel>;
-    key?: string;
-    contentTypeKey?: string;
+    id?: string;
+    contentTypeId?: string;
 };
+

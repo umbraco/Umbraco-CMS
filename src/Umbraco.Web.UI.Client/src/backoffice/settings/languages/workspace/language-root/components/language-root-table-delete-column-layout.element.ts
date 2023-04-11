@@ -34,7 +34,9 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 
 		return html`
 			<umb-dropdown .open="${this._isOpen}" @close=${this.#onClose}>
-				<uui-button slot="trigger" compact @click=${this.#onClick}><uui-symbol-more></uui-symbol-more></uui-button>
+				<uui-button label="actions" slot="trigger" compact @click=${this.#onClick}>
+					<uui-symbol-more></uui-symbol-more>
+				</uui-button>
 				<umb-entity-action-list
 					slot="dropdown"
 					@executed=${this.#onActionExecuted}

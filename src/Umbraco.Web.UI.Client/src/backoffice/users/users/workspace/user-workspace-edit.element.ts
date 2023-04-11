@@ -6,8 +6,8 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import { UMB_CHANGE_PASSWORD_MODAL_TOKEN } from '../../current-user/modals/change-password';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
+import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { getLookAndColorFromUserStatus } from '@umbraco-cms/backoffice/utils';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
@@ -127,8 +127,8 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		// TODO: make sure we use the workspace for this:
 		/*
 		isDisabled
-			? this._workspaceContext.getStore()?.enableUsers([this._user.key])
-			: this._workspaceContext.getStore()?.disableUsers([this._user.key]);
+			? this._workspaceContext.getStore()?.enableUsers([this._user.id])
+			: this._workspaceContext.getStore()?.disableUsers([this._user.id]);
 			*/
 	}
 
@@ -136,7 +136,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		if (!this._user || !this._workspaceContext) return;
 
 		// TODO: make sure we use the workspace for this:
-		//this._workspaceContext.getStore()?.deleteUsers([this._user.key]);
+		//this._workspaceContext.getStore()?.deleteUsers([this._user.id]);
 
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
@@ -166,7 +166,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				</uui-ref-node>
 			`;
 
-		//TODO Render the name of the content start node instead of it's key.
+		//TODO Render the name of the content start node instead of it's id.
 		return repeat(
 			this._user.contentStartNodes,
 			(node) => node,
@@ -181,7 +181,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 	}
 
 	private _changePassword() {
-		this._modalContext?.open(UMB_CHANGE_PASSWORD_MODAL_TOKEN, {
+		this._modalContext?.open(UMB_CHANGE_PASSWORD_MODAL, {
 			requireOldPassword: this._currentUserStore?.isAdmin === false,
 		});
 	}
@@ -204,7 +204,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				`
 			);
 
-		if (this._currentUser?.key !== this._user?.key)
+		if (this._currentUser?.id !== this._user?.id)
 			buttons.push(html` <uui-button
 				@click=${this._deleteUser}
 				look="primary"
@@ -318,7 +318,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				</div>
 				<div>
 					<b>Key:</b>
-					<span>${this._user.key}</span>
+					<span>${this._user.id}</span>
 				</div>
 			</div>
 		</uui-box>`;

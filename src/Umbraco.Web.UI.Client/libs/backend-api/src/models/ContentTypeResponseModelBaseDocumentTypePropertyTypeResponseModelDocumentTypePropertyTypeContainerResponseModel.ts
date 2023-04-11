@@ -8,7 +8,7 @@ import type { DocumentTypePropertyTypeContainerResponseModel } from './DocumentT
 import type { DocumentTypePropertyTypeResponseModel } from './DocumentTypePropertyTypeResponseModel';
 
 export type ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel = {
-    key?: string;
+    id?: string;
     alias?: string;
     name?: string;
     description?: string | null;
@@ -22,3 +22,4 @@ export type ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDoc
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
 };
+

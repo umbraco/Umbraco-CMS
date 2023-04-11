@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
-	ProblemDetailsModel,
 	DataTypeResource,
 	DataTypeResponseModel,
 	DataTypeModelBaseModel,
+	CreateDataTypeRequestModel,
+	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -15,49 +16,48 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDataTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeServerDataSource implements UmbDataSource<DataTypeResponseModel> {
-	#host: UmbControllerHostInterface;
+export class UmbDataTypeServerDataSource
+	implements
+		UmbDataSource<CreateDataTypeRequestModel & { id: string }, UpdateDataTypeRequestModel, DataTypeResponseModel>
+{
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbDataTypeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
 	/**
-	 * Fetches a Data Type with the given key from the server
-	 * @param {string} key
+	 * Fetches a Data Type with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async get(key: string) {
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
-		}
-
+	async get(id: string) {
+		if (!id) throw new Error('Key is missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.getDataTypeByKey({
-				key,
+			DataTypeResource.getDataTypeById({
+				id: id,
 			})
 		);
 	}
 
 	/**
 	 * Creates a new Data Type scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		const data: DataTypeResponseModel = {
 			$type: '',
-			parentKey: parentKey,
-			key: uuidv4(),
+			parentId: parentId,
+			id: uuidv4(),
 		};
 
 		return { data };
@@ -69,23 +69,15 @@ export class UmbDataTypeServerDataSource implements UmbDataSource<DataTypeRespon
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async insert(dataType: DataTypeResponseModel) {
-		if (!dataType.key) {
-			const error: ProblemDetailsModel = { title: 'DataType key is missing' };
-			return { error };
-		}
-		const requestBody: DataTypeModelBaseModel = { ...dataType };
+	async insert(dataType: CreateDataTypeRequestModel & { id: string }) {
+		if (!dataType) throw new Error('Data Type is missing');
+		if (!dataType.id) throw new Error('Data Type id is missing');
 
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeResponseModel>(
+		tryExecuteAndNotify(
 			this.#host,
-			// TODO: avoid this any?..
-			tryExecuteAndNotify(
-				this.#host,
-				DataTypeResource.postDataType({
-					requestBody,
-				})
-			) as any
+			DataTypeResource.postDataType({
+				requestBody: dataType,
+			})
 		);
 	}
 
@@ -95,63 +87,31 @@ export class UmbDataTypeServerDataSource implements UmbDataSource<DataTypeRespon
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	// TODO: Error mistake in this:
-	async update(dataType: DataTypeResponseModel) {
-		if (!dataType.key) {
-			const error: ProblemDetailsModel = { title: 'DataType key is missing' };
-			return { error };
-		}
+	async update(id: string, data: DataTypeModelBaseModel) {
+		if (!id) throw new Error('Key is missing');
 
-		const requestBody: DataTypeModelBaseModel = { ...dataType };
-
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeResponseModel>(
+		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.putDataTypeByKey({
-				key: dataType.key,
-				requestBody,
-			})
-		);
-	}
-
-	/**
-	 * Trash a Document on the server
-	 * @param {Document} Document
-	 * @return {*}
-	 * @memberof UmbDataTypeServerDataSource
-	 */
-	async trash(key: string) {
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'DataType key is missing' };
-			return { error };
-		}
-
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeResponseModel>(
-			this.#host,
-			DataTypeResource.deleteDataTypeByKey({
-				key,
+			DataTypeResource.putDataTypeById({
+				id: id,
+				requestBody: data,
 			})
 		);
 	}
 
 	/**
 	 * Deletes a Data Type on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'DataType key is missing' };
-			return { error };
-		}
+	async delete(id: string) {
+		if (!id) throw new Error('Key is missing');
 
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DataTypeResponseModel>(
+		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.deleteDataTypeByKey({
-				key,
+			DataTypeResource.deleteDataTypeById({
+				id: id,
 			})
 		);
 	}

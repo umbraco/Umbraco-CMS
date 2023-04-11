@@ -13,37 +13,30 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 
 	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
-	#routerPath? = '';
-
 	#element = document.createElement('umb-data-type-workspace-edit-element');
-	#key = '';
 
 	@state()
 	_routes: IRoute[] = [
 		{
-			path: 'create/:parentKey',
+			path: 'create/:parentId',
 			component: () => this.#element,
 			setup: async (component: HTMLElement, info: IRoutingInfo) => {
-				const parentKey = info.match.params.parentKey;
-				this.#workspaceContext.createScaffold(parentKey);
+				const parentId = info.match.params.parentId;
+				this.#workspaceContext.createScaffold(parentId);
 			},
 		},
 		{
-			path: 'edit/:key',
+			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				const key = info.match.params.key;
-				this.#workspaceContext.load(key);
+				const id = info.match.params.id;
+				this.#workspaceContext.load(id);
 			},
 		},
 	];
 
 	render() {
-		return html`<umb-router-slot
-			.routes=${this._routes}
-			@init=${(event: UmbRouterSlotInitEvent) => {
-				this.#routerPath = event.target.absoluteRouterPath;
-			}}></umb-router-slot>`;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 }
 

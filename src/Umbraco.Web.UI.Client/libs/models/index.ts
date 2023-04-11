@@ -1,5 +1,4 @@
 import type {
-	ContentTreeItemResponseModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
 	PackageManifestResponseModel,
@@ -12,15 +11,24 @@ export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 export type ClassConstructor<T> = new (...args: any[]) => T;
 
 // Users
-// TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentKey.
+// TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentId.
 export interface Entity {
-	key: string;
+	id: string;
 	name: string;
 	icon: string;
 	type: string;
 	hasChildren: boolean;
-	parentKey: string | null;
+	parentId: string | null;
 }
+
+/** Tried to find a common base of our entities — used by Entity Workspace Context */
+export type BaseEntity = {
+	id?: string;
+	//alias?: string;
+	name?: string;
+	//icon?: string;
+	//properties?: Array<PropertyTypeResponseModelBaseModel>;
+};
 
 export interface UserEntity extends Entity {
 	type: 'user';
@@ -55,7 +63,7 @@ export interface UserGroupDetails extends UserGroupEntity {
 
 // TODO: Make sure Entity Type/interface.
 export interface MemberTypeDetails extends EntityTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
+	id: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
@@ -63,23 +71,23 @@ export interface MemberTypeDetails extends EntityTreeItemResponseModel {
 // Media Types
 
 export interface MediaTypeDetails extends FolderTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
+	id: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
 // Member Groups
 export interface MemberGroupDetails extends EntityTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
+	id: string; // TODO: Remove this when the backend is fixed
 }
 
 export interface MemberDetails extends EntityTreeItemResponseModel {
-	key: string; // TODO: Remove this when the backend is fixed
+	id: string; // TODO: Remove this when the backend is fixed
 }
 
 // Document Blueprint
 export interface DocumentBlueprintDetails {
-	key: string;
+	id: string;
 	name: string;
 	type: 'document-blueprint';
 	properties: Array<any>;

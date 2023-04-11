@@ -4,16 +4,16 @@ import { umbDictionaryData } from '../data/dictionary.data';
 import { ImportDictionaryRequestModel, DictionaryOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 const uploadResponse: ImportDictionaryRequestModel = {
-	fileName: 'c:/path/to/tempfilename.udt',
-	parentKey: 'b7e7d0ab-53ba-485d-dddd-12537f9925aa',
+	temporaryFileId: 'c:/path/to/tempfilename.udt',
+	parentId: 'b7e7d0ab-53ba-485d-dddd-12537f9925aa',
 };
 
 ///
 const importResponse: DictionaryDetails = {
 	$type: '',
-	parentKey: null,
+	parentId: null,
 	name: 'Uploaded dictionary',
-	key: 'b7e7d0ab-53ba-485d-dddd-12537f9925cb',
+	id: 'b7e7d0ab-53ba-485d-dddd-12537f9925cb',
 	hasChildren: false,
 	type: 'dictionary-item',
 	isContainer: false,
@@ -34,24 +34,23 @@ const importResponse: DictionaryDetails = {
 const overviewData: Array<DictionaryOverviewResponseModel> = [
 	{
 		name: 'Hello',
-		key: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		translatedIsoCodes: ['en'],
 	},
 	{
 		name: 'Hello again',
-		key: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
+		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		translatedIsoCodes: ['en', 'fr'],
 	},
 ];
 
 // TODO: add schema
 export const handlers = [
-	rest.get('/umbraco/management/api/v1/dictionary/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get('/umbraco/management/api/v1/dictionary/:id', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const dictionary = umbDictionaryData.getByKey(key);
-		console.log(dictionary);
+		const dictionary = umbDictionaryData.getById(id);
 		return res(ctx.status(200), ctx.json(dictionary));
 	}),
 
@@ -77,7 +76,6 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		data.parentKey = data.parentId;
 		data.icon = 'umb:book-alt';
 		data.hasChildren = false;
 		data.type = 'dictionary-item';
@@ -102,12 +100,12 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(createdResult));
 	}),
 
-	rest.patch('/umbraco/management/api/v1/dictionary/:key', async (req, res, ctx) => {
+	rest.patch('/umbraco/management/api/v1/dictionary/:id', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
-		const key = req.params.key as string;
-		if (!key) return;
+		const id = req.params.id as string;
+		if (!id) return;
 
 		const dataToSave = JSON.parse(data[0].value);
 		const saved = umbDictionaryData.save(dataToSave);
@@ -125,10 +123,10 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/dictionary/children', (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
 
-		const items = umbDictionaryData.getTreeItemChildren(parentKey);
+		const items = umbDictionaryData.getTreeItemChildren(parentId);
 
 		const response = {
 			total: items.length,
@@ -139,30 +137,30 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/dictionary/item', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
 
-		const items = umbDictionaryData.getTreeItem(keys);
+		const items = umbDictionaryData.getTreeItem(ids);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.delete('/umbraco/management/api/v1/dictionary/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.delete('/umbraco/management/api/v1/dictionary/:id', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const deletedKeys = umbDictionaryData.delete([key]);
+		const deletedKeys = umbDictionaryData.delete([id]);
 
 		return res(ctx.status(200), ctx.json(deletedKeys));
 	}),
 
 	// TODO => handle properly, querystring breaks handler
-	rest.get('/umbraco/management/api/v1/dictionary/:key/export', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get('/umbraco/management/api/v1/dictionary/:id/export', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
 		const includeChildren = req.url.searchParams.get('includeChildren');
-		const item = umbDictionaryData.getByKey(key);
+		const item = umbDictionaryData.getById(id);
 
 		alert(
 			`Downloads file for dictionary "${item?.name}", ${includeChildren === 'true' ? 'with' : 'without'} children.`
@@ -179,16 +177,16 @@ export const handlers = [
 	rest.post('/umbraco/management/api/v1/dictionary/import', async (req, res, ctx) => {
 		const file = req.url.searchParams.get('file');
 
-		if (!file) return;
+		if (!file || !importResponse.id) return;
 
-		importResponse.parentKey = req.url.searchParams.get('parentId') ?? null;
+		importResponse.parentId = req.url.searchParams.get('parentId') ?? null;
 		umbDictionaryData.save(importResponse);
 
 		// build the path to the new item => reflects the expected server response
 		const path = ['-1'];
-		if (importResponse.parentKey) path.push(importResponse.parentKey);
+		if (importResponse.parentId) path.push(importResponse.parentId);
 
-		path.push(importResponse.key);
+		path.push(importResponse.id);
 
 		const contentResult = {
 			content: path.join(','),

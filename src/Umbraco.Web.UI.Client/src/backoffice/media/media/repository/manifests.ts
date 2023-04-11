@@ -1,8 +1,7 @@
 import { UmbMediaRepository } from './media.repository';
 import { UmbMediaStore } from './media.store';
 import { UmbMediaTreeStore } from './media.tree.store';
-import { ManifestRepository } from 'libs/extensions-registry/repository.models';
-import { ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestStore, ManifestTreeStore, ManifestRepository } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const MEDIA_REPOSITORY_ALIAS = 'Umb.Repository.Media';
 

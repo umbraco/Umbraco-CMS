@@ -1,14 +1,21 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { SearchResultResponseModel, SearcherResource, FieldPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_EXAMINE_FIELDS_SETTINGS_MODAL,
+} from '@umbraco-cms/backoffice/modal';
+import {
+	SearchResultResponseModel,
+	SearcherResource,
+	FieldPresentationModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 import './modal-views/fields-viewer.element';
 import './modal-views/fields-settings.element';
-import { UMB_EXAMINE_FIELDS_SETTINGS_MODAL_TOKEN } from './modal-views';
 
 interface ExposedSearchResultField {
 	name?: string | null;
@@ -174,7 +181,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	}
 
 	private _onFieldFilterClick() {
-		const modalHandler = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
 			...this._exposedFields,
 		});
 		modalHandler?.onSubmit().then(({ fields } = {}) => {

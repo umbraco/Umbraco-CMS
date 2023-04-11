@@ -1,5 +1,5 @@
 import { MemberTypeResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -10,14 +10,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {MemberTypeTreeDataSource}
  */
 export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of MemberTypeTreeDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof MemberTypeTreeDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -31,32 +31,32 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MemberTypeTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
+	async getChildrenOf(parentId: string | null) {
 		const error: ProblemDetailsModel = { title: 'Not implemented for Member Type' };
 		return { error };
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof MemberTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys || keys.length === 0) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+	async getItems(ids: Array<string>) {
+		if (!ids || ids.length === 0) {
+			const error: ProblemDetailsModel = { title: 'Ids are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			MemberTypeResource.getTreeMemberTypeItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

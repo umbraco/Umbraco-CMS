@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbWorkspaceDocumentTypeContext } from './document-type-workspace.context';
-import { UmbDocumentTypeWorkspaceEditElement } from './document-type-workspace-edit.element';
+import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context';
+import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element';
 import { IRoutingInfo } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -10,17 +10,17 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	static styles = [UUITextStyles];
 
-	#workspaceContext = new UmbWorkspaceDocumentTypeContext(this);
-	#element = new UmbDocumentTypeWorkspaceEditElement();
+	#workspaceContext = new UmbDocumentTypeWorkspaceContext(this);
+	#element = new UmbDocumentTypeWorkspaceEditorElement();
 
 	@state()
 	_routes = [
 		{
-			path: 'edit/:key',
+			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (component: HTMLElement, info: IRoutingInfo) => {
-				const key = info.match.params.key;
-				this.#workspaceContext.load(key);
+				const id = info.match.params.id;
+				this.#workspaceContext.load(id);
 			},
 		},
 	];

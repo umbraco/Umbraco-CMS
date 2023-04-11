@@ -1,14 +1,14 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
 import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import type { DictionaryDetails } from '../';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DictionaryDetails;
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbWorkspaceContext<UmbDictionaryRepository>
+	extends UmbWorkspaceContext<UmbDictionaryRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<DictionaryDetails | undefined>(undefined);
@@ -16,7 +16,7 @@ export class UmbDictionaryWorkspaceContext
 	name = this.#data.getObservablePart((data) => data?.name);
 	dictionary = this.#data.getObservablePart((data) => data);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDictionaryRepository(host));
 	}
 
@@ -24,8 +24,8 @@ export class UmbDictionaryWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -56,16 +56,16 @@ export class UmbDictionaryWorkspaceContext
 		this.#data.next({ ...this.#data.value, translations: updatedValue });
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(parentId: string | null) {
+		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);

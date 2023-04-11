@@ -1,19 +1,6 @@
 import { manifests as modalManifests } from './modals/manifests';
-import type { ManifestTypes, ManifestUserDashboard } from '@umbraco-cms/backoffice/extensions-registry';
-
-export const userDashboards: Array<ManifestUserDashboard> = [
-	{
-		type: 'userDashboard',
-		alias: 'Umb.UserDashboard.Themes',
-		name: 'Themes User Dashboard',
-		loader: () => import('./user-dashboard-themes.element'),
-		weight: 1,
-		meta: {
-			label: 'Themes User Dashboard',
-			pathname: 'themes',
-		},
-	},
-];
+import { manifests as userProfileAppsManifests } from './user-profile-apps/manifests';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const headerApps: Array<ManifestTypes> = [
 	{
@@ -21,7 +8,7 @@ export const headerApps: Array<ManifestTypes> = [
 		alias: 'Umb.HeaderApp.CurrentUser',
 		name: 'Current User',
 		loader: () => import('./current-user-header-app.element'),
-		weight: 1000,
+		weight: 0,
 		meta: {
 			label: 'TODO: how should we enable this to not be set.',
 			icon: 'TODO: how should we enable this to not be set.',
@@ -30,4 +17,4 @@ export const headerApps: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...userDashboards, ...headerApps, ...modalManifests];
+export const manifests = [...headerApps, ...modalManifests, ...userProfileAppsManifests];

@@ -1,6 +1,6 @@
 import { UmbModalConfig } from '../modal.context';
 
-export class UmbModalToken<Data = unknown, Result = unknown> {
+export class UmbModalToken<Data extends object = object, Result = unknown> {
 	/**
 	 * Get the data type of the token's data.
 	 *

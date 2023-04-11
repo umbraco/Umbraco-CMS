@@ -1,4 +1,4 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
@@ -11,9 +11,9 @@ import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
  * @implements {MemberTypeDetailDataSource}
  */
 export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<MemberTypeDetails> {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -28,15 +28,15 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	}
 
 	/**
-	 * @description - Fetches a MemberType with the given key from the server
-	 * @param {string} key
+	 * @description - Fetches a MemberType with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	requestByKey(key: string) {
-		//return tryExecuteAndNotify(this.#host, MemberTypeResource.getMemberTypeByKey({ key }));
+	requestById(id: string) {
+		//return tryExecuteAndNotify(this.#host, MemberTypeResource.getMemberTypeByKey({ id }));
 		// TODO => use backend cli when available.
-		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${key}`)) as any;
+		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${id}`)) as any;
 	}
 
 	/**
@@ -46,18 +46,18 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async save(memberType: MemberTypeDetails) {
-		if (!memberType.key) {
-			const error: ProblemDetailsModel = { title: 'MemberType key is missing' };
+		if (!memberType.id) {
+			const error: ProblemDetailsModel = { title: 'MemberType id is missing' };
 			return { error };
 		}
 
-		const payload = { key: memberType.key, requestBody: memberType };
+		const payload = { id: memberType.id, requestBody: memberType };
 		//return tryExecuteAndNotify(this.#host, MemberTypeResource.putMemberTypeByKey(payload));
 
 		// TODO => use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/member-type/${memberType.key}`, {
+			fetch(`/umbraco/management/api/v1/member-type/${memberType.id}`, {
 				method: 'PUT',
 				body: JSON.stringify(payload),
 				headers: {
@@ -94,21 +94,21 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 
 	/**
 	 * @description - Deletes a MemberType on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		//return await tryExecuteAndNotify(this.#host, MemberTypeResource.deleteMemberTypeByKey({ key }));
+		//return await tryExecuteAndNotify(this.#host, MemberTypeResource.deleteMemberTypeByKey({ id }));
 		// TODO => use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/member-type/${key}`, {
+			fetch(`/umbraco/management/api/v1/member-type/${id}`, {
 				method: 'DELETE',
 			})
 		) as any;

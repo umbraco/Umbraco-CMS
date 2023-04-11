@@ -2,7 +2,7 @@ import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export
@@ -11,14 +11,14 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeStore extends UmbStoreBase {
-	#data = new ArrayState<DocumentTypeResponseModel>([], (x) => x.key);
+	#data = new ArrayState<DocumentTypeResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbDocumentTypeStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDocumentTypeStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 
@@ -36,8 +36,8 @@ export class UmbDocumentTypeStore extends UmbStoreBase {
 	 * @param {DocumentTypeModel} document
 	 * @memberof UmbDocumentTypeStore
 	 */
-	byKey(key: DocumentTypeResponseModel['key']) {
-		return this.#data.getObservablePart((x) => x.find((y) => y.key === key));
+	byId(id: DocumentTypeResponseModel['id']) {
+		return this.#data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**
@@ -45,11 +45,9 @@ export class UmbDocumentTypeStore extends UmbStoreBase {
 	 * @param {string[]} uniques
 	 * @memberof UmbDocumentTypeStore
 	 */
-	remove(uniques: Array<DocumentTypeResponseModel['key']>) {
+	remove(uniques: Array<DocumentTypeResponseModel['id']>) {
 		this.#data.remove(uniques);
 	}
 }
 
-export const UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTypeStore>(
-	'UmbDocumentTypeStore'
-);
+export const UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTypeStore>('UmbDocumentTypeStore');

@@ -3,11 +3,10 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../../shared/modals/confirm';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
@@ -96,7 +95,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			<uui-ref-list>
 				${repeat(
 					this._createdPackages,
-					(item) => item.key,
+					(item) => item.id,
 					(item) => this.#renderPackageItem(item)
 				)}
 			</uui-ref-list>
@@ -114,8 +113,8 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	}
 
 	#packageBuilder(p: PackageDefinitionResponseModel) {
-		if (!p.key) return;
-		window.history.pushState({}, '', `/section/packages/view/created/package-builder/${p.key}`);
+		if (!p.id) return;
+		window.history.pushState({}, '', `/section/packages/view/created/package-builder/${p.id}`);
 	}
 
 	#renderPagination() {
@@ -134,8 +133,8 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	}
 
 	async #deletePackage(p: PackageDefinitionResponseModel) {
-		if (!p.key) return;
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		if (!p.id) return;
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${p.name}?`,
 			content: 'Are you sure you want to delete this package',
@@ -144,9 +143,9 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 		await modalHandler?.onSubmit();
 
-		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedByKey({ key: p.key }));
+		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedById({ id: p.id }));
 		if (error) return;
-		const index = this._createdPackages.findIndex((x) => x.key === p.key);
+		const index = this._createdPackages.findIndex((x) => x.id === p.id);
 		this._createdPackages.splice(index, 1);
 		this.requestUpdate();
 	}

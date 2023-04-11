@@ -5,7 +5,7 @@ import {
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
 import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -14,7 +14,7 @@ export class UmbResourceController extends UmbController {
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface, promise: Promise<any>, alias?: string) {
+	constructor(host: UmbControllerHostElement, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
 		this.#promise = promise;
@@ -39,8 +39,17 @@ export class UmbResourceController extends UmbController {
 	 */
 	static toProblemDetailsModel(error: unknown): ProblemDetailsModel | undefined {
 		if (error instanceof ApiError) {
-			const errorDetails = error.body as ProblemDetailsModel;
-			return errorDetails;
+			try {
+				const errorDetails = (
+					typeof error.body === 'string' ? JSON.parse(error.body) : error.body
+				) as ProblemDetailsModel;
+				return errorDetails;
+			} catch {
+				return {
+					title: error.name,
+					detail: error.message,
+				};
+			}
 		} else if (error instanceof Error) {
 			return {
 				title: error.name,

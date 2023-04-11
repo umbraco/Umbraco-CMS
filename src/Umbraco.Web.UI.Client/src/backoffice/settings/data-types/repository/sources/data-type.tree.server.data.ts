@@ -1,104 +1,64 @@
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel, DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document tree that fetches data from the server
  * @export
- * @class DocumentTreeServerDataSource
+ * @class UmbDataTypeTreeServerDataSource
  * @implements {DocumentTreeDataSource}
  */
-export class DataTypeTreeServerDataSource implements UmbTreeDataSource {
-	#host: UmbControllerHostInterface;
-
-	// TODO: how do we handle trashed items?
-	async trashItems(keys: Array<string>) {
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'DataType keys is missing' };
-			return { error };
-		}
-
-		// TODO: use resources when end point is ready:
-		/*
-		return tryExecuteAndNotify<DataType>(
-			this.#host,
-			DataTypeResource.deleteDataTypeByKey({
-				key: keys,
-			})
-		);
-		*/
-		return Promise.resolve({ error: null, data: null });
-	}
-
-	async moveItems(keys: Array<string>, destination: string) {
-		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/data-type/move', {
-				method: 'POST',
-				body: JSON.stringify({ keys, destination }),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-		);
-	}
+export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
+	#host: UmbControllerHostElement;
 
 	/**
-	 * Creates an instance of DocumentTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
-	 * @memberof DocumentTreeServerDataSource
+	 * Creates an instance of UmbDataTypeTreeServerDataSource.
+	 * @param {UmbControllerHostElement} host
+	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, DataTypeResource.getTreeDataTypeRoot({}));
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
-			return { error };
-		}
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) throw new Error('Parent id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getTreeDataTypeChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { error };
-		}
-
+	async getItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getTreeDataTypeItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

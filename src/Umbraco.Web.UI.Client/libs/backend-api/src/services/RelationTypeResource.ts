@@ -19,10 +19,10 @@ export class RelationTypeResource {
      * @throws ApiError
      */
     public static postRelationType({
-requestBody,
-}: {
-requestBody?: CreateRelationTypeRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateRelationTypeRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/relation-type',
@@ -39,16 +39,16 @@ requestBody?: CreateRelationTypeRequestModel,
      * @returns any Success
      * @throws ApiError
      */
-    public static getRelationTypeByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<RelationTypeResponseModel> {
+    public static getRelationTypeById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<RelationTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/relation-type/{key}',
+            url: '/umbraco/management/api/v1/relation-type/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -60,16 +60,16 @@ key: string,
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteRelationTypeByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+    public static deleteRelationTypeById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/relation-type/{key}',
+            url: '/umbraco/management/api/v1/relation-type/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -81,18 +81,18 @@ key: string,
      * @returns any Success
      * @throws ApiError
      */
-    public static putRelationTypeByKey({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: UpdateRelationTypeRequestModel,
-}): CancelablePromise<RelationTypeResponseModel> {
+    public static putRelationTypeById({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateRelationTypeRequestModel,
+    }): CancelablePromise<RelationTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/relation-type/{key}',
+            url: '/umbraco/management/api/v1/relation-type/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -108,15 +108,15 @@ requestBody?: UpdateRelationTypeRequestModel,
      * @throws ApiError
      */
     public static getTreeRelationTypeItem({
-key,
-}: {
-key?: Array<string>,
-}): CancelablePromise<Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/relation-type/item',
             query: {
-                'key': key,
+                'id': id,
             },
         });
     }
@@ -126,12 +126,12 @@ key?: Array<string>,
      * @throws ApiError
      */
     public static getTreeRelationTypeRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/relation-type/root',

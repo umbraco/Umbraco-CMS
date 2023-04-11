@@ -1,10 +1,10 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 // TODO: implement
 export class UmbUserGroupRepository {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		console.log(this.#host);
 	}

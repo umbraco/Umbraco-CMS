@@ -15,14 +15,14 @@ export class ScriptResource {
      * @throws ApiError
      */
     public static getTreeScriptChildren({
-path,
-skip,
-take = 100,
-}: {
-path?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        path,
+        skip,
+        take = 100,
+    }: {
+        path?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/children',
@@ -39,10 +39,10 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeScriptItem({
-path,
-}: {
-path?: Array<string>,
-}): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/item',
@@ -57,12 +57,12 @@ path?: Array<string>,
      * @throws ApiError
      */
     public static getTreeScriptRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/root',

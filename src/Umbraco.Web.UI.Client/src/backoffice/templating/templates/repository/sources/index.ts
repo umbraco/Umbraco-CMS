@@ -6,6 +6,6 @@ import type {
 
 export interface TemplateTreeDataSource {
 	getRootItems(): Promise<DataSourceResponse<PagedEntityTreeItemResponseModel>>;
-	getChildrenOf(parentKey: string): Promise<DataSourceResponse<PagedEntityTreeItemResponseModel>>;
-	getItems(key: Array<string>): Promise<DataSourceResponse<EntityTreeItemResponseModel[]>>;
+	getChildrenOf(parentId: string): Promise<DataSourceResponse<PagedEntityTreeItemResponseModel>>;
+	getItems(ids: Array<string>): Promise<DataSourceResponse<EntityTreeItemResponseModel[]>>;
 }

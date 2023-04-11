@@ -1,18 +1,14 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
 import { StylesheetDetails } from '..';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
-import { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbStylesheetWorkspaceContext
-	extends UmbWorkspaceContext<UmbStylesheetRepository>
-	implements UmbWorkspaceContextInterface
-{
+export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
 	#data = new ObjectState<StylesheetDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbStylesheetRepository(host));
 	}
 
@@ -24,7 +20,7 @@ export class UmbStylesheetWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
+	getEntityId() {
 		return this.getData()?.path || '';
 	}
 
@@ -34,6 +30,10 @@ export class UmbStylesheetWorkspaceContext
 			this.setIsNew(false);
 			this.#data.update(data);
 		}
+	}
+
+	public async save() {
+		throw new Error('Save method not implemented.');
 	}
 
 	public destroy(): void {

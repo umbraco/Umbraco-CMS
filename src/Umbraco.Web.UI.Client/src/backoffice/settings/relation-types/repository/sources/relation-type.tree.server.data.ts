@@ -1,6 +1,6 @@
 import { RelationTypeTreeDataSource } from '.';
 import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -11,12 +11,12 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RelationTypeTreeDataSource}
  */
 export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
-	async trashItems(keys: Array<string>) {
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'RelationType keys is missing' };
+	async trashItems(ids: Array<string>) {
+		if (!ids) {
+			const error: ProblemDetailsModel = { title: 'RelationType ids is missing' };
 			return { error };
 		}
 
@@ -25,20 +25,20 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 		return tryExecuteAndNotify<RelationType>(
 			this.#host,
 			RelationTypeResource.deleteRelationTypeByKey({
-				key: keys,
+				id: ids,
 			})
 		);
 		*/
 		return Promise.resolve({ error: null, data: null });
 	}
 
-	async moveItems(keys: Array<string>, destination: string) {
+	async moveItems(ids: Array<string>, destination: string) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/relation-type/move', {
 				method: 'POST',
-				body: JSON.stringify({ keys, destination }),
+				body: JSON.stringify({ ids, destination }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -48,10 +48,10 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 
 	/**
 	 * Creates an instance of RelationTypeTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof RelationTypeTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -65,21 +65,21 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof RelationTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+	async getItems(ids: Array<string>) {
+		if (ids) {
+			const error: ProblemDetailsModel = { title: 'Ids are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			RelationTypeResource.getTreeRelationTypeItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

@@ -1,20 +1,20 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 
 type EntityType = MediaTypeDetails;
 export class UmbWorkspaceMediaTypeContext
-	extends UmbWorkspaceContext<UmbMediaTypeRepository>
+	extends UmbWorkspaceContext<UmbMediaTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<MediaTypeDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbMediaTypeRepository(host));
 	}
 
@@ -22,8 +22,8 @@ export class UmbWorkspaceMediaTypeContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -38,8 +38,8 @@ export class UmbWorkspaceMediaTypeContext
 		// TODO => Implement setPropertyValue
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestDetails(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestDetails(entityId);
 		if (data) {
 			this.#data.next(data);
 		}

@@ -2,8 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state, query, property } from 'lit/decorators.js';
 import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-ui/uui';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../../shared/modals/confirm';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	RedirectManagementResource,
@@ -21,7 +20,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				display: block;
 				margin: var(--uui-size-layout-1);
 			}
-			
+
 			.actions {
 				display: flex;
 				gap: var(--uui-size-space-1);
@@ -136,7 +135,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private _removeRedirectHandler(data: RedirectUrlResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Delete',
 			content: html`
 				<div style="width:300px">
@@ -155,19 +154,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private async _removeRedirect(r: RedirectUrlResponseModel) {
-		if (!r.key) return;
-		const res = await tryExecuteAndNotify(
-			this,
-			RedirectManagementResource.deleteRedirectManagementByKey({ key: r.key })
-		);
+		if (!r.id) return;
+		const res = await tryExecuteAndNotify(this, RedirectManagementResource.deleteRedirectManagementById({ id: r.id }));
 		if (!res.error) {
 			// or just run a this._getRedirectData() again?
-			this.shadowRoot?.getElementById(`redirect-key-${r.key}`)?.remove();
+			//this.shadowRoot?.getElementById(`redirect-key-${r.id}`)?.remove();
+			// No no, never manipulate DOM manipulate the data for the DOM:
+			this._redirectData = this._redirectData?.filter((x) => x.id !== r.id);
 		}
 	}
 
 	private _disableRedirectHandler() {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: 'Disable URL tracker',
 			content: html`Are you sure you want to disable the URL tracker?`,
 			color: 'danger',
@@ -218,7 +216,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (data) {
 			this._total = data?.total;
 			this._redirectData = data?.items;
-			if (this._filter?.length) this._buttonState = 'success';
+			if (this._filter?.length) {
+				this._buttonState = 'success';
+			}
 		}
 	}
 
@@ -282,6 +282,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	private renderTable() {
+		// TODO: Instead of map, use repeat lit util:
 		return html`<uui-box style="--uui-box-default-padding: 0;">
 				<uui-table>
 					<uui-table-head>
@@ -292,7 +293,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<uui-table-head-cell style="width:10%;">Actions</uui-table-head-cell>
 					</uui-table-head>
 					${this._redirectData?.map((data) => {
-						return html` <uui-table-row id="redirect-key-${data.key}">
+						return html` <uui-table-row>
 							<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
 							<uui-table-cell>
 								<a href="${data.originalUrl || '#'}" target="_blank"> ${data.originalUrl}</a>

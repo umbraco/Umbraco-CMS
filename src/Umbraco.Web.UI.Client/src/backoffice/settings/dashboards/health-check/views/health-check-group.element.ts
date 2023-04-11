@@ -87,7 +87,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private _checks?: HealthCheckModel[];
 
 	@state()
-	private _keyResults?: HealthCheckWithResultPresentationModel[];
+	private _idResults?: HealthCheckWithResultPresentationModel[];
 
 	private _api?: UmbHealthCheckContext;
 
@@ -106,7 +106,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			});
 
 			this._api?.results.subscribe((results) => {
-				this._keyResults = results?.checks;
+				this._idResults = results?.checks;
 			});
 		});
 	}
@@ -143,18 +143,18 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				${this._group?.checks?.map((check) => {
 					return html`<uui-box headline="${check.name || '?'}">
 						<p>${check.description}</p>
-						${check.key ? this.renderCheckResults(check.key) : nothing}
+						${check.id ? this.renderCheckResults(check.id) : nothing}
 					</uui-box>`;
 				})}
 			</div>
 		`;
 	}
 
-	renderCheckResults(key: string) {
-		if (!this._keyResults) {
+	renderCheckResults(id: string) {
+		if (!this._idResults) {
 			return nothing;
 		}
-		const checkResults = this._keyResults.find((x) => x.key === key);
+		const checkResults = this._idResults.find((x) => x.id === id);
 
 		if (!checkResults) {
 			return nothing;

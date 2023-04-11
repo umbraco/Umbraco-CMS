@@ -1,15 +1,15 @@
 import { v4 as uuid } from 'uuid';
 import { ProblemDetailsModel, TemplateResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface TemplateDetailDataSource {
 	createScaffold(): Promise<DataSourceResponse<TemplateResponseModel>>;
-	get(key: string): Promise<DataSourceResponse<TemplateResponseModel>>;
+	get(id: string): Promise<DataSourceResponse<TemplateResponseModel>>;
 	insert(template: TemplateResponseModel): Promise<DataSourceResponse>;
 	update(template: TemplateResponseModel): Promise<DataSourceResponse>;
-	delete(key: string): Promise<DataSourceResponse>;
+	delete(id: string): Promise<DataSourceResponse>;
 }
 
 /**
@@ -19,30 +19,30 @@ export interface TemplateDetailDataSource {
  * @implements {TemplateDetailDataSource}
  */
 export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbTemplateDetailServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
 	/**
-	 * Fetches a Template with the given key from the server
-	 * @param {string} key
+	 * Fetches a Template with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	get(key: string) {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateByKey({ key }));
+	get(id: string) {
+		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateById({ id }));
 	}
 
 	/**
 	 * Creates a new Template scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
@@ -50,7 +50,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 		const error = undefined;
 		const data: TemplateResponseModel = {
 			$type: '',
-			key: uuid(),
+			id: uuid(),
 			name: '',
 			alias: '',
 			content: '',
@@ -93,27 +93,27 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async update(template: TemplateResponseModel) {
-		if (!template.key) {
-			const error: ProblemDetailsModel = { title: 'Template key is missing' };
+		if (!template.id) {
+			const error: ProblemDetailsModel = { title: 'Template id is missing' };
 			return { error };
 		}
 
-		const payload = { key: template.key, requestBody: template };
-		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateByKey(payload));
+		const payload = { id: template.id, requestBody: template };
+		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById(payload));
 	}
 
 	/**
 	 * Deletes a Template on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateByKey({ key }));
+		return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateById({ id }));
 	}
 }

@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type ImportDictionaryRequestModel = {
-    fileName?: string;
-    parentKey?: string | null;
+    temporaryFileId?: string;
+    parentId?: string | null;
 };
+

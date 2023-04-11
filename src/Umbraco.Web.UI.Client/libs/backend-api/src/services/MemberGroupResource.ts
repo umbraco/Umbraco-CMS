@@ -20,15 +20,15 @@ export class MemberGroupResource {
      * @throws ApiError
      */
     public static getTreeMemberGroupItem({
-key,
-}: {
-key?: Array<string>,
-}): CancelablePromise<Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel)>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel)>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/member-group/item',
             query: {
-                'key': key,
+                'id': id,
             },
         });
     }
@@ -38,12 +38,12 @@ key?: Array<string>,
      * @throws ApiError
      */
     public static getTreeMemberGroupRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/member-group/root',

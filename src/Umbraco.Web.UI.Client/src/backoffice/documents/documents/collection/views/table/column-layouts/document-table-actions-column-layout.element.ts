@@ -70,7 +70,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 					<umb-entity-action-list
 						@executed=${this.#onActionExecuted}
 						entity-type=${ifDefined(this.value.entityType)}
-						unique=${ifDefined(this.item.key)}></umb-entity-action-list>
+						unique=${ifDefined(this.item.id)}></umb-entity-action-list>
 				</uui-scroll-container>
 			</div>
 		`;

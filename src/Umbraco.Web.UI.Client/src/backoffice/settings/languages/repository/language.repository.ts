@@ -1,6 +1,6 @@
 import { UmbLanguageServerDataSource } from './sources/language.server.data';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
@@ -8,14 +8,14 @@ import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoff
 export class UmbLanguageRepository {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#dataSource: UmbLanguageServerDataSource;
 	#languageStore?: UmbLanguageStore;
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		this.#dataSource = new UmbLanguageServerDataSource(this.#host);
@@ -105,9 +105,11 @@ export class UmbLanguageRepository {
 	 * @memberof UmbLanguageRepository
 	 */
 	async save(language: LanguageResponseModel) {
+		if (!language.isoCode) throw new Error('Language iso code is missing');
+
 		await this.#init;
 
-		const { error } = await this.#dataSource.update(language);
+		const { error } = await this.#dataSource.update(language.isoCode, language);
 
 		if (!error) {
 			const notification = { data: { message: `Language saved` } };

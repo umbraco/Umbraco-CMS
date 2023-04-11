@@ -11,12 +11,12 @@ Generally a Store will be holding one or more RxJS Subjects, each Subject is mad
 
 ```typescript
 class MyProductStore {
-	#products = new ArrayState(<Array<MyProductType>>[], (product) => product.key);
+	#products = new ArrayState(<Array<MyProductType>>[], (product) => product.id);
 
 	public readonly products = this.#products.asObservable();
 
-	protected host: UmbControllerHostInterface;
-	constructor(host: UmbControllerHostInterface) {
+	protected host: UmbControllerHostElement;
+	constructor(host: UmbControllerHostElement) {
 		this.host = host;
 
 		// The Store provides it self as a Context-API.
@@ -65,10 +65,10 @@ class MyProductStore {
 
 	...
 
-	getByKey(key: string) {
+	getByKey(id: string) {
 
 		// Request data via a Resource to then take part of this state when recieved.
-		tryExecuteAndNotify(this.host, ProductResource.getByKey({key})).then(({ data }) => {
+		tryExecuteAndNotify(this.host, ProductResource.getByKey({id})).then(({ data }) => {
 			if (data) {
 				this.#products.append(data.items);
 			}
@@ -76,7 +76,7 @@ class MyProductStore {
 
 		// Return a Observable part, to listen for this specific product and the future changes of it.
 		return this.#data.getObservablePart((documents) =>
-			documents.find((document) => document.key === key)
+			documents.find((document) => document.id === id)
 		);
 	}
 }
@@ -134,11 +134,11 @@ With this we can make a high performant application, only triggering the parts t
 ### Ensure unique data:
 
 For incoming data to replace existing data, we need to clarify what makes a entry of the array unique.
-In the examples of this guide each product has a key, and we have clarified this to the State by giving it the little method `(product) => product.key` as part of the its creation:
+In the examples of this guide each product has a id, and we have clarified this to the State by giving it the little method `(product) => product.id` as part of the its creation:
 
 ```typescript
 class MyProductStore {
-  #products = new ArrayState(<Array<MyProductType>>[], (product) => product.key);
+  #products = new ArrayState(<Array<MyProductType>>[], (product) => product.id);
   ...
 }
 ```

@@ -2,7 +2,7 @@ import { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export
@@ -11,14 +11,14 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
  * @description - Data Store for Template Details
  */
 export class UmbDocumentStore extends UmbStoreBase {
-	#data = new ArrayState<DocumentResponseModel>([], (x) => x.key);
+	#data = new ArrayState<DocumentResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbDocumentDetailStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDocumentDetailStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DOCUMENT_STORE_CONTEXT_TOKEN.toString());
 	}
 
@@ -36,8 +36,8 @@ export class UmbDocumentStore extends UmbStoreBase {
 	 * @param {DocumentModel} document
 	 * @memberof UmbDocumentStore
 	 */
-	byKey(key: DocumentResponseModel['key']) {
-		return this.#data.getObservablePart((x) => x.find((y) => y.key === key));
+	byKey(id: DocumentResponseModel['id']) {
+		return this.#data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**
@@ -45,7 +45,7 @@ export class UmbDocumentStore extends UmbStoreBase {
 	 * @param {string[]} uniques
 	 * @memberof UmbDocumentDetailStore
 	 */
-	remove(uniques: Array<DocumentResponseModel['key']>) {
+	remove(uniques: Array<DocumentResponseModel['id']>) {
 		this.#data.remove(uniques);
 	}
 }

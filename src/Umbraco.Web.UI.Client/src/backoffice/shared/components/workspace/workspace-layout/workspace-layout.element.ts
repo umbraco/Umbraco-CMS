@@ -19,6 +19,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-workspace-layout
  * @description
  * @slot icon - Slot for icon
+ * @slot header - Slot for workspace header
  * @slot name - Slot for name
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
@@ -29,7 +30,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-layout')
-export class UmbWorkspaceLayout extends UmbLitElement {
+export class UmbWorkspaceLayoutElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -220,6 +221,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-layout': UmbWorkspaceLayout;
+		'umb-workspace-layout': UmbWorkspaceLayoutElement;
 	}
 }

@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type RelationItemResponseModel = {
-    nodeKey?: string;
+    nodeId?: string;
     nodeName?: string | null;
     nodeType?: string | null;
     nodePublished?: boolean | null;
@@ -14,3 +14,4 @@ export type RelationItemResponseModel = {
     relationTypeIsBidirectional?: boolean;
     relationTypeIsDependency?: boolean;
 };
+

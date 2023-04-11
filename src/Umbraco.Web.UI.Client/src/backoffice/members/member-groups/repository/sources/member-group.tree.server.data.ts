@@ -1,5 +1,5 @@
 import { MemberGroupResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -10,14 +10,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {MemberGroupTreeDataSource}
  */
 export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of MemberGroupTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof MemberGroupTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -31,24 +31,24 @@ export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MemberGroupTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
+	async getChildrenOf(parentId: string | null) {
 		// Not implemented for this tree
 		return {};
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof MemberGroupTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys || keys.length === 0) {
+	async getItems(ids: Array<string>) {
+		if (!ids || ids.length === 0) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
@@ -56,7 +56,7 @@ export class MemberGroupTreeServerDataSource implements UmbTreeDataSource {
 		return tryExecuteAndNotify(
 			this.#host,
 			MemberGroupResource.getTreeMemberGroupItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

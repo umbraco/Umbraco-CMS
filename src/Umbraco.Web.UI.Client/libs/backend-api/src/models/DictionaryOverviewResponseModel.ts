@@ -4,7 +4,8 @@
 
 export type DictionaryOverviewResponseModel = {
     name?: string | null;
-    key?: string;
-    parentKey?: string | null;
+    id?: string;
+    parentId?: string | null;
     translatedIsoCodes?: Array<string>;
 };
+

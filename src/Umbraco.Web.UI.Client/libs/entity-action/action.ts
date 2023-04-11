@@ -1,18 +1,18 @@
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { umbExtensionsRegistry, createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbAction<RepositoryType = unknown> {
-	host: UmbControllerHostInterface;
+	host: UmbControllerHostElement;
 	repository: RepositoryType;
 	execute(): Promise<void>;
 }
 
 export class UmbActionBase<RepositoryType> {
-	host: UmbControllerHostInterface;
+	host: UmbControllerHostElement;
 	repository?: RepositoryType;
 
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string) {
 		this.host = host;
 
 		// TODO: unsure a method can't be called before everything is initialized

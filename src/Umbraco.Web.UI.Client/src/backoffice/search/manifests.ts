@@ -6,7 +6,7 @@ const headerApps: Array<ManifestTypes> = [
 		alias: 'Umb.HeaderApp.Search',
 		name: 'Header App Search',
 		loader: () => import('./umb-search-header-app.element'),
-		weight: 10,
+		weight: 900,
 		meta: {
 			label: 'Search',
 			icon: 'search',

@@ -2,8 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
-import { UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN } from '../../../../../shared/property-editors/modals/property-editor-ui-picker';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
@@ -52,8 +56,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
 		});
 
 		// TODO: Figure out if this is the best way to consume a context or if it could be strongly typed using UmbContextToken
-		this.consumeContext<UmbDataTypeWorkspaceContext>('umbWorkspaceContext', (_instance) => {
-			this._workspaceContext = _instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (_instance) => {
+			this._workspaceContext = _instance as UmbDataTypeWorkspaceContext;
 			this._observeDataType();
 		});
 	}
@@ -101,7 +105,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
 	private _openPropertyEditorUIPicker() {
 		if (!this._dataType) return;
 
-		const modalHandler = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 		});
 

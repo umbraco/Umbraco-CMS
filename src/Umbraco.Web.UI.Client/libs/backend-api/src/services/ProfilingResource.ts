@@ -26,10 +26,10 @@ export class ProfilingResource {
      * @throws ApiError
      */
     public static putProfilingStatus({
-requestBody,
-}: {
-requestBody?: ProfilingStatusRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: ProfilingStatusRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/profiling/status',

@@ -1,10 +1,11 @@
 import type { DictionaryDetails } from '../../';
 import { DictionaryDetailDataSource } from './dictionary.details.server.data.interface';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryResource,
+	ImportDictionaryRequestModel,
 	LanguageResource,
 	ProblemDetailsModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -16,35 +17,35 @@ import {
  * @implements {DictionaryDetailDataSource}
  */
 export class UmbDictionaryDetailServerDataSource implements DictionaryDetailDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
 	/**
 	 * @description - Creates a new Dictionary scaffold
-	 * @param {string} parentKey
+	 * @param {string} parentId
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async createScaffold(parentKey: string) {
+	async createScaffold(parentId: string) {
 		const data: DictionaryDetails = {
 			name: '',
-			parentKey,
+			parentId,
 		} as DictionaryDetails;
 
 		return { data };
 	}
 
 	/**
-	 * @description - Fetches a Dictionary with the given key from the server
-	 * @param {string} key
+	 * @description - Fetches a Dictionary with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	get(key: string) {
-		return tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryByKey({ key })) as any;
+	get(id: string) {
+		return tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryById({ id })) as any;
 	}
 
 	/**
@@ -64,13 +65,13 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
 	async update(dictionary: DictionaryDetails) {
-		if (!dictionary.key) {
-			const error: ProblemDetailsModel = { title: 'Dictionary key is missing' };
+		if (!dictionary.id) {
+			const error: ProblemDetailsModel = { title: 'Dictionary id is missing' };
 			return { error };
 		}
 
-		const payload = { key: dictionary.key, requestBody: dictionary };
-		return tryExecuteAndNotify(this.#host, DictionaryResource.putDictionaryByKey(payload));
+		const payload = { id: dictionary.id, requestBody: dictionary };
+		return tryExecuteAndNotify(this.#host, DictionaryResource.putDictionaryById(payload));
 	}
 
 	/**
@@ -81,7 +82,7 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 */
 	async insert(data: DictionaryDetails) {
 		const requestBody: CreateDictionaryItemRequestModel = {
-			parentKey: data.parentKey,
+			parentId: data.parentId,
 			name: data.name,
 		};
 
@@ -91,44 +92,44 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 
 	/**
 	 * @description - Deletes a Dictionary on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return await tryExecuteAndNotify(this.#host, DictionaryResource.deleteDictionaryByKey({ key }));
+		return await tryExecuteAndNotify(this.#host, DictionaryResource.deleteDictionaryById({ id }));
 	}
 
 	/**
 	 * @description - Import a dictionary
-	 * @param {string} fileName
-	 * @param {string?} parentKey
+	 * @param {string} temporaryFileId
+	 * @param {string?} parentId
 	 * @returns {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async import(fileName: string, parentKey?: string) {
-		// TODO => parentKey will be a guid param once #13786 is merged and API regenerated
+	async import(temporaryFileId: string, parentId?: string) {
+		// TODO => parentId will be a guid param once #13786 is merged and API regenerated
 		return await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.postDictionaryImport({ requestBody: { fileName, parentKey } })
+			DictionaryResource.postDictionaryImport({ requestBody: { temporaryFileId, parentId } })
 		);
 	}
 
 	/**
 	 * @description - Upload a Dictionary
-	 * @param {FormData} formData
+	 * @param {ImportDictionaryRequestModel} formData
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async upload(formData: FormData) {
+	async upload(formData: ImportDictionaryRequestModel) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.postDictionaryUpload({
+			DictionaryResource.postDictionaryImport({
 				requestBody: formData,
 			})
 		);
@@ -136,13 +137,13 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 
 	/**
 	 * @description - Export a Dictionary, optionally including child items.
-	 * @param {string} key
+	 * @param {string} id
 	 * @param {boolean} includeChildren
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async export(key: string, includeChildren: boolean) {
-		return await tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryByKeyExport({ key, includeChildren }));
+	async export(id: string, includeChildren: boolean) {
+		return await tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryByIdExport({ id, includeChildren }));
 	}
 
 	async getLanguages() {

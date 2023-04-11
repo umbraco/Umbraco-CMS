@@ -3,9 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
-import { UmbRouteLocation } from '@umbraco-cms/internal/router';
+import { UmbRouteLocation } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * @element umb-data-type-workspace-edit-element
@@ -44,8 +45,8 @@ export class UmbDataTypeWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbDataTypeWorkspaceContext) => {
-			this.#workspaceContext = workspaceContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext as UmbDataTypeWorkspaceContext;
 			this.#observeName();
 		});
 	}

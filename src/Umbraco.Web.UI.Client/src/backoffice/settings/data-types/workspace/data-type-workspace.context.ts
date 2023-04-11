@@ -1,33 +1,33 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDataTypeRepository>
+	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
 	implements UmbEntityWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	#data = new ObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
-	key = this.#data.getObservablePart((data) => data?.key);
+	id = this.#data.getObservablePart((data) => data?.id);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDataTypeRepository(host));
 	}
 
-	async load(key: string) {
-		const { data } = await this.repository.requestByKey(key);
+	async load(id: string) {
+		const { data } = await this.repository.requestById(id);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
 		}
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(parentId: string | null) {
+		const { data } = await this.repository.createScaffold(parentId);
 		this.setIsNew(true);
 		this.#data.next(data);
 		return { data };
@@ -37,8 +37,8 @@ export class UmbDataTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -79,8 +79,8 @@ export class UmbDataTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	public destroy(): void {

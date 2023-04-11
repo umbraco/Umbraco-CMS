@@ -1,6 +1,6 @@
 import { StylesheetDetails } from '../..';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * A data source for the Stylesheet that fetches data from the server
@@ -8,18 +8,18 @@ import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
  * @class UmbStylesheetServerDataSource
  * @implements {UmbStylesheetServerDataSource}
  */
-export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDetails> {
-	#host: UmbControllerHostInterface;
+export class UmbStylesheetServerDataSource implements UmbDataSource<any, any, StylesheetDetails> {
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbStylesheetServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
-	createScaffold(parentKey: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
 		throw new Error('Method not implemented.');
 	}
 
@@ -38,10 +38,10 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDe
 	insert(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
 		throw new Error('Method not implemented.');
 	}
-	update(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
+	update(path: string, data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
 		throw new Error('Method not implemented.');
 	}
-	delete(key: string): Promise<DataSourceResponse<StylesheetDetails>> {
+	delete(path: string): Promise<DataSourceResponse> {
 		throw new Error('Method not implemented.');
 	}
 }

@@ -96,10 +96,10 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	private _createTableItems(items: Array<EntityTreeItemResponseModel>) {
 		this._tableItems = items.map((item) => {
-			// TODO: use unique instead of key
-			if (!item.key) throw new Error('Item key is missing.');
+			// TODO: use unique instead of id
+			if (!item.id) throw new Error('Item id is missing.');
 			return {
-				key: item.key,
+				id: item.id,
 				icon: item.icon,
 				data: [
 					{

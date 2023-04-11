@@ -1,25 +1,25 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface as UmbEntityWorkspaceContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbMemberTypeRepository } from '../repository/member-type.repository';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 // TODO => use correct tpye
 type EntityType = any;
 
 export class UmbMemberTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberTypeRepository>
+	extends UmbWorkspaceContext<UmbMemberTypeRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<EntityType | undefined>(undefined);
 	name = this.#data.getObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbMemberTypeRepository(host));
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
@@ -37,8 +37,8 @@ export class UmbMemberTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -64,8 +64,8 @@ export class UmbMemberTypeWorkspaceContext
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	public destroy(): void {

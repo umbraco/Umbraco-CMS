@@ -54,9 +54,9 @@ export const handlers = [
 
 	rest.post<HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async (req, res, ctx) => {
 		const body = await req.json<HealthCheckActionRequestModel>();
-		const healthCheckKey = body.healthCheckKey;
-		// Find the health check based on the healthCheckKey from the healthGroups[].checks
-		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.key === healthCheckKey);
+		const healthCheckId = body.healthCheckId;
+		// Find the health check based on the healthCheckId from the healthGroups[].checks
+		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.id === healthCheckId);
 
 		if (!healthCheck) {
 			return res(ctx.status(404));

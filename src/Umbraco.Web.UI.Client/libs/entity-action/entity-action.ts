@@ -1,5 +1,5 @@
 import { UmbAction, UmbActionBase } from './action';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryType> {
 	unique: string;
@@ -7,9 +7,11 @@ export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryTyp
 
 export class UmbEntityActionBase<RepositoryType> extends UmbActionBase<RepositoryType> {
 	unique: string;
+	repositoryAlias: string;
 
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, unique: string) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias);
 		this.unique = unique;
+		this.repositoryAlias = repositoryAlias;
 	}
 }

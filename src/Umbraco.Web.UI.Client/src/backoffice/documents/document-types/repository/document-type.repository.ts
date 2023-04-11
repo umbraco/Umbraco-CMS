@@ -3,7 +3,7 @@ import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.
 import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store';
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store';
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel, DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
@@ -13,7 +13,7 @@ type ItemType = DocumentTypeResponseModel;
 export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDocumentTypeTreeStore;
@@ -23,7 +23,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
@@ -60,34 +60,34 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
+		if (!ids) {
+			const error: ProblemDetailsModel = { title: 'Ids are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getItems(keys);
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -95,29 +95,29 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
-		if (!parentKey) throw new Error('Parent key is missing');
+	async createScaffold(parentId: string | null) {
+		if (!parentId) throw new Error('Parent id is missing');
 		await this.#init;
-		return this.#detailDataSource.createScaffold(parentKey);
+		return this.#detailDataSource.createScaffold(parentId);
 	}
 
-	async requestByKey(key: string) {
-		if (!key) throw new Error('Key is missing');
+	async requestById(id: string) {
+		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.get(key);
+		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -126,23 +126,23 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		return { data, error };
 	}
 
-	async byKey(key: string) {
-		if (!key) throw new Error('Key is missing');
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
 		await this.#init;
-		return this.#detailStore!.byKey(key);
+		return this.#detailStore!.byId(id);
 	}
 
 	// TODO: we need to figure out where to put this
-	async requestAllowedChildTypesOf(key: string) {
-		if (!key) throw new Error('Key is missing');
+	async requestAllowedChildTypesOf(id: string) {
+		if (!id) throw new Error('Id is missing');
 		await this.#init;
-		return this.#detailDataSource.getAllowedChildrenOf(key);
+		return this.#detailDataSource.getAllowedChildrenOf(id);
 	}
 
 	// Could potentially be general methods:
 
 	async create(template: ItemType) {
-		if (!template || !template.key) throw new Error('Template is missing');
+		if (!template || !template.id) throw new Error('Template is missing');
 		await this.#init;
 
 		const { error } = await this.#detailDataSource.insert(template);
@@ -161,10 +161,10 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 	}
 
 	async save(item: ItemType) {
-		if (!item || !item.key) throw new Error('Document-Type is missing');
+		if (!item || !item.id) throw new Error('Document-Type is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.update(item);
+		const { error } = await this.#detailDataSource.update(item.id, item);
 
 		if (!error) {
 			const notification = { data: { message: `Document saved` } };
@@ -174,7 +174,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
 			this.#detailStore?.append(item);
-			this.#treeStore?.updateItem(item.key, { name: item.name });
+			this.#treeStore?.updateItem(item.id, { name: item.name });
 			// TODO: would be nice to align the stores on methods/methodNames.
 		}
 
@@ -183,11 +183,11 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 
 	// General:
 
-	async delete(key: string) {
-		if (!key) throw new Error('Document key is missing');
+	async delete(id: string) {
+		if (!id) throw new Error('Document id is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.delete(key);
+		const { error } = await this.#detailDataSource.delete(id);
 
 		if (!error) {
 			const notification = { data: { message: `Document deleted` } };
@@ -196,8 +196,8 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-			this.#detailStore?.remove([key]);
-			this.#treeStore?.removeItem(key);
+			this.#detailStore?.remove([id]);
+			this.#treeStore?.removeItem(id);
 			// TODO: would be nice to align the stores on methods/methodNames.
 		}
 

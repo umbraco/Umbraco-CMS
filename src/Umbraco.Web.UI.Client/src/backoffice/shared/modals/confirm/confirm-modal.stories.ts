@@ -4,7 +4,7 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
 import type { UmbConfirmModalElement } from './confirm-modal.element';
-import type { UmbConfirmModalData } from './';
+import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {
 	title: 'API/Modals/Layouts/Confirm',

@@ -13,6 +13,7 @@ import type {
 import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
@@ -32,8 +33,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	public set property(value: PropertyTypeResponseModelBaseModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
-		if (this._property?.dataTypeKey !== oldProperty?.dataTypeKey) {
-			this._observeDataType(this._property?.dataTypeKey);
+		if (this._property?.dataTypeId !== oldProperty?.dataTypeId) {
+			this._observeDataType(this._property?.dataTypeId);
 			this._observeProperty();
 		}
 	}
@@ -75,8 +76,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbDocumentWorkspaceContext) => {
-			this._workspaceContext = workspaceContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._workspaceContext = workspaceContext as UmbDocumentWorkspaceContext;
 			this._observeProperty();
 		});
 	}
@@ -94,13 +95,13 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		);
 	}
 
-	private async _observeDataType(dataTypeKey?: string) {
+	private async _observeDataType(dataTypeId?: string) {
 		this._dataTypeObserver?.destroy();
-		if (dataTypeKey) {
+		if (dataTypeId) {
 			// Its not technically needed to have await here, this is only to ensure that the data is loaded before we observe it, and thereby only updating the DOM with the latest data.
-			await this._dataTypeRepository.requestByKey(dataTypeKey);
+			await this._dataTypeRepository.requestById(dataTypeId);
 			this._dataTypeObserver = this.observe(
-				await this._dataTypeRepository.byKey(dataTypeKey),
+				await this._dataTypeRepository.byId(dataTypeId),
 				(dataType) => {
 					this._dataTypeData = dataType?.values || [];
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;

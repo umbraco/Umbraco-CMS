@@ -6,9 +6,9 @@ import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backen
 export const data: Array<DictionaryDetails> = [
 	{
 		$type: '',
-		parentKey: null,
+		parentId: null,
 		name: 'Hello',
-		key: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		hasChildren: true,
 		type: 'dictionary-item',
 		isContainer: false,
@@ -26,9 +26,9 @@ export const data: Array<DictionaryDetails> = [
 	},
 	{
 		$type: '',
-		parentKey: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		parentId: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		name: 'Hello again',
-		key: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
+		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		hasChildren: false,
 		type: 'dictionary-item',
 		isContainer: false,
@@ -56,17 +56,17 @@ class UmbDictionaryData extends UmbEntityData<DictionaryDetails> {
 	}
 
 	getTreeRoot(): Array<EntityTreeItemResponseModel> {
-		const rootItems = this.data.filter((item) => item.parentKey === null);
+		const rootItems = this.data.filter((item) => item.parentId === null);
 		return rootItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItemChildren(key: string): Array<EntityTreeItemResponseModel> {
-		const childItems = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): Array<EntityTreeItemResponseModel> {
+		const childItems = this.data.filter((item) => item.parentId === id);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

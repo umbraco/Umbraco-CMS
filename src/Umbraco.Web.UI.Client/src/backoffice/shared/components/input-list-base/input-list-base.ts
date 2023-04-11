@@ -11,7 +11,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
-export class UmbInputListBase extends UmbLitElement {
+export class UmbInputListBaseElement extends UmbLitElement {
 	@property({ type: Array })
 	public value: Array<string> = [];
 
@@ -51,8 +51,8 @@ export class UmbInputListBase extends UmbLitElement {
 		});
 	}
 
-	protected removeFromSelection(key: string) {
-		this.value = this.value.filter((k) => k !== key);
+	protected removeFromSelection(id: string) {
+		this.value = this.value.filter((k) => k !== id);
 		this.selectionUpdated();
 	}
 
