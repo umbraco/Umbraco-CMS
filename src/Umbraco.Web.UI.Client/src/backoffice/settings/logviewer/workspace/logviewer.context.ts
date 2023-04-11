@@ -119,16 +119,16 @@ export class UmbLogViewerWorkspaceContext {
 			this.setFilterExpression(sanitizedQuery);
 		}
 
+		let validLogLevels: LogLevelModel[] = [];
 		if (searchQuery.loglevels) {
 			const loglevels = searchQuery.loglevels.split(',') as LogLevelModel[];
 
 			// Filter out invalid log levels that do not exist in LogLevelModel
-			const validLogLevels = loglevels.filter((loglevel) => {
-				return ['Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal'].includes(loglevel);
+			validLogLevels = loglevels.filter((loglevel) => {
+				return Object.values(LogLevelModel).includes(loglevel);
 			});
-
-			this.setLogLevelsFilter(validLogLevels);
 		}
+		this.setLogLevelsFilter(validLogLevels);
 
 		const dateRange: Partial<LogViewerDateRange> = {};
 
