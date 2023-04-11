@@ -26,7 +26,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 		if (this.#editorElement) {
 			return this.#editorElement;
 		}
-		this.#editorElement = (await import('./language-workspace-edit.element')) as unknown as HTMLElement;
+		this.#editorElement = new (await import('./language-workspace-edit.element')).default();
 		return this.#editorElement;
 	};
 
