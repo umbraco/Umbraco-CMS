@@ -64,7 +64,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			TemplateResource.getTreeTemplateItem({
+			TemplateResource.getTemplateItem({
 				id: ids,
 			})
 		);

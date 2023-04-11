@@ -5,6 +5,7 @@ import type { ContentTreeItemResponseModel } from '../models/ContentTreeItemResp
 import type { CreateMediaRequestModel } from '../models/CreateMediaRequestModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
 import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
+import type { MediaItemResponseModel } from '../models/MediaItemResponseModel';
 import type { PagedContentTreeItemResponseModel } from '../models/PagedContentTreeItemResponseModel';
 import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
@@ -102,6 +103,27 @@ export class MediaResource {
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMediaItem({
+        id,
+        dataTypeId,
+    }: {
+        id?: Array<string>,
+        dataTypeId?: string,
+    }): CancelablePromise<Array<MediaItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media/item',
+            query: {
+                'id': id,
+                'dataTypeId': dataTypeId,
             },
         });
     }

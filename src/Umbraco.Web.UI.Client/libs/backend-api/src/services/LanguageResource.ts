@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateLanguageRequestModel } from '../models/CreateLanguageRequestModel';
+import type { LanguageItemResponseModel } from '../models/LanguageItemResponseModel';
 import type { LanguageResponseModel } from '../models/LanguageResponseModel';
 import type { PagedLanguageResponseModel } from '../models/PagedLanguageResponseModel';
 import type { UpdateLanguageRequestModel } from '../models/UpdateLanguageRequestModel';
@@ -120,6 +121,24 @@ export class LanguageResource {
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getLanguageItem({
+        isoCode,
+    }: {
+        isoCode?: Array<string>,
+    }): CancelablePromise<Array<LanguageItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/language/item',
+            query: {
+                'isoCode': isoCode,
             },
         });
     }
