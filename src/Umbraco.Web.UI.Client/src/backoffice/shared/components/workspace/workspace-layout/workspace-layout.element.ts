@@ -140,7 +140,7 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 							component.manifest = view;
 						} else {
 							/*
-							TODO: Too noisy for my taste, so I would investigate if there is otherways to make this more visible.
+							TODO: Too noisy for my taste, so I would investigate if there is otherwise to make this more visible.
 							console.group(`[UmbWorkspaceLayout] Failed to setup component for route: ${info.match.route.path}`);
 							console.log('Matched route', info.match.route);
 							console.error('Missing property "manifest" on component', component);
