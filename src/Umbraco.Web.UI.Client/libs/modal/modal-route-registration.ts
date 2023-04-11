@@ -1,8 +1,8 @@
-import type { Params } from 'router-slot';
 import { v4 as uuidv4 } from 'uuid';
 import { UmbModalHandler } from './modal-handler';
 import { UmbModalConfig, UmbModalContext } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
+import type { Params } from '@umbraco-cms/backoffice/router';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) => string;
 

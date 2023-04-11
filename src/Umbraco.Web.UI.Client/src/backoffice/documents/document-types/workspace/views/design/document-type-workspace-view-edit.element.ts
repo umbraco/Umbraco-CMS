@@ -4,10 +4,12 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import { UmbWorkspaceContainerStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-container-structure-helper.class';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/internal/router';
+import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
@@ -82,7 +84,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: any[] = [];
+		const routes: IRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
@@ -90,9 +92,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 				routes.push({
 					path: `tab/${encodeURI(tabName || '').toString()}`,
 					component: () => import('./document-type-workspace-view-edit-tab.element'),
-					setup: (component: Promise<HTMLElement>) => {
-						(component as any).tabName = tabName;
-						(component as any).ownerTabId = tab.id;
+					setup: (component) => {
+						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName ?? '';
+						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = tab.id;
 					},
 				});
 			});
@@ -102,8 +104,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 			routes.push({
 				path: '',
 				component: () => import('./document-type-workspace-view-edit-tab.element'),
-				setup: (component: Promise<HTMLElement>) => {
-					(component as any).noTabName = true;
+				setup: (component) => {
+					(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
 				},
 			});
 		}

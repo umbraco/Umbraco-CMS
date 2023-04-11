@@ -9,7 +9,7 @@ import {
 	UMB_INVITE_USER_MODAL,
 	UMB_CREATE_USER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
-import type { IRoute } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

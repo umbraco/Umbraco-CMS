@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/repository/user.store';
-import type { IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
@@ -65,7 +65,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: any[] = [
+		const routes: IRoute[] = [
 			{
 				path: 'overview',
 				component: () => import('./workspace-view-users-overview.element'),
@@ -77,10 +77,10 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 			routes.push({
 				path: `${workspace.meta.entityType}/:id`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
-					component.then((el: HTMLElement) => {
-						(el as any).entityId = info.match.params.id;
-					});
+				setup: (component, info) => {
+					if (component) {
+						(component as any).entityId = info.match.params.id;
+					}
 				},
 			});
 			routes.push({

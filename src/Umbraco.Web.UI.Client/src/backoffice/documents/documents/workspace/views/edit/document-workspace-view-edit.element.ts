@@ -4,10 +4,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
 import { UmbWorkspaceContainerStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-container-structure-helper.class';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
@@ -72,7 +73,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: any[] = [];
+		const routes: IRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
@@ -80,7 +81,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 				routes.push({
 					path: `tab/${encodeURI(tabName || '').toString()}`,
 					component: () => import('./document-workspace-view-edit-tab.element'),
-					setup: (component: Promise<HTMLElement>) => {
+					setup: (component) => {
 						(component as any).tabName = tabName;
 					},
 				});
@@ -91,7 +92,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 			routes.push({
 				path: '',
 				component: () => import('./document-workspace-view-edit-tab.element'),
-				setup: (component: Promise<HTMLElement>) => {
+				setup: (component) => {
 					(component as any).noTabName = true;
 				},
 			});
