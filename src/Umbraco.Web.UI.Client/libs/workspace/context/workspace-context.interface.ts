@@ -13,4 +13,5 @@ export interface UmbWorkspaceContextInterface<DataType = unknown> {
 	destroy(): void;
 	// TODO: temp solution to bubble validation errors to the UI
 	setValidationErrors?(errorMap: any): void;
+	save(): void;
 }

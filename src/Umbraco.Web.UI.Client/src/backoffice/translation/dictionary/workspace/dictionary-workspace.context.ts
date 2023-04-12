@@ -1,18 +1,17 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
 import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
-import type { DictionaryDetails } from '../';
 import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
-
-type EntityType = DictionaryDetails;
+import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbWorkspaceContext<UmbDictionaryRepository, EntityType>
-	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
+	extends UmbWorkspaceContext<UmbDictionaryRepository, DictionaryItemResponseModel>
+	implements UmbEntityWorkspaceContextInterface<DictionaryItemResponseModel | undefined>
 {
-	#data = new ObjectState<DictionaryDetails | undefined>(undefined);
+	#data = new ObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
+
 	name = this.#data.getObservablePart((data) => data?.name);
 	dictionary = this.#data.getObservablePart((data) => data);
 
@@ -68,12 +67,15 @@ export class UmbDictionaryWorkspaceContext
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		// TODO: This is a hack to get around the fact that the data is not typed correctly.
+		// Create and response models are different. We need to look into this.
+		this.#data.next(data as unknown as DictionaryItemResponseModel);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		await this.repository.save(this.#data.value);
+		if (!this.#data.value.id) return;
+		await this.repository.save(this.#data.value.id, this.#data.value);
 		this.setIsNew(false);
 	}
 

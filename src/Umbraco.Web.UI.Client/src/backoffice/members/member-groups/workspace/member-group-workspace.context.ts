@@ -56,7 +56,7 @@ export class UmbWorkspaceMemberGroupContext
 
 	async save() {
 		if (!this.#data.value) return;
-		await this.repository.save(this.#data.value);
+		await this.repository.save(this.#data.value.id, this.#data.value);
 		this.setIsNew(true);
 	}
 

@@ -17,8 +17,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDataTypeServerDataSource
-	implements
-		UmbDataSource<CreateDataTypeRequestModel & { id: string }, UpdateDataTypeRequestModel, DataTypeResponseModel>
+	implements UmbDataSource<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>
 {
 	#host: UmbControllerHostElement;
 
@@ -50,14 +49,13 @@ export class UmbDataTypeServerDataSource
 	/**
 	 * Creates a new Data Type scaffold
 	 * @param {(string | null)} parentId
-	 * @return {*}
+	 * @return { CreateDataTypeRequestModel }
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async createScaffold(parentId: string | null) {
-		const data: DataTypeResponseModel = {
-			$type: '',
-			parentId: parentId,
+	async createScaffold(parentId?: string | null) {
+		const data: CreateDataTypeRequestModel = {
 			id: uuidv4(),
+			parentId,
 		};
 
 		return { data };
@@ -73,7 +71,7 @@ export class UmbDataTypeServerDataSource
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.id) throw new Error('Data Type id is missing');
 
-		tryExecuteAndNotify(
+		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataType({
 				requestBody: dataType,

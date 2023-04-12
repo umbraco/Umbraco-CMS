@@ -9,6 +9,7 @@ import {
 	ProblemDetailsModel,
 	DocumentResponseModel,
 	CreateDocumentRequestModel,
+	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
@@ -136,7 +137,6 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 	}
 
 	// Could potentially be general methods:
-
 	async create(item: CreateDocumentRequestModel & { id: string }) {
 		await this.#init;
 
@@ -159,26 +159,25 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		return { error };
 	}
 
-	async save(item: ItemType) {
+	async save(id: string, item: UpdateDocumentRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!item) throw new Error('Item is missing');
+
 		await this.#init;
 
-		if (!item || !item.id) {
-			throw new Error('Document is missing');
-		}
-
-		const { error } = await this.#detailDataSource.update(item.id, item);
+		const { error } = await this.#detailDataSource.update(id, item);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a document is updated in the store while someone is editing it.
+			this.#store?.append(item);
+			//this.#treeStore?.updateItem(item.id, { name: item.name });// Port data to tree store.
+			// TODO: would be nice to align the stores on methods/methodNames.
+
 			const notification = { data: { message: `Document saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a document is updated in the store while someone is editing it.
-		this.#store?.append(item);
-		//this.#treeStore?.updateItem(item.id, { name: item.name });// Port data to tree store.
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
@@ -186,25 +185,22 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 	// General:
 
 	async delete(id: string) {
+		if (!id) throw new Error('Id is missing');
 		await this.#init;
-
-		if (!id) {
-			throw new Error('Document id is missing');
-		}
 
 		const { error } = await this.#detailDataSource.delete(id);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server.
+			// Consider notify a workspace if a document is deleted from the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			this.#store?.remove([id]);
+			this.#treeStore?.removeItem(id);
+
 			const notification = { data: { message: `Document deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server.
-		// Consider notify a workspace if a document is deleted from the store while someone is editing it.
-		this.#store?.remove([id]);
-		this.#treeStore?.removeItem(id);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}

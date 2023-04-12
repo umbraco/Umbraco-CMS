@@ -1,6 +1,10 @@
 import type { MediaDetails } from '../../';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateMediaRequestModel,
+	ProblemDetailsModel,
+	UpdateMediaRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -10,7 +14,9 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbTemplateDetailServerDataSource
  * @implements {TemplateDetailDataSource}
  */
-export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, MediaDetails> {
+export class UmbMediaDetailServerDataSource
+	implements UmbDataSource<CreateMediaRequestModel, UpdateMediaRequestModel, MediaDetails>
+{
 	#host: UmbControllerHostElement;
 
 	/**
@@ -50,34 +56,15 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
-		const data: MediaDetails = {
-			$type: '',
+		const data = {
 			id: '',
 			name: '',
 			icon: '',
-			type: '',
-			hasChildren: false,
-			parentId: parentId ?? '',
-			isTrashed: false,
-			properties: [
-				{
-					alias: '',
-					label: '',
-					description: '',
-					dataTypeId: '',
-				},
-			],
-			data: [
-				{
-					alias: '',
-					value: '',
-				},
-			],
-			variants: [
-				{
-					name: '',
-				},
-			],
+			parentId,
+			contentTypeId: '',
+			properties: [],
+			data: [],
+			variants: [],
 		};
 
 		return { data };
@@ -89,12 +76,8 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async insert(media: MediaDetails) {
-		if (!media.id) {
-			//const error: ProblemDetails = { title: 'Media id is missing' };
-			return Promise.reject();
-		}
-		//const payload = { id: media.id, requestBody: media };
+	async insert(media: CreateMediaRequestModel) {
+		if (!media) throw new Error('Media is missing');
 
 		let body: string;
 
@@ -124,12 +107,9 @@ export class UmbMediaDetailServerDataSource implements UmbDataSource<any, any, M
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
 	// TODO: Error mistake in this:
-	async update(id: string, media: MediaDetails) {
-		if (!media.id) {
-			const error: ProblemDetailsModel = { title: 'Media id is missing' };
-			return { error };
-		}
-		//const payload = { id: media.id, requestBody: media };
+	async update(id: string, media: UpdateMediaRequestModel) {
+		if (!id) throw new Error('Key is missing');
+		if (!media) throw new Error('Media is missing');
 
 		let body: string;
 
