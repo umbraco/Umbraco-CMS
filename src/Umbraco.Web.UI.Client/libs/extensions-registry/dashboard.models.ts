@@ -27,11 +27,13 @@ export interface ConditionsDashboard {
 	/**
 	 * An array of section aliases that the dashboard should be available in
 	 *
-	 * @examples [
-	 *   ["Umb.Section.Content"],
-	 *   ["Umb.Section.Settings"]
-	 * ]
 	 * @uniqueItems true
+	 * @minItems 1
+	 * @items.examples [
+	 *   "Umb.Section.Content",
+	 *   "Umb.Section.Settings"
+	 * ]
+	 *
 	 */
 	sections: string[];
 }
