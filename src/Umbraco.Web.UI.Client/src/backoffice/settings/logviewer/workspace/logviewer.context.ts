@@ -15,6 +15,7 @@ import {
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
+	SavedLogSearchPresenationBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -57,7 +58,7 @@ export class UmbLogViewerWorkspaceContext {
 		endDate: this.today,
 	};
 
-	#savedSearches = new DeepState<PagedSavedLogSearchResponseModel | undefined>(undefined);
+	#savedSearches = new ObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
 	savedSearches = createObservablePart(this.#savedSearches, (data) => data?.items);
 
 	#logCount = new DeepState<LogLevelCountsReponseModel | null>(null);
@@ -110,7 +111,6 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	onChangeState = () => {
-
 		this.reset();
 
 		const searchQuery = query();
@@ -199,6 +199,17 @@ export class UmbLogViewerWorkspaceContext {
 				],
 				total: 6,
 			});
+		}
+	}
+
+	async saveSearch({ name, query }: SavedLogSearchPresenationBaseModel) {
+		const previousSavedSearches = this.#savedSearches.getValue()?.items ?? [];
+		try {
+			this.#savedSearches.update({ items: [...previousSavedSearches, { name, query }] });
+			await this.#repository.saveSearch({ name, query });
+		} catch (err) {
+			this.#savedSearches.update({ items: previousSavedSearches });
+			console.log(err);
 		}
 	}
 

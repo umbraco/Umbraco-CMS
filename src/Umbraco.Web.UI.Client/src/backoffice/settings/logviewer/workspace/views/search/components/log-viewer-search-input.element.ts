@@ -7,6 +7,25 @@ import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '
 import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
+import {
+	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalContext,
+	UmbModalHandler,
+	UmbModalToken,
+} from '@umbraco-cms/backoffice/modal';
+
+import './log-viewer-search-input-modal.element';
+export interface UmbContextSaveSearchModalData {
+	query: string;
+}
+
+export const UMB_LOG_VIEWER_SAVE_SEARCH_MODAL = new UmbModalToken<UmbContextSaveSearchModalData>(
+	'Umb.Modal.LogViewer.SaveSearch',
+	{
+		type: 'dialog',
+		size: 'small',
+	}
+);
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
@@ -108,6 +127,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
+	private _modalContext?: UmbModalContext;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
@@ -115,6 +136,10 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			this.#observeStuff();
 			this.#logViewerContext?.getSavedSearches();
 			this.#logViewerContext.getLogs();
+		});
+
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
 		});
 
 		this.inputQuery$
@@ -180,6 +205,25 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#logViewerContext?.getLogs();
 	}
 
+	#modalHandler?: UmbModalHandler;
+
+	async #saveSearch(savedSearch: SavedLogSearchResponseModel) {
+		try {
+			await this.#logViewerContext?.saveSearch(savedSearch);
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	#openSaveSearchDialog() {
+		this.#modalHandler = this._modalContext?.open(UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, { query: this._inputQuery });
+		this.#modalHandler?.onSubmit().then((savedSearch) => {
+			if (savedSearch) {
+				this.#saveSearch(savedSearch);
+			}
+		});
+	}
+
 	render() {
 		return html`
 			<uui-popover placement="bottom-start" id="saved-searches-popover" @close=${this.#toggleSavedSearchesExpandSymbol}>
@@ -196,7 +240,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 						  </div>`
 						: ''}
 					${this._inputQuery
-						? html`<uui-button compact slot="append" label="Save search"
+						? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
 									><uui-icon name="umb:favorite"></uui-icon></uui-button
 								><uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
 									><uui-icon name="umb:delete"></uui-icon
