@@ -142,9 +142,7 @@ export interface ManifestWithConditions<ConditionsType> {
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 	/**
-	 * Ignore this property when serializing to JSON Schema
-	 * found at /types/umbraco-package-schema.json
-	 * @ignore
+	 * @TJS-ignore
 	 */
 	loader?: () => Promise<LoaderReturnType>;
 }
@@ -162,12 +160,12 @@ export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
 	js?: string;
 
 	/**
-	 * @ignore
+	 * @TJS-ignore
 	 */
 	className?: string;
 
 	/**
-	 * @ignore
+	 * @TJS-ignore
 	 */
 	class?: ClassConstructor<T>;
 	//loader?: () => Promise<object | HTMLElement>;
