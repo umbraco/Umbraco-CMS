@@ -122,11 +122,22 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
+					<uui-button-group>
+						<uui-button look="secondary" id="master-template-button" label="Change Master template"
+							>Master template: something</uui-button
+						>
+						<uui-button look="secondary" id="save-button" label="Remove master template" compact
+							><uui-icon name="umb:delete"></uui-icon
+						></uui-button>
+					</uui-button-group>
 					<umb-button-with-dropdown look="secondary" placement="bottom-start" id="insert-button" label="Insert">
 						<uui-icon name="umb:add"></uui-icon>Insert
 						<ul id="insert-menu" slot="dropdown">
 							<li>
 								<uui-menu-item class="insert-menu-item" target="_blank" label="Value" title="Value"> </uui-menu-item>
+							</li>
+							<li>
+								<uui-menu-item class="insert-menu-item" label="Partial view" title="Partial view"> </uui-menu-item>
 							</li>
 							<li>
 								<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>
