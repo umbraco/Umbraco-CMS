@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType.Items;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
@@ -31,6 +32,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
         mapper.Define<IMediaEntitySlim, MediaItemResponseModel>((_, _) => new MediaItemResponseModel(), Map);
+        mapper.Define<IMember, MemberItemResponseModel>((_, _) => new MemberItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -107,5 +109,13 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Icon = source.ContentTypeIcon;
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(IMember source, MemberItemResponseModel target, MapperContext context)
+    {
+        target.Icon = source.ContentType.Icon;
+        target.Id = source.Key;
+        target.Name = source.Name ?? source.Username;
     }
 }
