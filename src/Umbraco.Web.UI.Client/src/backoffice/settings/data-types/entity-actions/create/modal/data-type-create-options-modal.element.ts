@@ -1,13 +1,25 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { DATA_TYPE_REPOSITORY_ALIAS } from '../../../repository/manifests';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UmbModalContext, UMB_FOLDER_MODAL, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbDataTypeCreateOptionsModalData } from '.';
+import {
+	UmbModalContext,
+	UmbModalHandler,
+	UMB_FOLDER_MODAL,
+	UMB_MODAL_CONTEXT_TOKEN,
+} from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('umb-create-data-type-modal')
-export class UmbCreateDataTypeModalElement extends UmbModalBaseElement {
+@customElement('umb-data-type-create-options-modal')
+export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 	static styles = [UUITextStyles];
+
+	@property({ attribute: false })
+	modalHandler?: UmbModalHandler<UmbDataTypeCreateOptionsModalData>;
+
+	@property({ type: Object })
+	data?: UmbDataTypeCreateOptionsModalData;
 
 	#modalContext?: UmbModalContext;
 
@@ -26,6 +38,11 @@ export class UmbCreateDataTypeModalElement extends UmbModalBaseElement {
 		folderModalHandler?.onSubmit().then(() => this.modalHandler?.submit());
 	}
 
+	// close the modal when navigating to data type
+	#onNavigate() {
+		this.modalHandler?.submit();
+	}
+
 	#onCancel() {
 		this.modalHandler?.reject();
 	}
@@ -34,7 +51,11 @@ export class UmbCreateDataTypeModalElement extends UmbModalBaseElement {
 		return html`
 			<umb-body-layout headline="Create Data Type">
 				<uui-box>
-					<uui-menu-item href="" label="New Data Type...">
+					<!-- TODO: construct url -->
+					<uui-menu-item
+						href=${`section/settings/workspace/data-type/create/${this.data?.parentKey || null}`}
+						label="New Data Type..."
+						@click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="umb:autofill"></uui-icon>}
 					</uui-menu-item>
 					<uui-menu-item @click=${this.#onClick} label="New Folder...">
@@ -47,10 +68,10 @@ export class UmbCreateDataTypeModalElement extends UmbModalBaseElement {
 	}
 }
 
-export default UmbCreateDataTypeModalElement;
+export default UmbDataTypeCreateOptionsModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-create-data-type-modal': UmbCreateDataTypeModalElement;
+		'umb-data-type-create-options-modal': UmbDataTypeCreateOptionsModalElement;
 	}
 }

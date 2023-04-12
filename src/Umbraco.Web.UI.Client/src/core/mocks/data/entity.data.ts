@@ -19,6 +19,16 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return this.data.filter((item) => ids.includes(item.id));
 	}
 
+	insert(item: T) {
+		const exits = this.data.find((i) => i.id === item.id);
+
+		if (exits) {
+			throw new Error(`Item with key ${item.id} already exists`);
+		}
+
+		this.data.push(item);
+	}
+
 	save(saveItem: T) {
 		const foundIndex = this.data.findIndex((item) => item.id === saveItem.id);
 		if (foundIndex !== -1) {

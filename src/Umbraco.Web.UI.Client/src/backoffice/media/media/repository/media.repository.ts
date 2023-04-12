@@ -6,13 +6,19 @@ import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.da
 import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateMediaRequestModel,
+	ProblemDetailsModel,
+	UpdateMediaRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemDetailType = MediaDetails;
 
-export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepository<ItemDetailType> {
+export class UmbMediaRepository
+	implements UmbTreeRepository, UmbDetailRepository<CreateMediaRequestModel, UpdateMediaRequestModel, MediaDetails>
+{
 	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
@@ -121,24 +127,15 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 	// DETAILS:
 
 	async createScaffold(parentId: string | null) {
+		if (!parentId) throw new Error('Parent id is missing');
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
-
 		return this.#detailDataSource.createScaffold(parentId);
 	}
 
 	async requestById(id: string) {
+		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		// TODO: should we show a notification if the id is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
-		}
 		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {
@@ -150,49 +147,45 @@ export class UmbMediaRepository implements UmbTreeRepository, UmbDetailRepositor
 
 	// Could potentially be general methods:
 
-	async create(template: ItemDetailType) {
+	async create(media: CreateMediaRequestModel) {
+		if (!media) throw new Error('Media is missing');
+
 		await this.#init;
 
-		if (!template || !template.id) {
-			throw new Error('Template is missing');
-		}
-
-		const { error } = await this.#detailDataSource.insert(template);
+		const { error } = await this.#detailDataSource.insert(media);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// TODO: Update tree store with the new item? or ask tree to request the new item?
+			//this.#store?.append(media);
+
 			const notification = { data: { message: `Media created` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		this.#store?.append(template);
-		// TODO: Update tree store with the new item? or ask tree to request the new item?
-
 		return { error };
 	}
 
-	async save(document: ItemDetailType) {
+	async save(id: string, updatedItem: UpdateMediaRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!updatedItem) throw new Error('Updated media item is missing');
+
 		await this.#init;
 
-		if (!document || !document.id) {
-			throw new Error('Template is missing');
-		}
-
-		const { error } = await this.#detailDataSource.update(document.id, document);
+		const { error } = await this.#detailDataSource.update(id, updatedItem);
 
 		if (!error) {
-			const notification = { data: { message: `Document saved` } };
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a template is updated in the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			// this.#store?.append(updatedMediaItem);
+			// this.#treeStore?.updateItem(id, updatedItem);
+
+			const notification = { data: { message: `Media saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#store?.append(document);
-		this.#treeStore?.updateItem(document.id, { name: document.name });
-
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}

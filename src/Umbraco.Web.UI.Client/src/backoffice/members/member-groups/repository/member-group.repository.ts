@@ -10,7 +10,7 @@ import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
 // TODO => Update type when backend updated
-export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRepository<any> {
+export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRepository<any, any, any> {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -129,48 +129,43 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return { data, error };
 	}
 
-	async save(memberGroup: MemberGroupDetails) {
+	async save(id: string, memberGroup: MemberGroupDetails) {
+		if (!id) throw new Error('Id is missing');
+		if (!memberGroup) throw new Error('Member group is missing');
+
 		await this.#init;
 
-		if (!memberGroup || !memberGroup.name) {
-			const error: ProblemDetailsModel = { title: 'Member group is missing' };
-			return { error };
-		}
-
-		const { error } = await this.#detailSource.update(memberGroup.id, memberGroup);
+		const { error } = await this.#detailSource.update(id, memberGroup);
 
 		if (!error) {
+			this.#store?.append(memberGroup);
+			this.#treeStore?.updateItem(memberGroup.id, memberGroup);
+
 			const notification = { data: { message: `Member group '${memberGroup.name} saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		this.#store?.append(memberGroup);
-		this.#treeStore?.updateItem(memberGroup.id, { name: memberGroup.name });
 
 		return { error };
 	}
 
 	async delete(id: string) {
-		await this.#init;
+		if (!id) throw new Error('Id is missing');
 
-		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Id is missing' };
-			return { error };
-		}
+		await this.#init;
 
 		const { error } = await this.#detailSource.delete(id);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server.
+			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			this.#store?.remove([id]);
+			this.#treeStore?.removeItem(id);
+
 			const notification = { data: { message: `Document deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server.
-		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#store?.remove([id]);
-		this.#treeStore?.removeItem(id);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}

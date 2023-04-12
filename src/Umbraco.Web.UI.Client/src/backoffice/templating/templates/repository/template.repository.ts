@@ -6,9 +6,18 @@ import type { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backof
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateTemplateRequestModel,
+	ProblemDetailsModel,
+	TemplateResponseModel,
+	UpdateTemplateRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<TemplateResponseModel> {
+export class UmbTemplateRepository
+	implements
+		UmbTreeRepository<any>,
+		UmbDetailRepository<CreateTemplateRequestModel, UpdateTemplateRequestModel, TemplateResponseModel>
+{
 	#init;
 	#host: UmbControllerHostElement;
 
@@ -156,26 +165,25 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 		return { error };
 	}
 
-	async save(template: TemplateResponseModel) {
+	async save(id: string, template: UpdateTemplateRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!template) throw new Error('Template is missing');
+
 		await this.#init;
 
-		if (!template || !template.id) {
-			throw new Error('Template is missing');
-		}
-
-		const { error } = await this.#detailDataSource.update(template);
+		const { error } = await this.#detailDataSource.update(id, template);
 
 		if (!error) {
 			const notification = { data: { message: `Template saved` } };
 			this.#notificationContext?.peek('positive', notification);
-		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#store?.append(template);
-		this.#treeStore?.updateItem(template.id, { name: template.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a template is updated in the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			//this.#store?.append(template);
+			this.#treeStore?.updateItem(id, template);
+		}
 
 		return { error };
 	}
