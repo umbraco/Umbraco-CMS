@@ -9,8 +9,6 @@ import './document-workspace-editor.element';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles];
-
 	#workspaceContext = new UmbDocumentWorkspaceContext(this);
 	#element = document.createElement('umb-document-workspace-editor');
 
@@ -40,6 +38,8 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes="${this._routes}"></umb-router-slot>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbDocumentWorkspaceElement;

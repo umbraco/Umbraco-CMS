@@ -14,17 +14,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-		`,
-	];
-
 	//private _defaultVariant?: VariantViewModelBaseModel;
 	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
 
@@ -132,6 +121,17 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			  >`
 			: '';
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceEditorElement;
