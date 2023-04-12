@@ -9,7 +9,35 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Testing.ITestDatabase</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Testing.LocalDbTestDatabase</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Testing.SqliteTestDatabase</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
     <Target>T:Umbraco.Cms.Tests.Integration.Testing.SqlServerBaseTestDatabase</Target>
+    <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Testing.SqlServerTestDatabase</Target>
     <Left>lib/net7.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net7.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
