@@ -5,9 +5,9 @@ using Umbraco.Cms.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Extensions;
 
-public static class EFCoreScopeExtension
+internal static class EFCoreScopeExtension
 {
-    public static async Task MigrateDatabaseAsync(this IEfCoreScope<UmbracoEFContext> scope, string targetMigration) =>
+    internal static async Task MigrateDatabaseAsync(this IEfCoreScope<UmbracoEFContext> scope, string targetMigration) =>
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
             await db.GetService<IMigrator>().MigrateAsync(targetMigration);
