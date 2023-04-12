@@ -90,10 +90,11 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		this.#logViewerContext?.togglePolling();
 	}
 
-	#setPolingInterval(interval: PoolingInterval) {
+	#setPolingInterval = (interval: PoolingInterval) => {
 		this.#logViewerContext?.setPollingInterval(interval);
+
 		this.#closePoolingPopover();
-	}
+	};
 
 	#openPoolingPopover() {
 		this._pollingPopover.open = true;
@@ -103,6 +104,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 	#closePoolingPopover() {
 		this._pollingPopover.open = false;
 		this._polingExpandSymbol.open = false;
+		this.#togglePolling();
 	}
 
 	render() {

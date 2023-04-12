@@ -310,7 +310,7 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	setPollingInterval(interval: PoolingInterval) {
-		this.#polling.update({ interval, enabled: true });
+		this.#polling.update({ interval });
 	}
 
 	toggleSortOrder() {
