@@ -16,7 +16,7 @@ public class IsUsedPropertyTypeController : PropertyTypeControllerBase
         _propertyTypeUsageService = propertyTypeUsageService;
     }
 
-     [HttpGet("is-used")]
+    [HttpGet("is-used")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<bool>), StatusCodes.Status200OK)]
@@ -28,6 +28,4 @@ public class IsUsedPropertyTypeController : PropertyTypeControllerBase
             ? Ok(result.Result)
             : PropertyTypeOperationStatusResult(result.Status);
     }
-
-
 }
