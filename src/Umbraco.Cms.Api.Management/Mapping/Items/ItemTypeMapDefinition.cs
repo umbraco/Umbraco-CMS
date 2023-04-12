@@ -11,10 +11,12 @@ using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType.Items;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Users.Item;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Items;
 
@@ -33,6 +35,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
         mapper.Define<IMediaEntitySlim, MediaItemResponseModel>((_, _) => new MediaItemResponseModel(), Map);
         mapper.Define<IMember, MemberItemResponseModel>((_, _) => new MemberItemResponseModel(), Map);
+        mapper.Define<IUser, UserItemResponseModel>((_, _) => new UserItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -115,6 +118,13 @@ public class ItemTypeMapDefinition : IMapDefinition
     private static void Map(IMember source, MemberItemResponseModel target, MapperContext context)
     {
         target.Icon = source.ContentType.Icon;
+        target.Id = source.Key;
+        target.Name = source.Name ?? source.Username;
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(IUser source, UserItemResponseModel target, MapperContext context)
+    {
         target.Id = source.Key;
         target.Name = source.Name ?? source.Username;
     }
