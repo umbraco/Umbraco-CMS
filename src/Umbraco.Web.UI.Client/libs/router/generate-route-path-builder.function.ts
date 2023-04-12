@@ -1,4 +1,4 @@
-import { stripSlash } from '@umbraco-cms/backoffice/router';
+import { stripSlash } from 'router-slot/util';
 
 const PARAM_IDENTIFIER = /:([^\\/]+)/g;
 
