@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Tag;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tag;
 
@@ -23,18 +22,17 @@ public class ByQueryTagController : TagControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<TagResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<TagResponseModel>>> ByQuery(string tagGroup, string? culture, string? query = null, int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<TagResponseModel>>> ByQuery(string? tagGroup, string? culture, string? query = null, int skip = 0, int take = 100)
     {
-        if (culture == string.Empty)
+        IEnumerable<ITag> result;
+
+        if (query is not null)
         {
-            culture = null;
+            result = await _tagService.GetByQueryAsync(query, tagGroup, culture);
         }
-
-        IEnumerable<ITag> result = _tagService.GetAllTags(tagGroup, culture);
-
-        if (query.IsNullOrWhiteSpace() is false)
+        else
         {
-            result = result.Where(x => x.Text.InvariantContains(query));
+            result = await _tagService.GetAllAsync(tagGroup, culture);
         }
 
         List<TagResponseModel> responseModels = _mapper.MapEnumerable<ITag, TagResponseModel>(result);

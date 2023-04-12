@@ -58,6 +58,10 @@ public interface ITagService : IService
     /// </summary>
     IEnumerable<ITag> GetAllTags(string? group = null, string? culture = null);
 
+    Task<IEnumerable<ITag>> GetAllAsync(string? group = null, string? culture = null);
+
+    Task<IEnumerable<ITag>> GetByQueryAsync(string query, string? group = null, string? culture = null);
+
     /// <summary>
     ///     Gets all document tags.
     /// </summary>
