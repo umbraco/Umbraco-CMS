@@ -30,7 +30,7 @@
 		"build": "tsc && vite build --mode staging",
 		"build:libs": "npm run wc-analyze && npm run wc-analyze:vscode && rollup -c rollup-libs.config.js && node utils/move-libs.js",
 		"build:for:static": "tsc && vite build",
-		"build:for:cms": "tsc && npm run build:libs && vite build -c vite.cms.config.ts",
+		"build:for:cms": "tsc && npm run build:libs && npm run generate:jsonschema && vite build -c vite.cms.config.ts",
 		"build:for:cms:watch": "tsc && npm run build:libs && vite build -c vite.cms.config.ts --watch",
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",
