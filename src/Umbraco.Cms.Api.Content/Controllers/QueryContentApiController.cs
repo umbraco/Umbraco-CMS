@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -18,22 +19,35 @@ public class QueryContentApiController : ContentApiControllerBase
         => _apiQueryService = apiQueryService;
 
     /// <summary>
-    ///     Gets content item(s) from query.
+    ///     Gets a paginated list of content item(s) from query.
     /// </summary>
     /// <param name="fetch">Optional fetch query parameter value.</param>
     /// <param name="filter">Optional filter query parameters values.</param>
     /// <param name="sort">Optional sort query parameters values.</param>
-    /// <returns>The content item(s) or empty collection.</returns>
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <returns>The paged result of the content item(s).</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedViewModel<IApiContentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Query(string? fetch, [FromQuery] string[] filter, [FromQuery] string[] sort)
+    public async Task<ActionResult<PagedViewModel<IApiContentResponse>>> Query(
+        string? fetch,
+        [FromQuery] string[] filter,
+        [FromQuery] string[] sort,
+        int skip = 0,
+        int take = 10)
     {
         IEnumerable<Guid> ids = _apiQueryService.ExecuteQuery(fetch, filter, sort);
         IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(ids);
-        IEnumerable<IApiContentResponse> results = contentItems.Select(ApiContentResponseBuilder.Build);
+        IApiContentResponse[] results = contentItems.Select(ApiContentResponseBuilder.Build).ToArray();
 
-        return await Task.FromResult(Ok(results));
+        var model = new PagedViewModel<IApiContentResponse>
+        {
+            Total = results.Length,
+            Items = results.Skip(skip).Take(take)
+        };
+
+        return await Task.FromResult(Ok(model));
     }
 }
