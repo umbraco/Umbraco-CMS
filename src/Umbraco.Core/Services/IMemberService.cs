@@ -247,6 +247,8 @@ public interface IMemberService : IMembershipMemberService
     /// </returns>
     IEnumerable<IMember> GetAllMembers(params int[] ids);
 
+    Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids);
+
     /// <summary>
     ///     Delete Members of the specified MemberType id
     /// </summary>
