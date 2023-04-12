@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.SqlServer;
 public class SqlLocalDbDatabaseProviderMetadataTests
 {
     [Test]
-    [TestCase("ignored", "myDatabase", "ignored", "ignored", true, ExpectedResult = "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\myDatabase.mdf;Integrated Security=True")]
-    [TestCase("ignored", "myDatabase2", "ignored", "ignored", false /*ignored*/, ExpectedResult = "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\myDatabase2.mdf;Integrated Security=True")]
+    [TestCase("ignored", "myDatabase", "ignored", "ignored", true, ExpectedResult = "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\myDatabase.mdf;Integrated Security=True;TrustServerCertificate=True")]
+    [TestCase("ignored", "myDatabase2", "ignored", "ignored", false /*ignored*/, ExpectedResult = "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\myDatabase2.mdf;Integrated Security=True;TrustServerCertificate=True")]
     public string GenerateConnectionString(string server, string databaseName, string login, string password, bool integratedAuth)
     {
         var sut = new SqlLocalDbDatabaseProviderMetadata();

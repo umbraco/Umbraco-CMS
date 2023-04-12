@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Persistence.SqlServer;
 public class SqlServerDatabaseProviderMetadataTests
 {
     [Test]
-    [TestCase("myServer", "myDatabase", "myLogin", "myPassword", true, ExpectedResult = "Server=myServer;Database=myDatabase;Integrated Security=true")]
-    [TestCase("myServer", "myDatabase", "myLogin", "myPassword", false, ExpectedResult = "Server=myServer;Database=myDatabase;User Id=myLogin;Password=myPassword")]
+    [TestCase("myServer", "myDatabase", "myLogin", "myPassword", true, ExpectedResult = "Server=myServer;Database=myDatabase;Integrated Security=true;TrustServerCertificate=True")]
+    [TestCase("myServer", "myDatabase", "myLogin", "myPassword", false, ExpectedResult = "Server=myServer;Database=myDatabase;User Id=myLogin;Password=myPassword;TrustServerCertificate=True")]
     public string GenerateConnectionString(string server, string databaseName, string login, string password, bool integratedAuth)
     {
         var sut = new SqlServerDatabaseProviderMetadata();

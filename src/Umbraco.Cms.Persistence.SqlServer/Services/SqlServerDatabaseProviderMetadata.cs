@@ -75,6 +75,6 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     /// <inheritdoc />
     public string GenerateConnectionString(DatabaseModel databaseModel) =>
         databaseModel.IntegratedAuth
-            ? $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};Integrated Security=true;Encrypt=False;TrustServerCertificate=True"
-            : $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};User Id={databaseModel.Login};Password={databaseModel.Password};Encrypt=False;TrustServerCertificate=True";
+            ? $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};Integrated Security=true;TrustServerCertificate=True"
+            : $"Server={databaseModel.Server};Database={databaseModel.DatabaseName};User Id={databaseModel.Login};Password={databaseModel.Password};TrustServerCertificate=True";
 }
