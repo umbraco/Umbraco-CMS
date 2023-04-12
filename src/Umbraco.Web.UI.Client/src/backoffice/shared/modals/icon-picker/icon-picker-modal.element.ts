@@ -6,8 +6,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import icons from '../../../../../public-assets/icons/icons.json';
-import { UmbIconPickerModalData, UmbIconPickerModalResult } from '.';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
+import { UmbIconPickerModalData, UmbIconPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 // TODO: Make use of UmbPickerLayoutBase
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers

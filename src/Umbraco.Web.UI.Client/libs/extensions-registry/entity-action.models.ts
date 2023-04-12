@@ -7,6 +7,7 @@ import type { ManifestElement } from './models';
 export interface ManifestEntityAction extends ManifestElement {
 	type: 'entityAction';
 	meta: MetaEntityAction;
+	conditions: ConditionsEntityAction;
 }
 
 export interface MetaEntityAction {
@@ -23,15 +24,9 @@ export interface MetaEntityAction {
 	 * @example 'Create Content Template'
 	 */
 	label: string;
-	
-	/**
-	 * The type of entity this action is for such as 'document'
-	 * @example 'media'
-	 * @example 'document'
-	 */
-	entityType: string;
 
-	api: any; // TODO: create interface
+	api: any; // create interface
+
 
 	/**
 	 * The alias for the repsoitory of the entity type this action is for
@@ -39,4 +34,8 @@ export interface MetaEntityAction {
 	 * @example 'Umb.Repository.Documents'
 	 */
 	repositoryAlias: string;
+}
+
+export interface ConditionsEntityAction {
+	entityType: string;
 }

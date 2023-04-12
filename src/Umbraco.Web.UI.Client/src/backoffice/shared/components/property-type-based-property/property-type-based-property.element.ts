@@ -1,14 +1,19 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
-import type { DataTypeModel, DataTypePropertyModel, PropertyTypeViewModelBaseModel } from '@umbraco-cms/backend-api';
+import type {
+	DataTypeResponseModel,
+	DataTypePropertyPresentationModel,
+	PropertyTypeResponseModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import '../workspace-property/workspace-property.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
@@ -22,27 +27,27 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	];
 
 	@property({ type: Object, attribute: false })
-	public get property(): PropertyTypeViewModelBaseModel | undefined {
+	public get property(): PropertyTypeResponseModelBaseModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeViewModelBaseModel | undefined) {
+	public set property(value: PropertyTypeResponseModelBaseModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
-		if (this._property?.dataTypeKey !== oldProperty?.dataTypeKey) {
-			this._observeDataType(this._property?.dataTypeKey);
+		if (this._property?.dataTypeId !== oldProperty?.dataTypeId) {
+			this._observeDataType(this._property?.dataTypeId);
 			this._observeProperty();
 		}
 	}
-	private _property?: PropertyTypeViewModelBaseModel;
+	private _property?: PropertyTypeResponseModelBaseModel;
 
 	@state()
 	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _dataTypeData: DataTypePropertyModel[] = [];
+	private _dataTypeData: DataTypePropertyPresentationModel[] = [];
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
-	private _dataTypeObserver?: UmbObserverController<DataTypeModel | null>;
+	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
 
 	@state()
 	private _value?: unknown;
@@ -71,8 +76,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbDocumentWorkspaceContext) => {
-			this._workspaceContext = workspaceContext;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._workspaceContext = workspaceContext as UmbDocumentWorkspaceContext;
 			this._observeProperty();
 		});
 	}
@@ -90,15 +95,15 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 		);
 	}
 
-	private async _observeDataType(dataTypeKey?: string) {
+	private async _observeDataType(dataTypeId?: string) {
 		this._dataTypeObserver?.destroy();
-		if (dataTypeKey) {
+		if (dataTypeId) {
 			// Its not technically needed to have await here, this is only to ensure that the data is loaded before we observe it, and thereby only updating the DOM with the latest data.
-			await this._dataTypeRepository.requestByKey(dataTypeKey);
+			await this._dataTypeRepository.requestById(dataTypeId);
 			this._dataTypeObserver = this.observe(
-				await this._dataTypeRepository.byKey(dataTypeKey),
+				await this._dataTypeRepository.byId(dataTypeId),
 				(dataType) => {
-					this._dataTypeData = dataType?.data || [];
+					this._dataTypeData = dataType?.values || [];
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
 				},
 				'observeDataType'

@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIMemberGroupPickerElement } from './property-editor-ui-member-group-picker.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIMemberGroupPickerElement', () => {
   let element: UmbPropertyEditorUIMemberGroupPickerElement;

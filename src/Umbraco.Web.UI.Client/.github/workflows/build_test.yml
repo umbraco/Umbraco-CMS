@@ -15,6 +15,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  NODE_OPTIONS: --max_old_space_size=16384
+
 jobs:
   build:
 
@@ -34,6 +37,7 @@ jobs:
     - run: npm ci --no-audit --no-fund --prefer-offline
     - run: npm run lint
     - run: npm run build
+    # - run: npm run build:libs
     - run: sudo npx playwright install-deps
     - run: npm test
     - name: Upload Code Coverage reports

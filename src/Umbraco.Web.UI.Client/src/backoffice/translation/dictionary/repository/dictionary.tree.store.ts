@@ -1,20 +1,20 @@
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbTreeStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export
  * @class UmbDictionaryTreeStore
- * @extends {UmbTreeStoreBase}
+ * @extends {UmbEntityTreeStore}
  * @description - Tree Data Store for Dictionary
  */
-export class UmbDictionaryTreeStore extends UmbTreeStoreBase {
+export class UmbDictionaryTreeStore extends UmbEntityTreeStore {
 	/**
 	 * Creates an instance of UmbDictionaryTreeStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDictionaryTreeStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
 }

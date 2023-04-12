@@ -1,10 +1,6 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-/**
- * A collection view is a view that can be used to display a collection of entities.
- * For example you may wish to display a collection of nodes as a table or grid of cards
- */
-export interface ManifestCollectionView extends ManifestElement {
+export interface ManifestCollectionView extends ManifestElement, ManifestWithConditions<ConditionsCollectionView> {
 	type: 'collectionView';
 	meta: MetaCollectionView;
 }
@@ -23,13 +19,11 @@ export interface MetaCollectionView {
 	icon: string;
 
 	/**
-	 * The entity type that this collection view is for
-	 * @example 'media'
-	 */
-	entityType: string;
-
-	/**
-	 * The URL pathname for this collection view that can be deep linked to by sharing the url
-	 */
+	* The URL pathname for this collection view that can be deep linked to by sharing the url
+	*/
 	pathName: string;
+}
+
+export interface ConditionsCollectionView {
+	entityType: string;
 }

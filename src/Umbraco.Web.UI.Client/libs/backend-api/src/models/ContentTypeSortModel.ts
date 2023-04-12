@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type ContentTypeSortModel = {
-    key?: string;
+    id?: string;
     sortOrder?: number;
 };
 

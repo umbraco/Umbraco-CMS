@@ -4,13 +4,13 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import {
-	DatabaseInstallModel,
-	DatabaseSettingsModel,
+	DatabaseInstallResponseModel,
+	DatabaseSettingsPresentationModel,
 	InstallResource,
 	ProblemDetailsModel,
-} from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecute } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
@@ -35,7 +35,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 
 			uui-form-layout-item {
 				margin-top: 0;
-				margin-bottom: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-layout-1);
 			}
 
 			uui-input,
@@ -47,7 +47,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			hr {
 				width: 100%;
 				margin-top: var(--uui-size-space-2);
-				margin-bottom: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-layout-1);
 				border: none;
 				border-bottom: 1px solid var(--uui-color-border);
 			}
@@ -82,16 +82,16 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _installButton!: UUIButtonElement;
 
 	@property({ attribute: false })
-	public databaseFormData!: DatabaseInstallModel;
+	public databaseFormData!: DatabaseInstallResponseModel;
 
 	@state()
 	private _options: Option[] = [];
 
 	@state()
-	private _databases: DatabaseSettingsModel[] = [];
+	private _databases: DatabaseSettingsPresentationModel[] = [];
 
 	@state()
-	private _preConfiguredDatabase?: DatabaseSettingsModel;
+	private _preConfiguredDatabase?: DatabaseSettingsPresentationModel;
 
 	@state()
 	private _validationErrorMessage = '';
@@ -151,7 +151,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
 		// TODO: Mark id and providerName as non-optional in schema
-		const database: DatabaseInstallModel = {
+		const database: DatabaseInstallResponseModel = {
 			id: '0',
 			providerName: '',
 			...this._installerContext?.getData().database,
@@ -161,7 +161,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		this._setDatabase(database);
 	}
 
-	private _setDatabase(database: DatabaseInstallModel) {
+	private _setDatabase(database: DatabaseInstallResponseModel) {
 		this._installerContext?.appendData({ database });
 	}
 
@@ -199,7 +199,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 
 			if (selectedDatabase.requiresConnectionTest) {
-				const databaseDetails: DatabaseInstallModel = {
+				const databaseDetails: DatabaseInstallResponseModel = {
 					id,
 					username,
 					password,
@@ -221,7 +221,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				}
 			}
 
-			const database: DatabaseInstallModel = {
+			const database: DatabaseInstallResponseModel = {
 				...this._installerContext?.getData().database,
 				id,
 				username,
@@ -253,7 +253,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		// TODO: The post install will probably return a user in the future, so we have to set that context somewhere to let the client know that it is authenticated
 		console.warn('TODO: Set up real authentication');
 		sessionStorage.setItem('is-authenticated', 'true');
-		history.replaceState(null, '', '/content');
+		history.replaceState(null, '', 'section/content');
 	}
 
 	private _handleRejected(e: ProblemDetailsModel) {
@@ -397,7 +397,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		${this._renderSettings()}
 	`;
 
-	private _renderPreConfiguredDatabase = (database: DatabaseSettingsModel) => html`
+	private _renderPreConfiguredDatabase = (database: DatabaseSettingsPresentationModel) => html`
 		<p>A database has already been pre-configured on the server and will be used:</p>
 		<p>
 			Type: <strong>${database.displayName}</strong>

@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIMarkdownEditorElement } from './property-editor-ui-markdown-editor.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIMarkdownEditorElement', () => {
   let element: UmbPropertyEditorUIMarkdownEditorElement;

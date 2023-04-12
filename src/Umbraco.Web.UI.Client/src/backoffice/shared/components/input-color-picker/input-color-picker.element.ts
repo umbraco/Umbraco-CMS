@@ -3,13 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { SwatchDetails } from '@umbraco-cms/models';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { SwatchDetails } from '@umbraco-cms/backoffice/models';
 
 /*
  * This wraps the UUI library uui-color-swatches component
  * @element umb-input-color-picker
-*/
+ */
 @customElement('umb-input-color-picker')
 export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) {
 	static styles = [UUITextStyles];

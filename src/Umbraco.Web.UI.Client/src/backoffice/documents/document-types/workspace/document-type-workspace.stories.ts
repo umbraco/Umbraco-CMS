@@ -1,6 +1,6 @@
-import './document-type-workspace.element';
+import './document-type-workspace-editor.element';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { treeData } from '../../../../core/mocks/data/document-type.data';
 import type { UmbDocumentTypeWorkspaceElement } from './document-type-workspace.element';
@@ -12,5 +12,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbDocumentTypeWorkspaceElement> = () =>
-	html` <umb-document-type-workspace id="${ifDefined(treeData[0].key)}"></umb-document-type-workspace>`;
+	html` <umb-document-type-workspace id="${ifDefined(treeData[0].id)}"></umb-document-type-workspace>`;
 AAAOverview.storyName = 'Overview';

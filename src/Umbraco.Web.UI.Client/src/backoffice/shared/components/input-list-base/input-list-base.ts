@@ -1,17 +1,17 @@
 import { html } from 'lit';
 import { property } from 'lit/decorators.js';
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
 import {
 	UmbModalContext,
 	UmbModalToken,
 	UmbModalType,
 	UMB_MODAL_CONTEXT_TOKEN,
 	UmbPickerModalData,
-} from '@umbraco-cms/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
+} from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
-export class UmbInputListBase extends UmbLitElement {
+export class UmbInputListBaseElement extends UmbLitElement {
 	@property({ type: Array })
 	public value: Array<string> = [];
 
@@ -51,8 +51,8 @@ export class UmbInputListBase extends UmbLitElement {
 		});
 	}
 
-	protected removeFromSelection(key: string) {
-		this.value = this.value.filter((k) => k !== key);
+	protected removeFromSelection(id: string) {
+		this.value = this.value.filter((k) => k !== id);
 		this.selectionUpdated();
 	}
 

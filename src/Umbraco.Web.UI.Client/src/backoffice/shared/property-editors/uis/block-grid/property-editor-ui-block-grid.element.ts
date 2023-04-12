@@ -1,12 +1,13 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { IRoute, IRoutingInfo } from 'router-slot';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../../shared/components/workspace/workspace-variant/workspace-variant.context';
 import { UmbVariantId } from '../../../../shared/variants/variant-id.class';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../../shared/components/workspace/workspace-variant/workspace-variant.context';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../../shared/components/workspace-property/workspace-property.context';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -38,10 +39,9 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, (context) => {
-			this._variantContext = context;
-			this.observe(this._variantContext?.variantId, (variantId) => {
-				this._variantId = variantId;
+		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (context) => {
+			this.observe(context?.variantId, (propertyVariantId) => {
+				this._variantId = propertyVariantId;
 				this.setupRoutes();
 			});
 		});
@@ -52,11 +52,11 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		if (this._variantId !== undefined) {
 			this._routes = [
 				{
-					path: this._variantId.toString() + '/modal-1',
+					path: 'modal-1',
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+					setup: (component, info) => {
 						console.log('block route', info);
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-1';
@@ -64,12 +64,12 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 					},
 				},
 				{
-					path: this._variantId.toString() + '/modal-2',
+					path: 'modal-2',
 					//pathMatch: 'full',
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+					setup: (component, info) => {
 						console.log('block route', info);
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-2';
@@ -88,17 +88,16 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 					<uui-tab-group slot="tabs">
 						<uui-tab
 							label="TAB 1"
-							href="${this._routerPath + '/' + this._variantId.toString()}/modal-1"
-							.active=${this._routerPath + '/' + this._variantId.toString() + '/modal-1' ===
-							this._activePath}></uui-tab>
+							href="${this._routerPath + '/'}modal-1"
+							.active=${this._routerPath + '/' + 'modal-1' === this._activePath}></uui-tab>
 						<uui-tab
 							label="TAB 2"
-							href="${this._routerPath + '/' + this._variantId.toString()}/modal-2"
-							.active=${this._routerPath + '/' + this._variantId.toString() + '/modal-2' ===
-							this._activePath}></uui-tab>
+							href="${this._routerPath + '/'}modal-2"
+							.active=${this._routerPath + '/' + 'modal-2' === this._activePath}></uui-tab>
 					</uui-tab-group>
 
-					<umb-router-slot
+					<umb-variant-router-slot
+						.variantId=${[this._variantId]}
 						id="router-slot"
 						.routes="${this._routes}"
 						@init=${(event: UmbRouterSlotInitEvent) => {
@@ -107,7 +106,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 						@change=${(event: UmbRouterSlotChangeEvent) => {
 							this._activePath = event.target.localActiveViewPath;
 						}}>
-					</umb-router-slot>
+					</umb-variant-router-slot>
 			  </div>`
 			: 'loading...';
 	}

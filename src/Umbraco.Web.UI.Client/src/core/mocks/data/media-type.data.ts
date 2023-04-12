@@ -1,7 +1,7 @@
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
-import { FolderTreeItemModel, PagedFolderTreeItemModel } from '@umbraco-cms/backend-api';
-import type { MediaTypeDetails } from '@umbraco-cms/models';
+import { FolderTreeItemResponseModel, PagedFolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 
 export const data: Array<MediaTypeDetails> = [
 	{
@@ -9,9 +9,9 @@ export const data: Array<MediaTypeDetails> = [
 		name: 'Media Type 1',
 		type: 'media-type',
 		hasChildren: false,
-		key: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
+		id: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		isFolder: false,
 		icon: '',
 		alias: 'mediaType1',
@@ -22,9 +22,9 @@ export const data: Array<MediaTypeDetails> = [
 		name: 'Media Type 2',
 		type: 'media-type',
 		hasChildren: false,
-		key: '22da1b0b-c310-4730-9912-c30b3eb9802e',
+		id: '22da1b0b-c310-4730-9912-c30b3eb9802e',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		isFolder: false,
 		icon: '',
 		alias: 'mediaType2',
@@ -41,22 +41,22 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedFolderTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+	getTreeRoot(): PagedFolderTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedFolderTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): PagedFolderTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createFolderTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<FolderTreeItemModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<FolderTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createFolderTreeItem(item));
 	}
 }

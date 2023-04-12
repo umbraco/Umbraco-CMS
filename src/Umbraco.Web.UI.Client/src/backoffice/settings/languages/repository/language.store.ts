@@ -1,8 +1,8 @@
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ArrayState } from '@umbraco-cms/observable-api';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>('UmbLanguageStore');
 
@@ -13,14 +13,14 @@ export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageS
  * @description - Details Data Store for Languages
  */
 export class UmbLanguageStore extends UmbStoreBase {
-	#data = new ArrayState<LanguageModel>([], (x) => x.isoCode);
+	#data = new ArrayState<LanguageResponseModel>([], (x) => x.isoCode);
 	data = this.#data.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN.toString());
 	}
 
-	append(language: LanguageModel) {
+	append(language: LanguageResponseModel) {
 		this.#data.append([language]);
 	}
 
@@ -33,4 +33,3 @@ export class UmbLanguageStore extends UmbStoreBase {
 		return this.#data.getObservablePart((items) => items.filter((item) => isoCodes.includes(item.isoCode ?? '')));
 	}
 }
-

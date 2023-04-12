@@ -1,13 +1,13 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import './table.element';
 import { v4 as uuidv4 } from 'uuid';
-import type { UmbTableElement, UmbTableColumn, UmbTableConfig, UmbTableItem } from './table.element'
+import type { UmbTableElement, UmbTableColumn, UmbTableConfig, UmbTableItem } from './table.element';
 
 const meta: Meta<UmbTableElement> = {
-    title: 'Components/Table',
-    component: 'umb-table',
+	title: 'Components/Table',
+	component: 'umb-table',
 };
-  
+
 export default meta;
 type Story = StoryObj<UmbTableElement>;
 
@@ -26,7 +26,7 @@ const columns: Array<UmbTableColumn> = [
 
 const items: Array<UmbTableItem> = [
 	{
-		key: uuidv4(),
+		id: uuidv4(),
 		icon: 'umb:wand',
 		data: [
 			{
@@ -40,7 +40,7 @@ const items: Array<UmbTableItem> = [
 		],
 	},
 	{
-		key: uuidv4(),
+		id: uuidv4(),
 		icon: 'umb:document',
 		data: [
 			{
@@ -54,7 +54,7 @@ const items: Array<UmbTableItem> = [
 		],
 	},
 	{
-		key: uuidv4(),
+		id: uuidv4(),
 		icon: 'umb:user',
 		data: [
 			{
@@ -70,35 +70,34 @@ const items: Array<UmbTableItem> = [
 ];
 
 export const Overview: Story = {
-    args: {
+	args: {
 		items: items,
 		columns: columns,
 		config: {
 			allowSelection: true,
 			hideIcon: false,
-		}
-    }
+		},
+	},
 };
 
-
 export const WithDisallowedSelections: Story = {
-    args: {
+	args: {
 		items: items,
 		columns: columns,
 		config: {
 			allowSelection: false,
 			hideIcon: false,
-		}
-    }
+		},
+	},
 };
 
 export const WithHiddenIcons: Story = {
-    args: {
+	args: {
 		items: items,
 		columns: columns,
 		config: {
 			allowSelection: true,
 			hideIcon: true,
-		}
-    }
+		},
+	},
 };

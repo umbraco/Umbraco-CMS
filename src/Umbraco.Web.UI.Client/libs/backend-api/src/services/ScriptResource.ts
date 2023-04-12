@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FileSystemTreeItemModel } from '../models/FileSystemTreeItemModel';
-import type { PagedFileSystemTreeItemModel } from '../models/PagedFileSystemTreeItemModel';
+import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
+import type { ScriptItemResponseModel } from '../models/ScriptItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,7 +11,25 @@ import { request as __request } from '../core/request';
 export class ScriptResource {
 
     /**
-     * @returns PagedFileSystemTreeItemModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getScriptItem({
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<ScriptItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/script/item',
+            query: {
+                'path': path,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreeScriptChildren({
@@ -22,7 +40,7 @@ export class ScriptResource {
         path?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedFileSystemTreeItemModel> {
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/children',
@@ -35,25 +53,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeScriptItem({
-        path,
-    }: {
-        path?: Array<string>,
-    }): CancelablePromise<Array<FileSystemTreeItemModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/script/item',
-            query: {
-                'path': path,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedFileSystemTreeItemModel Success
+     * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreeScriptRoot({
@@ -62,7 +62,7 @@ export class ScriptResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedFileSystemTreeItemModel> {
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/root',

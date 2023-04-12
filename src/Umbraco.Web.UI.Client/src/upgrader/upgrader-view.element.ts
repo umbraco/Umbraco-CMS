@@ -1,14 +1,14 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UpgradeSettingsModel } from '@umbraco-cms/backend-api';
+import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-upgrader-view
  * @fires {CustomEvent<SubmitEvent>} onAuthorizeUpgrade - fires when the user clicks the continue button
  */
 @customElement('umb-upgrader-view')
-export class UmbUpgraderView extends LitElement {
+export class UmbUpgraderViewElement extends LitElement {
 	static styles: CSSResultGroup = [
 		css`
 			.center {
@@ -32,7 +32,7 @@ export class UmbUpgraderView extends LitElement {
 	errorMessage = '';
 
 	@property({ type: Object, reflect: true })
-	settings?: UpgradeSettingsModel;
+	settings?: UpgradeSettingsResponseModel;
 
 	private _renderLayout() {
 		return html`
@@ -100,10 +100,10 @@ export class UmbUpgraderView extends LitElement {
 	};
 }
 
-export default UmbUpgraderView;
+export default UmbUpgraderViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-upgrader-view': UmbUpgraderView;
+		'umb-upgrader-view': UmbUpgraderViewElement;
 	}
 }

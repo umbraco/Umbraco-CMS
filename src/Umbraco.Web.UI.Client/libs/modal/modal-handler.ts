@@ -1,19 +1,22 @@
-import type { UUIDialogElement } from '@umbraco-ui/uui';
-import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
-import { UUIModalSidebarElement, UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type {
+	UUIDialogElement,
+	UUIModalDialogElement,
+	UUIModalSidebarElement,
+	UUIModalSidebarSize,
+} from '@umbraco-ui/uui';
 import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject } from 'rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ManifestModal } from '@umbraco-cms/extensions-registry';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
  */
-export type UmbModalHandler<ModalData = unknown, ModalResult = unknown> = Omit<
+export type UmbModalHandler<ModalData extends object = object, ModalResult = any> = Omit<
 	UmbModalHandlerClass<ModalData, ModalResult>,
 	'submit'
 > &
@@ -35,15 +38,15 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 	  };
 
 //TODO consider splitting this into two separate handlers
-export class UmbModalHandlerClass<ModalData, ModalResult> {
+export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> {
 	private _submitPromise: Promise<ModalResult>;
 	private _submitResolver?: (value: ModalResult) => void;
 	private _submitRejecter?: () => void;
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 
-	#innerElement = new BehaviorSubject<any | undefined>(undefined);
+	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
 
 	#modalElement?: UUIModalSidebarElement | UUIDialogElement;
@@ -53,7 +56,7 @@ export class UmbModalHandlerClass<ModalData, ModalResult> {
 	public size: UUIModalSidebarSize = 'small';
 
 	constructor(
-		host: UmbControllerHostInterface,
+		host: UmbControllerHostElement,
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig
@@ -103,7 +106,7 @@ export class UmbModalHandlerClass<ModalData, ModalResult> {
 		const innerElement = (await createExtensionElement(manifest)) as any;
 
 		if (innerElement) {
-			innerElement.data = data; //
+			innerElement.data = data;
 			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
 		}
@@ -111,7 +114,7 @@ export class UmbModalHandlerClass<ModalData, ModalResult> {
 		return innerElement;
 	}
 
-	// note, this methods argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
+	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
 	private submit(result?: ModalResult) {
 		this._submitResolver?.(result as ModalResult);
 		this.modalElement.close();
@@ -137,22 +140,25 @@ export class UmbModalHandlerClass<ModalData, ModalResult> {
 			async (manifest) => {
 				if (manifest) {
 					const innerElement = await this.#createInnerElement(manifest, data);
-					this.#appendInnerElement(innerElement);
-				} else {
-					this.#removeInnerElement();
+					if (innerElement) {
+						this.#appendInnerElement(innerElement);
+						return;
+					}
 				}
+				this.#removeInnerElement();
 			}
 		);
 	}
 
-	#appendInnerElement(element: any) {
+	#appendInnerElement(element: HTMLElement) {
 		this.#modalElement?.appendChild(element);
 		this.#innerElement.next(element);
 	}
 
 	#removeInnerElement() {
-		if (this.#innerElement.getValue()) {
-			this.#modalElement?.removeChild(this.#innerElement.getValue());
+		const innerElement = this.#innerElement.getValue();
+		if (innerElement) {
+			this.#modalElement?.removeChild(innerElement);
 			this.#innerElement.next(undefined);
 		}
 	}

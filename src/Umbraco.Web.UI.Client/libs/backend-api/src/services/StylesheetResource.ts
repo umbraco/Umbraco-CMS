@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FileSystemTreeItemModel } from '../models/FileSystemTreeItemModel';
-import type { PagedFileSystemTreeItemModel } from '../models/PagedFileSystemTreeItemModel';
+import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
+import type { ScriptItemResponseModel } from '../models/ScriptItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,7 +11,25 @@ import { request as __request } from '../core/request';
 export class StylesheetResource {
 
     /**
-     * @returns PagedFileSystemTreeItemModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getStylesheetItem({
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<ScriptItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/stylesheet/item',
+            query: {
+                'path': path,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreeStylesheetChildren({
@@ -22,7 +40,7 @@ export class StylesheetResource {
         path?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedFileSystemTreeItemModel> {
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/stylesheet/children',
@@ -35,25 +53,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeStylesheetItem({
-        path,
-    }: {
-        path?: Array<string>,
-    }): CancelablePromise<Array<FileSystemTreeItemModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/stylesheet/item',
-            query: {
-                'path': path,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedFileSystemTreeItemModel Success
+     * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreeStylesheetRoot({
@@ -62,7 +62,7 @@ export class StylesheetResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedFileSystemTreeItemModel> {
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/stylesheet/root',

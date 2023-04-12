@@ -9,7 +9,6 @@ import type {
 	ManifestHealthCheck,
 	ManifestMenu,
 	ManifestMenuItem,
-	ManifestMenuSectionSidebarApp,
 	ManifestPackageView,
 	ManifestPropertyAction,
 	ManifestPropertyEditorModel,
@@ -19,7 +18,6 @@ import type {
 	ManifestSectionSidebarApp,
 	ManifestSectionView,
 	ManifestTheme,
-	ManifestUserDashboard,
 	ManifestWorkspace,
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
@@ -42,11 +40,9 @@ export type ManifestJSONTypes =
 	| ManifestSection
 	| ManifestSectionSidebarApp
 	| ManifestSectionView
-	| ManifestMenuSectionSidebarApp
 	| ManifestMenu
 	| ManifestMenuItem
 	| ManifestTheme
-	| ManifestUserDashboard
 	| ManifestWorkspace
 	| ManifestWorkspaceView
 	| ManifestWorkspaceViewCollection;

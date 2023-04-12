@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute, IRoutingInfo } from '@umbraco-cms/router';
-import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/models';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-created-packages-section-view')
 export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
@@ -23,7 +23,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: any[] = [
+		const routes: IRoute[] = [
 			{
 				path: 'overview',
 				component: () => import('./packages-created-overview.element'),
@@ -33,12 +33,12 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 		// TODO: find a way to make this reuseable across:
 		this._workspaces?.map((workspace: ManifestWorkspace) => {
 			routes.push({
-				path: `${workspace.meta.entityType}/:key`,
+				path: `${workspace.meta.entityType}/:id`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
-					component.then((el: HTMLElement) => {
-						(el as any).entityKey = info.match.params.key;
-					});
+				setup: (component, info) => {
+					if (component) {
+						(component as any).entityId = info.match.params.id;
+					}
 				},
 			});
 			routes.push({

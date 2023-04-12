@@ -15,11 +15,11 @@ import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../../user-groups/repository/user-group.store';
-import type { UserDetails, UserGroupEntity } from '@umbraco-cms/models';
+import type { UserDetails, UserGroupEntity } from '@umbraco-cms/backoffice/models';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-view-users-table')
 export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
@@ -27,9 +27,13 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 		UUITextStyles,
 		css`
 			:host {
-				height: 100%;
 				display: flex;
 				flex-direction: column;
+			}
+
+			umb-table {
+				padding: 0;
+				margin: 0 var(--uui-size-layout-1) var(--uui-size-layout-1);
 			}
 		`,
 	];
@@ -115,10 +119,10 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 		});
 	}
 
-	private _getUserGroupNames(keys: Array<string>) {
-		return keys
-			.map((key: string) => {
-				return this._userGroups.find((x) => x.key === key)?.name;
+	private _getUserGroupNames(ids: Array<string>) {
+		return ids
+			.map((id: string) => {
+				return this._userGroups.find((x) => x.id === id)?.name;
 			})
 			.join(', ');
 	}
@@ -126,7 +130,7 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 	private _createTableItems(users: Array<UserDetails>) {
 		this._tableItems = users.map((user) => {
 			return {
-				key: user.key,
+				id: user.id,
 				icon: 'umb:user',
 				data: [
 					{

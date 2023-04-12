@@ -1,74 +1,46 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbWorkspaceEntityElement } from '../../../../shared/components/workspace/workspace-entity-element.interface';
 import { UmbLanguageWorkspaceContext } from './language-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
+import './language-workspace-edit.element';
 
 @customElement('umb-language-workspace')
-export class UmbLanguageWorkspaceElement extends UmbLitElement implements UmbWorkspaceEntityElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-space-6);
-				gap: var(--uui-size-space-4);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
-
-	@state()
-	_language?: LanguageModel;
+export class UmbLanguageWorkspaceElement extends UmbLitElement {
+	static styles = [UUITextStyles, css``];
 
 	#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this);
+	#element = document.createElement('umb-language-workspace-edit');
 
-	constructor() {
-		super();
+	#routerPath? = '';
 
-		this.observe(this.#languageWorkspaceContext.data, (data) => {
-			this._language = data;
-		});
-	}
-
-	load(key: string): void {
-		this.#languageWorkspaceContext.load(key);
-	}
-
-	create(): void {
-		this.#languageWorkspaceContext.createScaffold();
-	}
-
-	#handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#languageWorkspaceContext?.setName(target.value);
-			}
-		}
-	}
+	@state()
+	_routes: IRoute[] = [
+		{
+			path: 'edit/:isoCode',
+			component: () => this.#element,
+			setup: (_component, info) => {
+				this.#languageWorkspaceContext.load(info.match.params.isoCode);
+			},
+		},
+		{
+			path: 'create',
+			component: () => this.#element,
+			setup: () => {
+				this.#languageWorkspaceContext.createScaffold();
+			},
+		},
+	];
 
 	render() {
-		if (!this._language) return nothing;
-
-		return html`
-			<umb-workspace-layout alias="Umb.Workspace.Language">
-				<div id="header" slot="header">
-					<uui-button href="/section/settings/language-root" compact>
-						<uui-icon name="umb:arrow-left"></uui-icon>
-					</uui-button>
-					<uui-input value=${ifDefined(this._language.name)} @input="${this.#handleInput}"></uui-input>
-				</div>
-			</umb-workspace-layout>
-		`;
+		return html`<umb-router-slot
+			.routes=${this._routes}
+			@init=${(event: UmbRouterSlotInitEvent) => {
+				this.#routerPath = event.target.absoluteRouterPath;
+			}}></umb-router-slot>`;
 	}
 }
 

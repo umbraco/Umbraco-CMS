@@ -1,35 +1,34 @@
-import {
-	ContentTreeItemModel,
-	DictionaryItemTranslationModel,
-	EntityTreeItemModel,
-	FolderTreeItemModel,
-	PackageManifestModel,
-	ProblemDetailsModel,
-} from '@umbraco-cms/backend-api';
-
-// Extension Manifests
-export * from '@umbraco-cms/extensions-registry';
+import type {
+	EntityTreeItemResponseModel,
+	FolderTreeItemResponseModel,
+	PackageManifestResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ClassConstructor<T> = new (...args: any[]) => T;
+
 // Users
-// TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentKey.
+// TODO: would the right name be Node? as entity is just something with a Key. But node is something in a content structure, aka. with hasChildren and parentId.
 export interface Entity {
-	key: string;
+	id: string;
 	name: string;
 	icon: string;
 	type: string;
 	hasChildren: boolean;
-	parentKey: string | null;
+	parentId: string | null;
 }
 
-export interface ContentDetails extends ContentTreeItemModel {
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	//data: Array<ContentPropertyData>;
-	//layout?: any; // TODO: define layout type - make it non-optional
-}
+/** Tried to find a common base of our entities — used by Entity Workspace Context */
+export type BaseEntity = {
+	id?: string;
+	//alias?: string;
+	name?: string;
+	//icon?: string;
+	//properties?: Array<PropertyTypeResponseModelBaseModel>;
+};
 
 export interface UserEntity extends Entity {
 	type: 'user';
@@ -62,77 +61,33 @@ export interface UserGroupDetails extends UserGroupEntity {
 	permissions: Array<string>;
 }
 
-/*
-// Data Types
-export interface DataTypeDetails extends FolderTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	propertyEditorAlias: string | null;
-	propertyEditorUiAlias: string | null;
-	data: Array<DataTypeProperty>;
-}
-
-export interface DataTypeProperty {
-	alias: string;
-	value: any;
-}
-*/
-
 // TODO: Make sure Entity Type/interface.
-export interface MemberTypeDetails extends EntityTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
+export interface MemberTypeDetails extends EntityTreeItemResponseModel {
+	id: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
-// Content
-export interface ContentProperty {
-	alias: string;
-	label: string;
-	description: string;
-	dataTypeKey: string;
-}
-
-export interface ContentPropertyData {
-	alias: string;
-	value: any;
-}
-
-// Media
-export interface MediaDetails extends ContentTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	isTrashed: boolean; // TODO: remove only temp part of refactor
-	properties: Array<ContentProperty>;
-	data: Array<ContentPropertyData>;
-	variants: Array<any>; // TODO: define variant data
-	//layout?: any; // TODO: define layout type - make it non-optional
-}
-
 // Media Types
 
-export interface MediaTypeDetails extends FolderTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
+export interface MediaTypeDetails extends FolderTreeItemResponseModel {
+	id: string; // TODO: Remove this when the backend is fixed
 	alias: string;
 	properties: [];
 }
 
 // Member Groups
-export interface MemberGroupDetails extends EntityTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
+export interface MemberGroupDetails extends EntityTreeItemResponseModel {
+	id: string; // TODO: Remove this when the backend is fixed
 }
 
-export interface MemberDetails extends EntityTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-}
-
-// Dictionary
-export interface DictionaryDetails extends EntityTreeItemModel {
-	key: string; // TODO: Remove this when the backend is fixed
-	translations: DictionaryItemTranslationModel[];
+export interface MemberDetails extends EntityTreeItemResponseModel {
+	id: string; // TODO: Remove this when the backend is fixed
 }
 
 // Document Blueprint
 export interface DocumentBlueprintDetails {
-	key: string;
+	id: string;
 	name: string;
 	type: 'document-blueprint';
 	properties: Array<any>;
@@ -141,17 +96,12 @@ export interface DocumentBlueprintDetails {
 	documentTypeKey: string;
 }
 
-export interface DataSourceResponse<T = undefined> {
-	data?: T;
-	error?: ProblemDetailsModel;
-}
-
 export interface SwatchDetails {
 	label: string;
 	value: string;
 }
 
-export type UmbPackage = PackageManifestModel;
+export type UmbPackage = PackageManifestResponseModel;
 
 export type PackageManifestResponse = UmbPackage[];
 

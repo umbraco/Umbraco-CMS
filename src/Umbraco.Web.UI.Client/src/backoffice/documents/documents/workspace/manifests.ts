@@ -1,14 +1,13 @@
-import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
 import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
 import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
-} from '@umbraco-cms/models';
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -25,27 +24,30 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		loader: () => import('./views/document-workspace-view-edit.element'),
+		loader: () => import('./views/edit/document-workspace-view-edit.element'),
 		weight: 200,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Content',
 			pathname: 'content',
 			icon: 'document',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
-		loader: () =>
-			import('../../../shared/components/workspace/workspace-content/views/info/workspace-view-content-info.element'),
+		loader: () => import('./views/info/document-info-workspace-view.element'),
 		weight: 100,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 ];
@@ -59,13 +61,15 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 		name: 'Document Workspace Collection View',
 		weight: 300,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Documents',
 			pathname: 'collection',
 			icon: 'umb:grid',
 			entityType: 'document',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
+		}
 	},
 	*/
 ];
@@ -77,11 +81,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save And Publish Document Workspace Action',
 		weight: 100,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Publish',
 			look: 'primary',
 			color: 'positive',
 			api: UmbDocumentSaveAndPublishWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 	{
@@ -90,10 +96,12 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save Document Workspace Action',
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save',
 			look: 'secondary',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 	{
@@ -102,9 +110,11 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save And Preview Document Workspace Action',
 		weight: 80,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Preview',
 			api: UmbDocumentSaveAndPreviewWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 	{
@@ -113,9 +123,11 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save And Schedule Document Workspace Action',
 		weight: 70,
 		meta: {
-			workspaces: ['Umb.Workspace.Document'],
 			label: 'Save And Schedule',
 			api: UmbSaveAndScheduleDocumentWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Document'],
 		},
 	},
 ];

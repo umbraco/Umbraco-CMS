@@ -1,21 +1,21 @@
 import { UmbLanguageServerDataSource } from './sources/language.server.data';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
-import { LanguageModel, ProblemDetailsModel } from '@umbraco-cms/backend-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbLanguageRepository {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	#dataSource: UmbLanguageServerDataSource;
 	#languageStore?: UmbLanguageStore;
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		this.#dataSource = new UmbLanguageServerDataSource(this.#host);
@@ -84,7 +84,7 @@ export class UmbLanguageRepository {
 		return this.#dataSource.createScaffold();
 	}
 
-	async create(language: LanguageModel) {
+	async create(language: LanguageResponseModel) {
 		await this.#init;
 
 		const { error } = await this.#dataSource.insert(language);
@@ -104,10 +104,12 @@ export class UmbLanguageRepository {
 	 * @return {*}
 	 * @memberof UmbLanguageRepository
 	 */
-	async save(language: LanguageModel) {
+	async save(language: LanguageResponseModel) {
+		if (!language.isoCode) throw new Error('Language iso code is missing');
+
 		await this.#init;
 
-		const { error } = await this.#dataSource.update(language);
+		const { error } = await this.#dataSource.update(language.isoCode, language);
 
 		if (!error) {
 			const notification = { data: { message: `Language saved` } };

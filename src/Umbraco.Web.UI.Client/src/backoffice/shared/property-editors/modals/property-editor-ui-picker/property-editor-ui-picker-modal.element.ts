@@ -4,11 +4,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash-es';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult } from '.';
-import type { UmbModalHandler } from '@umbraco-cms/modal';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import {
+	UmbPropertyEditorUIPickerModalData,
+	UmbPropertyEditorUIPickerModalResult,
+} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUI>;

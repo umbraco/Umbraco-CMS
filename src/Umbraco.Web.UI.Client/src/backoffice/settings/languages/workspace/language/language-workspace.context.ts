@@ -1,18 +1,22 @@
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
-import type { LanguageModel } from '@umbraco-cms/backend-api';
-import { ObjectState } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
-export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguageRepository> {
-	#data = new ObjectState<LanguageModel | undefined>(undefined);
+export class UmbLanguageWorkspaceContext
+	extends UmbWorkspaceContext<UmbLanguageRepository, LanguageResponseModel>
+	implements UmbEntityWorkspaceContextInterface
+{
+	#data = new ObjectState<LanguageResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	// TODO: this is a temp solution to bubble validation errors to the UI
 	#validationErrors = new ObjectState<any | undefined>(undefined);
 	validationErrors = this.#validationErrors.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbLanguageRepository(host));
 	}
 
@@ -29,6 +33,7 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.update(data);
+		return { data };
 	}
 
 	getData() {
@@ -37,6 +42,11 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 
 	getEntityType() {
 		return 'language';
+	}
+
+	// TODO: Convert to uniques:
+	getEntityId() {
+		return this.#data.getValue()?.isoCode;
 	}
 
 	setName(name: string) {
@@ -63,6 +73,10 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 	setValidationErrors(errorMap: any) {
 		// TODO: I can't use the update method to set the value to undefined
 		this.#validationErrors.next(errorMap);
+	}
+
+	async save() {
+		throw new Error('Save method not implemented.');
 	}
 
 	destroy(): void {

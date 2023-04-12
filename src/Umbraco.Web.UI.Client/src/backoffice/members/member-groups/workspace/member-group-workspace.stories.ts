@@ -1,7 +1,7 @@
 import './member-group-workspace.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import { data } from '../../../../core/mocks/data/member-group.data';
 
@@ -14,5 +14,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbMemberGroupWorkspaceElement> = () =>
-	html` <umb-member-group-workspace id="${data[0].key}"></umb-member-group-workspace>`;
+	html` <umb-member-group-workspace id="${data[0].id}"></umb-member-group-workspace>`;
 AAAOverview.storyName = 'Overview';

@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { ManifestWorkspaceAction } from '@umbraco-cms/models';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
 
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-workspace-footer-layout
@@ -16,7 +16,7 @@ import { UmbLitElement } from '@umbraco-cms/element';
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-footer-layout')
-export class UmbWorkspaceFooterLayout extends UmbLitElement {
+export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -61,7 +61,7 @@ export class UmbWorkspaceFooterLayout extends UmbLitElement {
 				<umb-extension-slot
 					slot="actions"
 					type="workspaceAction"
-					.filter=${(extension: ManifestWorkspaceAction) => extension.meta.workspaces.includes(this.alias)}
+					.filter=${(extension: ManifestWorkspaceAction) => extension.conditions.workspaces.includes(this.alias)}
 					default-element="umb-workspace-action"></umb-extension-slot>
 				<slot name="actions" slot="actions"></slot>
 			</umb-footer-layout>
@@ -71,6 +71,6 @@ export class UmbWorkspaceFooterLayout extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-footer-layout': UmbWorkspaceFooterLayout;
+		'umb-workspace-footer-layout': UmbWorkspaceFooterLayoutElement;
 	}
 }

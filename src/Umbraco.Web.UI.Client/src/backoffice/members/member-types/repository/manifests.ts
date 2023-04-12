@@ -1,7 +1,7 @@
 import { UmbMemberTypeRepository } from './member-type.repository';
 import { UmbMemberTypeStore } from './member-type.store';
 import { UmbMemberTypeTreeStore } from './member-type.tree.store';
-import type { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/extensions-registry';
+import type { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const MEMBER_TYPES_REPOSITORY_ALIAS = 'Umb.Repository.MemberType';
 

@@ -1,19 +1,19 @@
 import { UmbLanguageRepository } from '../repository/language.repository';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbAppLanguageContext {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 	#languageRepository: UmbLanguageRepository;
 
-	#languages: Array<LanguageModel> = [];
+	#languages: Array<LanguageResponseModel> = [];
 
-	#appLanguage = new ObjectState<LanguageModel | undefined>(undefined);
+	#appLanguage = new ObjectState<LanguageResponseModel | undefined>(undefined);
 	appLanguage = this.#appLanguage.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		this.#languageRepository = new UmbLanguageRepository(this.#host);
 		this.#observeLanguages();

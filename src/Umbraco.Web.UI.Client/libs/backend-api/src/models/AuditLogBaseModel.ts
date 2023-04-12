@@ -5,8 +5,8 @@
 import type { AuditTypeModel } from './AuditTypeModel';
 
 export type AuditLogBaseModel = {
-    userKey?: string;
-    entityKey?: string | null;
+    userId?: string;
+    entityId?: string | null;
     timestamp?: string;
     logType?: AuditTypeModel;
     entityType?: string | null;

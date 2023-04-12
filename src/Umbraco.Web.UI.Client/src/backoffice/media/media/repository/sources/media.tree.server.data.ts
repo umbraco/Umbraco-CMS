@@ -1,7 +1,7 @@
-import type { RepositoryTreeDataSource } from '../../../../../../libs/repository/repository-tree-data-source.interface';
-import { ProblemDetailsModel, MediaResource } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { ProblemDetailsModel, MediaResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Media tree that fetches data from the server
@@ -9,17 +9,17 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @class MediaTreeServerDataSource
  * @implements {MediaTreeDataSource}
  */
-export class MediaTreeServerDataSource implements RepositoryTreeDataSource {
-	#host: UmbControllerHostInterface;
+export class MediaTreeServerDataSource implements UmbTreeDataSource {
+	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
-	async trashItems(keys: Array<string>) {
+	async trashItems(ids: Array<string>) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/trash', {
 				method: 'POST',
-				body: JSON.stringify(keys),
+				body: JSON.stringify(ids),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -27,13 +27,13 @@ export class MediaTreeServerDataSource implements RepositoryTreeDataSource {
 		);
 	}
 
-	async moveItems(keys: Array<string>, destination: string) {
+	async moveItems(ids: Array<string>, destination: string) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/move', {
 				method: 'POST',
-				body: JSON.stringify({ keys, destination }),
+				body: JSON.stringify({ ids, destination }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -43,10 +43,10 @@ export class MediaTreeServerDataSource implements RepositoryTreeDataSource {
 
 	/**
 	 * Creates an instance of MediaTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof MediaTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -60,33 +60,33 @@ export class MediaTreeServerDataSource implements RepositoryTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MediaTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			MediaResource.getTreeMediaChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof MediaTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys) {
+	async getItems(ids: Array<string>) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
@@ -94,7 +94,7 @@ export class MediaTreeServerDataSource implements RepositoryTreeDataSource {
 		return tryExecuteAndNotify(
 			this.#host,
 			MediaResource.getTreeMediaItem({
-				key: keys,
+				id: ids,
 			})
 		);
 	}

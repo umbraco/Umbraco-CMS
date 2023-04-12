@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIBooleanInputEvent } from '@umbraco-ui/uui';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-checkbox-list')
 export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement) {
@@ -20,6 +20,7 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	/**
 	 * List of items.
 	 */
+	// TODO: Could this use a type that we export to ensure TS failure,  or hook this up with a type coming from backend?
 	@property()
 	public list: Array<{ key: string; checked: boolean; value: string }> = [];
 

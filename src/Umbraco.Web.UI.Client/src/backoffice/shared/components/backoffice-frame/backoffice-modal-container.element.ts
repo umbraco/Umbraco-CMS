@@ -2,11 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalHandler, UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-modal-container')
-export class UmbBackofficeModalContainer extends UmbLitElement {
+export class UmbBackofficeModalContainerElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -49,6 +49,6 @@ export class UmbBackofficeModalContainer extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-modal-container': UmbBackofficeModalContainer;
+		'umb-backoffice-modal-container': UmbBackofficeModalContainerElement;
 	}
 }

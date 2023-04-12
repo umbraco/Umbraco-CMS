@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { umbTemplateData } from '../data/template.data';
-import { umbracoPath } from '@umbraco-cms/utils';
-import { TemplateCreateModel, TemplateUpdateModel } from '@umbraco-cms/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { TemplateModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: add schema
 export const handlers = [
@@ -11,18 +11,18 @@ export const handlers = [
 	}),
 
 	rest.get(umbracoPath('/tree/template/children'), (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
 
-		const response = umbTemplateData.getTreeItemChildren(parentKey);
+		const response = umbTemplateData.getTreeItemChildren(parentId);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get(umbracoPath('/tree/template/item'), (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
 
-		const items = umbTemplateData.getTreeItem(keys);
+		const items = umbTemplateData.getTreeItem(ids);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
@@ -34,24 +34,24 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath('/template/:key'), (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get(umbracoPath('/template/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const response = umbTemplateData.getByKey(key);
+		const response = umbTemplateData.getById(id);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.put<TemplateUpdateModel>(umbracoPath('/template/:key'), async (req, res, ctx) => {
-		const key = req.params.key as string;
+	rest.put<TemplateModelBaseModel>(umbracoPath('/template/:id'), async (req, res, ctx) => {
+		const id = req.params.id as string;
 		const data = await req.json();
-		if (!key) return;
+		if (!id) return;
 
 		umbTemplateData.update(data);
 		return res(ctx.status(200));
 	}),
 
-	rest.post<TemplateCreateModel>(umbracoPath('/template'), async (req, res, ctx) => {
+	rest.post<TemplateModelBaseModel>(umbracoPath('/template'), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 

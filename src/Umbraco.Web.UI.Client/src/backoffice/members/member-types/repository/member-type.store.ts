@@ -1,8 +1,8 @@
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ArrayState } from '@umbraco-cms/observable-api';
-import type { MemberTypeDetails } from '@umbraco-cms/models';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 
 /**
  * @export
@@ -11,9 +11,9 @@ import type { MemberTypeDetails } from '@umbraco-cms/models';
  * @description - Data Store for Member Types
  */
 export class UmbMemberTypeStore extends UmbStoreBase {
-	#data = new ArrayState<MemberTypeDetails>([], (x) => x.key);
+	#data = new ArrayState<MemberTypeDetails>([], (x) => x.id);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN.toString());
 	}
 

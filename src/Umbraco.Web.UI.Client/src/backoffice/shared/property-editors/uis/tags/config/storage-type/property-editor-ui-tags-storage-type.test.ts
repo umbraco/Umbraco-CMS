@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUITagsStorageTypeElement } from './property-editor-ui-tags-storage-type.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUITagsStorageTypeElement', () => {
   let element: UmbPropertyEditorUITagsStorageTypeElement;

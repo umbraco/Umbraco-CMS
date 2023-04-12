@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-tree-context-menu-service')
-export class UmbTreeContextMenuService extends UmbLitElement {
+export class UmbTreeContextMenuServiceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -92,12 +92,12 @@ export class UmbTreeContextMenuService extends UmbLitElement {
 	}
 }
 
-export const UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuService>(
+export const UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuServiceElement>(
 	'UmbTreeContextMenuService'
 );
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-context-menu-service': UmbTreeContextMenuService;
+		'umb-tree-context-menu-service': UmbTreeContextMenuServiceElement;
 	}
 }

@@ -1,10 +1,11 @@
 import { ReplaySubject } from 'rxjs';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbStoreBase } from '@umbraco-cms/store';
-import type { ManifestBase, UmbPackage } from '@umbraco-cms/models';
-import type { PackageMigrationStatusModel } from '@umbraco-cms/backend-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import type { UmbPackage } from '@umbraco-cms/backoffice/models';
+import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('UmbPackageStore');
 
@@ -22,7 +23,7 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	#extensions = new ArrayState<ManifestBase>([], (e) => e.alias);
 
-	#migrations = new ArrayState<PackageMigrationStatusModel>([], (e) => e.packageName);
+	#migrations = new ArrayState<PackageMigrationStatusResponseModel>([], (e) => e.packageName);
 
 	/**
 	 * Observable of packages with extensions
@@ -37,10 +38,10 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of PackageStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof PackageStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_PACKAGE_STORE_TOKEN.toString());
 	}
 
@@ -56,7 +57,7 @@ export class UmbPackageStore extends UmbStoreBase {
 		this.#extensions.append(extensions);
 	}
 
-	appendMigrations(migrations: PackageMigrationStatusModel[]) {
+	appendMigrations(migrations: PackageMigrationStatusResponseModel[]) {
 		this.#migrations.append(migrations);
 	}
 }

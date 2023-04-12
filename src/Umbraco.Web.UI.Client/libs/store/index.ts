@@ -1,4 +1,5 @@
-export * from './icon/icon.store';
 export * from './store';
 export * from './store-base';
-export * from './tree-store-base';
+export * from './entity-tree-store';
+export * from './file-system-tree.store';
+export * from './tree-store.interface';

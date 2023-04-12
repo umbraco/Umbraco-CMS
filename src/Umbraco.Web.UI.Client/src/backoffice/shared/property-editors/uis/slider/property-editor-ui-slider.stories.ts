@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import type { UmbPropertyEditorUISliderElement } from './property-editor-ui-slider.element';
 import './property-editor-ui-slider.element';

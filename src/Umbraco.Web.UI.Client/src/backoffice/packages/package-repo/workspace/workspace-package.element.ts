@@ -15,27 +15,27 @@ export class UmbWorkspacePackageElement extends LitElement {
 	];
 
 	@property()
-	entityKey?: string;
+	entityId?: string;
 
 	@state()
 	_package?: any;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		if (this.entityKey) this._getPackageData();
+		if (this.entityId) this._getPackageData();
 	}
 
 	private _getPackageData() {
 		//TODO
 
 		this._package = {
-			key: this.entityKey,
+			id: this.entityId,
 			name: 'A created package',
 		};
 	}
 
 	private _navigateBack() {
-		window.history.pushState({}, '', '/section/packages/view/installed');
+		window.history.pushState({}, '', 'section/packages/view/installed');
 	}
 
 	private _renderHeader() {

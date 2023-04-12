@@ -1,16 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UMB_CONTEXT_DEBUGGER_MODAL_TOKEN } from './modals/debug';
-import { UmbContextDebugRequest } from '@umbraco-cms/context-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+
+import { contextData, DebugContextData, DebugContextItemData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalContext, UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
-export class UmbDebug extends UmbLitElement {
+export class UmbDebugElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				float: right;
+			}
+
 			#container {
 				display: block;
 				font-family: monospace;
@@ -54,13 +58,13 @@ export class UmbDebug extends UmbLitElement {
 	];
 
 	@property({ reflect: true, type: Boolean })
-	enabled = false;
+	visible = false;
 
 	@property({ reflect: true, type: Boolean })
 	dialog = false;
 
-	@property()
-	contexts = new Map();
+	@state()
+	contextData = Array<DebugContextData>();
 
 	@state()
 	private _debugPaneOpen = false;
@@ -85,13 +89,16 @@ export class UmbDebug extends UmbLitElement {
 				// to the root of <umb-app> which then uses the callback prop
 				// of the this event tha has been raised to assign the contexts
 				// back to this property of the WebComponent
-				this.contexts = contexts;
+				
+				// Massage the data into a simplier array of objects
+				// From a function in the context-api '
+				this.contextData = contextData(contexts);
 			})
 		);
 	}
 
 	render() {
-		if (this.enabled) {
+		if (this.visible) {
 			return this.dialog ? this._renderDialog() : this._renderPanel();
 		} else {
 			return nothing;
@@ -103,7 +110,7 @@ export class UmbDebug extends UmbLitElement {
 	}
 
 	private _openDialog() {
-		this._modalContext?.open(UMB_CONTEXT_DEBUGGER_MODAL_TOKEN, {
+		this._modalContext?.open(UMB_CONTEXT_DEBUGGER_MODAL, {
 			content: html`${this._renderContextAliases()}`,
 		});
 	}
@@ -132,40 +139,39 @@ export class UmbDebug extends UmbLitElement {
 			</div>
 		</div>`;
 	}
-
+	
 	private _renderContextAliases() {
 		const contextsTemplates: TemplateResult[] = [];
 
-		for (const [alias, instance] of this.contexts) {
+		this.contextData.forEach((contextData) => {
 			contextsTemplates.push(
 				html` <li>
-					Context: <strong>${alias}</strong>
-					<em>(${typeof instance})</em>
+					Context: <strong>${contextData.alias}</strong>
+					<em>(${contextData.type})</em>
 					<ul>
-						${this._renderInstance(instance)}
+						${this._renderInstance(contextData.data)}
 					</ul>
 				</li>`
 			);
-		}
+		});
 
 		return contextsTemplates;
 	}
 
-	private _renderInstance(instance: any) {
+	private _renderInstance(instance: DebugContextItemData) {
 		const instanceTemplates: TemplateResult[] = [];
-
-		// TODO: WB - Maybe make this a switch statement?
-		if (typeof instance === 'function') {
+		
+		if(instance.type === 'function'){
 			return instanceTemplates.push(html`<li>Callable Function</li>`);
-		} else if (typeof instance === 'object') {
-			const methodNames = this.getClassMethodNames(instance);
-			if (methodNames.length) {
+		}
+		else if(instance.type === 'object'){
+			if(instance.methods?.length){
 				instanceTemplates.push(
 					html`
 						<li>
 							<strong>Methods</strong>
 							<ul>
-								${methodNames.map((methodName) => html`<li>${methodName}</li>`)}
+								${instance.methods?.map((methodName) => html`<li>${methodName}</li>`)}
 							</ul>
 						</li>
 					`
@@ -173,19 +179,13 @@ export class UmbDebug extends UmbLitElement {
 			}
 
 			const props: TemplateResult[] = [];
-
-			for (const key in instance) {
-				if (key.startsWith('_')) {
-					continue;
-				}
-
-				const value = instance[key];
-				if (typeof value === 'string') {
-					props.push(html`<li>${key} = ${value}</li>`);
+			instance.properties?.forEach((property) => {
+				if (property.type === 'string') {
+					props.push(html`<li>${property.key} = ${property.value}</li>`);
 				} else {
-					props.push(html`<li>${key} <em>(${typeof value})</em></li>`);
+					props.push(html`<li>${property.key} <em>(${property.type})</em></li>`);
 				}
-			}
+			});
 
 			instanceTemplates.push(html`
 				<li>
@@ -195,33 +195,17 @@ export class UmbDebug extends UmbLitElement {
 					</ul>
 				</li>
 			`);
-		} else {
-			instanceTemplates.push(html`<li>Context is a primitive with value: ${instance}</li>`);
+		}
+		else if(instance.type === 'primitive'){
+			instanceTemplates.push(html`<li>Context is a primitive with value: ${instance.value}</li>`);
 		}
 
 		return instanceTemplates;
-	}
-
-	private getClassMethodNames(klass: any) {
-		const isGetter = (x: any, name: string): boolean => !!(Object.getOwnPropertyDescriptor(x, name) || {}).get;
-		const isFunction = (x: any, name: string): boolean => typeof x[name] === 'function';
-		const deepFunctions = (x: any): any =>
-			x !== Object.prototype &&
-			Object.getOwnPropertyNames(x)
-				.filter((name) => isGetter(x, name) || isFunction(x, name))
-				.concat(deepFunctions(Object.getPrototypeOf(x)) || []);
-		const distinctDeepFunctions = (klass: any) => Array.from(new Set(deepFunctions(klass)));
-
-		const allMethods =
-			typeof klass.prototype === 'undefined'
-				? distinctDeepFunctions(klass)
-				: Object.getOwnPropertyNames(klass.prototype);
-		return allMethods.filter((name: any) => name !== 'constructor' && !name.startsWith('_'));
 	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-debug': UmbDebug;
+		'umb-debug': UmbDebugElement;
 	}
 }

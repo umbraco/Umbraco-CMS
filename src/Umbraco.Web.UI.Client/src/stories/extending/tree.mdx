@@ -1,0 +1,136 @@
+import { Meta } from '@storybook/addon-docs';
+
+<Meta title="Guides/Extending the Backoffice/Trees" parameters={{ previewTabs: { canvas: { hidden: true } } }} />
+
+# Trees
+
+// TODO: add description of trees.
+Rough notes:
+The tree is a hierarchical structure of nodes. The tree is registered in the Backoffice extension registry. A tree can be rendered anywhere in the Backoffice with the help of the umb-tree element.
+
+## Registering a tree
+
+Tree Manifest
+
+```json
+// TODO: add interface
+{
+	"type": "tree",
+	"alias": "My.Tree.Alias",
+	"name": "My Tree",
+	"meta": {
+		"repositoryAlias": "My.Repository.Alias"
+	}
+},
+{
+	"type": "treeItem",
+  "kind": "entity",
+	"alias": "My.TreeItem.Alias",
+	"name": "My Tree Item",
+  "conditions": {
+		"entityType": "my-entity-type",
+	},
+}
+```
+
+The backoffice comes with two different tree item kinds out of the box:
+entity and fileSystem
+
+## Rendering a tree
+
+```html
+<umb-tree alias="My.Tree.Alias"></umb-tree>
+```
+
+## Render a Custom Tree Item
+
+The Tree Item Manifest
+
+```json
+{
+	"type": "treeItem",
+	"alias": "Umb.TreeItem.Alias",
+	"name": "My Tree Item",
+	"js": "./my-tree-item.element.js",
+	"conditions": {
+		"entityType": "my-entity-type",
+	},
+};
+```
+
+### The Tree Item Element
+
+```typescript
+import { css, html, nothing } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element';
+import { UmbMyTreeItemContext, MyTreeItemDataModel } from './my-tree-item.context';
+
+@customElement('my-tree-item')
+export class MyTreeItemElement extends UmbElementMixin(LitElement) {
+	private _item?: MyTreeItemDataModel;
+	@property({ type: Object, attribute: false })
+	public get item() {
+		return this._item;
+	}
+	public set item(value: MyTreeItemDataModel | undefined) {
+		this._item = value;
+		this.#context.setTreeItem(value);
+	}
+
+	#context = new UmbMyTreeItemContext(this);
+
+	render() {
+		if (!this.item) return nothing;
+		return html` <umb-tree-item-base> Some custom markup </umb-tree-item-base>`;
+	}
+}
+
+export default MyTreeItemElement;
+```
+
+### The Tree Item Context
+
+```typescript
+// TODO: auto generate this from the interface
+export interface UmbTreeItemContext<T> {
+	host: UmbControllerHostElement;
+	unique?: string;
+	type?: string;
+
+	treeItem: Observable<T | undefined>;
+	hasChildren: Observable<boolean>;
+	isLoading: Observable<boolean>;
+	isSelectable: Observable<boolean>;
+	isSelected: Observable<boolean>;
+	isActive: Observable<boolean>;
+	hasActions: Observable<boolean>;
+	path: Observable<string>;
+
+	setTreeItem(treeItem: T | undefined): void;
+
+	requestChildren(): Promise<{
+		data: PagedResponse<T> | undefined;
+		error: ProblemDetailsModel | undefined;
+		asObservable?: () => Observable<T[]>;
+	}>;
+	toggleContextMenu(): void;
+	select(): void;
+	deselect(): void;
+	constructPath(pathname: string, entityType: string, unique: string): string;
+}
+```
+
+### Extending the Tree Item Context base
+
+We provide a base class for the tree item context. This class provides some default implementations for the context. You can extend this class to overwrite any of the default implementations.
+
+```typescript
+export class UmbMyTreeItemContext extends UmbTreeItemContextBase<MyTreeItemDataModel> {
+	constructor(host: UmbControllerHostElement) {
+		super(host, (x: MyTreeItemDataModel) => x.unique);
+	}
+
+	// overwrite any methods or properties here if needed
+}
+```

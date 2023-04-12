@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
-import { SavedLogSearchModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
@@ -87,7 +87,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	private _savedSearchesExpandSymbol!: UUISymbolExpandElement;
 
 	@state()
-	private _savedSearches: SavedLogSearchModel[] = [];
+	private _savedSearches: SavedLogSearchResponseModel[] = [];
 
 	@state()
 	private _inputQuery = '';

@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestEntityAction } from 'libs/extensions-registry/entity-action.models';
+import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 @customElement('umb-entity-action-list')
 class UmbEntityActionListElement extends UmbLitElement {
@@ -32,7 +32,7 @@ class UmbEntityActionListElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('entityAction').pipe(
 				map((extensions) => {
-					return extensions.filter((extension) => extension.meta.entityType === this.entityType);
+					return extensions.filter((extension) => extension.conditions.entityType === this.entityType);
 				})
 			),
 			(actions) => {

@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIOrderDirectionElement } from './property-editor-ui-order-direction.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIOrderDirectionElement', () => {
   let element: UmbPropertyEditorUIOrderDirectionElement;

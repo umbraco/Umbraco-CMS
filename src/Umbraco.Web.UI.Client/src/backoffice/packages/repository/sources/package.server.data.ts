@@ -1,23 +1,20 @@
-import { PackageResource } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Data source for packages from the server
  * @export
  */
 export class UmbPackageServerDataSource {
-	constructor(private readonly host: UmbControllerHostInterface) {}
+	constructor(private readonly host: UmbControllerHostElement) {}
 
 	/**
 	 * Get the root items from the server
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getRootItems() {
-		return tryExecuteAndNotify(
-			this.host,
-			PackageResource.getPackageManifest()
-		);
+		return tryExecuteAndNotify(this.host, PackageResource.getPackageManifest());
 	}
 
 	/**

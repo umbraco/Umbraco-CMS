@@ -1,16 +1,16 @@
-import { UmbContextToken } from '../context-token';
+import { UmbContextToken } from '../token/context-token';
 import { UmbContextProvider } from './context-provider';
-import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbContextProviderController<T = unknown>
-	extends UmbContextProvider<UmbControllerHostInterface>
+	extends UmbContextProvider<UmbControllerHostElement>
 	implements UmbControllerInterface
 {
 	public get unique() {
 		return this._contextAlias.toString();
 	}
 
-	constructor(host: UmbControllerHostInterface, contextAlias: string | UmbContextToken<T>, instance: T) {
+	constructor(host: UmbControllerHostElement, contextAlias: string | UmbContextToken<T>, instance: T) {
 		super(host, contextAlias, instance);
 
 		// If this API is already provided with this alias? Then we do not want to register this controller:

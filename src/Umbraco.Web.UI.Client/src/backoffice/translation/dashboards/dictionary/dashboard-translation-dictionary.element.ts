@@ -1,17 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { when } from 'lit-html/directives/when.js';
+import { when } from 'lit/directives/when.js';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
-import {
-	UmbCreateDictionaryModalResult,
-	UMB_CREATE_DICTIONARY_MODAL_TOKEN,
-} from '../../dictionary/entity-actions/create/';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DictionaryOverviewModel, LanguageModel } from '@umbraco-cms/backend-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
@@ -22,6 +18,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				height: 100%;
+				margin: var(--uui-size-layout-1);
 			}
 
 			#dictionary-top-bar {
@@ -50,7 +47,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	@state()
 	private _tableItemsFiltered: Array<UmbTableItem> = [];
 
-	#dictionaryItems: DictionaryOverviewModel[] = [];
+	#dictionaryItems: DictionaryOverviewResponseModel[] = [];
 
 	#repo!: UmbDictionaryRepository;
 
@@ -60,7 +57,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#tableColumns: Array<UmbTableColumn> = [];
 
-	#languages: Array<LanguageModel> = [];
+	#languages: Array<LanguageResponseModel> = [];
 
 	constructor() {
 		super();
@@ -112,14 +109,14 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#setTableItems() {
 		this.#tableItems = this.#dictionaryItems.map((dictionary) => {
-			// key is name to allow filtering on the displayed value
+			// id is set to name to allow filtering on the displayed value
 			const tableItem: UmbTableItem = {
-				key: dictionary.name ?? '',
+				id: dictionary.name ?? '',
 				icon: 'umb:book-alt',
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<a style="font-weight:bold" href="/section/translation/dictionary-item/edit/${dictionary.key}">
+						value: html`<a style="font-weight:bold" href="/section/translation/dictionary-item/edit/${dictionary.id}">
 							${dictionary.name}</a
 						> `,
 					},
@@ -151,24 +148,24 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#filter(e: { target: HTMLInputElement }) {
 		this._tableItemsFiltered = e.target.value
-			? this.#tableItems.filter((t) => t.key.includes(e.target.value))
+			? this.#tableItems.filter((t) => t.id.includes(e.target.value))
 			: this.#tableItems;
 	}
 
 	async #create() {
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
+		if (!this.#repo) return;
 
-		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL_TOKEN, { unique: null });
+		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
 
 		// TODO: get type from modal result
 		const { name } = await modalHandler.onSubmit();
 		if (!name) return;
 
-		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });
-
+		const { data } = await this.#repo.createScaffold(null);
+		console.log(data);
 		// TODO => get location header to route to new item
-		console.log(result);
 	}
 
 	render() {

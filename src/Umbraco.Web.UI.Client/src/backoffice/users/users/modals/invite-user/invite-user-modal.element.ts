@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
-import type { UserDetails } from '@umbraco-cms/models';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-invite-user-modal')
@@ -105,7 +105,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 		if (!this._invitedUser) return;
 
 		this._closeModal();
-		history.pushState(null, '', 'section/users/view/users/user/' + this._invitedUser?.key); //TODO: URL Should be dynamic
+		history.pushState(null, '', 'section/users/view/users/user/' + this._invitedUser?.id); //TODO: URL Should be dynamic
 	}
 
 	private _renderForm() {

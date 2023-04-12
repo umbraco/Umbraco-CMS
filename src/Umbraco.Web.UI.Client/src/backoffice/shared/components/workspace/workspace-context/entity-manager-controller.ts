@@ -1,37 +1,37 @@
 import { v4 as uuidv4 } from 'uuid';
-import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/notification';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import type { EntityTreeItemModel } from '@umbraco-cms/backend-api';
-import { UmbEntityDetailStore } from '@umbraco-cms/store';
+} from '@umbraco-cms/backoffice/notification';
+import { ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
 
-// Extend entityType base type?, so we are sure to have parentKey?
+// Extend entityType base type?, so we are sure to have parentId?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
 export class UmbEntityWorkspaceManager<
 	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
-	EntityDetailsType extends EntityTreeItemModel = ReturnType<StoreType['getScaffold']>
+	EntityDetailsType extends EntityTreeItemResponseModel = ReturnType<StoreType['getScaffold']>
 > {
 	private _host;
 
 	state = new ObjectState<EntityDetailsType | undefined>(undefined);
 
-	protected _storeSubscription?: UmbObserverController;
+	protected _storeSubscription?: UmbObserverController<EntityDetailsType | undefined>;
 
 	private _notificationContext?: UmbNotificationContext;
 	private _store?: StoreType;
 
 	#isNew = false;
 	private _entityType;
-	private _entityKey!: string;
+	private _entityId!: string;
 
 	private _createAtParentKey?: string | null;
 
-	constructor(host: UmbControllerHostInterface, entityType: string, storeToken: UmbContextToken<StoreType>) {
+	constructor(host: UmbControllerHostElement, entityType: string, storeToken: UmbContextToken<StoreType>) {
 		this._host = host;
 		this._entityType = entityType;
 
@@ -47,7 +47,7 @@ export class UmbEntityWorkspaceManager<
 	}
 
 	private _observeStore() {
-		if (!this._store || !this._entityKey) {
+		if (!this._store || !this._entityId) {
 			return;
 		}
 
@@ -58,7 +58,7 @@ export class UmbEntityWorkspaceManager<
 			this._storeSubscription?.destroy();
 			this._storeSubscription = new UmbObserverController(
 				this._host,
-				this._store.getByKey(this._entityKey),
+				this._store.getByKey(this._entityId),
 				(content) => {
 					if (!content) return; // TODO: Handle nicely if there is no content data.
 					this.state.next(content as any);
@@ -71,7 +71,7 @@ export class UmbEntityWorkspaceManager<
 		return this._entityType;
 	};
 	getEntityKey = (): string => {
-		return this._entityKey;
+		return this._entityId;
 	};
 
 	getStore = () => {
@@ -82,16 +82,16 @@ export class UmbEntityWorkspaceManager<
 		return this.state.getValue();
 	};
 
-	load = (entityKey: string) => {
+	load = (entityId: string) => {
 		this.#isNew = false;
-		this._entityKey = entityKey;
+		this._entityId = entityId;
 		this._observeStore();
 	};
 
-	create = (parentKey: string | null) => {
+	create = (parentId: string | null) => {
 		this.#isNew = true;
-		this._entityKey = uuidv4();
-		this._createAtParentKey = parentKey;
+		this._entityId = uuidv4();
+		this._createAtParentKey = parentId;
 	};
 
 	save = (): Promise<void> => {

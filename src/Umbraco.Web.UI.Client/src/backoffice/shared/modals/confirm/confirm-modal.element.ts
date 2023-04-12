@@ -1,9 +1,8 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbConfirmModalData, UmbConfirmModalResult } from '.';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalHandler } from '@umbraco-cms/modal';
+import { UmbConfirmModalData, UmbConfirmModalResult, UmbModalHandler } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {

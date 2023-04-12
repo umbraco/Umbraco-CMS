@@ -1,10 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedUserGroupModel } from '../models/PagedUserGroupModel';
-import type { UserGroupModel } from '../models/UserGroupModel';
-import type { UserGroupSaveModel } from '../models/UserGroupSaveModel';
-import type { UserGroupUpdateModel } from '../models/UserGroupUpdateModel';
+import type { PagedUserGroupPresentationModel } from '../models/PagedUserGroupPresentationModel';
+import type { SaveUserGroupRequestModel } from '../models/SaveUserGroupRequestModel';
+import type { UpdateUserGroupRequestModel } from '../models/UpdateUserGroupRequestModel';
+import type { UserGroupPresentationModel } from '../models/UserGroupPresentationModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -19,7 +19,7 @@ export class UserGroupsResource {
     public static postUserGroups({
         requestBody,
     }: {
-        requestBody?: UserGroupSaveModel,
+        requestBody?: SaveUserGroupRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -34,7 +34,7 @@ export class UserGroupsResource {
     }
 
     /**
-     * @returns PagedUserGroupModel Success
+     * @returns PagedUserGroupPresentationModel Success
      * @throws ApiError
      */
     public static getUserGroups({
@@ -43,7 +43,7 @@ export class UserGroupsResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedUserGroupModel> {
+    }): CancelablePromise<PagedUserGroupPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-groups',
@@ -58,16 +58,16 @@ export class UserGroupsResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getUserGroupsByKey({
-        key,
+    public static getUserGroupsById({
+        id,
     }: {
-        key: string,
-    }): CancelablePromise<UserGroupModel> {
+        id: string,
+    }): CancelablePromise<UserGroupPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/user-groups/{key}',
+            url: '/umbraco/management/api/v1/user-groups/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -79,16 +79,16 @@ export class UserGroupsResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteUserGroupsByKey({
-        key,
+    public static deleteUserGroupsById({
+        id,
     }: {
-        key: string,
+        id: string,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/user-groups/{key}',
+            url: '/umbraco/management/api/v1/user-groups/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -100,18 +100,18 @@ export class UserGroupsResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static putUserGroupsByKey({
-        key,
+    public static putUserGroupsById({
+        id,
         requestBody,
     }: {
-        key: string,
-        requestBody?: UserGroupUpdateModel,
+        id: string,
+        requestBody?: UpdateUserGroupRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/user-groups/{key}',
+            url: '/umbraco/management/api/v1/user-groups/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',

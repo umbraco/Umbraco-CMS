@@ -3,12 +3,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
-import type { ManifestPropertyAction } from '@umbraco-cms/models';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
+import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 import '../property-action/property-action.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbObserverController } from '@umbraco-cms/observable-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
@@ -26,6 +26,8 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			#popover-trigger {
 				--uui-button-padding-top-factor: 0.5;
 				--uui-button-padding-bottom-factor: 0.1;
+				--uui-button-height: 18px;
+				--uui-button-border-radius: 6px;
 			}
 
 			#dropdown {
@@ -78,7 +80,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		this._actionsObserver = this.observe(
 			umbExtensionsRegistry.extensionsOfType('propertyAction').pipe(
 				map((propertyActions) => {
-					return propertyActions.filter((propertyAction) => propertyAction.meta.propertyEditors.includes(alias));
+					return propertyActions.filter((propertyAction) => propertyAction.conditions.propertyEditors.includes(alias));
 				})
 			),
 			(manifests) => {

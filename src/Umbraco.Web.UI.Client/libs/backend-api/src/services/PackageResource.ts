@@ -1,12 +1,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PackageCreateModel } from '../models/PackageCreateModel';
-import type { PackageDefinitionModel } from '../models/PackageDefinitionModel';
-import type { PackageManifestModel } from '../models/PackageManifestModel';
-import type { PackageUpdateModel } from '../models/PackageUpdateModel';
-import type { PagedPackageDefinitionModel } from '../models/PagedPackageDefinitionModel';
-import type { PagedPackageMigrationStatusModel } from '../models/PagedPackageMigrationStatusModel';
+import type { CreatePackageRequestModel } from '../models/CreatePackageRequestModel';
+import type { PackageDefinitionResponseModel } from '../models/PackageDefinitionResponseModel';
+import type { PackageManifestResponseModel } from '../models/PackageManifestResponseModel';
+import type { PagedPackageDefinitionResponseModel } from '../models/PagedPackageDefinitionResponseModel';
+import type { PagedPackageMigrationStatusResponseModel } from '../models/PagedPackageMigrationStatusResponseModel';
+import type { UpdatePackageRequestModel } from '../models/UpdatePackageRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -37,7 +37,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageDefinitionModel Success
+     * @returns PagedPackageDefinitionResponseModel Success
      * @throws ApiError
      */
     public static getPackageCreated({
@@ -46,7 +46,7 @@ export class PackageResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedPackageDefinitionModel> {
+    }): CancelablePromise<PagedPackageDefinitionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/created',
@@ -64,7 +64,7 @@ export class PackageResource {
     public static postPackageCreated({
         requestBody,
     }: {
-        requestBody?: PackageCreateModel,
+        requestBody?: CreatePackageRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -83,16 +83,16 @@ export class PackageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getPackageCreatedByKey({
-        key,
+    public static getPackageCreatedById({
+        id,
     }: {
-        key: string,
-    }): CancelablePromise<PackageDefinitionModel> {
+        id: string,
+    }): CancelablePromise<PackageDefinitionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/package/created/{key}',
+            url: '/umbraco/management/api/v1/package/created/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -104,16 +104,16 @@ export class PackageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deletePackageCreatedByKey({
-        key,
+    public static deletePackageCreatedById({
+        id,
     }: {
-        key: string,
+        id: string,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/package/created/{key}',
+            url: '/umbraco/management/api/v1/package/created/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -125,18 +125,18 @@ export class PackageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static putPackageCreatedByKey({
-        key,
+    public static putPackageCreatedById({
+        id,
         requestBody,
     }: {
-        key: string,
-        requestBody?: PackageUpdateModel,
+        id: string,
+        requestBody?: UpdatePackageRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/package/created/{key}',
+            url: '/umbraco/management/api/v1/package/created/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -150,16 +150,16 @@ export class PackageResource {
      * @returns binary Success
      * @throws ApiError
      */
-    public static getPackageCreatedByKeyDownload({
-        key,
+    public static getPackageCreatedByIdDownload({
+        id,
     }: {
-        key: string,
+        id: string,
     }): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/package/created/{key}/download',
+            url: '/umbraco/management/api/v1/package/created/{id}/download',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -171,7 +171,7 @@ export class PackageResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getPackageManifest(): CancelablePromise<Array<PackageManifestModel>> {
+    public static getPackageManifest(): CancelablePromise<Array<PackageManifestResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/manifest',
@@ -179,7 +179,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns PagedPackageMigrationStatusModel Success
+     * @returns PagedPackageMigrationStatusResponseModel Success
      * @throws ApiError
      */
     public static getPackageMigrationStatus({
@@ -188,7 +188,7 @@ export class PackageResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedPackageMigrationStatusModel> {
+    }): CancelablePromise<PagedPackageMigrationStatusResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/migration-status',

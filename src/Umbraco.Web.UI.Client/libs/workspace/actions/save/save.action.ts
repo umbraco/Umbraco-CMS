@@ -1,10 +1,10 @@
-import { UmbWorkspaceContextInterface } from '../../../../src/backoffice/shared/components/workspace/workspace-context/workspace-context.interface';
+import { UmbWorkspaceContextInterface } from '../../context/workspace-context.interface';
 import { UmbWorkspaceActionBase } from '../workspace-action-base';
-import type { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 // TODO: add interface for repo/partial repo/save-repo
 export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbWorkspaceContextInterface> {
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host);
 	}
 
@@ -19,7 +19,7 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbWorkspaceC
 		// TODO: handle errors
 		if (!data) return;
 
-		this.workspaceContext.getIsNew() ? this.#create(data) : this.#update(data);
+		this.workspaceContext.getIsNew() ? this.#create(data) : this.#update();
 	}
 
 	async #create(data: any) {
@@ -41,8 +41,8 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbWorkspaceC
 		}
 	}
 
-	#update(data: any) {
+	#update() {
 		if (!this.workspaceContext) return;
-		this.workspaceContext.repository?.save(data);
+		this.workspaceContext.save();
 	}
 }

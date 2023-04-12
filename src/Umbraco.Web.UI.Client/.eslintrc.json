@@ -2,6 +2,12 @@
 	"ignorePatterns": ["vite.*.ts"],
 	"root": true,
 	"plugins": ["eslint-plugin-local-rules"],
+	"parserOptions": {
+		"ecmaVersion": "latest"
+	},
+	"env": {
+		"es6": true
+	},
 	"overrides": [
 		{
 			"files": ["**/*.ts"],
@@ -35,6 +41,9 @@
 				"local-rules/bad-type-import": "error",
 				"local-rules/no-direct-api-import": "warn",
 				"local-rules/prefer-import-aliases": "error",
+				"local-rules/enforce-element-suffix-on-element-class-name": "error",
+				"local-rules/prefer-umbraco-cms-imports": "error",
+				"local-rules/no-external-imports": "error",
 				"@typescript-eslint/no-non-null-assertion": "off"
 			},
 			"settings": {

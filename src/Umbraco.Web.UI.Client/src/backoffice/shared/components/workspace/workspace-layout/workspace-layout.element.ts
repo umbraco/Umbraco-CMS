@@ -4,18 +4,23 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent, IRoutingInfo } from '@umbraco-cms/router';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/models';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import type {
+	ManifestWorkspaceView,
+	ManifestWorkspaceViewCollection,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 import '../../body-layout/body-layout.element';
 import '../../extension-slot/extension-slot.element';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-workspace-layout
  * @description
  * @slot icon - Slot for icon
+ * @slot header - Slot for workspace header
  * @slot name - Slot for name
  * @slot footer - Slot for workspace footer
  * @slot actions - Slot for workspace footer actions
@@ -26,13 +31,19 @@ import { UmbLitElement } from '@umbraco-cms/element';
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-layout')
-export class UmbWorkspaceLayout extends UmbLitElement {
+export class UmbWorkspaceLayoutElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
 				display: block;
 				width: 100%;
+				height: 100%;
+			}
+
+			#router-slot {
+				display: flex;
+				flex-direction: column;
 				height: 100%;
 			}
 
@@ -87,7 +98,7 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _routes?: any[];
+	private _routes?: IRoute[];
 
 	@state()
 	private _routerPath?: string;
@@ -99,7 +110,9 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView', 'workspaceViewCollection'])
-				.pipe(map((extensions) => extensions.filter((extension) => extension.meta.workspaces.includes(this.alias)))),
+				.pipe(
+					map((extensions) => extensions.filter((extension) => extension.conditions.workspaces.includes(this.alias)))
+				),
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews;
 				this._createRoutes();
@@ -118,16 +131,18 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 						if (view.type === 'workspaceViewCollection') {
 							return import(
 								'../../../../shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
-							);
+							) as unknown as Promise<HTMLElement>;
 						}
 						return createExtensionElement(view);
 					},
-					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
-						// When its using import, we get an element, when using createExtensionElement we get a Promise.
-						if ((component as any).then) {
-							(component as any).then((el: any) => (el.manifest = view));
+					setup: (component, info) => {
+						if (component && 'manifest' in component) {
+							component.manifest = view;
 						} else {
-							(component as any).manifest = view;
+							console.group(`[UmbWorkspaceLayout] Failed to setup component for route: ${info.match.route.path}`);
+							console.log('Matched route', info.match.route);
+							console.error('Missing property "manifest" on component', component);
+							console.groupEnd();
 						}
 					},
 				};
@@ -209,6 +224,6 @@ export class UmbWorkspaceLayout extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-layout': UmbWorkspaceLayout;
+		'umb-workspace-layout': UmbWorkspaceLayoutElement;
 	}
 }

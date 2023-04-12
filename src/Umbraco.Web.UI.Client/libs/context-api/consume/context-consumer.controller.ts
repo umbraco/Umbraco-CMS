@@ -1,10 +1,10 @@
-import { UmbContextToken } from '../context-token';
+import { UmbContextToken } from '../token/context-token';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextCallback } from './context-request.event';
-import type { UmbControllerHostInterface, UmbControllerInterface } from '@umbraco-cms/controller';
+import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 
 export class UmbContextConsumerController<T = unknown>
-	extends UmbContextConsumer<UmbControllerHostInterface, T>
+	extends UmbContextConsumer<UmbControllerHostElement, T>
 	implements UmbControllerInterface
 {
 	public get unique() {
@@ -12,7 +12,7 @@ export class UmbContextConsumerController<T = unknown>
 	}
 
 	constructor(
-		host: UmbControllerHostInterface,
+		host: UmbControllerHostElement,
 		contextAlias: string | UmbContextToken<T>,
 		callback: UmbContextCallback<T>
 	) {

@@ -1,16 +1,19 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
 import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
-import { UMB_CONFIRM_MODAL_TOKEN } from '../../modals/confirm';
-import { UMB_DOCUMENT_PICKER_MODAL_TOKEN } from '../../../documents/documents/modals/document-picker';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { DocumentTreeItemModel, FolderTreeItemModel } from '@umbraco-cms/backend-api';
-import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+	UMB_DOCUMENT_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
@@ -58,30 +61,30 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	// TODO: do we need both selectedKeys and value? If we just use value we follow the same pattern as native form controls.
-	private _selectedKeys: Array<string> = [];
-	public get selectedKeys(): Array<string> {
-		return this._selectedKeys;
+	// TODO: do we need both selectedIds and value? If we just use value we follow the same pattern as native form controls.
+	private _selectedIds: Array<string> = [];
+	public get selectedIds(): Array<string> {
+		return this._selectedIds;
 	}
-	public set selectedKeys(keys: Array<string>) {
-		this._selectedKeys = keys;
-		super.value = keys.join(',');
+	public set selectedIds(ids: Array<string>) {
+		this._selectedIds = ids;
+		super.value = ids.join(',');
 		this._observePickedDocuments();
 	}
 
 	@property()
-	public set value(keysString: string) {
-		if (keysString !== this._value) {
-			this.selectedKeys = keysString.split(/[ ,]+/);
+	public set value(idsString: string) {
+		if (idsString !== this._value) {
+			this.selectedIds = idsString.split(/[ ,]+/);
 		}
 	}
 
 	@state()
-	private _items?: Array<DocumentTreeItemModel>;
+	private _items?: Array<DocumentTreeItemResponseModel>;
 
 	private _modalContext?: UmbModalContext;
 	private _documentStore?: UmbDocumentTreeStore;
-	private _pickedItemsObserver?: UmbObserverController<FolderTreeItemModel>;
+	private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 
 	constructor() {
 		super();
@@ -89,12 +92,12 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._selectedKeys.length < this.min
+			() => !!this.min && this._selectedIds.length < this.min
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this._selectedKeys.length > this.max
+			() => !!this.max && this._selectedIds.length > this.max
 		);
 
 		this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -116,16 +119,16 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		if (!this._documentStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentStore.items(this._selectedKeys), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentStore.items(this._selectedIds), (items) => {
 			this._items = items;
 		});
 	}
 
 	private _openPicker() {
-		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL_TOKEN, {
+		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
-			selection: [...this._selectedKeys],
+			selection: [...this._selectedIds],
 		});
 
 		modalHandler?.onSubmit().then(({ selection }: any) => {
@@ -133,8 +136,8 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		});
 	}
 
-	private async _removeItem(item: FolderTreeItemModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL_TOKEN, {
+	private async _removeItem(item: EntityTreeItemResponseModel) {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
@@ -142,12 +145,12 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		});
 
 		await modalHandler?.onSubmit();
-		const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+		const newSelection = this._selectedIds.filter((value) => value !== item.id);
 		this._setSelection(newSelection);
 	}
 
 	private _setSelection(newSelection: Array<string>) {
-		this.selectedKeys = newSelection;
+		this.selectedIds = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
@@ -158,12 +161,12 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	private _renderItem(item: FolderTreeItemModel) {
+	private _renderItem(item: EntityTreeItemResponseModel) {
 		// TODO: remove when we have a way to handle trashed items
-		const tempItem = item as FolderTreeItemModel & { isTrashed: boolean };
+		const tempItem = item as EntityTreeItemResponseModel & { isTrashed: boolean };
 
 		return html`
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
+			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.id)}>
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this._removeItem(item)} label="Remove document ${item.name}">Remove</uui-button>

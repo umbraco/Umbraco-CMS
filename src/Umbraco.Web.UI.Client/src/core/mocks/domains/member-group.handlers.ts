@@ -9,10 +9,10 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/member-group/item', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
 
-		const items = umbMemberGroupData.getTreeItem(keys);
+		const items = umbMemberGroupData.getTreeItem(ids);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),

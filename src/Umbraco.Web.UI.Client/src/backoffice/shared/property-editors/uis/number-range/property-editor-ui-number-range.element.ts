@@ -2,8 +2,8 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbInputNumberRangeElement } from '../../../../shared/components/input-number-range/input-number-range.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/property-editor';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../../shared/components/input-number-range/input-number-range.element';
 
 type ValueType = {

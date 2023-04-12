@@ -3,9 +3,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbTreeElement } from '../../components/tree/tree.element';
-import { UmbLinkPickerConfig, UmbLinkPickerLink, UmbLinkPickerModalData, UmbLinkPickerModalResult } from '.';
-import { UmbModalBaseElement } from '@umbraco-cms/modal';
-import { buildUdi, getKeyFromUdi } from '@umbraco-cms/utils';
+import {
+	UmbLinkPickerConfig,
+	UmbLinkPickerLink,
+	UmbLinkPickerModalData,
+	UmbLinkPickerModalResult,
+} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
@@ -47,6 +52,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	_selectedKey?: string;
 
 	@state()
+	_index: number | null = null;
+
+	@state()
 	_link: UmbLinkPickerLink = {
 		icon: null,
 		name: null,
@@ -76,6 +84,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
+		this._index = this.data?.index;
 		this._link = this.data?.link;
 		this._layout = this.data?.config;
 
@@ -105,7 +114,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	}
 
 	private _submit() {
-		this.modalHandler?.submit(this._link);
+		this.modalHandler?.submit({ index: this._index, link: this._link });
 	}
 
 	private _close() {

@@ -1,4 +1,4 @@
-import type { UmbEntrypointModule } from "./umb-lifecycle.interface";
+import type { UmbEntrypointModule } from './umb-lifecycle.interface';
 
 /**
  * Validate if an ESModule exports a known init function called 'onInit'

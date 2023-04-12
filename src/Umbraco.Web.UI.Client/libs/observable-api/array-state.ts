@@ -1,4 +1,5 @@
 import { DeepState } from './deep-state';
+import { partialUpdateFrozenArray } from './partial-update-frozen-array.function';
 import { pushToUniqueArray } from './push-to-unique-array.function';
 
 /**
@@ -11,8 +12,37 @@ import { pushToUniqueArray } from './push-to-unique-array.function';
  * The ArrayState provides methods to append data when the data is an Object.
  */
 export class ArrayState<T> extends DeepState<T[]> {
-	constructor(initialData: T[], private _getUnique?: (entry: T) => unknown) {
+	#getUnique?: (entry: T) => unknown;
+	#sortMethod?: (a: T, b: T) => number;
+
+	constructor(initialData: T[], getUniqueMethod?: (entry: T) => unknown) {
 		super(initialData);
+		this.#getUnique = getUniqueMethod;
+	}
+
+	/**
+	 * @method sortBy
+	 * @param {(a: T, b: T) => number} sortMethod - A method to be used for sorting everytime data is set.
+	 * @description - A sort method to this Subject.
+	 * @example <caption>Example add sort method</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+	 */
+	sortBy(sortMethod?: (a: T, b: T) => number) {
+		this.#sortMethod = sortMethod;
+		return this;
+	}
+
+	next(value: T[]) {
+		if (this.#sortMethod) {
+			super.next(value.sort(this.#sortMethod));
+		} else {
+			super.next(value);
+		}
 	}
 
 	/**
@@ -20,22 +50,22 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * @param {unknown[]} uniques - The unique values to remove.
 	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
-	 * @example <caption>Example remove entry with key '1' and '2'</caption>
+	 * @example <caption>Example remove entry with id '1' and '2'</caption>
 	 * const data = [
-	 * 	{ key: 1, value: 'foo'},
-	 * 	{ key: 2, value: 'bar'}
+	 * 	{ id: 1, value: 'foo'},
+	 * 	{ id: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.key);
+	 * const myState = new ArrayState(data, (x) => x.id);
 	 * myState.remove([1, 2]);
 	 */
 	remove(uniques: unknown[]) {
 		let next = this.getValue();
-		if (this._getUnique) {
+		if (this.#getUnique) {
 			uniques.forEach((unique) => {
 				next = next.filter((x) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
-					return this._getUnique(x) !== unique;
+					return this.#getUnique(x) !== unique;
 				});
 			});
 
@@ -49,21 +79,21 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * @param {unknown} unique - The unique value to remove.
 	 * @return {ArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
-	 * @example <caption>Example remove entry with key '1'</caption>
+	 * @example <caption>Example remove entry with id '1'</caption>
 	 * const data = [
-	 * 	{ key: 1, value: 'foo'},
-	 * 	{ key: 2, value: 'bar'}
+	 * 	{ id: 1, value: 'foo'},
+	 * 	{ id: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.key);
+	 * const myState = new ArrayState(data, (x) => x.id);
 	 * myState.removeOne(1);
 	 */
 	removeOne(unique: unknown) {
 		let next = this.getValue();
-		if (this._getUnique) {
+		if (this.#getUnique) {
 			next = next.filter((x) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				return this._getUnique(x) !== unique;
+				return this.#getUnique(x) !== unique;
 			});
 
 			this.next(next);
@@ -112,8 +142,8 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 */
 	appendOne(entry: T) {
 		const next = [...this.getValue()];
-		if (this._getUnique) {
-			pushToUniqueArray(next, entry, this._getUnique);
+		if (this.#getUnique) {
+			pushToUniqueArray(next, entry, this.#getUnique);
 		} else {
 			next.push(entry);
 		}
@@ -138,15 +168,37 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * ]);
 	 */
 	append(entries: T[]) {
-		if (this._getUnique) {
+		if (this.#getUnique) {
 			const next = [...this.getValue()];
 			entries.forEach((entry) => {
-				pushToUniqueArray(next, entry, this._getUnique!);
+				pushToUniqueArray(next, entry, this.#getUnique!);
 			});
 			this.next(next);
 		} else {
 			this.next([...this.getValue(), ...entries]);
 		}
+		return this;
+	}
+
+	/**
+	 * @method updateOne
+	 * @param {unknown} unique - Unique value to find entry to update.
+	 * @param {Partial<T>} entry - new data to be added in this Subject.
+	 * @return {ArrayState<T>} Reference to it self.
+	 * @description - Update a item with some new data, requires the ArrayState to be constructed with a getUnique method.
+	 * @example <caption>Example append some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 2, value: 'bar'}
+	 * ];
+	 * const myState = new ArrayState(data, (x) => x.key);
+	 * myState.updateOne(2, {value: 'updated-bar'});
+	 */
+	updateOne(unique: unknown, entry: Partial<T>) {
+		if (!this.#getUnique) {
+			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
+		}
+		this.next(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.#getUnique!(x)));
 		return this;
 	}
 }

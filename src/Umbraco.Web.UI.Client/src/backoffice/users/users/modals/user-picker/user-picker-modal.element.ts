@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
-import { UmbModalElementPickerBase } from '@umbraco-cms/modal';
-import type { UserDetails } from '@umbraco-cms/models';
+import { UmbModalElementPickerBase } from '@umbraco-cms/internal/modal';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-user-picker-modal')
 export class UmbUserPickerModalElement extends UmbModalElementPickerBase<UserDetails> {
@@ -86,9 +86,9 @@ export class UmbUserPickerModalElement extends UmbModalElementPickerBase<UserDet
 						${this._users.map(
 							(item) => html`
 								<div
-									@click=${() => this.handleSelection(item.key)}
-									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
-									class=${this.isSelected(item.key) ? 'item selected' : 'item'}>
+									@click=${() => this.handleSelection(item.id)}
+									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
+									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
 									<uui-avatar .name=${item.name}></uui-avatar>
 									<span>${item.name}</span>
 								</div>

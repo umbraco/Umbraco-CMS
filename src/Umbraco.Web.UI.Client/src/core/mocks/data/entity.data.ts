@@ -1,5 +1,5 @@
 import { UmbData } from './data';
-import type { Entity } from '@umbraco-cms/models';
+import type { Entity } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
 export class UmbEntityData<T extends Entity> extends UmbData<T> {
@@ -10,37 +10,45 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	getList(skip: number, take: number) {
 		return this.data.slice(skip, skip + take);
 	}
-	
-	getByKey(key: string) {
-		return this.data.find((item) => item.key === key);
+
+	getById(id: string) {
+		return this.data.find((item) => item.id === id);
 	}
 
-	getByKeys(keys: Array<string>) {
-		return this.data.filter((item) => keys.includes(item.key));
+	getByIds(ids: Array<string>) {
+		return this.data.filter((item) => ids.includes(item.id));
 	}
 
-	save(saveItems: Array<T>) {
-		saveItems.forEach((saveItem) => {
-			const foundIndex = this.data.findIndex((item) => item.key === saveItem.key);
-			if (foundIndex !== -1) {
-				// update
-				this.data[foundIndex] = saveItem;
-				this.updateData(saveItem);
-			} else {
-				// new
-				this.data.push(saveItem);
-			}
-		});
+	insert(item: T) {
+		const exits = this.data.find((i) => i.id === item.id);
 
-		return saveItems;
+		if (exits) {
+			throw new Error(`Item with key ${item.id} already exists`);
+		}
+
+		this.data.push(item);
 	}
 
-	move(keys: Array<string>, destinationKey: string) {
-		const items = this.getByKeys(keys);
+	save(saveItem: T) {
+		const foundIndex = this.data.findIndex((item) => item.id === saveItem.id);
+		if (foundIndex !== -1) {
+			// update
+			this.data[foundIndex] = saveItem;
+			this.updateData(saveItem);
+		} else {
+			// new
+			this.data.push(saveItem);
+		}
+
+		return saveItem;
+	}
+
+	move(ids: Array<string>, destinationKey: string) {
+		const items = this.getByIds(ids);
 		const movedItems = items.map((item) => {
 			return {
 				...item,
-				parentKey: destinationKey,
+				parentId: destinationKey,
 			};
 		});
 
@@ -48,11 +56,11 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return movedItems;
 	}
 
-	trash(keys: Array<string>) {
+	trash(ids: Array<string>) {
 		const trashedItems: Array<T> = [];
 
-		keys.forEach((key) => {
-			const item = this.getByKey(key);
+		ids.forEach((id) => {
+			const item = this.getById(id);
 			if (!item) return;
 
 			// TODO: how do we handle trashed items?
@@ -67,17 +75,18 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return trashedItems;
 	}
 
-	delete(keys: Array<string>) {
-		const deletedKeys = this.data.filter((item) => keys.includes(item.key)).map((item) => item.key);
-		this.data = this.data.filter((item) => keys.indexOf(item.key) === -1);
+	delete(ids: Array<string>) {
+		const deletedKeys = this.data.filter((item) => ids.includes(item.id)).map((item) => item.id);
+		this.data = this.data.filter((item) => ids.indexOf(item.id) === -1);
 		return deletedKeys;
 	}
 
 	protected updateData(updateItem: T) {
-		const itemIndex = this.data.findIndex((item) => item.key === updateItem.key);
+		const itemIndex = this.data.findIndex((item) => item.id === updateItem.id);
 		const item = this.data[itemIndex];
 		if (!item) return;
 
+		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
 		const itemKeys = Object.keys(item);
 		const newItem = {};
 

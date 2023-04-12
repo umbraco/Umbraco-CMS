@@ -4,19 +4,20 @@ import type { ManifestDashboardCollection } from './dashboard-collection.models'
 import type { ManifestEntityAction } from './entity-action.models';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.models';
 import type { ManifestExternalLoginProvider } from './external-login-provider.models';
-import type { ManifestHeaderApp } from './header-app.models';
+import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-app.models';
 import type { ManifestHealthCheck } from './health-check.models';
 import type { ManifestPackageView } from './package-view.models';
 import type { ManifestPropertyAction } from './property-action.models';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.models';
 import type { ManifestSection } from './section.models';
 import type { ManifestSectionView } from './section-view.models';
-import type { ManifestSectionSidebarApp, ManifestMenuSectionSidebarApp } from './section-sidebar-app.models';
+import type { ManifestSectionSidebarApp, ManifestSectionSidebarAppMenuKind } from './section-sidebar-app.models';
 import type { ManifestMenu } from './menu.models';
-import type { ManifestMenuItem } from './menu-item.models';
+import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.models';
 import type { ManifestTheme } from './theme.models';
 import type { ManifestTree } from './tree.models';
-import type { ManifestUserDashboard } from './user-dashboard.models';
+import type { ManifestTreeItem } from './tree-item.models';
+import type { ManifestUserProfileApp } from './user-profile-app.models';
 import type { ManifestWorkspace } from './workspace.models';
 import type { ManifestWorkspaceAction } from './workspace-action.models';
 import type { ManifestWorkspaceView } from './workspace-view.models';
@@ -24,6 +25,7 @@ import type { ManifestWorkspaceViewCollection } from './workspace-view-collectio
 import type { ManifestRepository } from './repository.models';
 import type { ManifestModal } from './modal.models';
 import type { ManifestStore, ManifestTreeStore } from './store.models';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 
 export * from './collection-view.models';
 export * from './dashboard-collection.models';
@@ -43,7 +45,8 @@ export * from './menu.models';
 export * from './menu-item.models';
 export * from './theme.models';
 export * from './tree.models';
-export * from './user-dashboard.models';
+export * from './tree-item.models';
+export * from './user-profile-app.models';
 export * from './workspace-action.models';
 export * from './workspace-view-collection.models';
 export * from './workspace-view.models';
@@ -54,7 +57,6 @@ export * from './modal.models';
 
 export type ManifestTypes =
 	| ManifestCollectionView
-	| ManifestCustom
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestEntityAction
@@ -62,6 +64,7 @@ export type ManifestTypes =
 	| ManifestEntrypoint
 	| ManifestExternalLoginProvider
 	| ManifestHeaderApp
+	| ManifestHeaderAppButtonKind
 	| ManifestHealthCheck
 	| ManifestPackageView
 	| ManifestPropertyAction
@@ -70,13 +73,15 @@ export type ManifestTypes =
 	| ManifestRepository
 	| ManifestSection
 	| ManifestSectionSidebarApp
+	| ManifestSectionSidebarAppMenuKind
 	| ManifestSectionView
-	| ManifestMenuSectionSidebarApp
 	| ManifestMenu
 	| ManifestMenuItem
+	| ManifestMenuItemTreeKind
 	| ManifestTheme
 	| ManifestTree
-	| ManifestUserDashboard
+	| ManifestTreeItem
+	| ManifestUserProfileApp
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceView
@@ -92,6 +97,9 @@ export type ManifestTypeMap = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
 };
 
+export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> =
+	T extends keyof ManifestTypeMap ? ManifestTypeMap[T] : ManifestBase;
+
 export interface ManifestBase {
 	/**
 	 * The type of extension such as dashboard etc...
@@ -104,6 +112,12 @@ export interface ManifestBase {
 	alias: string;
 
 	/**
+	 * The kind of the extension, used to group extensions together
+	 * @example "button"
+	 */
+	kind?: any; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
+
+	/**
 	 * The friendly name of the extension
 	 */
 	name: string;
@@ -112,6 +126,18 @@ export interface ManifestBase {
 	 * Extensions such as dashboards are ordered by weight with lower numbers being first in the list
 	 */
 	weight?: number;
+}
+
+export interface ManifestKind {
+	type: 'kind';
+	alias: string;
+	matchType: string;
+	matchKind: string;
+	manifest: Partial<ManifestTypes>;
+}
+
+export interface ManifestWithConditions<ConditionsType> {
+	conditions: ConditionsType;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
@@ -127,14 +153,22 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
  * The type of extension such as dashboard etc...
  */
 export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
-	type: ManifestStandardTypes;
+	//type: ManifestStandardTypes;
 
 	/**
 	 * The file location of the javascript file to load
+	 * @required
 	 */
 	js?: string;
 
+	/**
+	 * @ignore
+	 */
 	className?: string;
+
+	/**
+	 * @ignore
+	 */
 	class?: ClassConstructor<T>;
 	//loader?: () => Promise<object | HTMLElement>;
 }
@@ -144,13 +178,11 @@ export interface ManifestClassWithClassConstructor extends ManifestClass {
 }
 
 export interface ManifestElement extends ManifestWithLoader<object | HTMLElement> {
-	/**
-	 * The type of extension such as dashboard etc...
-	 */
-	type: ManifestStandardTypes;
+	//type: ManifestStandardTypes;
 
 	/**
 	 * The file location of the javascript file to load
+	 * @required
 	 */
 	js?: string;
 
@@ -159,11 +191,12 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
 	 */
 	elementName?: string;
+	//loader?: () => Promise<object | HTMLElement>;
 
 	/**
 	 * This contains properties specific to the type of extension
 	 */
-	meta?: unknown;
+	meta?: any;
 }
 
 export interface ManifestWithView extends ManifestElement {
@@ -184,23 +217,12 @@ export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;
 }
 
-export interface ManifestCustom extends ManifestBase {
-	type: 'custom';
-
-	/**
-	 * This contains properties specific to the type of extension
-	 */
-	meta?: unknown;
-}
-
 export interface ManifestWithMeta extends ManifestBase {
 	/**
 	 * This contains properties specific to the type of extension
 	 */
 	meta: unknown;
 }
-
-export type ClassConstructor<T> = new (...args: any[]) => T;
 
 /**
  * This type of extension gives full control and will simply load the specified JS file

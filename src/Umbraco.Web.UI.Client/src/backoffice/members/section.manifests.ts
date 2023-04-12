@@ -1,4 +1,4 @@
-import type { ManifestDashboard, ManifestSection, ManifestMenuSectionSidebarApp } from '@umbraco-cms/models';
+import type { ManifestDashboard, ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 const sectionAlias = 'Umb.Section.Members';
 
@@ -22,21 +22,26 @@ const dashboards: Array<ManifestDashboard> = [
 		loader: () => import('./dashboards/welcome/dashboard-members-welcome.element'),
 		meta: {
 			label: 'Members',
-			sections: [sectionAlias],
 			pathname: 'members',
+		},
+		conditions: {
+			sections: [sectionAlias],
 		},
 	},
 ];
 
-const menuSectionSidebarApp: ManifestMenuSectionSidebarApp = {
-	type: 'menuSectionSidebarApp',
+const menuSectionSidebarApp: ManifestTypes = {
+	type: 'sectionSidebarApp',
+	kind: 'menu',
 	alias: 'Umb.SectionSidebarMenu.Members',
 	name: 'Members Section Sidebar Menu',
 	weight: 100,
 	meta: {
 		label: 'Members',
-		sections: [sectionAlias],
 		menu: 'Umb.Menu.Members',
+	},
+	conditions: {
+		sections: [sectionAlias],
 	},
 };
 

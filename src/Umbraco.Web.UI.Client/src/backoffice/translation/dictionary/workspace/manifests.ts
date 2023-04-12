@@ -1,6 +1,10 @@
 import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
-import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestWorkspace,
+	ManifestWorkspaceAction,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspaceAlias = 'Umb.Workspace.Dictionary';
 
@@ -22,10 +26,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('./views/edit/workspace-view-dictionary-edit.element'),
 		weight: 100,
 		meta: {
-			workspaces: [workspaceAlias],
 			label: 'Edit',
 			pathname: 'edit',
 			icon: 'edit',
+		},
+		conditions: {
+			workspaces: [workspaceAlias],
 		},
 	},
 ];
@@ -37,11 +43,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		name: 'Save Dictionary Workspace Action',
 		weight: 90,
 		meta: {
-			workspaces: ['Umb.Workspace.Dictionary'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.Dictionary'],
 		},
 	},
 ];

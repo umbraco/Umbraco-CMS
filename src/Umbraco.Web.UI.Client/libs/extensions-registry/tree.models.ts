@@ -1,4 +1,4 @@
-import type { ClassConstructor, ManifestBase } from './models';
+import type { ManifestBase } from './models';
 
 export interface ManifestTree extends ManifestBase {
 	type: 'tree';
@@ -6,6 +6,5 @@ export interface ManifestTree extends ManifestBase {
 }
 
 export interface MetaTree {
-	storeAlias?: string;
-	repository?: ClassConstructor<unknown>;
+	repositoryAlias: string;
 }

@@ -2,9 +2,9 @@ import '../workspace-layout/workspace-layout.element';
 import './workspace-footer-layout.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
-import type { UmbWorkspaceFooterLayout } from './workspace-footer-layout.element';
+import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer-layout.element';
 
 export default {
 	title: 'Workspaces/Shared/Footer Layout',
@@ -12,7 +12,7 @@ export default {
 	id: 'umb-workspace-footer-layout',
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceFooterLayout> = () => html` <umb-workspace-footer-layout>
+export const AAAOverview: Story<UmbWorkspaceFooterLayoutElement> = () => html` <umb-workspace-footer-layout>
 	<div><uui-button color="" look="placeholder">Footer slot</uui-button></div>
 	<div slot="actions"><uui-button color="" look="placeholder">Actions slot</uui-button></div>
 </umb-workspace-footer-layout>`;

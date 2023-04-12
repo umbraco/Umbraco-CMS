@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DocumentBlueprintTreeItemModel } from '../models/DocumentBlueprintTreeItemModel';
-import type { PagedDocumentBlueprintTreeItemModel } from '../models/PagedDocumentBlueprintTreeItemModel';
+import type { DocumentBlueprintResponseModel } from '../models/DocumentBlueprintResponseModel';
+import type { PagedDocumentBlueprintTreeItemResponseModel } from '../models/PagedDocumentBlueprintTreeItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -14,22 +14,22 @@ export class DocumentBlueprintResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTreeDocumentBlueprintItem({
-        key,
+    public static getDocumentBlueprintItem({
+        id,
     }: {
-        key?: Array<string>,
-    }): CancelablePromise<Array<DocumentBlueprintTreeItemModel>> {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DocumentBlueprintResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/tree/document-blueprint/item',
+            url: '/umbraco/management/api/v1/document-blueprint/item',
             query: {
-                'key': key,
+                'id': id,
             },
         });
     }
 
     /**
-     * @returns PagedDocumentBlueprintTreeItemModel Success
+     * @returns PagedDocumentBlueprintTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDocumentBlueprintRoot({
@@ -38,7 +38,7 @@ export class DocumentBlueprintResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedDocumentBlueprintTreeItemModel> {
+    }): CancelablePromise<PagedDocumentBlueprintTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document-blueprint/root',

@@ -6,11 +6,11 @@ import {
 	UmbNotificationHandler,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/notification';
-import { UmbLitElement } from '@umbraco-cms/element';
+} from '@umbraco-cms/backoffice/notification';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-notification-container')
-export class UmbBackofficeNotificationContainer extends UmbLitElement {
+export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -65,6 +65,6 @@ export class UmbBackofficeNotificationContainer extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-backoffice-notification-container': UmbBackofficeNotificationContainer;
+		'umb-backoffice-notification-container': UmbBackofficeNotificationContainerElement;
 	}
 }

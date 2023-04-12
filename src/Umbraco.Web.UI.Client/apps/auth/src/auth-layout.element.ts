@@ -1,10 +1,10 @@
-import {css, CSSResultGroup, html, LitElement, unsafeCSS} from 'lit';
+import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import logoImg from '/umbraco_logomark_white.svg';
 import loginImg from '/login.jpeg';
 
 @customElement('umb-auth-layout')
-export class UmbAuthLayout extends LitElement {
+export class UmbAuthLayoutElement extends LitElement {
 	static styles: CSSResultGroup = [
 		css`
 			#background {
@@ -69,6 +69,6 @@ export class UmbAuthLayout extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-auth-layout': UmbAuthLayout;
+		'umb-auth-layout': UmbAuthLayoutElement;
 	}
 }

@@ -1,8 +1,8 @@
 import { css, html, LitElement, nothing } from 'lit';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbTableColumn, UmbTableItem } from '../../../../../../shared/components/table';
-import { UmbExecutedEvent } from '@umbraco-cms/events';
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
 // TODO: this could be done more generic, but for now we just need it for the document table
 @customElement('umb-document-table-actions-column-layout')
@@ -70,7 +70,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 					<umb-entity-action-list
 						@executed=${this.#onActionExecuted}
 						entity-type=${ifDefined(this.value.entityType)}
-						unique=${ifDefined(this.item.key)}></umb-entity-action-list>
+						unique=${ifDefined(this.item.id)}></umb-entity-action-list>
 				</uui-scroll-container>
 			</div>
 		`;

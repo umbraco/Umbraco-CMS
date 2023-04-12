@@ -1,28 +1,40 @@
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
-import type { FolderTreeItemModel, DataTypeModel } from '@umbraco-cms/backend-api';
+import type {
+	FolderTreeItemResponseModel,
+	DataTypeResponseModel,
+	CreateFolderRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-// TODO: investigate why we don't get an entity type as part of the DataTypeModel
-export const data: Array<DataTypeModel & { type: 'data-type' }> = [
+// TODO: investigate why we don't get an type as part of the DataTypeModel
+export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | FolderTreeItemResponseModel> = [
 	{
 		$type: 'data-type',
 		type: 'data-type',
-		key: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
-		parentKey: null,
+		name: 'Folder 1',
+		id: 'dt-folder1',
+		parentId: null,
+		isFolder: true,
+	},
+	{
+		$type: 'data-type',
+		type: 'data-type',
+		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+		parentId: null,
 		name: 'Textstring',
 		propertyEditorAlias: 'Umbraco.TextBox',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.TextBox',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Text',
-		key: 'dt-textBox',
-		parentKey: null,
+		id: 'dt-textBox',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.TextBox',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.TextBox',
-		data: [
+		values: [
 			{
 				alias: 'maxChars',
 				value: 10,
@@ -33,31 +45,31 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Text Area',
-		key: 'dt-textArea',
-		parentKey: null,
+		id: 'dt-textArea',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.TextArea',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.TextArea',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'My JS Property Editor',
-		key: 'dt-custom',
-		parentKey: null,
+		id: 'dt-custom',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.JSON',
 		propertyEditorUiAlias: 'My.PropertyEditorUI.Custom',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Color Picker',
-		key: 'dt-colorPicker',
-		parentKey: null,
+		id: 'dt-colorPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.ColorPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.ColorPicker',
-		data: [
+		values: [
 			{
 				alias: 'useLabel',
 				value: true,
@@ -109,11 +121,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Content Picker',
-		key: 'dt-contentPicker',
-		parentKey: null,
+		id: 'dt-contentPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.ContentPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DocumentPicker',
-		data: [
+		values: [
 			{
 				alias: 'validationLimit',
 				value: { min: 2, max: 4 },
@@ -124,11 +136,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Eye Dropper',
-		key: 'dt-eyeDropper',
-		parentKey: null,
+		id: 'dt-eyeDropper',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.ColorPicker.EyeDropper',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.EyeDropper',
-		data: [
+		values: [
 			{
 				//showPalette
 				alias: 'palette',
@@ -161,11 +173,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Multi URL Picker',
-		key: 'dt-multiUrlPicker',
-		parentKey: null,
+		id: 'dt-multiUrlPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.MultiUrlPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MultiUrlPicker',
-		data: [
+		values: [
 			{
 				alias: 'overlaySize',
 				value: 'small',
@@ -192,21 +204,21 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Multi Node Tree Picker',
-		key: 'dt-multiNodeTreePicker',
-		parentKey: null,
+		id: 'dt-multiNodeTreePicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.MultiNodeTreePicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.TreePicker',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Date Picker',
-		key: 'dt-datePicker',
-		parentKey: null,
+		id: 'dt-datePicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.DateTime',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
-		data: [
+		values: [
 			{
 				alias: 'format',
 				value: 'YYYY-MM-DD',
@@ -221,11 +233,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		name: 'Date Picker With Time',
 		type: 'data-type',
-		key: 'dt-datePicker-time',
-		parentKey: null,
+		id: 'dt-datePicker-time',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.DateTime',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
-		data: [
+		values: [
 			{
 				alias: 'format',
 				value: 'YYYY-MM-DD HH:mm:ss',
@@ -240,11 +252,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		name: 'Time',
 		type: 'data-type',
-		key: 'dt-time',
-		parentKey: null,
+		id: 'dt-time',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.DateTime',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
-		data: [
+		values: [
 			{
 				alias: 'format',
 				value: 'HH:mm:ss',
@@ -259,21 +271,21 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Email',
-		key: 'dt-email',
-		parentKey: null,
+		id: 'dt-email',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.EmailAddress',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Email',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Multiple Text String',
-		key: 'dt-multipleTextString',
-		parentKey: null,
+		id: 'dt-multipleTextString',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.MultipleTextString',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MultipleTextString',
-		data: [
+		values: [
 			{
 				alias: 'minNumber',
 				value: 2,
@@ -288,21 +300,21 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Dropdown',
-		key: 'dt-dropdown',
-		parentKey: null,
+		id: 'dt-dropdown',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.DropDown.Flexible',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Dropdown',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Slider',
-		key: 'dt-slider',
-		parentKey: null,
+		id: 'dt-slider',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.Slider',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Slider',
-		data: [
+		values: [
 			{
 				alias: 'enableRange',
 				value: true,
@@ -333,11 +345,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Toggle',
-		key: 'dt-toggle',
-		parentKey: null,
+		id: 'dt-toggle',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.TrueFalse',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Toggle',
-		data: [
+		values: [
 			{
 				alias: 'default',
 				value: false,
@@ -360,31 +372,31 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Tags',
-		key: 'dt-tags',
-		parentKey: null,
+		id: 'dt-tags',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.Tags',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Tags',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Markdown Editor',
-		key: 'dt-markdownEditor',
-		parentKey: null,
+		id: 'dt-markdownEditor',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.MarkdownEditor',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MarkdownEditor',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Radio Button List',
-		key: 'dt-radioButtonList',
-		parentKey: null,
+		id: 'dt-radioButtonList',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.RadioButtonList',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.RadioButtonList',
-		data: [
+		values: [
 			{
 				alias: 'items',
 				value: {
@@ -399,11 +411,11 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Checkbox List',
-		key: 'dt-checkboxList',
-		parentKey: null,
+		id: 'dt-checkboxList',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.CheckboxList',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.CheckboxList',
-		data: [
+		values: [
 			{
 				alias: 'items',
 				value: {
@@ -418,171 +430,176 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Block List',
-		key: 'dt-blockList',
-		parentKey: null,
+		id: 'dt-blockList',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.BlockList',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.BlockList',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Media Picker',
-		key: 'dt-mediaPicker',
-		parentKey: null,
+		id: 'dt-mediaPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.MediaPicker3',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MediaPicker',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Image Cropper',
-		key: 'dt-imageCropper',
-		parentKey: null,
+		id: 'dt-imageCropper',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.ImageCropper',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.ImageCropper',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Upload Field',
-		key: 'dt-uploadField',
-		parentKey: null,
+		id: 'dt-uploadField',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.UploadField',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.UploadField',
-		data: [],
+		values: [
+			{
+				alias: 'fileExtensions',
+				value: ['jpg', 'jpeg', 'png'],
+			},
+		],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Block Grid',
-		key: 'dt-blockGrid',
-		parentKey: null,
+		id: 'dt-blockGrid',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.BlockGrid',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.BlockGrid',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Collection View',
-		key: 'dt-collectionView',
-		parentKey: null,
+		id: 'dt-collectionView',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.ListView',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.CollectionView',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Icon Picker',
-		key: 'dt-iconPicker',
-		parentKey: null,
+		id: 'dt-iconPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.IconPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.IconPicker',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Number Range',
-		key: 'dt-numberRange',
-		parentKey: null,
+		id: 'dt-numberRange',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.JSON',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.NumberRange',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Order Direction',
-		key: 'dt-orderDirection',
-		parentKey: null,
+		id: 'dt-orderDirection',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.JSON',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.OrderDirection',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Overlay Size',
-		key: 'dt-overlaySize',
-		parentKey: null,
+		id: 'dt-overlaySize',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.JSON',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.OverlaySize',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Rich Text Editor',
-		key: 'dt-richTextEditor',
-		parentKey: null,
+		id: 'dt-richTextEditor',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.TinyMCE',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Label',
-		key: 'dt-label',
-		parentKey: null,
+		id: 'dt-label',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.Label',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Label',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Integer',
-		key: 'dt-integer',
-		parentKey: null,
+		id: 'dt-integer',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.Integer',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Integer',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Decimal',
-		key: 'dt-decimal',
-		parentKey: null,
+		id: 'dt-decimal',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.Decimal',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Decimal',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'User Picker',
-		key: 'dt-userPicker',
-		parentKey: null,
+		id: 'dt-userPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.UserPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.UserPicker',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Member Picker',
-		key: 'dt-memberPicker',
-		parentKey: null,
+		id: 'dt-memberPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.MemberPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MemberPicker',
-		data: [],
+		values: [],
 	},
 	{
 		$type: 'data-type',
 		type: 'data-type',
 		name: 'Member Group Picker',
-		key: 'dt-memberGroupPicker',
-		parentKey: null,
+		id: 'dt-memberGroupPicker',
+		parentId: null,
 		propertyEditorAlias: 'Umbraco.MemberGroupPicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.MemberGroupPicker',
-		data: [],
+		values: [],
 	},
 ];
 
@@ -590,24 +607,46 @@ export const data: Array<DataTypeModel & { type: 'data-type' }> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDataTypeData extends UmbEntityData<DataTypeModel> {
+class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeItemResponseModel> {
 	constructor() {
 		super(data);
 	}
 
-	getTreeRoot(): Array<FolderTreeItemModel> {
-		const rootItems = this.data.filter((item) => item.parentKey === null);
+	getTreeRoot(): Array<FolderTreeItemResponseModel> {
+		const rootItems = this.data.filter((item) => item.parentId === null);
 		return rootItems.map((item) => createFolderTreeItem(item));
 	}
 
-	getTreeItemChildren(key: string): Array<FolderTreeItemModel> {
-		const childItems = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): Array<FolderTreeItemResponseModel> {
+		const childItems = this.data.filter((item) => item.parentId === id);
 		return childItems.map((item) => createFolderTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<FolderTreeItemModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<FolderTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createFolderTreeItem(item));
+	}
+
+	createFolder(folder: CreateFolderRequestModel & { id: string | undefined }) {
+		const newFolder: FolderTreeItemResponseModel = {
+			name: folder.name,
+			id: folder.id,
+			parentId: folder.parentId,
+			$type: 'data-type',
+			type: 'data-type',
+			isFolder: true,
+			isContainer: false,
+		};
+
+		this.data.push(newFolder);
+	}
+
+	// TODO: this could be reused across other types that support folders
+	deleteFolder(id: string) {
+		const item = this.getById(id) as FolderTreeItemResponseModel;
+		if (!item) throw new Error(`Item with id ${id} not found`);
+		if (!item.isFolder) throw new Error(`Item with id ${id} is not a folder`);
+		this.data = this.data.filter((item) => item.id !== id);
 	}
 }
 

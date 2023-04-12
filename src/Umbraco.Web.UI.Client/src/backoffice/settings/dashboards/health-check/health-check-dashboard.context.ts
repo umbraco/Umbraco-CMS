@@ -1,6 +1,6 @@
 import { UmbHealthCheckContext } from './health-check.context';
-import type { ManifestHealthCheck } from '@umbraco-cms/models';
-import { UmbContextToken } from '@umbraco-cms/context-api';
+import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbHealthCheckDashboardContext {
 	#manifests: ManifestHealthCheck[] = [];

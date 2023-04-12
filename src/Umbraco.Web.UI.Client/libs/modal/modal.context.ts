@@ -1,13 +1,12 @@
 // TODO: remove this import when the search hack is removed
 import '../../src/backoffice/search/modals/search/search-modal.element';
 
-import { UUIModalSidebarSize } from '@umbraco-ui/uui-modal-sidebar';
+import type { UUIModalDialogElement, UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
-import type { UUIModalDialogElement } from '@umbraco-ui/uui-modal-dialog';
 import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -20,12 +19,12 @@ export interface UmbModalConfig {
 // TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
 // TODO: move all layouts into their correct "silo" folders. User picker should live with users etc.
 export class UmbModalContext {
-	host: UmbControllerHostInterface;
+	host: UmbControllerHostElement;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
-	#modals = new BehaviorSubject(<Array<UmbModalHandler<any, any>>>[]);
+	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
 	public readonly modals = this.#modals.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.host = host;
 	}
 
@@ -76,7 +75,7 @@ export class UmbModalContext {
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalContext
 	 */
-	public open<ModalData = unknown, ModalResult = unknown>(
+	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig

@@ -15,7 +15,7 @@ import { customElement, property, state } from 'lit/decorators.js';
  * @extends {UmbLitElement}
  */
 @customElement('umb-body-layout')
-export class UmbBodyLayout extends LitElement {
+export class UmbBodyLayoutElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -32,7 +32,7 @@ export class UmbBodyLayout extends LitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
-				height: 70px;
+				height: var(--umb-header-layout-height);
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
 				box-sizing: border-box;
@@ -136,6 +136,6 @@ export class UmbBodyLayout extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-body-layout': UmbBodyLayout;
+		'umb-body-layout': UmbBodyLayoutElement;
 	}
 }
