@@ -110,10 +110,10 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	onChangeState = () => {
+
 		this.reset();
 
 		const searchQuery = query();
-
 		if (searchQuery.lq) {
 			const sanitizedQuery = decodeURIComponent(searchQuery.lq);
 			this.setFilterExpression(sanitizedQuery);
