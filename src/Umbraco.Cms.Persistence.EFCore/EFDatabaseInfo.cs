@@ -40,7 +40,7 @@ internal class EFDatabaseInfo : DatabaseInfoBase
                 bool keyValueTableExists;
                 if (db.Database.IsSqlite())
                 {
-                    keyValueTableExists = await db.Database.ExecuteScalarAsync<int>(
+                    keyValueTableExists = await db.Database.ExecuteScalarAsync<long>(
                         $"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '%umbracoKeyValue%';") > 0;
                 }
                 else
