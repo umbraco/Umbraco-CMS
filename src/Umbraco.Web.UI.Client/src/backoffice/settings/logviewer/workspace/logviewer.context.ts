@@ -162,6 +162,7 @@ export class UmbLogViewerWorkspaceContext {
 		this.#dateRange.next({ startDate, endDate });
 		this.validateLogSize();
 		this.getLogCount();
+		this.getMessageTemplates(0, 10);
 	}
 
 	async getSavedSearches() {
@@ -230,8 +231,8 @@ export class UmbLogViewerWorkspaceContext {
 		}
 	}
 
-	async getMessageTemplates(skip: number, take: number) {
-		const { data } = await this.#repository.getMessageTemplates({ skip, take });
+	async getMessageTemplates(skip: number, take: number, 	) {
+		const { data } = await this.#repository.getMessageTemplates({ skip, take,...this.#dateRange.getValue()});
 
 		if (data) {
 			this.#messageTemplates.next(data);

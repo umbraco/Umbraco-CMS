@@ -57,10 +57,20 @@ export class UmbLogViewerRepository {
 		this.#searchDataSource.deleteSavedSearchByName({ name });
 	}
 
-	async getMessageTemplates({ skip, take }: { skip: number; take: number }) {
+	async getMessageTemplates({
+		skip,
+		take,
+		startDate,
+		endDate,
+	}: {
+		skip: number;
+		take: number;
+		startDate?: string;
+		endDate?: string;
+	}) {
 		await this.#init();
 
-		return this.#messagesDataSource.getLogViewerMessageTemplate({ skip, take });
+		return this.#messagesDataSource.getLogViewerMessageTemplate({ skip, take, startDate, endDate });
 	}
 
 	async getLogCount({ startDate, endDate }: { startDate?: string; endDate?: string }) {
