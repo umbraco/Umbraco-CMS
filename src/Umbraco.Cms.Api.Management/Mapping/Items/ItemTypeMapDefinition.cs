@@ -1,7 +1,5 @@
-﻿using NPoco.FluentMappings;
-using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
+﻿using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
-using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
@@ -11,8 +9,8 @@ using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType.Items;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Item;
+using Umbraco.Cms.Api.Management.ViewModels.UserGroups.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Users.Item;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -36,6 +34,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IMediaEntitySlim, MediaItemResponseModel>((_, _) => new MediaItemResponseModel(), Map);
         mapper.Define<IMember, MemberItemResponseModel>((_, _) => new MemberItemResponseModel(), Map);
         mapper.Define<IUser, UserItemResponseModel>((_, _) => new UserItemResponseModel(), Map);
+        mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -127,5 +126,13 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Id = source.Key;
         target.Name = source.Name ?? source.Username;
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(IUserGroup source, UserGroupItemResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? source.Alias;
+        target.Icon = source.Icon;
     }
 }
