@@ -78,7 +78,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	#onAddGroup = () => {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
-		this._groupStructureHelper.addGroup(this._ownerTabId);
+		this._groupStructureHelper.addContainer(this._ownerTabId);
 	};
 
 	render() {

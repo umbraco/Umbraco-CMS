@@ -27,7 +27,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	#documentTypeRepository: R;
 
-	#rootDocumentTypeKey?: string;
+	#rootDocumentTypeId?: string;
 	#documentTypeObservers = new Array<UmbControllerInterface>();
 	#documentTypes = new ArrayState<T>([], (x) => x.id);
 	readonly documentTypes = this.#documentTypes.asObservable();
@@ -62,7 +62,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	public async loadType(id?: string) {
 		this._reset();
 
-		this.#rootDocumentTypeKey = id;
+		this.#rootDocumentTypeId = id;
 
 		const promiseResult = this._loadType(id);
 		this.#init = promiseResult;
@@ -78,7 +78,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		const { data } = await this.#documentTypeRepository.createScaffold(parentId);
 		if (!data) return {};
 
-		this.#rootDocumentTypeKey = data.id;
+		this.#rootDocumentTypeId = data.id;
 
 		this.#init = this._observeDocumentType(data);
 		await this.#init;
@@ -139,13 +139,13 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	/** Public methods for consuming structure: */
 
 	rootDocumentType() {
-		return this.#documentTypes.getObservablePart((x) => x.find((y) => y.id === this.#rootDocumentTypeKey));
+		return this.#documentTypes.getObservablePart((x) => x.find((y) => y.id === this.#rootDocumentTypeId));
 	}
 	getRootDocumentType() {
-		return this.#documentTypes.getValue().find((y) => y.id === this.#rootDocumentTypeKey);
+		return this.#documentTypes.getValue().find((y) => y.id === this.#rootDocumentTypeId);
 	}
 	updateRootDocumentType(entry: T) {
-		this.#documentTypes.updateOne(this.#rootDocumentTypeKey, entry);
+		this.#documentTypes.updateOne(this.#rootDocumentTypeId, entry);
 	}
 
 	// We could move the actions to another class?
@@ -157,7 +157,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		sortOrder?: number
 	) {
 		await this.#init;
-		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeKey!;
+		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeId!;
 
 		const container: PropertyTypeContainerResponseModelBaseModel = {
 			id: generateGuid(),
@@ -175,9 +175,24 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		return container;
 	}
 
+	async updateContainer(
+		documentTypeId: string | null,
+		groupKey: string,
+		partialUpdate: Partial<PropertyTypeContainerResponseModelBaseModel>
+	) {
+		await this.#init;
+		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+
+		const frozenContainers = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.containers ?? [];
+
+		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === groupKey);
+
+		this.#documentTypes.updateOne(documentTypeId, { containers });
+	}
+
 	async removeContainer(documentTypeKey: string | null, containerId: string | null = null) {
 		await this.#init;
-		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeKey!;
+		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeId!;
 
 		const frozenContainers = this.#documentTypes.getValue().find((x) => x.id === documentTypeKey)?.containers ?? [];
 		const containers = frozenContainers.filter((x) => x.id !== containerId);
@@ -185,9 +200,9 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		this.#documentTypes.updateOne(documentTypeKey, { containers });
 	}
 
-	async createProperty(documentTypeKey: string | null, containerId: string | null = null, sortOrder?: number) {
+	async createProperty(documentTypeId: string | null, containerId: string | null = null, sortOrder?: number) {
 		await this.#init;
-		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeKey!;
+		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
 
 		const property: PropertyTypeResponseModelBaseModel = {
 			id: generateGuid(),
@@ -195,27 +210,27 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 			//sortOrder: sortOrder ?? 0,
 		};
 
-		const properties = [...(this.#documentTypes.getValue().find((x) => x.id === documentTypeKey)?.properties ?? [])];
+		const properties = [...(this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [])];
 		properties.push(property);
 
-		this.#documentTypes.updateOne(documentTypeKey, { properties });
+		this.#documentTypes.updateOne(documentTypeId, { properties });
 
 		return property;
 	}
 
 	async updateProperty(
-		documentTypeKey: string | null,
-		propertyKey: string,
+		documentTypeId: string | null,
+		propertyId: string,
 		partialUpdate: Partial<DocumentTypePropertyTypeResponseModel>
 	) {
 		await this.#init;
-		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeKey!;
+		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
 
-		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeKey)?.properties ?? [];
+		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [];
 
-		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyKey);
+		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyId);
 
-		this.#documentTypes.updateOne(documentTypeKey, { properties });
+		this.#documentTypes.updateOne(documentTypeId, { properties });
 	}
 
 	/*
@@ -229,7 +244,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	rootDocumentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
-			const docType = docTypes.find((x) => x.id === this.#rootDocumentTypeKey);
+			const docType = docTypes.find((x) => x.id === this.#rootDocumentTypeId);
 			return docType ? mappingFunction(docType) : undefined;
 		});
 	}
