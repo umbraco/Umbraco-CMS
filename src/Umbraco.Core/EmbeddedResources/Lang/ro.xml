@@ -15,4 +15,43 @@
     <key alias="translation">Traduceri</key>
     <key alias="users">Utilizatori</key>
   </area>
+  <area alias="treeHeaders">
+    <key alias="content">Conţinut</key>
+    <key alias="contentBlueprints">Content Templates</key>
+    <key alias="media">Media</key>
+    <key alias="cacheBrowser">Cache Browser</key>
+    <key alias="contentRecycleBin">Recycle Bin</key>
+    <key alias="createdPackages">Created packages</key>
+    <key alias="dataTypes">Tipuri de date</key>
+    <key alias="dictionary">Dictionary</key>
+    <key alias="installedPackages">Installed packages</key>
+    <key alias="installSkin">Install skin</key>
+    <key alias="installStarterKit">Install starter kit</key>
+    <key alias="languages">Languages</key>
+    <key alias="localPackage">Install local package</key>
+    <key alias="macros">Macros</key>
+    <key alias="mediaTypes">Media Types</key>
+    <key alias="member">Members</key>
+    <key alias="memberGroups">Member Groups</key>
+    <key alias="memberRoles">Member Roles</key>
+    <key alias="memberTypes">Member Types</key>
+    <key alias="documentTypes">Document Types</key>
+    <key alias="relationTypes">Relation Types</key>
+    <key alias="packager">Packages</key>
+    <key alias="packages">Packages</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Macro Files</key>
+    <key alias="repositories">Install from repository</key>
+    <key alias="runway">Install Runway</key>
+    <key alias="runwayModules">Runway modules</key>
+    <key alias="scripting">Scripting Files</key>
+    <key alias="scripts">Scripts</key>
+    <key alias="stylesheets">Stylesheets</key>
+    <key alias="templates">Templates</key>
+    <key alias="logViewer">Log Viewer</key>
+    <key alias="users">Users</key>
+    <key alias="settingsGroup">Settings</key>
+    <key alias="templatingGroup">Templating</key>
+    <key alias="thirdPartyGroup">Third Party</key>
+  </area>
 </language>
