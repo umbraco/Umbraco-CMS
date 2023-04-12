@@ -7,6 +7,7 @@ import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/obser
 
 export class UmbWorkspacePropertyStructureHelper {
 	#host: UmbControllerHostElement;
+	#init;
 
 	#workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -19,10 +20,10 @@ export class UmbWorkspacePropertyStructureHelper {
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
-		new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		this.#init = new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
 			this._observeGroupContainers();
-		});
+		}).asPromise();
 	}
 
 	public setContainerType(value?: PropertyContainerTypes) {
@@ -97,9 +98,11 @@ export class UmbWorkspacePropertyStructureHelper {
 		);
 	}
 
+	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
 
 	async addProperty(ownerKey?: string, sortOrder?: number) {
+		await this.#init;
 		if (!this.#workspaceContext) return;
 
 		return await this.#workspaceContext.structure.createProperty(null, ownerKey, sortOrder);
@@ -107,6 +110,7 @@ export class UmbWorkspacePropertyStructureHelper {
 
 	// Takes optional arguments as this is easier for the implementation in the view:
 	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<DocumentTypePropertyTypeResponseModel>) {
+		await this.#init;
 		if (!this.#workspaceContext || !propertyKey || !partialUpdate) return;
 
 		return await this.#workspaceContext.structure.updateProperty(null, propertyKey, partialUpdate);
