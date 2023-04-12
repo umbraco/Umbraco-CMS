@@ -22,18 +22,9 @@ public class ByQueryTagController : TagControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<TagResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<TagResponseModel>>> ByQuery(string? tagGroup, string? culture, string? query = null, int skip = 0, int take = 100)
+    public async Task<ActionResult<PagedViewModel<TagResponseModel>>> ByQuery(string? tagGroup, string? culture, string query, int skip = 0, int take = 100)
     {
-        IEnumerable<ITag> result;
-
-        if (query is not null)
-        {
-            result = await _tagService.GetByQueryAsync(query, tagGroup, culture);
-        }
-        else
-        {
-            result = await _tagService.GetAllAsync(tagGroup, culture);
-        }
+        IEnumerable<ITag> result = await _tagService.GetByQueryAsync(query, tagGroup, culture);
 
         List<TagResponseModel> responseModels = _mapper.MapEnumerable<ITag, TagResponseModel>(result);
 
