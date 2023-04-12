@@ -45,7 +45,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	_language?: LanguageResponseModel;
 
 	@state()
-	_isNew = false;
+	_isNew?: boolean;
 
 	constructor() {
 		super();
