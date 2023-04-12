@@ -1,25 +1,16 @@
 import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbDetailRepository<DetailType> {
-	createScaffold(parentId: string | null): Promise<{
-		data?: DetailType;
-		error?: ProblemDetailsModel;
-	}>;
+export interface UmbRepositoryErrorResponse {
+	error?: ProblemDetailsModel;
+}
+export interface UmbRepositoryResponse<T> extends UmbRepositoryErrorResponse {
+	data?: T;
+}
 
-	requestById(id: string): Promise<{
-		data?: DetailType;
-		error?: ProblemDetailsModel;
-	}>;
-
-	create(data: DetailType): Promise<{
-		error?: ProblemDetailsModel;
-	}>;
-
-	save(data: DetailType): Promise<{
-		error?: ProblemDetailsModel;
-	}>;
-
-	delete(id: string): Promise<{
-		error?: ProblemDetailsModel;
-	}>;
+export interface UmbDetailRepository<CreateRequestType = any, UpdateRequestType = any, ResponseType = any> {
+	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<CreateRequestType>>;
+	requestById(id: string): Promise<UmbRepositoryResponse<ResponseType>>;
+	create(data: CreateRequestType): Promise<UmbRepositoryErrorResponse>;
+	save(id: string, data: UpdateRequestType): Promise<UmbRepositoryErrorResponse>;
+	delete(id: string): Promise<UmbRepositoryErrorResponse>;
 }

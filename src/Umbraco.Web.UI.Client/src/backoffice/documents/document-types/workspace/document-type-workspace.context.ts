@@ -105,7 +105,9 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	async save() {
-		this.repository.save(this.getData());
+		const id = this.getEntityId();
+		if (!id) throw new Error('Cannot save entity without id');
+		this.repository.save(id, this.getData());
 	}
 
 	public destroy(): void {

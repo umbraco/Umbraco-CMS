@@ -9,7 +9,15 @@ import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 
 	@state()
 	_dataType?: DataTypeResponseModel;

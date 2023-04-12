@@ -1,4 +1,4 @@
-import { handlers as dataTypeHandlers } from './domains/data-type.handlers';
+import { handlers as dataTypeHandlers } from './domains/data-type';
 import { handlers as documentTypeHandlers } from './domains/document-type.handlers';
 import { handlers as installHandlers } from './domains/install.handlers';
 import * as manifestsHandlers from './domains/manifests.handlers';

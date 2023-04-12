@@ -58,7 +58,9 @@ export class UmbMediaWorkspaceContext
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		// TODO: This is a hack to get around the fact that the data is not typed correctly.
+		// Create and response models are different. We need to look into this.
+		this.#data.next(data as unknown as MediaDetails);
 	}
 
 	async save() {
@@ -66,7 +68,7 @@ export class UmbMediaWorkspaceContext
 		if (this.isNew) {
 			await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value);
+			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);

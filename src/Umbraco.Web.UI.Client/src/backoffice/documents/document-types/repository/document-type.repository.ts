@@ -160,22 +160,24 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		return { error };
 	}
 
-	async save(item: ItemType) {
-		if (!item || !item.id) throw new Error('Document-Type is missing');
+	async save(id: string, item: any) {
+		if (!id) throw new Error('Id is missing');
+		if (!item) throw new Error('Item is missing');
+
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.update(item.id, item);
+		const { error } = await this.#detailDataSource.update(id, item);
 
 		if (!error) {
-			const notification = { data: { message: `Document saved` } };
-			this.#notificationContext?.peek('positive', notification);
-
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
 			this.#detailStore?.append(item);
-			this.#treeStore?.updateItem(item.id, { name: item.name });
+			this.#treeStore?.updateItem(id, item);
 			// TODO: would be nice to align the stores on methods/methodNames.
+
+			const notification = { data: { message: `Document Type saved` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };

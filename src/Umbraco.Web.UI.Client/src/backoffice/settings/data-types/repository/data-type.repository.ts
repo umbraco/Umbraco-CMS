@@ -23,11 +23,11 @@ import {
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
-type ItemType = DataTypeResponseModel;
-type TreeItemType = any;
-
 export class UmbDataTypeRepository
-	implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType>, UmbFolderRepository
+	implements
+		UmbTreeRepository<FolderTreeItemResponseModel>,
+		UmbDetailRepository<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>,
+		UmbFolderRepository
 {
 	#init!: Promise<unknown>;
 
@@ -143,8 +143,7 @@ export class UmbDataTypeRepository
 		return this.#detailStore!.byId(id);
 	}
 
-	// Could potentially be general methods:
-	async create(dataType: ItemType) {
+	async create(dataType: CreateDataTypeRequestModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.id) throw new Error('Data Type id is missing');
 
@@ -153,35 +152,37 @@ export class UmbDataTypeRepository
 		const { error } = await this.#detailSource.insert(dataType);
 
 		if (!error) {
+			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
+			const treeItem = createTreeItem(dataType);
+			this.#treeStore?.appendItems([treeItem]);
+			//this.#detailStore?.append(dataType);
+
 			const notification = { data: { message: `Data Type created` } };
 			this.#notificationContext?.peek('positive', notification);
-
-			this.#detailStore?.append(dataType);
-			this.#treeStore?.appendItems([dataType]);
 		}
 
 		return { error };
 	}
 
-	async save(dataType: ItemType) {
-		if (!dataType) throw new Error('Data Type is missing');
-		if (!dataType.id) throw new Error('Data Type id is missing');
+	async save(id: string, updatedDataType: UpdateDataTypeRequestModel) {
+		if (!id) throw new Error('Data Type id is missing');
+		if (!updatedDataType) throw new Error('Data Type is missing');
 
 		await this.#init;
 
-		const { error } = await this.#detailSource.update(dataType.id, dataType);
+		const { error } = await this.#detailSource.update(id, updatedDataType);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a template is updated in the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			// this.#detailStore?.append(dataType);
+			this.#treeStore?.updateItem(id, updatedDataType);
+
 			const notification = { data: { message: `Data Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#detailStore?.append(dataType);
-		this.#treeStore?.updateItem(dataType.id, { name: dataType.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
@@ -195,16 +196,16 @@ export class UmbDataTypeRepository
 		const { error } = await this.#detailSource.delete(id);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server.
+			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			this.#detailStore?.remove([id]);
+			this.#treeStore?.removeItem(id);
+
 			const notification = { data: { message: `Data Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server.
-		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([id]);
-		this.#treeStore?.removeItem(id);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
@@ -222,21 +223,10 @@ export class UmbDataTypeRepository
 
 		const { error } = await this.#folderSource.insert(folderRequest);
 
-		// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
 		if (!error) {
-			const treeItem: FolderTreeItemResponseModel = {
-				$type: 'FolderTreeItemResponseModel',
-				parentId: folderRequest.parentId,
-				name: folderRequest.name,
-				id: folderRequest.id,
-				isFolder: true,
-				isContainer: false,
-				type: 'data-type',
-				icon: 'umb:folder',
-				hasChildren: false,
-			};
-
-			this.#treeStore?.appendItems([treeItem]);
+			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
+			const folderTreeItem = createFolderTreeItem(folderRequest);
+			this.#treeStore?.appendItems([folderTreeItem]);
 		}
 
 		return { error };
@@ -279,3 +269,29 @@ export class UmbDataTypeRepository
 		return { data, error };
 	}
 }
+
+export const createTreeItem = (item: CreateDataTypeRequestModel): FolderTreeItemResponseModel => {
+	if (!item) throw new Error('item is null or undefined');
+	if (!item.id) throw new Error('item.id is null or undefined');
+
+	return {
+		$type: 'FolderTreeItemResponseModel',
+		type: 'data-type',
+		parentId: item.parentId,
+		name: item.name,
+		id: item.id,
+		isFolder: false,
+		isContainer: false,
+		hasChildren: false,
+	};
+};
+
+export const createFolderTreeItem = (item: CreateFolderRequestModel): FolderTreeItemResponseModel => {
+	if (!item) throw new Error('item is null or undefined');
+	if (!item.id) throw new Error('item.id is null or undefined');
+
+	return {
+		...createTreeItem(item),
+		isFolder: true,
+	};
+};

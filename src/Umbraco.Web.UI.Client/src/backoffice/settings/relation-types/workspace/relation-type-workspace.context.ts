@@ -53,13 +53,15 @@ export class UmbRelationTypeWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
+		if (!this.#data.value.id) return;
+
 		if (this.isNew) {
 			await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value);
+			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
-		// If it went well, then its not new anymore?.
 
+		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 	}
 
