@@ -7,7 +7,7 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.DataType.Create',
 		name: 'Create Data Type Entity Action',
-		weight: 900,
+		weight: 1000,
 		meta: {
 			icon: 'umb:add',
 			label: 'Create',
@@ -15,14 +15,14 @@ const entityActions: Array<ManifestTypes> = [
 			api: UmbCreateDataTypeEntityAction,
 		},
 		conditions: {
-			entityType: 'data-type-root',
+			entityType: 'data-type',
 		},
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.CreateDataType',
-		name: 'Create Data Type Modal',
-		loader: () => import('./modal/create-data-type-modal.element'),
+		alias: 'Umb.Modal.DataTypeCreateOptions',
+		name: 'Data Type Create Options Modal',
+		loader: () => import('./modal/data-type-create-options-modal.element'),
 	},
 ];
 

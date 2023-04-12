@@ -1,14 +1,16 @@
-import type { DictionaryDetails } from '../../';
-import { DictionaryDetailDataSource } from './dictionary.details.server.data.interface';
+import { v4 as uuidv4 } from 'uuid';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
 	CreateDictionaryItemRequestModel,
+	DictionaryItemResponseModel,
 	DictionaryResource,
 	ImportDictionaryRequestModel,
 	LanguageResource,
 	ProblemDetailsModel,
+	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @description - A data source for the Dictionary detail that fetches data from the server
@@ -16,7 +18,10 @@ import {
  * @class UmbDictionaryDetailServerDataSource
  * @implements {DictionaryDetailDataSource}
  */
-export class UmbDictionaryDetailServerDataSource implements DictionaryDetailDataSource {
+export class UmbDictionaryDetailServerDataSource
+	implements
+		UmbDataSource<CreateDictionaryItemRequestModel, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
+{
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {
@@ -29,11 +34,13 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async createScaffold(parentId: string) {
-		const data: DictionaryDetails = {
-			name: '',
+	async createScaffold(parentId?: string | null, name?: string) {
+		const data = {
+			id: uuidv4(),
 			parentId,
-		} as DictionaryDetails;
+			name,
+			translations: [],
+		};
 
 		return { data };
 	}
@@ -45,7 +52,7 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
 	get(id: string) {
-		return tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryById({ id })) as any;
+		return tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryById({ id }));
 	}
 
 	/**
@@ -64,13 +71,11 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async update(dictionary: DictionaryDetails) {
-		if (!dictionary.id) {
-			const error: ProblemDetailsModel = { title: 'Dictionary id is missing' };
-			return { error };
-		}
+	async update(id: string, dictionary: UpdateDictionaryItemRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!dictionary) throw new Error('Dictionary is missing');
 
-		const payload = { id: dictionary.id, requestBody: dictionary };
+		const payload = { id, requestBody: dictionary };
 		return tryExecuteAndNotify(this.#host, DictionaryResource.putDictionaryById(payload));
 	}
 
@@ -80,14 +85,8 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async insert(data: DictionaryDetails) {
-		const requestBody: CreateDictionaryItemRequestModel = {
-			parentId: data.parentId,
-			name: data.name,
-		};
-
-		// TODO: fix type mismatch:
-		return tryExecuteAndNotify(this.#host, DictionaryResource.postDictionary({ requestBody })) as any;
+	async insert(data: CreateDictionaryItemRequestModel) {
+		return tryExecuteAndNotify(this.#host, DictionaryResource.postDictionary({ requestBody: data }));
 	}
 
 	/**

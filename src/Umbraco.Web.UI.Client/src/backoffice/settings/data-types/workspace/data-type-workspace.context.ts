@@ -1,7 +1,7 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
 import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateDataTypeRequestModel, DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -9,8 +9,10 @@ export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
 	implements UmbEntityWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
+	// TODO: revisit. temp solution because the create and response models are different.
 	#data = new ObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
+
 	name = this.#data.getObservablePart((data) => data?.name);
 	id = this.#data.getObservablePart((data) => data?.id);
 
@@ -29,7 +31,9 @@ export class UmbDataTypeWorkspaceContext
 	async createScaffold(parentId: string | null) {
 		const { data } = await this.repository.createScaffold(parentId);
 		this.setIsNew(true);
-		this.#data.next(data);
+		// TODO: This is a hack to get around the fact that the data is not typed correctly.
+		// Create and response models are different. We need to look into this.
+		this.#data.next(data as unknown as DataTypeResponseModel);
 		return { data };
 	}
 
@@ -70,10 +74,12 @@ export class UmbDataTypeWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
+		if (!this.#data.value.id) return;
+
 		if (this.isNew) {
 			await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value);
+			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);

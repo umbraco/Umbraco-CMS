@@ -19,7 +19,7 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbWorkspaceC
 		// TODO: handle errors
 		if (!data) return;
 
-		this.workspaceContext.getIsNew() ? this.#create(data) : this.#update(data);
+		this.workspaceContext.getIsNew() ? this.#create(data) : this.#update();
 	}
 
 	async #create(data: any) {
@@ -41,8 +41,8 @@ export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbWorkspaceC
 		}
 	}
 
-	#update(data: any) {
+	#update() {
 		if (!this.workspaceContext) return;
-		this.workspaceContext.repository?.save(data);
+		this.workspaceContext.save();
 	}
 }

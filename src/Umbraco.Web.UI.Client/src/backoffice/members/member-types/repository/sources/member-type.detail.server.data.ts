@@ -10,7 +10,7 @@ import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
  * @class UmbMemberTypeDetailServerDataSource
  * @implements {MemberTypeDetailDataSource}
  */
-export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<MemberTypeDetails> {
+export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<any, any, any> {
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {
@@ -45,11 +45,8 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async save(memberType: MemberTypeDetails) {
-		if (!memberType.id) {
-			const error: ProblemDetailsModel = { title: 'MemberType id is missing' };
-			return { error };
-		}
+	async save(id: string, memberType: any) {
+		if (!id) throw new Error('Member Type id is missing');
 
 		const payload = { id: memberType.id, requestBody: memberType };
 		//return tryExecuteAndNotify(this.#host, MemberTypeResource.putMemberTypeByKey(payload));

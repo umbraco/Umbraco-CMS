@@ -1,16 +1,13 @@
 import { v4 as uuid } from 'uuid';
-import { ProblemDetailsModel, TemplateResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import {
+	TemplateResponseModel,
+	TemplateResource,
+	CreateTemplateRequestModel,
+	UpdateTemplateRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
-
-export interface TemplateDetailDataSource {
-	createScaffold(): Promise<DataSourceResponse<TemplateResponseModel>>;
-	get(id: string): Promise<DataSourceResponse<TemplateResponseModel>>;
-	insert(template: TemplateResponseModel): Promise<DataSourceResponse>;
-	update(template: TemplateResponseModel): Promise<DataSourceResponse>;
-	delete(id: string): Promise<DataSourceResponse>;
-}
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Template detail that fetches data from the server
@@ -18,7 +15,9 @@ export interface TemplateDetailDataSource {
  * @class UmbTemplateDetailServerDataSource
  * @implements {TemplateDetailDataSource}
  */
-export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSource {
+export class UmbTemplateDetailServerDataSource
+	implements UmbDataSource<CreateTemplateRequestModel, UpdateTemplateRequestModel, TemplateResponseModel>
+{
 	#host: UmbControllerHostElement;
 
 	/**
@@ -77,13 +76,13 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async insert(template: TemplateResponseModel) {
-		const payload = { requestBody: template };
-		// TODO: fix type mismatch
+	async insert(template: CreateTemplateRequestModel) {
+		if (!template) throw new Error('Template is missing');
+
 		return tryExecuteAndNotify(
 			this.#host,
-			tryExecuteAndNotify(this.#host, TemplateResource.postTemplate(payload)) as any
-		) as any;
+			tryExecuteAndNotify(this.#host, TemplateResource.postTemplate({ requestBody: template }))
+		);
 	}
 
 	/**
@@ -92,14 +91,10 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async update(template: TemplateResponseModel) {
-		if (!template.id) {
-			const error: ProblemDetailsModel = { title: 'Template id is missing' };
-			return { error };
-		}
-
-		const payload = { id: template.id, requestBody: template };
-		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById(payload));
+	async update(id: string, template: UpdateTemplateRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!template) throw new Error('Template is missing');
+		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById({ id, requestBody: template }));
 	}
 
 	/**
@@ -109,11 +104,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async delete(id: string) {
-		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
-		}
-
+		if (!id) throw new Error('Id is missing');
 		return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateById({ id }));
 	}
 }

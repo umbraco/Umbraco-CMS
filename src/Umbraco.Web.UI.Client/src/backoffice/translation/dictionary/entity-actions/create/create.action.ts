@@ -34,6 +34,7 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 	async execute() {
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
+		if (!this.repository) return;
 
 		// TODO: how can we get the current entity detail in the modal? Passing the observable
 		// feels a bit hacky. Works, but hacky.
@@ -46,15 +47,9 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 		const { name } = await modalHandler.onSubmit();
 		if (!name) return;
 
-		const result = await this.repository?.create({
-			$type: '',
-			name,
-			parentId: this.unique,
-			translations: [],
-			id: '',
-		});
+		const { data } = await this.repository.createScaffold(this.unique, name);
 
 		// TODO => get location header to route to new item
-		console.log(result);
+		console.log(data);
 	}
 }
