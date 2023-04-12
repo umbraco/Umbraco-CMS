@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
@@ -26,8 +27,32 @@ public static class DatabaseProviderMetadataExtensions
     /// <returns>
     ///   <c>true</c> if a database can be created for the specified provider name; otherwise, <c>false</c>.
     /// </returns>
+    [Obsolete("Use CanForceCreateDatabase that takes an IUmbracoDatabaseFactory. Scheduled for removal in Umbraco 13.")]
     public static bool CanForceCreateDatabase(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, string? providerName)
-        => databaseProviderMetadata.FirstOrDefault(x => string.Equals(x.ProviderName, providerName, StringComparison.InvariantCultureIgnoreCase))?.ForceCreateDatabase == true;
+    {
+        return databaseProviderMetadata
+            .FirstOrDefault(x =>
+                string.Equals(x.ProviderName, providerName, StringComparison.InvariantCultureIgnoreCase))
+            ?.ForceCreateDatabase == true;
+    }
+
+    /// <summary>
+    /// Determines whether a database can be created for the specified provider name while ignoring the value of <see cref="GlobalSettings.InstallMissingDatabase" />.
+    /// </summary>
+    /// <param name="databaseProviderMetadata">The database provider metadata.</param>
+    /// <param name="umbracoDatabaseFactory">The database factory.</param>
+    /// <returns>
+    ///   <c>true</c> if a database can be created for the specified database; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool CanForceCreateDatabase(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, IUmbracoDatabaseFactory umbracoDatabaseFactory)
+    {
+        // In case more metadata providers can recognize the connection string, we need to check if any can force create.
+        // E.g. Both SqlServer and SqlAzure will recognize an azure connection string, but luckily none of those can force create.
+        return databaseProviderMetadata
+            .Where(x =>
+                string.Equals(x.ProviderName, umbracoDatabaseFactory.SqlContext.SqlSyntax.ProviderName, StringComparison.InvariantCultureIgnoreCase)
+                && x.CanRecognizeConnectionString(umbracoDatabaseFactory.ConnectionString) && x.IsAvailable).Any(x => x.ForceCreateDatabase == true);
+    }
 
     /// <summary>
     /// Generates the connection string.

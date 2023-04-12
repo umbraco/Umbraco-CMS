@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     This ensures that the grid config is merged in with the front-end value
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))] // this shadows the JsonValueConverter
+[Obsolete("The grid is obsolete, will be removed in V13")]
 public class GridValueConverter : JsonValueConverter
 {
     private readonly IGridConfig _config;

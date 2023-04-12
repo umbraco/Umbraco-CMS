@@ -1,5 +1,9 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -67,5 +71,8 @@ public class UmbracoPlan : MigrationPlan
 
         // To 11.3.0
         To<V_11_3_0.AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
+
+        // To 12.0.0
+        To<UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
     }
 }

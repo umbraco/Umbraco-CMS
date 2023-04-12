@@ -10,6 +10,11 @@ public static partial class Constants
     /// </summary>
     public static class HealthChecks
     {
+        public static class RoutePath
+        {
+            public const string HealthCheck = "health-check";
+        }
+
         public static class DocumentationLinks
         {
             public const string SmtpCheck = "https://umbra.co/healthchecks-smtp";
@@ -45,6 +50,7 @@ public static partial class Constants
                 public const string ClickJackingCheck = "https://umbra.co/healthchecks-click-jacking";
                 public const string HstsCheck = "https://umbra.co/healthchecks-hsts";
                 public const string NoSniffCheck = "https://umbra.co/healthchecks-no-sniff";
+                [Obsolete("This link is not used anymore in the XSS protected check.")]
                 public const string XssProtectionCheck = "https://umbra.co/healthchecks-xss-protection";
                 public const string ExcessiveHeadersCheck = "https://umbra.co/healthchecks-excessive-headers";
 

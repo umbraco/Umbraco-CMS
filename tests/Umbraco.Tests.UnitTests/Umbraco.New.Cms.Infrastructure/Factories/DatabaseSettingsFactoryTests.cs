@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.ManagementApi.Mapping.Installer;
+using Umbraco.Cms.Api.Management.Mapping.Installer;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Umbraco.New.Cms.Infrastructure.Factories.Installer;
@@ -176,6 +176,8 @@ public class DatabaseSettingsFactoryTests
 
         public Func<DatabaseModel, string> GenerateConnectionStringDelegate { get; set; } =
             _ => "ConnectionString";
+
+        public bool CanRecognizeConnectionString(string? connectionString) => false;
 
         public string? GenerateConnectionString(DatabaseModel databaseModel) => GenerateConnectionStringDelegate(databaseModel);
     }

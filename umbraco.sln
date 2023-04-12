@@ -100,7 +100,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewBackoffice", "NewBackoff
 		.github\New BackOffice - README.md = .github\New BackOffice - README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.ManagementApi", "src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj", "{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Api.Management", "src\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj", "{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Core", "src\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj", "{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}"
 EndProject
@@ -158,6 +158,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSh
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore", "src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj", "{DCFB7164-8355-457B-A4BE-8A7378A15ADF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{05878304-40EB-4F84-B40B-91BDB70DE094}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Common", "src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj", "{D48B5D6B-82FF-4235-986C-CDE646F41DEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -323,6 +325,12 @@ Global
 		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{DCFB7164-8355-457B-A4BE-8A7378A15ADF}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
