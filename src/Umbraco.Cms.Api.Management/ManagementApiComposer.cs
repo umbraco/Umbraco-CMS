@@ -35,6 +35,7 @@ public class ManagementApiComposer : IComposer
             .AddHealthChecks()
             .AddModelsBuilder()
             .AddRedirectUrl()
+            .AddTags()
             .AddTrackedReferences()
             .AddTemporaryFiles()
             .AddDataTypes()
