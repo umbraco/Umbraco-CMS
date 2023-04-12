@@ -1,6 +1,7 @@
 // eslint-disable-next-line local-rules/no-external-imports
-import type { IRoutingInfo, ISlashOptions } from 'router-slot/model';
+import type { IRoutingInfo } from 'router-slot/model';
 import type { UmbRoute } from './route.interface';
+import { generateRoutePathBuilder } from './generate-route-path-builder.function';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
@@ -10,17 +11,6 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
-
-const PARAM_IDENTIFIER = /:([^\\/]+)/g;
-
-function stripSlash(path: string): string {
-	return slashify(path, { start: false, end: false });
-}
-
-function slashify(path: string, { start = true, end = true }: Partial<ISlashOptions> = {}): string {
-	path = start && !path.startsWith('/') ? `/${path}` : !start && path.startsWith('/') ? path.slice(1) : path;
-	return end && !path.endsWith('/') ? `${path}/` : !end && path.endsWith('/') ? path.slice(0, path.length - 1) : path;
-}
 
 export class UmbRouteContext {
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
@@ -126,16 +116,9 @@ export class UmbRouteContext {
 		if (!this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
-		const localPath = `modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
+		const localPath = routeBasePath + `modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
 
-		const urlBuilder = (params: { [key: string]: string | number }) => {
-			const localRoutePath = stripSlash(
-				localPath.replace(PARAM_IDENTIFIER, (substring: string, ...args: string[]) => {
-					return params[args[0]].toString();
-				})
-			);
-			return routeBasePath + localRoutePath;
-		};
+		const urlBuilder = generateRoutePathBuilder(localPath);
 
 		modalRegistration._internal_setRouteBuilder(urlBuilder);
 	};
