@@ -10,7 +10,7 @@ export interface MetaDashboard {
 	 * This is the URL path for the dashboard which is used for navigating or deep linking directly to the dashboard
 	 * https://yoursite.com/section/settings/dashboard/my-dashboard-path
 	 *
-	 * @example 'my-dashboard-path'
+	 * @examples 'my-dashboard-path'
 	 */
 	pathname: string;
 
@@ -21,5 +21,12 @@ export interface MetaDashboard {
 }
 
 export interface ConditionsDashboard {
+	/**
+	 * An array of section aliases that the dashboard should be available in
+	 *
+	 * @examples [
+	 *   ["Umb.Section.Content"]
+	 * ]
+	 */
 	sections: string[];
 }
