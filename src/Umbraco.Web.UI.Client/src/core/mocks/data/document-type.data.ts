@@ -12,7 +12,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		defaultTemplateId: null,
 		id: 'all-property-editors-document-type-id',
 		alias: 'blogPost',
-		name: 'Blog Post',
+		name: 'All property editors document type',
 		description: null,
 		icon: 'umb:item-arrangement',
 		allowedAsRoot: true,
