@@ -52,17 +52,9 @@ export class UmbLogViewerRepository {
 		this.#searchDataSource.postLogViewerSavedSearch({ name, query });
 	}
 
-	async removeSearch({
-		name,
-		filterExpression,
-		logLevel,
-	}: {
-		name: string;
-		filterExpression: string;
-		logLevel: Array<LogLevelModel>;
-	}) {
-		console.log('save');
+	async removeSearch({ name }: { name: string }) {
 		await this.#init();
+		this.#searchDataSource.deleteSavedSearchByName({ name });
 	}
 
 	async getMessageTemplates({ skip, take }: { skip: number; take: number }) {

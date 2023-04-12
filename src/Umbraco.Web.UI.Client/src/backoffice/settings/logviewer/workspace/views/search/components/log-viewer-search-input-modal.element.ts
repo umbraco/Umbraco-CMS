@@ -13,14 +13,6 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-dialog-layout {
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24));
-				border-radius: var(--uui-border-radius);
-				padding: var(--uui-size-space-5);
-				box-sizing: border-box;
-			}
-
 			uui-input {
 				width: 100%;
 			}
@@ -38,20 +30,37 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 		this.modalHandler?.submit({ name: this._input.value as string, query: this.data?.query });
 	}
 
-	firstUpdated() {
-		console.log('this.data', this.data);
+	@state()
+	private _hasValue = false;
+
+	#validate(event: Event) {
+		const target = event.target as UUIInputElement;
+		this._hasValue = (target.value as string).length > 0;
 	}
 
 	render() {
 		return html`
 			<uui-dialog-layout headline="Save Search">
 				<span>Enter a friendly name for your search query</span>
-				<h4>Query:</h4>
-				<span>${this.data?.query}</span>
-				<h4>Name:</h4>
-				<uui-input></uui-input>
-				<uui-button slot="actions" @click="${this._handleClose}">Close</uui-button>
-				<uui-button slot="actions" look="primary" color="positive" @click="${this._handleSubmit}">Save</uui-button>
+				<uui-form-layout-item>
+					<uui-label slot="label">Query:</uui-label>
+					<span>${this.data?.query}</span>
+				</uui-form-layout-item>
+				<uui-form-layout-item>
+					<uui-label slot="label" for="input">Name:</uui-label>
+					<uui-input label="Search name" id="input" @input=${this.#validate}></uui-input>
+				</uui-form-layout-item>
+
+				<uui-button slot="actions" @click="${this._handleClose}" label="Close dialog">Close</uui-button>
+				<uui-button
+					.disabled=${!this._hasValue}
+					slot="actions"
+					look="primary"
+					color="positive"
+					label="Save search"
+					@click="${this._handleSubmit}"
+					>Save</uui-button
+				>
 			</uui-dialog-layout>
 		`;
 	}

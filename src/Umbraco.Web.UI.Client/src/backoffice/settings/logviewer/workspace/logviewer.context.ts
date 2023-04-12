@@ -209,7 +209,16 @@ export class UmbLogViewerWorkspaceContext {
 			await this.#repository.saveSearch({ name, query });
 		} catch (err) {
 			this.#savedSearches.update({ items: previousSavedSearches });
-			console.log(err);
+		}
+	}
+
+	async removeSearch({ name }: { name: string }) {
+		const previousSavedSearches = this.#savedSearches.getValue()?.items ?? [];
+		try {
+			this.#savedSearches.update({ items: previousSavedSearches.filter((search) => search.name !== name) });
+			await this.#repository.removeSearch({ name });
+		} catch (err) {
+			this.#savedSearches.update({ items: previousSavedSearches });
 		}
 	}
 

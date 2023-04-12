@@ -1,4 +1,4 @@
-import { UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
+import { UUIButtonElement, UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
@@ -207,12 +207,13 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	#modalHandler?: UmbModalHandler;
 
-	async #saveSearch(savedSearch: SavedLogSearchResponseModel) {
-		try {
-			await this.#logViewerContext?.saveSearch(savedSearch);
-		} catch (e) {
-			console.error(e);
-		}
+	#saveSearch(savedSearch: SavedLogSearchResponseModel) {
+		this.#logViewerContext?.saveSearch(savedSearch);
+	}
+
+	#removeSearch(event: Event) {
+		const target = event.target as UUIButtonElement;
+		this.#logViewerContext?.removeSearch({ name: target.id });
 	}
 
 	#openSaveSearchDialog() {
@@ -266,7 +267,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 									@click=${() => this.#setQueryFromSavedSearch(search.query ?? '')}>
 									<span class="saved-search-item-name">${search.name}</span>
 									<span class="saved-search-item-query">${search.query}</span></button
-								><uui-button label="Remove saved search" color="danger"
+								><uui-button label="Remove saved search" id="${search.name}" color="danger" @click=${this.#removeSearch}
 									><uui-icon name="umb:trash"></uui-icon
 								></uui-button>
 							</li>`
