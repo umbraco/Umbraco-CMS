@@ -10,39 +10,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			#header {
-				display: flex;
-				flex: 1 1 auto;
-				margin: 0 var(--uui-size-layout-1);
-			}
-
-			#name {
-				width: 100%;
-				flex: 1 1 auto;
-				align-items: center;
-			}
-
-			#alias {
-				height: calc(100% - 2px);
-				--uui-input-border-width: 0;
-				--uui-button-height: calc(100% -2px);
-			}
-
-			#icon {
-				font-size: calc(var(--uui-size-layout-3) / 2);
-			}
-		`,
-	];
-
 	// TODO: notice this format is not acceptable:
 	@state()
 	private _icon = {
@@ -143,6 +110,39 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#header {
+				display: flex;
+				flex: 1 1 auto;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
+			#name {
+				width: 100%;
+				flex: 1 1 auto;
+				align-items: center;
+			}
+
+			#alias {
+				height: calc(100% - 2px);
+				--uui-input-border-width: 0;
+				--uui-button-height: calc(100% -2px);
+			}
+
+			#icon {
+				font-size: calc(var(--uui-size-layout-3) / 2);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTypeWorkspaceEditorElement;
