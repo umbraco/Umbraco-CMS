@@ -11,15 +11,22 @@ export interface ManifestEntityBulkAction extends ManifestElement, ManifestWithC
 
 export interface MetaEntityBulkAction {
 	/**
-	 *
+	 * A friendly label for the action
 	 */
 	label: string;
+
+	/**
+	 * @TJS-ignore
+	 */
 	api: any; // create interface
 
 	/**
 	 * The alias for the repsoitory of the entity type this action is for
 	 * such as 'Umb.Repository.Documents'
-	 * @example 'Umb.Repository.Documents'
+	 *
+	 * @examples [
+	 *   "Umb.Repository.Documents"
+	 * ]
 	 */
 	repositoryAlias: string;
 }

@@ -113,9 +113,10 @@ export interface ManifestBase {
 
 	/**
 	 * The kind of the extension, used to group extensions together
-	 * @example "button"
+	 *
+	 * @examples ["button"]
 	 */
-	kind?: any; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
+	kind?: unknown; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
 
 	/**
 	 * The friendly name of the extension
@@ -137,6 +138,9 @@ export interface ManifestKind {
 }
 
 export interface ManifestWithConditions<ConditionsType> {
+	/**
+	 * Set the conditions for when the extension should be loaded
+	 */
 	conditions: ConditionsType;
 }
 
@@ -155,7 +159,7 @@ export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
 
 	/**
 	 * The file location of the javascript file to load
-	 * @required
+	 * @TJS-required
 	 */
 	js?: string;
 
@@ -180,7 +184,8 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 
 	/**
 	 * The file location of the javascript file to load
-	 * @required
+	 *
+	 * @TJS-require
 	 */
 	js?: string;
 
@@ -189,12 +194,13 @@ export interface ManifestElement extends ManifestWithLoader<object | HTMLElement
 	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
 	 */
 	elementName?: string;
+
 	//loader?: () => Promise<object | HTMLElement>;
 
 	/**
 	 * This contains properties specific to the type of extension
 	 */
-	meta?: any;
+	meta?: unknown;
 }
 
 export interface ManifestWithView extends ManifestElement {

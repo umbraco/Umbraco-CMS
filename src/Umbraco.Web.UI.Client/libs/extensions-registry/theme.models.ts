@@ -10,7 +10,8 @@ export interface ManifestTheme extends ManifestWithLoader<string> {
 
 	/**
 	 * File location of the CSS file of the theme
-	 * @example 'themes/dark.theme.css'
+	 *
+	 * @examples ["themes/dark.theme.css"]
 	 */
 	css?: string;
 }

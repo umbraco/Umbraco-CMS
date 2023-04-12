@@ -10,7 +10,10 @@ export interface MetaDashboard {
 	 * This is the URL path for the dashboard which is used for navigating or deep linking directly to the dashboard
 	 * https://yoursite.com/section/settings/dashboard/my-dashboard-path
 	 *
-	 * @examples 'my-dashboard-path'
+	 * @example my-dashboard-path
+	 * @examples [
+	 *  "my-dashboard-path"
+	 * ]
 	 */
 	pathname: string;
 

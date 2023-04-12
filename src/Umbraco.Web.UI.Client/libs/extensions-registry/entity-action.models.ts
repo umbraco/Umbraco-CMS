@@ -13,25 +13,35 @@ export interface ManifestEntityAction extends ManifestElement {
 export interface MetaEntityAction {
 	/**
 	 * An icon to represent the action to be performed
-	 * @example 'umb:box'
-	 * @example 'umb:grid'
+	 *
+	 * @examples [
+	 *   "umb:box",
+	 *   "umb:grid"
+	 * ]
 	 */
 	icon?: string;
 
 	/**
 	 * The friendly name of the action to perform
-	 * @example 'Create'
-	 * @example 'Create Content Template'
+	 *
+	 * @examples [
+	 *   "Create",
+	 *   "Create Content Template"
+	 * ]
 	 */
 	label: string;
 
+	/**
+	 * @TJS-ignore
+	 */
 	api: any; // create interface
-
 
 	/**
 	 * The alias for the repsoitory of the entity type this action is for
 	 * such as 'Umb.Repository.Documents'
-	 * @example 'Umb.Repository.Documents'
+	 * @examples [
+	 *   "Umb.Repository.Documents"
+	 * ]
 	 */
 	repositoryAlias: string;
 }
