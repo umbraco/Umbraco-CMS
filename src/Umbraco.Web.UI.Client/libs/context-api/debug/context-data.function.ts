@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /**
  * Change the collection of Contexts into a simplified array of data
  * 
@@ -39,11 +40,58 @@ function contextItemData(contextInstance:any):DebugContextItemData {
                 }
 
                 const value = contextInstance[key];
-                if (typeof value === 'string' || typeof value === 'boolean') {
-                    props.push({ key: key, value: value, type: typeof value });
-                } else {
-                    props.push({ key: key, type: typeof value });
+                const valueType = typeof value;
+
+                switch (valueType) {
+                    case 'string':
+                    case 'boolean':
+                    case 'number':
+                        props.push({ key: key, value: value, type: typeof value });
+                        break;
+                    
+                    case 'object':
+                        console.log('I AM OBJECT', value);
+
+                        const objValue = value;
+                        const jsonString = JSON.stringify(objValue, function(key, value) {
+                            const cache: any[] = [];
+                            console.log('OBJ JSON key', key);
+                            console.log('OBJ JSON value', value);
+                            console.log('OBJ JSON value typeof', typeof value);
+
+                            if(key === 'observers'){
+                                console.log('REMOVE OBSERVERS');
+                                return undefined;
+                            }
+
+                            if (typeof value === "object" && value !== null) {
+                                if (cache.includes(value)) {
+                                    // Circular reference found, remove the property
+                                    return undefined;
+                                }
+                            
+                                // Store the value in our cache
+                                cache.push(value);
+                            }
+                            return value;
+                        });
+
+                        console.log('OBJ JSON string', jsonString);
+
+                        props.push({ key: key, type: typeof value });
+                        break;
+
+                    default:
+                        props.push({ key: key, type: typeof value });
                 }
+                
+
+
+                // if (typeof value === 'string' || typeof value === 'boolean' || typeof value === 'number') {
+                //     props.push({ key: key, value: value, type: typeof value });
+                // } else {
+                //     props.push({ key: key, type: typeof value });
+                // }
             }
 
             contextItemData = { ...contextItemData, properties: props };
