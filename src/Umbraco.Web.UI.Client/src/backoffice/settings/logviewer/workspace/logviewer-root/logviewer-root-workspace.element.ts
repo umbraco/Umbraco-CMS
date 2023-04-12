@@ -26,7 +26,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				--umb-log-viewer-information-color: var(--uui-color-positive);
 				--umb-log-viewer-warning-color: var(--uui-color-warning);
 				--umb-log-viewer-error-color: var(--uui-color-danger);
-				--umb-log-viewer-fatal-color: var(--uui-color-default);
+				--umb-log-viewer-fatal-color: var(--uui-palette-black);
 				--umb-log-viewer-verbose-color: var(--uui-color-current);
 			}
 
