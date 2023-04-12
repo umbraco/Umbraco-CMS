@@ -1,65 +1,4 @@
-import type {
-	ManifestCollectionView,
-	ManifestDashboard,
-	ManifestDashboardCollection,
-	ManifestEntityAction,
-	ManifestEntityBulkAction,
-	ManifestEntrypoint,
-	ManifestHeaderApp,
-	ManifestHealthCheck,
-	ManifestMenu,
-	ManifestMenuItem,
-	ManifestPackageView,
-	ManifestPropertyAction,
-	ManifestPropertyEditorModel,
-	ManifestPropertyEditorUI,
-	ManifestRepository,
-	ManifestSection,
-	ManifestSectionSidebarApp,
-	ManifestSectionView,
-	ManifestTheme,
-	ManifestWorkspace,
-	ManifestWorkspaceView,
-	ManifestWorkspaceViewCollection,
-} from './models';
-
-export type ManifestJSONTypes =
-	| ManifestCollectionView
-	| ManifestDashboard
-	| ManifestDashboardCollection
-	| ManifestEntityAction
-	| ManifestEntityBulkAction
-	| ManifestEntrypoint
-	| ManifestHeaderApp
-	| ManifestHealthCheck
-	| ManifestPackageView
-	| ManifestPropertyAction
-	| ManifestPropertyEditorModel
-	| ManifestPropertyEditorUI
-	| ManifestRepository
-	| ManifestSection
-	| ManifestSectionSidebarApp
-	| ManifestSectionView
-	| ManifestMenu
-	| ManifestMenuItem
-	| ManifestTheme
-	| ManifestWorkspace
-	| ManifestWorkspaceView
-	| ManifestWorkspaceViewCollection;
-
-type LoadableManifestJSONTypes = ManifestJSONTypes & {
-	/**
-	 * @title The file location of the javascript file to load
-	 */
-	js: string;
-
-	/**
-	 * @title The name of the exported custom element to use
-	 * @description This is optional but useful if your module exports more than one custom element
-	 * @example my-dashboard
-	 */
-	elementName?: string;
-};
+import type { ManifestTypes } from './models';
 
 /**
  * Umbraco package manifest JSON
@@ -85,5 +24,5 @@ export class UmbracoPackage {
 	/**
 	 * @title An array of Umbraco package manifest types that will be installed
 	 */
-	extensions?: LoadableManifestJSONTypes[];
+	extensions?: ManifestTypes[];
 }
