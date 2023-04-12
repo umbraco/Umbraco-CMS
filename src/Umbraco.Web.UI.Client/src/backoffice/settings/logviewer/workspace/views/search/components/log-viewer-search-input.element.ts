@@ -174,16 +174,12 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#clearQuery() {
+		this.inputQuery$.next('');
+
 		this.#logViewerContext?.setFilterExpression('');
 		this.#logViewerContext?.getLogs();
 	}
-
-	#search() {
-		this.#logViewerContext?.setCurrentPage(1);
-
-		this.#logViewerContext?.getLogs();
-	}
-
+	
 	render() {
 		return html`
 			<uui-popover placement="bottom-start" id="saved-searches-popover" @close=${this.#toggleSavedSearchesExpandSymbol}>
