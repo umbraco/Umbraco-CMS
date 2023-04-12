@@ -28,8 +28,10 @@ export interface ConditionsDashboard {
 	 * An array of section aliases that the dashboard should be available in
 	 *
 	 * @examples [
-	 *   ["Umb.Section.Content"]
+	 *   ["Umb.Section.Content"],
+	 *   ["Umb.Section.Settings"]
 	 * ]
+	 * @uniqueItems true
 	 */
 	sections: string[];
 }
