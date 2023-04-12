@@ -4059,6 +4059,47 @@
         }
       }
     },
+    "/umbraco/management/api/v1/member/item": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "operationId": "GetMemberItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MemberItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/models-builder/build": {
       "post": {
         "tags": [
@@ -5623,6 +5664,46 @@
         }
       }
     },
+    "/umbraco/management/api/v1/static-file/item": {
+      "get": {
+        "tags": [
+          "Static File"
+        ],
+        "operationId": "GetStaticFileItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/StaticFileItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/tree/static-file/children": {
       "get": {
         "tags": [
@@ -6901,6 +6982,47 @@
         }
       }
     },
+    "/umbraco/management/api/v1/user-groups/item": {
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "GetUserGroupsItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserGroupItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/users": {
       "post": {
         "tags": [
@@ -7366,6 +7488,47 @@
         }
       }
     },
+    "/umbraco/management/api/v1/users/item": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUsersItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/users/set-user-groups": {
       "post": {
         "tags": [
@@ -7421,46 +7584,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/item": {
-      "get": {
-        "tags": [
-          "v1"
-        ],
-        "operationId": "GetItem",
-        "parameters": [
-          {
-            "name": "path",
-            "in": "query",
-            "schema": {
-              "uniqueItems": true,
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/StaticFileItemResponseModel"
-                      }
-                    ]
-                  }
                 }
               }
             }
@@ -9575,6 +9698,21 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "MemberItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "MemberTypeItemResponseModel": {
@@ -11750,6 +11888,21 @@
         },
         "additionalProperties": false
       },
+      "UserGroupItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UserGroupPresentationModel": {
         "required": [
           "$type"
@@ -11804,6 +11957,15 @@
             "readOnly": true
           }
         },
+        "additionalProperties": false
+      },
+      "UserItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+          }
+        ],
         "additionalProperties": false
       },
       "UserOrderModel": {
