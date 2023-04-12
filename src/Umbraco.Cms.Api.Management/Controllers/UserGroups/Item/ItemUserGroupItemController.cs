@@ -21,7 +21,7 @@ public class ItemUserGroupItemController : UserGroupItemControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<UserItemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<UserGroupItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "path")] SortedSet<Guid> ids)
     {
         IEnumerable<IUserGroup> userGroups = await _userGroupService.GetAsync(ids);
