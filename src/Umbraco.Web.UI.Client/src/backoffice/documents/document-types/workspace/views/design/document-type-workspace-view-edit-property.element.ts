@@ -12,9 +12,9 @@ import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/back
 export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 	/**
 	 * Property, the data object for the property.
-	 * @type {string}
+	 * @type {PropertyTypeResponseModelBaseModel}
 	 * @attr
-	 * @default ''
+	 * @default undefined
 	 */
 	@property({ type: Object })
 	public property?: PropertyTypeResponseModelBaseModel;

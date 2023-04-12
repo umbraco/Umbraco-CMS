@@ -3,7 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
@@ -19,8 +18,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
-	//@state()
-	//private _documentType?: DocumentTypeResponseModel;
 	@state()
 	private _name?: string;
 

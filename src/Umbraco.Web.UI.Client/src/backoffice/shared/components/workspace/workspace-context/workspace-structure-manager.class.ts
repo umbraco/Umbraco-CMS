@@ -213,7 +213,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeKey)?.properties ?? [];
 
-		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyKey!);
+		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyKey);
 
 		this.#documentTypes.updateOne(documentTypeKey, { properties });
 	}
