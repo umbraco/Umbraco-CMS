@@ -1,5 +1,6 @@
 ﻿using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -44,6 +45,12 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
 
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);
+
+        // We want specific keys for the default user groups, so we need to fetch the user groups again to set their keys.
+        IEnumerable<Guid> updatedUserGroups = Database.Fetch<UserGroupDto>()
+            .Select(x => x.Key = ResolveAliasToGuid(x.Alias));
+        Database.Update(updatedUserGroups);
+
         scope.Complete();
     }
 
@@ -82,7 +89,7 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         IEnumerable<UserGroupDto> groups = Database.Fetch<OldUserGroupDto>().Select(x => new UserGroupDto
         {
             Id = x.Id,
-            Key = Guid.NewGuid(),
+            Key = ResolveAliasToGuid(x.Alias),
             Alias = x.Alias,
             Name = x.Name,
             DefaultPermissions = x.DefaultPermissions,
@@ -109,6 +116,17 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
             Database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, group);
         }
     }
+
+    private Guid ResolveAliasToGuid(string? alias)
+        => alias switch
+        {
+            "admin" => Constants.Security.AdminGroupKey,
+            "editor" => Constants.Security.EditorGroupKey,
+            "sensitiveData" => Constants.Security.SensitiveDataGroupKey,
+            "translator" => Constants.Security.TranslatorGroupKey,
+            "writer" => Constants.Security.WriterGroupKey,
+            _ => Guid.NewGuid(),
+        };
 
     [TableName(Constants.DatabaseSchema.Tables.UserGroup)]
     [PrimaryKey("id")]

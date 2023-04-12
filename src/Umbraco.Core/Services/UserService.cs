@@ -1067,13 +1067,28 @@ internal class UserService : RepositoryService, IUserService
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize);
 
+        SortedSet<string>? excludeUserGroupAliases = new();
+        if (baseFilter.ExcludeUserGroups is not null)
+        {
+            Attempt<IEnumerable<string>, UserOperationStatus> userGroupKeyConversionAttempt =
+                GetUserGroupAliasesFromKeys(baseFilter.ExcludeUserGroups);
+
+
+            if (userGroupKeyConversionAttempt.Success is false)
+            {
+                return Attempt.FailWithStatus<PagedModel<IUser>?, UserOperationStatus>(UserOperationStatus.MissingUserGroup, null);
+            }
+
+            excludeUserGroupAliases = new SortedSet<string>(userGroupKeyConversionAttempt.Result);
+        }
+
         IEnumerable<IUser> result = _userRepository.GetPagedResultsByQuery(
             null,
             pageNumber,
             pageSize,
             out long totalRecords,
             x => x.Username,
-            excludeUserGroups: baseFilter.ExcludedUserGroupAliases?.ToArray(),
+            excludeUserGroups: excludeUserGroupAliases.ToArray(),
             filter: query,
             userState: baseFilter.IncludeUserStates?.ToArray());
 
@@ -1104,8 +1119,8 @@ internal class UserService : RepositoryService, IUserService
 
         UserFilter mergedFilter = filter.Merge(baseFilter);
 
-        // FIXME: This is not needed after we have keys
-        SortedSet<string> excludedUserGroupAliases = mergedFilter.ExcludedUserGroupAliases ?? new SortedSet<string>();
+        // TODO: We should have a repository method that accepts keys so we don't have to do this conversion
+        SortedSet<string>? excludedUserGroupAliases = null;
         if (mergedFilter.ExcludeUserGroups is not null)
         {
             Attempt<IEnumerable<string>, UserOperationStatus> userGroupKeyConversionAttempt =
@@ -1117,7 +1132,7 @@ internal class UserService : RepositoryService, IUserService
                 return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new PagedModel<IUser>());
             }
 
-            excludedUserGroupAliases.UnionWith(userGroupKeyConversionAttempt.Result);
+            excludedUserGroupAliases = new SortedSet<string>(userGroupKeyConversionAttempt.Result);
         }
 
         string[]? includedUserGroupAliases = null;
@@ -1175,7 +1190,7 @@ internal class UserService : RepositoryService, IUserService
             orderByExpression,
             orderDirection,
             includedUserGroupAliases?.ToArray(),
-            excludedUserGroupAliases.ToArray(),
+            excludedUserGroupAliases?.ToArray(),
             includeUserStates?.ToArray(),
             baseQuery);
 
@@ -1207,7 +1222,7 @@ internal class UserService : RepositoryService, IUserService
         // Only admins can see admins
         if (performingUser.IsAdmin() is false)
         {
-            filter.ExcludedUserGroupAliases = new SortedSet<string> { Constants.Security.AdminGroupAlias };
+            filter.ExcludeUserGroups = new SortedSet<Guid> { Constants.Security.AdminGroupKey };
         }
 
         if (_securitySettings.HideDisabledUsersInBackOffice)
