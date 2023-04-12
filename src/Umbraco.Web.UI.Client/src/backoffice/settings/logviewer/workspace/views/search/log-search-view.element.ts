@@ -12,6 +12,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		css`
 			#layout {
 				margin: 20px;
+				padding-bottom: 20px;
 			}
 			#levels-container,
 			#input-container {
