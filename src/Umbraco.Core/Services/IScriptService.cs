@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IScriptService
+public interface IScriptService : IService
 {
-    Task<Attempt<IScript, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey);
+    Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey);
 }

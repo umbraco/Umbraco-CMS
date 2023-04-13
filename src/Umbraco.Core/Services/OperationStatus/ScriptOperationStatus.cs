@@ -2,5 +2,7 @@
 
 public enum ScriptOperationStatus
 {
-    Success
+    Success,
+    AlreadyExists,
+    CancelledByEvent,
 }
