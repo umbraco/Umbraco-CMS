@@ -263,9 +263,29 @@ internal class Property : PublishedPropertyBase
         return vvalue.InterValue;
     }
 
+    /// <summary>
+    /// Method to check if VariationContext culture differs from culture parameter, if so it will update the VariationContext for the PublishedValueFallback.
+    /// </summary>
+    /// <param name="publishedContent">The requested PublishedValueFallback.</param>
+    /// <param name="culture">The requested culture.</param>
+    /// <param name="segment">The requested segment.</param>
+    /// <returns></returns>
+    private static void EventuallyUpdateVariationContext(PublishedContent publishedContent, string? culture, string? segment)
+    {
+        IVariationContextAccessor? variationContextAccessor = publishedContent.VariationContextAccessor;
+
+        //If there is a difference in requested culture and the culture that is set in the VariationContext, it will pick wrong localized content.
+        //This happens for example using links to localized content in a RichText Editor.
+        if (!string.IsNullOrEmpty(culture) && variationContextAccessor?.VariationContext?.Culture != culture)
+        {
+            variationContextAccessor!.VariationContext = new VariationContext(culture, segment);
+        }
+    }
+
     public override object? GetValue(string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+        EventuallyUpdateVariationContext(_content, culture, segment);
 
         object? value;
         lock (_locko)
