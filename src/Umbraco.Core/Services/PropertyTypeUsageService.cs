@@ -44,12 +44,13 @@ public class PropertyTypeUsageService : IPropertyTypeUsageService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
-        var contentType = _contentTypeService.Get(contentTypeKey);
+        var contentTypeExists = await _propertyTypeUsageRepository.ContentTypeExistAsync(contentTypeKey);
 
-        if (contentType is null)
+        if (contentTypeExists is false)
         {
             return Attempt.FailWithStatus(PropertyTypeOperationStatus.ContentTypeNotFound, false);
         }
+
 
         var hasSavedPropertyValues = await _propertyTypeUsageRepository.HasSavedPropertyValuesAsync(contentTypeKey, propertyAlias);
 
