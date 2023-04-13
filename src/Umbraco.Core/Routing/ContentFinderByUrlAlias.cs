@@ -59,7 +59,8 @@ public class ContentFinderByUrlAlias : IContentFinder
                 umbracoContext.Content,
                 frequest.Domain != null ? frequest.Domain.ContentId : 0,
                 frequest.Culture,
-                frequest.AbsolutePathDecoded);
+                frequest.AbsolutePathDecoded,
+                frequest.Domain?.Uri.AbsolutePath);
 
             if (node != null)
             {
@@ -75,7 +76,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         return Task.FromResult(node != null);
     }
 
-    private IPublishedContent? FindContentByAlias(IPublishedContentCache? cache, int rootNodeId, string? culture, string alias)
+    private IPublishedContent? FindContentByAlias(IPublishedContentCache? cache, int rootNodeId, string? culture, string alias, string? domain = null)
     {
         if (alias == null)
         {
@@ -94,7 +95,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         var test2 = ",/" + test1; // test2 is ",/alias,"
         test1 = "," + test1; // test1 is ",alias,"
 
-        bool IsMatch(IPublishedContent c, string a1, string a2)
+        bool IsMatch(IPublishedContent c, string a1, string a2, string? domain = null)
         {
             // this basically implements the original XPath query ;-(
             //
@@ -129,7 +130,7 @@ public class ContentFinderByUrlAlias : IContentFinder
                 return false;
             }
 
-            v = "," + v.Replace(" ", string.Empty) + ",";
+            v = "," + (domain is not null && domain != "/" ? $"{domain}/{v}" : v).Replace(" ", string.Empty) + ",";
             return v.InvariantContains(a1) || v.InvariantContains(a2);
         }
 
@@ -138,7 +139,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         if (rootNodeId > 0)
         {
             IPublishedContent? rootNode = cache?.GetById(rootNodeId);
-            return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2));
+            return rootNode?.Descendants(_variationContextAccessor).FirstOrDefault(x => IsMatch(x, test1, test2, domain));
         }
 
         if (cache is not null)
