@@ -1,3 +1,5 @@
+using Umbraco.New.Cms.Core.Models;
+
 namespace Umbraco.Cms.Core.ContentApi;
 
 /// <summary>
@@ -6,11 +8,13 @@ namespace Umbraco.Cms.Core.ContentApi;
 public interface IApiQueryService
 {
     /// <summary>
-    ///     Returns a collection of item ids that passed the search criteria.
+    ///     Returns a collection of item ids that passed the search criteria as a paged model.
     /// </summary>
     /// <param name="fetch">Optional fetch query parameter value.</param>
     /// <param name="filters">Optional filter query parameters values.</param>
     /// <param name="sorts">Optional sort query parameters values.</param>
-    /// <returns>A collection of item ids that are returned after applying the search queries.</returns>
-    IEnumerable<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts);
+    /// <param name="skip">The amount of items to skip.</param>
+    /// <param name="take">The amount of items to take.</param>
+    /// <returns>A paged model of item ids that are returned after applying the search queries.</returns>
+    PagedModel<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take);
 }

@@ -2,6 +2,7 @@ using Examine;
 using Examine.Search;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Content.Services;
 
@@ -30,11 +31,13 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
     }
 
     /// <inheritdoc/>
-    public IEnumerable<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts)
+    public PagedModel<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
     {
+        var emptyResult = new PagedModel<Guid>();
+
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentApiIndexName, out IIndex? apiIndex))
         {
-            return Enumerable.Empty<Guid>();
+            return emptyResult;
         }
 
         IQuery baseQuery = apiIndex.Searcher.CreateQuery();
@@ -45,7 +48,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         // If no Selector could be found, we return no results
         if (queryOperation is null)
         {
-            return Enumerable.Empty<Guid>();
+            return emptyResult;
         }
 
         // Handle Filtering
@@ -54,9 +57,19 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         // Handle Sorting
         IOrdering? sortQuery = HandleSorting(sorts, queryOperation);
 
-        ISearchResults? results = sortQuery is not null ? sortQuery.Execute() : DefaultSort(queryOperation)?.Execute();
+        ISearchResults? results = sortQuery is not null
+            ? sortQuery.Execute(QueryOptions.SkipTake(skip, take))
+            : DefaultSort(queryOperation)?.Execute(QueryOptions.SkipTake(skip, take));
 
-        return results!.Select(x => Guid.Parse(x.Id));
+        if (results is null)
+        {
+            return emptyResult;
+        }
+        else
+        {
+            Guid[] items = results.Select(x => Guid.Parse(x.Id)).ToArray();
+            return new PagedModel<Guid>(results.TotalItemCount, items);
+        }
     }
 
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)

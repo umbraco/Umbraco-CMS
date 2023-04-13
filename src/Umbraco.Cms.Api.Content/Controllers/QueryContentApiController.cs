@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.Models.ContentApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
@@ -38,14 +39,14 @@ public class QueryContentApiController : ContentApiControllerBase
         int skip = 0,
         int take = 10)
     {
-        IEnumerable<Guid> ids = _apiQueryService.ExecuteQuery(fetch, filter, sort);
-        IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(ids);
-        IApiContentResponse[] results = contentItems.Select(ApiContentResponseBuilder.Build).ToArray();
+        PagedModel<Guid> pagedResult = _apiQueryService.ExecuteQuery(fetch, filter, sort, skip, take);
+        IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(pagedResult.Items);
+        IApiContentResponse[] apiContentItems = contentItems.Select(ApiContentResponseBuilder.Build).ToArray();
 
         var model = new PagedViewModel<IApiContentResponse>
         {
-            Total = results.Length,
-            Items = results.Skip(skip).Take(take)
+            Total = pagedResult.Total,
+            Items = apiContentItems
         };
 
         return await Task.FromResult(Ok(model));
