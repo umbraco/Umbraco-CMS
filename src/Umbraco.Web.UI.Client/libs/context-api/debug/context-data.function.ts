@@ -50,91 +50,27 @@ function contextItemData(contextInstance:any):DebugContextItemData {
                         break;
                     
                     case 'object':
-                        console.log('I AM OBJECT', value);
 
-                        const objValue = value;
-                        const jsonString = JSON.stringify(objValue, function(key, value) {
+                        // Check if the object is an observable (by checking if it has a subscribe method/function)
+                        const isSubscribeLike = 'subscribe' in value && typeof value['subscribe'] === 'function';
+                        const isWebComponent = value instanceof HTMLElement;
 
-                            const cache: any[] = [];
-                            const valueTypeOfProp = typeof value;
+                        let valueToDisplay = "Complex Object";
+                        if(isWebComponent){
+                            const tagName = value.tagName.toLowerCase();
 
-                            console.log('Key', key);
-                            console.log('Value', value);
-                            console.log('TypeOf', valueTypeOfProp);
+                            valueToDisplay = `Web Component <${tagName}>`;
+                        } else if(isSubscribeLike){
+                            valueToDisplay = "Subscribable";
+                        }
 
-                            // Remove the 'observers' property
-                            if(key === 'observers'){
-                                console.log('REMOVE OBSERVERS');
-                                return undefined;
-                            }
-
-                            if(key === 'host'){
-                                console.log('REMOVE HOST');
-                                return undefined;
-                            }
-
-                            if(key.startsWith('_')){
-                                console.log('STARTED WITH _');
-                                return undefined;;
-                            }
-
-
-                            switch(valueTypeOfProp){
-                                case 'string':
-                                case 'boolean':
-                                case 'number':
-                                case 'bigint':
-                                    return value;
-                                
-                                case 'object':
-                                    console.log('Prop inside OBJ is another OBJ', value);
-
-                                    if (typeof value === "object" && value !== null) {
-                                        if (cache.includes(value)) {
-                                            // Circular reference found, remove the property
-                                            return undefined;
-                                        }
-                                    
-                                        // Store the value in our cache
-                                        cache.push(value);
-                                    }
-
-                                    return value;
-
-                                default:
-                                    console.log('WHAT AM I?', value, valueTypeOfProp);
-                                    return undefined;
-                            }
-                           
-
-                            // if (typeof value === "object" && value !== null) {
-                            //     if (cache.includes(value)) {
-                            //         // Circular reference found, remove the property
-                            //         return undefined;
-                            //     }
-                            
-                            //     // Store the value in our cache
-                            //     cache.push(value);
-                            // }
-                            // return value;
-                        });
-
-                        console.log('OBJ JSON string', jsonString);
-
-                        props.push({ key: key, type: typeof value, value: jsonString });
+                        props.push({ key: key, type: typeof value, value: valueToDisplay });
                         break;
 
                     default:
                         props.push({ key: key, type: typeof value });
+                        break;
                 }
-                
-
-
-                // if (typeof value === 'string' || typeof value === 'boolean' || typeof value === 'number') {
-                //     props.push({ key: key, value: value, type: typeof value });
-                // } else {
-                //     props.push({ key: key, type: typeof value });
-                // }
             }
 
             contextItemData = { ...contextItemData, properties: props };
@@ -146,14 +82,6 @@ function contextItemData(contextInstance:any):DebugContextItemData {
 
     return contextItemData;
 };
-
-function jsonReplacer(key: any, value: any) {
-    // Filtering out properties
-    if (key === 'observers') {
-        return undefined;
-    }
-    return value;
-}
 
 /**
  * Gets a list of methods from a class
