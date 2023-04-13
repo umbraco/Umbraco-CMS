@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _migrationPlanExecutor = migrationPlanExecutor;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _databaseProviderMetadata = databaseProviderMetadata;
-            _aggregator = aggregator;
+            _aggregator = eventAggregator;
         }
 
         [Obsolete("Use constructor that takes IEventAggregator, this will be removed in V13.")]
