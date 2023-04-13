@@ -20,16 +20,16 @@ public class MoveMediaController : MediaControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{key:guid}/move")]
+    [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid key, MoveMediaRequestModel moveDocumentRequestModel)
+    public async Task<IActionResult> Move(Guid id, MoveMediaRequestModel moveDocumentRequestModel)
     {
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveAsync(
-            key,
-            moveDocumentRequestModel.TargetKey,
+            id,
+            moveDocumentRequestModel.TargetId,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

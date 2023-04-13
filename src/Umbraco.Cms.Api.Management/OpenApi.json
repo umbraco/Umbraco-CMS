@@ -1706,6 +1706,59 @@
         }
       }
     },
+    "/umbraco/management/api/v1/document/{id}/copy": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PostDocumentByIdCopy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CopyDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/document/{id}/domains": {
       "get": {
         "tags": [
@@ -1761,6 +1814,49 @@
         "responses": {
           "200": {
             "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/document/{id}/move": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByIdMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MoveDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -1837,102 +1933,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/document/{key}/copy": {
-      "post": {
-        "tags": [
-          "Document"
-        ],
-        "operationId": "PostDocumentByKeyCopy",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/CopyDocumentRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "headers": {
-              "Location": {
-                "description": "Location of the newly created resource",
-                "schema": {
-                  "type": "string",
-                  "description": "Location of the newly created resource",
-                  "format": "uri"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/document/{key}/move": {
-      "put": {
-        "tags": [
-          "Document"
-        ],
-        "operationId": "PutDocumentByKeyMove",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/MoveDocumentRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
@@ -3695,15 +3695,15 @@
         }
       }
     },
-    "/umbraco/management/api/v1/media/{key}/move": {
+    "/umbraco/management/api/v1/media/{id}/move": {
       "put": {
         "tags": [
           "Media"
         ],
-        "operationId": "PutMediaByKeyMove",
+        "operationId": "PutMediaByIdMove",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5976,6 +5976,67 @@
         }
       }
     },
+    "/umbraco/management/api/v1/tag": {
+      "get": {
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "GetTag",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tagGroup",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "culture",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedTagResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/telemetry": {
       "get": {
         "tags": [
@@ -8035,7 +8096,7 @@
       "CopyDocumentRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9813,7 +9874,7 @@
       "MoveDocumentRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -9824,7 +9885,7 @@
       "MoveMediaRequestModel": {
         "type": "object",
         "properties": {
-          "targetKey": {
+          "targetId": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -10708,6 +10769,30 @@
         },
         "additionalProperties": false
       },
+      "PagedTagResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TagResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedTelemetryResponseModel": {
         "required": [
           "items",
@@ -11312,6 +11397,28 @@
             "$ref": "#/components/schemas/FileItemResponseModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "TagResponseModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "group": {
+            "type": "string",
+            "nullable": true
+          },
+          "nodeCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
         "additionalProperties": false
       },
       "TelemetryLevelModel": {

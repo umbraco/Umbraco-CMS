@@ -20,16 +20,16 @@ public class CopyDocumentController : DocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("{key:guid}/copy")]
+    [HttpPost("{id:guid}/copy")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Copy(Guid key, CopyDocumentRequestModel copyDocumentRequestModel)
+    public async Task<IActionResult> Copy(Guid id, CopyDocumentRequestModel copyDocumentRequestModel)
     {
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CopyAsync(
-            key,
-            copyDocumentRequestModel.TargetKey,
+            id,
+            copyDocumentRequestModel.TargetId,
             copyDocumentRequestModel.RelateToOriginal,
             copyDocumentRequestModel.IncludeDescendants,
             CurrentUserKey(_backOfficeSecurityAccessor));

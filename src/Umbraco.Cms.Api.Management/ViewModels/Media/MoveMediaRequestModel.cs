@@ -2,5 +2,5 @@
 
 public class MoveMediaRequestModel
 {
-    public Guid? TargetKey { get; set; }
+    public Guid? TargetId { get; set; }
 }

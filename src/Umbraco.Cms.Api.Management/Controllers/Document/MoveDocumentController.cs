@@ -20,16 +20,16 @@ public class MoveDocumentController : DocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{key:guid}/move")]
+    [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Move(Guid key, MoveDocumentRequestModel moveDocumentRequestModel)
+    public async Task<IActionResult> Move(Guid id, MoveDocumentRequestModel moveDocumentRequestModel)
     {
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveAsync(
-            key,
-            moveDocumentRequestModel.TargetKey,
+            id,
+            moveDocumentRequestModel.TargetId,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
