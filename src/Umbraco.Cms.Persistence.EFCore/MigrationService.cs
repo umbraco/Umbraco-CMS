@@ -8,16 +8,11 @@ internal class MigrationService : IMigrationService
 {
     private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
 
-    public MigrationService(UmbracoDbContextFactory umbracoDbContextFactory)
-    {
-        _umbracoDbContextFactory = umbracoDbContextFactory;
-    }
+    public MigrationService(UmbracoDbContextFactory umbracoDbContextFactory) => _umbracoDbContextFactory = umbracoDbContextFactory;
 
-    public async Task MigrateAsync(string migrationName)
-    {
-        _umbracoDbContextFactory.ExecuteWithContextAsync<Task>(async db =>
+    public async Task MigrateAsync(string migrationName) =>
+        await _umbracoDbContextFactory.ExecuteWithContextAsync<Task>(async db =>
         {
             await db.GetService<IMigrator>().MigrateAsync(migrationName);
         });
-    }
 }
