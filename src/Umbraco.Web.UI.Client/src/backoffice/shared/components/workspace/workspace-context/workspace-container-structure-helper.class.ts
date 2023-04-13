@@ -18,6 +18,7 @@ export class UmbWorkspaceContainerStructureHelper {
 	private _ownerKey?: string;
 
 	// Containers defined in data might be more than actual containers to display as we merge them by name.
+	// Owner containers are the containers defining the total of this container(Multiple containers with the same name and type)
 	private _ownerContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
@@ -150,6 +151,15 @@ export class UmbWorkspaceContainerStructureHelper {
 			}
 		});
 	};
+
+	/**
+	 * Returns true if the container is an owner container.
+	 */
+	isOwnerContainer(groupId?: string) {
+		if (!this.#workspaceContext || !groupId) return;
+
+		return this._ownerContainers.find((x) => x.id === groupId) !== undefined;
+	}
 
 	/** Manipulate methods: */
 

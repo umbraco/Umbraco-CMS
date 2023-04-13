@@ -221,7 +221,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	async updateProperty(
 		documentTypeId: string | null,
 		propertyId: string,
-		partialUpdate: Partial<DocumentTypePropertyTypeResponseModel>
+		partialUpdate: Partial<PropertyTypeResponseModelBaseModel>
 	) {
 		await this.#init;
 		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;

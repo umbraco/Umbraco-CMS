@@ -147,7 +147,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 					// TODO: make better url folder name:
 					const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
 					return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}>
-						${path === this._activePath
+						${path === this._activePath && this._tabsStructureHelper.isOwnerContainer(tab.id!)
 							? html` <uui-input
 									label="Tab name"
 									look="placeholder"
@@ -155,11 +155,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 									placeholder="Enter a name"
 									@change=${(e: InputEvent) => {
 										const newName = (e.target as HTMLInputElement).value;
-										// Update the current URL, so we are still on this specific tab:
-										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeURI(newName));
 										this._tabsStructureHelper.partialUpdateContainer(tab.id, {
 											name: newName,
 										});
+
+										// Update the current URL, so we are still on this specific tab:
+										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeURI(newName));
 									}}>
 									<!-- todo only if its part of root: -->
 									<uui-button
