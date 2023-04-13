@@ -14,16 +14,16 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // Domains
 const CORE_PACKAGES = [
-	() => import('./shared/umbraco-package'),
-	() => import('./settings/umbraco-package'),
-	() => import('./documents/umbraco-package'),
-	() => import('./media/umbraco-package'),
-	() => import('./members/umbraco-package'),
-	() => import('./translation/umbraco-package'),
-	() => import('./users/umbraco-package'),
-	() => import('./packages/umbraco-package'),
-	() => import('./search/umbraco-package'),
-	() => import('./templating/umbraco-package'),
+	import('./shared/umbraco-package'),
+	import('./settings/umbraco-package'),
+	import('./documents/umbraco-package'),
+	import('./media/umbraco-package'),
+	import('./members/umbraco-package'),
+	import('./translation/umbraco-package'),
+	import('./users/umbraco-package'),
+	import('./packages/umbraco-package'),
+	import('./search/umbraco-package'),
+	import('./templating/umbraco-package'),
 ];
 
 @defineElement('umb-backoffice')
@@ -52,10 +52,10 @@ export class UmbBackofficeElement extends UmbLitElement {
 		super();
 
 		this.#loadCorePackages();
-		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
 
 		// Register All Stores
@@ -71,16 +71,19 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 	// TODO: temp solution. These packages should show up in the package section, so they need to go through the extension controller
 	async #loadCorePackages() {
-		const corePackagePromises = CORE_PACKAGES.map((packageManifestLoader) => packageManifestLoader());
-		const packageManifests = await Promise.all(corePackagePromises);
-		const extensions = packageManifests.flatMap((packageManifest) => packageManifest.extensions);
-		const entryPointLoaderPromises = extensions.map(
-			(extension) => extension.type === 'entryPoint' && extension.loader()
-		);
-		const entryPointModules = await Promise.all(entryPointLoaderPromises);
-		entryPointModules.forEach((entryPointModule) =>
-			entryPointModule ? entryPointModule.onInit(this, umbExtensionsRegistry) : null
-		);
+		CORE_PACKAGES.forEach(async (packageImport) => {
+			const packageModule = await packageImport;
+			const extensions = packageModule.extensions;
+			const entryPointLoaders = extensions.map((extension) => extension.type === 'entryPoint' && extension.loader);
+
+			entryPointLoaders.forEach((loader) => {
+				if (!loader) return;
+
+				loader().then((entryPointModule) => {
+					entryPointModule.onInit(this, umbExtensionsRegistry);
+				});
+			});
+		});
 	}
 
 	render() {
