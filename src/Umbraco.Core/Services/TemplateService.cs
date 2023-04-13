@@ -39,27 +39,6 @@ public class TemplateService : RepositoryService, ITemplateService
         _userIdKeyResolver = userIdKeyResolver;
     }
 
-    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in v15")]
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            auditRepository,
-            templateContentParserService,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
-
     /// <inheritdoc />
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateForContentTypeAsync(
         string contentTypeAlias, string? contentTypeName, Guid userKey)
