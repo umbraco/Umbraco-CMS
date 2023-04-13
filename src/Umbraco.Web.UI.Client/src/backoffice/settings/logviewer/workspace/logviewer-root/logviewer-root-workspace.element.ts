@@ -1,15 +1,15 @@
 import './components';
 import { map } from 'rxjs';
-import { css, html, nothing } from 'lit';
+import { PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
@@ -26,7 +26,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 				--umb-log-viewer-information-color: var(--uui-color-positive);
 				--umb-log-viewer-warning-color: var(--uui-color-warning);
 				--umb-log-viewer-error-color: var(--uui-color-danger);
-				--umb-log-viewer-fatal-color: var(--uui-color-default);
+				--umb-log-viewer-fatal-color: var(--uui-palette-black);
 				--umb-log-viewer-verbose-color: var(--uui-color-current);
 			}
 
@@ -51,7 +51,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _routes: any[] = [];
+	private _routes: IRoute[] = [];
 
 	@state()
 	private _activePath?: string;
@@ -64,12 +64,24 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#logViewerContext.init();
+		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
+	}
+
+	firstUpdated(props: PropertyValueMap<unknown>) {
+		super.firstUpdated(props);
+
+		window.addEventListener('changestate', this.#logViewerContext.onChangeState);
+		this.#logViewerContext.onChangeState();
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
 		this._observeWorkspaceViews();
-		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		window.removeEventListener('changestate', this.#logViewerContext.onChangeState);
 	}
 
 	load(): void {
@@ -101,16 +113,9 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 			this._routes = this._workspaceViews.map((view) => {
 				return {
 					path: `${view.meta.pathname}`,
-					component: () => {
-						return createExtensionElement(view);
-					},
-					setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
-						// When its using import, we get an element, when using createExtensionElement we get a Promise.
-						if ((component as any).then) {
-							(component as any).then((el: any) => (el.manifest = view));
-						} else {
-							(component as any).manifest = view;
-						}
+					component: () => createExtensionElement(view),
+					setup: (component) => {
+						(component as any).manifest = view;
 					},
 				};
 			});

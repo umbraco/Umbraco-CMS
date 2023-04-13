@@ -22,9 +22,9 @@ export class UmbMediaWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	// TODO: this should be async because it can only return the key if the data is loaded.
-	getEntityKey() {
-		return this.getData()?.key || '';
+	// TODO: this should be async because it can only return the id if the data is loaded.
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -46,19 +46,21 @@ export class UmbMediaWorkspaceContext
 		}
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(parentId: string | null) {
+		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		// TODO: This is a hack to get around the fact that the data is not typed correctly.
+		// Create and response models are different. We need to look into this.
+		this.#data.next(data as unknown as MediaDetails);
 	}
 
 	async save() {
@@ -66,14 +68,14 @@ export class UmbMediaWorkspaceContext
 		if (this.isNew) {
 			await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value);
+			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	public destroy(): void {

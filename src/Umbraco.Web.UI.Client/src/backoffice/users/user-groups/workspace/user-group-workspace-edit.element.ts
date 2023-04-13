@@ -214,9 +214,9 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		this.observe(this._userStore.getAll(), (users) => {
 			// TODO: handle if there is no users.
 			if (!this._userKeys && users.length > 0) {
-				const entityKey = this.#workspaceContext?.getEntityKey();
-				if (!entityKey) return;
-				this._userKeys = users.filter((user) => user.userGroups.includes(entityKey)).map((user) => user.key);
+				const entityId = this.#workspaceContext?.getEntityId();
+				if (!entityId) return;
+				this._userKeys = users.filter((user) => user.userGroups.includes(entityId)).map((user) => user.id);
 				//this._updateProperty('users', this._userKeys);
 				// TODO: make a method on the UmbWorkspaceUserGroupContext:
 				//this._workspaceContext.setUsers();

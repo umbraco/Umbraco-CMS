@@ -85,27 +85,27 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 		this.observe(this._usersContext.selection, (selection) => (this._selection = selection));
 	}
 
-	private _isSelected(key: string) {
-		return this._selection.includes(key);
+	private _isSelected(id: string) {
+		return this._selection.includes(id);
 	}
 
 	//TODO How should we handle url stuff?
-	private _handleOpenCard(key: string) {
-		history.pushState(null, '', 'section/users/view/users/user/' + key); //TODO Change to a tag with href and make dynamic
+	private _handleOpenCard(id: string) {
+		history.pushState(null, '', 'section/users/view/users/user/' + id); //TODO Change to a tag with href and make dynamic
 	}
 
 	private _selectRowHandler(user: UserEntity) {
-		this._usersContext?.select(user.key);
+		this._usersContext?.select(user.id);
 	}
 
 	private _deselectRowHandler(user: UserEntity) {
-		this._usersContext?.deselect(user.key);
+		this._usersContext?.deselect(user.id);
 	}
 
-	private _getUserGroupNames(keys: Array<string>) {
-		return keys
-			.map((key: string) => {
-				return this._userGroups.find((x) => x.key === key)?.name;
+	private _getUserGroupNames(ids: Array<string>) {
+		return ids
+			.map((id: string) => {
+				return this._userGroups.find((x) => x.id === id)?.name;
 			})
 			.join(', ');
 	}
@@ -120,8 +120,8 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 				.name=${user.name}
 				selectable
 				?select-only=${this._selection.length > 0}
-				?selected=${this._isSelected(user.key)}
-				@open=${() => this._handleOpenCard(user.key)}
+				?selected=${this._isSelected(user.id)}
+				@open=${() => this._handleOpenCard(user.id)}
 				@selected=${() => this._selectRowHandler(user)}
 				@unselected=${() => this._deselectRowHandler(user)}>
 				${user.status && user.status !== 'enabled'
@@ -149,7 +149,7 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 			<div id="user-grid">
 				${repeat(
 					this._users,
-					(user) => user.key,
+					(user) => user.id,
 					(user) => this.renderUserCard(user)
 				)}
 			</div>

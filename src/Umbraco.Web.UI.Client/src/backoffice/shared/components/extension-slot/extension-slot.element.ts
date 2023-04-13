@@ -45,6 +45,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 	set props(newVal) {
 		this._props = newVal;
+		// TODO: we could optimize this so we only re-set the updated props.
 		this.#assignPropsToAllComponents();
 	}
 

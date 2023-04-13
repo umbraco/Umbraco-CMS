@@ -15,10 +15,10 @@ export class RelationResource {
      * @throws ApiError
      */
     public static getRelationById({
-id,
-}: {
-id: number,
-}): CancelablePromise<RelationResponseModel> {
+        id,
+    }: {
+        id: number,
+    }): CancelablePromise<RelationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/relation/{id}',
@@ -36,16 +36,16 @@ id: number,
      * @throws ApiError
      */
     public static getRelationChildRelationByChildId({
-childId,
-skip,
-take,
-relationTypeAlias = '',
-}: {
-childId: number,
-skip?: number,
-take?: number,
-relationTypeAlias?: string,
-}): CancelablePromise<PagedRelationResponseModel> {
+        childId,
+        skip,
+        take,
+        relationTypeAlias = '',
+    }: {
+        childId: number,
+        skip?: number,
+        take?: number,
+        relationTypeAlias?: string,
+    }): CancelablePromise<PagedRelationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/relation/child-relation/{childId}',
@@ -64,20 +64,20 @@ relationTypeAlias?: string,
      * @returns PagedRelationResponseModel Success
      * @throws ApiError
      */
-    public static getRelationTypeByKey({
-key,
-skip,
-take = 100,
-}: {
-key: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedRelationResponseModel> {
+    public static getRelationTypeById({
+        id,
+        skip,
+        take = 100,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedRelationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/relation/type/{key}',
+            url: '/umbraco/management/api/v1/relation/type/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             query: {
                 'skip': skip,

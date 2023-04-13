@@ -60,7 +60,7 @@ export class UmbStylesheetTreeServerDataSource
 	async getItems(path: Array<string>) {
 		return tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.getTreeStylesheetItem({
+			StylesheetResource.getStylesheetItem({
 				path,
 			})
 		);

@@ -5,3 +5,4 @@
 import type { FolderModelBaseModel } from './FolderModelBaseModel';
 
 export type UpdateFolderReponseModel = FolderModelBaseModel;
+

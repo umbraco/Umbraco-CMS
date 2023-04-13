@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /**
  * Change the collection of Contexts into a simplified array of data
  * 
@@ -39,10 +40,36 @@ function contextItemData(contextInstance:any):DebugContextItemData {
                 }
 
                 const value = contextInstance[key];
-                if (typeof value === 'string' || typeof value === 'boolean') {
-                    props.push({ key: key, value: value, type: typeof value });
-                } else {
-                    props.push({ key: key, type: typeof value });
+                const valueType = typeof value;
+
+                switch (valueType) {
+                    case 'string':
+                    case 'boolean':
+                    case 'number':
+                        props.push({ key: key, value: value, type: typeof value });
+                        break;
+                    
+                    case 'object':
+
+                        // Check if the object is an observable (by checking if it has a subscribe method/function)
+                        const isSubscribeLike = 'subscribe' in value && typeof value['subscribe'] === 'function';
+                        const isWebComponent = value instanceof HTMLElement;
+
+                        let valueToDisplay = "Complex Object";
+                        if(isWebComponent){
+                            const tagName = value.tagName.toLowerCase();
+
+                            valueToDisplay = `Web Component <${tagName}>`;
+                        } else if(isSubscribeLike){
+                            valueToDisplay = "Subscribable";
+                        }
+
+                        props.push({ key: key, type: typeof value, value: valueToDisplay });
+                        break;
+
+                    default:
+                        props.push({ key: key, type: typeof value });
+                        break;
                 }
             }
 

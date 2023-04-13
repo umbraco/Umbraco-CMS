@@ -3,7 +3,6 @@ import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
 import { DeepState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 export interface UmbTreeContext {
@@ -12,7 +11,7 @@ export interface UmbTreeContext {
 	readonly selection: Observable<Array<string>>;
 	setSelectable(value: boolean): void;
 	setSelection(value: Array<string>): void;
-	select(key: string): void;
+	select(id: string): void;
 }
 
 export class UmbTreeContextBase implements UmbTreeContext {
@@ -75,17 +74,17 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		this.#selection.next(value);
 	}
 
-	public select(key: string) {
+	public select(id: string) {
 		const oldSelection = this.#selection.getValue();
-		if (oldSelection.indexOf(key) !== -1) return;
+		if (oldSelection.indexOf(id) !== -1) return;
 
-		const selection = [...oldSelection, key];
+		const selection = [...oldSelection, id];
 		this.#selection.next(selection);
 	}
 
-	public deselect(key: string) {
+	public deselect(id: string) {
 		const selection = this.#selection.getValue();
-		this.#selection.next(selection.filter((x) => x !== key));
+		this.#selection.next(selection.filter((x) => x !== id));
 	}
 
 	public async requestRootItems() {
@@ -93,9 +92,9 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		return this.repository!.requestRootTreeItems();
 	}
 
-	public async requestChildrenOf(parentKey: string | null) {
+	public async requestChildrenOf(parentId: string | null) {
 		await this.#init;
-		return this.repository!.requestTreeItemsOf(parentKey);
+		return this.repository!.requestTreeItemsOf(parentId);
 	}
 
 	public async rootItems() {
@@ -103,8 +102,8 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		return this.repository!.rootTreeItems();
 	}
 
-	public async childrenOf(parentKey: string | null) {
+	public async childrenOf(parentId: string | null) {
 		await this.#init;
-		return this.repository!.treeItemsOf(parentKey);
+		return this.repository!.treeItemsOf(parentId);
 	}
 }

@@ -27,10 +27,10 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 		const modalHandler = this.#modalContext?.open(UMB_IMPORT_DICTIONARY_MODAL, { unique: this.unique });
 
 		// TODO: get type from modal result
-		const { fileName, parentKey } = await modalHandler.onSubmit();
-		if (!fileName) return;
+		const { temporaryFileId, parentId } = await modalHandler.onSubmit();
+		if (!temporaryFileId) return;
 
-		const result = await this.repository?.import(fileName, parentKey);
+		const result = await this.repository?.import(temporaryFileId, parentId);
 
 		// TODO => get location header to route to new item
 		console.log(result);

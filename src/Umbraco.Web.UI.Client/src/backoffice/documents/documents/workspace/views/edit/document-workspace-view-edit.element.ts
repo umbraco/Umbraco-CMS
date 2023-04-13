@@ -3,10 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, IRoute } from '@umbraco-cms/internal/router';
+import { UmbWorkspaceContainerStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-container-structure-helper.class';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
@@ -37,43 +39,28 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
+	private _tabsStructureHelper = new UmbWorkspaceContainerStructureHelper(this);
+
 	constructor() {
 		super();
 
+		this._tabsStructureHelper.setIsRoot(true);
+		this._tabsStructureHelper.setContainerChildType('Tab');
+		this.observe(this._tabsStructureHelper.containers, (tabs) => {
+			this._tabs = tabs;
+			this._createRoutes();
+		});
+
+		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
+
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext as UmbDocumentWorkspaceContext;
-			this._observeTabs();
+			this._observeRootGroups();
 		});
 	}
 
-	private _observeTabs() {
+	private _observeRootGroups() {
 		if (!this._workspaceContext) return;
-
-		this.observe(
-			this._workspaceContext.structure.rootContainers('Tab'),
-			(tabs) => {
-				tabs.forEach((tab) => {
-					// Only add each tab name once, as our containers merge on name:
-					if (!this._tabs.find((x) => x.name === tab.name || '')) {
-						this._tabs.push(tab);
-					}
-				});
-				this._createRoutes();
-			},
-			'_observeTabs'
-		);
-
-		/*
-		Impleent this, when it becomes an option to have properties directly in the root of the document.
-		this.observe(
-			this._workspaceContext.rootPropertyStructures(),
-			(rootPropertyStructure) => {
-				this._hasRootProperties = rootPropertyStructure.length > 0;
-				this._createRoutes();
-			},
-			'_observeTabs'
-		);
-		*/
 
 		this.observe(
 			this._workspaceContext.structure.hasRootContainers('Group'),
@@ -81,12 +68,12 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
 			},
-			'_observeTabs'
+			'_observeGroups'
 		);
 	}
 
 	private _createRoutes() {
-		const routes: any[] = [];
+		const routes: IRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
@@ -94,7 +81,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 				routes.push({
 					path: `tab/${encodeURI(tabName || '').toString()}`,
 					component: () => import('./document-workspace-view-edit-tab.element'),
-					setup: (component: Promise<HTMLElement>) => {
+					setup: (component) => {
 						(component as any).tabName = tabName;
 					},
 				});
@@ -105,7 +92,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 			routes.push({
 				path: '',
 				component: () => import('./document-workspace-view-edit-tab.element'),
-				setup: (component: Promise<HTMLElement>) => {
+				setup: (component) => {
 					(component as any).noTabName = true;
 				},
 			});
@@ -139,6 +126,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement {
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
+								// TODO: make better url folder name:
 								const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
 								return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
 									>${tab.name}</uui-tab

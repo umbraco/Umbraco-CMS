@@ -64,7 +64,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 		if (error) {
 			this.errorMessage = error.detail || 'Unknown error, please try again';
 		} else {
-			history.pushState(null, '', '/');
+			history.pushState(null, '', 'section/content');
 		}
 
 		this.upgrading = false;

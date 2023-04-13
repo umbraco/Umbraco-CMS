@@ -31,34 +31,34 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) throw new Error('Parent key is missing');
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) throw new Error('Parent id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getTreeDataTypeChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys) throw new Error('Keys are missing');
+	async getItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.getTreeDataTypeItem({
-				key: keys,
+			DataTypeResource.getDataTypeItem({
+				id: ids,
 			})
 		);
 	}

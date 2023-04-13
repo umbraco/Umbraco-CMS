@@ -1,13 +1,16 @@
-import type { DictionaryDetails } from '../../';
-import { DictionaryDetailDataSource } from './dictionary.details.server.data.interface';
+import { v4 as uuidv4 } from 'uuid';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
 	CreateDictionaryItemRequestModel,
+	DictionaryItemResponseModel,
 	DictionaryResource,
+	ImportDictionaryRequestModel,
 	LanguageResource,
 	ProblemDetailsModel,
+	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @description - A data source for the Dictionary detail that fetches data from the server
@@ -15,7 +18,10 @@ import {
  * @class UmbDictionaryDetailServerDataSource
  * @implements {DictionaryDetailDataSource}
  */
-export class UmbDictionaryDetailServerDataSource implements DictionaryDetailDataSource {
+export class UmbDictionaryDetailServerDataSource
+	implements
+		UmbDataSource<CreateDictionaryItemRequestModel, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
+{
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {
@@ -24,27 +30,29 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 
 	/**
 	 * @description - Creates a new Dictionary scaffold
-	 * @param {string} parentKey
+	 * @param {string} parentId
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async createScaffold(parentKey: string) {
-		const data: DictionaryDetails = {
-			name: '',
-			parentKey,
-		} as DictionaryDetails;
+	async createScaffold(parentId?: string | null, name?: string) {
+		const data = {
+			id: uuidv4(),
+			parentId,
+			name,
+			translations: [],
+		};
 
 		return { data };
 	}
 
 	/**
-	 * @description - Fetches a Dictionary with the given key from the server
-	 * @param {string} key
+	 * @description - Fetches a Dictionary with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	get(key: string) {
-		return tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryByKey({ key })) as any;
+	get(id: string) {
+		return tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryById({ id }));
 	}
 
 	/**
@@ -63,14 +71,12 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async update(dictionary: DictionaryDetails) {
-		if (!dictionary.key) {
-			const error: ProblemDetailsModel = { title: 'Dictionary key is missing' };
-			return { error };
-		}
+	async update(id: string, dictionary: UpdateDictionaryItemRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!dictionary) throw new Error('Dictionary is missing');
 
-		const payload = { key: dictionary.key, requestBody: dictionary };
-		return tryExecuteAndNotify(this.#host, DictionaryResource.putDictionaryByKey(payload));
+		const payload = { id, requestBody: dictionary };
+		return tryExecuteAndNotify(this.#host, DictionaryResource.putDictionaryById(payload));
 	}
 
 	/**
@@ -79,56 +85,50 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async insert(data: DictionaryDetails) {
-		const requestBody: CreateDictionaryItemRequestModel = {
-			parentKey: data.parentKey,
-			name: data.name,
-		};
-
-		// TODO: fix type mismatch:
-		return tryExecuteAndNotify(this.#host, DictionaryResource.postDictionary({ requestBody })) as any;
+	async insert(data: CreateDictionaryItemRequestModel) {
+		return tryExecuteAndNotify(this.#host, DictionaryResource.postDictionary({ requestBody: data }));
 	}
 
 	/**
 	 * @description - Deletes a Dictionary on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		return await tryExecuteAndNotify(this.#host, DictionaryResource.deleteDictionaryByKey({ key }));
+		return await tryExecuteAndNotify(this.#host, DictionaryResource.deleteDictionaryById({ id }));
 	}
 
 	/**
 	 * @description - Import a dictionary
-	 * @param {string} fileName
-	 * @param {string?} parentKey
+	 * @param {string} temporaryFileId
+	 * @param {string?} parentId
 	 * @returns {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async import(fileName: string, parentKey?: string) {
-		// TODO => parentKey will be a guid param once #13786 is merged and API regenerated
+	async import(temporaryFileId: string, parentId?: string) {
+		// TODO => parentId will be a guid param once #13786 is merged and API regenerated
 		return await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.postDictionaryImport({ requestBody: { fileName, parentKey } })
+			DictionaryResource.postDictionaryImport({ requestBody: { temporaryFileId, parentId } })
 		);
 	}
 
 	/**
 	 * @description - Upload a Dictionary
-	 * @param {FormData} formData
+	 * @param {ImportDictionaryRequestModel} formData
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async upload(formData: FormData) {
+	async upload(formData: ImportDictionaryRequestModel) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			DictionaryResource.postDictionaryUpload({
+			DictionaryResource.postDictionaryImport({
 				requestBody: formData,
 			})
 		);
@@ -136,13 +136,13 @@ export class UmbDictionaryDetailServerDataSource implements DictionaryDetailData
 
 	/**
 	 * @description - Export a Dictionary, optionally including child items.
-	 * @param {string} key
+	 * @param {string} id
 	 * @param {boolean} includeChildren
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async export(key: string, includeChildren: boolean) {
-		return await tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryByKeyExport({ key, includeChildren }));
+	async export(id: string, includeChildren: boolean) {
+		return await tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryByIdExport({ id, includeChildren }));
 	}
 
 	async getLanguages() {

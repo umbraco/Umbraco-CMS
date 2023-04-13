@@ -2,15 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateDictionaryItemRequestModel } from '../models/CreateDictionaryItemRequestModel';
+import type { DictionaryItemItemResponseModel } from '../models/DictionaryItemItemResponseModel';
 import type { DictionaryItemResponseModel } from '../models/DictionaryItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
 import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
-import type { UploadDictionaryResponseModel } from '../models/UploadDictionaryResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -23,12 +21,12 @@ export class DictionaryResource {
      * @throws ApiError
      */
     public static getDictionary({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedDictionaryOverviewResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedDictionaryOverviewResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/dictionary',
@@ -44,10 +42,10 @@ take?: number,
      * @throws ApiError
      */
     public static postDictionary({
-requestBody,
-}: {
-requestBody?: CreateDictionaryItemRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateDictionaryItemRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary',
@@ -66,16 +64,16 @@ requestBody?: CreateDictionaryItemRequestModel,
      * @returns any Success
      * @throws ApiError
      */
-    public static getDictionaryByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<DictionaryItemResponseModel> {
+    public static getDictionaryById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<DictionaryItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/dictionary/{key}',
+            url: '/umbraco/management/api/v1/dictionary/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -87,16 +85,16 @@ key: string,
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteDictionaryByKey({
-key,
-}: {
-key: string,
-}): CancelablePromise<any> {
+    public static deleteDictionaryById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/dictionary/{key}',
+            url: '/umbraco/management/api/v1/dictionary/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 400: `Bad Request`,
@@ -109,18 +107,18 @@ key: string,
      * @returns any Success
      * @throws ApiError
      */
-    public static putDictionaryByKey({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: UpdateDictionaryItemRequestModel,
-}): CancelablePromise<any> {
+    public static putDictionaryById({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDictionaryItemRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/dictionary/{key}',
+            url: '/umbraco/management/api/v1/dictionary/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -135,18 +133,18 @@ requestBody?: UpdateDictionaryItemRequestModel,
      * @returns binary Success
      * @throws ApiError
      */
-    public static getDictionaryByKeyExport({
-key,
-includeChildren = false,
-}: {
-key: string,
-includeChildren?: boolean,
-}): CancelablePromise<Blob> {
+    public static getDictionaryByIdExport({
+        id,
+        includeChildren = false,
+    }: {
+        id: string,
+        includeChildren?: boolean,
+    }): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/dictionary/{key}/export',
+            url: '/umbraco/management/api/v1/dictionary/{id}/export',
             path: {
-                'key': key,
+                'id': id,
             },
             query: {
                 'includeChildren': includeChildren,
@@ -161,18 +159,18 @@ includeChildren?: boolean,
      * @returns any Success
      * @throws ApiError
      */
-    public static postDictionaryByKeyMove({
-key,
-requestBody,
-}: {
-key: string,
-requestBody?: MoveDictionaryRequestModel,
-}): CancelablePromise<any> {
+    public static postDictionaryByIdMove({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveDictionaryRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/umbraco/management/api/v1/dictionary/{key}/move',
+            url: '/umbraco/management/api/v1/dictionary/{id}/move',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -188,10 +186,10 @@ requestBody?: MoveDictionaryRequestModel,
      * @throws ApiError
      */
     public static postDictionaryImport({
-requestBody,
-}: {
-requestBody?: ImportDictionaryRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: ImportDictionaryRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dictionary/import',
@@ -209,17 +207,16 @@ requestBody?: ImportDictionaryRequestModel,
      * @returns any Success
      * @throws ApiError
      */
-    public static postDictionaryUpload({
-requestBody,
-}: {
-requestBody?: any,
-}): CancelablePromise<UploadDictionaryResponseModel> {
+    public static getDictionaryItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DictionaryItemItemResponseModel>> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v1/dictionary/upload',
-            body: requestBody,
-            errors: {
-                400: `Bad Request`,
+            method: 'GET',
+            url: '/umbraco/management/api/v1/dictionary/item',
+            query: {
+                'id': id,
             },
         });
     }
@@ -229,39 +226,21 @@ requestBody?: any,
      * @throws ApiError
      */
     public static getTreeDictionaryChildren({
-parentKey,
-skip,
-take = 100,
-}: {
-parentKey?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/children',
             query: {
-                'parentKey': parentKey,
+                'parentId': parentId,
                 'skip': skip,
                 'take': take,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeDictionaryItem({
-key,
-}: {
-key?: Array<string>,
-}): CancelablePromise<Array<(FolderTreeItemResponseModel | DocumentTypeTreeItemResponseModel)>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/dictionary/item',
-            query: {
-                'key': key,
             },
         });
     }
@@ -271,12 +250,12 @@ key?: Array<string>,
      * @throws ApiError
      */
     public static getTreeDictionaryRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/root',

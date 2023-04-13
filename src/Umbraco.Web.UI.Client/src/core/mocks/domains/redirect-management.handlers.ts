@@ -35,21 +35,21 @@ export const handlers = [
 		}
 	}),
 
-	rest.get(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
-		const key = _req.params.key as string;
-		if (!key) return res(ctx.status(404));
-		if (key === 'status') return res(ctx.status(200), ctx.json<RedirectUrlStatusResponseModel>(UrlTracker));
+	rest.get(umbracoPath('/redirect-management/:id'), async (_req, res, ctx) => {
+		const id = _req.params.id as string;
+		if (!id) return res(ctx.status(404));
+		if (id === 'status') return res(ctx.status(200), ctx.json<RedirectUrlStatusResponseModel>(UrlTracker));
 
-		const PagedRedirectUrlObject = _getRedirectUrlByKey(key);
+		const PagedRedirectUrlObject = _getRedirectUrlByKey(id);
 
 		return res(ctx.status(200), ctx.json<PagedRedirectUrlResponseModel>(PagedRedirectUrlObject));
 	}),
 
-	rest.delete(umbracoPath('/redirect-management/:key'), async (_req, res, ctx) => {
-		const key = _req.params.key as string;
-		if (!key) return res(ctx.status(404));
+	rest.delete(umbracoPath('/redirect-management/:id'), async (_req, res, ctx) => {
+		const id = _req.params.id as string;
+		if (!id) return res(ctx.status(404));
 
-		const PagedRedirectUrlObject = _deleteRedirectUrlByKey(key);
+		const PagedRedirectUrlObject = _deleteRedirectUrlByKey(id);
 
 		return res(ctx.status(200), ctx.json<any>(PagedRedirectUrlObject));
 	}),
@@ -69,13 +69,13 @@ export const handlers = [
 
 const UrlTracker: RedirectUrlStatusResponseModel = { status: RedirectStatusModel.ENABLED, userIsAdmin: true };
 
-const _getRedirectUrlByKey = (key: string) => {
+const _getRedirectUrlByKey = (id: string) => {
 	const PagedResult: PagedRedirectUrlResponseModel = {
 		total: 0,
 		items: [],
 	};
 	RedirectUrlData.forEach((data) => {
-		if (data.key?.includes(key)) {
+		if (data.id?.includes(id)) {
 			PagedResult.items.push(data);
 			PagedResult.total++;
 		}
@@ -83,8 +83,8 @@ const _getRedirectUrlByKey = (key: string) => {
 	return PagedResult;
 };
 
-const _deleteRedirectUrlByKey = (key: string) => {
-	const index = RedirectUrlData.findIndex((data) => data.key === key);
+const _deleteRedirectUrlByKey = (id: string) => {
+	const index = RedirectUrlData.findIndex((data) => data.id === id);
 	if (index > -1) RedirectUrlData.splice(index, 1);
 	const PagedResult: PagedRedirectUrlResponseModel = {
 		items: RedirectUrlData,
@@ -95,81 +95,81 @@ const _deleteRedirectUrlByKey = (key: string) => {
 
 const RedirectUrlData: RedirectUrlResponseModel[] = [
 	{
-		key: '1',
+		id: '1',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'kitty.com',
 		originalUrl: 'kitty.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9f2',
 	},
 	{
-		key: '2',
+		id: '2',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'umbraco.com',
 		originalUrl: 'umbraco.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9f',
 	},
 	{
-		key: '3',
+		id: '3',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'uui.umbraco.com',
 		originalUrl: 'uui.umbraco.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f23',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9f23',
 	},
 	{
-		key: '4',
+		id: '4',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'umbracoffee.com',
 		originalUrl: 'umbracoffee.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fdsaa',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9fdsaa',
 	},
 	{
-		key: '5',
+		id: '5',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'section/settings',
 		originalUrl: 'section/settings/123',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2e23',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9f2e23',
 	},
 	{
-		key: '6',
+		id: '6',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'dxp.com',
 		originalUrl: 'dxp.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fsafsfd',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9fsafsfd',
 	},
 	{
-		key: '7',
+		id: '7',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'google.com',
 		originalUrl: 'google.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9f2cxza',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9f2cxza',
 	},
 	{
-		key: '8',
+		id: '8',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'unicorns.com',
 		originalUrl: 'unicorns.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31d9fweds',
+		contentId: '7191c911-6747-4824-849e-5208e2b31d9fweds',
 	},
 	{
-		key: '9',
+		id: '9',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'h5yr.com',
 		originalUrl: 'h5yr.dk',
-		contentKey: '7191c911-6747-4824-849e-5208e2b31ddsfsdsfadsfdx9f2',
+		contentId: '7191c911-6747-4824-849e-5208e2b31ddsfsdsfadsfdx9f2',
 	},
 	{
-		key: '10',
+		id: '10',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'our.umbraco.com',
 		originalUrl: 'our.umbraco.dk',
-		contentKey: '7191c911-6747-4824-849e-52dsacx08e2b31d9dsafdsff',
+		contentId: '7191c911-6747-4824-849e-52dsacx08e2b31d9dsafdsff',
 	},
 	{
-		key: '11',
+		id: '11',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'your.umbraco.com',
 		originalUrl: 'your.umbraco.dk',
-		contentKey: '7191c911-6747-4824-849e-52dsacx08e2b31d9fsda',
+		contentId: '7191c911-6747-4824-849e-52dsacx08e2b31d9fsda',
 	},
 ];
 

@@ -18,12 +18,12 @@ export class HealthCheckResource {
      * @throws ApiError
      */
     public static getHealthCheckGroup({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedHealthCheckGroupResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedHealthCheckGroupResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/health-check-group',
@@ -39,10 +39,10 @@ take?: number,
      * @throws ApiError
      */
     public static getHealthCheckGroupByName({
-name,
-}: {
-name: string,
-}): CancelablePromise<HealthCheckGroupPresentationModel> {
+        name,
+    }: {
+        name: string,
+    }): CancelablePromise<HealthCheckGroupPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/health-check-group/{name}',
@@ -60,10 +60,10 @@ name: string,
      * @throws ApiError
      */
     public static postHealthCheckGroupByNameCheck({
-name,
-}: {
-name: string,
-}): CancelablePromise<HealthCheckGroupWithResultResponseModel> {
+        name,
+    }: {
+        name: string,
+    }): CancelablePromise<HealthCheckGroupWithResultResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/health-check-group/{name}/check',
@@ -81,10 +81,10 @@ name: string,
      * @throws ApiError
      */
     public static postHealthCheckExecuteAction({
-requestBody,
-}: {
-requestBody?: HealthCheckActionRequestModel,
-}): CancelablePromise<HealthCheckResultResponseModel> {
+        requestBody,
+    }: {
+        requestBody?: HealthCheckActionRequestModel,
+    }): CancelablePromise<HealthCheckResultResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/health-check/execute-action',

@@ -6,9 +6,10 @@ import type { TemplateQueryExecuteFilterPresentationModel } from './TemplateQuer
 import type { TemplateQueryExecuteSortModel } from './TemplateQueryExecuteSortModel';
 
 export type TemplateQueryExecuteModel = {
-    rootContentKey?: string | null;
+    rootContentId?: string | null;
     contentTypeAlias?: string | null;
     filters?: Array<TemplateQueryExecuteFilterPresentationModel> | null;
     sort?: TemplateQueryExecuteSortModel | null;
     take?: number;
 };
+

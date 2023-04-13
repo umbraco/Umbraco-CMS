@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { umbLogviewerData } from '../data/log-viewer.data';
+import { umbLogViewerData } from '../data/log-viewer.data';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { SavedLogSearchRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -11,7 +11,7 @@ export const handlers = [
 		const take = req.url.searchParams.get('take');
 		const takeNumber = take ? Number.parseInt(take) : undefined;
 
-		const items = umbLogviewerData.searches.getSavedSearches(skipNumber, takeNumber);
+		const items = umbLogViewerData.searches.getSavedSearches(skipNumber, takeNumber);
 
 		const response = {
 			total: items.length,
@@ -22,11 +22,11 @@ export const handlers = [
 	}),
 
 	rest.get(umbracoPath('/log-viewer/saved-search/:name'), (req, res, ctx) => {
-		const name = req.params.key as string;
+		const name = req.params.name as string;
 
 		if (!name) return;
 
-		const item = umbLogviewerData.searches.getByName(name);
+		const item = umbLogViewerData.searches.getByName(name);
 		return res(ctx.delay(), ctx.status(200), ctx.json(item));
 	}),
 
@@ -35,6 +35,7 @@ export const handlers = [
 	}),
 
 	rest.delete(umbracoPath('/log-viewer/saved-search/:name'), async (req, res, ctx) => {
+		// TODO: implement this
 		return res(ctx.status(200));
 	}),
 	//#endregion
@@ -46,10 +47,10 @@ export const handlers = [
 		const take = req.url.searchParams.get('take');
 		const takeNumber = take ? Number.parseInt(take) : undefined;
 
-		const items = umbLogviewerData.templates.getTemplates(skipNumber, takeNumber);
+		const items = umbLogViewerData.templates.getTemplates(skipNumber, takeNumber);
 
 		const response = {
-			total: umbLogviewerData.templates.total,
+			total: umbLogViewerData.templates.total,
 			items,
 		};
 
@@ -58,11 +59,11 @@ export const handlers = [
 	//#endregion
 	//#region Logs
 	rest.get(umbracoPath('/log-viewer/level'), (req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogviewerData.logLevels));
+		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogViewerData.logLevels));
 	}),
 
 	rest.get(umbracoPath('/log-viewer/level-count'), (req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogviewerData.logs.getLevelCount()));
+		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogViewerData.logs.getLevelCount()));
 	}),
 
 	rest.get(umbracoPath('/log-viewer/validate-logs-size'), (req, res, ctx) => {
@@ -75,9 +76,9 @@ export const handlers = [
 		const take = req.url.searchParams.get('take');
 		const takeNumber = take ? Number.parseInt(take) : undefined;
 
-		const items = umbLogviewerData.logs.getLogs(skipNumber, takeNumber);
+		const items = umbLogViewerData.logs.getLogs(skipNumber, takeNumber);
 		const response = {
-			total: umbLogviewerData.logs.total,
+			total: umbLogViewerData.logs.total,
 			items,
 		};
 

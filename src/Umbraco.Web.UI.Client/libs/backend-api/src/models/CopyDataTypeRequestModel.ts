@@ -3,5 +3,6 @@
 /* eslint-disable */
 
 export type CopyDataTypeRequestModel = {
-    targetKey?: string | null;
+    targetId?: string | null;
 };
+

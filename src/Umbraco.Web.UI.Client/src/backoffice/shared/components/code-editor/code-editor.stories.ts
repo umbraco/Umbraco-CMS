@@ -137,16 +137,16 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 			this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
 		}
 
-		async load(entityKey: string) {
-			const { data } = await this.repository.requestByKey(entityKey);
+		async load(entityId: string) {
+			const { data } = await this.repository.requestByKey(entityId);
 			if (data) {
 				this.setIsNew(false);
 				this.#data.next(data);
 			}
 		}
 
-		async createScaffold(parentKey: string | null) {
-			const { data } = await this.repository.createScaffold(parentKey);
+		async createScaffold(parentId: string | null) {
+			const { data } = await this.repository.createScaffold(parentId);
 			if (!data) return;
 			this.setIsNew(true);
 			this.#data.next(data);

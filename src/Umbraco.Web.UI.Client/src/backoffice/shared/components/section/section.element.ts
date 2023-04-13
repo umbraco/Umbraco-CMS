@@ -6,7 +6,7 @@ import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
 import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import type { IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './section-sidebar-menu/section-sidebar-menu.element';
@@ -37,7 +37,7 @@ export class UmbSectionElement extends UmbLitElement {
 	public manifest?: ManifestSection;
 
 	@state()
-	private _routes?: Array<any>;
+	private _routes?: Array<IRoute>;
 
 	@state()
 	private _menus?: Array<Omit<ManifestSectionSidebarApp, 'kind'>>;
@@ -55,15 +55,15 @@ export class UmbSectionElement extends UmbLitElement {
 			{
 				path: 'workspace/:entityType',
 				component: () => import('../workspace/workspace.element'),
-				setup: (element: UmbWorkspaceElement, info: IRoutingInfo) => {
-					element.entityType = info.match.params.entityType;
+				setup: (element, info) => {
+					(element as UmbWorkspaceElement).entityType = info.match.params.entityType;
 				},
 			},
 			{
 				path: '**',
 				component: () => import('../section/section-views/section-views.element'),
-				setup: (element: UmbSectionViewsElement) => {
-					element.sectionAlias = this.manifest?.alias;
+				setup: (element) => {
+					(element as UmbSectionViewsElement).sectionAlias = this.manifest?.alias;
 				},
 			},
 		];

@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { IRoute, IRoutingInfo } from 'router-slot';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 
 /**
  * @element umb-property-editor-ui-block-grid-inner-test
@@ -28,7 +28,7 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 			component: () => {
 				return import('./property-editor-ui-block-grid-inner-test.element');
 			},
-			setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				console.log('block route inner', info);
 				if (component instanceof HTMLElement) {
 					(component as any).name = 'inner-1';
@@ -41,7 +41,7 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 			component: () => {
 				return import('./property-editor-ui-block-grid-inner-test.element');
 			},
-			setup: (component: Promise<HTMLElement> | HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				console.log('block route inner', info);
 				if (component instanceof HTMLElement) {
 					(component as any).name = 'inner-2';

@@ -18,8 +18,8 @@ export class UmbMemberTypeWorkspaceContext
 		super(host, new UmbMemberTypeRepository(host));
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
@@ -37,8 +37,8 @@ export class UmbMemberTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -55,17 +55,19 @@ export class UmbMemberTypeWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
+		if (!this.#data.value.id) return;
+
 		if (this.isNew) {
 			await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value);
+			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	public destroy(): void {

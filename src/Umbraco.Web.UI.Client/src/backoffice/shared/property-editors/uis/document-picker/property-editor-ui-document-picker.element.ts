@@ -32,7 +32,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentPickerElement).selectedKeys;
+		this.value = (event.target as UmbInputDocumentPickerElement).selectedIds;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -41,7 +41,7 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 		return html`
 			<umb-input-document-picker
 				@change=${this._onChange}
-				.selectedKeys=${this._value}
+				.selectedIds=${this._value}
 				.min=${this._limitMin}
 				.max=${this._limitMax}
 				>Add</umb-input-document-picker

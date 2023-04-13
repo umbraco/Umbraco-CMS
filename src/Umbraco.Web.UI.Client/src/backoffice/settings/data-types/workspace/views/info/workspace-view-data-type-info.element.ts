@@ -9,7 +9,15 @@ import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-workspace-view-data-type-info')
 export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 
 	@state()
 	_dataType?: DataTypeResponseModel;
@@ -42,8 +50,8 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 	private _renderGeneralInfo() {
 		return html`
 			<uui-box headline="General" style="margin-bottom: 20px;">
-				<umb-workspace-property-layout label="Key">
-					<div slot="editor">${this._dataType?.key}</div>
+				<umb-workspace-property-layout label="Id">
+					<div slot="editor">${this._dataType?.id}</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Property Editor Alias">
 					<div slot="editor">${this._dataType?.propertyEditorAlias}</div>

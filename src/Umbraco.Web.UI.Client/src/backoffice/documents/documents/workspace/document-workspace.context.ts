@@ -3,7 +3,7 @@ import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
 import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variable-entity-context.interface';
 import { UmbVariantId } from '../../../shared/variants/variant-id.class';
-import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-property-structure-manager.class';
+import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
 import { UmbWorkspaceSplitViewManager } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { partialUpdateFrozenArray, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -28,12 +28,12 @@ export class UmbDocumentWorkspaceContext
 	 * The document is the current state/draft version of the document.
 	 */
 	#draft = new ObjectState<EntityType | undefined>(undefined);
-	readonly unique = this.#draft.getObservablePart((data) => data?.key);
-	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeKey);
+	readonly unique = this.#draft.getObservablePart((data) => data?.id);
+	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeId);
 
 	readonly variants = this.#draft.getObservablePart((data) => data?.variants || []);
 	readonly urls = this.#draft.getObservablePart((data) => data?.urls || []);
-	readonly templateKey = this.#draft.getObservablePart((data) => data?.templateKey || null);
+	readonly templateId = this.#draft.getObservablePart((data) => data?.templateId || null);
 
 	readonly structure;
 	readonly splitView;
@@ -44,7 +44,7 @@ export class UmbDocumentWorkspaceContext
 		this.structure = new UmbWorkspacePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
 		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
 
-		new UmbObserverController(this.host, this.documentTypeKey, (key) => this.structure.loadType(key));
+		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
 
 		/*
 		TODO: Concept for ensure variant values:
@@ -59,8 +59,8 @@ export class UmbDocumentWorkspaceContext
 		*/
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (!data) return undefined;
 
 		this.setIsNew(false);
@@ -89,8 +89,8 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	getEntityKey() {
-		return this.getData().key;
+	getEntityId() {
+		return this.getData().id;
 	}
 
 	getEntityType() {
@@ -163,19 +163,21 @@ export class UmbDocumentWorkspaceContext
 
 	async save() {
 		if (!this.#draft.value) return;
+		if (!this.#draft.value.id) return;
+
 		if (this.getIsNew()) {
 			// TODO: typescript hack until we get the create type
-			const value = this.#draft.value as CreateDocumentRequestModel & { key: string };
+			const value = this.#draft.value as CreateDocumentRequestModel & { id: string };
 			await this.repository.create(value);
 		} else {
-			await this.repository.save(this.#draft.value);
+			await this.repository.save(this.#draft.value.id, this.#draft.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 	}
 
-	async delete(key: string) {
-		await this.repository.delete(key);
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	/*

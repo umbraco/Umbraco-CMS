@@ -28,21 +28,21 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		`,
 	];
 
-	// TODO: do we need both selectedKeys and value? If we just use value we follow the same pattern as native form controls.
-	private _selectedKeys: Array<string> = [];
-	public get selectedKeys(): Array<string> {
-		return this._selectedKeys;
+	// TODO: do we need both selectedIds and value? If we just use value we follow the same pattern as native form controls.
+	private _selectedIds: Array<string> = [];
+	public get selectedIds(): Array<string> {
+		return this._selectedIds;
 	}
-	public set selectedKeys(keys: Array<string>) {
-		this._selectedKeys = keys;
-		super.value = keys.join(',');
+	public set selectedIds(ids: Array<string>) {
+		this._selectedIds = ids;
+		super.value = ids.join(',');
 		this._observePickedDocuments();
 	}
 
 	@property()
-	public set value(keysString: string) {
-		if (keysString !== this._value) {
-			this.selectedKeys = keysString.split(/[ ,]+/);
+	public set value(idsString: string) {
+		if (idsString !== this._value) {
+			this.selectedIds = idsString.split(/[ ,]+/);
 		}
 	}
 
@@ -74,16 +74,16 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		if (!this._documentTypeStore) return;
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		this._pickedItemsObserver = this.observe(this._documentTypeStore.items(this._selectedKeys), (items) => {
+		this._pickedItemsObserver = this.observe(this._documentTypeStore.items(this._selectedIds), (items) => {
 			this._items = items;
 		});
 	}
 
 	private _openPicker() {
-		// We send a shallow copy(good enough as its just an array of keys) of our this._selectedKeys, as we don't want the modal to manipulate our data:
+		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
 		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			multiple: true,
-			selection: [...this._selectedKeys],
+			selection: [...this._selectedIds],
 		});
 
 		modalHandler?.onSubmit().then(({ selection }: any) => {
@@ -100,12 +100,12 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		});
 
 		await modalHandler?.onSubmit();
-		const newSelection = this._selectedKeys.filter((value) => value !== item.key);
+		const newSelection = this._selectedIds.filter((value) => value !== item.id);
 		this._setSelection(newSelection);
 	}
 
 	private _setSelection(newSelection: Array<string>) {
-		this.selectedKeys = newSelection;
+		this.selectedIds = newSelection;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
@@ -121,7 +121,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 		const tempItem = item as DocumentTypeResponseModel & { isTrashed: boolean };
 
 		return html`
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.key)}>
+			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.id)}>
 				<uui-icon slot="icon" name="${ifDefined(item.icon)}"></uui-icon>
 				${tempItem.isTrashed ? html` <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> ` : nothing}
 				<uui-action-bar slot="actions">

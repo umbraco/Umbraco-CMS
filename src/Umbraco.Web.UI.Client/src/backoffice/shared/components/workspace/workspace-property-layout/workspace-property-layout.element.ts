@@ -11,49 +11,6 @@ import { customElement, property } from 'lit/decorators.js';
  */
 @customElement('umb-workspace-property-layout')
 export class UmbWorkspacePropertyLayoutElement extends LitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: grid;
-				grid-template-columns: 200px auto;
-				column-gap: var(--uui-size-layout-2);
-				border-bottom: 1px solid var(--uui-color-divider);
-				padding: var(--uui-size-layout-1) 0;
-				container-type: inline-size;
-			}
-
-			:host > div {
-				grid-column: span 2;
-			}
-
-			@container (width > 600px) {
-				:host(:not([orientation='vertical'])) > div {
-					grid-column: span 1;
-				}
-			}
-
-			:host(:last-of-type) {
-				border-bottom: none;
-			}
-
-			:host-context(umb-variantable-property:first-of-type) {
-				padding-top: 0;
-			}
-
-			p {
-				margin-bottom: 0;
-			}
-
-			#header {
-				position: sticky;
-				top: var(--uui-size-space-4);
-				height: min-content;
-				z-index: 2;
-			}
-		`,
-	];
-
 	/**
 	 * Alias. The technical name of the property.
 	 * @type {string}
@@ -107,6 +64,49 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 			</div>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: grid;
+				grid-template-columns: 200px auto;
+				column-gap: var(--uui-size-layout-2);
+				border-bottom: 1px solid var(--uui-color-divider);
+				padding: var(--uui-size-layout-1) 0;
+				container-type: inline-size;
+			}
+
+			:host > div {
+				grid-column: span 2;
+			}
+
+			@container (width > 600px) {
+				:host(:not([orientation='vertical'])) > div {
+					grid-column: span 1;
+				}
+			}
+
+			:host(:last-of-type) {
+				border-bottom: none;
+			}
+
+			:host-context(umb-variantable-property:first-of-type) {
+				padding-top: 0;
+			}
+
+			p {
+				margin-bottom: 0;
+			}
+
+			#header {
+				position: sticky;
+				top: var(--uui-size-space-4);
+				height: min-content;
+				z-index: 2;
+			}
+		`,
+	];
 }
 
 declare global {

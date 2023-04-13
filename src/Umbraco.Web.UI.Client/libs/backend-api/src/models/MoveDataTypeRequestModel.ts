@@ -3,5 +3,6 @@
 /* eslint-disable */
 
 export type MoveDataTypeRequestModel = {
-    targetKey?: string | null;
+    targetId?: string | null;
 };
+

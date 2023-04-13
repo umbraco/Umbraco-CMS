@@ -8,8 +8,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
-@customElement('umb-language-workspace-thingy')
-export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
+@customElement('umb-language-workspace-edit')
+export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -19,8 +19,22 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 				gap: var(--uui-size-space-4);
 				width: 100%;
 			}
+
 			uui-input {
 				width: 100%;
+			}
+
+			strong {
+				display: flex;
+				align-items: center;
+			}
+
+			#footer {
+				padding: 0 var(--uui-size-layout-1);
+			}
+
+			uui-input:not(:focus) {
+				border: 1px solid transparent;
 			}
 		`,
 	];
@@ -29,6 +43,9 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 
 	@state()
 	_language?: LanguageResponseModel;
+
+	@state()
+	_isNew?: boolean;
 
 	constructor() {
 		super();
@@ -43,6 +60,9 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.data, (data) => {
 			this._language = data;
+		});
+		this.observe(this.#workspaceContext.isNew, (isNew) => {
+			this._isNew = isNew;
 		});
 	}
 
@@ -59,19 +79,28 @@ export class UmbLanguageWorkspaceThingyElement extends UmbLitElement {
 	render() {
 		return html`<umb-workspace-layout alias="Umb.Workspace.Language">
 			<div id="header" slot="header">
-				<uui-button href="/section/settings/workspace/language-root" compact>
+				<uui-button label="Navigate back" href="section/settings/workspace/language-root" compact>
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</uui-button>
-				<uui-input value=${ifDefined(this._language?.name)} @input="${this.#handleInput}"></uui-input>
+				${this._isNew
+					? html`<strong>Add language</strong>`
+					: html`<uui-input
+							label="Language name"
+							value=${ifDefined(this._language?.name)}
+							@input="${this.#handleInput}"></uui-input>`}
+			</div>
+			<div slot="footer" id="footer">
+				<a href="section/settings/workspace/language-root">Languages</a> /
+				${this._isNew ? 'Create' : this._language?.name}
 			</div>
 		</umb-workspace-layout>`;
 	}
 }
 
-export default UmbLanguageWorkspaceThingyElement;
+export default UmbLanguageWorkspaceEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-workspace-thingy': UmbLanguageWorkspaceThingyElement;
+		'umb-language-workspace-edit': UmbLanguageWorkspaceEditElement;
 	}
 }

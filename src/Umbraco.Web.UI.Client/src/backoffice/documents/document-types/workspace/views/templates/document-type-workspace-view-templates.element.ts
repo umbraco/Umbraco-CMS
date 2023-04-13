@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import { UmbWorkspaceDocumentTypeContext } from '../../document-type-workspace.context';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
@@ -35,12 +35,12 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		`,
 	];
 
-	private _workspaceContext?: UmbWorkspaceDocumentTypeContext;
+	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (documentTypeContext) => {
-			this._workspaceContext = documentTypeContext as UmbWorkspaceDocumentTypeContext;
+			this._workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
 			this._observeDocumentType();
 		});
 	}
@@ -49,13 +49,13 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		if (!this._workspaceContext) return;
 	}
 
-	async #changeDefaultKey(e: CustomEvent) {
-		// save new default key
-		console.log('workspace: default template key', e);
+	async #changeDefaultId(e: CustomEvent) {
+		// save new default id
+		console.log('workspace: default template id', e);
 	}
 
 	#changeAllowedKeys(e: CustomEvent) {
-		// save new allowed keys
+		// save new allowed ids
 		console.log('workspace: allowed templates changed', e);
 	}
 
@@ -65,9 +65,9 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
 				<div id="templates" slot="editor">
 					<umb-input-template-picker
-						.defaultKey="${/*this._documentType?.defaultTemplateKey ??*/ ''}"
-						.allowedKeys="${/*this._documentType?.allowedTemplateKeys ??*/ []}"
-						@change-default="${this.#changeDefaultKey}"
+						.defaultKey="${/*this._documentType?.defaultTemplateId ??*/ ''}"
+						.allowedKeys="${/*this._documentType?.allowedTemplateIds ??*/ []}"
+						@change-default="${this.#changeDefaultId}"
 						@change-allowed="${this.#changeAllowedKeys}"></umb-input-template-picker>
 				</div>
 			</umb-workspace-property-layout>

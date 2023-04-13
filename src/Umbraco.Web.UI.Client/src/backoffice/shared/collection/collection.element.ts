@@ -9,6 +9,7 @@ import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/back
 import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
@@ -30,7 +31,7 @@ export class UmbCollectionElement extends UmbLitElement {
 	];
 
 	@state()
-	private _routes: Array<any> = [];
+	private _routes: Array<IRoute> = [];
 
 	@state()
 	private _selection?: Array<string> | null;
@@ -95,7 +96,7 @@ export class UmbCollectionElement extends UmbLitElement {
 
 		this._routes.push({
 			path: '**',
-			redirectTo: views?.[0]?.meta.pathName,
+			redirectTo: views?.[0]?.meta.pathName ?? '/',
 		});
 	}
 

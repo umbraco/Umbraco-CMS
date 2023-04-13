@@ -31,41 +31,41 @@ export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof MediaTypeTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			MediaTypeResource.getTreeMediaTypeChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof MediaTypeTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (!keys || keys.length === 0) {
+	async getItems(ids: Array<string>) {
+		if (!ids || ids.length === 0) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
-			MediaTypeResource.getTreeMediaTypeItem({
-				key: keys,
+			MediaTypeResource.getMediaTypeItem({
+				id: ids,
 			})
 		);
 	}
