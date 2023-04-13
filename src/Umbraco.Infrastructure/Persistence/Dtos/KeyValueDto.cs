@@ -19,6 +19,7 @@ internal class KeyValueDto
     public string Key { get; set; } = null!;
 
     [Column("value")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Value { get; set; }
 
