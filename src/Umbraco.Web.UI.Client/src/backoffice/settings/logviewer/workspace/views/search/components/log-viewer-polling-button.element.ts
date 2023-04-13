@@ -90,10 +90,11 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		this.#logViewerContext?.togglePolling();
 	}
 
-	#setPolingInterval(interval: PoolingInterval) {
+	#setPolingInterval = (interval: PoolingInterval) => {
 		this.#logViewerContext?.setPollingInterval(interval);
+
 		this.#closePoolingPopover();
-	}
+	};
 
 	#openPoolingPopover() {
 		this._pollingPopover.open = true;
@@ -103,6 +104,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 	#closePoolingPopover() {
 		this._pollingPopover.open = false;
 		this._polingExpandSymbol.open = false;
+		this.#togglePolling();
 	}
 
 	render() {
@@ -111,7 +113,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 				>${this._poolingConfig.enabled
 					? html`<uui-icon name="umb:axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
 							${this._poolingConfig.interval / 1000} seconds`
-					: 'Pooling'}</uui-button
+					: 'Polling'}</uui-button
 			>
 			<uui-popover placement="bottom-end" id="polling-popover" @close=${() => (this._polingExpandSymbol.open = false)}>
 				<uui-button slot="trigger" compact label="Choose pooling time" @click=${this.#openPoolingPopover}>

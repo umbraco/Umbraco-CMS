@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -37,7 +37,7 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	render() {
 		return html`${this._loggers.length > 0
 			? this._loggers.find((logger) => logger.name === this.loggerName)?.level
-			: ''}`;
+			: nothing}`;
 	}
 }
 

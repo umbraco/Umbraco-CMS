@@ -27,7 +27,10 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 		Information: { look: 'primary', color: 'positive' },
 		Warning: { look: 'primary', color: 'warning' },
 		Error: { look: 'primary', color: 'danger' },
-		Fatal: { look: 'primary' },
+		Fatal: {
+			look: 'primary',
+			style: 'background-color: var(--umb-log-viewer-fatal-color); color: var(--uui-color-surface)',
+		},
 	};
 
 	render() {
