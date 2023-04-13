@@ -2,5 +2,5 @@
 
 public interface IMigrationService
 {
-    Task MigrateAsync();
+    Task MigrateAsync(string migrationName);
 }

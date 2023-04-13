@@ -1,21 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Infrastructure.Migrations;
+﻿using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Persistence.EFCore.Entities;
+using Umbraco.Cms.Persistence.EFCore.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
 internal class MigrationService : IMigrationService
 {
-    private readonly UmbracoDbContextFactory _umbracoDbContextFactory;
+    private readonly IEfCoreScopeProvider<UmbracoEFContext> _efCoreScopeProvider;
 
-    public MigrationService(UmbracoDbContextFactory umbracoDbContextFactory)
+    public MigrationService(IEfCoreScopeProvider<UmbracoEFContext> efCoreScopeProvider) => _efCoreScopeProvider = efCoreScopeProvider;
+
+    public async Task MigrateAsync(string migrationName)
     {
-        _umbracoDbContextFactory = umbracoDbContextFactory;
+        using IEfCoreScope<UmbracoEFContext> scope = _efCoreScopeProvider.CreateScope();
+        await scope.MigrateDatabaseAsync(migrationName);
+        scope.Complete();
     }
-
-    public async Task MigrateAsync() =>
-        await _umbracoDbContextFactory.ExecuteWithContextAsync<Task>(async db =>
-        {
-            await db.Database.MigrateAsync();
-        });
 }
