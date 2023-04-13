@@ -54,31 +54,74 @@ function contextItemData(contextInstance:any):DebugContextItemData {
 
                         const objValue = value;
                         const jsonString = JSON.stringify(objValue, function(key, value) {
-                            const cache: any[] = [];
-                            console.log('OBJ JSON key', key);
-                            console.log('OBJ JSON value', value);
-                            console.log('OBJ JSON value typeof', typeof value);
 
+                            const cache: any[] = [];
+                            const valueTypeOfProp = typeof value;
+
+                            console.log('Key', key);
+                            console.log('Value', value);
+                            console.log('TypeOf', valueTypeOfProp);
+
+                            // Remove the 'observers' property
                             if(key === 'observers'){
                                 console.log('REMOVE OBSERVERS');
                                 return undefined;
                             }
 
-                            if (typeof value === "object" && value !== null) {
-                                if (cache.includes(value)) {
-                                    // Circular reference found, remove the property
-                                    return undefined;
-                                }
-                            
-                                // Store the value in our cache
-                                cache.push(value);
+                            if(key === 'host'){
+                                console.log('REMOVE HOST');
+                                return undefined;
                             }
-                            return value;
+
+                            if(key.startsWith('_')){
+                                console.log('STARTED WITH _');
+                                return undefined;;
+                            }
+
+
+                            switch(valueTypeOfProp){
+                                case 'string':
+                                case 'boolean':
+                                case 'number':
+                                case 'bigint':
+                                    return value;
+                                
+                                case 'object':
+                                    console.log('Prop inside OBJ is another OBJ', value);
+
+                                    if (typeof value === "object" && value !== null) {
+                                        if (cache.includes(value)) {
+                                            // Circular reference found, remove the property
+                                            return undefined;
+                                        }
+                                    
+                                        // Store the value in our cache
+                                        cache.push(value);
+                                    }
+
+                                    return value;
+
+                                default:
+                                    console.log('WHAT AM I?', value, valueTypeOfProp);
+                                    return undefined;
+                            }
+                           
+
+                            // if (typeof value === "object" && value !== null) {
+                            //     if (cache.includes(value)) {
+                            //         // Circular reference found, remove the property
+                            //         return undefined;
+                            //     }
+                            
+                            //     // Store the value in our cache
+                            //     cache.push(value);
+                            // }
+                            // return value;
                         });
 
                         console.log('OBJ JSON string', jsonString);
 
-                        props.push({ key: key, type: typeof value });
+                        props.push({ key: key, type: typeof value, value: jsonString });
                         break;
 
                     default:
@@ -103,6 +146,14 @@ function contextItemData(contextInstance:any):DebugContextItemData {
 
     return contextItemData;
 };
+
+function jsonReplacer(key: any, value: any) {
+    // Filtering out properties
+    if (key === 'observers') {
+        return undefined;
+    }
+    return value;
+}
 
 /**
  * Gets a list of methods from a class
