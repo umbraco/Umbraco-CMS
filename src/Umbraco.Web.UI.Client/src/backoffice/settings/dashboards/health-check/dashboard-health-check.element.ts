@@ -6,7 +6,7 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from './health-check-dashboard.context';
 import { UmbHealthCheckContext } from './health-check.context';
-import type { IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
@@ -20,7 +20,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		{
 			path: `/:groupName`,
 			component: () => import('./views/health-check-group.element'),
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				const element = component as UmbDashboardHealthCheckGroupElement;
 				element.groupName = decodeURI(info.match.params.groupName);
 			},

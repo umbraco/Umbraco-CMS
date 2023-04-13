@@ -76,7 +76,25 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	async save() {
-		throw new Error('Save method not implemented.');
+		const data = this.getData();
+		if (!data) return;
+
+		if (this.getIsNew()) {
+			const { error } = await this.repository.create(data);
+			// TODO: this is temp solution to bubble validation errors to the UI
+			if (error) {
+				if (error.type === 'validation') {
+					this.setValidationErrors?.(error.errors);
+				}
+			} else {
+				this.setValidationErrors?.(undefined);
+				// TODO: do not make it the buttons responsibility to set the workspace to not new.
+				this.setIsNew(false);
+			}
+		} else {
+			await this.repository.save(data);
+			// TODO: Show validation errors as warnings?
+		}
 	}
 
 	destroy(): void {

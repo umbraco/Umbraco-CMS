@@ -9,6 +9,7 @@ export interface Circle {
 	name: string;
 	percent: number;
 	kind: string;
+	number: number;
 }
 
 interface CircleWithCommands extends Circle {
@@ -195,6 +196,7 @@ export class UmbDonutChartElement extends LitElement {
 			this._slices.map((slice) => {
 				return {
 					percent: this.#calculatePercentage(slice.amount),
+					number: slice.amount,
 					color: slice.color,
 					name: slice.name,
 					kind: slice.kind,
@@ -249,7 +251,7 @@ export class UmbDonutChartElement extends LitElement {
 		const index = target.dataset.index as unknown as number;
 		const circle = this.circles[index];
 		this._detailName = circle.name;
-		this._detailAmount = circle.percent;
+		this._detailAmount = circle.number;
 		this._detailColor = circle.color;
 		this._detailKind = circle.kind;
 	}

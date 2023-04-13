@@ -107,8 +107,8 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	#observeErrorCount() {
 		if (!this.#logViewerContext) return;
 
-		this.observe(this.#logViewerContext.logCount, () => {
-			this._errorCount = this._logLevelCount?.error ?? 0;
+		this.observe(this.#logViewerContext.logCount, (logLevelCount) => {
+			this._errorCount = logLevelCount?.error ?? 0;
 		});
 	}
 
@@ -128,7 +128,13 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					</uui-box>
 
 					<uui-box id="errors" headline="Number of Errors">
-						<h1 id="error-count">${this._errorCount}</h1>
+						<uui-button
+							label="Show error logs"
+							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
+								`@Level='Fatal' or @Level='Error' or Has(@Exception)`
+							)}`}>
+							<h1 id="error-count">${this._errorCount}</h1></uui-button
+						>
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">

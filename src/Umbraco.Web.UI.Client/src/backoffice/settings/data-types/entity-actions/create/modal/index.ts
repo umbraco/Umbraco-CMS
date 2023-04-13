@@ -1,6 +1,13 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export const UMB_CREATE_DATA_TYPE_MODAL = new UmbModalToken('Umb.Modal.CreateDataType', {
-	type: 'sidebar',
-	size: 'small',
-});
+export interface UmbDataTypeCreateOptionsModalData {
+	parentKey: string | null;
+}
+
+export const UMB_DATA_TYPE_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbDataTypeCreateOptionsModalData>(
+	'Umb.Modal.DataTypeCreateOptions',
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);

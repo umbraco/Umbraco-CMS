@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoutingInfo } from 'router-slot';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context';
 import { UmbMemberGroupWorkspaceEditElement } from './member-group-workspace-edit.element';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -27,11 +27,11 @@ export class UmbMemberGroupWorkspaceElement extends UmbLitElement {
 	#element = new UmbMemberGroupWorkspaceEditElement();
 
 	@state()
-	_routes: any[] = [
+	_routes: IRoute[] = [
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},

@@ -93,7 +93,7 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentResource.getTreeDocumentItem({
+			DocumentResource.getDocumentItem({
 				id: ids,
 			})
 		);

@@ -1,4 +1,3 @@
-import type { DictionaryDetails } from '../';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictionary.store';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data';
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store';
@@ -6,10 +5,24 @@ import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ImportDictionaryRequestModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateDictionaryItemRequestModel,
+	DictionaryOverviewResponseModel,
+	ImportDictionaryRequestModel,
+	ProblemDetailsModel,
+	UpdateDictionaryItemRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepository<DictionaryDetails> {
+export class UmbDictionaryRepository
+	implements
+		UmbTreeRepository,
+		UmbDetailRepository<
+			CreateDictionaryItemRequestModel,
+			UpdateDictionaryItemRequestModel,
+			DictionaryOverviewResponseModel
+		>
+{
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -103,26 +116,16 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 
 	// DETAILS
 
-	async createScaffold(parentId: string | null) {
+	async createScaffold(parentId: string | null, name?: string) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
-		}
-
-		return this.#detailSource.createScaffold(parentId);
+		return this.#detailSource.createScaffold(parentId, name);
 	}
 
 	async requestById(id: string) {
+		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		// TODO: should we show a notification if the id is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Id is missing' };
-			return { error };
-		}
 		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
@@ -141,34 +144,30 @@ export class UmbDictionaryRepository implements UmbTreeRepository, UmbDetailRepo
 		return this.#detailSource.delete(id);
 	}
 
-	async save(dictionary: DictionaryDetails) {
+	async save(id: string, updatedDictionary: UpdateDictionaryItemRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!updatedDictionary) throw new Error('Dictionary is missing');
+
 		await this.#init;
 
-		// TODO: should we show a notification if the dictionary is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!dictionary || !dictionary.id) {
-			const error: ProblemDetailsModel = { title: 'Dictionary is missing' };
-			return { error };
-		}
-
-		const { error } = await this.#detailSource.update(dictionary);
+		const { error } = await this.#detailSource.update(id, updatedDictionary);
 
 		if (!error) {
-			const notification = { data: { message: `Dictionary '${dictionary.name}' saved` } };
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a dictionary is updated in the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			//this.#detailStore?.append(dictionary);
+			this.#treeStore?.updateItem(id, { name: updatedDictionary.name });
+
+			const notification = { data: { message: `Dictionary '${updatedDictionary.name}' saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a dictionary is updated in the store while someone is editing it.
-		this.#detailStore?.append(dictionary);
-		this.#treeStore?.updateItem(dictionary.id, { name: dictionary.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
 
-	async create(detail: DictionaryDetails) {
+	async create(detail: CreateDictionaryItemRequestModel) {
 		await this.#init;
 
 		if (!detail.name) {

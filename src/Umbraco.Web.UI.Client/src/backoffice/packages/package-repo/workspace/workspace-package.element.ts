@@ -35,7 +35,7 @@ export class UmbWorkspacePackageElement extends LitElement {
 	}
 
 	private _navigateBack() {
-		window.history.pushState({}, '', '/section/packages/view/installed');
+		window.history.pushState({}, '', 'section/packages/view/installed');
 	}
 
 	private _renderHeader() {

@@ -15,9 +15,11 @@ import {
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
+	SavedLogSearchPresenationBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { query } from '@umbraco-cms/backoffice/router';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface PoolingCOnfig {
@@ -56,7 +58,7 @@ export class UmbLogViewerWorkspaceContext {
 		endDate: this.today,
 	};
 
-	#savedSearches = new DeepState<PagedSavedLogSearchResponseModel | undefined>(undefined);
+	#savedSearches = new ObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
 	savedSearches = createObservablePart(this.#savedSearches, (data) => data?.items);
 
 	#logCount = new DeepState<LogLevelCountsReponseModel | null>(null);
@@ -103,8 +105,54 @@ export class UmbLogViewerWorkspaceContext {
 		this.validateLogSize();
 	}
 
-	setDateRange(dateRange: LogViewerDateRange) {
-		const { startDate, endDate } = dateRange;
+	reset() {
+		this.#logs.next({ items: [], total: 0 });
+		this.setCurrentPage(1);
+	}
+
+	onChangeState = () => {
+		this.reset();
+
+		const searchQuery = query();
+		let sanitizedQuery = '';
+		if (searchQuery.lq) {
+			sanitizedQuery = decodeURIComponent(searchQuery.lq);
+		}
+		this.setFilterExpression(sanitizedQuery);
+
+		let validLogLevels: LogLevelModel[] = [];
+		if (searchQuery.loglevels) {
+			const loglevels = searchQuery.loglevels.split(',') as LogLevelModel[];
+
+			// Filter out invalid log levels that do not exist in LogLevelModel
+			validLogLevels = loglevels.filter((loglevel) => {
+				return Object.values(LogLevelModel).includes(loglevel);
+			});
+		}
+		this.setLogLevelsFilter(validLogLevels);
+
+		const dateRange: Partial<LogViewerDateRange> = {};
+
+		if (searchQuery.startDate) {
+			dateRange.startDate = searchQuery.startDate;
+		}
+
+		if (searchQuery.endDate) {
+			dateRange.endDate = searchQuery.endDate;
+		}
+
+		this.setDateRange(dateRange);
+
+		this.setCurrentPage(searchQuery.page ? Number(searchQuery.page) : 1);
+
+		this.getLogs();
+	};
+
+	setDateRange(dateRange: Partial<LogViewerDateRange>) {
+		let { startDate, endDate } = dateRange;
+
+		if (!startDate) startDate = this.defaultDateRange.startDate;
+		if (!endDate) endDate = this.defaultDateRange.endDate;
 
 		const isAnyDateInTheFuture = new Date(startDate) > new Date() || new Date(endDate) > new Date();
 		const isStartDateBiggerThenEndDate = new Date(startDate) > new Date(endDate);
@@ -112,9 +160,10 @@ export class UmbLogViewerWorkspaceContext {
 			return;
 		}
 
-		this.#dateRange.next(dateRange);
+		this.#dateRange.next({ startDate, endDate });
 		this.validateLogSize();
 		this.getLogCount();
+		this.getMessageTemplates(0, 10);
 	}
 
 	async getSavedSearches() {
@@ -122,7 +171,7 @@ export class UmbLogViewerWorkspaceContext {
 		if (data) {
 			this.#savedSearches.next(data);
 		} else {
-			//falback to some default searches like in the old backoffice
+			//falback to some default searches resembling Umbraco <= 12
 			this.#savedSearches.next({
 				items: [
 					{
@@ -155,6 +204,26 @@ export class UmbLogViewerWorkspaceContext {
 		}
 	}
 
+	async saveSearch({ name, query }: SavedLogSearchPresenationBaseModel) {
+		const previousSavedSearches = this.#savedSearches.getValue()?.items ?? [];
+		try {
+			this.#savedSearches.update({ items: [...previousSavedSearches, { name, query }] });
+			await this.#repository.saveSearch({ name, query });
+		} catch (err) {
+			this.#savedSearches.update({ items: previousSavedSearches });
+		}
+	}
+
+	async removeSearch({ name }: { name: string }) {
+		const previousSavedSearches = this.#savedSearches.getValue()?.items ?? [];
+		try {
+			this.#savedSearches.update({ items: previousSavedSearches.filter((search) => search.name !== name) });
+			await this.#repository.removeSearch({ name });
+		} catch (err) {
+			this.#savedSearches.update({ items: previousSavedSearches });
+		}
+	}
+
 	async getLogCount() {
 		const { data } = await this.#repository.getLogCount({ ...this.#dateRange.getValue() });
 
@@ -164,7 +233,7 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	async getMessageTemplates(skip: number, take: number) {
-		const { data } = await this.#repository.getMessageTemplates({ skip, take });
+		const { data } = await this.#repository.getMessageTemplates({ skip, take, ...this.#dateRange.getValue() });
 
 		if (data) {
 			this.#messageTemplates.next(data);
@@ -180,14 +249,12 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	async validateLogSize() {
-		const { data, error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
+		const { error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
 		if (error) {
 			this.#canShowLogs.next(false);
-			console.info('LogViewer: ', error);
 			return;
 		}
 		this.#canShowLogs.next(true);
-		console.info('LogViewer:showinfg logs');
 	}
 
 	setCurrentPage(page: number) {
@@ -244,7 +311,7 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	setPollingInterval(interval: PoolingInterval) {
-		this.#polling.update({ interval, enabled: true });
+		this.#polling.update({ interval });
 	}
 
 	toggleSortOrder() {

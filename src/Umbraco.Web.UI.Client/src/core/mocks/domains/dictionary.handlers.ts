@@ -1,15 +1,19 @@
 import { rest } from 'msw';
-import type { DictionaryDetails } from '../../../backoffice/translation/dictionary';
 import { umbDictionaryData } from '../data/dictionary.data';
-import { ImportDictionaryRequestModel, DictionaryOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	ImportDictionaryRequestModel,
+	DictionaryOverviewResponseModel,
+	DictionaryItemResponseModel,
+	EntityTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 const uploadResponse: ImportDictionaryRequestModel = {
 	temporaryFileId: 'c:/path/to/tempfilename.udt',
 	parentId: 'b7e7d0ab-53ba-485d-dddd-12537f9925aa',
 };
 
-///
-const importResponse: DictionaryDetails = {
+/// TODO: get correct type
+const importResponse: DictionaryItemResponseModel & EntityTreeItemResponseModel = {
 	$type: '',
 	parentId: null,
 	name: 'Uploaded dictionary',

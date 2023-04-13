@@ -3,8 +3,9 @@ import { isManifestElementNameType } from './is-manifest-element-name-type.funct
 import { loadExtension } from './load-extension.function';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
 import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-registry';
+import type { PageComponent } from '@umbraco-cms/backoffice/router';
 
-export async function createExtensionElement(manifest: ManifestElement): Promise<HTMLElement | undefined> {
+export async function createExtensionElement(manifest: ManifestElement): Promise<PageComponent> {
 	//TODO: Write tests for these extension options:
 	const js = await loadExtension(manifest);
 

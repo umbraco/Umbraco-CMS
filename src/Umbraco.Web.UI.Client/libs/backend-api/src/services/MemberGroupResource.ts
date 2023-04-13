@@ -1,12 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ContentTreeItemResponseModel } from '../models/ContentTreeItemResponseModel';
-import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
-import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { EntityTreeItemResponseModel } from '../models/EntityTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
+import type { MemberGroupItemReponseModel } from '../models/MemberGroupItemReponseModel';
 import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -19,14 +14,14 @@ export class MemberGroupResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTreeMemberGroupItem({
+    public static getMemberGroupItem({
         id,
     }: {
         id?: Array<string>,
-    }): CancelablePromise<Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel)>> {
+    }): CancelablePromise<Array<MemberGroupItemReponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/tree/member-group/item',
+            url: '/umbraco/management/api/v1/member-group/item',
             query: {
                 'id': id,
             },

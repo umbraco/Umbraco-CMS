@@ -163,12 +163,14 @@ export class UmbDocumentWorkspaceContext
 
 	async save() {
 		if (!this.#draft.value) return;
+		if (!this.#draft.value.id) return;
+
 		if (this.getIsNew()) {
 			// TODO: typescript hack until we get the create type
 			const value = this.#draft.value as CreateDocumentRequestModel & { id: string };
 			await this.repository.create(value);
 		} else {
-			await this.repository.save(this.#draft.value);
+			await this.repository.save(this.#draft.value.id, this.#draft.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);

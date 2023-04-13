@@ -78,7 +78,7 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 
 		return tryExecuteAndNotify(
 			this.#host,
-			RelationTypeResource.getTreeRelationTypeItem({
+			RelationTypeResource.getRelationTypeItem({
 				id: ids,
 			})
 		);

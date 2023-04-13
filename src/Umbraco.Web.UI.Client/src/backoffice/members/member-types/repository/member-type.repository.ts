@@ -154,29 +154,25 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return { error };
 	}
 
-	async save(detail: ItemType) {
+	async save(id: string, updatedMemberType: any) {
+		if (!id) throw new Error('Key is missing');
+		if (!updatedMemberType) throw new Error('Member Type is missing');
+
 		await this.#init;
 
-		// TODO: should we show a notification if the MemberType is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!detail || !detail.id) {
-			const error: ProblemDetailsModel = { title: 'Member type is missing' };
-			return { error };
-		}
-
-		const { error } = await this.#detailSource.save(detail);
+		const { error } = await this.#detailSource.save(id, updatedMemberType);
 
 		if (!error) {
-			const notification = { data: { message: `Member type '${detail.name}' saved` } };
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a member type is updated in the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			//this.#store?.append(detail);
+			this.#treeStore?.updateItem(id, updatedMemberType);
+
+			const notification = { data: { message: `Member type '${updatedMemberType.name}' saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a member type is updated in the store while someone is editing it.
-		this.#store?.append(detail);
-		this.#treeStore?.updateItem(detail.id, { name: detail.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}

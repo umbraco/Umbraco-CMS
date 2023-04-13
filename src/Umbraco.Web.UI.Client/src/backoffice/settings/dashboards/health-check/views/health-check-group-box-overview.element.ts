@@ -6,7 +6,7 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context';
-import { ensureSlash, path } from '@umbraco-cms/internal/router';
+import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
 import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

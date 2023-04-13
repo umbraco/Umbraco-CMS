@@ -77,7 +77,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	}
 
 	#createNewPackage() {
-		window.history.pushState({}, '', `/section/packages/view/created/package-builder`);
+		window.history.pushState({}, '', `section/packages/view/created/package-builder`);
 	}
 
 	render() {
@@ -114,7 +114,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 	#packageBuilder(p: PackageDefinitionResponseModel) {
 		if (!p.id) return;
-		window.history.pushState({}, '', `/section/packages/view/created/package-builder/${p.id}`);
+		window.history.pushState({}, '', `section/packages/view/created/package-builder/${p.id}`);
 	}
 
 	#renderPagination() {

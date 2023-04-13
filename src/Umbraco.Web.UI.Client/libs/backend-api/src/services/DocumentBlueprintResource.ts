@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
+import type { DocumentBlueprintResponseModel } from '../models/DocumentBlueprintResponseModel';
 import type { PagedDocumentBlueprintTreeItemResponseModel } from '../models/PagedDocumentBlueprintTreeItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -14,14 +14,14 @@ export class DocumentBlueprintResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTreeDocumentBlueprintItem({
+    public static getDocumentBlueprintItem({
         id,
     }: {
         id?: Array<string>,
-    }): CancelablePromise<Array<DocumentBlueprintTreeItemResponseModel>> {
+    }): CancelablePromise<Array<DocumentBlueprintResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/tree/document-blueprint/item',
+            url: '/umbraco/management/api/v1/document-blueprint/item',
             query: {
                 'id': id,
             },
