@@ -2,7 +2,9 @@ export const name = 'Umbraco.Core';
 export const version = '0.0.1';
 export const extensions = [
 	{
-		type: 'entryPoint',
+		name: 'Core Entry Point',
+		alias: 'Umb.EntryPoint.Core',
+		type: 'entrypoint',
 		loader: () => import('./index'),
 	},
 ];

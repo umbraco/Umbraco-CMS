@@ -2,7 +2,9 @@ export const name = 'Umbraco.Core.MediaManagement';
 export const version = '0.0.1';
 export const extensions = [
 	{
-		type: 'entryPoint',
+		name: 'Media Management Entry Point',
+		alias: 'Umb.EntryPoint.MediaManagement',
+		type: 'entrypoint',
 		loader: () => import('./index'),
 	},
 ];
