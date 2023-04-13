@@ -29,7 +29,7 @@
 
   <!-- Package Validation -->
   <PropertyGroup>
-    <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
+    <GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageValidationBaselineVersion>11.0.0</PackageValidationBaselineVersion>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
