@@ -3,19 +3,28 @@ import { UmbPackageRepository } from './package.repository';
 import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbExtensionRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
-export class UmbServerExtensionController extends UmbController {
+export class UmbExtensionInitializer extends UmbController {
 	#host: UmbControllerHostElement;
+	#extensionRegistry: UmbExtensionRegistry;
 	#unobserve = new Subject<void>();
 	#repository: UmbPackageRepository;
+	#localPackages: Array<Promise<any>>;
 
-	constructor(host: UmbControllerHostElement, private readonly extensionRegistry: UmbExtensionRegistry) {
-		super(host, UmbServerExtensionController.name);
+	constructor(
+		host: UmbControllerHostElement,
+		extensionRegistry: UmbExtensionRegistry,
+		localPackages: Array<Promise<any>>
+	) {
+		super(host, UmbExtensionInitializer.name);
 		this.#host = host;
+		this.#extensionRegistry = extensionRegistry;
 		this.#repository = new UmbPackageRepository(host);
+		this.#localPackages = localPackages;
 	}
 
 	hostConnected(): void {
-		this.#loadPackages();
+		this.#loadLocalPackages();
+		this.#loadServerPackages();
 	}
 
 	hostDisconnected(): void {
@@ -23,7 +32,14 @@ export class UmbServerExtensionController extends UmbController {
 		this.#unobserve.complete();
 	}
 
-	async #loadPackages() {
+	async #loadLocalPackages() {
+		this.#localPackages.forEach(async (packageImport) => {
+			const packageModule = await packageImport;
+			this.#extensionRegistry.registerMany(packageModule.extensions);
+		});
+	}
+
+	async #loadServerPackages() {
 		const extensions$ = await this.#repository.extensions();
 
 		extensions$
@@ -31,10 +47,6 @@ export class UmbServerExtensionController extends UmbController {
 				// If the app breaks then stop the request
 				takeUntil(this.#unobserve)
 			)
-			.subscribe((extensions) => {
-				extensions.forEach((extension) => {
-					this.extensionRegistry.register(extension);
-				});
-			});
+			.subscribe((extensions) => this.#extensionRegistry.registerMany(extensions));
 	}
 }

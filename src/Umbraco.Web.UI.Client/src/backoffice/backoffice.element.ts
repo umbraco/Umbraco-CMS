@@ -6,14 +6,13 @@ import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
-import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
+import { UmbExtensionInitializer } from './packages/repository/server-extension.controller';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-// Domains
 const CORE_PACKAGES = [
 	import('./shared/umbraco-package'),
 	import('./settings/umbraco-package'),
@@ -49,23 +48,12 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
-		this.#loadCorePackages();
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbStoreExtensionInitializer(this);
-		new UmbServerExtensionController(this, umbExtensionsRegistry);
-	}
-
-	// TODO: Temp solution. These packages should show up in the package section, so they need to go through the extension controller
-	async #loadCorePackages() {
-		CORE_PACKAGES.forEach(async (packageImport) => {
-			const packageModule = await packageImport;
-			const extensions = packageModule.extensions;
-			umbExtensionsRegistry.registerMany(extensions);
-		});
+		new UmbExtensionInitializer(this, umbExtensionsRegistry, CORE_PACKAGES);
 	}
 
 	render() {
