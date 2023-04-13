@@ -4,7 +4,7 @@ export const extensions = [
 	{
 		name: 'Document Management Entry Point',
 		alias: 'Umb.EntryPoint.DocumentManagement',
-		type: 'entrypoint',
+		type: 'entryPoint',
 		loader: () => import('./index'),
 	},
 ];

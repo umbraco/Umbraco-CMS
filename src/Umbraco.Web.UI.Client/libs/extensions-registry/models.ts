@@ -171,6 +171,6 @@ export interface ManifestWithMeta extends ManifestBase {
 }
 
 export interface ManifestEntrypoint extends ManifestBase {
-	type: 'entrypoint';
+	type: 'entryPoint';
 	js: string;
 }

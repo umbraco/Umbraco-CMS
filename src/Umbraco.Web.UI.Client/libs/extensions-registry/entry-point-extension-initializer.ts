@@ -10,8 +10,7 @@ export class UmbEntryPointExtensionInitializer {
 	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry) {
 		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
-		// TODO: change entrypoint extension to be entryPoint:
-		extensionRegistry.extensionsOfType('entrypoint').subscribe((entryPoints) => {
+		extensionRegistry.extensionsOfType('entryPoint').subscribe((entryPoints) => {
 			entryPoints.forEach((entryPoint) => {
 				if (this.#entryPointMap.has(entryPoint.alias)) return;
 				this.#entryPointMap.set(entryPoint.alias, entryPoint);

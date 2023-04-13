@@ -4,7 +4,7 @@ export const extensions = [
 	{
 		name: 'Settings Entry Point',
 		alias: 'Umb.EntryPoint.Settings',
-		type: 'entrypoint',
+		type: 'entryPoint',
 		loader: () => import('./index'),
 	},
 ];
