@@ -59,20 +59,12 @@ export class UmbBackofficeElement extends UmbLitElement {
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
 	}
 
-	// TODO: temp solution. These packages should show up in the package section, so they need to go through the extension controller
+	// TODO: Temp solution. These packages should show up in the package section, so they need to go through the extension controller
 	async #loadCorePackages() {
 		CORE_PACKAGES.forEach(async (packageImport) => {
 			const packageModule = await packageImport;
 			const extensions = packageModule.extensions;
-			const entryPointLoaders = extensions.map((extension) => extension.type === 'entryPoint' && extension.loader);
-
-			entryPointLoaders.forEach((loader) => {
-				if (!loader) return;
-
-				loader().then((entryPointModule) => {
-					entryPointModule.onInit(this, umbExtensionsRegistry);
-				});
-			});
+			umbExtensionsRegistry.registerMany(extensions);
 		});
 	}
 
