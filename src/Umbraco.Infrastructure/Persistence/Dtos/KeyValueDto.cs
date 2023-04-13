@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class KeyValueDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
+
     [Column("key")]
     [Length(256)]
     [PrimaryKeyColumn(AutoIncrement = false, Clustered = true)]
