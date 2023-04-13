@@ -139,7 +139,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                 // FIXME: Use timeout variable
                 await dbContext.Database.ExecuteSqlAsync($"SET LOCK_TIMEOUT 60000;");
 
-                int? number = dbContext.UmbracoLocks.FromSqlRaw($"SELECT * FROM dbo.umbracoLock WITH (REPEATABLEREAD)").Select(x => x.Value).FirstOrDefault();
+                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SELECT value FROM dbo.umbracoLock WITH (REPEATABLEREAD) WHERE id={LockId}");
 
                 if (number == null)
                 {
