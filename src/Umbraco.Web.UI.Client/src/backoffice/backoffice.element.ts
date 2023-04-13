@@ -1,12 +1,13 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
+import { UmbStoreExtensionInitializer } from '../core/store-extension-initializer';
 import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
-import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-registry';
@@ -46,8 +47,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		`,
 	];
 
-	#storeMap = new Map();
-
 	constructor() {
 		super();
 
@@ -56,17 +55,8 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		new UmbStoreExtensionInitializer(this);
 		new UmbServerExtensionController(this, umbExtensionsRegistry);
-
-		// Register All Stores
-		// TODO: we have a performance issue here. Temp fix is to cache in a map so we don't create new instances of already known stores every time a new extension is registered
-		this.observe(umbExtensionsRegistry.extensionsOfTypes(['store', 'treeStore']), (stores) => {
-			if (!stores) return;
-			stores.forEach((store) => {
-				if (this.#storeMap.has(store.alias)) return;
-				this.#storeMap.set(store.alias, createExtensionClass(store, [this]));
-			});
-		});
 	}
 
 	// TODO: temp solution. These packages should show up in the package section, so they need to go through the extension controller
