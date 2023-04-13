@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Umbraco.Cms.Infrastructure.Migrations;
+﻿using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore;
 
@@ -13,6 +12,6 @@ internal class MigrationService : IMigrationService
     public async Task MigrateAsync(string migrationName) =>
         await _umbracoDbContextFactory.ExecuteWithContextAsync<Task>(async db =>
         {
-            await db.GetService<IMigrator>().MigrateAsync(migrationName);
+            await db.MigrateDatabaseAsync(migrationName);
         });
 }
