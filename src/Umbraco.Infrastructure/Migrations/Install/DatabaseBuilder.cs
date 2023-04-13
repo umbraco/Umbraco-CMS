@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             IMigrationPlanExecutor migrationPlanExecutor,
             IDatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
-            IEventAggregator eventAggregator)
+            IEventAggregator aggregator)
         {
             _scopeProvider = scopeProvider;
             _scopeAccessor = scopeAccessor;
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _migrationPlanExecutor = migrationPlanExecutor;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _databaseProviderMetadata = databaseProviderMetadata;
-            _aggregator = eventAggregator;
+            _aggregator = aggregator;
         }
 
         [Obsolete("Use constructor that takes IEventAggregator, this will be removed in V13.")]
