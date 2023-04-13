@@ -942,7 +942,7 @@
                 // Chromes popup blocker will kick in if a window is opened
                 // without the initial scoped request. This trick will fix that.
               
-              const previewWindow = window.open(`preview/?id=${content.id}${$scope.culture ? `&culture=${$scope.culture}` : ''}`, 'umbpreview');
+              const previewWindow = $window.open(`preview/?id=${content.id}${$scope.culture ? `&culture=${$scope.culture}` : ''}`, 'umbpreview');
 
               previewWindow.addEventListener('load', () => {
                 previewWindow.location.href = previewWindow.document.URL;
