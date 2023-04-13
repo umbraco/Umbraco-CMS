@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -13,6 +14,7 @@ public class ScriptService : RepositoryService, IScriptService
     private readonly IScriptRepository _scriptRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IUmbracoMapper _mapper;
 
     public ScriptService(
         ICoreScopeProvider provider,
@@ -20,25 +22,27 @@ public class ScriptService : RepositoryService, IScriptService
         IEventMessagesFactory eventMessagesFactory,
         IScriptRepository scriptRepository,
         IAuditRepository auditRepository,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IUmbracoMapper mapper)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _scriptRepository = scriptRepository;
         _auditRepository = auditRepository;
         _userIdKeyResolver = userIdKeyResolver;
+        _mapper = mapper;
     }
 
-    public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey)
+    public async Task<Attempt<ScriptFile?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         string filePath = createModel.ParentPath is null
             ? createModel.Name
-            : $"{createModel.ParentPath}/{createModel.Name}";
+            : Path.Combine(createModel.ParentPath, createModel.Name);
 
         if (_scriptRepository.Exists(filePath))
         {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.AlreadyExists, null);
+            return Attempt.FailWithStatus<ScriptFile?, ScriptOperationStatus>(ScriptOperationStatus.AlreadyExists, null);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -47,7 +51,7 @@ public class ScriptService : RepositoryService, IScriptService
         var savingNotification = new ScriptSavingNotification(script, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByEvent, null);
+            return Attempt.FailWithStatus<ScriptFile?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByEvent, null);
         }
 
         _scriptRepository.Save(script);
@@ -57,11 +61,9 @@ public class ScriptService : RepositoryService, IScriptService
         Audit(AuditType.Save, userId ?? -1);
 
         scope.Complete();
-        return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
+        return Attempt.SucceedWithStatus(ScriptOperationStatus.Success, _mapper.Map<ScriptFile>(script));
     }
 
     private void Audit(AuditType type, int userId)
-    {
-        _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));
-    }
+        => _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));
 }

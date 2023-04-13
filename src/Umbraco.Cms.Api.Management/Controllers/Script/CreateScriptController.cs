@@ -33,7 +33,7 @@ public class CreateScriptController : ScriptControllerBase
 
         ScriptCreateModel createModel = _umbracoMapper.Map<ScriptCreateModel>(createRequestModel)!;
 
-        Attempt<IScript?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, currentUserKey);
+        Attempt<ScriptFile?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, currentUserKey);
 
         return createAttempt.Success
             ? /*CreatedAtAction<ByKeyScriptController>(controller => nameof(controller.ByKey), createAttempt.Result.Key) TODO: Point to Created action */ Ok()
