@@ -22,8 +22,4 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Scoping\" />
-  </ItemGroup>
-
 </Project>
