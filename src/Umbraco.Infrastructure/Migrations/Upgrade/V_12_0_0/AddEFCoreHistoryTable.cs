@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
-public class AddEFCoreHistoryTable : MigrationBase
+public class AddEFCoreHistoryTable : UnscopedMigrationBase
 {
     private readonly IMigrationService _migrationService;
 
