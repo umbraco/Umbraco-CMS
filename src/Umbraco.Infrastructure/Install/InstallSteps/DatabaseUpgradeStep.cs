@@ -72,17 +72,9 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 {
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }
-
-                await ExecuteEFCoreUpgrade();
             }
 
             return null;
-        }
-
-        private async Task ExecuteEFCoreUpgrade()
-        {
-            _logger.LogInformation("Running EFCore upgrade");
-            await _migrationService.MigrateAsync();
         }
 
         public override bool RequiresExecution(object model)
