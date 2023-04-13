@@ -120,6 +120,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 		this._routes = routes;
 	}
 
+	#requestRemoveTab(tabId: string | undefined) {
+		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
+		// TODO: Update URL when removing tab.
+		this.#remove(tabId);
+	}
 	#remove(tabId: string | undefined) {
 		if (!tabId) return;
 		this._workspaceContext?.structure.removeContainer(null, tabId);
@@ -162,12 +167,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 										// Update the current URL, so we are still on this specific tab:
 										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeURI(newName));
 									}}>
-									<!-- todo only if its part of root: -->
 									<uui-button
 										label="Remove tab"
 										class="trash"
 										slot="append"
-										@click=${() => this.#remove(tab.id)}
+										@click=${() => this.#requestRemoveTab(tab.id)}
 										compact>
 										<uui-icon name="umb:trash"></uui-icon>
 									</uui-button>
