@@ -114,10 +114,11 @@ export class UmbLogViewerWorkspaceContext {
 		this.reset();
 
 		const searchQuery = query();
+		let sanitizedQuery = '';
 		if (searchQuery.lq) {
-			const sanitizedQuery = decodeURIComponent(searchQuery.lq);
-			this.setFilterExpression(sanitizedQuery);
+			sanitizedQuery = decodeURIComponent(searchQuery.lq);
 		}
+		this.setFilterExpression(sanitizedQuery);
 
 		let validLogLevels: LogLevelModel[] = [];
 		if (searchQuery.loglevels) {
@@ -231,8 +232,8 @@ export class UmbLogViewerWorkspaceContext {
 		}
 	}
 
-	async getMessageTemplates(skip: number, take: number, 	) {
-		const { data } = await this.#repository.getMessageTemplates({ skip, take,...this.#dateRange.getValue()});
+	async getMessageTemplates(skip: number, take: number) {
+		const { data } = await this.#repository.getMessageTemplates({ skip, take, ...this.#dateRange.getValue() });
 
 		if (data) {
 			this.#messageTemplates.next(data);
