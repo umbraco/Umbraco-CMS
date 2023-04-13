@@ -1,26 +1,52 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	@property()
 	value = '';
 
+	@state()
+	private _max?: number;
+
+	@state()
+	private _min?: number;
+
+	@state()
+	private _step?: number;
+
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
+		const min = config.find((x) => x.alias === 'min');
+		if (min) this._min = min.value;
+
+		const max = config.find((x) => x.alias === 'max');
+		if (max) this._max = max.value;
+
+		const step = config.find((x) => x.alias === 'step');
+		if (step) this._step = step.value;
+	}
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
+	//TODO: UUI-INPUT needs to handle max, min, and step natively in its input field, maybe make a uui-input-number?
+
 	render() {
-		return html`<uui-input .value=${this.value} type="number" @input=${this.onInput}></uui-input>`;
+		return html`<uui-input
+			.value=${this.value}
+			type="number"
+			max="${ifDefined(this._max)}"
+			min="${ifDefined(this._min)}"
+			step="${ifDefined(this._step)}"
+			@input=${this.onInput}></uui-input>`;
 	}
 
 	static styles = [
