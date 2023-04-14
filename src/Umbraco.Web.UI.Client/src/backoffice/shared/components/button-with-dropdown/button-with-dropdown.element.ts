@@ -12,7 +12,7 @@ export class UmbButtonWithDropdownElement extends LitElement {
 		UUITextStyles,
 		css`
 			uui-symbol-expand {
-				margin-left: var(--uui-size-space-3);
+				margin-left: var(--umb-button-with-dropdown-symbol-expand-margin-left, var(--uui-size-space-3));
 			}
 		`,
 	];
@@ -31,6 +31,9 @@ export class UmbButtonWithDropdownElement extends LitElement {
 
 	@property()
 	placement: PopoverPlacement = 'bottom-start';
+
+	@property({ type: Boolean })
+	compact = false;
 
 	@query('#symbol-expand')
 	symbolExpand!: UUISymbolExpandElement;
@@ -62,6 +65,7 @@ export class UmbButtonWithDropdownElement extends LitElement {
 					.look=${this.look}
 					.color=${this.color}
 					.label=${this.label}
+					.compact=${this.compact}
 					id="myPopoverBtn"
 					@click=${this.#togglePopover}>
 					<slot></slot>
