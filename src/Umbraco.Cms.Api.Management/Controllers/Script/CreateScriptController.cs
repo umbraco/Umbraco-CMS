@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -27,6 +28,7 @@ public class CreateScriptController : ScriptControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(CreateScriptRequestModel createRequestModel)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);

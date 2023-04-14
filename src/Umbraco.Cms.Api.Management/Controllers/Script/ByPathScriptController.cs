@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -21,6 +22,7 @@ public class ByPathScriptController : ScriptControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(ScriptResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByPath(string path)
     {
         IScript? script = await _scriptService.GetAsync(path);
