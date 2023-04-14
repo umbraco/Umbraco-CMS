@@ -206,7 +206,9 @@ function keyboardService($window, $timeout) {
                 // Disable event handler when focus input and textarea
                 if (opt['inputDisabled']) {
                     var elt;
-                    if (e.target) {
+					if (e.composedPath()) {
+						elt = e.composedPath()[0];
+					} else if (e.target) {
                         elt = e.target;
                     } else if (e.srcElement) {
                         elt = e.srcElement;
