@@ -4,5 +4,8 @@ public enum ScriptOperationStatus
 {
     Success,
     AlreadyExists,
-    CancelledByEvent,
+    CancelledByNotification,
+    InvalidFileExtension,
+    ParentNotFound,
+    PathTooLong,
 }

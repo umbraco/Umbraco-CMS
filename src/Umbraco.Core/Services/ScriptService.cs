@@ -15,6 +15,9 @@ public class ScriptService : RepositoryService, IScriptService
     private readonly IAuditRepository _auditRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IUmbracoMapper _mapper;
+    private readonly ILogger<ScriptService> _logger;
+
+    private readonly string[] _allowedFileExtensions = { ".js" };
 
     public ScriptService(
         ICoreScopeProvider provider,
@@ -23,35 +26,42 @@ public class ScriptService : RepositoryService, IScriptService
         IScriptRepository scriptRepository,
         IAuditRepository auditRepository,
         IUserIdKeyResolver userIdKeyResolver,
-        IUmbracoMapper mapper)
+        IUmbracoMapper mapper,
+        ILogger<ScriptService> logger)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _scriptRepository = scriptRepository;
         _auditRepository = auditRepository;
         _userIdKeyResolver = userIdKeyResolver;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        string filePath = createModel.ParentPath is null
-            ? createModel.Name
-            : Path.Combine(createModel.ParentPath, createModel.Name);
-
-        if (_scriptRepository.Exists(filePath))
+        try
         {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.AlreadyExists, null);
+            ScriptOperationStatus validationResult = ValidateSave(createModel);
+            if (validationResult is not ScriptOperationStatus.Success)
+            {
+                return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(validationResult, null);
+            }
+        }
+        catch (PathTooLongException exception)
+        {
+            _logger.LogError(exception, "The script path is too long");
+            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.PathTooLong, null);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
-        var script = new Script(filePath) { Content = createModel.Content };
+        var script = new Script(createModel.FilePath) { Content = createModel.Content };
 
         var savingNotification = new ScriptSavingNotification(script, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByEvent, null);
+            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByNotification, null);
         }
 
         _scriptRepository.Save(script);
@@ -63,6 +73,29 @@ public class ScriptService : RepositoryService, IScriptService
         scope.Complete();
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
     }
+
+    private ScriptOperationStatus ValidateSave(ScriptCreateModel createModel)
+    {
+        if (_scriptRepository.Exists(createModel.FilePath))
+        {
+            return ScriptOperationStatus.AlreadyExists;
+        }
+
+        if (string.IsNullOrEmpty(createModel.ParentPath) is false && _scriptRepository.FolderExists(createModel.ParentPath) is false)
+        {
+            return ScriptOperationStatus.ParentNotFound;
+        }
+
+        if (HasValidFileExtension(createModel.FilePath) is false)
+        {
+            return ScriptOperationStatus.InvalidFileExtension;
+        }
+
+        return ScriptOperationStatus.Success;
+    }
+
+    private bool HasValidFileExtension(string fileName)
+        => _allowedFileExtensions.Contains(Path.GetExtension(fileName));
 
     private void Audit(AuditType type, int userId)
         => _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));

@@ -18,6 +18,8 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
     public virtual void DeleteFolder(string folderPath) => PersistDeletedItem(new Folder(folderPath));
 
+    public virtual bool FolderExists(string folderPath) => FileSystem?.DirectoryExists(folderPath) == true;
+
     public Stream GetFileContentStream(string filepath)
     {
         if (FileSystem?.FileExists(filepath) == false)

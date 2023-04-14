@@ -7,4 +7,9 @@ public class ScriptCreateModel
     public string? ParentPath { get; set; }
 
     public string? Content { get; set; }
+
+    public string FilePath =>
+        ParentPath is null
+            ? Name
+            : Path.Combine(ParentPath, Name);
 }
