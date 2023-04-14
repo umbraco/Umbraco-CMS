@@ -1,16 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-
 import { UUIButtonState } from '@umbraco-ui/uui-button';
-
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { HealthStatusModel, IndexResponseModel, IndexerResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 import './section-view-examine-searchers';
-
-import { HealthStatusModel, IndexModel, IndexerResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {
@@ -87,7 +84,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	private _buttonState?: UUIButtonState = undefined;
 
 	@state()
-	private _indexData?: IndexModel;
+	private _indexData?: IndexResponseModel;
 
 	@state()
 	private _loading = true;
@@ -120,7 +117,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	}
 
 	private async _onRebuildHandler() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: `Rebuild ${this.indexName}`,
 			content: html`
 				This will cause the index to be rebuilt.<br />
@@ -131,8 +128,8 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			color: 'danger',
 			confirmLabel: 'Rebuild',
 		});
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) this._rebuild();
+		modalHandler?.onSubmit().then(() => {
+			this._rebuild();
 		});
 	}
 	private async _rebuild() {

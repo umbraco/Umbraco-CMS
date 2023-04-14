@@ -2,8 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
-import { LogLevelModel, LogMessagePropertyModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router';
 
 //TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
@@ -132,7 +133,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	renderedMessage = '';
 
 	@property({ attribute: false })
-	properties: Array<LogMessagePropertyModel> = [];
+	properties: Array<LogMessagePropertyPresentationModel> = [];
 
 	@property({ type: Boolean })
 	open = false;
@@ -210,19 +211,24 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 	private _propertiesWithSearchMenu: Array<string> = ['HttpRequestNumber', 'SourceContext', 'MachineName'];
 
-	private _findLogsWithProperty({ name, value }: LogMessagePropertyModel) {
-		let queryString = '';
+	private _findLogsWithProperty({ name, value }: LogMessagePropertyPresentationModel) {
+		if (!name) return '';
+
+		let query = getQuery();
+		let sanitizedValue = value ?? '';
 
 		if (isNaN(+(value ?? ''))) {
-			queryString = name + "='" + value + "'";
-		} else {
-			queryString = name + '=' + value;
+			sanitizedValue = "'" + value + "'";
 		}
 
-		this.#logViewerContext?.setFilterExpression(queryString);
-		this.#logViewerContext?.setCurrentPage(1);
-		this.details.removeAttribute('open');
-		this.#logViewerContext?.getLogs();
+		query = {
+			...query,
+			lq: encodeURIComponent(`${name}=${sanitizedValue}`),
+		};
+
+		const queryString = toQueryString(query);
+
+		return queryString;
 	}
 
 	#setOpen(event: Event) {
@@ -259,14 +265,12 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 									${this._propertiesWithSearchMenu.includes(property.name ?? '')
 										? html`<uui-button
 												compact
-												@click=${() => {
-													this._findLogsWithProperty(property);
-												}}
 												look="secondary"
 												label="Find logs with ${property.name}"
 												title="Find logs with ${property.name}"
-												><uui-icon name="umb:search"></uui-icon
-										  ></uui-button>`
+												href=${`section/settings/workspace/logviewer/search/?${this._findLogsWithProperty(property)}`}>
+												<uui-icon name="umb:search"></uui-icon>
+										  </uui-button>`
 										: ''}
 								</div>
 							</li>`

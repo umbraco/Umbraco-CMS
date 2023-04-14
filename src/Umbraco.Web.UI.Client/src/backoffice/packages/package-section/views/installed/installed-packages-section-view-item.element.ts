@@ -3,18 +3,17 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { firstValueFrom, map } from 'rxjs';
 import { UUIButtonState } from '@umbraco-ui/uui';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-
-import type { ManifestPackageView } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { PackageResource } from '@umbraco-cms/backend-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import type { ManifestPackageView } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-installed-packages-section-view-item')
-export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
+export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	static styles = css`
 		:host {
 			display: flex;
@@ -26,7 +25,7 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 	name?: string;
 
 	@property()
-	version?: string;
+	version?: string | null;
 
 	@property()
 	hasPendingMigrations = false;
@@ -81,18 +80,15 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 
 	async _onMigration() {
 		if (!this.name) return;
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'positive',
 			headline: `Run migrations for ${this.name}?`,
 			content: `Do you want to start run migrations for ${this.name}`,
 			confirmLabel: 'Run migrations',
 		});
 
-		const migrationConfirmed = await modalHandler?.onClose().then(({ confirmed }: any) => {
-			return confirmed;
-		});
+		await modalHandler?.onSubmit();
 
-		if (!migrationConfirmed == true) return;
 		this._migrationButtonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
@@ -108,7 +104,7 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 		return html`
 			<uui-ref-node-package
 				name=${ifDefined(this.name)}
-				version="${ifDefined(this.version)}"
+				version="${ifDefined(this.version ?? undefined)}"
 				@open=${this._onConfigure}
 				?disabled="${!this._packageView}">
 				${this.customIcon ? html`<uui-icon slot="icon" name="${this.customIcon}"></uui-icon>` : nothing}
@@ -141,16 +137,20 @@ export class UmbInstalledPackagesSectionViewItem extends UmbLitElement {
 			return;
 		}
 
+		// TODO: add dedicated modal for package views, and register it in a manifest.
+		alert('package view modal temporarily disabled. See comment in code.');
+		/*
 		this._modalContext?.open(element, {
 			data: { name: this.name, version: this.version },
 			size: 'full',
 			type: 'sidebar',
 		});
+		*/
 	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItem;
+		'umb-installed-packages-section-view-item': UmbInstalledPackagesSectionViewItemElement;
 	}
 }

@@ -1,15 +1,15 @@
 import { rest } from 'msw';
 import { umbDocumentData } from '../data/document.data';
-import type { DocumentModel } from '@umbraco-cms/backend-api';
-import { umbracoPath } from '@umbraco-cms/utils';
+import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [
 	rest.post<string[]>('/umbraco/management/api/v1/document/trash', async (req, res, ctx) => {
 		console.warn('Please move to schema');
-		const keys = await req.json();
+		const ids = await req.json();
 
-		const trashed = umbDocumentData.trash(keys);
+		const trashed = umbDocumentData.trash(ids);
 
 		return res(ctx.status(200), ctx.json(trashed));
 	}),
@@ -20,22 +20,22 @@ export const handlers = [
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/document/children', (req, res, ctx) => {
-		const parentKey = req.url.searchParams.get('parentKey');
-		if (!parentKey) return;
-		const response = umbDocumentData.getTreeItemChildren(parentKey);
+		const parentId = req.url.searchParams.get('parentId');
+		if (!parentId) return;
+		const response = umbDocumentData.getTreeItemChildren(parentId);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get('/umbraco/management/api/v1/tree/document/item', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (!keys) return;
+		const ids = req.url.searchParams.getAll('id');
+		if (!ids) return;
 
-		const items = umbDocumentData.getTreeItem(keys);
+		const items = umbDocumentData.getTreeItem(ids);
 
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.post<DocumentModel[]>('/umbraco/management/api/v1/document/:key', async (req, res, ctx) => {
+	rest.post<DocumentResponseModel[]>('/umbraco/management/api/v1/document/:id', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
@@ -44,11 +44,11 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.get(umbracoPath('/document/:key'), (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get(umbracoPath('/document/:id'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const document = umbDocumentData.getByKey(key);
+		const document = umbDocumentData.getById(id);
 
 		return res(ctx.status(200), ctx.json(document));
 	}),

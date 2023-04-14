@@ -1,40 +1,54 @@
-import type { RepositoryTreeDataSource } from '../../../../../libs/repository/repository-tree-data-source.interface';
-import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
-import { UmbDataTypeServerDataSource } from './sources/data-type.server.data';
+import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store';
-import { DataTypeTreeServerDataSource } from './sources/data-type.tree.server.data';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { ProblemDetailsModel, DataTypeModel } from '@umbraco-cms/backend-api';
-import type { UmbTreeRepository } from 'libs/repository/tree-repository.interface';
-import { UmbDetailRepository } from '@umbraco-cms/repository';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbDataTypeServerDataSource } from './sources/data-type.server.data';
+import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
+import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data';
+import type {
+	UmbTreeDataSource,
+	UmbTreeRepository,
+	UmbDetailRepository,
+	UmbFolderDataSource,
+	UmbDataSource,
+} from '@umbraco-cms/backoffice/repository';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import {
+	CreateDataTypeRequestModel,
+	CreateFolderRequestModel,
+	DataTypeResponseModel,
+	FolderModelBaseModel,
+	FolderTreeItemResponseModel,
+	UpdateDataTypeRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
-type ItemType = DataTypeModel;
-
-// Move to documentation / JSdoc
-/* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
-// element -> context -> repository -> (store) -> data source
-// All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
-export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailRepository<ItemType> {
+export class UmbDataTypeRepository
+	implements
+		UmbTreeRepository<FolderTreeItemResponseModel>,
+		UmbDetailRepository<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>,
+		UmbFolderRepository
+{
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	#treeSource: RepositoryTreeDataSource;
-	#treeStore?: UmbDataTypeTreeStore;
+	#treeSource: UmbTreeDataSource;
+	#detailSource: UmbDataSource<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>;
+	#folderSource: UmbFolderDataSource;
 
-	#detailDataSource: UmbDataTypeServerDataSource;
 	#detailStore?: UmbDataTypeStore;
+	#treeStore?: UmbDataTypeTreeStore;
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new DataTypeTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbDataTypeServerDataSource(this.#host);
+		this.#treeSource = new UmbDataTypeTreeServerDataSource(this.#host);
+		this.#detailSource = new UmbDataTypeServerDataSource(this.#host);
+		this.#folderSource = new UmbDataTypeFolderServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -51,9 +65,6 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 		]);
 	}
 
-	// TODO: Trash
-	// TODO: Move
-
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -66,34 +77,26 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
+		if (!parentId) throw new Error('Parent id is missing');
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
-			return { data: undefined, error };
-		}
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
+		if (!ids) throw new Error('Keys are missing');
 		await this.#init;
 
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
-		}
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		const { data, error } = await this.#treeSource.getItems(keys);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -101,38 +104,31 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
 
-		if (!parentKey) {
-			throw new Error('Parent key is missing');
-		}
-
-		return this.#detailDataSource.createScaffold(parentKey);
+		return this.#detailSource.createScaffold(parentId);
 	}
 
-	async requestByKey(key: string) {
+	async requestById(id: string) {
+		if (!id) throw new Error('Key is missing');
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
-		}
-		const { data, error } = await this.#detailDataSource.get(key);
+		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -141,82 +137,161 @@ export class UmbDataTypeRepository implements UmbTreeRepository, UmbDetailReposi
 		return { data, error };
 	}
 
-	async byKey(key: string) {
+	async byId(id: string) {
+		if (!id) throw new Error('Key is missing');
 		await this.#init;
-		return this.#detailStore!.byKey(key);
+		return this.#detailStore!.byId(id);
 	}
 
-	// Could potentially be general methods:
+	async create(dataType: CreateDataTypeRequestModel) {
+		if (!dataType) throw new Error('Data Type is missing');
+		if (!dataType.id) throw new Error('Data Type id is missing');
 
-	async create(template: ItemType) {
 		await this.#init;
 
-		if (!template || !template.key) {
-			throw new Error('Template is missing');
-		}
-
-		const { error } = await this.#detailDataSource.insert(template);
+		const { error } = await this.#detailSource.insert(dataType);
 
 		if (!error) {
-			const notification = { data: { message: `Document created` } };
+			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
+			const treeItem = createTreeItem(dataType);
+			this.#treeStore?.appendItems([treeItem]);
+			//this.#detailStore?.append(dataType);
+
+			const notification = { data: { message: `Data Type created` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		this.#detailStore?.append(template);
-		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };
 	}
 
-	async save(item: ItemType) {
+	async save(id: string, updatedDataType: UpdateDataTypeRequestModel) {
+		if (!id) throw new Error('Data Type id is missing');
+		if (!updatedDataType) throw new Error('Data Type is missing');
+
 		await this.#init;
 
-		if (!item || !item.key) {
-			throw new Error('Document-Type is missing');
-		}
-
-		const { error } = await this.#detailDataSource.update(item);
+		const { error } = await this.#detailSource.update(id, updatedDataType);
 
 		if (!error) {
-			const notification = { data: { message: `Document saved` } };
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a template is updated in the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			// this.#detailStore?.append(dataType);
+			this.#treeStore?.updateItem(id, updatedDataType);
+
+			const notification = { data: { message: `Data Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#detailStore?.append(item);
-		this.#treeStore?.updateItem(item.key, { name: item.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
 
 	// General:
 
-	async delete(key: string) {
+	async delete(id: string) {
+		if (!id) throw new Error('Data Type id is missing');
 		await this.#init;
 
-		if (!key) {
-			throw new Error('Document key is missing');
-		}
-
-		const { error } = await this.#detailDataSource.delete(key);
+		const { error } = await this.#detailSource.delete(id);
 
 		if (!error) {
-			const notification = { data: { message: `Document deleted` } };
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server.
+			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			this.#detailStore?.remove([id]);
+			this.#treeStore?.removeItem(id);
+
+			const notification = { data: { message: `Data Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server.
-		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
-		this.#treeStore?.removeItem(key);
-		// TODO: would be nice to align the stores on methods/methodNames.
+		return { error };
+	}
+
+	// folder
+	async createFolderScaffold(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
+		return this.#folderSource.createScaffold(parentId);
+	}
+
+	// TODO: temp create type until backend is ready. Remove the id addition when new types are generated.
+	async createFolder(folderRequest: CreateFolderRequestModel & { id?: string | undefined }) {
+		if (!folderRequest) throw new Error('folder request is missing');
+		await this.#init;
+
+		const { error } = await this.#folderSource.insert(folderRequest);
+
+		if (!error) {
+			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
+			const folderTreeItem = createFolderTreeItem(folderRequest);
+			this.#treeStore?.appendItems([folderTreeItem]);
+		}
 
 		return { error };
 	}
+
+	async deleteFolder(id: string) {
+		if (!id) throw new Error('Key is missing');
+
+		const { error } = await this.#folderSource.delete(id);
+
+		if (!error) {
+			this.#treeStore?.removeItem(id);
+		}
+
+		return { error };
+	}
+
+	async updateFolder(id: string, folder: FolderModelBaseModel) {
+		if (!id) throw new Error('Key is missing');
+		if (!folder) throw new Error('Folder data is missing');
+
+		const { error } = await this.#folderSource.update(id, folder);
+
+		if (!error) {
+			this.#treeStore?.updateItem(id, { name: folder.name });
+		}
+
+		return { error };
+	}
+
+	async requestFolder(id: string) {
+		if (!id) throw new Error('Key is missing');
+
+		const { data, error } = await this.#folderSource.get(id);
+
+		if (data) {
+			this.#treeStore?.appendItems([data]);
+		}
+
+		return { data, error };
+	}
 }
+
+export const createTreeItem = (item: CreateDataTypeRequestModel): FolderTreeItemResponseModel => {
+	if (!item) throw new Error('item is null or undefined');
+	if (!item.id) throw new Error('item.id is null or undefined');
+
+	return {
+		$type: 'FolderTreeItemResponseModel',
+		type: 'data-type',
+		parentId: item.parentId,
+		name: item.name,
+		id: item.id,
+		isFolder: false,
+		isContainer: false,
+		hasChildren: false,
+	};
+};
+
+export const createFolderTreeItem = (item: CreateFolderRequestModel): FolderTreeItemResponseModel => {
+	if (!item) throw new Error('item is null or undefined');
+	if (!item.id) throw new Error('item.id is null or undefined');
+
+	return {
+		...createTreeItem(item),
+		isFolder: true,
+	};
+};

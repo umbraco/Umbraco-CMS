@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { UmbNotificationHandler } from './notification-handler';
-import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * The default data of notifications
@@ -72,10 +72,7 @@ export class UmbNotificationContext {
 	 * @return {*}
 	 * @memberof UmbNotificationContext
 	 */
-	public peek(
-		color: UmbNotificationColor,
-		options: UmbNotificationOptions
-	): UmbNotificationHandler {
+	public peek(color: UmbNotificationColor, options: UmbNotificationOptions): UmbNotificationHandler {
 		return this._open({ color, ...options });
 	}
 
@@ -86,10 +83,7 @@ export class UmbNotificationContext {
 	 * @return {*}
 	 * @memberof UmbNotificationContext
 	 */
-	public stay(
-		color: UmbNotificationColor,
-		options: UmbNotificationOptions
-	): UmbNotificationHandler {
+	public stay(color: UmbNotificationColor, options: UmbNotificationOptions): UmbNotificationHandler {
 		return this._open({ ...options, color, duration: null });
 	}
 }

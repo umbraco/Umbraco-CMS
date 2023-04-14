@@ -9,6 +9,9 @@ on:
   #   branches:
   #     - main
 
+env:
+  NODE_OPTIONS: --max_old_space_size=16384
+
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')

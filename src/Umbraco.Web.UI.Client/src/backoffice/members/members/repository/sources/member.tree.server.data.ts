@@ -1,6 +1,5 @@
 import { MemberTreeDataSource } from '.';
-import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * A data source for the Member tree that fetches data from the server
@@ -9,14 +8,14 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  * @implements {MemberTreeDataSource}
  */
 export class MemberTreeServerDataSource implements MemberTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of MemberTreeServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof MemberTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -34,26 +33,26 @@ export class MemberTreeServerDataSource implements MemberTreeDataSource {
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof MemberTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
+	async getItems(ids: Array<string>) {
 		const response = await fetch('/umbraco/management/api/v1/tree/member/item');
 		const data = await response.json();
 
 		return { data, error: undefined };
 
-		// if (keys) {
-		// 	const error: ProblemDetailsModel = { title: 'Keys are missing' };
+		// if (ids) {
+		// 	const error: ProblemDetailsModel = { title: 'Ids are missing' };
 		// 	return { error };
 		// }
 
 		// return tryExecuteAndNotify(
 		// 	this.#host,
 		// 	MemberResource.getTreeMemberItem({
-		// 		key: keys,
+		// 		id: ids,
 		// 	})
 		// );
 	}

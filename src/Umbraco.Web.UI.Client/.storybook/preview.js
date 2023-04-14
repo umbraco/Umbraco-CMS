@@ -1,13 +1,10 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import '../libs/css/custom-properties.css';
+import '../src/core/css/custom-properties.css';
 
+import 'element-internals-polyfill';
 import '@umbraco-ui/uui';
-import '@umbraco-ui/uui-modal';
-import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-dialog';
-import '@umbraco-ui/uui-modal-sidebar';
 
-import { html } from 'lit-html';
+import { html } from 'lit';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
@@ -17,26 +14,28 @@ import { UmbDocumentStore } from '../src/backoffice/documents/documents/reposito
 import { UmbDocumentTreeStore } from '../src/backoffice/documents/documents/repository/document.tree.store.ts';
 
 import customElementManifests from '../custom-elements.json';
-import { UmbIconStore } from '../libs/store/icon/icon.store';
+import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';
-import { LitElement } from 'lit';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../src/core/modal';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
+import { UmbLitElement } from '../src/core/lit-element';
 
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 
-import '../libs/element/context-provider.element';
+import '../src/core/context-provider/context-provider.element';
+import '../src/core/controller-host/controller-host-test.element';
 import '../src/backoffice/shared/components';
 
 import { manifests as documentManifests } from '../src/backoffice/documents';
 
-class UmbStoryBookElement extends LitElement {
+class UmbStoryBookElement extends UmbLitElement {
 	_umbIconStore = new UmbIconStore();
 
 	constructor() {
 		super();
 		this._umbIconStore.attach(this);
 		this._registerExtensions(documentManifests);
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 	}
 
 	_registerExtensions(manifests) {
@@ -47,7 +46,8 @@ class UmbStoryBookElement extends LitElement {
 	}
 
 	render() {
-		return html`<slot></slot>`;
+		return html`<slot></slot>
+			<umb-backoffice-modal-container></umb-backoffice-modal-container> `;
 	}
 }
 
@@ -71,16 +71,6 @@ const documentTreeStoreProvider = (story) => html`
 	<umb-controller-host-test .create=${(host) => new UmbDocumentTreeStore(host)}>${story()}</umb-controller-host-test>
 `;
 
-const modalContextProvider = (story) => html`
-	<umb-context-provider
-		style="display: block; padding: 32px;"
-		key="${UMB_MODAL_CONTEXT_TOKEN}"
-		.value=${new UmbModalContext()}>
-		${story()}
-		<umb-backoffice-modal-container></umb-backoffice-modal-container>
-	</umb-context-provider>
-`;
-
 // Initialize MSW
 initialize({ onUnhandledRequest });
 
@@ -92,7 +82,6 @@ export const decorators = [
 	documentTreeStoreProvider,
 	dataTypeStoreProvider,
 	documentTypeStoreProvider,
-	modalContextProvider,
 ];
 
 export const parameters = {

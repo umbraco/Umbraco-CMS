@@ -1,18 +1,24 @@
 import { Observable, Subscription } from 'rxjs';
 
 export class UmbObserver<T> {
+	#source!: Observable<T>;
+	#callback!: (_value: T) => void;
 	#subscription!: Subscription;
 
 	constructor(source: Observable<T>, callback: (_value: T) => void) {
-		this.#subscription = source.subscribe((value) => {
-			callback(value);
-		});
+		this.#source = source;
+		this.#subscription = source.subscribe(callback);
 	}
 
-	// Notice controller class implements empty hostConnected().
+	hostConnected() {
+		if (this.#subscription.closed) {
+			this.#subscription = this.#source.subscribe(this.#callback);
+		}
+	}
 
 	hostDisconnected() {
-		this.#subscription.unsubscribe();
+		// No cause then it cant re-connect, if the same element just was moved in DOM.
+		//this.#subscription.unsubscribe();
 	}
 
 	destroy(): void {

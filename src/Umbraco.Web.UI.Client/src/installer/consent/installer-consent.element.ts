@@ -3,8 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
-import { ConsentLevelModel, TelemetryModel, TelemetryLevelModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { ConsentLevelPresentationModel, TelemetryResponseModel, TelemetryLevelModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbLitElement {
@@ -45,10 +45,10 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 	];
 
 	@state()
-	private _telemetryLevels: ConsentLevelModel[] = [];
+	private _telemetryLevels: ConsentLevelPresentationModel[] = [];
 
 	@state()
-	private _telemetryFormData?: TelemetryModel['telemetryLevel'];
+	private _telemetryFormData?: TelemetryResponseModel['telemetryLevel'];
 
 	private _installerContext?: UmbInstallerContext;
 

@@ -1,7 +1,7 @@
 import { UmbData } from './data';
 import { createEntityTreeItem } from './utils';
-import { EntityTreeItemModel, PagedEntityTreeItemModel } from '@umbraco-cms/backend-api';
-import type { MemberTypeDetails } from '@umbraco-cms/models';
+import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 
 export const data: Array<MemberTypeDetails> = [
 	{
@@ -10,9 +10,9 @@ export const data: Array<MemberTypeDetails> = [
 		type: 'member-type',
 		icon: 'icon-user',
 		hasChildren: false,
-		key: 'd59be02f-1df9-4228-aa1e-01917d806cda',
+		id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		alias: 'memberType1',
 		properties: [],
 	},
@@ -24,22 +24,22 @@ class UmbMemberTypeData extends UmbData<MemberTypeDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedEntityTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+	getTreeRoot(): PagedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedEntityTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): PagedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

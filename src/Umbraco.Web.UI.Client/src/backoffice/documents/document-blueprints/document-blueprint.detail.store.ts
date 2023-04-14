@@ -1,8 +1,8 @@
-import type { DocumentBlueprintDetails } from '@umbraco-cms/models';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { ArrayState } from '@umbraco-cms/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/store';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import type { DocumentBlueprintDetails } from '@umbraco-cms/backoffice/models';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 /**
  * @export
@@ -12,30 +12,30 @@ import { UmbControllerHostInterface } from '@umbraco-cms/controller';
  */
 export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	// TODO: use the right type:
-	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.key);
+	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.id);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString());
 	}
 
 	/**
-	 * @description - Request a Data Type by key. The Data Type is added to the store and is returned as an Observable.
-	 * @param {string} key
+	 * @description - Request a Data Type by id. The Data Type is added to the store and is returned as an Observable.
+	 * @param {string} id
 	 * @return {*}  {(Observable<DocumentBlueprintDetails | undefined>)}
 	 * @memberof UmbDocumentBlueprintStore
 	 */
-	getByKey(key: string) {
+	getById(id: string) {
 		// TODO: use backend cli when available.
-		fetch(`/umbraco/management/api/v1/document-blueprint/details/${key}`)
+		fetch(`/umbraco/management/api/v1/document-blueprint/details/${id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				this.#data.append(data);
 			});
 
-		return this.#data.getObservablePart((documents) => documents.find((document) => document.key === key));
+		return this.#data.getObservablePart((documents) => documents.find((document) => document.id === id));
 	}
 
-	getScaffold(entityType: string, parentKey: string | null) {
+	getScaffold(entityType: string, parentId: string | null) {
 		return {} as DocumentBlueprintDetails;
 	}
 
@@ -75,21 +75,21 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	// TODO: How can we avoid having this in both stores?
 	/**
 	 * @description - Delete a Data Type.
-	 * @param {string[]} keys
+	 * @param {string[]} ids
 	 * @memberof UmbDocumentBlueprintStore
 	 * @return {*}  {Promise<void>}
 	 */
-	async delete(keys: string[]) {
+	async delete(ids: string[]) {
 		// TODO: use backend cli when available.
 		await fetch('/umbraco/backoffice/document-blueprint/delete', {
 			method: 'POST',
-			body: JSON.stringify(keys),
+			body: JSON.stringify(ids),
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
 
-		this.#data.remove(keys);
+		this.#data.remove(ids);
 	}
 }
 

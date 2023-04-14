@@ -1,14 +1,15 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../core/modal';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-icon-picker
  */
 @customElement('umb-property-editor-ui-icon-picker')
-export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement {
+export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
 	static styles = [UUITextStyles];
 
 	@property()
@@ -27,7 +28,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement {
 	}
 
 	private _openModal() {
-		this._modalContext?.iconPicker();
+		this._modalContext?.open(UMB_ICON_PICKER_MODAL);
 	}
 
 	render() {

@@ -1,24 +1,31 @@
-import {
-	ActiveVariant,
-	UmbDocumentWorkspaceContext,
-} from '../../../../documents/documents/workspace/document-workspace.context';
+import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/workspace/document-workspace.context';
 import { UmbVariantId } from '../../../variants/variant-id.class';
-import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { DocumentVariantModel } from '@umbraco-cms/backend-api';
+import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
+import { ActiveVariant } from '../workspace-context/workspace-split-view-manager.class';
+import {
+	UmbContextConsumerController,
+	UmbContextProviderController,
+	UmbContextToken,
+	UMB_ENTITY_WORKSPACE_CONTEXT,
+} from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 //type EntityType = DocumentModel;
 
 export class UmbWorkspaceVariantContext {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	#workspaceContext?: UmbDocumentWorkspaceContext;
+	#workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
+	public getWorkspaceContext() {
+		return this.#workspaceContext;
+	}
 
 	#index = new NumberState(undefined);
 	index = this.#index.asObservable();
 
-	#currentVariant = new ObjectState<DocumentVariantModel | undefined>(undefined);
+	#currentVariant = new ObjectState<DocumentVariantResponseModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
 	name = this.#currentVariant.getObservablePart((x) => x?.name);
@@ -30,14 +37,14 @@ export class UmbWorkspaceVariantContext {
 
 	private _currentVariantObserver?: UmbObserverController<ActiveVariant>;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
-		new UmbContextProviderController(host, 'umbWorkspaceVariantContext', this);
+		new UmbContextProviderController(host, UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.toString(), this);
 
 		// How do we ensure this connects to a document workspace context? and not just any other context? (We could start providing workspace contexts twice, under the general name and under a specific name)
 		// TODO: Figure out if this is the best way to consume the context or if it can be strongly typed with an UmbContextToken
-		new UmbContextConsumerController(host, 'umbWorkspaceContext', (context) => {
+		new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
 			this._observeVariant();
 		});
@@ -47,8 +54,23 @@ export class UmbWorkspaceVariantContext {
 		});
 	}
 
-	private _setVariantId(culture: string | null, segment: string | null) {
-		const variantId = UmbVariantId.Create(culture, segment);
+	public switchVariant(variant: DocumentVariantResponseModel) {
+		const index = this.#index.value;
+		if (index === undefined) return;
+		this.#workspaceContext?.splitView.switchVariant(index, new UmbVariantId(variant));
+	}
+
+	public closeSplitView() {
+		const index = this.#index.value;
+		if (index === undefined) return;
+		this.#workspaceContext?.splitView.closeSplitView(index);
+	}
+
+	public openSplitView(variant: DocumentVariantResponseModel) {
+		this.#workspaceContext?.splitView.openSplitView(new UmbVariantId(variant));
+	}
+
+	private _setVariantId(variantId: UmbVariantId) {
 		this.#variantId.next(variantId);
 		return variantId;
 	}
@@ -62,10 +84,10 @@ export class UmbWorkspaceVariantContext {
 		this._currentVariantObserver?.destroy();
 		this._currentVariantObserver = new UmbObserverController(
 			this.#host,
-			this.#workspaceContext.activeVariantInfoByIndex(index),
+			this.#workspaceContext.splitView.activeVariantByIndex(index),
 			async (activeVariantInfo) => {
 				if (!activeVariantInfo) return;
-				const variantId = this._setVariantId(activeVariantInfo.culture, activeVariantInfo.segment);
+				const variantId = this._setVariantId(UmbVariantId.Create(activeVariantInfo));
 				const currentVariant = await this.#workspaceContext?.getVariant(variantId);
 				this.#currentVariant.next(currentVariant);
 			},
@@ -76,14 +98,12 @@ export class UmbWorkspaceVariantContext {
 	public changeVariant(culture: string | null, segment: string | null) {
 		const index = this.#index.getValue();
 		if (index === undefined) return;
-		this.#workspaceContext?.setActiveVariant(index, culture, segment);
+		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
 	}
 
-	/*
 	public getSplitViewIndex() {
 		return this.#index.getValue();
 	}
-	*/
 	public setSplitViewIndex(index: number) {
 		this.#index.next(index);
 	}
@@ -105,3 +125,7 @@ export class UmbWorkspaceVariantContext {
 	}
 	*/
 }
+
+export const UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN = new UmbContextToken<UmbWorkspaceVariantContext>(
+	'umbWorkspaceVariantContext'
+);

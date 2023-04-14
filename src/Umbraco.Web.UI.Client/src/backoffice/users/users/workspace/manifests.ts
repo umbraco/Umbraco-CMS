@@ -1,5 +1,9 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/workspace';
-import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ManifestWorkspace,
+	ManifestWorkspaceAction,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -18,11 +22,13 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		alias: 'Umb.WorkspaceAction.User.Save',
 		name: 'Save User Workspace Action',
 		meta: {
-			workspaces: ['Umb.Workspace.User'],
 			label: 'Save',
 			look: 'primary',
 			color: 'positive',
 			api: UmbSaveWorkspaceAction,
+		},
+		conditions: {
+			workspaces: ['Umb.Workspace.User'],
 		},
 	},
 ];

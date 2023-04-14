@@ -3,10 +3,10 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
-import { PackageDefinitionModel, PackageResource } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
@@ -43,7 +43,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	private _loading = true;
 
 	@state()
-	private _createdPackages: PackageDefinitionModel[] = [];
+	private _createdPackages: PackageDefinitionResponseModel[] = [];
 
 	@state()
 	private _currentPage = 1;
@@ -77,7 +77,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	}
 
 	#createNewPackage() {
-		window.history.pushState({}, '', `/section/packages/view/created/package-builder`);
+		window.history.pushState({}, '', `section/packages/view/created/package-builder`);
 	}
 
 	render() {
@@ -95,14 +95,14 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			<uui-ref-list>
 				${repeat(
 					this._createdPackages,
-					(item) => item.key,
+					(item) => item.id,
 					(item) => this.#renderPackageItem(item)
 				)}
 			</uui-ref-list>
 		</uui-box>`;
 	}
 
-	#renderPackageItem(p: PackageDefinitionModel) {
+	#renderPackageItem(p: PackageDefinitionResponseModel) {
 		return html`<uui-ref-node-package name=${ifDefined(p.name)} @open="${() => this.#packageBuilder(p)}">
 			<uui-action-bar slot="actions">
 				<uui-button @click=${() => this.#deletePackage(p)} label="Delete package">
@@ -112,9 +112,9 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		</uui-ref-node-package>`;
 	}
 
-	#packageBuilder(p: PackageDefinitionModel) {
-		if (!p.key) return;
-		window.history.pushState({}, '', `/section/packages/view/created/package-builder/${p.key}`);
+	#packageBuilder(p: PackageDefinitionResponseModel) {
+		if (!p.id) return;
+		window.history.pushState({}, '', `section/packages/view/created/package-builder/${p.id}`);
 	}
 
 	#renderPagination() {
@@ -132,24 +132,20 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		this.#getPackages();
 	}
 
-	async #deletePackage(p: PackageDefinitionModel) {
-		if (!p.key) return;
-		const modalHandler = this._modalContext?.confirm({
+	async #deletePackage(p: PackageDefinitionResponseModel) {
+		if (!p.id) return;
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${p.name}?`,
 			content: 'Are you sure you want to delete this package',
 			confirmLabel: 'Delete',
 		});
 
-		const deleteConfirmed = await modalHandler?.onClose().then(({ confirmed }: any) => {
-			return confirmed;
-		});
+		await modalHandler?.onSubmit();
 
-		if (!deleteConfirmed == true) return;
-
-		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedByKey({ key: p.key }));
+		const { error } = await tryExecuteAndNotify(this, PackageResource.deletePackageCreatedById({ id: p.id }));
 		if (error) return;
-		const index = this._createdPackages.findIndex((x) => x.key === p.key);
+		const index = this._createdPackages.findIndex((x) => x.id === p.id);
 		this._createdPackages.splice(index, 1);
 		this.requestUpdate();
 	}

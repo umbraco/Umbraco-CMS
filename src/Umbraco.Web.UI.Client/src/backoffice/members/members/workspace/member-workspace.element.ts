@@ -1,9 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbMemberWorkspaceEditElement } from './member-workspace-edit.element';
+import { UmbMemberWorkspaceContext } from './member-workspace.context';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-workspace')
-export class UmbMemberWorkspaceElement extends LitElement {
+export class UmbMemberWorkspaceElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -15,11 +19,23 @@ export class UmbMemberWorkspaceElement extends LitElement {
 		`,
 	];
 
-	@property()
-	id!: string;
+	#workspaceContext = new UmbMemberWorkspaceContext(this);
+	#element = new UmbMemberWorkspaceEditElement();
+
+	@state()
+	_routes: IRoute[] = [
+		{
+			path: 'edit/:id',
+			component: () => this.#element,
+			setup: (_component, info) => {
+				const id = info.match.params.id;
+				this.#workspaceContext.load(id);
+			},
+		},
+	];
 
 	render() {
-		return html` <umb-workspace-layout alias="Umb.Workspace.Member">Member Workspace</umb-workspace-layout> `;
+		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
 }
 

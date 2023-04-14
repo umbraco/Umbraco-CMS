@@ -2,19 +2,19 @@ import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from '
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
 import { MediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
-import { ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import type { MediaTypeDetails } from '@umbraco-cms/models';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
-import { UmbTreeRepository, RepositoryTreeDataSource } from '@umbraco-cms/repository';
+import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMediaTypeRepository implements UmbTreeRepository {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	#treeSource: RepositoryTreeDataSource;
+	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTypeTreeStore;
 
 	#detailSource: UmbMediaTypeDetailServerDataSource;
@@ -22,7 +22,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
@@ -56,34 +56,34 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentKey);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentKey) };
+		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
 		await this.#init;
 
-		if (!keys) {
+		if (!ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeSource.getItems(keys);
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -91,14 +91,14 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS
@@ -108,16 +108,16 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return this.#detailSource.createScaffold();
 	}
 
-	async requestDetails(key: string) {
+	async requestDetails(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
+		if (!id) {
+			const error: ProblemDetailsModel = { title: 'Id is missing' };
 			return { error };
 		}
-		const { data, error } = await this.#detailSource.get(key);
+		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -125,9 +125,9 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return { data, error };
 	}
 
-	async delete(key: string) {
+	async delete(id: string) {
 		await this.#init;
-		return this.#detailSource.delete(key);
+		return this.#detailSource.delete(id);
 	}
 
 	async save(mediaType: MediaTypeDetails) {
@@ -135,7 +135,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 		// TODO: should we show a notification if the media type is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!mediaType || !mediaType.key) {
+		if (!mediaType || !mediaType.id) {
 			const error: ProblemDetailsModel = { title: 'Media Type is missing' };
 			return { error };
 		}
@@ -151,7 +151,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a media type is updated in the store while someone is editing it.
 		this.#store?.append(mediaType);
-		this.#treeStore?.updateItem(mediaType.key, { name: mediaType.name });
+		this.#treeStore?.updateItem(mediaType.id, { name: mediaType.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };

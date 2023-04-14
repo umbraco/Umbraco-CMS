@@ -5,10 +5,11 @@ import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import type { ManifestCollectionView, MediaDetails } from '@umbraco-cms/models';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
@@ -30,12 +31,12 @@ export class UmbCollectionElement extends UmbLitElement {
 	];
 
 	@state()
-	private _routes: Array<any> = [];
+	private _routes: Array<IRoute> = [];
 
 	@state()
 	private _selection?: Array<string> | null;
 
-	private _collectionContext?: UmbCollectionContext<MediaDetails>;
+	private _collectionContext?: UmbCollectionContext;
 
 	private _entityType!: string;
 	@property({ type: String, attribute: 'entity-type' })
@@ -72,7 +73,7 @@ export class UmbCollectionElement extends UmbLitElement {
 			// TODO: could we make some helper methods for this scenario:
 			umbExtensionsRegistry?.extensionsOfType('collectionView').pipe(
 				map((extensions) => {
-					return extensions.filter((extension) => extension.meta.entityType === this._entityType);
+					return extensions.filter((extension) => extension.conditions.entityType === this._entityType);
 				})
 			),
 			(views) => {
@@ -95,7 +96,7 @@ export class UmbCollectionElement extends UmbLitElement {
 
 		this._routes.push({
 			path: '**',
-			redirectTo: views?.[0]?.meta.pathName,
+			redirectTo: views?.[0]?.meta.pathName ?? '/',
 		});
 	}
 

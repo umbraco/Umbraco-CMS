@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { PagedLogTemplateModel, SavedLogSearchModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { PagedLogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 //TODO: fix pagination bug when API is fixed
 @customElement('umb-log-viewer-message-templates-overview')
@@ -39,7 +39,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	];
 
 	@state()
-	private _messageTemplates: PagedLogTemplateModel | null = null;
+	private _messageTemplates: PagedLogTemplateResponseModel | null = null;
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
@@ -63,17 +63,14 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 		this.#logViewerContext?.getMessageTemplates(0, take + 10);
 	}
 
-	#renderSearchItem = (searchListItem: SavedLogSearchModel) => {
+	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
 		return html` <li>
 			<uui-button
-				@click=${() => {
-					this.#setCurrentQuery(searchListItem.query ?? '');
-				}}
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${'/section/settings/logviewer/search?lq=' + searchListItem.query}
-				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
-			>
+				href=${`section/settings/workspace/logviewer/search/?lq=${searchListItem.query}`}>
+				<uui-icon name="umb:search"></uui-icon>${searchListItem.name}
+			</uui-button>
 		</li>`;
 	};
 
@@ -90,13 +87,12 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 					${this._messageTemplates
 						? this._messageTemplates.items.map(
 								(template) =>
-									html`<uui-table-row
-										><uui-table-cell>
+									html`<uui-table-row>
+										<uui-table-cell>
 											<a
-												@click=${() => {
-													this.#setCurrentQuery(`@MessageTemplate='${template.messageTemplate}'` ?? '');
-												}}
-												href=${'/section/settings/logviewer/search?lg=@MessageTemplate%3D' + template.messageTemplate}>
+												href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
+													`@MessageTemplate='${template.messageTemplate}'`
+												)}`}>
 												<span>${template.messageTemplate}</span> <span>${template.count}</span>
 											</a>
 										</uui-table-cell>
@@ -109,9 +105,9 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 					id="show-more-templates-btn"
 					look="primary"
 					@click=${this.#getMessageTemplates}
-					label="Show more templates"
-					>Show more</uui-button
-				>
+					label="Show more templates">
+					Show more
+				</uui-button>
 			</uui-box>
 		`;
 	}

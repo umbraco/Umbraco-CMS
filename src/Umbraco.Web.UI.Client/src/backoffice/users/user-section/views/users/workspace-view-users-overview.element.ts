@@ -1,18 +1,21 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute } from 'router-slot';
 import { UUIPopoverElement } from '@umbraco-ui/uui';
-
 import type { UmbSectionViewUsersElement } from './section-view-users.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from 'src/core/modal';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_INVITE_USER_MODAL,
+	UMB_CREATE_USER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
 import './list-view-layouts/grid/workspace-view-users-grid.element';
 import './workspace-view-users-selection.element';
-import './workspace-view-users-invite.element';
-import './workspace-view-users-create.element';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-workspace-view-users-overview')
@@ -28,7 +31,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 
 			#sticky-top {
 				position: sticky;
-				top: -1px;
+				top: 0px;
 				z-index: 1;
 				box-shadow: 0 1px 3px rgba(0, 0, 0, 0), 0 1px 2px rgba(0, 0, 0, 0);
 				transition: 250ms box-shadow ease-in-out;
@@ -39,7 +42,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 			}
 
 			#user-list-top-bar {
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				padding: var(--uui-size-space-4) var(--uui-size-layout-1);
 				background-color: var(--uui-color-background);
 				display: flex;
 				justify-content: space-between;
@@ -48,7 +51,7 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 				align-items: center;
 			}
 			#user-list {
-				padding: var(--uui-size-space-6);
+				padding: var(--uui-size-layout-1);
 				padding-top: var(--uui-size-space-2);
 			}
 			#input-search {
@@ -72,9 +75,6 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 			a {
 				color: inherit;
 				text-decoration: none;
-			}
-			router-slot {
-				overflow: hidden;
 			}
 		`,
 	];
@@ -160,67 +160,71 @@ export class UmbWorkspaceViewUsersOverviewElement extends UmbLitElement {
 	}
 
 	private _showInviteOrCreate() {
-		let modal = undefined;
+		let token = undefined;
+		// TODO: we need to find a better way to determine if we should create or invite
 		if (this.isCloud) {
-			modal = document.createElement('umb-workspace-view-users-invite');
+			token = UMB_INVITE_USER_MODAL;
 		} else {
-			modal = document.createElement('umb-workspace-view-users-create');
+			token = UMB_CREATE_USER_MODAL;
 		}
-		this._modalContext?.open(modal, { type: 'dialog' });
+
+		this._modalContext?.open(token);
 	}
 
 	render() {
 		return html`
-			<div id="sticky-top">
-				<div id="user-list-top-bar">
-					<uui-button
-						@click=${this._showInviteOrCreate}
-						label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
-						look="outline"></uui-button>
-					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
-					<div>
-						<!-- TODO: consider making this a shared component, as we need similar for other locations, example media library, members. -->
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
-								Status: <b>All</b>
+			<uui-scroll-container>
+				<div id="sticky-top">
+					<div id="user-list-top-bar">
+						<uui-button
+							@click=${this._showInviteOrCreate}
+							label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
+							look="outline"></uui-button>
+						<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
+						<div>
+							<!-- TODO: consider making this a shared component, as we need similar for other locations, example media library, members. -->
+							<uui-popover margin="8">
+								<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
+									Status: <b>All</b>
+								</uui-button>
+								<div slot="popover" class="filter-dropdown">
+									<uui-checkbox label="Active"></uui-checkbox>
+									<uui-checkbox label="Inactive"></uui-checkbox>
+									<uui-checkbox label="Invited"></uui-checkbox>
+									<uui-checkbox label="Disabled"></uui-checkbox>
+								</div>
+							</uui-popover>
+							<uui-popover margin="8">
+								<uui-button @click=${this._handleTogglePopover} slot="trigger" label="groups">
+									Groups: <b>All</b>
+								</uui-button>
+								<div slot="popover" class="filter-dropdown">
+									<uui-checkbox label="Active"></uui-checkbox>
+									<uui-checkbox label="Inactive"></uui-checkbox>
+									<uui-checkbox label="Invited"></uui-checkbox>
+									<uui-checkbox label="Disabled"></uui-checkbox>
+								</div>
+							</uui-popover>
+							<uui-popover margin="8">
+								<uui-button @click=${this._handleTogglePopover} slot="trigger" label="order by">
+									Order by: <b>Name (A-Z)</b>
+								</uui-button>
+								<div slot="popover" class="filter-dropdown">
+									<uui-checkbox label="Active"></uui-checkbox>
+									<uui-checkbox label="Inactive"></uui-checkbox>
+									<uui-checkbox label="Invited"></uui-checkbox>
+									<uui-checkbox label="Disabled"></uui-checkbox>
+								</div>
+							</uui-popover>
+							<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
+								<uui-icon name="settings"></uui-icon>
 							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="groups">
-								Groups: <b>All</b>
-							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="order by">
-								Order by: <b>Name (A-Z)</b>
-							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</uui-popover>
-						<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
-							<uui-icon name="settings"></uui-icon>
-						</uui-button>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<umb-router-slot .routes=${this._routes}></umb-router-slot>
+				<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>
+			</uui-scroll-container>
 
 			${this._renderSelection()}
 		`;

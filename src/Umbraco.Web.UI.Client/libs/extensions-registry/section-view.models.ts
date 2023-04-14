@@ -1,14 +1,16 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement, ManifestWithConditions } from './models';
 
-export interface ManifestSectionView extends ManifestElement {
+export interface ManifestSectionView extends ManifestElement, ManifestWithConditions<ConditionsSectionView> {
 	type: 'sectionView';
 	meta: MetaSectionView;
 }
 
 export interface MetaSectionView {
-	sections: Array<string>;
 	label: string;
 	pathname: string;
-	weight: number;
 	icon: string;
+}
+
+export interface ConditionsSectionView {
+	sections: Array<string>;
 }

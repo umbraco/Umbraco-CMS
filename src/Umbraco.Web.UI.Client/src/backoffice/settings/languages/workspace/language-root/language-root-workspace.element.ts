@@ -3,11 +3,11 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
 import { UmbLanguageRepository } from '../../repository/language.repository';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './language-root-table-delete-column-layout.element';
-import './language-root-table-name-column-layout.element';
+import './components/language-root-table-delete-column-layout.element';
+import './components/language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
@@ -21,7 +21,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 			}
 
 			#main {
-				margin: var(--uui-size-space-6);
+				margin: var(--uui-size-layout-1);
 			}
 		`,
 	];
@@ -65,6 +65,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	#languageRepository = new UmbLanguageRepository(this);
+	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -79,17 +80,17 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		}
 	}
 
-	#createTableItems(languages: Array<LanguageModel>) {
+	#createTableItems(languages: Array<LanguageResponseModel>) {
 		this._tableItems = languages.map((language) => {
 			return {
-				key: language.isoCode ?? '',
+				id: language.isoCode ?? '',
 				icon: 'umb:globe',
 				data: [
 					{
 						columnAlias: 'languageName',
 						value: {
-							name: language.name,
-							key: language.isoCode,
+							name: language.name ? language.name : this._cultureNames.of(language.isoCode ?? ''),
+							isoCode: language.isoCode,
 						},
 					},
 					{
@@ -126,7 +127,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 							label="Add language"
 							look="outline"
 							color="default"
-							href="section/settings/language/create/root"></uui-button>
+							href="section/settings/workspace/language/create"></uui-button>
 					</div>
 					<!--- TODO: investigate if it's possible to use a collection component here --->
 					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>

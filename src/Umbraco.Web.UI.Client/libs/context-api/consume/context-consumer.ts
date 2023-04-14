@@ -1,4 +1,4 @@
-import { UmbContextToken } from '../context-token';
+import { UmbContextToken } from '../token/context-token';
 import { isUmbContextProvideEventType, umbContextProvideEventType } from '../provide/context-provide.event';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event';
 
@@ -7,10 +7,8 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = unknown> {
-
-
 	_promise?: Promise<T>;
-	_promiseResolver?: (instance:T) => void;
+	_promiseResolver?: (instance: T) => void;
 
 	private _instance?: T;
 	get instance() {
@@ -38,15 +36,22 @@ export class UmbContextConsumer<HostType extends EventTarget = EventTarget, T = 
 	}
 
 	protected _onResponse = (instance: T) => {
+		// TODO: check that this check is not giving us any problems:
+		if (this._instance === instance) {
+			return;
+		}
 		this._instance = instance;
 		this._callback?.(instance);
 		this._promiseResolver?.(instance);
 	};
 
 	public asPromise() {
-		return this._promise || (this._promise = new Promise<T>((resolve) => {
-			this._instance ? resolve(this._instance) : (this._promiseResolver = resolve);
-		}));
+		return (
+			this._promise ||
+			(this._promise = new Promise<T>((resolve) => {
+				this._instance ? resolve(this._instance) : (this._promiseResolver = resolve);
+			}))
+		);
 	}
 
 	/**

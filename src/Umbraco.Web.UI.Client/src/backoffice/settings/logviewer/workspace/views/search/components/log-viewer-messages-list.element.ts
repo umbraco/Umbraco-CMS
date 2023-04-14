@@ -1,16 +1,19 @@
-import { DirectionModel, LogMessageModel } from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
 import { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+			}
 			#message-list-header {
 				display: flex;
 				font-weight: 600;
@@ -56,7 +59,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	private _sortingDirection: DirectionModel = DirectionModel.ASCENDING;
 
 	@state()
-	private _logs: LogMessageModel[] = [];
+	private _logs: LogMessageResponseModel[] = [];
 
 	@state()
 	private _logsTotal = 0;
@@ -129,23 +132,21 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				<div id="machine">Machine name</div>
 				<div id="message">Message</div>
 			</div>
-			<uui-scroll-container id="logs-scroll-container" style="max-height: calc(100vh - 490px)">
-				${this._logs.length > 0
-					? html` ${this._logs.map(
-							(log) => html`<umb-log-viewer-message
-								.timestamp=${log.timestamp ?? ''}
-								.level=${log.level ?? ''}
-								.renderedMessage=${log.renderedMessage ?? ''}
-								.properties=${log.properties ?? []}
-								.exception=${log.exception ?? ''}
-								.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
-					  )}`
-					: html`<umb-empty-state size="small"
-							><span id="empty">
-								<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
-							</span></umb-empty-state
-					  >`}
-			</uui-scroll-container>
+			${this._logs.length > 0
+				? html` ${this._logs.map(
+						(log) => html`<umb-log-viewer-message
+							.timestamp=${log.timestamp ?? ''}
+							.level=${log.level ?? ''}
+							.renderedMessage=${log.renderedMessage ?? ''}
+							.properties=${log.properties ?? []}
+							.exception=${log.exception ?? ''}
+							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
+				  )}`
+				: html`<umb-empty-state size="small"
+						><span id="empty">
+							<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
+						</span></umb-empty-state
+				  >`}
 			${this._renderPagination()}
 		</uui-box>`;
 	}

@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
-import { LogLevelModel } from '@umbraco-cms/backend-api';
+import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 
 interface LevelMapStyles {
 	look?: InterfaceLook;
@@ -27,7 +27,10 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 		Information: { look: 'primary', color: 'positive' },
 		Warning: { look: 'primary', color: 'warning' },
 		Error: { look: 'primary', color: 'danger' },
-		Fatal: { look: 'primary' },
+		Fatal: {
+			look: 'primary',
+			style: 'background-color: var(--umb-log-viewer-fatal-color); color: var(--uui-color-surface)',
+		},
 	};
 
 	render() {

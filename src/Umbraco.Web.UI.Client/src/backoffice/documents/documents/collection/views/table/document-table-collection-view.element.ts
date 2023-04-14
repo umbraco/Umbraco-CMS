@@ -14,12 +14,12 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../../../../shared/components/table';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DocumentTreeItemModel, EntityTreeItemModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './column-layouts/document-table-actions-column-layout.element';
 
-type EntityType = DocumentTreeItemModel;
+type EntityType = DocumentTreeItemResponseModel;
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
@@ -42,7 +42,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	];
 
 	@state()
-	private _items?: Array<EntityTreeItemModel>;
+	private _items?: Array<EntityTreeItemResponseModel>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -94,12 +94,12 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(items: Array<EntityTreeItemModel>) {
+	private _createTableItems(items: Array<EntityTreeItemResponseModel>) {
 		this._tableItems = items.map((item) => {
-			// TODO: use unique instead of key
-			if (!item.key) throw new Error('Item key is missing.');
+			// TODO: use unique instead of id
+			if (!item.id) throw new Error('Item id is missing.');
 			return {
-				key: item.key,
+				id: item.id,
 				icon: item.icon,
 				data: [
 					{

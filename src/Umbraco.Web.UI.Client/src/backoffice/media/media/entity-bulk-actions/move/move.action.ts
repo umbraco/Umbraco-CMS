@@ -1,13 +1,13 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
 	#modalContext?: UmbModalContext;
 
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
 		super(host, repositoryAlias, selection);
 
 		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
@@ -17,9 +17,14 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 
 	async execute() {
 		// TODO: the picker should be single picker by default
-		const modalHandler = this.#modalContext?.mediaPicker({ selection: [], multiple: false });
-		const selection = await modalHandler?.onClose();
-		const destination = selection[0];
-		await this.repository?.move(this.selection, destination);
+		const modalHandler = this.#modalContext?.open(UMB_MEDIA_PICKER_MODAL, {
+			selection: [],
+			multiple: false,
+		});
+		if (modalHandler) {
+			const { selection } = await modalHandler.onSubmit();
+			const destination = selection[0];
+			await this.repository?.move(this.selection, destination);
+		}
 	}
 }

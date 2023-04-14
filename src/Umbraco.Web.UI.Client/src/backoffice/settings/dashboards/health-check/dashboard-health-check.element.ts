@@ -1,17 +1,17 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute, IRoutingInfo } from 'router-slot';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from './health-check-dashboard.context';
 import { UmbHealthCheckContext } from './health-check.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { ManifestHealthCheck } from '@umbraco-cms/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { HealthCheckGroupModel, HealthCheckResource } from '@umbraco-cms/backend-api';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
@@ -20,7 +20,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		{
 			path: `/:groupName`,
 			component: () => import('./views/health-check-group.element'),
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				const element = component as UmbDashboardHealthCheckGroupElement;
 				element.groupName = decodeURI(info.match.params.groupName);
 			},
@@ -53,7 +53,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		this.#register(manifests);
 	};
 
-	#createManifests(groups: HealthCheckGroupModel[]): Array<ManifestHealthCheck> {
+	#createManifests(groups: HealthCheckGroupResponseModel[]): Array<ManifestHealthCheck> {
 		return groups.map((group) => {
 			return {
 				type: 'healthCheck',

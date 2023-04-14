@@ -10,15 +10,15 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from '../health-check-dashboard.context';
 import {
-	HealthCheckActionModel,
-	HealthCheckGroupModel,
+	HealthCheckActionRequestModel,
+	HealthCheckGroupPresentationModel,
 	HealthCheckModel,
 	HealthCheckResource,
-	HealthCheckWithResultModel,
+	HealthCheckWithResultPresentationModel,
 	StatusResultTypeModel,
-} from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import './health-check-action.element';
 
 @customElement('umb-dashboard-health-check-group')
@@ -26,8 +26,13 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-box {
-				margin-bottom: var(--uui-size-space-5);
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
+			uui-box + uui-box {
+				margin-top: var(--uui-size-space-5);
 			}
 
 			p {
@@ -74,7 +79,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private _buttonState: UUIButtonState;
 
 	@state()
-	private _group?: HealthCheckGroupModel;
+	private _group?: HealthCheckGroupPresentationModel;
 
 	private _healthCheckContext?: UmbHealthCheckDashboardContext;
 
@@ -82,7 +87,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private _checks?: HealthCheckModel[];
 
 	@state()
-	private _keyResults?: HealthCheckWithResultModel[];
+	private _idResults?: HealthCheckWithResultPresentationModel[];
 
 	private _api?: UmbHealthCheckContext;
 
@@ -101,7 +106,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			});
 
 			this._api?.results.subscribe((results) => {
-				this._keyResults = results?.checks;
+				this._idResults = results?.checks;
 			});
 		});
 	}
@@ -112,7 +117,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		this._buttonState = 'success';
 	}
 
-	private _onActionClick(action: HealthCheckActionModel) {
+	private _onActionClick(action: HealthCheckActionRequestModel) {
 		return tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckExecuteAction({ requestBody: action }));
 	}
 
@@ -138,18 +143,18 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				${this._group?.checks?.map((check) => {
 					return html`<uui-box headline="${check.name || '?'}">
 						<p>${check.description}</p>
-						${check.key ? this.renderCheckResults(check.key) : nothing}
+						${check.id ? this.renderCheckResults(check.id) : nothing}
 					</uui-box>`;
 				})}
 			</div>
 		`;
 	}
 
-	renderCheckResults(key: string) {
-		if (!this._keyResults) {
+	renderCheckResults(id: string) {
+		if (!this._idResults) {
 			return nothing;
 		}
-		const checkResults = this._keyResults.find((x) => x.key === key);
+		const checkResults = this._idResults.find((x) => x.id === id);
 
 		if (!checkResults) {
 			return nothing;
@@ -197,7 +202,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		}
 	}
 
-	private renderActions(actions: HealthCheckActionModel[]) {
+	private renderActions(actions: HealthCheckActionRequestModel[]) {
 		if (actions.length)
 			return html` <div class="action-wrapper">
 				${actions.map(

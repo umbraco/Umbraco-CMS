@@ -2,12 +2,20 @@ import { css, html, LitElement, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 
-/*
- * <umb-body-layout> is used to create a layout with a header, main and footer slot for workspaces
+/**
  * @element umb-body-layout
-*/
+ * @description Layout element to arrange elements in a body layout. A general layout for most views.
+ * @slot icon - Slot for icon
+ * @slot name - Slot for name
+ * @slot footer - Slot for workspace footer
+ * @slot actions - Slot for workspace footer actions
+ * @slot default - slot for main content
+ * @export
+ * @class UmbBodyLayout
+ * @extends {UmbLitElement}
+ */
 @customElement('umb-body-layout')
-export class UmbBodyLayout extends LitElement {
+export class UmbBodyLayoutElement extends LitElement {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -24,7 +32,7 @@ export class UmbBodyLayout extends LitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
-				height: 70px;
+				height: var(--umb-header-layout-height);
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
 				box-sizing: border-box;
@@ -43,24 +51,6 @@ export class UmbBodyLayout extends LitElement {
 				display: flex;
 				flex: 1;
 				flex-direction: column;
-			}
-
-			#footer {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				width: 100%;
-				height: 54px; /* TODO: missing var(--uui-size-18);*/
-				border-top: 1px solid var(--uui-color-border);
-				background-color: var(--uui-color-surface);
-				box-sizing: border-box;
-			}
-
-			#actions {
-				display: flex;
-				gap: var(--uui-size-space-2);
-				margin: 0 var(--uui-size-layout-1);
-				margin-left: auto;
 			}
 		`,
 	];
@@ -82,13 +72,13 @@ export class UmbBodyLayout extends LitElement {
 	private _tabsSlotHasChildren = false;
 
 	@state()
+	private _actionsMenuSlotHasChildren = false;
+
+	@state()
 	private _footerSlotHasChildren = false;
 
 	@state()
 	private _actionsSlotHasChildren = false;
-
-	@state()
-	private _actionsMenuSlotHasChildren = false;
 
 	#hasNodes = (e: Event) => {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
@@ -127,26 +117,25 @@ export class UmbBodyLayout extends LitElement {
 			<uui-scroll-container id="main">
 				<slot></slot>
 			</uui-scroll-container>
-			<div id="footer" style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
+			<umb-footer-layout style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
 				<slot
 					name="footer"
 					@slotchange=${(e: Event) => {
 						this._footerSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 				<slot
-					id="actions"
 					name="actions"
-					style="display:${this._actionsSlotHasChildren ? '' : 'none'}"
+					slot="actions"
 					@slotchange=${(e: Event) => {
 						this._actionsSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
-			</div>
+			</umb-footer-layout>
 		`;
 	}
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-body-layout': UmbBodyLayout;
+		'umb-body-layout': UmbBodyLayoutElement;
 	}
 }

@@ -1,20 +1,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ContentTreeItemModel } from '../models/ContentTreeItemModel';
-import type { DocumentBlueprintTreeItemModel } from '../models/DocumentBlueprintTreeItemModel';
-import type { DocumentTreeItemModel } from '../models/DocumentTreeItemModel';
-import type { DocumentTypeTreeItemModel } from '../models/DocumentTypeTreeItemModel';
-import type { EntityTreeItemModel } from '../models/EntityTreeItemModel';
-import type { FolderTreeItemModel } from '../models/FolderTreeItemModel';
-import type { PagedEntityTreeItemModel } from '../models/PagedEntityTreeItemModel';
-import type { TemplateCreateModel } from '../models/TemplateCreateModel';
-import type { TemplateModel } from '../models/TemplateModel';
+import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
+import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
 import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteModel';
-import type { TemplateQueryResultModel } from '../models/TemplateQueryResultModel';
-import type { TemplateQuerySettingsModel } from '../models/TemplateQuerySettingsModel';
-import type { TemplateScaffoldModel } from '../models/TemplateScaffoldModel';
-import type { TemplateUpdateModel } from '../models/TemplateUpdateModel';
+import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryResultResponseModel';
+import type { TemplateQuerySettingsResponseModel } from '../models/TemplateQuerySettingsResponseModel';
+import type { TemplateResponseModel } from '../models/TemplateResponseModel';
+import type { TemplateScaffoldResponseModel } from '../models/TemplateScaffoldResponseModel';
+import type { UpdateTemplateRequestModel } from '../models/UpdateTemplateRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -29,7 +24,7 @@ export class TemplateResource {
     public static postTemplate({
         requestBody,
     }: {
-        requestBody?: TemplateCreateModel,
+        requestBody?: CreateTemplateRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -48,16 +43,16 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemplateByKey({
-        key,
+    public static getTemplateById({
+        id,
     }: {
-        key: string,
-    }): CancelablePromise<TemplateModel> {
+        id: string,
+    }): CancelablePromise<TemplateResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/template/{key}',
+            url: '/umbraco/management/api/v1/template/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 404: `Not Found`,
@@ -69,16 +64,16 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteTemplateByKey({
-        key,
+    public static deleteTemplateById({
+        id,
     }: {
-        key: string,
+        id: string,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/template/{key}',
+            url: '/umbraco/management/api/v1/template/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             errors: {
                 400: `Bad Request`,
@@ -91,24 +86,42 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static putTemplateByKey({
-        key,
+    public static putTemplateById({
+        id,
         requestBody,
     }: {
-        key: string,
-        requestBody?: TemplateUpdateModel,
+        id: string,
+        requestBody?: UpdateTemplateRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/template/{key}',
+            url: '/umbraco/management/api/v1/template/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTemplateItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<TemplateItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/template/item',
+            query: {
+                'id': id,
             },
         });
     }
@@ -121,7 +134,7 @@ export class TemplateResource {
         requestBody,
     }: {
         requestBody?: TemplateQueryExecuteModel,
-    }): CancelablePromise<TemplateQueryResultModel> {
+    }): CancelablePromise<TemplateQueryResultResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template/query/execute',
@@ -134,7 +147,7 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemplateQuerySettings(): CancelablePromise<TemplateQuerySettingsModel> {
+    public static getTemplateQuerySettings(): CancelablePromise<TemplateQuerySettingsResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/query/settings',
@@ -145,7 +158,7 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemplateScaffold(): CancelablePromise<TemplateScaffoldModel> {
+    public static getTemplateScaffold(): CancelablePromise<TemplateScaffoldResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/scaffold',
@@ -156,23 +169,23 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedEntityTreeItemModel Success
+     * @returns PagedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateChildren({
-        parentKey,
+        parentId,
         skip,
         take = 100,
     }: {
-        parentKey?: string,
+        parentId?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemModel> {
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/children',
             query: {
-                'parentKey': parentKey,
+                'parentId': parentId,
                 'skip': skip,
                 'take': take,
             },
@@ -180,25 +193,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeTemplateItem({
-        key,
-    }: {
-        key?: Array<string>,
-    }): CancelablePromise<Array<(EntityTreeItemModel | ContentTreeItemModel | DocumentBlueprintTreeItemModel | DocumentTreeItemModel | DocumentTypeTreeItemModel | FolderTreeItemModel)>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/template/item',
-            query: {
-                'key': key,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedEntityTreeItemModel Success
+     * @returns PagedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateRoot({
@@ -207,7 +202,7 @@ export class TemplateResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemModel> {
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/root',

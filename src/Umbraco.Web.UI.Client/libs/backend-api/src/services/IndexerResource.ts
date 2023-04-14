@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { IndexModel } from '../models/IndexModel';
+import type { IndexResponseModel } from '../models/IndexResponseModel';
 import type { OkResultModel } from '../models/OkResultModel';
-import type { PagedIndexModel } from '../models/PagedIndexModel';
+import type { PagedIndexResponseModel } from '../models/PagedIndexResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -12,7 +12,7 @@ import { request as __request } from '../core/request';
 export class IndexerResource {
 
     /**
-     * @returns PagedIndexModel Success
+     * @returns PagedIndexResponseModel Success
      * @throws ApiError
      */
     public static getIndexer({
@@ -21,7 +21,7 @@ export class IndexerResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedIndexModel> {
+    }): CancelablePromise<PagedIndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer',
@@ -40,7 +40,7 @@ export class IndexerResource {
         indexName,
     }: {
         indexName: string,
-    }): CancelablePromise<IndexModel> {
+    }): CancelablePromise<IndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer/{indexName}',

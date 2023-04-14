@@ -2,7 +2,6 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../core/modal';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
 import {
 	UmbCurrentUserHistoryStore,
@@ -19,11 +18,11 @@ import {
 	UmbAppLanguageContext,
 } from './settings/languages/app-language-select/app-language.context';
 import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
-import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
-import { UmbLitElement } from '@umbraco-cms/element';
-
-import '@umbraco-cms/router';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // Domains
 import './settings';
@@ -51,14 +50,18 @@ export class UmbBackofficeElement extends UmbLitElement {
 				font-size: 14px;
 				box-sizing: border-box;
 			}
+			umb-backoffice-modal-container {
+				z-index: 1000;
+			}
 		`,
 	];
 
 	constructor() {
 		super();
 
-		// TODO: find a way this is possible outside this element.
-		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext());
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
 		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
 		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));

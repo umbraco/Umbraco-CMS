@@ -1,12 +1,12 @@
 import { html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { IRoute, IRoutingInfo, path } from 'router-slot';
 
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbLitElement {
@@ -27,7 +27,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		{
 			path: `/index/:indexerName`,
 			component: () => import('./views/section-view-examine-indexers'),
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				const element = component as UmbDashboardExamineIndexElement;
 				element.indexName = info.match.params.indexerName;
 			},
@@ -35,7 +35,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		{
 			path: `/searcher/:searcherName`,
 			component: () => import('./views/section-view-examine-searchers'),
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (component, info) => {
 				const element = component as UmbDashboardExamineSearcherElement;
 				element.searcherName = info.match.params.searcherName;
 			},
@@ -51,7 +51,6 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 
 	@state()
 	private _activePath = '';
-
 
 	render() {
 		return html` ${this._routerPath && this._activePath !== ''

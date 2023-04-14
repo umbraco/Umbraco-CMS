@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbExecutedEvent } from '@umbraco-cms/events';
+import { customElement, state } from 'lit/decorators.js';
+import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
@@ -31,14 +31,31 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		`,
 	];
 
-	@property({ type: String })
-	public unique?: string;
-
-	@property({ type: String, attribute: 'entity-type' })
-	public entityType?: string;
-
 	@state()
 	private _actionMenuIsOpen = false;
+
+	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
+
+	@state()
+	_entityId?: string;
+
+	@state()
+	_entityType?: string;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+			this._workspaceContext = context;
+			this._observeInfo();
+		});
+	}
+
+	private _observeInfo() {
+		if (!this._workspaceContext) return;
+		this._entityId = this._workspaceContext.getEntityId();
+		this._entityType = this._workspaceContext.getEntityType();
+	}
 
 	#close() {
 		this._actionMenuIsOpen = false;
@@ -58,18 +75,20 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	}
 
 	#renderActionsMenu() {
-		return html`
+		return this._entityId
+			? html`
 			<uui-popover  id="action-menu-popover" .open=${this._actionMenuIsOpen} @close=${this.#close}>
 				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
 				<div id="action-menu-dropdown" slot="popover">
 					<uui-scroll-container>
-						<umb-entity-action-list @executed=${this.#onActionExecuted} entity-type=${ifDefined(
-			this.entityType
-		)} unique=${ifDefined(this.unique)}></umb-entity-action-list>
+						<umb-entity-action-list @executed=${this.#onActionExecuted} entity-type=${this._entityType as string} unique=${
+					this._entityId
+			  }></umb-entity-action-list>
 					</uui-scroll-container>
 				</div>
 			</uui-popover>
-			</div>`;
+			</div>`
+			: '';
 	}
 }
 

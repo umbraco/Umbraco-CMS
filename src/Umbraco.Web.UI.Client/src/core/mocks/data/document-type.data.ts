@@ -1,16 +1,16 @@
 import { UmbEntityData } from './entity.data';
 import { createDocumentTypeTreeItem } from './utils';
 import {
-	DocumentTypeTreeItemModel,
-	DocumentTypeModel,
+	DocumentTypeTreeItemResponseModel,
+	DocumentTypeResponseModel,
 	ContentTypeCompositionTypeModel,
-} from '@umbraco-cms/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<DocumentTypeModel> = [
+export const data: Array<DocumentTypeResponseModel> = [
 	{
-		allowedTemplateKeys: [],
-		defaultTemplateKey: null,
-		key: 'all-property-editors-document-type-key',
+		allowedTemplateIds: [],
+		defaultTemplateId: null,
+		id: 'all-property-editors-document-type-id',
 		alias: 'blogPost',
 		name: 'Blog Post',
 		description: null,
@@ -21,12 +21,12 @@ export const data: Array<DocumentTypeModel> = [
 		isElement: false,
 		properties: [
 			{
-				key: '2',
-				containerKey: 'all-properties-group-key',
+				id: '2',
+				containerId: 'all-properties-group-id',
 				alias: 'colorPicker',
 				name: 'Color Picker',
 				description: '',
-				dataTypeKey: 'dt-colorPicker',
+				dataTypeId: 'dt-colorPicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -40,12 +40,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '3',
-				containerKey: 'all-properties-group-key',
+				id: '3',
+				containerId: 'all-properties-group-key',
 				alias: 'contentPicker',
 				name: 'Content Picker',
 				description: '',
-				dataTypeKey: 'dt-contentPicker',
+				dataTypeId: 'dt-contentPicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -59,12 +59,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '4',
-				containerKey: 'all-properties-group-key',
+				id: '4',
+				containerId: 'all-properties-group-key',
 				alias: 'eyeDropper',
 				name: 'Eye Dropper',
 				description: '',
-				dataTypeKey: 'dt-eyeDropper',
+				dataTypeId: 'dt-eyeDropper',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -78,13 +78,13 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '5',
-				containerKey: 'all-properties-group-key',
+				id: '5',
+				containerId: 'all-properties-group-key',
 				alias: 'multiUrlPicker',
 				name: 'Multi URL Picker',
 				description: '',
-				dataTypeKey: 'dt-multiUrlPicker',
-				variesByCulture: false,
+				dataTypeId: 'dt-multiUrlPicker',
+				variesByCulture: true,
 				variesBySegment: false,
 				validation: {
 					mandatory: true,
@@ -97,12 +97,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '6',
-				containerKey: 'all-properties-group-key',
+				id: '6',
+				containerId: 'all-properties-group-key',
 				alias: 'multiNodeTreePicker',
 				name: 'Multi Node Tree Picker',
 				description: '',
-				dataTypeKey: 'dt-multiNodeTreePicker',
+				dataTypeId: 'dt-multiNodeTreePicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -116,12 +116,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '7',
-				containerKey: 'all-properties-group-key',
+				id: '7',
+				containerId: 'all-properties-group-key',
 				alias: 'datePicker',
 				name: 'Date Picker',
 				description: '',
-				dataTypeKey: 'dt-datePicker',
+				dataTypeId: 'dt-datePicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -135,12 +135,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '8',
-				containerKey: 'all-properties-group-key',
+				id: '8',
+				containerId: 'all-properties-group-key',
 				alias: 'email',
 				name: 'Email',
 				description: '',
-				dataTypeKey: 'dt-email',
+				dataTypeId: 'dt-email',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -154,12 +154,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '9',
-				containerKey: 'all-properties-group-key',
+				id: '9',
+				containerId: 'all-properties-group-key',
 				alias: 'textBox',
 				name: 'Text Box',
 				description: '',
-				dataTypeKey: 'dt-textBox',
+				dataTypeId: 'dt-textBox',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -173,12 +173,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '19',
-				containerKey: 'all-properties-group-key',
+				id: '19',
+				containerId: 'all-properties-group-key',
 				alias: 'dropdown',
 				name: 'Dropdown',
 				description: '',
-				dataTypeKey: 'dt-dropdown',
+				dataTypeId: 'dt-dropdown',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -192,12 +192,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '11',
-				containerKey: 'all-properties-group-key',
+				id: '11',
+				containerId: 'all-properties-group-key',
 				alias: 'textArea',
 				name: 'Text Area',
 				description: '',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -211,12 +211,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '12',
-				containerKey: 'all-properties-group-key',
+				id: '12',
+				containerId: 'all-properties-group-key',
 				alias: 'slider',
 				name: 'Slider',
 				description: '',
-				dataTypeKey: 'dt-slider',
+				dataTypeId: 'dt-slider',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -230,12 +230,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '13',
-				containerKey: 'all-properties-group-key',
+				id: '13',
+				containerId: 'all-properties-group-key',
 				alias: 'toggle',
 				name: 'Toggle',
 				description: '',
-				dataTypeKey: 'dt-toggle',
+				dataTypeId: 'dt-toggle',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -249,12 +249,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '14',
-				containerKey: 'all-properties-group-key',
+				id: '14',
+				containerId: 'all-properties-group-key',
 				alias: 'tags',
 				name: 'Tags',
 				description: '',
-				dataTypeKey: 'dt-tags',
+				dataTypeId: 'dt-tags',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -268,12 +268,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '15',
-				containerKey: 'all-properties-group-key',
+				id: '15',
+				containerId: 'all-properties-group-key',
 				alias: 'markdownEditor',
 				name: 'MarkdownEditor',
 				description: '',
-				dataTypeKey: 'dt-markdownEditor',
+				dataTypeId: 'dt-markdownEditor',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -287,12 +287,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '16',
-				containerKey: 'all-properties-group-key',
+				id: '16',
+				containerId: 'all-properties-group-key',
 				alias: 'radioButtonList',
 				name: 'Radio Button List',
 				description: '',
-				dataTypeKey: 'dt-radioButtonList',
+				dataTypeId: 'dt-radioButtonList',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -306,12 +306,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '17',
-				containerKey: 'all-properties-group-key',
+				id: '17',
+				containerId: 'all-properties-group-key',
 				alias: 'checkboxList',
 				name: 'Checkbox List',
 				description: '',
-				dataTypeKey: 'dt-checkboxList',
+				dataTypeId: 'dt-checkboxList',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -325,12 +325,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '18',
-				containerKey: 'all-properties-group-key',
+				id: '18',
+				containerId: 'all-properties-group-key',
 				alias: 'blockList',
 				name: 'Block List',
 				description: '',
-				dataTypeKey: 'dt-blockList',
+				dataTypeId: 'dt-blockList',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -344,12 +344,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '19',
-				containerKey: 'all-properties-group-key',
+				id: '19',
+				containerId: 'all-properties-group-key',
 				alias: 'mediaPicker',
 				name: 'Media Picker',
 				description: '',
-				dataTypeKey: 'dt-mediaPicker',
+				dataTypeId: 'dt-mediaPicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -363,12 +363,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '20',
-				containerKey: 'all-properties-group-key',
+				id: '20',
+				containerId: 'all-properties-group-key',
 				alias: 'imageCropper',
 				name: 'Image Cropper',
 				description: '',
-				dataTypeKey: 'dt-imageCropper',
+				dataTypeId: 'dt-imageCropper',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -382,12 +382,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '21',
-				containerKey: 'all-properties-group-key',
+				id: '21',
+				containerId: 'all-properties-group-key',
 				alias: 'uploadField',
 				name: 'Upload Field',
 				description: '',
-				dataTypeKey: 'dt-uploadField',
+				dataTypeId: 'dt-uploadField',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -401,12 +401,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '22',
-				containerKey: 'all-properties-group-key',
+				id: '22',
+				containerId: 'all-properties-group-key',
 				alias: 'blockGrid',
 				name: 'Block Grid',
 				description: '',
-				dataTypeKey: 'dt-blockGrid',
+				dataTypeId: 'dt-blockGrid',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -420,12 +420,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '23',
-				containerKey: 'all-properties-group-key',
+				id: '23',
+				containerId: 'all-properties-group-key',
 				alias: 'blockGrid',
 				name: 'Icon Picker',
 				description: '',
-				dataTypeKey: 'dt-iconPicker',
+				dataTypeId: 'dt-iconPicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -439,12 +439,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '24',
-				containerKey: 'all-properties-group-key',
+				id: '24',
+				containerId: 'all-properties-group-key',
 				alias: 'numberRange',
 				name: 'Number Range',
 				description: '',
-				dataTypeKey: 'dt-numberRange',
+				dataTypeId: 'dt-numberRange',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -458,12 +458,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '25',
-				containerKey: 'all-properties-group-key',
+				id: '25',
+				containerId: 'all-properties-group-key',
 				alias: 'orderDirection',
 				name: 'Order Direction',
 				description: '',
-				dataTypeKey: 'dt-orderDirection',
+				dataTypeId: 'dt-orderDirection',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -477,12 +477,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '26',
-				containerKey: 'all-properties-group-key',
+				id: '26',
+				containerId: 'all-properties-group-key',
 				alias: 'overlaySize',
 				name: 'Overlay Size',
 				description: '',
-				dataTypeKey: 'dt-overlaySize',
+				dataTypeId: 'dt-overlaySize',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -496,12 +496,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '27',
-				containerKey: 'all-properties-group-key',
+				id: '27',
+				containerId: 'all-properties-group-key',
 				alias: 'label',
 				name: 'Label',
 				description: '',
-				dataTypeKey: 'dt-label',
+				dataTypeId: 'dt-label',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -515,12 +515,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '28',
-				containerKey: 'all-properties-group-key',
+				id: '28',
+				containerId: 'all-properties-group-key',
 				alias: 'integer',
 				name: 'Integer',
 				description: '',
-				dataTypeKey: 'dt-integer',
+				dataTypeId: 'dt-integer',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -534,12 +534,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '29',
-				containerKey: 'all-properties-group-key',
+				id: '29',
+				containerId: 'all-properties-group-key',
 				alias: 'decimal',
 				name: 'Decimal',
 				description: '',
-				dataTypeKey: 'dt-decimal',
+				dataTypeId: 'dt-decimal',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -553,12 +553,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '30',
-				containerKey: 'all-properties-group-key',
+				id: '30',
+				containerId: 'all-properties-group-key',
 				alias: 'memberPicker',
 				name: 'Member Picker',
 				description: '',
-				dataTypeKey: 'dt-memberPicker',
+				dataTypeId: 'dt-memberPicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -572,12 +572,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '31',
-				containerKey: 'all-properties-group-key',
+				id: '31',
+				containerId: 'all-properties-group-key',
 				alias: 'memberGroupPicker',
 				name: 'Member Group Picker',
 				description: '',
-				dataTypeKey: 'dt-memberGroupPicker',
+				dataTypeId: 'dt-memberGroupPicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -591,12 +591,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '32',
-				containerKey: 'all-properties-group-key',
+				id: '32',
+				containerId: 'all-properties-group-key',
 				alias: 'userPicker',
 				name: 'User Picker',
 				description: '',
-				dataTypeKey: 'dt-userPicker',
+				dataTypeId: 'dt-userPicker',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -612,8 +612,8 @@ export const data: Array<DocumentTypeModel> = [
 		],
 		containers: [
 			{
-				key: 'all-properties-group-key',
-				parentKey: null,
+				id: 'all-properties-group-key',
+				parentId: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
@@ -629,9 +629,9 @@ export const data: Array<DocumentTypeModel> = [
 	},
 
 	{
-		allowedTemplateKeys: [],
-		defaultTemplateKey: null,
-		key: '29643452-cff9-47f2-98cd-7de4b6807681',
+		allowedTemplateIds: [],
+		defaultTemplateId: null,
+		id: '29643452-cff9-47f2-98cd-7de4b6807681',
 		alias: 'blogPost',
 		name: 'Blog Post',
 		description: null,
@@ -642,12 +642,12 @@ export const data: Array<DocumentTypeModel> = [
 		isElement: false,
 		properties: [
 			{
-				key: '5b4ca208-134e-4865-b423-06e5e97adf3c',
-				containerKey: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				id: '5b4ca208-134e-4865-b423-06e5e97adf3c',
+				containerId: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
 				alias: 'blogPostText',
 				name: 'Blog Post Text',
 				description: null,
-				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -661,12 +661,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: 'ef7096b6-7c9e-49ba-8d49-395111e65ea2',
-				containerKey: '227d6ed2-e118-4494-b8f2-deb69854a56a',
+				id: 'ef7096b6-7c9e-49ba-8d49-395111e65ea2',
+				containerId: '227d6ed2-e118-4494-b8f2-deb69854a56a',
 				alias: 'blogTextStringUnderMasterTab',
 				name: 'Blog text string under master tab',
 				description: null,
-				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: true,
 				variesBySegment: false,
 				validation: {
@@ -680,12 +680,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: 'e010c429-b298-499a-9bfe-79687af8972a',
-				containerKey: '22177c49-ecba-4f2e-b7fa-3f2c04d02cfb',
+				id: 'e010c429-b298-499a-9bfe-79687af8972a',
+				containerId: '22177c49-ecba-4f2e-b7fa-3f2c04d02cfb',
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				name: 'Blog text string under group under master tab',
 				description: null,
-				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: true,
 				variesBySegment: false,
 				validation: {
@@ -699,12 +699,12 @@ export const data: Array<DocumentTypeModel> = [
 				},
 			},
 			{
-				key: '1a22749a-c7d2-44bb-b36b-c977c2ced6ef',
-				containerKey: '2c943997-b685-432d-a6c5-601d8e7a298a',
+				id: '1a22749a-c7d2-44bb-b36b-c977c2ced6ef',
+				containerId: '2c943997-b685-432d-a6c5-601d8e7a298a',
 				alias: 'localBlogTabString',
 				name: 'Local Blog Tab String',
 				description: null,
-				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -717,32 +717,51 @@ export const data: Array<DocumentTypeModel> = [
 					labelOnTop: true,
 				},
 			},
+			{
+				id: '22',
+				containerId: '2c943997-b685-432d-a6c5-601d8e7a298a',
+				alias: 'blockGrid',
+				name: 'Block Grid',
+				description: '',
+				dataTypeId: 'dt-blockGrid',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
-				key: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
-				parentKey: null,
+				id: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
+				parentId: null,
 				name: 'Content-group',
 				type: 'Group',
 				sortOrder: 0,
 			},
 			{
-				key: '227d6ed2-e118-4494-b8f2-deb69854a56a',
-				parentKey: null,
+				id: '227d6ed2-e118-4494-b8f2-deb69854a56a',
+				parentId: null,
 				name: 'Master Tab',
 				type: 'Tab',
 				sortOrder: 0,
 			},
 			{
-				key: '22177c49-ecba-4f2e-b7fa-3f2c04d02cfb',
-				parentKey: '227d6ed2-e118-4494-b8f2-deb69854a56a',
+				id: '22177c49-ecba-4f2e-b7fa-3f2c04d02cfb',
+				parentId: '227d6ed2-e118-4494-b8f2-deb69854a56a',
 				name: 'Blog Group under master tab',
 				type: 'Group',
 				sortOrder: 0,
 			},
 			{
-				key: '2c943997-b685-432d-a6c5-601d8e7a298a',
-				parentKey: null,
+				id: '2c943997-b685-432d-a6c5-601d8e7a298a',
+				parentId: null,
 				name: 'Local blog tab',
 				type: 'Tab',
 				sortOrder: 1,
@@ -750,17 +769,17 @@ export const data: Array<DocumentTypeModel> = [
 		],
 		allowedContentTypes: [
 			{
-				key: '29643452-cff9-47f2-98cd-7de4b6807681',
+				id: '29643452-cff9-47f2-98cd-7de4b6807681',
 				sortOrder: 0,
 			},
 		],
 		compositions: [
 			{
-				key: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
+				id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
 				compositionType: ContentTypeCompositionTypeModel.INHERITANCE,
 			},
 			{
-				key: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
+				id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
 				compositionType: ContentTypeCompositionTypeModel.COMPOSITION,
 			},
 		],
@@ -771,9 +790,9 @@ export const data: Array<DocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateKeys: ['916cfecc-3295-490c-a16d-c41fa9f72980'],
-		defaultTemplateKey: '916cfecc-3295-490c-a16d-c41fa9f72980',
-		key: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
+		allowedTemplateIds: ['916cfecc-3295-490c-a16d-c41fa9f72980'],
+		defaultTemplateId: '916cfecc-3295-490c-a16d-c41fa9f72980',
+		id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
 		alias: 'masterPage',
 		name: 'Master Page',
 		description: null,
@@ -784,12 +803,12 @@ export const data: Array<DocumentTypeModel> = [
 		isElement: false,
 		properties: [
 			{
-				key: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
-				containerKey: '6f281e5a-0242-4649-bd9e-d6bf87f92b41',
+				id: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
+				containerId: '6f281e5a-0242-4649-bd9e-d6bf87f92b41',
 				alias: 'masterText',
 				name: 'Master text',
 				description: null,
-				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -805,8 +824,8 @@ export const data: Array<DocumentTypeModel> = [
 		],
 		containers: [
 			{
-				key: '6f281e5a-0242-4649-bd9e-d6bf87f92b41',
-				parentKey: null,
+				id: '6f281e5a-0242-4649-bd9e-d6bf87f92b41',
+				parentId: null,
 				name: 'Master Tab',
 				type: 'Tab',
 				sortOrder: 0,
@@ -821,9 +840,9 @@ export const data: Array<DocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateKeys: [],
-		defaultTemplateKey: null,
-		key: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
+		allowedTemplateIds: [],
+		defaultTemplateId: null,
+		id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
 		alias: 'baseElementType',
 		name: 'Base Element Type',
 		description: null,
@@ -834,12 +853,12 @@ export const data: Array<DocumentTypeModel> = [
 		isElement: true,
 		properties: [
 			{
-				key: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
-				containerKey: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
+				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
+				containerId: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
 				alias: 'pageTitle',
 				name: 'Page title',
 				description: null,
-				dataTypeKey: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
 				validation: {
@@ -855,8 +874,8 @@ export const data: Array<DocumentTypeModel> = [
 		],
 		containers: [
 			{
-				key: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
-				parentKey: null,
+				id: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
+				parentId: null,
 				name: 'Content-group',
 				type: 'Group',
 				sortOrder: 0,
@@ -870,38 +889,194 @@ export const data: Array<DocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 	},
+	{
+		allowedTemplateIds: [
+			'2bf464b6-3aca-4388-b043-4eb439cc2643',
+			'9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+			'9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
+		],
+		defaultTemplateId: '2bf464b6-3aca-4388-b043-4eb439cc2643',
+		id: 'simple-document-type-key',
+		alias: 'simpleDocumentType',
+		name: 'Simple Document Type',
+		description: null,
+		icon: 'umb:document',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
+				containerId: '341b8521-fd43-4333-ae7a-a10cbbc6f4b0',
+				alias: 'prop1',
+				name: 'Prop 1',
+				description: null,
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				id: '341b8521-fd43-4333-ae7a-a10cbbc6f4b0',
+				parentId: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [
+			{ id: 'simple-document-type-key', sortOrder: 0 },
+			{ id: 'simple-document-type-2-key', sortOrder: 0 },
+		],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
+	{
+		allowedTemplateIds: [],
+		defaultTemplateId: null,
+		id: 'simple-document-type-2-key',
+		alias: 'simpleDocumentType2',
+		name: 'Simple Document Type 2',
+		description: null,
+		icon: 'umb:document',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				id: '82d4b050-b128-42fe-ac8e-d5586e533592',
+				containerId: 'b275052a-1868-4901-bc8c-2b35b78a9ab2',
+				alias: 'prop1',
+				name: 'Prop 1',
+				description: null,
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'beadc69a-d669-4d01-9919-98bafba31e57',
+				containerId: 'b275052a-1868-4901-bc8c-2b35b78a9ab2',
+				alias: 'prop2',
+				name: 'Prop 2',
+				description: null,
+				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				id: 'b275052a-1868-4901-bc8c-2b35b78a9ab2',
+				parentId: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [{ id: 'simple-document-type-key', sortOrder: 0 }],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
 ];
 
-export const treeData: Array<DocumentTypeTreeItemModel> = [
+export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 	{
 		$type: 'DocumentTypeTreeItemViewModel',
 		name: 'All property editors document type',
 		type: 'document-type',
 		hasChildren: false,
-		key: 'all-property-editors-document-type-key',
+		id: 'all-property-editors-document-type-id',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		icon: '',
 	},
 	{
 		$type: 'DocumentTypeTreeItemViewModel',
-		name: 'Document Type 1',
+		name: 'Page Document Type',
 		type: 'document-type',
 		hasChildren: false,
-		key: 'd81c7957-153c-4b5a-aa6f-b434a4964624',
+		id: '29643452-cff9-47f2-98cd-7de4b6807681',
 		isContainer: false,
-		parentKey: null,
-		icon: '',
+		parentId: null,
+		icon: 'umb:document',
 	},
 	{
 		$type: 'DocumentTypeTreeItemViewModel',
-		name: 'Document Type 2',
+		name: 'Page Document Type Compositional',
 		type: 'document-type',
 		hasChildren: false,
-		key: 'a99e4018-3ffc-486b-aa76-eecea9593d17',
+		id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
 		isContainer: false,
-		parentKey: null,
-		icon: '',
+		parentId: null,
+		icon: 'umb:document',
+	},
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'Page Document Type Inherited',
+		type: 'document-type',
+		hasChildren: false,
+		id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
+		isContainer: false,
+		parentId: null,
+		icon: 'umb:document',
+	},
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'Simple Document Type',
+		type: 'document-type',
+		hasChildren: false,
+		id: 'simple-document-type-key',
+		isContainer: false,
+		parentId: null,
+		icon: 'umb:document',
+	},
+	{
+		$type: 'DocumentTypeTreeItemViewModel',
+		name: 'Simple Document Type 2',
+		type: 'document-type',
+		hasChildren: false,
+		id: 'simple-document-type-2-key',
+		isContainer: false,
+		parentId: null,
+		icon: 'umb:document',
 	},
 ];
 
@@ -909,25 +1084,32 @@ export const treeData: Array<DocumentTypeTreeItemModel> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDocumentTypeData extends UmbEntityData<DocumentTypeModel> {
+class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 	private treeData = treeData;
 
 	constructor() {
 		super(data);
 	}
 
-	getTreeRoot(): Array<DocumentTypeTreeItemModel> {
-		const rootItems = this.treeData.filter((item) => item.parentKey === null);
+	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
+		const rootItems = this.treeData.filter((item) => item.parentId === null);
 		return rootItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
-	getTreeItemChildren(key: string): Array<DocumentTypeTreeItemModel> {
-		const childItems = this.treeData.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): Array<DocumentTypeTreeItemResponseModel> {
+		const childItems = this.treeData.filter((item) => item.parentId === id);
 		return childItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<DocumentTypeTreeItemModel> {
-		const items = this.treeData.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
+		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createDocumentTypeTreeItem(item));
+	}
+
+	getAllowedTypesOf(id: string): Array<DocumentTypeTreeItemResponseModel> {
+		const documentType = this.getById(id);
+		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.id) ?? [];
+		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
 		return items.map((item) => createDocumentTypeTreeItem(item));
 	}
 }

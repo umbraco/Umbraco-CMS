@@ -1,5 +1,5 @@
 import { manifest as startNode } from './config/start-node/manifests';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/models';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 
 const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',

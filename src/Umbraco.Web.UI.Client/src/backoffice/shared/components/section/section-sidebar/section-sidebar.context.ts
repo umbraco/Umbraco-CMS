@@ -1,11 +1,10 @@
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { StringState } from '@umbraco-cms/observable-api';
-import { BasicState } from 'libs/observable-api/basic-state';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { StringState, BooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbSectionSidebarContext {
-	#host: UmbControllerHostInterface;
-	#contextMenuIsOpen = new BasicState<boolean>(false);
+	#host: UmbControllerHostElement;
+	#contextMenuIsOpen = new BooleanState(false);
 	contextMenuIsOpen = this.#contextMenuIsOpen.asObservable();
 
 	#entityType = new StringState<undefined>(undefined);
@@ -17,17 +16,18 @@ export class UmbSectionSidebarContext {
 	#headline = new StringState<undefined>(undefined);
 	headline = this.#headline.asObservable();
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
-	toggleContextMenu(entityType: string, unique: string, headline: string) {
-		this.#unique.getValue() === unique ? this.closeContextMenu() : this.openContextMenu(entityType, unique, headline);
+	toggleContextMenu(entityType: string, unique: string | undefined, headline: string) {
+		console.log('open for ', entityType, unique, headline);
+		this.openContextMenu(entityType, unique, headline);
 	}
 
 	// TODO: we wont get notified about tree item name changes because we don't have a subscription
 	// we need to figure out how we best can handle this when we only know the entity and unique id
-	openContextMenu(entityType: string, unique: string, headline: string) {
+	openContextMenu(entityType: string, unique: string | undefined, headline: string) {
 		this.#entityType.next(entityType);
 		this.#unique.next(unique);
 		this.#headline.next(headline);

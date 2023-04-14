@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ModelsBuilderModel } from '../models/ModelsBuilderModel';
-import type { OutOfDateStatusModel } from '../models/OutOfDateStatusModel';
+import type { ModelsBuilderResponseModel } from '../models/ModelsBuilderResponseModel';
+import type { OutOfDateStatusResponseModel } from '../models/OutOfDateStatusResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -28,7 +28,7 @@ export class ModelsBuilderResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getModelsBuilderDashboard(): CancelablePromise<ModelsBuilderModel> {
+    public static getModelsBuilderDashboard(): CancelablePromise<ModelsBuilderResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/dashboard',
@@ -39,7 +39,7 @@ export class ModelsBuilderResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getModelsBuilderStatus(): CancelablePromise<OutOfDateStatusModel> {
+    public static getModelsBuilderStatus(): CancelablePromise<OutOfDateStatusResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/status',

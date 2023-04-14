@@ -1,9 +1,9 @@
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbMediaCopyEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
-	constructor(host: UmbControllerHostInterface, repositoryAlias: string, selection: Array<string>) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
 		super(host, repositoryAlias, selection);
 	}
 

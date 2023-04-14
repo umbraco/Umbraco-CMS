@@ -1,20 +1,20 @@
 import { rest } from 'msw';
 import { v4 as uuidv4 } from 'uuid';
 
-import { umbracoPath } from '@umbraco-cms/utils';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
-	PackageCreateModel,
-	PackageDefinitionModel,
-	PagedPackageDefinitionModel,
-	PagedPackageMigrationStatusModel,
-} from '@umbraco-cms/backend-api';
+	PackageMigrationStatusResponseModel,
+	PackageDefinitionResponseModel,
+	PagedPackageDefinitionResponseModel,
+	PagedPackageMigrationStatusResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/package/migration-status'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedPackageMigrationStatusModel>({
+			ctx.json<PagedPackageMigrationStatusResponseModel>({
 				total: 3,
 				items: [
 					{
@@ -44,7 +44,7 @@ export const handlers = [
 		// read all
 		return res(
 			ctx.status(200),
-			ctx.json<PagedPackageDefinitionModel>({
+			ctx.json<PagedPackageDefinitionResponseModel>({
 				total: packageArray.length,
 				items: packageArray,
 			})
@@ -53,54 +53,54 @@ export const handlers = [
 
 	rest.post(umbracoPath('/package/created'), async (_req, res, ctx) => {
 		//save
-		const data: PackageCreateModel = await _req.json();
-		const newPackage: PackageDefinitionModel = { ...data, key: uuidv4() };
+		const data: PackageMigrationStatusResponseModel = await _req.json();
+		const newPackage: PackageDefinitionResponseModel = { ...data, id: uuidv4() };
 		packageArray.push(newPackage);
-		return res(ctx.status(200), ctx.json<PackageDefinitionModel>(newPackage));
+		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(newPackage));
 	}),
 
-	rest.get(umbracoPath('/package/created/:key'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/package/created/:id'), (_req, res, ctx) => {
 		//read 1
-		const key = _req.params.key as string;
-		if (!key) return res(ctx.status(404));
-		const found = packageArray.find((p) => p.key == key);
+		const id = _req.params.id as string;
+		if (!id) return res(ctx.status(404));
+		const found = packageArray.find((p) => p.id == id);
 		if (!found) return res(ctx.status(404));
-		return res(ctx.status(200), ctx.json<PackageDefinitionModel>(found));
+		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(found));
 	}),
 
-	rest.put(umbracoPath('/package/created/:key'), async (_req, res, ctx) => {
+	rest.put(umbracoPath('/package/created/:id'), async (_req, res, ctx) => {
 		//update
-		const data: PackageDefinitionModel = await _req.json();
-		if (!data.key) return;
-		const index = packageArray.findIndex((x) => x.key === data.key);
+		const data: PackageDefinitionResponseModel = await _req.json();
+		if (!data.id) return;
+		const index = packageArray.findIndex((x) => x.id === data.id);
 		packageArray[index] = data;
 		return res(ctx.status(200));
 	}),
 
-	rest.delete(umbracoPath('/package/created/:key'), (_req, res, ctx) => {
+	rest.delete(umbracoPath('/package/created/:id'), (_req, res, ctx) => {
 		//delete
-		const key = _req.params.key as string;
-		if (!key) return res(ctx.status(404));
-		const index = packageArray.findIndex((p) => p.key == key);
+		const id = _req.params.id as string;
+		if (!id) return res(ctx.status(404));
+		const index = packageArray.findIndex((p) => p.id == id);
 		if (index <= -1) return res(ctx.status(404));
 		packageArray.splice(index, 1);
 		return res(ctx.status(200));
 	}),
 
-	rest.get(umbracoPath('/package/created/:key/download'), (_req, res, ctx) => {
+	rest.get(umbracoPath('/package/created/:id/download'), (_req, res, ctx) => {
 		//download
 		return res(ctx.status(200));
 	}),
 ];
 
-const packageArray: PackageDefinitionModel[] = [
+const packageArray: PackageDefinitionResponseModel[] = [
 	{
-		key: '2a0181ec-244b-4068-a1d7-2f95ed7e6da6',
+		id: '2a0181ec-244b-4068-a1d7-2f95ed7e6da6',
 		packagePath: undefined,
 		name: 'My Package',
 		//contentNodeId?: string | null;
 		//contentLoadChildNodes?: boolean;
-		//mediaKeys?: Array<string>;
+		//mediaIds?: Array<string>;
 		//mediaLoadChildNodes?: boolean;
 		//documentTypes?: Array<string>;
 		//mediaTypes?: Array<string>;
@@ -113,13 +113,13 @@ const packageArray: PackageDefinitionModel[] = [
 		//dictionaryItems?: Array<string>;
 	},
 	{
-		key: '2a0181ec-244b-4068-a1d7-2f95ed7e6da7',
+		id: '2a0181ec-244b-4068-a1d7-2f95ed7e6da7',
 		packagePath: undefined,
 		name: 'My Second Package',
 	},
 
 	{
-		key: '2a0181ec-244b-4068-a1d7-2f95ed7e6da8',
+		id: '2a0181ec-244b-4068-a1d7-2f95ed7e6da8',
 		packagePath: undefined,
 		name: 'My Third Package',
 	},

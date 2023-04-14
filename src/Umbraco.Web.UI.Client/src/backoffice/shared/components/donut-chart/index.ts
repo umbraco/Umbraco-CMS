@@ -1,2 +1,2 @@
-export * from './donut-chart';
-export * from './donut-slice';
+export * from './donut-chart.element';
+export * from './donut-slice.element';

@@ -2,12 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbLanguageRepository } from '../repository/language.repository';
 import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LanguageModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {
@@ -43,10 +43,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	];
 
 	@state()
-	private _languages: Array<LanguageModel> = [];
+	private _languages: Array<LanguageResponseModel> = [];
 
 	@state()
-	private _appLanguage?: LanguageModel;
+	private _appLanguage?: LanguageResponseModel;
 
 	@state()
 	private _isOpen = false;

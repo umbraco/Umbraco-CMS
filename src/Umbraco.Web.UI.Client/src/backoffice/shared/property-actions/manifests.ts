@@ -1,4 +1,4 @@
-import type { ManifestPropertyAction } from '@umbraco-cms/models';
+import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests: Array<ManifestPropertyAction> = [
 	{
@@ -6,7 +6,7 @@ export const manifests: Array<ManifestPropertyAction> = [
 		alias: 'Umb.PropertyAction.Copy',
 		name: 'Copy Property Action',
 		loader: () => import('./copy/property-action-copy.element'),
-		meta: {
+		conditions: {
 			propertyEditors: ['Umb.PropertyEditorUI.TextBox'],
 		},
 	},
@@ -15,7 +15,7 @@ export const manifests: Array<ManifestPropertyAction> = [
 		alias: 'Umb.PropertyAction.Clear',
 		name: 'Clear Property Action',
 		loader: () => import('./clear/property-action-clear.element'),
-		meta: {
+		conditions: {
 			propertyEditors: ['Umb.PropertyEditorUI.TextBox'],
 		},
 	},

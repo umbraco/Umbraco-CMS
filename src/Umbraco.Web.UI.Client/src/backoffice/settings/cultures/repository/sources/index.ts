@@ -1,5 +1,5 @@
-import { PagedCultureModel } from '@umbraco-cms/backend-api';
-import type { DataSourceResponse } from '@umbraco-cms/models';
+import { PagedCultureReponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 // TODO: This is a temporary solution until we have a proper paging interface
 type paging = {
@@ -8,5 +8,5 @@ type paging = {
 };
 
 export interface UmbCultureDataSource {
-	getCollection(paging: paging): Promise<DataSourceResponse<PagedCultureModel>>;
+	getCollection(paging: paging): Promise<DataSourceResponse<PagedCultureReponseModel>>;
 }

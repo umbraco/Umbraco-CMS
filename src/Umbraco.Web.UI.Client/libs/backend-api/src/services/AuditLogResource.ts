@@ -43,14 +43,14 @@ export class AuditLogResource {
      * @returns PagedAuditLogResponseModel Success
      * @throws ApiError
      */
-    public static getAuditLogByKey({
-        key,
+    public static getAuditLogById({
+        id,
         orderDirection,
         sinceDate,
         skip,
         take = 100,
     }: {
-        key: string,
+        id: string,
         orderDirection?: DirectionModel,
         sinceDate?: string,
         skip?: number,
@@ -58,9 +58,9 @@ export class AuditLogResource {
     }): CancelablePromise<PagedAuditLogResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/audit-log/{key}',
+            url: '/umbraco/management/api/v1/audit-log/{id}',
             path: {
-                'key': key,
+                'id': id,
             },
             query: {
                 'orderDirection': orderDirection,

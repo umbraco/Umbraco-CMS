@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { UmbInstallerInstallingElement } from './installer-installing.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 // TODO: Write tests
 describe('UmbInstallerInstallingElement', () => {

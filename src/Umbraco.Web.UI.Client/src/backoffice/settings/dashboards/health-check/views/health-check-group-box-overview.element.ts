@@ -1,19 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ensureSlash, path } from 'router-slot';
 import { UmbHealthCheckContext } from '../health-check.context';
 import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context';
-import type { ManifestHealthCheck } from '@umbraco-cms/models';
-import {
-	HealthCheckGroupWithResultModel,
-	HealthCheckWithResultModel,
-	StatusResultTypeModel,
-} from '@umbraco-cms/backend-api';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
+import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
+import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-health-check-group-box-overview')
 export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
@@ -68,7 +64,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	private _tagResults?: any = [];
 
 	@state()
-	private _keyResults?: HealthCheckGroupWithResultModel;
+	private _keyResults?: HealthCheckGroupWithResultResponseModel;
 
 	constructor() {
 		super();

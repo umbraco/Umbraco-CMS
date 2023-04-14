@@ -1,5 +1,5 @@
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { DeepState } from '@umbraco-cms/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { DeepState } from '@umbraco-cms/backoffice/observable-api';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 

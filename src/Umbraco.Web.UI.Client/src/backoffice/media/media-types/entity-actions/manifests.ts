@@ -1,8 +1,8 @@
 import { MEDIA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbCreateMediaTypeEntityAction } from './create.action';
 import UmbReloadMediaTypeEntityAction from './reload.action';
-import { UmbDeleteEntityAction, UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/entity-action';
-import type { ManifestEntityAction } from '@umbraco-cms/models';
+import { UmbDeleteEntityAction, UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
 
 const entityType = 'media-type';
 const repositoryAlias = MEDIA_TYPE_REPOSITORY_ALIAS;
@@ -14,11 +14,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Create Media Type Entity Action',
 		weight: 500,
 		meta: {
-			entityType,
 			icon: 'umb:add',
 			label: 'Create',
 			repositoryAlias,
 			api: UmbCreateMediaTypeEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -27,11 +29,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Move Media Type Entity Action',
 		weight: 400,
 		meta: {
-			entityType,
 			icon: 'umb:enter',
 			label: 'Move',
 			repositoryAlias,
 			api: UmbMoveEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -40,11 +44,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Copy Media Type Entity Action',
 		weight: 300,
 		meta: {
-			entityType,
 			icon: 'umb:documents',
 			label: 'Copy',
 			repositoryAlias,
 			api: UmbCopyEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -53,11 +59,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Delete Media Type Entity Action',
 		weight: 200,
 		meta: {
-			entityType,
 			icon: 'umb:trash',
 			label: 'Delete',
 			repositoryAlias,
 			api: UmbDeleteEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 	{
@@ -66,11 +74,13 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Reload Media Type Entity Action',
 		weight: 100,
 		meta: {
-			entityType,
 			icon: 'umb:refresh',
 			label: 'Reload',
 			repositoryAlias,
 			api: UmbReloadMediaTypeEntityAction,
+		},
+		conditions: {
+			entityType,
 		},
 	},
 ];

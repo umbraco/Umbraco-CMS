@@ -1,8 +1,9 @@
 import type { Observable } from 'rxjs';
-import { UmbTreeRepository } from '@umbraco-cms/repository';
-import type { ManifestTree } from '@umbraco-cms/models';
-import { DeepState } from '@umbraco-cms/observable-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
+import { DeepState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 export interface UmbTreeContext {
 	tree: ManifestTree;
@@ -10,11 +11,11 @@ export interface UmbTreeContext {
 	readonly selection: Observable<Array<string>>;
 	setSelectable(value: boolean): void;
 	setSelection(value: Array<string>): void;
-	select(key: string): void;
+	select(id: string): void;
 }
 
 export class UmbTreeContextBase implements UmbTreeContext {
-	#host: UmbControllerHostInterface;
+	host: UmbControllerHostElement;
 	public tree: ManifestTree;
 
 	#selectable = new DeepState(false);
@@ -23,15 +24,44 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	#selection = new DeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
-	repository!: UmbTreeRepository;
+	repository?: UmbTreeRepository;
 
-	constructor(host: UmbControllerHostInterface, tree: ManifestTree) {
-		this.#host = host;
+	#initResolver?: () => void;
+	#initialized = false;
+
+	#init = new Promise<void>((resolve) => {
+		this.#initialized ? resolve() : (this.#initResolver = resolve);
+	});
+
+	constructor(host: UmbControllerHostElement, tree: ManifestTree) {
+		this.host = host;
 		this.tree = tree;
 
-		if (this.tree.meta.repository) {
-			// TODO: should be using the right extension and the createExtensionClass method.
-			this.repository = new this.tree.meta.repository(this.#host) as any;
+		const repositoryAlias = this.tree.meta.repositoryAlias;
+		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
+
+		new UmbObserverController(
+			this.host,
+			umbExtensionsRegistry.getByTypeAndAlias('repository', this.tree.meta.repositoryAlias),
+			async (repositoryManifest) => {
+				if (!repositoryManifest) return;
+
+				try {
+					const result = await createExtensionClass<UmbTreeRepository>(repositoryManifest, [this.host]);
+					this.repository = result;
+					this.#checkIfInitialized();
+				} catch (error) {
+					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
+				}
+			}
+		);
+	}
+
+	// TODO: find a generic way to do this
+	#checkIfInitialized() {
+		if (this.repository) {
+			this.#initialized = true;
+			this.#initResolver?.();
 		}
 	}
 
@@ -44,32 +74,36 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		this.#selection.next(value);
 	}
 
-	public select(key: string) {
+	public select(id: string) {
 		const oldSelection = this.#selection.getValue();
-		if (oldSelection.indexOf(key) !== -1) return;
+		if (oldSelection.indexOf(id) !== -1) return;
 
-		const selection = [...oldSelection, key];
+		const selection = [...oldSelection, id];
 		this.#selection.next(selection);
 	}
 
-	public deselect(key: string) {
+	public deselect(id: string) {
 		const selection = this.#selection.getValue();
-		this.#selection.next(selection.filter((x) => x !== key));
+		this.#selection.next(selection.filter((x) => x !== id));
 	}
 
 	public async requestRootItems() {
-		return this.repository.requestRootTreeItems();
+		await this.#init;
+		return this.repository!.requestRootTreeItems();
 	}
 
-	public async requestChildrenOf(parentKey: string | null) {
-		return this.repository.requestTreeItemsOf(parentKey);
+	public async requestChildrenOf(parentId: string | null) {
+		await this.#init;
+		return this.repository!.requestTreeItemsOf(parentId);
 	}
 
 	public async rootItems() {
-		return this.repository.rootTreeItems();
+		await this.#init;
+		return this.repository!.rootTreeItems();
 	}
 
-	public async childrenOf(parentKey: string | null) {
-		return this.repository.treeItemsOf(parentKey);
+	public async childrenOf(parentId: string | null) {
+		await this.#init;
+		return this.repository!.treeItemsOf(parentId);
 	}
 }

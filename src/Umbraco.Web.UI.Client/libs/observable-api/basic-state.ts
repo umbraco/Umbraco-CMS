@@ -1,4 +1,4 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject } from 'rxjs';
 
 /**
  * @export
@@ -12,7 +12,7 @@ export class BasicState<T> extends BehaviorSubject<T> {
 	}
 
 	next(newData: T): void {
-		if(newData !== this.getValue()) {
+		if (newData !== this.getValue()) {
 			super.next(newData);
 		}
 	}

@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-creator')
 export class UmbPropertyCreatorElement extends UmbLitElement {
@@ -17,13 +17,11 @@ export class UmbPropertyCreatorElement extends UmbLitElement {
 	}
 
 	#onAddProperty() {
-		const modalHandler = this.#modalContext?.propertySettings();
+		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
-		if (modalHandler) {
-			modalHandler.onClose().then((result) => {
-				console.log('result', result);
-			});
-		}
+		modalHandler?.onSubmit().then((result) => {
+			console.log('result', result);
+		});
 	}
 
 	render() {

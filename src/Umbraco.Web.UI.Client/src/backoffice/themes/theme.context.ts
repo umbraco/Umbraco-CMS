@@ -1,24 +1,24 @@
 import { map } from 'rxjs';
 import { manifests } from './manifests';
-import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/context-api';
-import { StringState, UmbObserverController } from '@umbraco-cms/observable-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ManifestTheme } from '@umbraco-cms/extensions-registry';
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
 export class UmbThemeContext {
-	private _host: UmbControllerHostInterface;
+	private _host: UmbControllerHostElement;
 
 	#theme = new StringState('umb-light-theme');
 	public readonly theme = this.#theme.asObservable();
 
-	private themeSubscription?: UmbObserverController;
+	private themeSubscription?: UmbObserverController<ManifestTheme[]>;
 
-	#styleElement: HTMLLinkElement| HTMLStyleElement | null = null;
+	#styleElement: HTMLLinkElement | HTMLStyleElement | null = null;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this._host = host;
 
 		new UmbContextProviderController(host, UMB_THEME_CONTEXT_TOKEN, this);
@@ -43,25 +43,21 @@ export class UmbThemeContext {
 				async (themes) => {
 					this.#styleElement?.remove();
 					if (themes.length > 0) {
-						if(themes[0].loader) {
-
-							const styleEl = this.#styleElement = document.createElement('style');
+						if (themes[0].loader) {
+							const styleEl = (this.#styleElement = document.createElement('style'));
 							styleEl.setAttribute('type', 'text/css');
 							document.head.appendChild(styleEl);
 
 							const result = await themes[0].loader();
 							// Checking that this is still our styleElement, it has not been replaced with another theme in between.
-							if(styleEl === this.#styleElement) {
+							if (styleEl === this.#styleElement) {
 								(styleEl as any).appendChild(document.createTextNode(result));
 							}
-
 						} else if (themes[0].css) {
-
 							this.#styleElement = document.createElement('link');
 							this.#styleElement.setAttribute('rel', 'stylesheet');
 							this.#styleElement.setAttribute('href', themes[0].css);
 							document.head.appendChild(this.#styleElement);
-
 						}
 					} else {
 						localStorage.removeItem(LOCAL_STORAGE_KEY);

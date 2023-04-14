@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FileSystemTreeItemModel } from '../models/FileSystemTreeItemModel';
-import type { PagedFileSystemTreeItemModel } from '../models/PagedFileSystemTreeItemModel';
+import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
+import type { PartialViewItemResponseModel } from '../models/PartialViewItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,7 +11,25 @@ import { request as __request } from '../core/request';
 export class PartialViewResource {
 
     /**
-     * @returns PagedFileSystemTreeItemModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getPartialViewItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<PartialViewItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/partial-view/item',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreePartialViewChildren({
@@ -22,7 +40,7 @@ export class PartialViewResource {
         path?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedFileSystemTreeItemModel> {
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/partial-view/children',
@@ -35,25 +53,7 @@ export class PartialViewResource {
     }
 
     /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreePartialViewItem({
-        path,
-    }: {
-        path?: Array<string>,
-    }): CancelablePromise<Array<FileSystemTreeItemModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/partial-view/item',
-            query: {
-                'path': path,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedFileSystemTreeItemModel Success
+     * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
      */
     public static getTreePartialViewRoot({
@@ -62,7 +62,7 @@ export class PartialViewResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedFileSystemTreeItemModel> {
+    }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/partial-view/root',

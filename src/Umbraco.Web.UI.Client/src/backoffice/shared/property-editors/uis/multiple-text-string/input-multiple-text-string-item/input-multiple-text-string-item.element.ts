@@ -4,9 +4,9 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIInputEvent } from '@umbraco-ui/uui-input';
 import { UUIInputElement } from '@umbraco-ui/uui';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../../../core/modal';
-import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/events';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-input-multiple-text-string-item
@@ -65,17 +65,15 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	}
 
 	#onDelete() {
-		const modalHandler = this._modalContext?.confirm({
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			headline: `Delete ${this.value || 'item'}`,
 			content: 'Are you sure you want to delete this item?',
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }: any) => {
-			if (confirmed) {
-				this.dispatchEvent(new UmbDeleteEvent());
-			}
+		modalHandler?.onSubmit().then(() => {
+			this.dispatchEvent(new UmbDeleteEvent());
 		});
 	}
 

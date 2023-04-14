@@ -1,19 +1,23 @@
 import { BehaviorSubject } from 'rxjs';
-import { HealthCheckGroupModel, HealthCheckGroupWithResultModel, HealthCheckResource } from '@umbraco-cms/backend-api';
-import { UmbContextToken } from '@umbraco-cms/context-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import {
+	HealthCheckGroupPresentationModel,
+	HealthCheckGroupWithResultResponseModel,
+	HealthCheckResource,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbHealthCheckContext {
-	private _checks = new BehaviorSubject<HealthCheckGroupModel | undefined>(undefined);
+	private _checks = new BehaviorSubject<HealthCheckGroupPresentationModel | undefined>(undefined);
 	public readonly checks = this._checks.asObservable();
 
-	private _results = new BehaviorSubject<HealthCheckGroupWithResultModel | undefined>(undefined);
+	private _results = new BehaviorSubject<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
 	public readonly results = this._results.asObservable();
 
-	public host: UmbControllerHostInterface;
+	public host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.host = host;
 	}
 

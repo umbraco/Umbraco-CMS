@@ -3,18 +3,18 @@ import {
 	UmbNotificationOptions,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/notification';
-import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backend-api';
-import { UmbController, UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { UmbContextConsumerController } from '@umbraco-cms/context-api';
-import type { DataSourceResponse } from '@umbraco-cms/models';
+} from '@umbraco-cms/backoffice/notification';
+import { ApiError, CancelablePromise, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostInterface, promise: Promise<any>, alias?: string) {
+	constructor(host: UmbControllerHostElement, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
 		this.#promise = promise;
@@ -39,8 +39,17 @@ export class UmbResourceController extends UmbController {
 	 */
 	static toProblemDetailsModel(error: unknown): ProblemDetailsModel | undefined {
 		if (error instanceof ApiError) {
-			const errorDetails = error.body as ProblemDetailsModel;
-			return errorDetails;
+			try {
+				const errorDetails = (
+					typeof error.body === 'string' ? JSON.parse(error.body) : error.body
+				) as ProblemDetailsModel;
+				return errorDetails;
+			} catch {
+				return {
+					title: error.name,
+					detail: error.message,
+				};
+			}
 		} else if (error instanceof Error) {
 			return {
 				title: error.name,
@@ -56,9 +65,9 @@ export class UmbResourceController extends UmbController {
 	 */
 	static async tryExecute<T>(promise: Promise<T>): Promise<DataSourceResponse<T>> {
 		try {
-			return {data: await promise};
+			return { data: await promise };
 		} catch (e) {
-			return {error: UmbResourceController.toProblemDetailsModel(e)};
+			return { error: UmbResourceController.toProblemDetailsModel(e) };
 		}
 	}
 
@@ -67,15 +76,16 @@ export class UmbResourceController extends UmbController {
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
 	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<DataSourceResponse<T>> {
-		const {data, error} = await UmbResourceController.tryExecute<T>(this.#promise);
+		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
 
 		if (error) {
 			if (this.#notificationContext) {
 				this.#notificationContext?.peek('danger', {
 					data: {
 						headline: error.title ?? 'Server Error',
-						message: error.detail ?? 'Something went wrong'
-					}, ...options
+						message: error.detail ?? 'Something went wrong',
+					},
+					...options,
 				});
 			} else {
 				console.group('UmbResourceController');
@@ -84,7 +94,7 @@ export class UmbResourceController extends UmbController {
 			}
 		}
 
-		return {data, error};
+		return { data, error };
 	}
 
 	/**

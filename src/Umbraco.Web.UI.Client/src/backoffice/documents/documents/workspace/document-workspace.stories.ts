@@ -1,7 +1,6 @@
-import './document-workspace.element';
+import './document-workspace-editor.element';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
-import { data as documentNodes } from '../../../../core/mocks/data/document.data';
+import { html } from 'lit';
 import type { UmbDocumentWorkspaceElement } from './document-workspace.element';
 
 export default {
@@ -11,5 +10,5 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbDocumentWorkspaceElement> = () =>
-	html` <umb-document-workspace id="${documentNodes[0].key}"></umb-document-workspace>`;
+	html` <umb-document-workspace></umb-document-workspace>`;
 AAAOverview.storyName = 'Overview';

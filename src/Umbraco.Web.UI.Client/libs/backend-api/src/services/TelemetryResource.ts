@@ -1,8 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedTelemetryModel } from '../models/PagedTelemetryModel';
-import type { TelemetryModel } from '../models/TelemetryModel';
+import type { PagedTelemetryResponseModel } from '../models/PagedTelemetryResponseModel';
+import type { TelemetryRequestModel } from '../models/TelemetryRequestModel';
+import type { TelemetryResponseModel } from '../models/TelemetryResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -11,7 +12,7 @@ import { request as __request } from '../core/request';
 export class TelemetryResource {
 
     /**
-     * @returns PagedTelemetryModel Success
+     * @returns PagedTelemetryResponseModel Success
      * @throws ApiError
      */
     public static getTelemetry({
@@ -20,7 +21,7 @@ export class TelemetryResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedTelemetryModel> {
+    }): CancelablePromise<PagedTelemetryResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/telemetry',
@@ -35,7 +36,7 @@ export class TelemetryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTelemetryLevel(): CancelablePromise<TelemetryModel> {
+    public static getTelemetryLevel(): CancelablePromise<TelemetryResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/telemetry/level',
@@ -49,7 +50,7 @@ export class TelemetryResource {
     public static postTelemetryLevel({
         requestBody,
     }: {
-        requestBody?: TelemetryModel,
+        requestBody?: TelemetryRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',

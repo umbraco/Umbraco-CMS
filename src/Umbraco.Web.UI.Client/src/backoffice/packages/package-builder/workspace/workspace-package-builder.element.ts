@@ -2,14 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbInputDocumentPickerElement } from '../../../shared/components/input-document-picker/input-document-picker.element';
 import { UmbInputMediaPickerElement } from '../../../shared/components/input-media-picker/input-media-picker.element';
 import { UmbInputLanguagePickerElement } from '../../../shared/components/input-language-picker/input-language-picker.element';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { PackageDefinitionModel, PackageResource } from '@umbraco-cms/backend-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/notification';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
@@ -38,10 +38,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	];
 
 	@property()
-	entityKey?: string;
+	entityId?: string;
 
 	@state()
-	private _package: PackageDefinitionModel = {};
+	private _package: PackageDefinitionResponseModel = {};
 
 	@query('#package-name-input')
 	private _packageNameInput!: UUIInputElement;
@@ -57,22 +57,19 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		if (this.entityKey) this.#getPackageCreated();
+		if (this.entityId) this.#getPackageCreated();
 	}
 
 	async #getPackageCreated() {
-		if (!this.entityKey) return;
-		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedByKey({ key: this.entityKey }));
+		if (!this.entityId) return;
+		const { data } = await tryExecuteAndNotify(this, PackageResource.getPackageCreatedById({ id: this.entityId }));
 		if (!data) return;
-		this._package = data as PackageDefinitionModel;
+		this._package = data as PackageDefinitionResponseModel;
 	}
 
 	async #download() {
-		if (!this._package?.key) return;
-		const response = await tryExecuteAndNotify(
-			this,
-			PackageResource.getPackageCreatedByKeyDownload({ key: this._package.key })
-		);
+		if (!this._package?.id) return;
+		await tryExecuteAndNotify(this, PackageResource.getPackageCreatedByIdDownload({ id: this._package.id }));
 	}
 
 	#nameDefined() {
@@ -88,16 +85,16 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			PackageResource.postPackageCreated({ requestBody: this._package })
 		);
 		if (!response.data || response.error) return;
-		this._package = response.data as PackageDefinitionModel;
+		this._package = response.data as PackageDefinitionResponseModel;
 		this.#navigateBack();
 	}
 
 	async #update() {
 		if (!this.#nameDefined()) return;
-		if (!this._package?.key) return;
+		if (!this._package?.id) return;
 		const response = await tryExecuteAndNotify(
 			this,
-			PackageResource.putPackageCreatedByKey({ key: this._package.key, requestBody: this._package })
+			PackageResource.putPackageCreatedById({ id: this._package.id, requestBody: this._package })
 		);
 
 		if (response.error) return;
@@ -105,7 +102,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#navigateBack() {
-		window.history.pushState({}, '', '/section/packages/view/created');
+		window.history.pushState({}, '', 'section/packages/view/created');
 	}
 
 	render() {
@@ -135,13 +132,13 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	#renderActions() {
 		return html`<div slot="actions">
-			${this._package?.key
+			${this._package?.id
 				? html`<uui-button @click="${this.#download}" color="" look="secondary" label="Download package">
 						Download
 				  </uui-button>`
 				: nothing}
 			<uui-button
-				@click="${this._package.key ? this.#update : this.#save}"
+				@click="${this._package.id ? this.#update : this.#save}"
 				color="positive"
 				look="primary"
 				label="Save changes to package">
@@ -203,7 +200,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 					.value=${this._package.contentNodeId ?? ''}
 					max="1"
 					@change="${(e: CustomEvent) =>
-						(this._package.contentNodeId = (e.target as UmbInputDocumentPickerElement).selectedKeys[0])}">
+						(this._package.contentNodeId = (e.target as UmbInputDocumentPickerElement).selectedIds[0])}">
 				</umb-input-document-picker>
 				<uui-checkbox
 					label="Include child nodes"
@@ -219,11 +216,9 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<div slot="editor">
 				<umb-input-media-picker
-					.selectedKeys=${this._package.mediaKeys ?? []}
+					.selectedIds=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
-						(this._package.mediaKeys = (
-							e.target as UmbInputMediaPickerElement
-						).selectedKeys)}"></umb-input-media-picker>
+						(this._package.mediaIds = (e.target as UmbInputMediaPickerElement).selectedIds)}"></umb-input-media-picker>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.mediaLoadChildNodes ?? false}"

@@ -1,14 +1,19 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '../../../../core/modal';
 import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
-import { UmbChangeEvent } from '@umbraco-cms/events';
-import { UmbLitElement } from '@umbraco-cms/element';
-import type { LanguageModel } from '@umbraco-cms/backend-api';
-import type { UmbObserverController } from '@umbraco-cms/observable-api';
+import {
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+	UMB_LANGUAGE_PICKER_MODAL,
+} from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
@@ -57,31 +62,31 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Object, attribute: false })
-	public filter: (language: LanguageModel) => boolean = () => true;
+	public filter: (language: LanguageResponseModel) => boolean = () => true;
 
 	private _selectedIsoCodes: Array<string> = [];
 	public get selectedIsoCodes(): Array<string> {
 		return this._selectedIsoCodes;
 	}
-	public set selectedIsoCodes(keys: Array<string>) {
-		this._selectedIsoCodes = keys;
-		super.value = keys.join(',');
+	public set selectedIsoCodes(isoCodes: Array<string>) {
+		this._selectedIsoCodes = isoCodes;
+		super.value = isoCodes.join(',');
 		this._observePickedItems();
 	}
 
 	@property()
-	public set value(keysString: string) {
-		if (keysString !== this._value) {
-			this.selectedIsoCodes = keysString.split(/[ ,]+/);
+	public set value(isoCodesString: string) {
+		if (isoCodesString !== this._value) {
+			this.selectedIsoCodes = isoCodesString.split(/[ ,]+/);
 		}
 	}
 
 	@state()
-	private _items?: Array<LanguageModel>;
+	private _items?: Array<LanguageResponseModel>;
 
 	private _modalContext?: UmbModalContext;
 	private _repository = new UmbLanguageRepository(this);
-	private _pickedItemsObserver?: UmbObserverController<LanguageModel>;
+	private _pickedItemsObserver?: UmbObserverController<LanguageResponseModel[]>;
 
 	constructor() {
 		super();
@@ -119,30 +124,28 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		const modalHandler = this._modalContext?.languagePicker({
+		const modalHandler = this._modalContext?.open(UMB_LANGUAGE_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIsoCodes],
 			filter: this.filter,
 		});
 
-		modalHandler?.onClose().then(({ selection }: any) => {
+		modalHandler?.onSubmit().then(({ selection }) => {
 			this._setSelection(selection);
 		});
 	}
 
-	private _removeItem(item: LanguageModel) {
-		const modalHandler = this._modalContext?.confirm({
+	private _removeItem(item: LanguageResponseModel) {
+		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
 
-		modalHandler?.onClose().then(({ confirmed }) => {
-			if (confirmed) {
-				const newSelection = this._selectedIsoCodes.filter((value) => value !== item.isoCode);
-				this._setSelection(newSelection);
-			}
+		modalHandler?.onSubmit().then(() => {
+			const newSelection = this._selectedIsoCodes.filter((value) => value !== item.isoCode);
+			this._setSelection(newSelection);
 		});
 	}
 
@@ -165,7 +168,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	private _renderItem(item: LanguageModel) {
+	private _renderItem(item: LanguageResponseModel) {
 		return html`
 			<!-- TODO: add language ref element -->
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.isoCode)}>

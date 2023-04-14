@@ -5,8 +5,8 @@ import { manifests as documentBlueprintManifests } from './document-blueprints/m
 import { manifests as documentTypeManifests } from './document-types/manifests';
 import { manifests as documentManifests } from './documents/manifests';
 
-import { umbExtensionsRegistry } from '@umbraco-cms/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 export const manifests = [
 	...dashboardManifests,

@@ -1,6 +1,12 @@
-import { ProblemDetailsModel, LanguageResource, LanguageModel } from '@umbraco-cms/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
+import {
+	ProblemDetailsModel,
+	LanguageResource,
+	LanguageResponseModel,
+	CreateLanguageRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Language that fetches data from the server
@@ -8,15 +14,17 @@ import { tryExecuteAndNotify } from '@umbraco-cms/resources';
  * @class UmbLanguageServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource {
-	#host: UmbControllerHostInterface;
+export class UmbLanguageServerDataSource
+	implements UmbDataSource<CreateLanguageRequestModel, any, LanguageResponseModel>
+{
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbLanguageServerDataSource.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -27,11 +35,7 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async get(isoCode: string) {
-		if (!isoCode) {
-			const error: ProblemDetailsModel = { title: 'Iso Code is missing' };
-			return { error };
-		}
-
+		if (!isoCode) throw new Error('Iso Code is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			LanguageResource.getLanguageByIsoCode({
@@ -47,11 +51,10 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async createScaffold() {
-		const data: LanguageModel = {
+		const data: LanguageResponseModel = {
 			name: '',
 			isDefault: false,
 			isMandatory: false,
-			fallbackIsoCode: '',
 			isoCode: '',
 		};
 
@@ -60,11 +63,11 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 
 	/**
 	 * Inserts a new Language on the server
-	 * @param {LanguageModel} language
+	 * @param {LanguageResponseModel} language
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async insert(language: LanguageModel) {
+	async insert(language: CreateLanguageRequestModel) {
 		if (!language.isoCode) {
 			const error: ProblemDetailsModel = { title: 'Language iso code is missing' };
 			return { error };
@@ -75,11 +78,11 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 
 	/**
 	 * Updates a Language on the server
-	 * @param {LanguageModel} language
+	 * @param {LanguageResponseModel} language
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async update(language: LanguageModel) {
+	async update(iscoCode: string, language: LanguageResponseModel) {
 		if (!language.isoCode) {
 			const error: ProblemDetailsModel = { title: 'Language iso code is missing' };
 			return { error };
@@ -98,15 +101,8 @@ export class UmbLanguageServerDataSource implements UmbLanguageServerDataSource 
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async delete(isoCode: string) {
-		if (!isoCode) {
-			const error: ProblemDetailsModel = { title: 'Iso code is missing' };
-			return { error };
-		}
-
-		return tryExecuteAndNotify(
-			this.#host,
-			tryExecuteAndNotify(this.#host, LanguageResource.deleteLanguageByIsoCode({ isoCode })).then(() => isoCode)
-		);
+		if (!isoCode) throw new Error('Iso Code is missing');
+		return tryExecuteAndNotify(this.#host, LanguageResource.deleteLanguageByIsoCode({ isoCode }));
 	}
 
 	/**

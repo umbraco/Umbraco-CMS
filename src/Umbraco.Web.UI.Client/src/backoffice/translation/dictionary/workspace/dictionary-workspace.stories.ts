@@ -1,6 +1,7 @@
 import './dictionary-workspace.element';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit-html';
+import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { data } from '../../../../core/mocks/data/dictionary.data';
 import type { UmbWorkspaceDictionaryElement } from './dictionary-workspace.element';
 
@@ -11,6 +12,6 @@ export default {
 } as Meta;
 
 export const AAAOverview: Story<UmbWorkspaceDictionaryElement> = () =>
-	html` <umb-dictionary-workspace id="${data[0].key}"></umb-dictionary-workspace>`;
+	html` <umb-dictionary-workspace id="${ifDefined(data[0].id)}"></umb-dictionary-workspace>`;
 
 AAAOverview.storyName = 'Overview';

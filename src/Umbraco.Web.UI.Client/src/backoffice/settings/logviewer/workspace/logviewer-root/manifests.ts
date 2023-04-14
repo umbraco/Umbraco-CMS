@@ -1,4 +1,9 @@
-import type { ManifestWorkspace, ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cms/models';
+import type {
+	ManifestModal,
+	ManifestWorkspace,
+	ManifestWorkspaceAction,
+	ManifestWorkspaceView,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspaceAlias = 'Umb.Workspace.LogviewerRoot';
 
@@ -20,10 +25,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('../views/overview/index'),
 		weight: 300,
 		meta: {
-			workspaces: [workspaceAlias],
 			label: 'Overview',
 			pathname: 'overview',
 			icon: 'umb:box-alt',
+		},
+		conditions: {
+			workspaces: [workspaceAlias],
 		},
 	},
 	{
@@ -33,14 +40,25 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		loader: () => import('../views/search/index'),
 		weight: 200,
 		meta: {
-			workspaces: [workspaceAlias],
 			label: 'Search',
 			pathname: 'search',
 			icon: 'umb:search',
+		},
+		conditions: {
+			workspaces: [workspaceAlias],
 		},
 	},
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+const modals: Array<ManifestModal> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.LogViewer.SaveSearch',
+		name: 'Saved Searches Modal',
+		loader: () => import('../views/search/components/log-viewer-search-input-modal.element'),
+	},
+];
+
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...modals];

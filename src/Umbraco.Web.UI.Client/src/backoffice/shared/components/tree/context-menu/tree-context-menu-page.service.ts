@@ -1,13 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { DeepState } from '@umbraco-cms/observable-api';
-import { UmbContextToken } from '@umbraco-cms/context-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 // TODO: Refactor this, its not a service and the data should be handled by a context api.
 @customElement('umb-tree-context-menu-page-service')
-export class UmbTreeContextMenuPageService extends UmbLitElement {
+export class UmbTreeContextMenuPageServiceElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ type: Object })
@@ -64,12 +64,11 @@ export class UmbTreeContextMenuPageService extends UmbLitElement {
 	}
 }
 
-export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuPageService>(
-	'UmbTreeContextMenuService'
-);
+export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN =
+	new UmbContextToken<UmbTreeContextMenuPageServiceElement>('UmbTreeContextMenuService');
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-context-menu-page-service': UmbTreeContextMenuPageService;
+		'umb-tree-context-menu-page-service': UmbTreeContextMenuPageServiceElement;
 	}
 }

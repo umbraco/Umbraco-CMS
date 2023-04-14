@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { v4 as uuidv4 } from 'uuid';
 import { umbUsersData } from '../data/users.data';
-import type { UserDetails } from '@umbraco-cms/models';
+import type { UserDetails } from '@umbraco-cms/backoffice/models';
 
 // TODO: add schema
 export const handlers = [
@@ -16,19 +16,19 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get('/umbraco/backoffice/users/details/:key', (req, res, ctx) => {
-		const key = req.params.key as string;
-		if (!key) return;
+	rest.get('/umbraco/backoffice/users/details/:id', (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
 
-		const user = umbUsersData.getByKey(key);
+		const user = umbUsersData.getById(id);
 
 		return res(ctx.status(200), ctx.json(user));
 	}),
 
 	rest.get('/umbraco/backoffice/users/getByKeys', (req, res, ctx) => {
-		const keys = req.url.searchParams.getAll('key');
-		if (keys.length === 0) return;
-		const users = umbUsersData.getByKeys(keys);
+		const ids = req.url.searchParams.getAll('id');
+		if (ids.length === 0) return;
+		const users = umbUsersData.getByIds(ids);
 
 		return res(ctx.status(200), ctx.json(users));
 	}),
@@ -49,7 +49,7 @@ export const handlers = [
 		if (!data) return;
 
 		const newUser: UserDetails = {
-			key: uuidv4(),
+			id: uuidv4(),
 			name: data.name,
 			email: data.email,
 			status: 'invited',
@@ -57,7 +57,7 @@ export const handlers = [
 			updateDate: new Date().toISOString(),
 			createDate: new Date().toISOString(),
 			failedLoginAttempts: 0,
-			parentKey: '',
+			parentId: '',
 			hasChildren: false,
 			type: 'user',
 			icon: 'umb:icon-user',
@@ -66,7 +66,7 @@ export const handlers = [
 			mediaStartNodes: [],
 		};
 
-		const invited = umbUsersData.save([newUser]);
+		const invited = umbUsersData.save(newUser);
 
 		console.log('invited', invited);
 

@@ -1,6 +1,6 @@
-import type { ManifestElement } from '../models';
 import { isManifestJSType } from './is-manifest-js-type.function';
 import { isManifestLoaderType } from './is-manifest-loader-type.function';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 export type ManifestLoaderType = ManifestElement & { loader: () => Promise<object | HTMLElement> };
 export type ManifestJSType = ManifestElement & { js: string };

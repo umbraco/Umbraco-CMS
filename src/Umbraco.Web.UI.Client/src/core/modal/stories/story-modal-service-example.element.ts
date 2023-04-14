@@ -1,7 +1,7 @@
-import { html } from 'lit-html';
+import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '..';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('story-modal-context-example')
 export class StoryModalContextExampleElement extends UmbLitElement {
@@ -21,9 +21,11 @@ export class StoryModalContextExampleElement extends UmbLitElement {
 	}
 
 	private _open() {
+		// TODO: use the extension registry to get all modals
+		/*
 		switch (this.modalLayout) {
 			case 'Content Picker':
-				this._modalContext?.contentPicker();
+				this._modalContext?.documentPicker();
 				break;
 			case 'Property Editor UI Picker':
 				this._modalContext?.propertyEditorUIPicker();
@@ -38,6 +40,7 @@ export class StoryModalContextExampleElement extends UmbLitElement {
 				});
 				break;
 		}
+		*/
 	}
 
 	render() {

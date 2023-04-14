@@ -1,10 +1,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { LanguageCreateModel } from '../models/LanguageCreateModel';
-import type { LanguageModel } from '../models/LanguageModel';
-import type { LanguageUpdateModel } from '../models/LanguageUpdateModel';
-import type { PagedLanguageModel } from '../models/PagedLanguageModel';
+import type { CreateLanguageRequestModel } from '../models/CreateLanguageRequestModel';
+import type { LanguageItemResponseModel } from '../models/LanguageItemResponseModel';
+import type { LanguageResponseModel } from '../models/LanguageResponseModel';
+import type { PagedLanguageResponseModel } from '../models/PagedLanguageResponseModel';
+import type { UpdateLanguageRequestModel } from '../models/UpdateLanguageRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -13,7 +14,7 @@ import { request as __request } from '../core/request';
 export class LanguageResource {
 
     /**
-     * @returns PagedLanguageModel Success
+     * @returns PagedLanguageResponseModel Success
      * @throws ApiError
      */
     public static getLanguage({
@@ -22,7 +23,7 @@ export class LanguageResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedLanguageModel> {
+    }): CancelablePromise<PagedLanguageResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/language',
@@ -40,7 +41,7 @@ export class LanguageResource {
     public static postLanguage({
         requestBody,
     }: {
-        requestBody?: LanguageCreateModel,
+        requestBody?: CreateLanguageRequestModel,
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -63,7 +64,7 @@ export class LanguageResource {
         isoCode,
     }: {
         isoCode: string,
-    }): CancelablePromise<LanguageModel> {
+    }): CancelablePromise<LanguageResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/language/{isoCode}',
@@ -107,7 +108,7 @@ export class LanguageResource {
         requestBody,
     }: {
         isoCode: string,
-        requestBody?: LanguageUpdateModel,
+        requestBody?: UpdateLanguageRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
@@ -120,6 +121,24 @@ export class LanguageResource {
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getLanguageItem({
+        isoCode,
+    }: {
+        isoCode?: Array<string>,
+    }): CancelablePromise<Array<LanguageItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/language/item',
+            query: {
+                'isoCode': isoCode,
             },
         });
     }

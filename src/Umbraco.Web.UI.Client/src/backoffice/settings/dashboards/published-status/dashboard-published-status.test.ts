@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { UmbDashboardPublishedStatusElement } from './dashboard-published-status.element';
-import { defaultA11yConfig } from '@umbraco-cms/test-utils';
+import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbDashboardPublishedStatus', () => {
 	let element: UmbDashboardPublishedStatusElement;

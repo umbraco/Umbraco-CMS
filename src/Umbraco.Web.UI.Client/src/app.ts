@@ -1,28 +1,27 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import '@umbraco-cms/css';
+import './core/css/custom-properties.css';
 
-// TODO: remove these imports when they are part of UUI
-import '@umbraco-ui/uui-modal';
-import '@umbraco-ui/uui-modal-container';
-import '@umbraco-ui/uui-modal-dialog';
-import '@umbraco-ui/uui-modal-sidebar';
 import 'element-internals-polyfill';
-import '@umbraco-cms/router';
 
-import type { Guard, IRoute } from 'router-slot/model';
+import './core/router/router-slot.element';
+import './core/router/variant-router-slot.element';
+import './core/notification/layouts/default';
+import './core/modal/modal-element.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
-import { UmbLitElement } from '@umbraco-cms/element';
-import { tryExecuteAndNotify } from '@umbraco-cms/resources';
-import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backend-api';
-import { UmbIconStore } from '@umbraco-cms/store';
-import { umbDebugContextEventType } from '@umbraco-cms/context-api';
+import { UmbIconStore } from './core/stores/icon/icon.store';
+import type { Guard, IRoute } from '@umbraco-cms/backoffice/router';
+import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
+import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-app')
-export class UmbApp extends UmbLitElement {
+export class UmbAppElement extends UmbLitElement {
 	static styles = css`
 		:host {
 			overflow: hidden;
@@ -39,8 +38,7 @@ export class UmbApp extends UmbLitElement {
 	@property({ type: String })
 	private umbracoUrl?: string;
 
-	@state()
-	private _routes: IRoute<any>[] = [
+	private _routes: IRoute[] = [
 		{
 			path: 'install',
 			component: () => import('./installer/installer.element'),
@@ -48,29 +46,27 @@ export class UmbApp extends UmbLitElement {
 		{
 			path: 'upgrade',
 			component: () => import('./upgrader/upgrader.element'),
-			guards: [this._isAuthorizedGuard('/upgrade')],
+			guards: [this.#isAuthorizedGuard('/upgrade')],
 		},
 		{
 			path: '**',
 			component: () => import('./backoffice/backoffice.element'),
-			guards: [this._isAuthorizedGuard()],
+			guards: [this.#isAuthorizedGuard()],
 		},
 	];
 
-	private _umbIconRegistry = new UmbIconStore();
-
-	private _iconRegistry = new UUIIconRegistryEssential();
-	private _runtimeLevel = RuntimeLevelModel.UNKNOWN;
+	#umbIconRegistry = new UmbIconStore();
+	#uuiIconRegistry = new UUIIconRegistryEssential();
+	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
 
 	constructor() {
 		super();
-
-		this._umbIconRegistry.attach(this);
-
-		this._setup();
+		this.#umbIconRegistry.attach(this);
+		this.#uuiIconRegistry.attach(this);
+		this.#setInitStatus();
 	}
 
-	async connectedCallback() {
+	connectedCallback() {
 		super.connectedCallback();
 
 		OpenAPI.BASE =
@@ -81,9 +77,6 @@ export class UmbApp extends UmbLitElement {
 
 		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
 
-		await this._setInitStatus();
-		this._redirect();
-
 		// Listen for the debug event from the <umb-debug> component
 		this.addEventListener(umbDebugContextEventType, (event: any) => {
 			// Once we got to the outter most component <umb-app>
@@ -91,51 +84,62 @@ export class UmbApp extends UmbLitElement {
 			// we have collected whilst coming up through the DOM
 			// and pass it back down to the callback in
 			// the <umb-debug> component that originally fired the event
-			event.callback(event.instances);
+			if (event.callback) {
+				event.callback(event.instances);
+			}
+
+			// Massage the data into a simplier format
+			// Why? Can't send contexts data directly - browser seems to not serialize it and says its null
+			// But a simple object works fine for browser extension to consume
+			const data = {
+				contexts: contextData(event.instances),
+			};
+
+			// Emit this new event for the browser extension to listen for
+			this.dispatchEvent(new CustomEvent('umb:debug-contexts:data', { detail: data, bubbles: true }));
 		});
 	}
 
-	private async _setup() {
-		this._iconRegistry.attach(this);
-	}
-
-	private async _setInitStatus() {
+	async #setInitStatus() {
 		const { data } = await tryExecuteAndNotify(this, ServerResource.getServerStatus());
-		this._runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
+		this.#runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
+		this.#redirect();
 	}
 
-	private _redirect() {
-		switch (this._runtimeLevel) {
+	#redirect() {
+		switch (this.#runtimeLevel) {
 			case RuntimeLevelModel.INSTALL:
-				history.replaceState(null, '', '/install');
+				history.replaceState(null, '', 'install');
 				break;
 
 			case RuntimeLevelModel.UPGRADE:
-				history.replaceState(null, '', '/upgrade');
+				history.replaceState(null, '', 'upgrade');
 				break;
 
 			case RuntimeLevelModel.RUN: {
-				const pathname =
-					window.location.pathname === '/install' || window.location.pathname === '/upgrade'
-						? '/'
-						: window.location.pathname;
-				history.replaceState(null, '', pathname);
+				const pathname = pathWithoutBasePath({ start: true, end: false });
+
+				// If we are on the installer or upgrade page, redirect to the root
+				// but if not, keep the current path but replace state anyway to initialize the router
+				const finalPath = pathname === '/install' || pathname === '/upgrade' ? '/' : location.href;
+
+				history.replaceState(null, '', finalPath);
 				break;
 			}
 
 			default:
-				throw new Error(`Unsupported runtime level: ${this._runtimeLevel}`);
+				throw new Error(`Unsupported runtime level: ${this.#runtimeLevel}`);
 		}
 	}
 
-	private _isAuthorized(): boolean {
+	#isAuthorized(): boolean {
 		return true; // TODO: Return true for now, until new login page is up and running
 		//return sessionStorage.getItem('is-authenticated') === 'true';
 	}
 
-	private _isAuthorizedGuard(redirectTo?: string): Guard {
+	#isAuthorizedGuard(redirectTo?: string): Guard {
 		return () => {
-			if (this._isAuthorized()) {
+			if (this.#isAuthorized()) {
 				return true;
 			}
 
@@ -158,6 +162,6 @@ export class UmbApp extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-app': UmbApp;
+		'umb-app': UmbAppElement;
 	}
 }

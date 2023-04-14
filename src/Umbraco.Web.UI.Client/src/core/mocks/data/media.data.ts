@@ -1,7 +1,7 @@
+import type { MediaDetails } from '../../../backoffice/media/media';
 import { UmbEntityData } from './entity.data';
 import { createContentTreeItem } from './utils';
-import { ContentTreeItemModel, PagedContentTreeItemModel } from '@umbraco-cms/backend-api';
-import type { MediaDetails } from '@umbraco-cms/models';
+import { ContentTreeItemResponseModel, PagedContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaDetails> = [
 	{
@@ -10,9 +10,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
+		id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -20,7 +20,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaHeadline',
 				label: 'Media Headline',
 				description: 'Text string property',
-				dataTypeKey: 'dt-textBox',
+				dataTypeId: 'dt-textBox',
 			},
 		],
 		data: [
@@ -37,9 +37,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '69431027-8867-45bf-a93b-72bbdabfb177',
+		id: '69431027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -47,7 +47,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -64,9 +64,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'folder',
 		hasChildren: true,
-		key: '69461027-8867-45bf-a93b-72bbdabfb177',
+		id: '69461027-8867-45bf-a93b-72bbdabfb177',
 		isContainer: true,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [],
@@ -79,9 +79,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'folder',
 		hasChildren: true,
-		key: '69461027-8867-45bf-a93b-5224dabfb177',
+		id: '69461027-8867-45bf-a93b-5224dabfb177',
 		isContainer: true,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isTrashed: false,
 		properties: [],
@@ -94,9 +94,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '69431027-8867-45s7-a93b-7uibdabfb177',
+		id: '69431027-8867-45s7-a93b-7uibdabfb177',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-72bbdabfb177',
+		parentId: '69461027-8867-45bf-a93b-72bbdabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -104,7 +104,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -121,9 +121,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '69431027-8867-45s7-a93b-7uibdabf2147',
+		id: '69431027-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-72bbdabfb177',
+		parentId: '69461027-8867-45bf-a93b-72bbdabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -131,7 +131,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -148,9 +148,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '694hdj27-8867-45s7-a93b-7uibdabf2147',
+		id: '694hdj27-8867-45s7-a93b-7uibdabf2147',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-5224dabfb177',
+		parentId: '69461027-8867-45bf-a93b-5224dabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -158,7 +158,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -175,9 +175,9 @@ export const data: Array<MediaDetails> = [
 		type: 'media',
 		icon: 'picture',
 		hasChildren: false,
-		key: '694hdj27-1237-45s7-a93b-7uibdabfas47',
+		id: '694hdj27-1237-45s7-a93b-7uibdabfas47',
 		isContainer: false,
-		parentKey: '69461027-8867-45bf-a93b-5224dabfb177',
+		parentId: '69461027-8867-45bf-a93b-5224dabfb177',
 		noAccess: false,
 		isTrashed: false,
 		properties: [
@@ -185,7 +185,7 @@ export const data: Array<MediaDetails> = [
 				alias: 'myMediaDescription',
 				label: 'Description',
 				description: 'Textarea property',
-				dataTypeKey: 'dt-textArea',
+				dataTypeId: 'dt-textArea',
 			},
 		],
 		data: [
@@ -207,22 +207,22 @@ class UmbMediaData extends UmbEntityData<MediaDetails> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedContentTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+	getTreeRoot(): PagedContentTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedContentTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): PagedContentTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createContentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<ContentTreeItemModel> {
-		const items = this.data.filter((item) => keys.includes(item.key));
+	getTreeItem(ids: Array<string>): Array<ContentTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id));
 		return items.map((item) => createContentTreeItem(item));
 	}
 }

@@ -1,21 +1,21 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
 import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
-import { UmbWorkspaceEntityContextInterface } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import { UmbControllerHostInterface } from '@umbraco-cms/controller';
-import { ObjectState } from '@umbraco-cms/observable-api';
-import type { DictionaryDetails } from '@umbraco-cms/models';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-type EntityType = DictionaryDetails;
-export class UmbWorkspaceDictionaryContext
-	extends UmbWorkspaceContext<UmbDictionaryRepository>
-	implements UmbWorkspaceEntityContextInterface<EntityType | undefined>
+export class UmbDictionaryWorkspaceContext
+	extends UmbWorkspaceContext<UmbDictionaryRepository, DictionaryItemResponseModel>
+	implements UmbEntityWorkspaceContextInterface<DictionaryItemResponseModel | undefined>
 {
-	#data = new ObjectState<DictionaryDetails | undefined>(undefined);
+	#data = new ObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
+
 	name = this.#data.getObservablePart((data) => data?.name);
 	dictionary = this.#data.getObservablePart((data) => data);
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDictionaryRepository(host));
 	}
 
@@ -23,8 +23,8 @@ export class UmbWorkspaceDictionaryContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -55,24 +55,27 @@ export class UmbWorkspaceDictionaryContext
 		this.#data.next({ ...this.#data.value, translations: updatedValue });
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
-	async createScaffold(parentKey: string | null) {
-		const { data } = await this.repository.createScaffold(parentKey);
+	async createScaffold(parentId: string | null) {
+		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		// TODO: This is a hack to get around the fact that the data is not typed correctly.
+		// Create and response models are different. We need to look into this.
+		this.#data.next(data as unknown as DictionaryItemResponseModel);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		await this.repository.save(this.#data.value);
+		if (!this.#data.value.id) return;
+		await this.repository.save(this.#data.value.id, this.#data.value);
 		this.setIsNew(false);
 	}
 

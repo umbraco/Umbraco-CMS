@@ -1,9 +1,8 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
-import { UmbLitElement } from '@umbraco-cms/element';
-import { LogLevelCountsModel } from '@umbraco-cms/backend-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-log-viewer-log-types-chart')
 export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
@@ -80,7 +79,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	}
 
 	@state()
-	private _logLevelCount: LogLevelCountsModel | null = null;
+	private _logLevelCount: LogLevelCountsReponseModel | null = null;
 
 	@state()
 	private logLevelCount: [string, number][] = [];
@@ -117,6 +116,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 		});
 	}
 
+	// TODO: Stop using this complex code in render methods, instead changes to _logLevelCount should trigger a state prop containing the keys. And then try to make use of the repeat LIT method:
 	render() {
 		return html`
 			<uui-box id="types" headline="Log types">

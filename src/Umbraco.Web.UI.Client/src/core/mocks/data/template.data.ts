@@ -2,19 +2,19 @@ import { v4 as uuid } from 'uuid';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
 import {
-	EntityTreeItemModel,
-	PagedEntityTreeItemModel,
-	TemplateModel,
-	TemplateCreateModel,
-	TemplateScaffoldModel,
-} from '@umbraco-cms/backend-api';
+	EntityTreeItemResponseModel,
+	PagedEntityTreeItemResponseModel,
+	TemplateResponseModel,
+	TemplateModelBaseModel,
+	TemplateScaffoldResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-type TemplateDBItem = TemplateModel & EntityTreeItemModel;
+type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
 
-const createTemplate = (dbItem: TemplateDBItem): TemplateModel => {
+const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
 	return {
 		$type: '',
-		key: dbItem.key,
+		id: dbItem.id,
 		name: dbItem.name,
 		alias: dbItem.alias,
 		content: dbItem.content,
@@ -24,22 +24,33 @@ const createTemplate = (dbItem: TemplateDBItem): TemplateModel => {
 export const data: Array<TemplateDBItem> = [
 	{
 		$type: '',
-		key: '2bf464b6-3aca-4388-b043-4eb439cc2643',
+		id: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Doc 1',
 		type: 'template',
 		icon: 'icon-layout',
 		hasChildren: false,
 		alias: 'Doc1',
-		content:
-			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Doc1>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
+		content: `@using Umbraco.Extensions
+		@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
+		@{
+			if (Model?.Areas.Any() != true) { return; }
+		}
+
+		<div class="umb-block-grid__area-container"
+			 style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? Model.GridColumns?.ToString() ?? "12");">
+			@foreach (var area in Model.Areas)
+			{
+				@await Html.GetBlockGridItemAreaHtmlAsync(area)
+			}
+		</div>`,
 	},
 	{
 		$type: '',
-		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Test',
 		type: 'template',
 		icon: 'icon-layout',
@@ -50,9 +61,9 @@ export const data: Array<TemplateDBItem> = [
 	},
 	{
 		$type: '',
-		key: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
+		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		isContainer: false,
-		parentKey: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
 		type: 'template',
 		icon: 'icon-layout',
@@ -76,48 +87,48 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		super(data);
 	}
 
-	getByKey(key: string): TemplateModel | undefined {
-		const item = this.data.find((item) => item.key === key);
+	getById(id: string): TemplateResponseModel | undefined {
+		const item = this.data.find((item) => item.id === id);
 		return item ? createTemplate(item) : undefined;
 	}
 
-	getScaffold(masterTemplateAlias: string): TemplateScaffoldModel {
+	getScaffold(masterTemplateAlias: string): TemplateScaffoldResponseModel {
 		return {
 			content: `Template Scaffold Mock: Layout = ${masterTemplateAlias || null};`,
 		};
 	}
 
-	create(templateData: TemplateCreateModel) {
+	create(templateData: TemplateModelBaseModel) {
 		const template = {
 			$type: '',
-			key: uuid(),
+			id: uuid(),
 			...templateData,
 		};
 		this.data.push(template);
 		return template;
 	}
 
-	update(template: TemplateModel) {
+	update(template: TemplateResponseModel) {
 		this.updateData(template);
 		return template;
 	}
 
-	getTreeRoot(): PagedEntityTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === null);
+	getTreeRoot(): PagedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedEntityTreeItemModel {
-		const items = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): PagedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }
