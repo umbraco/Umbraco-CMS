@@ -61,6 +61,20 @@ public class UserIdKeyResolverTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Resolve_Super_User_Key_To_Id()
+    {
+        var resolvedId = await UserIdKeyResolver.GetAsync(Constants.Security.SuperUserKey);
+        Assert.AreEqual(Constants.Security.SuperUserId, resolvedId);
+    }
+
+    [Test]
+    public async Task Can_Resolve_Super_User_Id_To_Key()
+    {
+        var resolvedKey = await UserIdKeyResolver.GetAsync(Constants.Security.SuperUserId);
+        Assert.AreEqual(Constants.Security.SuperUserKey, resolvedKey);
+    }
+
+    [Test]
     public async Task Unknown_Key_Throws()
     {
         Assert.ThrowsAsync<InvalidOperationException>(async () => await UserIdKeyResolver.GetAsync(Guid.NewGuid()));
