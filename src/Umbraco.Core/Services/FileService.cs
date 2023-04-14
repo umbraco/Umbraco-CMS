@@ -383,7 +383,7 @@ public class FileService : RepositoryService, IFileService
             throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
         }
 
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateForContentTypeAsync(contentTypeAlias, contentTypeName, currentUserKey).GetAwaiter().GetResult();
 
         // mimic old service behavior
@@ -418,7 +418,7 @@ public class FileService : RepositoryService, IFileService
             throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be more than 255 characters in length.");
         }
 
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, currentUserKey).GetAwaiter().GetResult();
         return result.Result;
     }
@@ -495,7 +495,7 @@ public class FileService : RepositoryService, IFileService
                 "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
         }
 
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         if (template.Id > 0)
         {
             _templateService.UpdateAsync(template, currentUserKey).GetAwaiter().GetResult();
@@ -548,7 +548,7 @@ public class FileService : RepositoryService, IFileService
     [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
     {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         _templateService.DeleteAsync(alias, currentUserKey).GetAwaiter().GetResult();
     }
 
