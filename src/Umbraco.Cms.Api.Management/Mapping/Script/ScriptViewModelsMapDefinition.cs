@@ -9,7 +9,15 @@ public class ScriptViewModelsMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<CreateScriptRequestModel, ScriptCreateModel>((_, _) => new ScriptCreateModel{ Name = string.Empty }, Map);
+        mapper.Define<UpdateScriptRequestModel, ScriptUpdateModel>((_, _) => new ScriptUpdateModel{ Name = string.Empty, Content = string.Empty, ExistingPath = string.Empty}, Map);
         mapper.Define<IScript, ScriptResponseModel>((_, _) => new ScriptResponseModel{ Name = string.Empty }, Map);
+    }
+
+    private void Map(UpdateScriptRequestModel source, ScriptUpdateModel target, MapperContext context)
+    {
+        target.Name = source.Name;
+        target.Content = source.Content ?? string.Empty;
+        target.ExistingPath = source.ExistingPath;
     }
 
     private void Map(IScript source, ScriptResponseModel target, MapperContext context)

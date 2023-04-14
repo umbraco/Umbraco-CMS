@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -123,6 +122,57 @@ public class ScriptService : RepositoryService, IScriptService
         }
 
         if (HasValidFileExtension(createModel.FilePath) is false)
+        {
+            return ScriptOperationStatus.InvalidFileExtension;
+        }
+
+        return ScriptOperationStatus.Success;
+    }
+
+    public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IScript? script = _scriptRepository.Get(updateModel.ExistingPath);
+
+        if (script is null)
+        {
+            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.NotFound, null);
+        }
+
+        ScriptOperationStatus validationResult = ValidateUpdate(updateModel);
+        if (validationResult is not ScriptOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(validationResult, null);
+        }
+
+        script.Content = updateModel.Content;
+        if (script.Name != updateModel.Name)
+        {
+            // Name has been updated, so we need to update the path as well
+            var newPath = script.Path.Replace(script.Name!, updateModel.Name);
+            script.Path = newPath;
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new ScriptSavingNotification(script, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByNotification, null);
+        }
+
+        _scriptRepository.Save(script);
+        scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
+
+        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        Audit(AuditType.Save, userId);
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
+    }
+
+    private ScriptOperationStatus ValidateUpdate(ScriptUpdateModel updateModel)
+    {
+        if (HasValidFileExtension(updateModel.Name) is false)
         {
             return ScriptOperationStatus.InvalidFileExtension;
         }
