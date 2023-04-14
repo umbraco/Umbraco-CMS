@@ -37,6 +37,15 @@ public class ScriptService : RepositoryService, IScriptService
         _logger = logger;
     }
 
+    public Task<IScript?> GetAsync(string path)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IScript? script = _scriptRepository.Get(path);
+
+        scope.Complete();
+        return Task.FromResult(script);
+    }
+
     public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();

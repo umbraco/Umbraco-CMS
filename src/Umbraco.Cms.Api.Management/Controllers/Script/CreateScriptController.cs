@@ -36,7 +36,7 @@ public class CreateScriptController : ScriptControllerBase
         Attempt<IScript?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, currentUserKey);
 
         return createAttempt.Success
-            ? /*CreatedAtAction<ByKeyScriptController>(controller => nameof(controller.ByKey), createAttempt.Result.Key) TODO: Point to Created action */ Ok()
+            ? CreatedAtAction<ByPathScriptController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path })
             : ScriptOperationStatusResult(createAttempt.Status);
     }
 }
