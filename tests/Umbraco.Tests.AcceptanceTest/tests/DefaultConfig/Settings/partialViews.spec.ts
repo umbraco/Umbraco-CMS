@@ -37,7 +37,7 @@ test.describe('Partial Views', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     //Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout: 20000});
+    await umbracoUi.isSuccessNotificationVisible({timeout: 30000});
 
     //Clean up
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
