@@ -221,7 +221,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Save(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     { ;
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         if (dictionaryItem.Id > 0)
         {
             _dictionaryItemService.UpdateAsync(dictionaryItem, currentUserKey).GetAwaiter().GetResult();
@@ -241,7 +241,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Will be removed in V15.")]
     public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
     {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         _dictionaryItemService.DeleteAsync(dictionaryItem.Key, currentUserKey).GetAwaiter().GetResult();
     }
 
@@ -321,7 +321,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public void Save(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         Attempt<ILanguage, LanguageOperationStatus> result = language.Id > 0
             ? _languageService.UpdateAsync(language, currentUserKey).GetAwaiter().GetResult()
             : _languageService.CreateAsync(language, currentUserKey).GetAwaiter().GetResult();
@@ -341,7 +341,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use ILanguageService for language operations. Will be removed in V15.")]
     public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
     {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult() ?? Constants.Security.SuperUserKey;
+        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
         _languageService.DeleteAsync(language.IsoCode, currentUserKey).GetAwaiter().GetResult();
     }
 

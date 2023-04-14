@@ -13,17 +13,17 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement;
 internal sealed class UserIdKeyResolver : IUserIdKeyResolver
 {
     private readonly IScopeProvider _scopeProvider;
-    private readonly ConcurrentDictionary<Guid, int?> _keyToId = new();
-    private readonly ConcurrentDictionary<int, Guid?> _idToKey = new();
+    private readonly ConcurrentDictionary<Guid, int> _keyToId = new();
+    private readonly ConcurrentDictionary<int, Guid> _idToKey = new();
     private readonly SemaphoreSlim _keytToIdLock = new(1, 1);
     private readonly SemaphoreSlim _idToKeyLock = new(1, 1);
 
     public UserIdKeyResolver(IScopeProvider scopeProvider) => _scopeProvider = scopeProvider;
 
     /// <inheritdoc/>
-    public async Task<int?> GetAsync(Guid key)
+    public async Task<int> GetAsync(Guid key)
     {
-        if (_keyToId.TryGetValue(key, out int? id))
+        if (_keyToId.TryGetValue(key, out int id))
         {
             return id;
         }
@@ -33,7 +33,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
         await _keytToIdLock.WaitAsync();
         try
         {
-            if (_keyToId.TryGetValue(key, out int? recheckedId))
+            if (_keyToId.TryGetValue(key, out int recheckedId))
             {
                 // It was added while we were waiting, so we'll just return it
                 return recheckedId;
@@ -48,7 +48,9 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .From<UserDto>()
                 .Where<UserDto>(x => x.Key == key);
 
-            int? fetchedId = await scope.Database.ExecuteScalarAsync<int?>(query);
+            int fetchedId = (await scope.Database.ExecuteScalarAsync<int?>(query))
+                            ?? throw new InvalidOperationException("No user found with the specified key");
+
 
             _keyToId[key] = fetchedId;
             return fetchedId;
@@ -60,9 +62,9 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
     }
 
     /// <inheritdoc/>
-    public async Task<Guid?> GetAsync(int id)
+    public async Task<Guid> GetAsync(int id)
     {
-        if (_idToKey.TryGetValue(id, out Guid? key))
+        if (_idToKey.TryGetValue(id, out Guid key))
         {
             return key;
         }
@@ -70,7 +72,7 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
         await _idToKeyLock.WaitAsync();
         try
         {
-            if (_idToKey.TryGetValue(id, out Guid? recheckedKey))
+            if (_idToKey.TryGetValue(id, out Guid recheckedKey))
             {
                 return recheckedKey;
             }
@@ -84,13 +86,11 @@ internal sealed class UserIdKeyResolver : IUserIdKeyResolver
                 .Where<UserDto>(x => x.Id == id);
 
             string? guidString = await scope.Database.ExecuteScalarAsync<string?>(query);
-            Guid? fetchedKey = guidString is null ? null : new Guid(guidString);
+            Guid fetchedKey = guidString is not null
+                ? new Guid(guidString)
+                : throw new InvalidOperationException("No user found with the specified id");
 
-            // For ids we don't want to cache the null value, since unlike keys, it's pretty likely that we'll see collision
-            if (fetchedKey is not null)
-            {
-                _idToKey[id] = fetchedKey;
-            }
+            _idToKey[id] = fetchedKey;
 
             return fetchedKey;
         }

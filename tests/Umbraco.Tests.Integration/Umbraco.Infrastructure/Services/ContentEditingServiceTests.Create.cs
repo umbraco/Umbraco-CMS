@@ -11,7 +11,7 @@ public partial class ContentEditingServiceTests
 {
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Create_At_Root(bool allowedAtRoot)
+    public async Task Can_Create_At_Root(bool allowedAtRoot)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -64,7 +64,7 @@ public partial class ContentEditingServiceTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Create_As_Child(bool allowedAsChild)
+    public async Task Can_Create_As_Child(bool allowedAsChild)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -425,6 +425,38 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
+        Assert.IsNull(result.Result);
+    }
+
+    [Test]
+    public async Task Cannot_Create_Under_Trashed_Parent()
+    {
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
+        contentType.AllowedAsRoot = true;
+        contentType.AllowedContentTypes = new[]
+        {
+            new ContentTypeSort(new Lazy<int>(() => contentType.Id), contentType.Key, 1, contentType.Alias)
+        };
+        ContentTypeService.Save(contentType);
+
+        var rootKey = (await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key, InvariantName = "Root", ParentKey = Constants.System.RootKey
+            },
+            Constants.Security.SuperUserKey)).Result.Key;
+
+        await ContentEditingService.MoveToRecycleBinAsync(rootKey, Constants.Security.SuperUserKey);
+
+        var result = await ContentEditingService.CreateAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key, InvariantName = "Child", ParentKey = rootKey,
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InTrash, result.Status);
         Assert.IsNull(result.Result);
     }
 }

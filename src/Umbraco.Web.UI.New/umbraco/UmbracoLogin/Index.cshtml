@@ -1,23 +1,15 @@
+@model Umbraco.Cms.Web.UI.BackOfficeLoginModel
 @{
-    string returnTo = "/umbraco";
-    var redirectToValues = Context.Request.Query["redirectTo"];
-    if (redirectToValues.Count > 0)
-    {
-        var redirectTo = redirectToValues[0];
-        if (redirectTo is not null)
-        {
-            returnTo = redirectTo;
-        }
-    }
+    var authUrlLogin = Model.AuthUrl + "PostLogin";
 }
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Umbraco</title>
+<head>
+    <title>Umbraco</title>
 
-        <link rel="stylesheet" href="https://unpkg.com/blocks.css/dist/blocks.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/blocks.css/dist/blocks.min.css"/>
 
-        <style>
+    <style>
             body {
                 display: grid;
                 place-content: center;
@@ -33,20 +25,74 @@
                 place-items: center;
             }
         </style>
-    </head>
+</head>
 <body>
 <div class="card fixed block">
     <h1>Umbraco login universe</h1>
-    <p>We have not yet implemented login, so for your pleasure, we present you a login button that just works™</p>
-    <button type="button" id="login" class="accent block">LOGIN</button>
+    <p>We have not yet implemented the new login page, so for your pleasure,<br/>we present you a blocky experience that just works™</p>
+    <form id="loginform" method="post">
+        <div>
+            <label>Username: <input class="round block" type="text" name="username" autocomplete="username"></label>
+        </div>
+        <div>
+            <label>Password: <input class="round block" type="password" name="password" autocomplete="current-password"></label>
+        </div>
+        <button id="login" class="accent block">LOGIN</button>
+    </form>
 </div>
 
-    <script>
+<script>
     !(function () {
-        const button = document.getElementById("login");
-        button.addEventListener('click', () => {
-            sessionStorage.setItem('is-authenticated', 'true');
-            location.href = '@returnTo';
+        const authUrlLogin = "@authUrlLogin"
+        const returnUrl = "@Model.ReturnUrl".replaceAll("&amp;", "&")
+
+        console.log('urls', {authUrlLogin, returnUrl})
+
+        const form = document.getElementById("loginform");
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+
+            try {
+                const formData = new FormData(e.target)
+                const userName = formData.get("username")
+                const password = formData.get("password")
+                console.log('username', userName)
+
+                const res = await fetch(authUrlLogin, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        userName,
+                        password
+                    }),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+                const content = await res.text()
+                console.log('raw content', content)
+
+                if (!content) throw new Error('No content from server')
+
+                // Special AngularJS scraping
+                const splitContent = content.split("\n")
+
+                if (splitContent.length < 2) throw new Error('Invalid content from server')
+
+                const response = JSON.parse(splitContent[1])
+
+                if (response) {
+                    console.log('login success', response)
+                    if (returnUrl) {
+                        location.href = returnUrl
+                    }
+                }
+            } catch (err) {
+                alert('Could not login: ' + err.message)
+                throw err
+            }
         });
     })();
     </script>
