@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IScriptService : IService
 {
-    Task<Attempt<ScriptFile?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey);
+    Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey);
 }
