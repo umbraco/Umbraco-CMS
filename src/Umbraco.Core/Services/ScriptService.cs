@@ -14,7 +14,6 @@ public class ScriptService : RepositoryService, IScriptService
     private readonly IScriptRepository _scriptRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IUmbracoMapper _mapper;
     private readonly ILogger<ScriptService> _logger;
 
     private readonly string[] _allowedFileExtensions = { ".js" };
@@ -26,14 +25,12 @@ public class ScriptService : RepositoryService, IScriptService
         IScriptRepository scriptRepository,
         IAuditRepository auditRepository,
         IUserIdKeyResolver userIdKeyResolver,
-        IUmbracoMapper mapper,
         ILogger<ScriptService> logger)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _scriptRepository = scriptRepository;
         _auditRepository = auditRepository;
         _userIdKeyResolver = userIdKeyResolver;
-        _mapper = mapper;
         _logger = logger;
     }
 
