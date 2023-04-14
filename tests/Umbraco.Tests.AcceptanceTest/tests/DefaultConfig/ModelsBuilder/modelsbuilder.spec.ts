@@ -192,7 +192,9 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoApi.templates.ensureNameNotExists(docTypeName);
   });
 
-  test('Can update view and document type', async ({page, umbracoApi, umbracoUi}) => {
+  test('Can update view and document type', async ({page, umbracoApi, umbracoUi}, testInfo) => {
+    await testInfo.slow();
+    
     const docTypeName = "TestDocument";
     const docTypeAlias = AliasHelper.toAlias(docTypeName);
     const propertyAlias = "title";
