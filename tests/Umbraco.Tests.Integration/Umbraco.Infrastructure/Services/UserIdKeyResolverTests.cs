@@ -61,16 +61,14 @@ public class UserIdKeyResolverTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Unknown_Key_Resolves_To_Null()
+    public async Task Unknown_Key_Throws()
     {
-        var resolvedId = await UserIdKeyResolver.GetAsync(Guid.NewGuid());
-        Assert.IsNull(resolvedId);
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await UserIdKeyResolver.GetAsync(Guid.NewGuid()));
     }
 
     [Test]
-    public async Task Unknown_Id_Resolves_To_Null()
+    public async Task Unknown_Id_Throws()
     {
-        var resolvedKey = await UserIdKeyResolver.GetAsync(1234567890);
-        Assert.IsNull(resolvedKey);
+         Assert.ThrowsAsync<InvalidOperationException>(async () => await UserIdKeyResolver.GetAsync(1234567890));
     }
 }
