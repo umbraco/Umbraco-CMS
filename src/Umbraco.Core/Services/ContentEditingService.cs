@@ -152,5 +152,5 @@ internal sealed class ContentEditingService
         }
     }
 
-    private async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+    private async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 }
