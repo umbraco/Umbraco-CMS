@@ -441,6 +441,40 @@
         }
       }
     },
+    "/umbraco/management/api/v1/data-type/{id}/is-used": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeByIdIsUsed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/data-type/{id}/move": {
       "post": {
         "tags": [
@@ -4806,6 +4840,53 @@
         "responses": {
           "200": {
             "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/property-type/is-used": {
+      "get": {
+        "tags": [
+          "Property Type"
+        ],
+        "operationId": "GetPropertyTypeIsUsed",
+        "parameters": [
+          {
+            "name": "contentTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "propertyAlias",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedBooleanModel"
+                }
+              }
+            }
           }
         }
       }
@@ -10119,6 +10200,26 @@
                   "$ref": "#/components/schemas/AuditLogWithUsernameResponseModel"
                 }
               ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedBooleanModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
             }
           }
         },
