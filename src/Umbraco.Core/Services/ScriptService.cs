@@ -69,8 +69,8 @@ public class ScriptService : RepositoryService, IScriptService
         scope.Notifications.Publish(
             new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
 
-        var performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
-        Audit(AuditType.Delete, performingUserId ?? -1);
+        int performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        Audit(AuditType.Delete, performingUserId);
 
         scope.Complete();
         return ScriptOperationStatus.Success;
@@ -106,8 +106,8 @@ public class ScriptService : RepositoryService, IScriptService
         _scriptRepository.Save(script);
 
         scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
-        int? userId = await _userIdKeyResolver.GetAsync(performingUserKey);
-        Audit(AuditType.Save, userId ?? -1);
+        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        Audit(AuditType.Save, userId);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
