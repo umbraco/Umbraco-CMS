@@ -57,9 +57,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
         // Handle Sorting
         IOrdering? sortQuery = HandleSorting(sorts, queryOperation);
 
-        ISearchResults? results = sortQuery is not null
-            ? sortQuery.Execute(QueryOptions.SkipTake(skip, take))
-            : DefaultSort(queryOperation)?.Execute(QueryOptions.SkipTake(skip, take));
+        ISearchResults? results = (sortQuery ?? DefaultSort(queryOperation))?.Execute(QueryOptions.SkipTake(skip, take));
 
         if (results is null)
         {
