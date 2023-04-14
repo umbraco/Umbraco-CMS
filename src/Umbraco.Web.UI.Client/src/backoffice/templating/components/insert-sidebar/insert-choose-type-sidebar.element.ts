@@ -1,8 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS } from './manifest';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
+
+export const UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL = new UmbModalToken(
+	UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS,
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);
 
 @customElement('umb-insert-sidebar')
 export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hidePartialViews: boolean }> {
@@ -20,7 +29,7 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hideP
 				height: calc(100vh - 124px);
 			}
 
-			#main uui-button {
+			#main uui-button:not(:last-of-type) {
 				display: block;
 				margin-bottom: var(--uui-size-space-5);
 			}
@@ -45,12 +54,16 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hideP
 		});
 	}
 
+	#openInsertValueSidebar() {
+		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
+	}
+
 	render() {
 		return html`
 			<umb-workspace-layout headline="Insert">
 				<div id="main">
 					<uui-box>
-						<uui-button @click=${this._close} look="placeholder" label="Insert value"
+						<uui-button @click=${this.#openInsertValueSidebar} look="placeholder" label="Insert value"
 							><h3>Value</h3>
 							<p>
 								Displays the value of a named field from the current page, with options to modify the value or fallback
