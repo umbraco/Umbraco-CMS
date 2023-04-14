@@ -8,4 +8,5 @@ public enum ScriptOperationStatus
     InvalidFileExtension,
     ParentNotFound,
     PathTooLong,
+    NotFound,
 }

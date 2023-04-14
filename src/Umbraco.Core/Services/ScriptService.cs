@@ -46,6 +46,36 @@ public class ScriptService : RepositoryService, IScriptService
         return Task.FromResult(script);
     }
 
+    public async Task<ScriptOperationStatus> DeleteAsync(string path, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IScript? script = _scriptRepository.Get(path);
+        if (script is null)
+        {
+            return ScriptOperationStatus.NotFound;
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        var deletingNotification = new ScriptDeletingNotification(script, eventMessages);
+        if (scope.Notifications.PublishCancelable(deletingNotification))
+        {
+            return ScriptOperationStatus.CancelledByNotification;
+        }
+
+        _scriptRepository.Delete(script);
+
+        scope.Notifications.Publish(
+            new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
+
+        var performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        Audit(AuditType.Delete, performingUserId ?? -1);
+
+        scope.Complete();
+        return ScriptOperationStatus.Success;
+    }
+
     public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
