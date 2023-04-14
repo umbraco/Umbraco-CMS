@@ -17,15 +17,14 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddUmbracoEfCoreContext<T>(this IServiceCollection services, string providerName, string connectionString) where T : DbContext
+    public static IServiceCollection AddUmbracoEfCoreContext<T>(this IServiceCollection services, IConfiguration configuration) where T : DbContext
     {
-
+        string? connectionString = configuration.GetUmbracoConnectionString("umbracoDbDSN", out string? providerName);
         services.AddDbContext<T>(
             options =>
             {
                 DefaultOptionsAction(options, providerName, connectionString);
-            },
-            optionsLifetime: ServiceLifetime.Singleton);
+            });
 
         services.AddDbContextFactory<T>(options =>
         {
@@ -44,7 +43,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         return services;
     }
 
-    private static void DefaultOptionsAction(DbContextOptionsBuilder options, string providerName, string connectionString)
+    private static void DefaultOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString)
     {
         if (connectionString.IsNullOrWhiteSpace())
         {
