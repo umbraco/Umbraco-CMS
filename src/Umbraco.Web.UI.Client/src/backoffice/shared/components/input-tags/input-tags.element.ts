@@ -1,9 +1,9 @@
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UUIInputElement, UUITagElement } from '@umbraco-ui/uui';
-import { UmbLitElement } from '@umbraco-cms/element';
+import { UUIInputElement, UUIInputEvent, UUIPopoverElement, UUITagElement } from '@umbraco-ui/uui';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-tags')
 export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
@@ -12,6 +12,10 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 		css`
 			:host {
 				box-sizing: border-box;
+			}
+
+			uui-popover {
+				width: auto;
 			}
 
 			#wrapper {
@@ -44,7 +48,7 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 			}
 
 			#tag-add-wrapper {
-				padding: 3px 4px;
+				padding: 3px 3px;
 				background-color: var(--uui-color-selected-contrast);
 				//transition: width 500ms ease-in;
 				width: 20px;
@@ -110,6 +114,21 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 			.tag uui-icon:active {
 				color: var(--uui-color-selected-contrast);
 			}
+
+			#matching-tags button {
+				cursor: pointer;
+				text-align: left;
+				display: block;
+				width: 100%;
+				background: none;
+				border: none;
+				padding: 5px 7.5px;
+			}
+
+			#matching-tags button:hover,
+			#matching-tags button:focus {
+				background: var(--uui-color-focus);
+			}
 		`,
 	];
 
@@ -126,11 +145,20 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 		return this._items;
 	}
 
+	@state()
+	private _matches: Array<string> = [];
+
+	@state()
+	private _currentInput = '';
+
 	@query('#tag-input')
 	private _tagInput!: UUIInputElement;
 
 	@query('#tag-add-wrapper')
 	private _tagWrapper!: UUITagElement;
+
+	@query('#popover')
+	private _popover!: UUIPopoverElement;
 
 	public focus() {
 		this._tagInput.focus();
@@ -149,8 +177,8 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#onKeydown(e: KeyboardEvent) {
-		//Prevent tab away if there is a input
-		if (e.key === 'Tab' && (this._tagInput.value as string).trim().length) {
+		//Prevent tab away if there is a input, but no matches.
+		if (e.key === 'Tab' && (this._tagInput.value as string).trim().length && !this._matches.length) {
 			e.preventDefault();
 			this.#createTag();
 			return;
@@ -162,7 +190,21 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 		this.#inputError(false);
 	}
 
+	#onInput(e: UUIInputEvent) {
+		this._currentInput = e.target.value as string;
+
+		//TODO: If match an existing tag
+		if (this._currentInput.length) this._popover.open = true;
+		//else this._popover.open = false;
+	}
+
+	#onBlur() {
+		if (this._matches.length) return;
+		this.#createTag();
+	}
+
 	#createTag() {
+		this._currentInput = '';
 		this.#inputError(false);
 		const newTag = (this._tagInput.value as string).trim();
 		if (!newTag) return;
@@ -196,19 +238,25 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` <div id="wrapper">
-			${this.#renderTags()}
-			<uui-tag look="outline" id="tag-add-wrapper" @click="${this.focus}">
-				<input
-					size="10"
-					id="tag-input"
-					aria-label="tag input"
-					@keydown="${this.#onKeydown}"
-					placeholder="Enter tag"
-					@blur="${this.#createTag}" />
-				<uui-icon id="icon-add" name="umb:add"></uui-icon>
-			</uui-tag>
-		</div>`;
+		return html`
+			<div id="wrapper">
+				${this.#renderTags()}
+				<uui-popover placement="bottom-start" id="popover">
+					<uui-tag look="outline" id="tag-add-wrapper" @click="${this.focus}" slot="trigger">
+						<input
+							size="10"
+							id="tag-input"
+							aria-label="tag input"
+							@keydown="${this.#onKeydown}"
+							@input="${this.#onInput}"
+							placeholder="Enter tag"
+							@blur="${this.#onBlur}" />
+						<uui-icon id="icon-add" name="umb:add"></uui-icon>
+					</uui-tag>
+					<div slot="popover">${this.#renderTagOptions()}</div>
+				</uui-popover>
+			</div>
+		`;
 	}
 
 	#renderTags() {
@@ -220,6 +268,14 @@ export class UmbInputTagsElement extends FormControlMixin(UmbLitElement) {
 				</uui-tag>
 			`;
 		})}`;
+	}
+
+	#renderTagOptions() {
+		if (!this._currentInput.length) return nothing;
+		return html`<uui-box id="matching-tags" style="--uui-box-default-padding: 0;">
+			<button>${this._currentInput}</button>
+			<button>${this._currentInput}</button>
+		</uui-box>`;
 	}
 }
 
