@@ -11,7 +11,7 @@ import {
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbClassState,
-	NumberState,
+	UmbNumberState,
 	UmbObjectState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
@@ -27,7 +27,7 @@ export class UmbWorkspaceVariantContext {
 		return this.#workspaceContext;
 	}
 
-	#index = new NumberState(undefined);
+	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
 
 	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);

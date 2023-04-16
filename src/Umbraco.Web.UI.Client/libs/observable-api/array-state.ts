@@ -1,17 +1,17 @@
-import { DeepState } from './deep-state';
+import { UmbDeepState } from './deep-state';
 import { partialUpdateFrozenArray } from './partial-update-frozen-array.function';
 import { pushToUniqueArray } from './push-to-unique-array.function';
 
 /**
  * @export
  * @class UmbArrayState
- * @extends {DeepState<T>}
+ * @extends {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  *
  * The ArrayState provides methods to append data when the data is an Object.
  */
-export class UmbArrayState<T> extends DeepState<T[]> {
+export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	#getUnique?: (entry: T) => unknown;
 	#sortMethod?: (a: T, b: T) => number;
 

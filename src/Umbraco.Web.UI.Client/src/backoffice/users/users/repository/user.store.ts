@@ -1,5 +1,5 @@
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
-import { UmbArrayState, NumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -18,7 +18,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 	#users = new UmbArrayState<UserDetails>([], (x) => x.id);
 	public users = this.#users.asObservable();
 
-	#totalUsers = new NumberState(0);
+	#totalUsers = new UmbNumberState(0);
 	public readonly totalUsers = this.#totalUsers.asObservable();
 
 	constructor(host: UmbControllerHostElement) {

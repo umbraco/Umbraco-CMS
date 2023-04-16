@@ -1,15 +1,15 @@
-import { DeepState } from './deep-state';
+import { UmbDeepState } from './deep-state';
 
 /**
  * @export
  * @class UmbObjectState
- * @extends {DeepState<T>}
+ * @extends {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  *
  * The UmbObjectState provides methods to append data when the data is an Object.
  */
-export class UmbObjectState<T> extends DeepState<T> {
+export class UmbObjectState<T> extends UmbDeepState<T> {
 	/**
 	 * @method update
 	 * @param {Partial<T>} partialData - A object containing some of the data to update in this Subject.

@@ -8,7 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbObjectState, NumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Context API for the installer
@@ -23,7 +23,7 @@ export class UmbInstallerContext {
 	});
 	public readonly data = this._data.asObservable();
 
-	private _currentStep = new NumberState<number>(1);
+	private _currentStep = new UmbNumberState<number>(1);
 	public readonly currentStep = this._currentStep.asObservable();
 
 	private _settings = new UmbObjectState<InstallSettingsResponseModel | undefined>(undefined);

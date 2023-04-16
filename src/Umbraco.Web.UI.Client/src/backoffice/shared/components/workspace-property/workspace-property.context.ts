@@ -6,7 +6,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import {
 	UmbClassState,
 	UmbObjectState,
-	StringState,
+	UmbStringState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -43,7 +43,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	public readonly variantId = this.#variantId.asObservable();
 
-	private _variantDifference = new StringState(undefined);
+	private _variantDifference = new UmbStringState(undefined);
 	public readonly variantDifference = this._variantDifference.asObservable();
 
 	private _workspaceContext?: UmbWorkspaceVariableEntityContextInterface;

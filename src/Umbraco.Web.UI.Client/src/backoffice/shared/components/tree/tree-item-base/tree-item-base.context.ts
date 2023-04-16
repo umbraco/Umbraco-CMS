@@ -7,7 +7,12 @@ import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/sect
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbTreeItemContext } from '../tree-item.context.interface';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbBooleanState, DeepState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbBooleanState,
+	UmbDeepState,
+	UmbStringState,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbContextConsumerController,
@@ -27,7 +32,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	public unique?: string;
 	public type?: string;
 
-	#treeItem = new DeepState<T | undefined>(undefined);
+	#treeItem = new UmbDeepState<T | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
 
 	#hasChildren = new UmbBooleanState(false);
@@ -48,7 +53,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	#hasActions = new UmbBooleanState(false);
 	hasActions = this.#hasActions.asObservable();
 
-	#path = new StringState('');
+	#path = new UmbStringState('');
 	path = this.#path.asObservable();
 
 	treeContext?: UmbTreeContextBase;

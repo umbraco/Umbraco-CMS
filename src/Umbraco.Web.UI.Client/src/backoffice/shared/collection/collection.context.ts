@@ -25,7 +25,7 @@ export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel =
 
 	/*
 	TODO:
-	private _search = new StringState('');
+	private _search = new UmbStringState('');
 	public readonly search = this._search.asObservable();
 	*/
 
