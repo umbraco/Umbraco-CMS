@@ -3,7 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbContextConsumer } from '../consume/context-consumer';
 import { UmbContextProviderController } from './context-provider.controller';
 
-class MyClass {
+class UmbTestContextProviderControllerClass {
 	prop = 'value from provider';
 }
 
@@ -11,13 +11,13 @@ class ControllerHostElement extends UmbLitElement {}
 const controllerHostElement = defineCE(ControllerHostElement);
 
 describe('UmbContextProviderController', () => {
-	let instance: MyClass;
+	let instance: UmbTestContextProviderControllerClass;
 	let provider: UmbContextProviderController;
 	let element: UmbLitElement;
 
 	beforeEach(async () => {
 		element = await fixture(`<${controllerHostElement}></${controllerHostElement}>`);
-		instance = new MyClass();
+		instance = new UmbTestContextProviderControllerClass();
 		provider = new UmbContextProviderController(element, 'my-test-context', instance);
 	});
 
@@ -39,11 +39,15 @@ describe('UmbContextProviderController', () => {
 	});
 
 	it('works with UmbContextConsumer', (done) => {
-		const localConsumer = new UmbContextConsumer(element, 'my-test-context', (_instance: MyClass) => {
-			expect(_instance.prop).to.eq('value from provider');
-			done();
-			localConsumer.hostDisconnected();
-		});
+		const localConsumer = new UmbContextConsumer(
+			element,
+			'my-test-context',
+			(_instance: UmbTestContextProviderControllerClass) => {
+				expect(_instance.prop).to.eq('value from provider');
+				done();
+				localConsumer.hostDisconnected();
+			}
+		);
 		localConsumer.hostConnected();
 	});
 
