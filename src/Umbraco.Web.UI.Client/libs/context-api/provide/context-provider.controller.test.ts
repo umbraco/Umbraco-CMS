@@ -7,8 +7,8 @@ class UmbTestContextProviderControllerClass {
 	prop = 'value from provider';
 }
 
-class ControllerHostElement extends UmbLitElement {}
-const controllerHostElement = defineCE(ControllerHostElement);
+class UmbTestControllerHostElement extends UmbLitElement {}
+const controllerHostElement = defineCE(UmbTestControllerHostElement);
 
 describe('UmbContextProviderController', () => {
 	let instance: UmbTestContextProviderControllerClass;
