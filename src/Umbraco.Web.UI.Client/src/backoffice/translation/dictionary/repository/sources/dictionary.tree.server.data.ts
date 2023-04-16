@@ -6,10 +6,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Dictionary tree that fetches data from the server
  * @export
- * @class DictionaryTreeServerDataSource
+ * @class UmbDictionaryTreeServerDataSource
  * @implements {DictionaryTreeDataSource}
  */
-export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -24,7 +24,7 @@ export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof DictionaryTreeServerDataSource
+	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, DictionaryResource.getTreeDictionaryRoot({}));
@@ -34,7 +34,7 @@ export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof DictionaryTreeServerDataSource
+	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
@@ -54,7 +54,7 @@ export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof DictionaryTreeServerDataSource
+	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids || ids.length === 0) {

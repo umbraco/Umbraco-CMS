@@ -8,8 +8,8 @@ import {
 } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('story-notification-default-example')
-export class StoryNotificationDefaultExampleElement extends UmbLitElement {
+@customElement('umb-story-notification-default-example')
+export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {
 	private _notificationContext?: UmbNotificationContext;
 
 	connectedCallback(): void {
@@ -56,6 +56,6 @@ export class StoryNotificationDefaultExampleElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'story-notification-default-example': StoryNotificationDefaultExampleElement;
+		'umb-story-notification-default-example': UmbStoryNotificationDefaultExampleElement;
 	}
 }
