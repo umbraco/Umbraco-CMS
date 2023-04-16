@@ -1,6 +1,6 @@
 import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
 import type { Entity } from '@umbraco-cms/backoffice/models';
-import { ObjectState, StringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, StringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type ActiveTreeItemType = Entity | undefined;

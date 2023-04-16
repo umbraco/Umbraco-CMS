@@ -11,7 +11,7 @@ Generally a Store will be holding one or more RxJS Subjects, each Subject is mad
 
 ```typescript
 class MyProductStore {
-	#products = new ArrayState(<Array<MyProductType>>[], (product) => product.id);
+	#products = new UmbArrayState(<Array<MyProductType>>[], (product) => product.id);
 
 	public readonly products = this.#products.asObservable();
 
@@ -118,7 +118,7 @@ This example give some inspiration to how fine grained this can become:
 
 ```typescript
 class MyProductStore {
-  #products = new ArrayState(<Array<MyProductType>>[]);
+  #products = new UmbArrayState(<Array<MyProductType>>[]);
 
   public readonly products = this.#products.asObservable();
   public readonly amountOfProducts = this.#products.getObservablePart((products) => products.length);
@@ -138,7 +138,7 @@ In the examples of this guide each product has a id, and we have clarified this 
 
 ```typescript
 class MyProductStore {
-  #products = new ArrayState(<Array<MyProductType>>[], (product) => product.id);
+  #products = new UmbArrayState(<Array<MyProductType>>[], (product) => product.id);
   ...
 }
 ```

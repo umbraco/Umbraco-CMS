@@ -8,7 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ObjectState, NumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, NumberState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Context API for the installer
@@ -16,7 +16,7 @@ import { ObjectState, NumberState } from '@umbraco-cms/backoffice/observable-api
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
-	private _data = new ObjectState<InstallVResponseModel>({
+	private _data = new UmbObjectState<InstallVResponseModel>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '' },
 		telemetryLevel: TelemetryLevelModel.BASIC,
@@ -26,10 +26,10 @@ export class UmbInstallerContext {
 	private _currentStep = new NumberState<number>(1);
 	public readonly currentStep = this._currentStep.asObservable();
 
-	private _settings = new ObjectState<InstallSettingsResponseModel | undefined>(undefined);
+	private _settings = new UmbObjectState<InstallSettingsResponseModel | undefined>(undefined);
 	public readonly settings = this._settings.asObservable();
 
-	private _installStatus = new ObjectState<ProblemDetailsModel | null>(null);
+	private _installStatus = new UmbObjectState<ProblemDetailsModel | null>(null);
 	public readonly installStatus = this._installStatus.asObservable();
 
 	constructor() {

@@ -7,7 +7,7 @@ import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/sect
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbTreeItemContext } from '../tree-item.context.interface';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
-import { BooleanState, DeepState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, DeepState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbContextConsumerController,
@@ -30,22 +30,22 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	#treeItem = new DeepState<T | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
 
-	#hasChildren = new BooleanState(false);
+	#hasChildren = new UmbBooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
 
-	#isLoading = new BooleanState(false);
+	#isLoading = new UmbBooleanState(false);
 	isLoading = this.#isLoading.asObservable();
 
-	#isSelectable = new BooleanState(false);
+	#isSelectable = new UmbBooleanState(false);
 	isSelectable = this.#isSelectable.asObservable();
 
-	#isSelected = new BooleanState(false);
+	#isSelected = new UmbBooleanState(false);
 	isSelected = this.#isSelected.asObservable();
 
-	#isActive = new BooleanState(false);
+	#isActive = new UmbBooleanState(false);
 	isActive = this.#isActive.asObservable();
 
-	#hasActions = new BooleanState(false);
+	#hasActions = new UmbBooleanState(false);
 	hasActions = this.#hasActions.asObservable();
 
 	#path = new StringState('');

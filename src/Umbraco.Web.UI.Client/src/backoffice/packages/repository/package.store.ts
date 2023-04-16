@@ -5,7 +5,7 @@ import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbPackage } from '@umbraco-cms/backoffice/models';
 import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export const UMB_PACKAGE_STORE_TOKEN = new UmbContextToken<UmbPackageStore>('UmbPackageStore');
 
@@ -21,9 +21,9 @@ export class UmbPackageStore extends UmbStoreBase {
 	 */
 	#packages = new ReplaySubject<Array<UmbPackage>>(1);
 
-	#extensions = new ArrayState<ManifestBase>([], (e) => e.alias);
+	#extensions = new UmbArrayState<ManifestBase>([], (e) => e.alias);
 
-	#migrations = new ArrayState<PackageMigrationStatusResponseModel>([], (e) => e.packageName);
+	#migrations = new UmbArrayState<PackageMigrationStatusResponseModel>([], (e) => e.packageName);
 
 	/**
 	 * Observable of packages with extensions

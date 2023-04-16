@@ -1,5 +1,5 @@
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -9,7 +9,7 @@ import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
  * @description - General Tree Data Store
  */
 export class UmbFileSystemTreeStore extends UmbStoreBase implements UmbTreeStore<FileSystemTreeItemPresentationModel> {
-	#data = new ArrayState<FileSystemTreeItemPresentationModel>([], (x) => x.path);
+	#data = new UmbArrayState<FileSystemTreeItemPresentationModel>([], (x) => x.path);
 
 	/**
 	 * Appends items to the store

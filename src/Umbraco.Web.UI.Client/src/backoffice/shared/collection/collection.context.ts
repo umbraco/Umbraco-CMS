@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextToken, UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry, createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
@@ -17,10 +17,10 @@ export class UmbCollectionContext<DataType extends EntityTreeItemResponseModel =
 	private _store?: any;
 	protected _dataObserver?: UmbObserverController<DataType[]>;
 
-	#data = new ArrayState(<Array<DataType>>[]);
+	#data = new UmbArrayState(<Array<DataType>>[]);
 	public readonly data = this.#data.asObservable();
 
-	#selection = new ArrayState(<Array<string>>[]);
+	#selection = new UmbArrayState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
 	/*

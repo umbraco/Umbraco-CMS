@@ -1,6 +1,6 @@
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -11,7 +11,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  * @description - Data Store for Document Types
  */
 export class UmbDocumentTypeStore extends UmbStoreBase {
-	#data = new ArrayState<DocumentTypeResponseModel>([], (x) => x.id);
+	#data = new UmbArrayState<DocumentTypeResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbDocumentTypeStore.

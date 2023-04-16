@@ -1,10 +1,10 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository';
 import {
-	BasicState,
-	ArrayState,
+	UmbBasicState,
+	UmbArrayState,
 	createObservablePart,
 	DeepState,
-	ObjectState,
+	UmbObjectState,
 	StringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -58,7 +58,7 @@ export class UmbLogViewerWorkspaceContext {
 		endDate: this.today,
 	};
 
-	#savedSearches = new ObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
+	#savedSearches = new UmbObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
 	savedSearches = createObservablePart(this.#savedSearches, (data) => data?.items);
 
 	#logCount = new DeepState<LogLevelCountsReponseModel | null>(null);
@@ -70,7 +70,7 @@ export class UmbLogViewerWorkspaceContext {
 	#loggers = new DeepState<PagedLoggerResponseModel | null>(null);
 	loggers = createObservablePart(this.#loggers, (data) => data?.items);
 
-	#canShowLogs = new BasicState<boolean | null>(null);
+	#canShowLogs = new UmbBasicState<boolean | null>(null);
 	canShowLogs = createObservablePart(this.#canShowLogs, (data) => data);
 
 	#filterExpression = new StringState<string>('');
@@ -79,17 +79,17 @@ export class UmbLogViewerWorkspaceContext {
 	#messageTemplates = new DeepState<PagedLogTemplateResponseModel | null>(null);
 	messageTemplates = createObservablePart(this.#messageTemplates, (data) => data);
 
-	#logLevelsFilter = new ArrayState<LogLevelModel>([]);
+	#logLevelsFilter = new UmbArrayState<LogLevelModel>([]);
 	logLevelsFilter = createObservablePart(this.#logLevelsFilter, (data) => data);
 
 	#logs = new DeepState<PagedLogMessageResponseModel | null>(null);
 	logs = createObservablePart(this.#logs, (data) => data?.items);
 	logsTotal = createObservablePart(this.#logs, (data) => data?.total);
 
-	#polling = new ObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
+	#polling = new UmbObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
 	polling = createObservablePart(this.#polling, (data) => data);
 
-	#sortingDirection = new BasicState<DirectionModel>(DirectionModel.ASCENDING);
+	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.ASCENDING);
 	sortingDirection = createObservablePart(this.#sortingDirection, (data) => data);
 
 	#intervalID: number | null = null;

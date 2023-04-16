@@ -2,10 +2,10 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
 import { StylesheetDetails } from '..';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {
-	#data = new ObjectState<StylesheetDetails | undefined>(undefined);
+	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
