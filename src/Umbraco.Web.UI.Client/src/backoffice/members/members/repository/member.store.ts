@@ -11,18 +11,16 @@ import type { MemberDetails } from '@umbraco-cms/backoffice/models';
  * @description - Data Store for Members
  */
 export class UmbMemberStore extends UmbStoreBase {
-	#data = new ArrayState<MemberDetails>([], (x) => x.id);
-
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEMBER_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEMBER_STORE_CONTEXT_TOKEN.toString(), new ArrayState<MemberDetails>([], (x) => x.id));
 	}
 
 	append(member: MemberDetails) {
-		this.#data.append([member]);
+		this._data.append([member]);
 	}
 
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 
