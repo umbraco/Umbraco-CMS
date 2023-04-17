@@ -21,10 +21,15 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
+	 * @default 0
 	 */
 	@property({ type: Number })
-	min?: number;
+	public get min(): number {
+		return this.#pickerContext.min;
+	}
+	public set min(value: number) {
+		this.#pickerContext.min = value;
+	}
 
 	/**
 	 * Min validation message.
@@ -39,10 +44,15 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
+	 * @default Infinite
 	 */
 	@property({ type: Number })
-	max?: number;
+	public get max(): number {
+		return this.#pickerContext.max;
+	}
+	public set max(value: number) {
+		this.#pickerContext.max = value;
+	}
 
 	/**
 	 * Max validation message.
@@ -92,7 +102,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedIsoCodes.length > this.max
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.selectedIsoCodes = selection));
+		this.observe(this.#pickerContext.selection, (selection) => (this._selectedIsoCodes = selection));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
@@ -101,14 +111,15 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _openPicker() {
-		// TODO: add filter
-		// filter: this.filter,
-		this.#pickerContext.openPicker();
+		this.#pickerContext.openPicker({
+			filter: this.filter,
+			hello: 'world',
+		});
 	}
 
 	render() {
 		return html`
-			${this._items.map((item) => this._renderItem(item))}
+			<uui-ref-list> ${this._items.map((item) => this._renderItem(item))} </uui-ref-list>
 			<uui-button
 				id="add-button"
 				look="placeholder"

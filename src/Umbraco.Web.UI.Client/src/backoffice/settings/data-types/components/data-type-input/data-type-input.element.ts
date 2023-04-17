@@ -44,11 +44,16 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	 * @attr
 	 * @default undefined
 	 */
+	private _max: number | undefined;
 	@property({ type: Number })
+	public get max(): number | undefined {
+		return this._max;
+	}
 	public set max(value: number | undefined) {
 		if (value !== undefined) {
 			this.#pickerContext.max = value;
 		}
+		this._max = value;
 	}
 
 	/**

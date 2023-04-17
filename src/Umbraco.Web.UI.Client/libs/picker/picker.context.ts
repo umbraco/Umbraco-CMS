@@ -1,4 +1,4 @@
-import { UmbItemRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
@@ -14,7 +14,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
 export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
-	modalAlias: UmbModalToken | string;
+	modalAlias: string | UmbModalToken;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
@@ -36,7 +36,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	constructor(
 		host: UmbControllerHostElement,
 		repositoryAlias: string,
-		modalAlias: UmbModalToken | string,
+		modalAlias: string | UmbModalToken,
 		getUniqueMethod?: (entry: ItemType) => string | undefined
 	) {
 		this.host = host;
@@ -74,13 +74,14 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 		this.#selection.next(selection);
 	}
 
-	// TODO: this need to accept an options object at some point to pass to the modal context
-	openPicker() {
+	// TODO: revisit this method. How do we best pass picker data?
+	openPicker(pickerData: any) {
 		if (!this.modalContext) throw new Error('Modal context is not initialized');
 
 		const modalHandler = this.modalContext.open(this.modalAlias, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this.getSelection()],
+			...pickerData,
 		});
 
 		modalHandler?.onSubmit().then(({ selection }: any) => {
