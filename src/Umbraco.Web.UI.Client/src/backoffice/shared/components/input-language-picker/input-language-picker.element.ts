@@ -3,17 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbLanguageRepository } from '../../../settings/languages/repository/language.repository';
-import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-	UMB_LANGUAGE_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import { UmbLanguagePickerContext } from './input-language-picker.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
@@ -71,7 +63,6 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	public set selectedIsoCodes(isoCodes: Array<string>) {
 		this._selectedIsoCodes = isoCodes;
 		super.value = isoCodes.join(',');
-		this._observePickedItems();
 	}
 
 	@property()
@@ -82,11 +73,9 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@state()
-	private _items?: Array<LanguageResponseModel>;
+	private _items: Array<LanguageResponseModel> = [];
 
-	private _modalContext?: UmbModalContext;
-	private _repository = new UmbLanguageRepository(this);
-	private _pickedItemsObserver?: UmbObserverController<LanguageResponseModel[]>;
+	#pickerContext = new UmbLanguagePickerContext(this);
 
 	constructor() {
 		super();
@@ -103,60 +92,23 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this._selectedIsoCodes.length > this.max
 		);
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
-			this._modalContext = instance;
-		});
+		this.observe(this.#pickerContext.selection, (selection) => (this.selectedIsoCodes = selection));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected getFormElement() {
 		return undefined;
 	}
 
-	private async _observePickedItems() {
-		this._pickedItemsObserver?.destroy();
-		if (!this._repository) return;
-
-		const { asObservable } = await this._repository.requestItems(this._selectedIsoCodes);
-
-		this._pickedItemsObserver = this.observe(asObservable(), (items) => {
-			this._items = items;
-		});
-	}
-
 	private _openPicker() {
-		const modalHandler = this._modalContext?.open(UMB_LANGUAGE_PICKER_MODAL, {
-			multiple: this.max === 1 ? false : true,
-			selection: [...this._selectedIsoCodes],
-			filter: this.filter,
-		});
-
-		modalHandler?.onSubmit().then(({ selection }) => {
-			this._setSelection(selection);
-		});
-	}
-
-	private _removeItem(item: LanguageResponseModel) {
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
-		});
-
-		modalHandler?.onSubmit().then(() => {
-			const newSelection = this._selectedIsoCodes.filter((value) => value !== item.isoCode);
-			this._setSelection(newSelection);
-		});
-	}
-
-	private _setSelection(newSelection: Array<string>) {
-		this.selectedIsoCodes = newSelection;
-		this.dispatchEvent(new UmbChangeEvent());
+		// TODO: add filter
+		// filter: this.filter,
+		this.#pickerContext.openPicker();
 	}
 
 	render() {
 		return html`
-			${this._items?.map((item) => this._renderItem(item))}
+			${this._items.map((item) => this._renderItem(item))}
 			<uui-button
 				id="add-button"
 				look="placeholder"
@@ -169,11 +121,14 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	private _renderItem(item: LanguageResponseModel) {
+		if (!item.isoCode) return;
 		return html`
 			<!-- TODO: add language ref element -->
 			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.isoCode)}>
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this._removeItem(item)} label="Remove ${item.name}">Remove</uui-button>
+					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.isoCode!)} label="Remove ${item.name}"
+						>Remove</uui-button
+					>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;

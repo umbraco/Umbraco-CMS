@@ -10,11 +10,13 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
 export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
 	modalAlias: UmbModalToken | string;
 	repository?: UmbTreeRepository<ItemType>;
+	#getUnique: (entry: ItemType) => string | undefined;
 
 	public modalContext?: UmbModalContext;
 
@@ -29,9 +31,17 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	max = Infinity;
 	min = 0;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, modalAlias: UmbModalToken | string) {
+	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
+	then it need to be bound to the type and can't be a generic method we pass in. */
+	constructor(
+		host: UmbControllerHostElement,
+		repositoryAlias: string,
+		modalAlias: UmbModalToken | string,
+		getUniqueMethod?: (entry: ItemType) => string | undefined
+	) {
 		this.host = host;
 		this.modalAlias = modalAlias;
+		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
 		// TODO: unsure a method can't be called before everything is initialized
 		new UmbObserverController(
@@ -75,6 +85,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 
 		modalHandler?.onSubmit().then(({ selection }: any) => {
 			this.setSelection(selection);
+			this.host.dispatchEvent(new UmbChangeEvent());
 			// TODO: we only want to request items that are not already in the selectedItems array
 			this.#requestItems();
 		});
@@ -84,7 +95,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 		if (!this.repository) throw new Error('Repository is not initialized');
 
 		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
-		const item = this.#selectedItems.value.find((item) => item.id === unique);
+		const item = this.#selectedItems.value.find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
 		const modalHandler = this.modalContext?.open(UMB_CONFIRM_MODAL, {
@@ -117,7 +128,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 
 		// remove items items from selectedItems array
 		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
-		const newSelectedItems = this.#selectedItems.value.filter((item) => item.id !== unique);
+		const newSelectedItems = this.#selectedItems.value.filter((item) => this.#getUnique(item) !== unique);
 		this.#selectedItems.next(newSelectedItems);
 	}
 }
