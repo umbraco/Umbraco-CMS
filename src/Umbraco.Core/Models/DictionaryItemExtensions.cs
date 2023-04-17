@@ -10,7 +10,7 @@ public static class DictionaryItemExtensions
     /// <param name="d"></param>
     /// <param name="languageId"></param>
     /// <returns></returns>
-    [Obsolete("This will be replaced in V13 by a corresponding method accepting language ISO code instead of language ID.")]
+    [Obsolete("This will be replaced in V15 by a corresponding method accepting language ISO code instead of language ID.")]
     public static string? GetTranslatedValue(this IDictionaryItem d, int languageId)
     {
         IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.LanguageId == languageId);
