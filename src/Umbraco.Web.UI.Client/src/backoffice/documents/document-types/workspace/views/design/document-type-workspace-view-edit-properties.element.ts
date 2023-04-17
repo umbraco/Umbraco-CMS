@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypePropertyTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
 import './document-type-workspace-view-edit-property.element';
+import { UmbSorterController } from '@umbraco-cms/sorter';
 
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -46,12 +47,15 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 
 	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
 
+	#propertySorter = new UmbSorterController(this, sorterConfig);
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
+			this.#propertySorter.setModel(this._propertyStructure);
 		});
 	}
 
