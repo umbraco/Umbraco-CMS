@@ -17,7 +17,9 @@ export interface UmbTreeRepository<ItemType = any, PagedItemType = UmbPagedData<
 		error: ProblemDetailsModel | undefined;
 		asObservable?: () => Observable<ItemType[]>;
 	}>;
-	requestTreeItems: (uniques: string[]) => Promise<{
+
+	// TODO: remove this when all repositories are migrated to the new interface items interface
+	requestTreeItems?: (uniques: string[]) => Promise<{
 		data: Array<ItemType> | undefined;
 		error: ProblemDetailsModel | undefined;
 		asObservable?: () => Observable<ItemType[]>;
@@ -25,5 +27,7 @@ export interface UmbTreeRepository<ItemType = any, PagedItemType = UmbPagedData<
 
 	rootTreeItems: () => Promise<Observable<ItemType[]>>;
 	treeItemsOf: (parentUnique: string | null) => Promise<Observable<ItemType[]>>;
-	treeItems: (uniques: string[]) => Promise<Observable<ItemType[]>>;
+
+	// TODO: remove this when all repositories are migrated to the new items interface
+	treeItems?: (uniques: string[]) => Promise<Observable<ItemType[]>>;
 }
