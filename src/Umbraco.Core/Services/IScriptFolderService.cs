@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Services;
+﻿using Umbraco.Cms.Core.Services.OperationStatus;
 
-public interface IScriptFolderService : IPathFolderService
+namespace Umbraco.Cms.Core.Services;
+
+public interface IScriptFolderService : IPathFolderService<ScriptOperationStatus>
 {
 
 }

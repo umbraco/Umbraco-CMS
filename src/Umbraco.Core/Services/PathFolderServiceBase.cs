@@ -1,23 +1,62 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
-public abstract class PathFolderServiceBase<TRepo> : IPathFolderService
+public abstract class PathFolderServiceBase<TRepo, TStatus> :
+    RepositoryService,
+    IPathFolderService<TStatus>
     where TRepo: IFileWithFoldersRepository
+    where TStatus : Enum
 {
-    public abstract TRepo Repository { get; }
+    protected PathFolderServiceBase(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory) : base(provider, loggerFactory, eventMessagesFactory)
+    {
+    }
+
+    protected abstract TRepo Repository { get; }
+
+    protected abstract TStatus SuccessStatus { get; }
 
     public virtual Task<PathContainer?> GetAsync(string path)
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
         // There's not much we can actually get when it's a folder, so it more a matter of ensuring the folder exists and returning a model.
         if (Repository.FolderExists(path) is false)
         {
             return Task.FromResult<PathContainer?>(null);
         }
 
+        PathContainer model = CreateFromPath(path);
+
+        scope.Complete();
+        return Task.FromResult<PathContainer?>(model);
+    }
+
+    public async Task<Attempt<PathContainer?, TStatus>> CreateAsync(PathContainer container, Guid performingUserId)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        Attempt<TStatus> validationResult = await ValidateCreate(container);
+        if (validationResult.Success is false)
+        {
+            return Attempt.FailWithStatus<PathContainer?, TStatus>(validationResult.Result!, null);
+        }
+
+        Repository.AddFolder(container.Path);
+
+        scope.Complete();
+
+        return Attempt.SucceedWithStatus<PathContainer?, TStatus>(SuccessStatus, CreateFromPath(container.Path));
+    }
+
+    private PathContainer CreateFromPath(string path)
+    {
         var parentPath = Path.GetDirectoryName(path);
-        var parentPathLength = parentPath?.Length + 1 ?? 0;
+        var parentPathLength = string.IsNullOrEmpty(parentPath) ? 0 : parentPath.Length + 1;
 
         var model = new PathContainer
         {
@@ -25,6 +64,8 @@ public abstract class PathFolderServiceBase<TRepo> : IPathFolderService
             ParentPath = parentPath,
         };
 
-        return Task.FromResult<PathContainer?>(model);
+        return model;
     }
+
+    public abstract Task<Attempt<TStatus>> ValidateCreate(PathContainer container);
 }

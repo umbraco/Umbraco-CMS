@@ -3,6 +3,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -16,24 +17,22 @@ public class ScriptFolderBaseController : PathFolderManagementControllerBase<Scr
 {
     private readonly IScriptFolderService _scriptFolderService;
 
-    public ScriptFolderBaseController(IUmbracoMapper mapper, IScriptFolderService scriptFolderService) : base(mapper)
+    public ScriptFolderBaseController(
+        IUmbracoMapper mapper,
+        IBackOfficeSecurityAccessor  backOfficeSecurityAccessor,
+        IScriptFolderService scriptFolderService)
+        : base(mapper, backOfficeSecurityAccessor)
     {
         _scriptFolderService = scriptFolderService;
     }
 
     protected override async Task<PathContainer?> GetContainerAsync(string path)
-    {
-        PathContainer? scriptContainer = await _scriptFolderService.GetAsync(path);
+        => await _scriptFolderService.GetAsync(path);
 
-        if (scriptContainer is null)
-        {
-            return null;
-        }
-
-        return scriptContainer;
-    }
-
-    protected override Task<Attempt<PathContainer, ScriptOperationStatus>> CreateContainerAsync(PathContainer container, Guid performingUserId) => throw new NotImplementedException();
+    protected override Task<Attempt<PathContainer?, ScriptOperationStatus>> CreateContainerAsync(
+        PathContainer container,
+        Guid performingUserId) =>
+        _scriptFolderService.CreateAsync(container, performingUserId);
 
     protected override Task<Attempt<PathContainer, ScriptOperationStatus>> UpdateContainerAsync(PathContainer container, Guid performingUserId) => throw new NotImplementedException();
 

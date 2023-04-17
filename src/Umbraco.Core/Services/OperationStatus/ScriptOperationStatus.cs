@@ -9,4 +9,5 @@ public enum ScriptOperationStatus
     ParentNotFound,
     PathTooLong,
     NotFound,
+    FolderAlreadyExists
 }
