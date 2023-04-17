@@ -40,6 +40,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	private _savedSearches: SavedLogSearchResponseModel[] = [];
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
@@ -56,39 +57,21 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 		});
 	}
 
-	#setCurrentQuery(query: string) {
-		this.#logViewerContext?.setFilterExpression(query);
-	}
-
 	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
 		return html` <li>
 			<uui-button
-				@click=${() => {
-					this.#setCurrentQuery(searchListItem.query ?? '');
-				}}
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${'/section/settings/logviewer/search?lq=' + searchListItem.query}
-				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
-			>
+				href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(searchListItem.query ?? '')}`}>
+				<uui-icon name="umb:search"></uui-icon>${searchListItem.name}
+			</uui-button>
 		</li>`;
 	};
 
 	render() {
 		return html` <uui-box id="saved-searches" headline="Saved searches">
 			<ul>
-				<li>
-					<uui-button
-						@click=${() => {
-							this.#setCurrentQuery('');
-						}}
-						label="All logs"
-						title="All logs"
-						href="/section/settings/logviewer/search"
-						><uui-icon name="umb:search"></uui-icon>All logs</uui-button
-					>
-				</li>
-				${this._savedSearches.map(this.#renderSearchItem)}
+				${this.#renderSearchItem({ name: 'All logs', query: '' })} ${this._savedSearches.map(this.#renderSearchItem)}
 			</ul>
 		</uui-box>`;
 	}
