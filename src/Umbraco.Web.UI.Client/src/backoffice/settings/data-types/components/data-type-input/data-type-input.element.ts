@@ -114,11 +114,12 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	private _renderItem(item: DataTypeItemResponseModel) {
+		if (!item.id) return;
 		return html`
 			<uui-ref-node-data-type name=${item.name}>
 				<uui-action-bar slot="actions">
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.id)}
+						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
 						label="Remove Data Type ${item.name}"
 						>Remove</uui-button
 					>
