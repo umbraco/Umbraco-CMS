@@ -48,20 +48,7 @@ const configurationManifests: Array<ManifestPropertyEditorUI> = [
 			icon: 'umb:autofill',
 			group: 'common',
 		},
-	},
-	// Not in use, for now	
-	// {
-	// 	type: 'propertyEditorUI',
-	// 	alias: 'Umb.PropertyEditorUI.TinyMCE.ModeConfiguration',
-	// 	name: 'TinyMCE Mode Property Editor UI',
-	// 	loader: () => import('./mode/property-editor-ui-tiny-mce-mode-configuration.element'),
-	// 	meta: {
-	// 		label: 'TinyMCE Mode Configuration',
-	// 		propertyEditorModel: 'Umbraco.TinyMCE.Configuration',
-	// 		icon: 'umb:autofill',
-	// 		group: 'common',
-	// 	},
-	// },	
+	},	
 ];
 
 export const manifests = [...configurationManifests];

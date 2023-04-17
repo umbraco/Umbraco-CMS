@@ -32,12 +32,6 @@ export const manifest: ManifestPropertyEditorModel = {
 					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 				},
 				{
-					alias: 'mode',
-					label: 'Mode',
-					description: 'Select mode',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.ModeConfiguration',
-				},
-				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
 					description: 'Choose the upload location of pasted images',

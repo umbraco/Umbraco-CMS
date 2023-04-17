@@ -20,10 +20,7 @@ import type { ClassConstructor, UserDetails } from '@umbraco-cms/backoffice/mode
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { hasDefaultExport, loadExtension, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-// TODO => determine optimal method for including tiny. Currently using public assets
-// as we need to ship all core plugins to allow implementors to register these. Have not considered
-// other locations for serving these assests - might make better sense in /libs
+import { availableLanguages } from './input-tiny-mce.languages';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
@@ -86,84 +83,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	];
 
 	// these languages are available for localization
-	#availableLanguages = [
-		'ar',
-		'ar_SA',
-		'hy',
-		'az',
-		'eu',
-		'be',
-		'bn_BD',
-		'bs',
-		'bg_BG',
-		'ca',
-		'zh_CN',
-		'zh_TW',
-		'hr',
-		'cs',
-		'da',
-		'dv',
-		'nl',
-		'en_CA',
-		'en_GB',
-		'et',
-		'fo',
-		'fi',
-		'fr_FR',
-		'gd',
-		'gl',
-		'ka_GE',
-		'de',
-		'de_AT',
-		'el',
-		'he_IL',
-		'hi_IN',
-		'hu_HU',
-		'is_IS',
-		'id',
-		'it',
-		'ja',
-		'kab',
-		'kk',
-		'km_KH',
-		'ko_KR',
-		'ku',
-		'ku_IQ',
-		'lv',
-		'lt',
-		'lb',
-		'ml',
-		'ml_IN',
-		'mn_MN',
-		'nb_NO',
-		'fa',
-		'fa_IR',
-		'pl',
-		'pt_BR',
-		'pt_PT',
-		'ro',
-		'ru',
-		'sr',
-		'si_LK',
-		'sk',
-		'sl_SI',
-		'es',
-		'es_MX',
-		'sv_SE',
-		'tg',
-		'ta',
-		'ta_IN',
-		'tt',
-		'th_TH',
-		'tr',
-		'tr_TR',
-		'ug',
-		'uk',
-		'uk_UA',
-		'vi',
-		'vi_VN',
-		'cy',
-	];
+	#availableLanguages = availableLanguages;
 
 	//define fallback language
 	#defaultLanguage = 'en_US';

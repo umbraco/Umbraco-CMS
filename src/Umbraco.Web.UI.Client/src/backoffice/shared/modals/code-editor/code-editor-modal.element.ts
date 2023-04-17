@@ -1,25 +1,28 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property } from 'lit/decorators.js';
-import { html } from 'lit';
-import { UmbCodeEditorElement as CodeEditorElement } from '../../components/code-editor';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalHandler, UmbCodeEditorModalData, UmbCodeEditorModalResult } from '@umbraco-cms/backoffice/modal';
+import { customElement, query } from 'lit/decorators.js';
+import { css, html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { UmbCodeEditorElement as UmbCodeEditor } from '../../components/code-editor';
+import { UmbCodeEditorModalData, UmbCodeEditorModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbInputEvent } from '@umbraco-cms/backoffice/events';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
-// TODO => Integrate with code editor
 @customElement('umb-code-editor-modal')
-export class UmbCodeEditorModalElement extends UmbLitElement {
+export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditorModalData, UmbCodeEditorModalResult> {
 	static styles = [
 		UUITextStyles,
+		css`
+			uui-box {
+				flex: 1;
+				--editor-height: calc(100vh - var(--umb-header-layout-height) - (var(--uui-size-space-5) * 2) - 54px);
+			}
+		`,
 	];
 
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbCodeEditorModalData, UmbCodeEditorModalResult>;
-
-	@property({ type: Object })
-	data?: UmbCodeEditorModalData;
+	@query('umb-code-editor')
+	_codeEditor?: UmbCodeEditor;
 
 	#handleConfirm() {
-		console.log(this.data?.content)
 		this.modalHandler?.submit({ content: this.data?.content ?? '' });
 	}
 
@@ -28,11 +31,13 @@ export class UmbCodeEditorModalElement extends UmbLitElement {
 	}
 
 	// TODO => debounce?
-	#onCodeEditorInput(event: Event) {
-		if (!this.data) return;
+	#onCodeEditorInput(e: UmbInputEvent) {
+		e.preventDefault();
+		if (!this.data) {
+			return;
+		}
 
-		const target = event.target as CodeEditorElement;
-		this.data.content = target.code as string;
+		this.data.content = this._codeEditor?.code ?? '';
 	}
 
 	render() {
@@ -40,8 +45,7 @@ export class UmbCodeEditorModalElement extends UmbLitElement {
 			<umb-workspace-layout .headline=${this.data?.headline ?? 'Code Editor'}>
 				<uui-box>
 					<umb-code-editor
-						language=${this.data?.language ?? 'html'}
-						id="content"
+						language=${ifDefined(this.data?.language)}
 						.code=${this.data?.content ?? ''}
 						@input=${this.#onCodeEditorInput}></umb-code-editor>
 				</uui-box>
