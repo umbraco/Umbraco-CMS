@@ -25,16 +25,6 @@ export class UmbLanguageItemStore
 		);
 	}
 
-	/**
-	 * Updates an item in the store
-	 * @param {string} isoCode
-	 * @param {Partial<LanguageResponseModel>} data
-	 * @memberof UmbLanguageItemStore
-	 */
-	updateItem(isoCode: string, data: Partial<LanguageResponseModel>) {
-		this._data.next(partialUpdateFrozenArray(this._data.getValue(), data, (entry) => entry.isoCode === isoCode));
-	}
-
 	items(isoCodes: Array<string>) {
 		return this._data.getObservablePart((items) => items.filter((item) => isoCodes.includes(item.isoCode ?? '')));
 	}
