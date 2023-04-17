@@ -1,9 +1,10 @@
 import { UmbControllerInterface, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { NullValue } from 'rollup';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
 
-function isWithinRect(x: number, y: number, rect: DOMRect, modifier: number = 0) {
+function isWithinRect(x: number, y: number, rect: DOMRect, modifier = 0) {
 	return x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier;
 }
 
@@ -61,14 +62,14 @@ function destroyPreventEvent(element: Element) {
 	element.removeAttribute('draggable');
 }
 
-export type UmbSorterConfig<T> = {
+type INTERNAL_UmbSorterConfig<T> = {
 	compareElementToModel: (el: HTMLElement, modelEntry: T) => boolean;
-	querySelectModelToElement: (container: HTMLElement, modelEntry: T) => HTMLElement;
+	querySelectModelToElement: (container: HTMLElement, modelEntry: T) => HTMLElement | null;
 	identifier: string;
-	ignorerSelector: string;
 	itemSelector: string;
-	placeholderClass: string;
 	containerSelector: string;
+	ignorerSelector: string;
+	placeholderClass: string;
 	draggableSelector?: string;
 	boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
@@ -98,6 +99,19 @@ export type UmbSorterConfig<T> = {
 	}) => void;
 };
 
+// External type with some properties optional, as they have defaults:
+export type UmbSorterConfig<T> = Omit<
+	INTERNAL_UmbSorterConfig<T>,
+	'placeholderClass' | 'ignorerSelector' | 'containerSelector'
+> &
+	Partial<Pick<INTERNAL_UmbSorterConfig<T>, 'placeholderClass' | 'ignorerSelector' | 'containerSelector'>>;
+
+/**
+ * @export
+ * @class UmbSorterController
+ * @implements {UmbControllerInterface}
+ * @description This controller can make user able to sort items.
+ */
 export class UmbSorterController<T> implements UmbControllerInterface {
 	#host;
 	#config;
@@ -106,8 +120,9 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 	#model: Array<T> = [];
 	#rqaId?: number;
 
+	#containerElement!: Element;
 	#currentContainerVM = this;
-	#currentContainerElement: Element;
+	#currentContainerElement: Element | null = null;
 
 	#scrollElement?: Element | null;
 	#currentElement?: HTMLElement;
@@ -126,10 +141,15 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 
 	constructor(host: UmbControllerHostElement, config: UmbSorterConfig<T>) {
 		this.#host = host;
-		this.#config = config;
+
+		// Set defaults:
+		config.ignorerSelector ??= 'a, img, iframe';
+		config.placeholderClass ??= 'umb-drag-placeholder';
+
+		this.#config = config as INTERNAL_UmbSorterConfig<T>;
 		host.addController(this);
 
-		this.#currentContainerElement = host;
+		//this.#currentContainerElement = host;
 
 		this.#observer = new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => {
@@ -146,33 +166,52 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			});
 		});
 
-		(host as any)['__umbBlockGridSorterController'] = () => {
-			return this;
-		};
 		host.addEventListener('dragover', preventDragOver);
 	}
 
 	setModel(model: Array<T>) {
+		if (this.#model) {
+			// TODO: Some updates might need to be done, as the modal is about to changed? Do make the changes after setting the model?..
+		}
 		this.#model = model;
-		// TODO: Some update?
 	}
 
 	hostConnected() {
-		this.#observer.observe(this.#host, { childList: true, subtree: false });
+		const containerEl =
+			(this.#config.containerSelector ? this.#host.querySelector(this.#config.containerSelector) : this.#host) ??
+			this.#host;
+
+		(containerEl as any)['__umbBlockGridSorterController'] = () => {
+			return this;
+		};
+
+		if (this.#currentContainerElement === this.#containerElement) {
+			this.#currentContainerElement = containerEl;
+		}
+		this.#containerElement = containerEl;
+
+		// TODO: Clean up??
+		this.#observer.disconnect();
+		this.#observer.observe(this.#containerElement, { childList: true, subtree: false });
 	}
 	hostDisconnected() {
+		// TODO: Clean up??
 		this.#observer.disconnect();
 	}
 
 	setupItem(element: HTMLElement) {
-		setupIgnorerElements(element, this.#config.ignorerSelector);
+		if (this.#config.ignorerSelector) {
+			setupIgnorerElements(element, this.#config.ignorerSelector);
+		}
 
 		element.draggable = true;
 		element.addEventListener('dragstart', this.handleDragStart);
 	}
 
 	destroyItem(element: HTMLElement) {
-		destroyIgnorerElements(element, this.#config.ignorerSelector);
+		if (this.#config.ignorerSelector) {
+			destroyIgnorerElements(element, this.#config.ignorerSelector);
+		}
 
 		element.removeEventListener('dragstart', this.handleDragStart);
 	}
@@ -271,7 +310,11 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			if (movingItemIndex < this.#model.length - 1) {
 				const afterItem = this.#model[movingItemIndex + 1];
 				const afterEl = this.#config.querySelectModelToElement(this.#host, afterItem);
-				this.#host.insertBefore(this.#currentElement, afterEl);
+				if (afterEl) {
+					this.#host.insertBefore(this.#currentElement, afterEl);
+				} else {
+					this.#host.appendChild(this.#currentElement);
+				}
 			} else {
 				this.#host.appendChild(this.#currentElement);
 			}
@@ -285,7 +328,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			cancelAnimationFrame(this.#rqaId);
 		}
 
-		this.#currentContainerElement = this.#host;
+		this.#currentContainerElement = this.#containerElement;
 		this.#currentContainerVM = this;
 
 		this.#rqaId = undefined;
@@ -315,7 +358,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			this.#dragX = clientX;
 			this.#dragY = clientY;
 
-			handleAutoScroll(this.#dragX, this.#dragY);
+			this.handleAutoScroll(this.#dragX, this.#dragY);
 
 			this.#currentDragRect = this.#currentDragElement!.getBoundingClientRect();
 			const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, this.#currentDragRect);
@@ -343,7 +386,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		const currentBoundaryElement =
 			(this.#config.boundarySelector
 				? this.#currentContainerElement.closest(this.#config.boundarySelector)
-				: this.#currentContainerElement) || this.#currentContainerElement;
+				: this.#currentContainerElement) ?? this.#currentContainerElement;
 
 		const currentBoundaryRect = currentBoundaryElement.getBoundingClientRect();
 
@@ -355,18 +398,22 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		if (!isWithinRect(this.#dragX, this.#dragY, currentBoundaryRect, offsetEdge)) {
 			// we are outside the current container boundary, so lets see if there is a parent we can move.
 			const parentNode = this.#currentContainerElement.parentNode;
-			const parentContainer = parentNode ? (parentNode as HTMLElement).closest(this.#config.containerSelector) : null;
-			if (parentContainer) {
-				const parentContainerVM = (parentContainer as any)['__umbBlockGridSorterController']();
-				if (parentContainerVM.unique === this.unique) {
-					this.#currentContainerElement = parentContainer;
-					this.#currentContainerVM = parentContainerVM;
-					if (this.#config.onContainerChange) {
-						this.#config.onContainerChange({
-							item: this.#currentItem,
-							element: this.#currentElement,
-							//ownerVM: this.#currentContainerVM.ownerVM,
-						});
+			if (parentNode) {
+				const parentContainer = this.#config.containerSelector
+					? (parentNode as HTMLElement).closest(this.#config.containerSelector)
+					: null;
+				if (parentContainer) {
+					const parentContainerVM = (parentContainer as any)['__umbBlockGridSorterController']();
+					if (parentContainerVM.unique === this.unique) {
+						this.#currentContainerElement = parentContainer as Element;
+						this.#currentContainerVM = parentContainerVM;
+						if (this.#config.onContainerChange) {
+							this.#config.onContainerChange({
+								item: this.#currentItem,
+								element: this.#currentElement,
+								//ownerVM: this.#currentContainerVM.ownerVM,
+							});
+						}
 					}
 				}
 			}
@@ -736,6 +783,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		(this.#host as any)['__umbBlockGridSorterController'] = null;
 		this.#host.removeEventListener('dragover', preventDragOver);
 
+		// TODO: Clean up items??
 		this.#observer.disconnect();
 
 		// For auto scroller:
