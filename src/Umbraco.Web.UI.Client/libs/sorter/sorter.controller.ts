@@ -1,5 +1,4 @@
 import { UmbControllerInterface, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { NullValue } from 'rollup';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
