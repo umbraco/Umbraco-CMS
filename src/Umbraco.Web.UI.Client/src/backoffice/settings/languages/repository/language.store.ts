@@ -13,6 +13,8 @@ export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageS
  * @description - Details Data Store for Languages
  */
 export class UmbLanguageStore extends UmbStoreBase {
+	public data = this._data.asObservable();
+
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,

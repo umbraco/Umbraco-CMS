@@ -11,18 +11,16 @@ import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
  * @description - Details Data Store for Media Types
  */
 export class UmbMediaTypeStore extends UmbStoreBase {
-	#data = new ArrayState<MediaTypeDetails>([], (x) => x.id);
-
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN.toString(), new ArrayState<MediaTypeDetails>([], (x) => x.id));
 	}
 
 	append(mediaType: MediaTypeDetails) {
-		this.#data.append([mediaType]);
+		this._data.append([mediaType]);
 	}
 
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 

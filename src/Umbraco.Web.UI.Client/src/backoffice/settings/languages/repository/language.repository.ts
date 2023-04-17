@@ -1,17 +1,26 @@
 import { UmbLanguageServerDataSource } from './sources/language.server.data';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store';
+import { UmbLanguageItemServerDataSource } from './sources/language-item.server.data';
+import { UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, UmbLanguageItemStore } from './language-item.store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	LanguageItemResponseModel,
+	LanguageResponseModel,
+	ProblemDetailsModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbLanguageRepository {
-	#init!: Promise<unknown>;
+export class UmbLanguageRepository implements UmbItemRepository<LanguageItemResponseModel> {
+	#init: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
 
 	#dataSource: UmbLanguageServerDataSource;
+	#itemDataSource: UmbLanguageItemServerDataSource;
 	#languageStore?: UmbLanguageStore;
+	#languageItemStore?: UmbLanguageItemStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -19,14 +28,20 @@ export class UmbLanguageRepository {
 		this.#host = host;
 
 		this.#dataSource = new UmbLanguageServerDataSource(this.#host);
+		this.#itemDataSource = new UmbLanguageItemServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
-			}),
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#languageStore = instance;
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#languageItemStore = instance;
+				debugger;
 			}).asPromise(),
 		]);
 	}
@@ -59,19 +74,19 @@ export class UmbLanguageRepository {
 	}
 
 	async requestItems(isoCodes: Array<string>) {
-		// HACK: filter client side until we have a proper server side endpoint
-		// TODO: we will get a different size model here, how do we handle that in the store?
-		const { data, error } = await this.requestLanguages();
-
-		let items = undefined;
+		await this.#init;
+		const { data, error } = await this.#itemDataSource.getItems(isoCodes);
 
 		if (data) {
-			// TODO: how do we best handle this? They might have a smaller data set than the details
-			items = data.items = data.items.filter((x) => isoCodes.includes(x.isoCode!));
-			data.items.forEach((x) => this.#languageStore?.append(x));
+			this.#languageItemStore?.appendItems(data);
 		}
 
-		return { data: items, error, asObservable: () => this.#languageStore!.items(isoCodes) };
+		return { data, error, asObservable: () => this.#languageItemStore!.items(isoCodes) };
+	}
+
+	async items(isoCodes: Array<string>) {
+		await this.#init;
+		return this.#languageItemStore!.items(isoCodes);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 import { UmbStore } from './store.interface';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Make a Store interface?
 export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType> {
@@ -33,8 +33,8 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 * @param {Partial<StoreItemType>} data
 	 * @memberof UmbEntityTreeStore
 	 */
-	updateItem(id: string, data: Partial<StoreItemType>) {
-		this._data.next(partialUpdateFrozenArray(this._data.getValue(), data, (entry) => entry.id === id));
+	updateItem(unique: string, data: Partial<StoreItemType>) {
+		this._data.updateOne(unique, data);
 	}
 
 	/**
@@ -42,7 +42,7 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 * @param {string} id
 	 * @memberof UmbEntityTreeStore
 	 */
-	removeItem(id: string) {
-		this._data.removeOne(id);
+	removeItem(unique: string) {
+		this._data.removeOne(unique);
 	}
 }
