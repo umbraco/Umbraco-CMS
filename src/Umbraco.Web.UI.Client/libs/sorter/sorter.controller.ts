@@ -650,7 +650,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 	private autoScrollY = 0;
 
 	private handleAutoScroll(clientX: number, clientY: number) {
-		let scrollRect: DOMRect = null;
+		let scrollRect: DOMRect | null = null;
 		if (this.#scrollElement) {
 			this.#autoScrollEl = this.#scrollElement;
 			scrollRect = this.#autoScrollEl.getBoundingClientRect();
@@ -663,7 +663,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 				right: window.innerWidth,
 				height: window.innerHeight,
 				width: window.innerWidth,
-			};
+			} as DOMRect;
 		}
 
 		const scrollWidth = this.#autoScrollEl.scrollWidth;
