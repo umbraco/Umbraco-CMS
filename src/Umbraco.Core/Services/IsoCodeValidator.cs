@@ -11,7 +11,7 @@ public class IsoCodeValidator : IIsoCodeValidator
         try
         {
             var culture = CultureInfo.GetCultureInfo(isoCode);
-            return culture.Name == isoCode && culture.CultureTypes.HasFlag(CultureTypes.UserCustomCulture) == false;
+            return culture.Name.Equals(isoCode, StringComparison.InvariantCultureIgnoreCase) && culture.CultureTypes.HasFlag(CultureTypes.UserCustomCulture) == false;
         }
         catch (CultureNotFoundException)
         {
