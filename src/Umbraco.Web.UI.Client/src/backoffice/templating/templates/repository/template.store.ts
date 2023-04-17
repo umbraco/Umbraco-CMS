@@ -11,15 +11,13 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
  * @description - Data Store for Templates
  */
 export class UmbTemplateStore extends UmbStoreBase {
-	#data = new ArrayState<TemplateResponseModel>([], (x) => x.id);
-
 	/**
 	 * Creates an instance of UmbTemplateStore.
 	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbTemplateStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_TEMPLATE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_TEMPLATE_STORE_CONTEXT_TOKEN.toString(), new ArrayState<TemplateResponseModel>([], (x) => x.id));
 	}
 
 	/**
@@ -28,7 +26,7 @@ export class UmbTemplateStore extends UmbStoreBase {
 	 * @memberof UmbTemplateStore
 	 */
 	append(template: TemplateResponseModel) {
-		this.#data.append([template]);
+		this._data.append([template]);
 	}
 
 	/**
@@ -37,7 +35,7 @@ export class UmbTemplateStore extends UmbStoreBase {
 	 * @memberof UmbTemplateStore
 	 */
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 

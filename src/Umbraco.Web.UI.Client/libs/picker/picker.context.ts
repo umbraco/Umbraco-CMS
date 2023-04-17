@@ -1,4 +1,4 @@
-import { UmbTreeRepository } from '../repository';
+import { UmbItemRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
@@ -15,7 +15,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
 	modalAlias: UmbModalToken | string;
-	repository?: UmbTreeRepository<ItemType>;
+	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
 	public modalContext?: UmbModalContext;
@@ -53,7 +53,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<UmbTreeRepository>(repositoryManifest, [this.host]);
+					const result = await createExtensionClass<UmbItemRepository<ItemType>>(repositoryManifest, [this.host]);
 					this.repository = result;
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
@@ -113,7 +113,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 		if (!this.repository) throw new Error('Repository is not initialized');
 		if (this.#selectedItemsObserver) this.#selectedItemsObserver.destroy();
 
-		const { asObservable } = await this.repository.requestTreeItems(this.getSelection());
+		const { asObservable } = await this.repository.requestItems(this.getSelection());
 
 		if (asObservable) {
 			this.#selectedItemsObserver = new UmbObserverController(this.host, asObservable(), (data) => {

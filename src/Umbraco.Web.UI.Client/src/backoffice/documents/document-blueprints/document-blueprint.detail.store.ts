@@ -11,11 +11,12 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  * @description - Data Store for Document Blueprints
  */
 export class UmbDocumentBlueprintStore extends UmbStoreBase {
-	// TODO: use the right type:
-	#data = new ArrayState<DocumentBlueprintDetails>([], (x) => x.id);
-
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString());
+		super(
+			host,
+			UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString(),
+			new ArrayState<DocumentBlueprintDetails>([], (x) => x.id)
+		);
 	}
 
 	/**
@@ -29,10 +30,10 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 		fetch(`/umbraco/management/api/v1/document-blueprint/details/${id}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.#data.append(data);
+				this._data.append(data);
 			});
 
-		return this.#data.getObservablePart((documents) => documents.find((document) => document.id === id));
+		return this._data.getObservablePart((documents) => documents.find((document) => document.id === id));
 	}
 
 	getScaffold(entityType: string, parentId: string | null) {
@@ -68,7 +69,7 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 		})
 			.then((res) => res.json())
 			.then((data: Array<DocumentBlueprintDetails>) => {
-				this.#data.append(data);
+				this._data.append(data);
 			});
 	}
 
@@ -89,7 +90,7 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 			},
 		});
 
-		this.#data.remove(ids);
+		this._data.remove(ids);
 	}
 }
 

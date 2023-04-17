@@ -4,7 +4,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Make a Store interface?
-export class UmbStoreBase<StoreItemType> implements UmbStore<StoreItemType> {
+export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType> {
 	protected _host: UmbControllerHostElement;
 	protected _data: ArrayState<StoreItemType>;
 
