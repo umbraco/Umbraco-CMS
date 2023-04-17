@@ -71,6 +71,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
 
 		// Register All Stores
+		// TODO: can we use kinds here so we don't have to hardcode the types?
 		this.observe(umbExtensionsRegistry.extensionsOfTypes(['store', 'treeStore', 'itemStore']), (stores) => {
 			stores.forEach((store) => createExtensionClass(store, [this]));
 		});
