@@ -44,7 +44,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default Infinite
+	 * @default Infinity
 	 */
 	@property({ type: Number })
 	public get max(): number {

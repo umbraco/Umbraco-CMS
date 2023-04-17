@@ -20,13 +20,14 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
+	 * @default 0
 	 */
 	@property({ type: Number })
-	public set min(value: number | undefined) {
-		if (value !== undefined) {
-			this.#pickerContext.min = value;
-		}
+	public get min(): number {
+		return this.#pickerContext.min;
+	}
+	public set min(value: number) {
+		this.#pickerContext.min = value;
 	}
 
 	/**
@@ -42,18 +43,14 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
 	 * @attr
-	 * @default undefined
+	 * @default Infinity
 	 */
-	private _max: number | undefined;
 	@property({ type: Number })
-	public get max(): number | undefined {
-		return this._max;
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
-	public set max(value: number | undefined) {
-		if (value !== undefined) {
-			this.#pickerContext.max = value;
-		}
-		this._max = value;
+	public set max(value: number) {
+		this.#pickerContext.max = value;
 	}
 
 	/**
@@ -101,7 +98,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this._selectedIds.length > this.max
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.selectedIds = selection));
+		this.observe(this.#pickerContext.selection, (selection) => (this._selectedIds = selection));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 

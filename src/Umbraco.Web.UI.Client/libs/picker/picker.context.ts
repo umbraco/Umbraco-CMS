@@ -75,7 +75,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	}
 
 	// TODO: revisit this method. How do we best pass picker data?
-	openPicker(pickerData: any) {
+	openPicker(pickerData?: any) {
 		if (!this.modalContext) throw new Error('Modal context is not initialized');
 
 		const modalHandler = this.modalContext.open(this.modalAlias, {
