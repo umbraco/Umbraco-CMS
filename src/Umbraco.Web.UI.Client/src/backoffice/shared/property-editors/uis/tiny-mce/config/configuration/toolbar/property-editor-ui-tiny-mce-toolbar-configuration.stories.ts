@@ -3,8 +3,9 @@ import { html } from 'lit-html';
 import { umbDataTypeData } from '../../../../../../../../core/mocks/data/data-type.data';
 
 import './property-editor-ui-tiny-mce-toolbar-configuration.element';
+import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-const dataTypeData = umbDataTypeData.getByKey('dt-richTextEditor');
+const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as DataTypeResponseModel;
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Toolbar Configuration',
