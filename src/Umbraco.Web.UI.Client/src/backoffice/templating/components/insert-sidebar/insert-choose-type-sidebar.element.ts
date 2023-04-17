@@ -1,12 +1,23 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS } from './manifest';
+import {
+	UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_ALIAS,
+	UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS,
+} from './manifest';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS,
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);
+
+export const UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_MODAL = new UmbModalToken(
+	UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_ALIAS,
 	{
 		type: 'sidebar',
 		size: 'small',
@@ -58,6 +69,10 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hideP
 		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
 	}
 
+	#openInsertPartialViewSidebar() {
+		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_MODAL);
+	}
+
 	render() {
 		return html`
 			<umb-workspace-layout headline="Insert">
@@ -72,7 +87,7 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hideP
 						>
 						${this.data?.hidePartialViews
 							? ''
-							: html`<uui-button @click=${this._close} look="placeholder" label="Insert value"
+							: html`<uui-button @click=${this.#openInsertPartialViewSidebar} look="placeholder" label="Insert value"
 									><h3>Partial view</h3>
 									<p>
 										A partial view is a separate template file which can be rendered inside another template, it's great

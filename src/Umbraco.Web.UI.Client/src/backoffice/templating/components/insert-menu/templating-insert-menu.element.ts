@@ -4,7 +4,10 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../insert-sidebar/manifest';
-import { UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL } from '../insert-sidebar/insert-choose-type-sidebar.element';
+import {
+	UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_MODAL,
+	UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL,
+} from '../insert-sidebar/insert-choose-type-sidebar.element';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
@@ -72,6 +75,10 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
 	}
 
+	#openInsertPartialViewSidebar() {
+		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_MODAL);
+	}
+
 	@property()
 	hidePartialView = false;
 
@@ -100,7 +107,12 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 						${this.hidePartialView
 							? ''
 							: html` <li>
-									<uui-menu-item class="insert-menu-item" label="Partial view" title="Partial view"> </uui-menu-item>
+									<uui-menu-item
+										class="insert-menu-item"
+										label="Partial view"
+										title="Partial view"
+										@click=${this.#openInsertPartialViewSidebar}>
+									</uui-menu-item>
 							  </li>`}
 						<li>
 							<uui-menu-item class="insert-menu-item" label="Dictionary item" title="Dictionary item"> </uui-menu-item>
