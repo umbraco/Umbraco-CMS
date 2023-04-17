@@ -77,7 +77,7 @@ public class MultiValuePropertyEditorTests
         prop.SetValue("Value 1,Value 2,Value 3");
 
         var valueEditor = dataType.Editor.GetValueEditor();
-        ((DataValueEditor)valueEditor).Configuration = dataType.ConfigurationObject;
+        ((DataValueEditor)valueEditor).ConfigurationObject = dataType.ConfigurationObject;
         var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue());
 
         Assert.AreEqual("Value 1,Value 2,Value 3", result);

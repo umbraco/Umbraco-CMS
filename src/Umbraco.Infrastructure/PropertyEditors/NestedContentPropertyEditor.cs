@@ -116,9 +116,9 @@ public class NestedContentPropertyEditor : DataEditor
         }
 
         /// <inheritdoc />
-        public override object? Configuration
+        public override object? ConfigurationObject
         {
-            get => base.Configuration;
+            get => base.ConfigurationObject;
             set
             {
                 if (value == null)
@@ -133,7 +133,7 @@ public class NestedContentPropertyEditor : DataEditor
                         nameof(value));
                 }
 
-                base.Configuration = value;
+                base.ConfigurationObject = value;
 
                 HideLabel = configuration.HideLabel.TryConvertTo<bool>().Result;
             }
@@ -190,9 +190,9 @@ public class NestedContentPropertyEditor : DataEditor
                         continue;
                     }
 
-                    object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
+                    object? configurationObject = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
 
-                    result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
+                    result.AddRange(tagsProvider.GetTags(prop.Value.Value, configurationObject, languageId));
                 }
             }
 

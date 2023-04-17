@@ -58,7 +58,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase
     private bool IsMultipleDataType(PublishedDataType dataType)
     {
         MediaPickerConfiguration? config =
-            ConfigurationEditor.ConfigurationAs<MediaPickerConfiguration>(dataType.Configuration);
+            ConfigurationEditor.ConfigurationAs<MediaPickerConfiguration>(dataType.ConfigurationObject);
         return config?.Multiple ?? false;
     }
 

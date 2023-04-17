@@ -77,7 +77,8 @@ public class DataValueEditor : IDataValueEditor
     /// <summary>
     ///     Gets or sets the value editor configuration.
     /// </summary>
-    public virtual object? Configuration { get; set; }
+    /// <seealso cref="IDataType.ConfigurationObject"/>
+    public virtual object? ConfigurationObject { get; set; }
 
     public bool SupportsReadOnly { get; set; }
 
@@ -120,7 +121,7 @@ public class DataValueEditor : IDataValueEditor
     public IEnumerable<ValidationResult> Validate(object? value, bool required, string? format)
     {
         List<ValidationResult>? results = null;
-        var r = Validators.SelectMany(v => v.Validate(value, ValueType, Configuration)).ToList();
+        var r = Validators.SelectMany(v => v.Validate(value, ValueType, ConfigurationObject)).ToList();
         if (r.Any())
         {
             results = r;

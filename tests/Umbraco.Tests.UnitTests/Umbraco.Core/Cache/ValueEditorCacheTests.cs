@@ -124,7 +124,7 @@ public class ValueEditorCacheTests
             return Mock.Of<IDataValueEditor>();
         }
 
-        public IDataValueEditor GetValueEditor(object configuration) => GetValueEditor();
+        public IDataValueEditor GetValueEditor(object configurationObject) => GetValueEditor();
 
         public IDictionary<string, object> DefaultConfiguration { get; }
 
