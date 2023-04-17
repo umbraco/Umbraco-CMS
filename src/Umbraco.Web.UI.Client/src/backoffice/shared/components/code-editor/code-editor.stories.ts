@@ -31,7 +31,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 		height: 100%;
 		flex-direction: column;
 	}
-	
+
 	#header {
 		display: flex;
 		align-items: center;
@@ -42,12 +42,12 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 		border-bottom: 1px solid var(--uui-color-border);
 		box-sizing: border-box;
 	}
-	
+
 	#headline {
 		display: block;
 		margin: 0 var(--uui-size-layout-1);
 	}
-	
+
 	#tabs {
 		margin-left: auto;
 	}`,
@@ -57,10 +57,10 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 	<title>Page Title</title>
 	</head>
 	<body>
-	
+
 	<h1>This is a Heading</h1>
 	<p>This is a paragraph.</p>
-	
+
 	</body>
 	</html>`,
 	razor: `@using Umbraco.Extensions
@@ -68,7 +68,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 	@{
 		if (Model?.Areas.Any() != true) { return; }
 	}
-	
+
 	<div class="umb-block-grid__area-container"
 		 style="--umb-block-grid--area-grid-columns: @(Model.AreaGridColumns?.ToString() ?? Model.GridColumns?.ToString() ?? "12");">
 		@foreach (var area in Model.Areas)
@@ -78,75 +78,75 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 	</div>`,
 	markdown: `
 	You will like those projects!
-	
+
 	---
-	
+
 	# h1 Heading 8-)
 	## h2 Heading
 	### h3 Heading
 	#### h4 Heading
 	##### h5 Heading
 	###### h6 Heading
-	
-	
+
+
 	## Horizontal Rules
-	
+
 	___
-	
+
 	---
-	
+
 	***
-	
-	
+
+
 	## Typographic replacements
-	
+
 	Enable typographer option to see result.
-	
+
 	(c) (C) (r) (R) (tm) (TM) (p) (P) +-
-	
+
 	test.. test... test..... test?..... test!....
-	
+
 	!!!!!! ???? ,,  -- ---
-	
+
 	"Smartypants, double quotes" and 'single quotes'`,
 	typescript: `import { UmbTemplateRepository } from '../repository/template.repository';
 	import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 	import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
 	import { TemplateModel } from '@umbraco-cms/backend-api';
 	import { UmbControllerHostElement } from '@umbraco-cms/controller';
-	
-	export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository> {
+
+	export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateModel> {
 		#data = new DeepState<TemplateModel | undefined>(undefined);
 		data = this.#data.asObservable();
 		name = createObservablePart(this.#data, (data) => data?.name);
 		content = createObservablePart(this.#data, (data) => data?.content);
-	
+
 		constructor(host: UmbControllerHostElement) {
 			super(host, new UmbTemplateRepository(host));
 		}
-	
+
 		getData() {
 			return this.#data.getValue();
 		}
-	
+
 		setName(value: string) {
 			this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', name: value });
 		}
-	
+
 		setContent(value: string) {
 			this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', content: value });
 		}
-	
-		async load(entityKey: string) {
-			const { data } = await this.repository.requestByKey(entityKey);
+
+		async load(entityId: string) {
+			const { data } = await this.repository.requestByKey(entityId);
 			if (data) {
 				this.setIsNew(false);
 				this.#data.next(data);
 			}
 		}
-	
-		async createScaffold(parentKey: string | null) {
-			const { data } = await this.repository.createScaffold(parentKey);
+
+		async createScaffold(parentId: string | null) {
+			const { data } = await this.repository.createScaffold(parentId);
 			if (!data) return;
 			this.setIsNew(true);
 			this.#data.next(data);

@@ -109,14 +109,14 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#setTableItems() {
 		this.#tableItems = this.#dictionaryItems.map((dictionary) => {
-			// key is name to allow filtering on the displayed value
+			// id is set to name to allow filtering on the displayed value
 			const tableItem: UmbTableItem = {
-				key: dictionary.name ?? '',
+				id: dictionary.name ?? '',
 				icon: 'umb:book-alt',
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<a style="font-weight:bold" href="/section/translation/dictionary-item/edit/${dictionary.key}">
+						value: html`<a style="font-weight:bold" href="/section/translation/dictionary-item/edit/${dictionary.id}">
 							${dictionary.name}</a
 						> `,
 					},
@@ -148,13 +148,14 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#filter(e: { target: HTMLInputElement }) {
 		this._tableItemsFiltered = e.target.value
-			? this.#tableItems.filter((t) => t.key.includes(e.target.value))
+			? this.#tableItems.filter((t) => t.id.includes(e.target.value))
 			: this.#tableItems;
 	}
 
 	async #create() {
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
+		if (!this.#repo) return;
 
 		const modalHandler = this.#modalContext?.open(UMB_CREATE_DICTIONARY_MODAL, { unique: null });
 
@@ -162,10 +163,9 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		const { name } = await modalHandler.onSubmit();
 		if (!name) return;
 
-		const result = await this.#repo?.create({ $type: '', name, parentKey: null, translations: [], key: '' });
-
+		const { data } = await this.#repo.createScaffold(null);
+		console.log(data);
 		// TODO => get location header to route to new item
-		console.log(result);
 	}
 
 	render() {

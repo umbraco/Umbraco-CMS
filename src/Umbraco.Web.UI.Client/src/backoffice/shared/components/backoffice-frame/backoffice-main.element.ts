@@ -5,6 +5,7 @@ import { state } from 'lit/decorators.js';
 import { UmbSectionElement } from '../section/section.element';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -24,7 +25,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	];
 
 	@state()
-	private _routes: Array<any> = [];
+	private _routes: Array<IRoute> = [];
 
 	@state()
 	private _sections: Array<ManifestSection> = [];
@@ -63,10 +64,8 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 			return {
 				path: this._routePrefix + section.meta.pathname,
 				component: () => createExtensionElementOrFallback(section, 'umb-section'),
-				setup: (component: Promise<UmbSectionElement>) => {
-					component.then((element) => {
-						element.manifest = section;
-					});
+				setup: (component) => {
+					(component as UmbSectionElement).manifest = section;
 				},
 			};
 		});

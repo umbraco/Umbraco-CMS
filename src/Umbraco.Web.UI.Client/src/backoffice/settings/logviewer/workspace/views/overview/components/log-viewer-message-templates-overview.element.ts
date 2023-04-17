@@ -66,14 +66,11 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
 		return html` <li>
 			<uui-button
-				@click=${() => {
-					this.#setCurrentQuery(searchListItem.query ?? '');
-				}}
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${'/section/settings/logviewer/search?lq=' + searchListItem.query}
-				><uui-icon name="umb:search"></uui-icon>${searchListItem.name}</uui-button
-			>
+				href=${`section/settings/workspace/logviewer/search/?lq=${searchListItem.query}`}>
+				<uui-icon name="umb:search"></uui-icon>${searchListItem.name}
+			</uui-button>
 		</li>`;
 	};
 
@@ -90,13 +87,12 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 					${this._messageTemplates
 						? this._messageTemplates.items.map(
 								(template) =>
-									html`<uui-table-row
-										><uui-table-cell>
+									html`<uui-table-row>
+										<uui-table-cell>
 											<a
-												@click=${() => {
-													this.#setCurrentQuery(`@MessageTemplate='${template.messageTemplate}'` ?? '');
-												}}
-												href=${'/section/settings/logviewer/search?lg=@MessageTemplate%3D' + template.messageTemplate}>
+												href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
+													`@MessageTemplate='${template.messageTemplate}'`
+												)}`}>
 												<span>${template.messageTemplate}</span> <span>${template.count}</span>
 											</a>
 										</uui-table-cell>
@@ -109,9 +105,9 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 					id="show-more-templates-btn"
 					look="primary"
 					@click=${this.#getMessageTemplates}
-					label="Show more templates"
-					>Show more</uui-button
-				>
+					label="Show more templates">
+					Show more
+				</uui-button>
 			</uui-box>
 		`;
 	}

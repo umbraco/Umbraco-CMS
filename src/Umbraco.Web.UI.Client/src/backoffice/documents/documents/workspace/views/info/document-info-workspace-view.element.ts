@@ -3,9 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
-import { UmbEntityWorkspaceContextInterface } from '../../../../../shared/components/workspace/workspace-context/workspace-entity-context.interface';
-import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 interface HistoryNode {
 	userId?: number;
@@ -184,20 +183,16 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _nodeName = '';
 
-	private _workspaceContext?: UmbEntityWorkspaceContextInterface<DocumentResponseModel>;
+	private _workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 	private itemsPerPage = 10;
 
 	constructor() {
 		super();
 
-		// TODO: Figure out how to get the magic string for the workspace context.
-		this.consumeContext<UmbEntityWorkspaceContextInterface<DocumentResponseModel>>(
-			'umbWorkspaceContext',
-			(nodeContext) => {
-				this._workspaceContext = nodeContext;
-				this._observeContent();
-			}
-		);
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (nodeContext) => {
+			this._workspaceContext = nodeContext;
+			this._observeContent();
+		});
 	}
 
 	private _observeContent() {

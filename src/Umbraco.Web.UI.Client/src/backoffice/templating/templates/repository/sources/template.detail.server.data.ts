@@ -1,16 +1,13 @@
 import { v4 as uuid } from 'uuid';
-import { ProblemDetailsModel, TemplateResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import {
+	TemplateResponseModel,
+	TemplateResource,
+	CreateTemplateRequestModel,
+	UpdateTemplateRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
-
-export interface TemplateDetailDataSource {
-	createScaffold(): Promise<DataSourceResponse<TemplateResponseModel>>;
-	get(key: string): Promise<DataSourceResponse<TemplateResponseModel>>;
-	insert(template: TemplateResponseModel): Promise<DataSourceResponse>;
-	update(template: TemplateResponseModel): Promise<DataSourceResponse>;
-	delete(key: string): Promise<DataSourceResponse>;
-}
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Template detail that fetches data from the server
@@ -18,7 +15,9 @@ export interface TemplateDetailDataSource {
  * @class UmbTemplateDetailServerDataSource
  * @implements {TemplateDetailDataSource}
  */
-export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSource {
+export class UmbTemplateDetailServerDataSource
+	implements UmbDataSource<CreateTemplateRequestModel, UpdateTemplateRequestModel, TemplateResponseModel>
+{
 	#host: UmbControllerHostElement;
 
 	/**
@@ -31,18 +30,18 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	}
 
 	/**
-	 * Fetches a Template with the given key from the server
-	 * @param {string} key
+	 * Fetches a Template with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	get(key: string) {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateByKey({ key }));
+	get(id: string) {
+		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateById({ id }));
 	}
 
 	/**
 	 * Creates a new Template scaffold
-	 * @param {(string | null)} parentKey
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
@@ -50,7 +49,7 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 		const error = undefined;
 		const data: TemplateResponseModel = {
 			$type: '',
-			key: uuid(),
+			id: uuid(),
 			name: '',
 			alias: '',
 			content: '',
@@ -77,13 +76,13 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async insert(template: TemplateResponseModel) {
-		const payload = { requestBody: template };
-		// TODO: fix type mismatch
+	async insert(template: CreateTemplateRequestModel) {
+		if (!template) throw new Error('Template is missing');
+
 		return tryExecuteAndNotify(
 			this.#host,
-			tryExecuteAndNotify(this.#host, TemplateResource.postTemplate(payload)) as any
-		) as any;
+			tryExecuteAndNotify(this.#host, TemplateResource.postTemplate({ requestBody: template }))
+		);
 	}
 
 	/**
@@ -92,28 +91,20 @@ export class UmbTemplateDetailServerDataSource implements TemplateDetailDataSour
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async update(template: TemplateResponseModel) {
-		if (!template.key) {
-			const error: ProblemDetailsModel = { title: 'Template key is missing' };
-			return { error };
-		}
-
-		const payload = { key: template.key, requestBody: template };
-		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateByKey(payload));
+	async update(id: string, template: UpdateTemplateRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!template) throw new Error('Template is missing');
+		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById({ id, requestBody: template }));
 	}
 
 	/**
 	 * Deletes a Template on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
-		}
-
-		return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateByKey({ key }));
+	async delete(id: string) {
+		if (!id) throw new Error('Id is missing');
+		return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateById({ id }));
 	}
 }

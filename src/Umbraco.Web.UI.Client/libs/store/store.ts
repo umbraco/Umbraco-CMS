@@ -16,7 +16,7 @@ export interface UmbEntityDetailStore<T> extends UmbDataStore {
 	 * @return {*}  {T}
 	 * @memberof UmbEntityDetailStore
 	 */
-	getScaffold: (entityType: string, parentKey: string | null) => T;
+	getScaffold: (entityType: string, parentId: string | null) => T;
 
 	/**
 	 * @description - Request data by key. The data is added to the store and is returned as an Observable.

@@ -8,7 +8,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  * @class UmbStylesheetServerDataSource
  * @implements {UmbStylesheetServerDataSource}
  */
-export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDetails> {
+export class UmbStylesheetServerDataSource implements UmbDataSource<any, any, StylesheetDetails> {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -19,7 +19,7 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDe
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
-	createScaffold(parentKey: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
 		throw new Error('Method not implemented.');
 	}
 
@@ -38,10 +38,10 @@ export class UmbStylesheetServerDataSource implements UmbDataSource<StylesheetDe
 	insert(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
 		throw new Error('Method not implemented.');
 	}
-	update(data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
+	update(path: string, data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
 		throw new Error('Method not implemented.');
 	}
-	delete(key: string): Promise<DataSourceResponse<StylesheetDetails>> {
+	delete(path: string): Promise<DataSourceResponse> {
 		throw new Error('Method not implemented.');
 	}
 }

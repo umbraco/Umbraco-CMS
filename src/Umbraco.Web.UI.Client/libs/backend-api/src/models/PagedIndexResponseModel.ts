@@ -8,3 +8,4 @@ export type PagedIndexResponseModel = {
     total: number;
     items: Array<IndexResponseModel>;
 };
+

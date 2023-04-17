@@ -11,7 +11,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  * @description - Data Store for Template Details
  */
 export class UmbMediaStore extends UmbStoreBase {
-	#data = new ArrayState<MediaDetails>([], (x) => x.key);
+	#data = new ArrayState<MediaDetails>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbMediaStore.

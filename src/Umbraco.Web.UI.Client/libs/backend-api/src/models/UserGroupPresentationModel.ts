@@ -5,6 +5,7 @@
 import type { UserGroupBaseModel } from './UserGroupBaseModel';
 
 export type UserGroupPresentationModel = (UserGroupBaseModel & {
-$type: string;
-key?: string;
+    $type: string;
+    id?: string;
 });
+

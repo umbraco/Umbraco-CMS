@@ -1,12 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ContentTreeItemResponseModel } from '../models/ContentTreeItemResponseModel';
-import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
-import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { EntityTreeItemResponseModel } from '../models/EntityTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
+import type { MemberTypeItemResponseModel } from '../models/MemberTypeItemResponseModel';
 import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -19,16 +14,16 @@ export class MemberTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTreeMemberTypeItem({
-key,
-}: {
-key?: Array<string>,
-}): CancelablePromise<Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel)>> {
+    public static getMemberTypeItem({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MemberTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/tree/member-type/item',
+            url: '/umbraco/management/api/v1/member-type/item',
             query: {
-                'key': key,
+                'id': id,
             },
         });
     }
@@ -38,12 +33,12 @@ key?: Array<string>,
      * @throws ApiError
      */
     public static getTreeMemberTypeRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/member-type/root',

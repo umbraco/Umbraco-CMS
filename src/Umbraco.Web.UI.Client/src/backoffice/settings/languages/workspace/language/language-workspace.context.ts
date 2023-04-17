@@ -1,10 +1,14 @@
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
-export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguageRepository> {
+export class UmbLanguageWorkspaceContext
+	extends UmbWorkspaceContext<UmbLanguageRepository, LanguageResponseModel>
+	implements UmbEntityWorkspaceContextInterface
+{
 	#data = new ObjectState<LanguageResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
@@ -40,6 +44,11 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 		return 'language';
 	}
 
+	// TODO: Convert to uniques:
+	getEntityId() {
+		return this.#data.getValue()?.isoCode;
+	}
+
 	setName(name: string) {
 		this.#data.update({ name });
 	}
@@ -64,6 +73,28 @@ export class UmbLanguageWorkspaceContext extends UmbWorkspaceContext<UmbLanguage
 	setValidationErrors(errorMap: any) {
 		// TODO: I can't use the update method to set the value to undefined
 		this.#validationErrors.next(errorMap);
+	}
+
+	async save() {
+		const data = this.getData();
+		if (!data) return;
+
+		if (this.getIsNew()) {
+			const { error } = await this.repository.create(data);
+			// TODO: this is temp solution to bubble validation errors to the UI
+			if (error) {
+				if (error.type === 'validation') {
+					this.setValidationErrors?.(error.errors);
+				}
+			} else {
+				this.setValidationErrors?.(undefined);
+				// TODO: do not make it the buttons responsibility to set the workspace to not new.
+				this.setIsNew(false);
+			}
+		} else {
+			await this.repository.save(data);
+			// TODO: Show validation errors as warnings?
+		}
 	}
 
 	destroy(): void {

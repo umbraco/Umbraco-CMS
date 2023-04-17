@@ -33,13 +33,13 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		`,
 	];
 
-	public load(entityKey: string) {
-		this.#templateWorkspaceContext.load(entityKey);
+	public load(entityId: string) {
+		this.#templateWorkspaceContext.load(entityId);
 	}
 
-	public create(parentKey: string | null) {
+	public create(parentId: string | null) {
 		this.#isNew = true;
-		this.#templateWorkspaceContext.createScaffold(parentKey);
+		this.#templateWorkspaceContext.createScaffold(parentId);
 	}
 
 	@state()

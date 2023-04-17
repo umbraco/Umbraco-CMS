@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbTreeElement } from '../../components/tree/tree.element';
-import { UmbTemplatePickerModalData, UmbTemplatePickerModalResult } from '.';
+import { UmbTemplatePickerModalData, UmbTemplatePickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 //TODO: make a default tree-picker that can be used across multiple pickers

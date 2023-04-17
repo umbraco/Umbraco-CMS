@@ -27,7 +27,7 @@ export class UmbFileSystemTreeStore extends UmbStoreBase implements UmbTreeStore
 	 * @memberof UmbFileSystemTreeStore
 	 */
 	updateItem(path: string, data: Partial<FileSystemTreeItemPresentationModel>) {
-		this.#data.appendOne(data)
+		this.#data.appendOne(data);
 	}
 
 	/**
@@ -56,7 +56,7 @@ export class UmbFileSystemTreeStore extends UmbStoreBase implements UmbTreeStore
 	}
 
 	/**
-	 * Returns an observable to observe the items with the given keys
+	 * Returns an observable to observe the items with the given ids
 	 * @param {Array<string>} paths
 	 * @return {*}
 	 * @memberof UmbFileSystemTreeStore

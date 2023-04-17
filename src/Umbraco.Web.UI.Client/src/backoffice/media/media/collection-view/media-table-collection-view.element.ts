@@ -85,7 +85,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		// TODO: I guess the type error will go away when we get an entity based MediaDetails model instead of tree based.
 		this._tableItems = mediaItems.map((item) => {
 			return {
-				key: item.key,
+				id: item.id,
 				icon: item.icon,
 				data: [
 					{

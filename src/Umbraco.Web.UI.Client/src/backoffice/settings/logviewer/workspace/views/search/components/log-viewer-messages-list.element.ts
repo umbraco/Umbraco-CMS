@@ -11,6 +11,9 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				display: block;
+			}
 			#message-list-header {
 				display: flex;
 				font-weight: 600;
@@ -129,23 +132,21 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				<div id="machine">Machine name</div>
 				<div id="message">Message</div>
 			</div>
-			<uui-scroll-container id="logs-scroll-container" style="max-height: calc(100vh - 490px)">
-				${this._logs.length > 0
-					? html` ${this._logs.map(
-							(log) => html`<umb-log-viewer-message
-								.timestamp=${log.timestamp ?? ''}
-								.level=${log.level ?? ''}
-								.renderedMessage=${log.renderedMessage ?? ''}
-								.properties=${log.properties ?? []}
-								.exception=${log.exception ?? ''}
-								.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
-					  )}`
-					: html`<umb-empty-state size="small"
-							><span id="empty">
-								<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
-							</span></umb-empty-state
-					  >`}
-			</uui-scroll-container>
+			${this._logs.length > 0
+				? html` ${this._logs.map(
+						(log) => html`<umb-log-viewer-message
+							.timestamp=${log.timestamp ?? ''}
+							.level=${log.level ?? ''}
+							.renderedMessage=${log.renderedMessage ?? ''}
+							.properties=${log.properties ?? []}
+							.exception=${log.exception ?? ''}
+							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
+				  )}`
+				: html`<umb-empty-state size="small"
+						><span id="empty">
+							<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
+						</span></umb-empty-state
+				  >`}
 			${this._renderPagination()}
 		</uui-box>`;
 	}

@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../../users/repository/user.store';
-import type { IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 
 import './list-view-layouts/table/workspace-view-users-table.element';
@@ -21,7 +21,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		css`
 			:host {
 				height: 100%;
-			}			
+			}
 
 			#router-slot {
 				height: calc(100% - var(--umb-header-layout-height));
@@ -65,7 +65,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: any[] = [
+		const routes: IRoute[] = [
 			{
 				path: 'overview',
 				component: () => import('./workspace-view-users-overview.element'),
@@ -75,12 +75,12 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		// TODO: find a way to make this reuseable across:
 		this._workspaces?.map((workspace: ManifestWorkspace) => {
 			routes.push({
-				path: `${workspace.meta.entityType}/:key`,
+				path: `${workspace.meta.entityType}/:id`,
 				component: () => createExtensionElement(workspace),
-				setup: (component: Promise<HTMLElement>, info: IRoutingInfo) => {
-					component.then((el: HTMLElement) => {
-						(el as any).entityKey = info.match.params.key;
-					});
+				setup: (component, info) => {
+					if (component) {
+						(component as any).entityId = info.match.params.id;
+					}
 				},
 			});
 			routes.push({
@@ -118,17 +118,17 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 		this.requestUpdate('selection');
 	}
 
-	public select(key: string) {
+	public select(id: string) {
 		const oldSelection = this.#selection.getValue();
-		if (oldSelection.indexOf(key) !== -1) return;
+		if (oldSelection.indexOf(id) !== -1) return;
 
-		this.#selection.next([...oldSelection, key]);
+		this.#selection.next([...oldSelection, id]);
 		this.requestUpdate('selection');
 	}
 
-	public deselect(key: string) {
+	public deselect(id: string) {
 		const selection = this.#selection.getValue();
-		this.#selection.next(selection.filter((k) => k !== key));
+		this.#selection.next(selection.filter((k) => k !== id));
 		this.requestUpdate('selection');
 	}
 

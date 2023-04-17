@@ -127,8 +127,8 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		// TODO: make sure we use the workspace for this:
 		/*
 		isDisabled
-			? this._workspaceContext.getStore()?.enableUsers([this._user.key])
-			: this._workspaceContext.getStore()?.disableUsers([this._user.key]);
+			? this._workspaceContext.getStore()?.enableUsers([this._user.id])
+			: this._workspaceContext.getStore()?.disableUsers([this._user.id]);
 			*/
 	}
 
@@ -136,7 +136,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		if (!this._user || !this._workspaceContext) return;
 
 		// TODO: make sure we use the workspace for this:
-		//this._workspaceContext.getStore()?.deleteUsers([this._user.key]);
+		//this._workspaceContext.getStore()?.deleteUsers([this._user.id]);
 
 		history.pushState(null, '', 'section/users/view/users/overview');
 	}
@@ -166,7 +166,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				</uui-ref-node>
 			`;
 
-		//TODO Render the name of the content start node instead of it's key.
+		//TODO Render the name of the content start node instead of it's id.
 		return repeat(
 			this._user.contentStartNodes,
 			(node) => node,
@@ -204,7 +204,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				`
 			);
 
-		if (this._currentUser?.key !== this._user?.key)
+		if (this._currentUser?.id !== this._user?.id)
 			buttons.push(html` <uui-button
 				@click=${this._deleteUser}
 				look="primary"
@@ -318,7 +318,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				</div>
 				<div>
 					<b>Key:</b>
-					<span>${this._user.key}</span>
+					<span>${this._user.id}</span>
 				</div>
 			</div>
 		</uui-box>`;

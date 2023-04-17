@@ -1,4 +1,4 @@
-import './document-workspace-edit.element';
+import './document-workspace-editor.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 import type { UmbDocumentWorkspaceElement } from './document-workspace.element';

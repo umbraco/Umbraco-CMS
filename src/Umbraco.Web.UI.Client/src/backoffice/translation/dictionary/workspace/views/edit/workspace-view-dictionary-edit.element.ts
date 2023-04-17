@@ -8,6 +8,7 @@ import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.contex
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-workspace-view-dictionary-edit')
 export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
@@ -37,8 +38,8 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 		this.#repo = new UmbDictionaryRepository(this);
 		this._languages = await this.#repo.getLanguages();
 
-		this.consumeContext<UmbDictionaryWorkspaceContext>('umbWorkspaceContext', (_instance) => {
-			this.#workspaceContext = _instance;
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (_instance) => {
+			this.#workspaceContext = _instance as UmbDictionaryWorkspaceContext;
 			this.#observeDictionary();
 		});
 	}

@@ -8,6 +8,7 @@ import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
+	UMB_ENTITY_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/context-api';
 
 // If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.
@@ -45,14 +46,9 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
-		// TODO: Figure out how to get the magic string in a better way.
-		new UmbContextConsumerController<UmbWorkspaceVariableEntityContextInterface>(
-			host,
-			'umbWorkspaceContext',
-			(workspaceContext) => {
-				this._workspaceContext = workspaceContext;
-			}
-		);
+		new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._workspaceContext = workspaceContext as UmbWorkspaceVariableEntityContextInterface;
+		});
 
 		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
 

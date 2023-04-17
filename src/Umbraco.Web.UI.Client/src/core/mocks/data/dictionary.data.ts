@@ -1,18 +1,12 @@
-import type { DictionaryDetails } from '../../../backoffice/translation/dictionary';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DictionaryItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<DictionaryDetails> = [
+export const data: Array<DictionaryItemResponseModel> = [
 	{
 		$type: '',
-		parentKey: null,
 		name: 'Hello',
-		key: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
-		hasChildren: true,
-		type: 'dictionary-item',
-		isContainer: false,
-		icon: 'umb:book-alt',
+		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		translations: [
 			{
 				isoCode: 'en',
@@ -26,13 +20,8 @@ export const data: Array<DictionaryDetails> = [
 	},
 	{
 		$type: '',
-		parentKey: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		name: 'Hello again',
-		key: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
-		hasChildren: false,
-		type: 'dictionary-item',
-		isContainer: false,
-		icon: 'umb:book-alt',
+		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		translations: [
 			{
 				isoCode: 'en',
@@ -46,27 +35,50 @@ export const data: Array<DictionaryDetails> = [
 	},
 ];
 
+const dictionaryTree: Array<EntityTreeItemResponseModel> = [
+	{
+		$type: '',
+		parentId: null,
+		name: 'Hello',
+		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		hasChildren: true,
+		type: 'dictionary-item',
+		isContainer: false,
+		icon: 'umb:book-alt',
+	},
+	{
+		$type: '',
+		parentId: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		name: 'Hello again',
+		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
+		hasChildren: false,
+		type: 'dictionary-item',
+		isContainer: false,
+		icon: 'umb:book-alt',
+	},
+];
+
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDictionaryData extends UmbEntityData<DictionaryDetails> {
+class UmbDictionaryData extends UmbEntityData<DictionaryItemResponseModel> {
 	constructor() {
 		super(data);
 	}
 
 	getTreeRoot(): Array<EntityTreeItemResponseModel> {
-		const rootItems = this.data.filter((item) => item.parentKey === null);
+		const rootItems = dictionaryTree.filter((item) => item.parentId === null);
 		return rootItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItemChildren(key: string): Array<EntityTreeItemResponseModel> {
-		const childItems = this.data.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): Array<EntityTreeItemResponseModel> {
+		const childItems = dictionaryTree.filter((item) => item.parentId === id);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItem(keys: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = this.data.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
+		const items = dictionaryTree.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

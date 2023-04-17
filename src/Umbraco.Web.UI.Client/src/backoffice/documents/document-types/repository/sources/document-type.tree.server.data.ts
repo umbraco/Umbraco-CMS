@@ -13,13 +13,13 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
-	async trashItems(keys: Array<string>) {
+	async trashItems(ids: Array<string>) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document-type/trash', {
 				method: 'POST',
-				body: JSON.stringify(keys),
+				body: JSON.stringify(ids),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -27,13 +27,13 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 		);
 	}
 
-	async moveItems(keys: Array<string>, destination: string) {
+	async moveItems(ids: Array<string>, destination: string) {
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
 			fetch('/umbraco/management/api/v1/document-type/move', {
 				method: 'POST',
-				body: JSON.stringify({ keys, destination }),
+				body: JSON.stringify({ ids: ids, destination }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -60,41 +60,41 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Fetches the children of a given parent key from the server
-	 * @param {(string | null)} parentKey
+	 * Fetches the children of a given parent id from the server
+	 * @param {(string | null)} parentId
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
 	 */
-	async getChildrenOf(parentKey: string | null) {
-		if (!parentKey) {
-			const error: ProblemDetailsModel = { title: 'Parent key is missing' };
+	async getChildrenOf(parentId: string | null) {
+		if (!parentId) {
+			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.getTreeDocumentTypeChildren({
-				parentKey,
+				parentId,
 			})
 		);
 	}
 
 	/**
-	 * Fetches the items for the given keys from the server
-	 * @param {Array<string>} keys
+	 * Fetches the items for the given ids from the server
+	 * @param {Array<string>} ids
 	 * @return {*}
 	 * @memberof DocumentTreeServerDataSource
 	 */
-	async getItems(keys: Array<string>) {
-		if (keys) {
+	async getItems(ids: Array<string>) {
+		if (ids) {
 			const error: ProblemDetailsModel = { title: 'Keys are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DocumentTypeResource.getTreeDocumentTypeItem({
-				key: keys,
+			DocumentTypeResource.getDocumentTypeItem({
+				id: ids,
 			})
 		);
 	}

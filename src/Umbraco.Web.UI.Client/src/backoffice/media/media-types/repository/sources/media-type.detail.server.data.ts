@@ -31,15 +31,15 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	}
 
 	/**
-	 * @description - Fetches a MediaType with the given key from the server
-	 * @param {string} key
+	 * @description - Fetches a MediaType with the given id from the server
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	get(key: string) {
-		//return tryExecuteAndNotify(this.#host, MediaTypeResource.getMediaTypeByKey({ key })) as any;
+	get(id: string) {
+		//return tryExecuteAndNotify(this.#host, MediaTypeResource.getMediaTypeByKey({ id })) as any;
 		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/media-type/${key}`)) as any;
+		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/media-type/${id}`)) as any;
 	}
 
 	/**
@@ -49,18 +49,18 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async update(mediaType: MediaTypeDetails) {
-		if (!mediaType.key) {
-			const error: ProblemDetailsModel = { title: 'MediaType key is missing' };
+		if (!mediaType.id) {
+			const error: ProblemDetailsModel = { title: 'MediaType id is missing' };
 			return { error };
 		}
 
-		const payload = { key: mediaType.key, requestBody: mediaType };
+		const payload = { id: mediaType.id, requestBody: mediaType };
 		//return tryExecuteAndNotify(this.#host, MediaTypeResource.putMediaTypeByKey(payload));
 
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/media-type/${mediaType.key}`, {
+			fetch(`/umbraco/management/api/v1/media-type/${mediaType.id}`, {
 				method: 'PUT',
 				body: JSON.stringify(payload),
 				headers: {
@@ -93,21 +93,21 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 
 	/**
 	 * @description - Deletes a MediaType on the server
-	 * @param {string} key
+	 * @param {string} id
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async delete(key: string) {
-		if (!key) {
+	async delete(id: string) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
 
-		//return await tryExecuteAndNotify(this.#host, MediaTypeResource.deleteMediaTypeByKey({ key }));
+		//return await tryExecuteAndNotify(this.#host, MediaTypeResource.deleteMediaTypeByKey({ id }));
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/media-type/${key}`, {
+			fetch(`/umbraco/management/api/v1/media-type/${id}`, {
 				method: 'DELETE',
 			})
 		) as any;

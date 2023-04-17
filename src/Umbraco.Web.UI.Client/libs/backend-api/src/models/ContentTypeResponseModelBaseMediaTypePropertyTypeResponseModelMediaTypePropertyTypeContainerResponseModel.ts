@@ -8,7 +8,7 @@ import type { MediaTypePropertyTypeContainerResponseModel } from './MediaTypePro
 import type { MediaTypePropertyTypeResponseModel } from './MediaTypePropertyTypeResponseModel';
 
 export type ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel = {
-    key?: string;
+    id?: string;
     alias?: string;
     name?: string;
     description?: string | null;
@@ -22,3 +22,4 @@ export type ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaT
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
 };
+

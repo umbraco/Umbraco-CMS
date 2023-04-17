@@ -81,9 +81,9 @@ export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<Us
 						${this._userGroups.map(
 							(item) => html`
 								<div
-									@click=${() => this.handleSelection(item.key)}
-									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.key)}
-									class=${this.isSelected(item.key) ? 'item selected' : 'item'}>
+									@click=${() => this.handleSelection(item.id)}
+									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
+									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
 									<uui-icon .name=${item.icon}></uui-icon>
 									<span>${item.name}</span>
 								</div>

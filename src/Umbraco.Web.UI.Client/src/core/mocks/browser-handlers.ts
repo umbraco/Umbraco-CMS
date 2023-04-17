@@ -1,4 +1,4 @@
-import { handlers as dataTypeHandlers } from './domains/data-type.handlers';
+import { handlers as dataTypeHandlers } from './domains/data-type';
 import { handlers as relationTypeHandlers } from './domains/relation-type.handlers';
 import { handlers as documentTypeHandlers } from './domains/document-type.handlers';
 import { handlers as installHandlers } from './domains/install.handlers';

@@ -5,18 +5,20 @@ import { RelationTypeTreeServerDataSource } from './sources/relation-type.tree.s
 import { RelationTypeTreeDataSource } from './sources';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateRelationTypeRequestModel,
+	ProblemDetailsModel,
+	RelationTypeResponseModel,
+	UpdateRelationTypeRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
-type ItemType = RelationTypeResponseModel;
-type TreeItemType = any;
-
-// Move to documentation / JSdoc
-/* We need to create a new instance of the repository from within the element context. We want the notifications to be displayed in the right context. */
-// element -> context -> repository -> (store) -> data source
-// All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
-export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
+export class UmbRelationTypeRepository
+	implements
+		UmbTreeRepository<any>,
+		UmbDetailRepository<CreateRelationTypeRequestModel, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
+{
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -67,22 +69,18 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 	}
 
 	//TODO RelationTypes can't have children. But this method is required by the tree interface.
-	async requestTreeItemsOf(parentKey: string | null) {
+	async requestTreeItemsOf(parentId: string | null) {
 		const error: ProblemDetailsModel = { title: 'Not implemented' };
 		return { data: undefined, error };
 	}
 
-	async requestTreeItems(keys: Array<string>) {
+	async requestTreeItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
 		await this.#init;
 
-		if (!keys) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
-		}
+		const { data, error } = await this.#treeSource.getItems(ids);
 
-		const { data, error } = await this.#treeSource.getItems(keys);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -90,38 +88,38 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 		return this.#treeStore!.rootItems;
 	}
 
-	async treeItemsOf(parentKey: string | null) {
+	async treeItemsOf(parentId: string | null) {
 		await this.#init;
-		return this.#treeStore!.childrenOf(parentKey);
+		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(keys: Array<string>) {
+	async treeItems(ids: Array<string>) {
 		await this.#init;
-		return this.#treeStore!.items(keys);
+		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS:
 
-	async createScaffold(parentKey: string | null) {
+	async createScaffold(parentId: string | null) {
 		await this.#init;
 
-		if (!parentKey) {
-			throw new Error('Parent key is missing');
+		if (!parentId) {
+			throw new Error('Parent id is missing');
 		}
 
-		return this.#detailDataSource.createScaffold(parentKey);
+		return this.#detailDataSource.createScaffold(parentId);
 	}
 
-	async requestByKey(key: string) {
+	async requestById(id: string) {
 		await this.#init;
 
-		// TODO: should we show a notification if the key is missing?
+		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!key) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Key is missing' };
 			return { error };
 		}
-		const { data, error } = await this.#detailDataSource.get(key);
+		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -130,81 +128,78 @@ export class UmbRelationTypeRepository implements UmbTreeRepository<TreeItemType
 		return { data, error };
 	}
 
-	async byKey(key: string) {
+	async byKey(id: string) {
 		await this.#init;
-		return this.#detailStore!.byKey(key);
+		return this.#detailStore!.byKey(id);
 	}
 
 	// Could potentially be general methods:
 
-	async create(template: ItemType) {
-		await this.#init;
+	async create(template: CreateRelationTypeRequestModel) {
+		if (!template) throw new Error('Template is missing');
+		if (!template.id) throw new Error('Template id is missing');
 
-		if (!template || !template.key) {
-			throw new Error('Template is missing');
-		}
+		await this.#init;
 
 		const { error } = await this.#detailDataSource.insert(template);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// TODO: Update tree store with the new item? or ask tree to request the new item?
+			// this.#detailStore?.append(template);
+
 			const notification = { data: { message: `Relation Type created` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		this.#detailStore?.append(template);
-		// TODO: Update tree store with the new item? or ask tree to request the new item?
-
 		return { error };
 	}
 
-	async save(item: ItemType) {
+	async save(id: string, item: UpdateRelationTypeRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!item) throw new Error('Relation type is missing');
+
 		await this.#init;
 
-		if (!item || !item.key) {
-			throw new Error('Relation Type is missing');
-		}
-
-		const { error } = await this.#detailDataSource.update(item);
+		const { error } = await this.#detailDataSource.update(id, item);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server
+			// Consider notify a workspace if a template is updated in the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+			this.#detailStore?.append(item);
+			this.#treeStore?.updateItem(id, { name: item.name });
+
 			const notification = { data: { message: `Relation Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a template is updated in the store while someone is editing it.
-		this.#detailStore?.append(item);
-		this.#treeStore?.updateItem(item.key, { name: item.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
 
 	// General:
 
-	async delete(key: string) {
+	async delete(id: string) {
+		if (!id) throw new Error('Id is missing');
+
 		await this.#init;
 
-		if (!key) {
-			throw new Error('Relation Type key is missing');
-		}
-
-		const { error } = await this.#detailDataSource.delete(key);
+		const { error } = await this.#detailDataSource.delete(id);
 
 		if (!error) {
+			// TODO: we currently don't use the detail store for anything.
+			// Consider to look up the data before fetching from the server.
+			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
+			// TODO: would be nice to align the stores on methods/methodNames.
+
+			this.#detailStore?.remove([id]);
+			this.#treeStore?.removeItem(id);
+
 			const notification = { data: { message: `Relation Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
-
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server.
-		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#detailStore?.remove([key]);
-		this.#treeStore?.removeItem(key);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}

@@ -29,6 +29,7 @@ import './input-multi-url-picker/input-multi-url-picker.element';
 import './input-slider/input-slider.element';
 import './input-tiny-mce/input-tiny-mce.element';
 import './input-toggle/input-toggle.element';
+import './input-upload-field/input-upload-field.element';
 import './input-template-picker/input-template-picker.element';
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
@@ -41,6 +42,8 @@ import './table/table.element';
 import './tree/tree.element';
 import './tree/entity-tree-item/entity-tree-item.element';
 import './tree/tree-menu-item/tree-menu-item.element';
+
+import './menu/menu-item-base/menu-item-base.element';
 
 import './variantable-property/variantable-property.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';

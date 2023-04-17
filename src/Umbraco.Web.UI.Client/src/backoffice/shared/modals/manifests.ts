@@ -9,6 +9,12 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
+		alias: 'Umb.Modal.Folder',
+		name: 'Folder Modal',
+		loader: () => import('./folder/folder-modal.element'),
+	},
+	{
+		type: 'modal',
 		alias: 'Umb.Modal.IconPicker',
 		name: 'Icon Picker Modal',
 		loader: () => import('./icon-picker/icon-picker-modal.element'),

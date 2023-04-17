@@ -3,5 +3,6 @@
 /* eslint-disable */
 
 export type MoveDictionaryRequestModel = {
-    targetKey?: string | null;
+    targetId?: string | null;
 };
+

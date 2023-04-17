@@ -20,11 +20,7 @@ export interface LogSearchDataSource {
 	}): Promise<DataSourceResponse<PagedSavedLogSearchResponseModel>>;
 	getSavedSearchByName({ name }: { name: string }): Promise<DataSourceResponse<SavedLogSearchResponseModel>>;
 	deleteSavedSearchByName({ name }: { name: string }): Promise<DataSourceResponse<unknown>>;
-	postLogViewerSavedSearch({
-		requestBody,
-	}: {
-		requestBody?: SavedLogSearchResponseModel;
-	}): Promise<DataSourceResponse<unknown>>;
+	postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel): Promise<DataSourceResponse<unknown>>;
 }
 
 export interface LogMessagesDataSource {

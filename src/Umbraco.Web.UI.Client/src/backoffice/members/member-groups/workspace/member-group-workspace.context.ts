@@ -1,13 +1,13 @@
-import { UmbEntityWorkspaceContextInterface } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
 import { UmbMemberGroupRepository } from '../repository/member-group.repository';
+import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MemberGroupDetails;
 export class UmbWorkspaceMemberGroupContext
-	extends UmbWorkspaceContext<UmbMemberGroupRepository>
+	extends UmbWorkspaceContext<UmbMemberGroupRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new ObjectState<EntityType | undefined>(undefined);
@@ -22,8 +22,8 @@ export class UmbWorkspaceMemberGroupContext
 		return this.#data.getValue();
 	}
 
-	getEntityKey() {
-		return this.getData()?.key || '';
+	getEntityId() {
+		return this.getData()?.id || '';
 	}
 
 	getEntityType() {
@@ -40,8 +40,8 @@ export class UmbWorkspaceMemberGroupContext
 		return;
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(entityId: string) {
+		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.#data.next(data);
 		}
@@ -56,7 +56,7 @@ export class UmbWorkspaceMemberGroupContext
 
 	async save() {
 		if (!this.#data.value) return;
-		await this.repository.save(this.#data.value);
+		await this.repository.save(this.#data.value.id, this.#data.value);
 		this.setIsNew(true);
 	}
 

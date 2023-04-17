@@ -15,9 +15,9 @@ export const data: Array<DocumentResponseModel> = [
 				url: '/',
 			},
 		],
-		templateKey: null,
-		key: 'all-property-editors-document-key',
-		contentTypeKey: 'all-property-editors-document-type-key',
+		templateId: null,
+		id: 'all-property-editors-document-id',
+		contentTypeId: 'all-property-editors-document-type-id',
 		values: [
 			{
 				$type: '', 
@@ -312,9 +312,9 @@ export const data: Array<DocumentResponseModel> = [
 				url: '/',
 			},
 		],
-		templateKey: null,
-		key: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
-		contentTypeKey: '29643452-cff9-47f2-98cd-7de4b6807681',
+		templateId: null,
+		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
 		values: [
 			{
 				$type: '',
@@ -442,9 +442,9 @@ export const data: Array<DocumentResponseModel> = [
 	},
 	{
 		urls: [],
-		templateKey: null,
-		key: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
-		contentTypeKey: '29643452-cff9-47f2-98cd-7de4b6807681',
+		templateId: null,
+		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
+		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
 		values: [
 			{
 				$type: '',
@@ -518,9 +518,9 @@ export const data: Array<DocumentResponseModel> = [
 	},
 	{
 		urls: [],
-		templateKey: null,
-		key: 'simple-document-key',
-		contentTypeKey: 'simple-document-type-key',
+		templateId: null,
+		id: 'simple-document-id',
+		contentTypeId: 'simple-document-type-id',
 		variants: [
 			{
 				$type: '',
@@ -544,9 +544,9 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isEdited: false,
 		noAccess: false,
 		isTrashed: false,
-		key: 'all-property-editors-document-key',
+		id: 'all-property-editors-document-id',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'All property editors',
 		type: 'document',
 		icon: 'document',
@@ -559,9 +559,9 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isEdited: false,
 		noAccess: false,
 		isTrashed: false,
-		key: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		name: 'Article in english',
 		type: 'document',
 		icon: 'document',
@@ -574,9 +574,9 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isEdited: false,
 		noAccess: false,
 		isTrashed: false,
-		key: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
+		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 		isContainer: false,
-		parentKey: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		parentId: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		name: 'Blog post B',
 		type: 'document',
 		icon: 'document',
@@ -588,9 +588,9 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
-		key: 'f6n7a5b2-e7c1-463a-956bc-6ck5b9bdf447',
+		id: 'f6n7a5b2-e7c1-463a-956bc-6ck5b9bdf447',
 		isContainer: false,
-		parentKey: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
+		parentId: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
 		noAccess: false,
 		isProtected: false,
 		isPublished: false,
@@ -603,9 +603,9 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
-		key: 'simple-document-key',
+		id: 'simple-document-id',
 		isContainer: false,
-		parentKey: null,
+		parentId: null,
 		noAccess: false,
 		isProtected: false,
 		isPublished: false,
@@ -626,21 +626,21 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	getTreeRoot(): PagedDocumentTreeItemResponseModel {
-		const items = this.treeData.filter((item) => item.parentKey === null);
+		const items = this.treeData.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(key: string): PagedDocumentTreeItemResponseModel {
-		const items = this.treeData.filter((item) => item.parentKey === key);
+	getTreeItemChildren(id: string): PagedDocumentTreeItemResponseModel {
+		const items = this.treeData.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createDocumentTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItem(keys: Array<string>): Array<DocumentTreeItemResponseModel> {
-		const items = this.treeData.filter((item) => keys.includes(item.key ?? ''));
+	getTreeItem(ids: Array<string>): Array<DocumentTreeItemResponseModel> {
+		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createDocumentTreeItem(item));
 	}
 }

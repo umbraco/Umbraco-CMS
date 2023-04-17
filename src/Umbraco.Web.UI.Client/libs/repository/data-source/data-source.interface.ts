@@ -1,9 +1,9 @@
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbDataSource<T> {
-	createScaffold(parentKey: string | null): Promise<DataSourceResponse<T>>;
-	get(key: string): Promise<DataSourceResponse<T>>;
-	insert(data: T): Promise<DataSourceResponse<T>>;
-	update(data: T): Promise<DataSourceResponse<T>>;
-	delete(key: string): Promise<DataSourceResponse<T>>;
+export interface UmbDataSource<CreateRequestType, UpdateRequestType, ResponseType> {
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<CreateRequestType>>;
+	get(unique: string): Promise<DataSourceResponse<ResponseType>>;
+	insert(data: CreateRequestType): Promise<any>;
+	update(unique: string, data: UpdateRequestType): Promise<DataSourceResponse<ResponseType>>;
+	delete(unique: string): Promise<DataSourceResponse>;
 }

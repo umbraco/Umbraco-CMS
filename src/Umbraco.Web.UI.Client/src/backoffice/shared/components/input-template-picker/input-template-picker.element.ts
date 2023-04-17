@@ -3,10 +3,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbTemplateCardElement } from '../template-card/template-card.element';
-import { UMB_TEMPLATE_PICKER_MODAL_TOKEN } from '../../modals/template-picker';
-import { UMB_TEMPLATE_MODAL_TOKEN } from '../../modals/template';
 import { UmbTemplateRepository } from '../../../templating/templates/repository/template.repository';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_TEMPLATE_PICKER_MODAL,
+	UMB_TEMPLATE_MODAL,
+	UmbModalContext,
+	UMB_MODAL_CONTEXT_TOKEN,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -104,7 +107,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	#openPicker() {
-		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL_TOKEN, {
+		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this.allowedKeys],
 		});
@@ -116,7 +119,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		});
 	}
 
-	#removeTemplate(key: string) {
+	#removeTemplate(id: string) {
 		/*
 		TODO: We need to follow up on this experience.
 		Could we test if this document type is in use, if so we should have a dialog notifying the user(Dialog, are you sure...) about that we might will break something?
@@ -126,14 +129,14 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		this.allowedKeys = this.allowedKeys.filter((x) => x !== key);
+		this.allowedKeys = this.allowedKeys.filter((x) => x !== id);
 	}
 
 	#openTemplate(e: CustomEvent) {
-		const key = (e.target as UmbTemplateCardElement).value;
+		const id = (e.target as UmbTemplateCardElement).value;
 
-		this._modalContext?.open(UMB_TEMPLATE_MODAL_TOKEN, {
-			key: key as string,
+		this._modalContext?.open(UMB_TEMPLATE_MODAL, {
+			id: id as string,
 			language: 'razor',
 		});
 	}
@@ -145,14 +148,14 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 					<umb-template-card
 						class="template-card"
 						.name="${template.name ?? ''}"
-						.key="${template.key ?? ''}"
+						.id="${template.id ?? ''}"
 						@change-default="${this.#changeDefault}"
 						@open="${this.#openTemplate}"
-						?default="${template.key === this.defaultKey}">
+						?default="${template.id === this.defaultKey}">
 						<uui-button
 							slot="actions"
 							label="Remove document ${template.name}"
-							@click="${() => this.#removeTemplate(template.key ?? '')}"
+							@click="${() => this.#removeTemplate(template.id ?? '')}"
 							compact>
 							<uui-icon name="umb:trash"> </uui-icon>
 						</uui-button>

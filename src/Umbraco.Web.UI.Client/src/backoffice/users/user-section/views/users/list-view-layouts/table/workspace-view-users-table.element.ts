@@ -119,10 +119,10 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 		});
 	}
 
-	private _getUserGroupNames(keys: Array<string>) {
-		return keys
-			.map((key: string) => {
-				return this._userGroups.find((x) => x.key === key)?.name;
+	private _getUserGroupNames(ids: Array<string>) {
+		return ids
+			.map((id: string) => {
+				return this._userGroups.find((x) => x.id === id)?.name;
 			})
 			.join(', ');
 	}
@@ -130,7 +130,7 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 	private _createTableItems(users: Array<UserDetails>) {
 		this._tableItems = users.map((user) => {
 			return {
-				key: user.key,
+				id: user.id,
 				icon: 'umb:user',
 				data: [
 					{

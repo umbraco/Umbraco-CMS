@@ -1,4 +1,5 @@
 import type {
+	ManifestModal,
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
@@ -51,4 +52,13 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+const modals: Array<ManifestModal> = [
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.LogViewer.SaveSearch',
+		name: 'Saved Searches Modal',
+		loader: () => import('../views/search/components/log-viewer-search-input-modal.element'),
+	},
+];
+
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...modals];
