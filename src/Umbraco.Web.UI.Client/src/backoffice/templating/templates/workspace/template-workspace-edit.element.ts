@@ -85,7 +85,6 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 			});
 
 			this.observe(this.#templateWorkspaceContext.content, (content) => {
-				debugger;
 				this._content = content;
 			});
 
