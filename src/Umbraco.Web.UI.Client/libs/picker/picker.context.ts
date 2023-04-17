@@ -83,12 +83,13 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	async requestRemoveItem(unique: string) {
 		if (!this.repository) throw new Error('Repository is not initialized');
 
-		const { data } = await this.repository.requestTreeItems([unique]);
-		if (!data) throw new Error('Could not find item with unique id: ' + unique);
+		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
+		const item = this.#selectedItems.value.find((item) => item.id === unique);
+		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
 		const modalHandler = this.modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
-			headline: `Remove ${data[0].name}?`,
+			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
 			confirmLabel: 'Remove',
 		});
