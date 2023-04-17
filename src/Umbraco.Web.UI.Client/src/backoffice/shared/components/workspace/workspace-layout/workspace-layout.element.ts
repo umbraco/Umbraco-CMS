@@ -135,14 +135,9 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 						}
 						return createExtensionElement(view);
 					},
-					setup: (component, info) => {
+					setup: (component) => {
 						if (component && 'manifest' in component) {
 							component.manifest = view;
-						} else {
-							console.group(`[UmbWorkspaceLayout] Failed to setup component for route: ${info.match.route.path}`);
-							console.log('Matched route', info.match.route);
-							console.error('Missing property "manifest" on component', component);
-							console.groupEnd();
 						}
 					},
 				};
