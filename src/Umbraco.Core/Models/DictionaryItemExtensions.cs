@@ -22,7 +22,7 @@ public static class DictionaryItemExtensions
     /// </summary>
     /// <param name="d"></param>
     /// <returns></returns>
-    [Obsolete("Warning: This method ONLY works in very specific scenarios. It will be removed in V13.")]
+    [Obsolete("Warning: This method ONLY works in very specific scenarios. It will be removed in V15.")]
     public static string? GetDefaultValue(this IDictionaryItem d)
     {
         IDictionaryTranslation? defaultTranslation = d.Translations.FirstOrDefault(x => x.Language?.Id == 1);
