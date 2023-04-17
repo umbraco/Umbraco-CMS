@@ -41,7 +41,6 @@ export class UmbLanguageRepository implements UmbItemRepository<LanguageItemResp
 
 			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#languageItemStore = instance;
-				debugger;
 			}).asPromise(),
 		]);
 	}
