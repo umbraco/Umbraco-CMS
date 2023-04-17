@@ -78,13 +78,14 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext('umbWorkspaceContext', (workspaceContext: UmbTemplateWorkspaceContext) => {
+		this.consumeContext('UmbEntityWorkspaceContext', (workspaceContext: UmbTemplateWorkspaceContext) => {
 			this.#templateWorkspaceContext = workspaceContext;
 			this.observe(this.#templateWorkspaceContext.name, (name) => {
 				this._name = name;
 			});
 
 			this.observe(this.#templateWorkspaceContext.content, (content) => {
+				debugger;
 				this._content = content;
 			});
 

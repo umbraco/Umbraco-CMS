@@ -41,13 +41,12 @@ export default class UmbInsertPartialViewSidebarElement extends UmbModalBaseElem
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Insert">
+			<umb-workspace-layout headline="Insert Partial view">
 				<div id="main">
 					<uui-box> <umb-tree alias="Umb.Tree.PartialViews"></umb-tree> </uui-box>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
-					<uui-button @click=${this._close} look="primary">Submit</uui-button>
 				</div>
 			</umb-workspace-layout>
 		`;
