@@ -116,9 +116,9 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 		const { asObservable } = await this.repository.requestItems(this.getSelection());
 
 		if (asObservable) {
-			this.#selectedItemsObserver = new UmbObserverController(this.host, asObservable(), (data) => {
-				this.#selectedItems.next(data);
-			});
+			this.#selectedItemsObserver = new UmbObserverController(this.host, asObservable(), (data) =>
+				this.#selectedItems.next(data)
+			);
 		}
 	}
 
