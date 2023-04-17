@@ -6,8 +6,9 @@ export interface ManifestTinyMcePlugin extends ManifestClass {
 	type: 'tinyMcePlugin';
 }
 
+// TODO => editor property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
 export interface TinyMcePluginArguments {
     host: UmbElementMixinInterface;
-	editor: any; // TODO => should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
+	editor: any; 
 	configuration?: Array<DataTypePropertyPresentationModel>;
 }
