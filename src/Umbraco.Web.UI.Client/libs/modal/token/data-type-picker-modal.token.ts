@@ -2,6 +2,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDataTypePickerModalData {
 	selection?: Array<string>;
+	multiple?: boolean;
 }
 
 export interface UmbDataTypePickerModalResult {

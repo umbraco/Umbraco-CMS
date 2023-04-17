@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import {
-	UmbDocumentTypePickerModalData,
-	UmbDocumentTypePickerModalResult,
+	UmbDataTypePickerModalData,
+	UmbDataTypePickerModalResult,
 	UmbModalHandler,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -15,55 +15,53 @@ export class UmbDataTypePickerModalElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbDocumentTypePickerModalData, UmbDocumentTypePickerModalResult>;
+	modalHandler?: UmbModalHandler<UmbDataTypePickerModalData, UmbDataTypePickerModalResult>;
 
 	@property({ type: Object, attribute: false })
-	data?: UmbDocumentTypePickerModalData;
+	data?: UmbDataTypePickerModalData;
 
 	@state()
 	_selection: Array<string> = [];
 
 	@state()
-	_multiple = true;
+	_multiple = false;
 
 	connectedCallback() {
 		super.connectedCallback();
 		this._selection = this.data?.selection ?? [];
-		this._multiple = this.data?.multiple ?? true;
+		this._multiple = this.data?.multiple ?? false;
 	}
 
-	private _handleSelectionChange(e: CustomEvent) {
+	#onSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		//TODO: Should multiple property be implemented here or be passed down into umb-tree?
-		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
+		this._selection = element.selection;
 	}
 
-	private _submit() {
+	#submit() {
 		this.modalHandler?.submit({ selection: this._selection });
 	}
 
-	private _close() {
+	#close() {
 		this.modalHandler?.reject();
 	}
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select">
+			<umb-body-layout headline="Select">
 				<uui-box>
-					<uui-input></uui-input>
-					<hr />
 					<umb-tree
 						alias="Umb.Tree.DataTypes"
-						@selected=${this._handleSelectionChange}
+						@selected=${this.#onSelectionChange}
 						.selection=${this._selection}
-						selectable></umb-tree>
+						selectable
+						?multiple=${this._multiple}></umb-tree>
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
+					<uui-button label="Close" @click=${this.#close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
 }

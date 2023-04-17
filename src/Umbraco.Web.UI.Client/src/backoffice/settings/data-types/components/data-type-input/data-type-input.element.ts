@@ -5,7 +5,6 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbDataTypePickerContext } from './data-type-input.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-data-type-input')
 export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
@@ -24,7 +23,11 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default undefined
 	 */
 	@property({ type: Number })
-	min?: number;
+	public set min(value: number | undefined) {
+		if (value !== undefined) {
+			this.#pickerContext.min = value;
+		}
+	}
 
 	/**
 	 * Min validation message.
@@ -42,7 +45,11 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default undefined
 	 */
 	@property({ type: Number })
-	max?: number;
+	public set max(value: number | undefined) {
+		if (value !== undefined) {
+			this.#pickerContext.max = value;
+		}
+	}
 
 	/**
 	 * Max validation message.
@@ -90,7 +97,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (this.selectedIds = selection));
-		//this.observe(this.#pickerContext.items, (items) => (this._items = items));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected getFormElement() {
@@ -110,7 +117,9 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 		return html`
 			<uui-ref-node-data-type name=${item.name}>
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.removeItem(item.id)} label="Remove Data Type ${item.name}"
+					<uui-button
+						@click=${() => this.#pickerContext.requestRemoveItem(item.id)}
+						label="Remove Data Type ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>

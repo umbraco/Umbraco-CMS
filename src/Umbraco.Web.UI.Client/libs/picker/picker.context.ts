@@ -9,19 +9,22 @@ import {
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPickerContext<RepositoryType extends UmbTreeRepository> {
+export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
 	modalAlias: UmbModalToken | string;
-	repository?: RepositoryType;
+	repository?: UmbTreeRepository<ItemType>;
 
 	public modalContext?: UmbModalContext;
 
 	#selection = new ArrayState<string>([]);
 	selection = this.#selection.asObservable();
 
-	#items = new ArrayState<any>([]);
-	items = this.#items.asObservable();
+	#selectedItems = new ArrayState<ItemType>([]);
+	selectedItems = this.#selectedItems.asObservable();
+
+	#selectedItemsObserver?: UmbObserverController<ItemType[]>;
 
 	max = Infinity;
 	min = 0;
@@ -40,7 +43,7 @@ export class UmbPickerContext<RepositoryType extends UmbTreeRepository> {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionClass<RepositoryType>(repositoryManifest, [this.host]);
+					const result = await createExtensionClass<UmbTreeRepository>(repositoryManifest, [this.host]);
 					this.repository = result;
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
@@ -61,6 +64,7 @@ export class UmbPickerContext<RepositoryType extends UmbTreeRepository> {
 		this.#selection.next(selection);
 	}
 
+	// TODO: this need to accept an options object at some point to pass to the modal context
 	openPicker() {
 		if (!this.modalContext) throw new Error('Modal context is not initialized');
 
@@ -71,10 +75,12 @@ export class UmbPickerContext<RepositoryType extends UmbTreeRepository> {
 
 		modalHandler?.onSubmit().then(({ selection }: any) => {
 			this.setSelection(selection);
+			// TODO: we only want to request items that are not already in the selectedItems array
+			this.#requestItems();
 		});
 	}
 
-	async removeItem(unique: string) {
+	async requestRemoveItem(unique: string) {
 		if (!this.repository) throw new Error('Repository is not initialized');
 
 		const { data } = await this.repository.requestTreeItems([unique]);
@@ -88,7 +94,29 @@ export class UmbPickerContext<RepositoryType extends UmbTreeRepository> {
 		});
 
 		await modalHandler?.onSubmit();
+		this.#removeItem(unique);
+	}
+
+	async #requestItems() {
+		if (!this.repository) throw new Error('Repository is not initialized');
+		if (this.#selectedItemsObserver) this.#selectedItemsObserver.destroy();
+
+		const { asObservable } = await this.repository.requestTreeItems(this.getSelection());
+
+		if (asObservable) {
+			this.#selectedItemsObserver = new UmbObserverController(this.host, asObservable(), (data) => {
+				this.#selectedItems.next(data);
+			});
+		}
+	}
+
+	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
+
+		// remove items items from selectedItems array
+		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
+		const newSelectedItems = this.#selectedItems.value.filter((item) => item.id !== unique);
+		this.#selectedItems.next(newSelectedItems);
 	}
 }
