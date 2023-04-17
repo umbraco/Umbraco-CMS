@@ -8,7 +8,7 @@ public interface IDictionaryTranslation : IEntity, IRememberBeingDirty
     /// <summary>
     ///     Gets or sets the <see cref="Language" /> for the translation
     /// </summary>
-    [Obsolete("This will be removed in V13. From V15 onwards you should get languages by ISO code from ILanguageService.")]
+    [Obsolete("This will be removed in V15. From V13 onwards you should get languages by ISO code from ILanguageService.")]
     [DataMember]
     ILanguage? Language { get; set; }
 
