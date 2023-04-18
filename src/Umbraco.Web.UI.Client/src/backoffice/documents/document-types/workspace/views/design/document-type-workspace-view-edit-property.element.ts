@@ -97,8 +97,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 			}
 			:host(.--umb-sorter-placeholder)::after {
 				content: '';
-				display:block:
-    		grid-column: span 2;
+				grid-column: span 2;
 				width: 100%;
 				border-top: 2px solid blue;
 			}
