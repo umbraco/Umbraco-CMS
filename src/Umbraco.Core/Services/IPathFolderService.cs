@@ -6,5 +6,5 @@ public interface IPathFolderService<TStatus> where TStatus : Enum
 {
     Task<PathContainer?> GetAsync(string path);
 
-    Task<Attempt<PathContainer?, TStatus>> CreateAsync(PathContainer container, Guid performingUserId);
+    Task<Attempt<PathContainer?, TStatus>> CreateAsync(PathContainer container);
 }

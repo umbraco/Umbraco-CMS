@@ -37,7 +37,7 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
     {
         PathContainer folderModel = Mapper.Map<PathContainer>(requestModel)!;
 
-        Attempt<PathContainer?, TStatus> attempt = await CreateContainerAsync(folderModel, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<PathContainer?, TStatus> attempt = await CreateContainerAsync(folderModel);
         if (attempt.Success)
         {
             PathFolderResponseModel? viewModel = Mapper.Map<PathFolderResponseModel>(attempt.Result);
@@ -49,7 +49,7 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
 
     protected abstract Task<PathContainer?> GetContainerAsync(string path);
 
-    protected abstract Task<Attempt<PathContainer?, TStatus>> CreateContainerAsync(PathContainer container, Guid performingUserId);
+    protected abstract Task<Attempt<PathContainer?, TStatus>> CreateContainerAsync(PathContainer container);
 
     protected abstract Task<Attempt<PathContainer, TStatus>> UpdateContainerAsync(PathContainer container, Guid performingUserId);
 

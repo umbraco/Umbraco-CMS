@@ -36,7 +36,7 @@ public abstract class PathFolderServiceBase<TRepo, TStatus> :
         return Task.FromResult<PathContainer?>(model);
     }
 
-    public async Task<Attempt<PathContainer?, TStatus>> CreateAsync(PathContainer container, Guid performingUserId)
+    public async Task<Attempt<PathContainer?, TStatus>> CreateAsync(PathContainer container)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -53,6 +53,8 @@ public abstract class PathFolderServiceBase<TRepo, TStatus> :
         return Attempt.SucceedWithStatus<PathContainer?, TStatus>(SuccessStatus, CreateFromPath(container.Path));
     }
 
+    protected abstract Task<Attempt<TStatus>> ValidateCreate(PathContainer container);
+
     private PathContainer CreateFromPath(string path)
     {
         var parentPath = Path.GetDirectoryName(path);
@@ -66,6 +68,4 @@ public abstract class PathFolderServiceBase<TRepo, TStatus> :
 
         return model;
     }
-
-    public abstract Task<Attempt<TStatus>> ValidateCreate(PathContainer container);
 }

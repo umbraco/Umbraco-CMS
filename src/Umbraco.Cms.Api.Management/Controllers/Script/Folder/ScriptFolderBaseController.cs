@@ -30,9 +30,8 @@ public class ScriptFolderBaseController : PathFolderManagementControllerBase<Scr
         => await _scriptFolderService.GetAsync(path);
 
     protected override Task<Attempt<PathContainer?, ScriptOperationStatus>> CreateContainerAsync(
-        PathContainer container,
-        Guid performingUserId) =>
-        _scriptFolderService.CreateAsync(container, performingUserId);
+        PathContainer container) =>
+        _scriptFolderService.CreateAsync(container);
 
     protected override Task<Attempt<PathContainer, ScriptOperationStatus>> UpdateContainerAsync(PathContainer container, Guid performingUserId) => throw new NotImplementedException();
 
