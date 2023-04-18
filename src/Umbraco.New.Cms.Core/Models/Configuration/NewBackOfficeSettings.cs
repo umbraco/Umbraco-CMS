@@ -7,4 +7,6 @@ namespace Umbraco.New.Cms.Core.Models.Configuration;
 public class NewBackOfficeSettings
 {
     public Uri? BackOfficeHost { get; set; } = null;
+
+    public string? AuthorizeCallbackPathName { get; set; } = null;
 }
