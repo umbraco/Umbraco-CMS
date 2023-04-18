@@ -688,8 +688,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 
 		const movingItemIndex = this.#model.indexOf(movingItem);
 
-		console.log('this.#model', this.#model, movingItemIndex);
-
 		if (movingItemIndex !== -1 && movingItemIndex <= movingItemIndex) {
 			newIndex--;
 		}
