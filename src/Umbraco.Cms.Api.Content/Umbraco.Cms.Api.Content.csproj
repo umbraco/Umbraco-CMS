@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Content API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Content API.</Description>
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
