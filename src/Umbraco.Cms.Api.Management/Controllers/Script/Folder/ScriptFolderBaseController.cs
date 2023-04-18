@@ -54,6 +54,14 @@ public class ScriptFolderBaseController : PathFolderManagementControllerBase<Scr
                 .WithTitle("Parent not found")
                 .WithDetail("The parent folder was not found.")
                 .Build()),
+            ScriptFolderOperationStatus.NotAllowedIsRoot => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Not allowed")
+                .WithDetail("The requested action is not allowed to be performed on the root.")
+                .Build()),
+            ScriptFolderOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid name")
+                .WithDetail("The name specified is not a valid name.")
+                .Build()),
             _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
         };
 }

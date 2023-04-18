@@ -6,5 +6,7 @@ public enum ScriptFolderOperationStatus
     AlreadyExists,
     NotFound,
     NotEmpty,
+    NotAllowedIsRoot,
     ParentNotFound,
+    InvalidName,
 }

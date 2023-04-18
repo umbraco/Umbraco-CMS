@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -27,7 +28,12 @@ public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, Scri
 
     protected override Task<Attempt<ScriptFolderOperationStatus>> ValidateCreate(PathContainer container)
     {
-        if(_scriptRepository.FolderExists(container.Path))
+        if (container.Name.ContainsAny(Path.GetInvalidFileNameChars()))
+        {
+            return Task.FromResult(Attempt.Fail(ScriptFolderOperationStatus.InvalidName));
+        }
+
+        if (_scriptRepository.FolderExists(container.Path))
         {
             return Task.FromResult(Attempt.Fail(ScriptFolderOperationStatus.AlreadyExists));
         }
