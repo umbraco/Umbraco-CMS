@@ -67,7 +67,7 @@ export class UmbDataTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async insert(dataType: CreateDataTypeRequestModel & { id: string }) {
+	async insert(dataType: CreateDataTypeRequestModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.id) throw new Error('Data Type id is missing');
 
