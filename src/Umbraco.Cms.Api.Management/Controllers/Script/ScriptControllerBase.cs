@@ -41,6 +41,10 @@ public class ScriptControllerBase : ManagementApiControllerBase
                 .WithTitle("Script not found")
                 .WithDetail("The script was not found.")
                 .Build()),
+            ScriptOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid name")
+                .WithDetail("The script name is invalid.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown script operation status")
         };
 }

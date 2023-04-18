@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -121,6 +122,11 @@ public class ScriptService : RepositoryService, IScriptService
             return ScriptOperationStatus.ParentNotFound;
         }
 
+        if(HasValidName(createModel.Name) is false)
+        {
+            return ScriptOperationStatus.InvalidName;
+        }
+
         if (HasValidFileExtension(createModel.FilePath) is false)
         {
             return ScriptOperationStatus.InvalidFileExtension;
@@ -177,11 +183,26 @@ public class ScriptService : RepositoryService, IScriptService
             return ScriptOperationStatus.InvalidFileExtension;
         }
 
+        if (HasValidName(updateModel.Name) is false)
+        {
+            return ScriptOperationStatus.InvalidName;
+        }
+
         return ScriptOperationStatus.Success;
     }
 
     private bool HasValidFileExtension(string fileName)
         => _allowedFileExtensions.Contains(Path.GetExtension(fileName));
+
+    private bool HasValidName(string fileName)
+    {
+        if (fileName.ContainsAny(Path.GetInvalidFileNameChars()))
+        {
+            return false;
+        }
+
+        return true;
+    }
 
     private void Audit(AuditType type, int userId)
         => _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));
