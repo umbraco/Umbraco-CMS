@@ -9,10 +9,8 @@ namespace Umbraco.Extensions;
 
 public static class UmbracoEFCoreServiceCollectionExtensions
 {
-    public static IServiceCollection AddUmbracoEFCore(this IServiceCollection services, IConfiguration configuration, Action<DbContextOptionsBuilder, IConfiguration>? optionsAction = null)
+    public static IServiceCollection AddUmbracoEFCore(this IServiceCollection services)
     {
-
-        // services.AddUnique<IDatabaseInfo, EFDatabaseInfo>();
         services.AddUnique<IAmbientEFCoreScopeContextStack, AmbientEFCoreScopeContextStack>();
         return services;
     }
