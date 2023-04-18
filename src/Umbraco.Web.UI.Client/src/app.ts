@@ -63,7 +63,6 @@ export class UmbAppElement extends UmbLitElement {
 		super();
 		this.#umbIconRegistry.attach(this);
 		this.#uuiIconRegistry.attach(this);
-		this.#setInitStatus();
 	}
 
 	connectedCallback() {
@@ -76,6 +75,7 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.WITH_CREDENTIALS = true;
 
 		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
+		this.#setInitStatus();
 
 		// Listen for the debug event from the <umb-debug> component
 		this.addEventListener(umbDebugContextEventType, (event: any) => {
