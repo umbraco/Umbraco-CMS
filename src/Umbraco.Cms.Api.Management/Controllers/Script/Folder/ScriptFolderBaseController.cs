@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -34,5 +35,25 @@ public class ScriptFolderBaseController : PathFolderManagementControllerBase<Scr
     protected override Task<Attempt<ScriptFolderOperationStatus>> DeleteContainerAsync(string path) =>
         _scriptFolderService.DeleteAsync(path);
 
-    protected override IActionResult OperationStatusResult(ScriptFolderOperationStatus status) => throw new NotImplementedException();
+    protected override IActionResult OperationStatusResult(ScriptFolderOperationStatus status) =>
+        status switch
+        {
+            ScriptFolderOperationStatus.AlreadyExists => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Folder already exists")
+                .WithDetail("The folder already exists")
+                .Build()),
+            ScriptFolderOperationStatus.NotEmpty => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Not empty")
+                .WithDetail("The folder is not empty and can therefore not be deleted.")
+                .Build()),
+            ScriptFolderOperationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Not found")
+                .WithDetail("The specified folder was not found.")
+                .Build()),
+            ScriptFolderOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Parent not found")
+                .WithDetail("The parent folder was not found.")
+                .Build()),
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
 }
