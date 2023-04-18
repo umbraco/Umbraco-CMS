@@ -51,8 +51,6 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
 
     protected abstract Task<Attempt<PathContainer?, TStatus>> CreateContainerAsync(PathContainer container);
 
-    protected abstract Task<Attempt<PathContainer, TStatus>> UpdateContainerAsync(PathContainer container, Guid performingUserId);
-
     protected abstract Task<TStatus> DeleteContainerAsync(string path, Guid performingUserId);
 
     protected abstract IActionResult OperationStatusResult(TStatus status);

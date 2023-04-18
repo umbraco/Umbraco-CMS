@@ -25,7 +25,7 @@ public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, Scri
 
     protected override ScriptOperationStatus SuccessStatus => ScriptOperationStatus.Success;
 
-    public override Task<Attempt<ScriptOperationStatus>> ValidateCreate(PathContainer container)
+    protected override Task<Attempt<ScriptOperationStatus>> ValidateCreate(PathContainer container)
     {
         if(_scriptRepository.FolderExists(container.Path))
         {
