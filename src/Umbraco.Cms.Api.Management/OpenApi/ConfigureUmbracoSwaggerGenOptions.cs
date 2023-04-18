@@ -24,7 +24,7 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
         swaggerGenOptions.SwaggerDoc(
-            ManagementApiConfiguration.DefaultApiDocumentName,
+            ManagementApiConfiguration.ApiDocumentName,
             new OpenApiInfo
             {
                 Title = ManagementApiConfiguration.ApiTitle,

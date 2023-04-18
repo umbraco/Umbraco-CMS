@@ -7,7 +7,7 @@ using Umbraco.New.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
-[MapToApi(ManagementApiConfiguration.DefaultApiDocumentName)]
+[MapToApi(ManagementApiConfiguration.ApiDocumentName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 public class ManagementApiControllerBase : Controller
 {

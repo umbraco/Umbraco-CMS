@@ -6,7 +6,7 @@ internal static class ManagementApiConfiguration
 {
     internal const string ApiTitle = "Umbraco Backoffice API";
 
-    internal const string DefaultApiDocumentName = "v1";
+    internal const string ApiDocumentName = "v1";
 
     internal static ApiVersion DefaultApiVersion => new(1, 0);
 }
