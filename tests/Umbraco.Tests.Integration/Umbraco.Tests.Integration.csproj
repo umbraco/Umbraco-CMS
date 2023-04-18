@@ -53,10 +53,16 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Create.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Delete.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Get.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Move.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Update.cs">

@@ -5,7 +5,7 @@ public class HealthCheckActionRequestModel
     /// <summary>
     ///     Gets or sets the health check key.
     /// </summary>
-    public Guid HealthCheckKey { get; set; }
+    public Guid HealthCheckId { get; set; }
 
     /// <summary>
     ///     Gets or sets the alias.

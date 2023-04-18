@@ -32,7 +32,7 @@ public class CopyDataTypeController : DataTypeControllerBase
             return NotFound();
         }
 
-        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CopyAsync(source, copyDataTypeRequestModel.TargetKey, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IDataType, DataTypeOperationStatus> result = await _dataTypeService.CopyAsync(source, copyDataTypeRequestModel.TargetId, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyDataTypeController>(controller => nameof(controller.ByKey), result.Result.Key)

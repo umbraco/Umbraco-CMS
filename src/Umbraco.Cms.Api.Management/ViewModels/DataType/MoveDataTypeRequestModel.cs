@@ -2,5 +2,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.DataType;
 
 public class MoveDataTypeRequestModel
 {
-    public Guid? TargetKey { get; set; }
+    public Guid? TargetId { get; set; }
 }

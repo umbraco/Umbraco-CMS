@@ -2,5 +2,5 @@
 
 public class CreateDictionaryItemRequestModel : DictionaryItemModelBase
 {
-    public Guid? ParentKey { get; set; }
+    public Guid? ParentId { get; set; }
 }

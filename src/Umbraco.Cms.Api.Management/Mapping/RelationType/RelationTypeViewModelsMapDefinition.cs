@@ -23,7 +23,7 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
             target.IsDependency = sourceWithIsDependency.IsDependency;
         }
 
-        target.Key = source.Key;
+        target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
         target.Alias = source.Alias;
         target.ParentObjectType = source.ParentObjectType;

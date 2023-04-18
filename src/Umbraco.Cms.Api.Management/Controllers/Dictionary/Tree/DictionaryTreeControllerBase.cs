@@ -38,7 +38,7 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
                 Type = Constants.UdiEntityType.DictionaryItem,
                 HasChildren = hasChildren,
                 IsContainer = false,
-                ParentKey = parentKey
+                ParentId = parentKey
             };
         }
 

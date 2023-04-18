@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Web.UI
                     u.AllowCredentials();
                     u.AllowAnyMethod();
                     u.AllowAnyHeader();
-                    u.WithOrigins(new[] { "http://127.0.0.1:5173", "http://localhost:5173" });
+                    u.WithOrigins(new[] { "http://127.0.0.1:5173", "http://localhost:5173", "https://127.0.0.1:5173", "https://localhost:5173" });
                 });
             }
 #if (UseHttpsRedirect)

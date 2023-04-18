@@ -35,6 +35,7 @@ public class ManagementApiComposer : IComposer
             .AddHealthChecks()
             .AddModelsBuilder()
             .AddRedirectUrl()
+            .AddTags()
             .AddTrackedReferences()
             .AddTemporaryFiles()
             .AddDataTypes()
@@ -44,6 +45,7 @@ public class ManagementApiComposer : IComposer
             .AddUsers()
             .AddUserGroups()
             .AddPackages()
+            .AddEntitys()
             .AddBackOfficeAuthentication()
             .AddApiVersioning()
             .AddSwaggerGen();

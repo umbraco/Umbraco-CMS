@@ -18,14 +18,14 @@ public class ByKeyMediaTypeController : MediaTypeControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet("{key:guid}")]
+    [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaTypeResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByKey(Guid key)
+    public async Task<IActionResult> ByKey(Guid id)
     {
         // FIXME: create and use an async get method here.
-        IMediaType? mediaType = _mediaTypeService.Get(key);
+        IMediaType? mediaType = _mediaTypeService.Get(id);
         if (mediaType == null)
         {
             return NotFound();

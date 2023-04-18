@@ -22,13 +22,13 @@ public class UpdateUserGroupController : UserGroupsControllerBase
         _userGroupPresentationFactory = userGroupPresentationFactory;
     }
 
-    [HttpPut("{key:guid}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid key, UpdateUserGroupRequestModel dataTypeRequestModel)
+    public async Task<IActionResult> Update(Guid id, UpdateUserGroupRequestModel dataTypeRequestModel)
     {
-        IUserGroup? existingUserGroup = await _userGroupService.GetAsync(key);
+        IUserGroup? existingUserGroup = await _userGroupService.GetAsync(id);
 
         if (existingUserGroup is null)
         {

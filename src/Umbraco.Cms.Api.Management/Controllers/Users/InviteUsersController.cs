@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -14,13 +15,15 @@ public class InviteUsersController : UsersControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public InviteUsersController(
         IUserService userService,
-        IUserPresentationFactory userPresentationFactory)
+        IUserPresentationFactory userPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _userPresentationFactory = userPresentationFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
 
@@ -31,16 +34,10 @@ public class InviteUsersController : UsersControllerBase
     {
         UserInviteModel userInvite = await _userPresentationFactory.CreateInviteModelAsync(model);
 
-        // FIXME: use the actual currently logged in user key
-        Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(Constants.Security.SuperUserKey, userInvite);
+        Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(CurrentUserKey(_backOfficeSecurityAccessor), userInvite);
 
-        if (result.Success)
-        {
-            return Ok();
-        }
-
-        return result.Status is UserOperationStatus.UnknownFailure
-            ? FormatErrorMessageResult(result.Result)
-            : UserOperationStatusResult(result.Status);
+        return result.Success
+            ? Ok()
+            : UserOperationStatusResult(result.Status, result.Result);
     }
 }

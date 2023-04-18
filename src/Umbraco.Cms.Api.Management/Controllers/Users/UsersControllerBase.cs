@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Users;
 [ApiVersion("1.0")]
 public abstract class UsersControllerBase : ManagementApiControllerBase
 {
-    protected IActionResult UserOperationStatusResult(UserOperationStatus status) =>
+    protected IActionResult UserOperationStatusResult(UserOperationStatus status, ErrorMessageResult? errorMessageResult = null) =>
         status switch
         {
             UserOperationStatus.Success => Ok(),
@@ -64,17 +64,39 @@ public abstract class UsersControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid avatar")
                 .WithDetail("The selected avatar is invalid")
                 .Build()),
-            UserOperationStatus.NotFound => NotFound(),
+            UserOperationStatus.InvalidEmail => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid email")
+                .WithDetail("The email is invalid")
+                .Build()),
+            UserOperationStatus.AvatarFileNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Avatar file not found")
+                .WithDetail("The file key did not resolve in to a file")
+                .Build()),
+            UserOperationStatus.ContentStartNodeNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content Start Node not found")
+                .WithDetail("Some of the provided content start nodes was not found.")
+                .Build()),
+            UserOperationStatus.MediaStartNodeNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Media Start Node not found")
+                .WithDetail("Some of the provided media start nodes was not found.")
+                .Build()),
+            UserOperationStatus.UserNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("The was not found")
+                .WithDetail("The specified user was not found.")
+                .Build()),
             UserOperationStatus.CannotDisableInvitedUser => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cannot disable invited user")
                 .WithDetail("An invited user cannot be disabled.")
                 .Build()),
+            UserOperationStatus.UnknownFailure => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unknown failure")
+                .WithDetail(errorMessageResult?.Error?.ErrorMessage ?? "The error was unknown")
+                .Build()),
+            UserOperationStatus.InvalidIsoCode => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid ISO code")
+                .WithDetail("The specified ISO code is invalid.")
+                .Build()),
+            UserOperationStatus.Forbidden => Forbid(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown user operation status."),
         };
-
-    protected IActionResult FormatErrorMessageResult(IErrorMessageResult errorMessageResult) =>
-        BadRequest(new ProblemDetailsBuilder()
-            .WithTitle("An error occured.")
-            .WithDetail(errorMessageResult.ErrorMessage ?? "The error was unknown")
-            .Build());
 }

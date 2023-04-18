@@ -2,7 +2,7 @@
 
 public class ImportDictionaryRequestModel
 {
-    public required Guid TemporaryFileKey { get; set; }
+    public required Guid TemporaryFileId { get; set; }
 
-    public Guid? ParentKey { get; set; }
+    public Guid? ParentId { get; set; }
 }

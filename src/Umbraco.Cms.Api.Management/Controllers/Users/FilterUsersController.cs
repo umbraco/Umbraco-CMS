@@ -56,9 +56,8 @@ public class FilterUsersController : UsersControllerBase
             NameFilters = string.IsNullOrEmpty(filter) ? null : new SortedSet<string> { filter }
         };
 
-        // FIXME: use the actual currently logged in user key
         Attempt<PagedModel<IUser>, UserOperationStatus> filterAttempt =
-            await _userService.FilterAsync(Constants.Security.SuperUserKey, userFilter, skip, take, orderBy, orderDirection);
+            await _userService.FilterAsync(CurrentUserKey(_backOfficeSecurityAccessor), userFilter, skip, take, orderBy, orderDirection);
 
         if (filterAttempt.Success is false)
         {

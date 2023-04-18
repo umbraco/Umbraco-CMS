@@ -22,6 +22,10 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentEditingOperationStatus.NotFound => NotFound("The content could not be found"),
             ContentEditingOperationStatus.ParentNotFound => NotFound("The targeted content parent could not be found"),
+            ContentEditingOperationStatus.ParentInvalid => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid parent")
+                .WithDetail("The targeted parent was not valid for the operation.")
+                .Build()),
             ContentEditingOperationStatus.NotAllowed => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Operation not permitted")
                 .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")

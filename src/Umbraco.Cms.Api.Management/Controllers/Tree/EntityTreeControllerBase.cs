@@ -44,29 +44,29 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentKey, int skip, int take)
+    protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentId, int skip, int take)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
             return BadRequest(error);
         }
 
-        IEntitySlim[] children = GetPagedChildEntities(parentKey, pageNumber, pageSize, out var totalItems);
+        IEntitySlim[] children = GetPagedChildEntities(parentId, pageNumber, pageSize, out var totalItems);
 
-        TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, children);
+        TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
 
         PagedViewModel<TItem> result = PagedViewModel(treeItemViewModels, totalItems);
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<IEnumerable<TItem>>> GetItems(Guid[] keys)
+    protected async Task<ActionResult<IEnumerable<TItem>>> GetItems(Guid[] ids)
     {
-        if (keys.IsCollectionEmpty())
+        if (ids.IsCollectionEmpty())
         {
             return await Task.FromResult(Ok(PagedViewModel(Array.Empty<TItem>(), 0)));
         }
 
-        IEntitySlim[] itemEntities = GetEntities(keys);
+        IEntitySlim[] itemEntities = GetEntities(ids);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, itemEntities);
 
@@ -86,7 +86,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {
-        // EntityService is only able to get paged children by parent ID, so we must first map parent key to parent ID
+        // EntityService is only able to get paged children by parent ID, so we must first map parent id to parent ID
         Attempt<int> parentId = EntityService.GetId(parentKey, ItemObjectType);
         if (parentId.Success == false)
         {
@@ -106,7 +106,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return children;
     }
 
-    protected virtual IEntitySlim[] GetEntities(Guid[] keys) => EntityService.GetAll(ItemObjectType, keys).ToArray();
+    protected virtual IEntitySlim[] GetEntities(Guid[] ids) => EntityService.GetAll(ItemObjectType, ids).ToArray();
 
     protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
         => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
@@ -121,7 +121,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             IsContainer = entity.IsContainer,
-            ParentKey = parentKey
+            ParentId = parentKey
         };
 
         return viewModel;

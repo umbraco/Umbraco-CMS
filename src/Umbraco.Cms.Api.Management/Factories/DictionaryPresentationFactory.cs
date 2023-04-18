@@ -78,7 +78,7 @@ public class DictionaryPresentationFactory : IDictionaryPresentationFactory
                         ? key
                         : null;
 
-                    return new ImportDictionaryItemsPresentationModel { Name = name, Key = itemKey, ParentKey = parentKey };
+                    return new ImportDictionaryItemsPresentationModel { Name = name, Id = itemKey, ParentId = parentKey };
                 })
                 .WhereNotNull()
                 .ToArray(),

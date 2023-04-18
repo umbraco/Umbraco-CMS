@@ -20,13 +20,13 @@ public class ExportDictionaryController : DictionaryControllerBase
         _entityXmlSerializer = entityXmlSerializer;
     }
 
-    [HttpGet("{key:guid}/export")]
+    [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Export(Guid key, bool includeChildren = false)
+    public async Task<IActionResult> Export(Guid id, bool includeChildren = false)
     {
-        IDictionaryItem? dictionaryItem = await _dictionaryItemService.GetAsync(key);
+        IDictionaryItem? dictionaryItem = await _dictionaryItemService.GetAsync(id);
         if (dictionaryItem is null)
         {
             return await Task.FromResult(NotFound());

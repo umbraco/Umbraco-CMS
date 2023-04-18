@@ -23,9 +23,9 @@ public class ItemsMediaTreeController : MediaTreeControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ContentTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ContentTreeItemResponseModel>>> Items([FromQuery(Name = "key")] Guid[] keys, Guid? dataTypeKey = null)
+    public async Task<ActionResult<IEnumerable<ContentTreeItemResponseModel>>> Items([FromQuery(Name = "id")] Guid[] ids, Guid? dataTypeId = null)
     {
-        IgnoreUserStartNodesForDataType(dataTypeKey);
-        return await GetItems(keys);
+        IgnoreUserStartNodesForDataType(dataTypeId);
+        return await GetItems(ids);
     }
 }

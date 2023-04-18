@@ -23,7 +23,7 @@ public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<Docu
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentBlueprint;
 
-    protected override DocumentBlueprintTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override DocumentBlueprintTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
     {
         var contentTypeAliases = entities
             .OfType<IDocumentEntitySlim>()
@@ -37,14 +37,14 @@ public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<Docu
 
         return entities.Select(entity =>
         {
-            DocumentBlueprintTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentKey, entity);
+            DocumentBlueprintTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentId, entity);
             responseModel.Icon = Constants.Icons.Blueprint;
             responseModel.HasChildren = false;
 
             if (entity is IDocumentEntitySlim documentEntitySlim
                 && contentTypeByAlias.TryGetValue(documentEntitySlim.ContentTypeAlias, out IContentType? contentType))
             {
-                responseModel.DocumentTypeKey = contentType.Key;
+                responseModel.DocumentTypeId = contentType.Key;
                 responseModel.DocumentTypeAlias = contentType.Alias;
                 responseModel.DocumentTypeName = contentType.Name;
             }

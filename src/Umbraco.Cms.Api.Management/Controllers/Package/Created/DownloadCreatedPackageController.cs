@@ -18,15 +18,15 @@ public class DownloadCreatedPackageController : CreatedPackageControllerBase
     /// <summary>
     ///     Downloads a package XML or ZIP file.
     /// </summary>
-    /// <param name="key">The key of the package.</param>
+    /// <param name="id">The id of the package.</param>
     /// <returns>The XML or ZIP file of the package or not found result.</returns>
-    [HttpGet("{key:guid}/download")]
+    [HttpGet("{id:guid}/download")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Download(Guid key)
+    public async Task<IActionResult> Download(Guid id)
     {
-        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(key);
+        PackageDefinition? package = await _packagingService.GetCreatedPackageByKeyAsync(id);
 
         if (package is null)
         {
