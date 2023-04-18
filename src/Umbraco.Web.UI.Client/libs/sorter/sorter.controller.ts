@@ -66,6 +66,7 @@ type INTERNAL_UmbSorterConfig<T> = {
 	querySelectModelToElement: (container: HTMLElement, modelEntry: T) => HTMLElement | null;
 	identifier: string;
 	itemSelector: string;
+	disabledItemSelector?: string;
 	containerSelector: string;
 	ignorerSelector: string;
 	placeholderClass: string;
@@ -115,7 +116,7 @@ export type UmbSorterConfig<T> = Omit<
  */
 export class UmbSorterController<T> implements UmbControllerInterface {
 	#host;
-	#config;
+	#config: INTERNAL_UmbSorterConfig<T>;
 	#observer;
 
 	#model: Array<T> = [];
@@ -208,8 +209,10 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			setupIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		element.draggable = true;
-		element.addEventListener('dragstart', this.handleDragStart);
+		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
+			element.draggable = true;
+			element.addEventListener('dragstart', this.handleDragStart);
+		}
 	}
 
 	destroyItem(element: HTMLElement) {
@@ -367,7 +370,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			this.#currentDragRect = this.#currentDragElement!.getBoundingClientRect();
 			const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, this.#currentDragRect);
 			if (!insideCurrentRect) {
-				if (this.#rqaId === null) {
+				if (this.#rqaId === undefined) {
 					this.#rqaId = requestAnimationFrame(this.moveCurrentElement);
 				}
 			}
@@ -379,6 +382,8 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		if (!this.#currentElement || !this.#currentContainerElement || !this.#currentItem) {
 			return;
 		}
+
+		console.log('moveCurrentElement!!!');
 
 		const currentElementRect = this.#currentElement.getBoundingClientRect();
 		const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, currentElementRect);
@@ -429,6 +434,8 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 				? this.#currentContainerElement.shadowRoot.children
 				: this.#currentContainerElement.children
 		);
+
+		console.log('orderedContainerElements', orderedContainerElements);
 
 		const currentContainerRect = this.#currentContainerElement.getBoundingClientRect();
 
@@ -665,6 +672,9 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		}
 
 		let newIndex = this.#model.length;
+
+		console.log('NextEl:', nextEl);
+
 		if (nextEl) {
 			// We had a reference element, we want to get the index of it.
 			// This is might a problem if a item is being moved forward? (was also like this in the AngularJS version...)

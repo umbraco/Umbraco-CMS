@@ -19,7 +19,8 @@ const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 		return container.querySelector('data-umb-property-id[' + modelEntry.id + ']');
 	},
 	identifier: 'content-type-property-sorter',
-	itemSelector: '[data-umb-property-id][data-property-of-owner-document]',
+	itemSelector: '[data-umb-property-id]',
+	disabledItemSelector: ':not([data-property-of-owner-document])',
 };
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -28,6 +29,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		performItemInsert: (args) => {
 			let sortOrder = 0;
 			if (this._propertyStructure.length > 0) {
+				console.log('args.newIndex', args.newIndex);
 				if (args.newIndex === 0) {
 					// TODO: Remove as any when sortOrder is added to the model:
 					sortOrder = ((this._propertyStructure[0] as any).sortOrder ?? 0) - 1;
@@ -109,7 +111,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	render() {
 		return html`${repeat(
 				this._propertyStructure,
-				(property) => property.alias,
+				(property) => property.alias ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
 				(property) =>
 					html`<document-type-workspace-view-edit-property
 						class="property"
