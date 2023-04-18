@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
@@ -11,14 +10,11 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
     where TStatus : Enum
 {
     protected readonly IUmbracoMapper Mapper;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     protected PathFolderManagementControllerBase(
-        IUmbracoMapper mapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IUmbracoMapper mapper)
     {
         Mapper = mapper;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     protected async Task<IActionResult> GetFolderAsync(string path)
@@ -47,11 +43,20 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
         return OperationStatusResult(attempt.Status);
     }
 
+    protected async Task<IActionResult> DeleteAsync(string path)
+    {
+        Attempt<TStatus> attempt = await DeleteContainerAsync(path);
+
+        return attempt.Success
+            ? Ok()
+            : OperationStatusResult(attempt.Result!);
+    }
+
     protected abstract Task<PathContainer?> GetContainerAsync(string path);
 
     protected abstract Task<Attempt<PathContainer?, TStatus>> CreateContainerAsync(PathContainer container);
 
-    protected abstract Task<TStatus> DeleteContainerAsync(string path, Guid performingUserId);
+    protected abstract Task<Attempt<TStatus>> DeleteContainerAsync(string path);
 
     protected abstract IActionResult OperationStatusResult(TStatus status);
 }

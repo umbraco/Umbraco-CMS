@@ -38,7 +38,7 @@ public abstract class PathFolderServiceBase<TRepo, TStatus> :
 
     public async Task<Attempt<PathContainer?, TStatus>> CreateAsync(PathContainer container)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         Attempt<TStatus> validationResult = await ValidateCreate(container);
         if (validationResult.Success is false)
@@ -54,6 +54,25 @@ public abstract class PathFolderServiceBase<TRepo, TStatus> :
     }
 
     protected abstract Task<Attempt<TStatus>> ValidateCreate(PathContainer container);
+
+    public async Task<Attempt<TStatus?>> DeleteAsync(string path)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        Attempt<TStatus> validationResult = await ValidateDelete(path);
+        if (validationResult.Success is false)
+        {
+            return Attempt.Fail(validationResult.Result);
+        }
+
+        Repository.DeleteFolder(path);
+
+        scope.Complete();
+
+        return Attempt.Succeed(SuccessStatus);
+    }
+
+    protected abstract Task<Attempt<TStatus>> ValidateDelete(string path);
 
     private PathContainer CreateFromPath(string path)
     {

@@ -7,4 +7,6 @@ public interface IFileWithFoldersRepository
     void DeleteFolder(string folderPath);
 
     bool FolderExists(string folderPath);
+
+    bool FolderHasContent(string folderPath);
 }

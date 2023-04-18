@@ -40,4 +40,19 @@ public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, Scri
 
         return Task.FromResult(Attempt.Succeed(ScriptOperationStatus.Success));
     }
+
+    protected override Task<Attempt<ScriptOperationStatus>> ValidateDelete(string path)
+    {
+        if(_scriptRepository.FolderExists(path) is false)
+        {
+            return Task.FromResult(Attempt.Fail(ScriptOperationStatus.FolderNotFound));
+        }
+
+        if (_scriptRepository.FolderHasContent(path))
+        {
+            return Task.FromResult(Attempt.Fail(ScriptOperationStatus.FolderNotEmpty));
+        }
+
+        return Task.FromResult(Attempt.Succeed(ScriptOperationStatus.Success));
+    }
 }

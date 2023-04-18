@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -19,6 +20,8 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
     public virtual void DeleteFolder(string folderPath) => PersistDeletedItem(new Folder(folderPath));
 
     public virtual bool FolderExists(string folderPath) => FileSystem?.DirectoryExists(folderPath) == true;
+
+    public virtual bool FolderHasContent(string folderPath) => FileSystem?.GetFiles(folderPath).Any() == true || FileSystem?.GetDirectories(folderPath).Any() == true;
 
     public Stream GetFileContentStream(string filepath)
     {
