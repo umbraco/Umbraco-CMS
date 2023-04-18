@@ -90,7 +90,6 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
 				this.#isNew = !!isNew;
-				console.log(this.#isNew);
 			});
 		});
 	}
