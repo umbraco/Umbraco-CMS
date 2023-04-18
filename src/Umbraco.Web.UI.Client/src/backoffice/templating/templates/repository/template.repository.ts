@@ -82,7 +82,7 @@ export class UmbTemplateRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -105,7 +105,7 @@ export class UmbTemplateRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

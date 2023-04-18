@@ -74,7 +74,7 @@ export class UmbRelationTypeRepository
 		return { data: undefined, error };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		if (!ids) throw new Error('Ids are missing');
 		await this.#init;
 
@@ -93,7 +93,7 @@ export class UmbRelationTypeRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

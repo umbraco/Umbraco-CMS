@@ -87,7 +87,7 @@ export class UmbInputTemplatePickerElement extends FormControlMixin(UmbLitElemen
 
 	async #observePickedTemplates() {
 		this.observe(
-			await this._templateRepository.treeItems(this._allowedKeys),
+			await this._templateRepository.itemsLegacy(this._allowedKeys),
 			(data) => {
 				this._pickedTemplates = data;
 			},
