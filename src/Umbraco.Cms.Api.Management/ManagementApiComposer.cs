@@ -34,7 +34,7 @@ public class ManagementApiComposer : IComposer
     private const string ApiTitle = "Umbraco Backoffice API";
     private const string ApiDefaultDocumentName = "v1";
 
-    private ApiVersion DefaultApiVersion => new(1, 0);
+    private ApiVersion DefaultApiVersion => new ApiVersion(1, 0);
 
     public void Compose(IUmbracoBuilder builder)
     {
@@ -53,14 +53,7 @@ public class ManagementApiComposer : IComposer
             .AddMappers()
             .AddBackOfficeAuthentication();
 
-        services.AddApiVersioning(options =>
-        {
-            options.DefaultApiVersion = DefaultApiVersion;
-            options.ReportApiVersions = true;
-            options.ApiVersionReader = new UrlSegmentApiVersionReader();
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.UseApiBehavior = false;
-        });
+        services.AddApiVersioning();
 
         services.AddSwaggerGen(swaggerGenOptions =>
         {
@@ -163,14 +156,7 @@ public class ManagementApiComposer : IComposer
             swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         });
 
-        services.AddVersionedApiExplorer(options =>
-        {
-            options.DefaultApiVersion = DefaultApiVersion;
-            options.GroupNameFormat = "'v'VVV";
-            options.SubstituteApiVersionInUrl = true;
-            options.AddApiVersionParametersWhenVersionNeutral = true;
-            options.AssumeDefaultVersionWhenUnspecified = true;
-        });
+        services.AddVersionedApiExplorer();
         services.AddControllers()
             .AddJsonOptions(options =>
             {

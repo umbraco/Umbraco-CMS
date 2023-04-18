@@ -28,6 +28,11 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiQueryService, ApiQueryService>();
 
+        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
+        builder.Services.AddApiVersioning();
+        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
+        builder.Services.AddVersionedApiExplorer();
+
         builder
             .Services
             .ConfigureOptions<ConfigureMvcOptions>()
