@@ -197,8 +197,6 @@ export class UmbDataTypeRepository
 		return { error };
 	}
 
-	// General:
-
 	async delete(id: string) {
 		if (!id) throw new Error('Data Type id is missing');
 		await this.#init;
