@@ -383,8 +383,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			return;
 		}
 
-		console.log('moveCurrentElement!!!');
-
 		const currentElementRect = this.#currentElement.getBoundingClientRect();
 		const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, currentElementRect);
 		if (insideCurrentRect) {
@@ -434,8 +432,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 				? this.#currentContainerElement.shadowRoot.children
 				: this.#currentContainerElement.children
 		);
-
-		console.log('orderedContainerElements', orderedContainerElements);
 
 		const currentContainerRect = this.#currentContainerElement.getBoundingClientRect();
 
@@ -672,8 +668,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		}
 
 		let newIndex = this.#model.length;
-
-		console.log('NextEl:', nextEl);
 
 		if (nextEl) {
 			// We had a reference element, we want to get the index of it.
