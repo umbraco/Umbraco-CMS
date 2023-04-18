@@ -27,10 +27,7 @@ public class BackOfficeLoginController : Controller
     // GET
     public IActionResult Index(BackOfficeLoginModel model)
     {
-        var authUrl = _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
-            controller => controller.PostLogin(new LoginModel()));
-
-        model.AuthUrl = authUrl ?? string.Empty;
+        model.AuthUrl = "/umbraco/management/api/v1.0/security/back-office";
 
         return View("/umbraco/UmbracoLogin/Index.cshtml", model);
     }
