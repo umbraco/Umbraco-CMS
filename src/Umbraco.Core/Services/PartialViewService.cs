@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.New.Cms.Core.Models;
 
@@ -27,4 +28,6 @@ public class PartialViewService : IPartialViewService
 
         return Task.FromResult(new PagedModel<PartialViewSnippet> { Items = snippets, Total = total });
     }
+
+    public Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid performingUserKey) => throw new NotImplementedException();
 }

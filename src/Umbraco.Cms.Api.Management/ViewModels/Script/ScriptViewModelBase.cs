@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Script;
+﻿using Umbraco.Cms.Api.Management.ViewModels.TextFiles;
 
-public class ScriptViewModelBase
+namespace Umbraco.Cms.Api.Management.ViewModels.Script;
+
+public class ScriptViewModelBase : TextFileViewModelBase
 {
-    public required string Name { get; set; }
-
-    public string? Content { get; set; }
 }
