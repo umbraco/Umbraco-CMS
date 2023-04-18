@@ -2,13 +2,15 @@
   <PropertyGroup>
     <Title>Umbraco CMS - API Common</Title>
     <Description>Contains the bits and pieces that are shared between the Umbraco CMS APIs.</Description>
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
     <AssemblyName>Umbraco.Cms.Api.Common</AssemblyName>
     <RootNamespace>Umbraco.Cms.Api.Common</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
+<!--    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />-->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />

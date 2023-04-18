@@ -2,14 +2,10 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Content API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Content API.</Description>
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />

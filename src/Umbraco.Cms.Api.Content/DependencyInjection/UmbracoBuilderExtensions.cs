@@ -11,11 +11,11 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApi;
 using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Cms.Api.Content.DependencyInjection;
+namespace Umbraco.Extensions;
 
 public static class UmbracoBuilderExtensions
 {
-    public static IUmbracoBuilder AddContentApi(this IUmbracoBuilder builder)
+    public static IUmbracoBuilder AddDeliveryApi(this IUmbracoBuilder builder)
     {
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
         builder.Services.AddScoped<IOutputExpansionStrategy, RequestContextOutputExpansionStrategy>();
@@ -27,6 +27,11 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, RequestContextRequestStartItemProviderAccessor>();
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiQueryService, ApiQueryService>();
+
+        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
+        builder.Services.AddApiVersioning();
+        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
+        builder.Services.AddVersionedApiExplorer();
 
         builder
             .Services
