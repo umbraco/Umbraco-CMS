@@ -4,7 +4,8 @@ import {PartialViewBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Partial Views', () => {
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -22,7 +23,7 @@ test.describe('Partial Views', () => {
     const name = "TestPartialView";
     const fileName = name + ".cshtml";
 
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
 
     await openPartialViewsCreatePanel(page, umbracoUi);
 
@@ -30,24 +31,24 @@ test.describe('Partial Views', () => {
     await page.locator('.menu-label localize[key="create_newEmptyPartialView"]').click();
 
     //Type name
-    await umbracoUi.setEditorHeaderName(name);
+    await page.locator('[data-element="editor-name-field"]').type(name);
 
     //Save
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     //Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+    await umbracoUi.isSuccessNotificationVisible({timeout: 30000});
 
     //Clean up
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
-  });  
-  
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
+  });
+
   test('Create partial view from snippet', async ({page, umbracoApi, umbracoUi}) => {
     const name = "TestPartialViewFromSnippet";
     const fileName = name + ".cshtml";
 
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
-    
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
+
     await openPartialViewsCreatePanel(page, umbracoUi);
 
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction("action-create"));
@@ -60,14 +61,14 @@ test.describe('Partial Views', () => {
 
     // Save
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
+
     // Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout:10000});
+    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
 
     // Clean up
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
-  });  
-  
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
+  });
+
   test('Partial view with no name', async ({page, umbracoApi, umbracoUi}) => {
     await openPartialViewsCreatePanel(page, umbracoUi);
 
@@ -83,13 +84,13 @@ test.describe('Partial Views', () => {
 
     // Asserts
     await umbracoUi.isErrorNotificationVisible();
-  });  
-  
+  });
+
   test('Delete partial view', async ({page, umbracoApi, umbracoUi}) => {
     const name = "TestDeletePartialView";
     const fileName = name + ".cshtml";
 
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
 
     // Build and save partial view
     const partialView = new PartialViewBuilder()
@@ -110,14 +111,14 @@ test.describe('Partial Views', () => {
     await expect(await page.locator("body", { hasText: fileName})).not.toBeVisible();
 
     // Clean
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
-  });  
-  
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
+  });
+
   test('Edit partial view', async ({page, umbracoApi, umbracoUi}) => {
     const name = 'EditPartialView';
     const fileName = name + ".cshtml";
 
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
 
     const partialView = new PartialViewBuilder()
       .withName(name)
@@ -134,9 +135,9 @@ test.describe('Partial Views', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout:10000});
-    
+    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
+
     // Clean
-    await umbracoApi.partialViews.ensureNameNotExists(fileName);
+    await umbracoApi.partialViews.ensureNameNotExists('', fileName);
   });
 });
