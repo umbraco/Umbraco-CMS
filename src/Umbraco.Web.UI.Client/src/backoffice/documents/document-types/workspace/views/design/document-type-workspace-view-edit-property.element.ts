@@ -81,8 +81,26 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 				border-bottom: none;
 			}
 
-			:host-context(umb-variantable-property:first-of-type) {
+			:host(:first-of-type) {
 				padding-top: 0;
+			}
+			:host([data-property-of-owner-document]) {
+				cursor: grab;
+			}
+
+			// PLaceholder style, used when property is being dragged.
+			:host(.--umb-sorter-placeholder) {
+				height: 2px;
+			}
+			:host(.--umb-sorter-placeholder) > div {
+				display: none;
+			}
+			:host(.--umb-sorter-placeholder)::after {
+				content: '';
+				display:block:
+    		grid-column: span 2;
+				width: 100%;
+				border-top: 2px solid blue;
 			}
 
 			p {

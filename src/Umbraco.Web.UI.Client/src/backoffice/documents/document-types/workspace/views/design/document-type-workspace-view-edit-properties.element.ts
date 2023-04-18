@@ -21,6 +21,7 @@ const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
 	disabledItemSelector: ':not([data-property-of-owner-document])',
+	containerSelector: '#property-list',
 };
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -31,7 +32,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			if (this._propertyStructure.length > 0) {
 				console.log('args.newIndex', args.newIndex);
 				if (args.newIndex === 0) {
-					// TODO: Remove as any when sortOrder is added to the model:
+					// TODO: Remove 'as any' when sortOrder is added to the model:
 					sortOrder = ((this._propertyStructure[0] as any).sortOrder ?? 0) - 1;
 				} else {
 					sortOrder =
@@ -39,11 +40,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 							0) + 1;
 				}
 			}
-			console.log('insert', args.item.id, sortOrder);
 			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
 		},
 		performItemRemove: (args) => {
-			console.log('remove', args.item.id);
 			return this._propertyStructureHelper.removeProperty(args.item.id!);
 		},
 	});
@@ -109,36 +108,29 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	}
 
 	render() {
-		return html`${repeat(
-				this._propertyStructure,
-				(property) => property.alias ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
-				(property) =>
-					html`<document-type-workspace-view-edit-property
-						class="property"
-						data-umb-property-id=${property.id}
-						data-property-container-is=${property.containerId}
-						data-container-id=${this.containerId}
-						?data-property-of-owner-document=${ifDefined(property.containerId === this.containerId)}
-						.property=${property}
-						@partial-property-update=${(event: CustomEvent) => {
-							this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
-						}}></document-type-workspace-view-edit-property>`
-			)}<uui-button id="add" look="placeholder" @click=${this.#onAddProperty}> Add property </uui-button>`;
+		return html`<div id="property-list">
+				${repeat(
+					this._propertyStructure,
+					(property) => property.alias ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
+					(property) =>
+						html`<document-type-workspace-view-edit-property
+							class="property"
+							data-umb-property-id=${property.id}
+							data-property-container-is=${property.containerId}
+							data-container-id=${this.containerId}
+							?data-property-of-owner-document=${ifDefined(property.containerId === this.containerId)}
+							.property=${property}
+							@partial-property-update=${(event: CustomEvent) => {
+								this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
+							}}></document-type-workspace-view-edit-property>`
+				)}
+			</div>
+			<uui-button id="add" look="placeholder" @click=${this.#onAddProperty}> Add property </uui-button> `;
 	}
 
 	static styles = [
 		UUITextStyles,
 		css`
-			.property:first-of-type {
-				padding-top: 0;
-			}
-			.property {
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-			.property:last-child {
-				border-bottom: 0;
-			}
-
 			#add {
 				width: 100%;
 			}

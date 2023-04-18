@@ -122,7 +122,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 	#model: Array<T> = [];
 	#rqaId?: number;
 
-	#containerElement!: Element;
+	#containerElement!: HTMLElement;
 	#currentContainerVM = this;
 	#currentContainerElement: Element | null = null;
 
@@ -146,7 +146,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 
 		// Set defaults:
 		config.ignorerSelector ??= 'a, img, iframe';
-		config.placeholderClass ??= 'umb-drag-placeholder';
+		config.placeholderClass ??= '--umb-sorter-placeholder';
 
 		this.#config = config as INTERNAL_UmbSorterConfig<T>;
 		host.addController(this);
@@ -167,8 +167,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 				});
 			});
 		});
-
-		host.addEventListener('dragover', preventDragOver);
 	}
 
 	setModel(model: Array<T>) {
@@ -179,29 +177,46 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 	}
 
 	hostConnected() {
+		requestAnimationFrame(this._onFirstRender);
+	}
+	private _onFirstRender = () => {
 		const containerEl =
-			(this.#config.containerSelector ? this.#host.querySelector(this.#config.containerSelector) : this.#host) ??
-			this.#host;
-
-		(containerEl as any)['__umbBlockGridSorterController'] = () => {
-			return this;
-		};
+			(this.#config.containerSelector
+				? this.#host.shadowRoot!.querySelector(this.#config.containerSelector)
+				: this.#host) ?? this.#host;
 
 		if (this.#currentContainerElement === this.#containerElement) {
 			this.#currentContainerElement = containerEl;
 		}
-		this.#containerElement = containerEl;
+		this.#containerElement = containerEl as HTMLElement;
+		this.#containerElement.addEventListener('dragover', preventDragOver);
+
+		(this.#containerElement as any)['__umbBlockGridSorterController'] = () => {
+			return this;
+		};
+
+		console.log('containerEl', this.#containerElement.shadowRoot ?? this.#containerElement);
 
 		// TODO: Clean up??
 		this.#observer.disconnect();
-		this.#observer.observe(this.#containerElement.shadowRoot ?? this.#containerElement, {
+
+		const containerElement = this.#containerElement.shadowRoot ?? this.#containerElement;
+		containerElement.querySelectorAll(this.#config.itemSelector).forEach((child) => {
+			if (child.matches && child.matches(this.#config.itemSelector)) {
+				this.setupItem(child as HTMLElement);
+			}
+		});
+		this.#observer.observe(containerElement, {
 			childList: true,
 			subtree: false,
 		});
-	}
+	};
 	hostDisconnected() {
 		// TODO: Clean up??
 		this.#observer.disconnect();
+		(this.#containerElement as any)['__umbBlockGridSorterController'] = undefined;
+		this.#containerElement.removeEventListener('dragover', preventDragOver);
+		(this.#containerElement as any) = undefined;
 	}
 
 	setupItem(element: HTMLElement) {
@@ -316,14 +331,14 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			const movingItemIndex = this.#model.indexOf(this.#currentItem);
 			if (movingItemIndex < this.#model.length - 1) {
 				const afterItem = this.#model[movingItemIndex + 1];
-				const afterEl = this.#config.querySelectModelToElement(this.#host, afterItem);
+				const afterEl = this.#config.querySelectModelToElement(this.#containerElement, afterItem);
 				if (afterEl) {
-					this.#host.insertBefore(this.#currentElement, afterEl);
+					this.#containerElement.insertBefore(this.#currentElement, afterEl);
 				} else {
-					this.#host.appendChild(this.#currentElement);
+					this.#containerElement.appendChild(this.#currentElement);
 				}
 			} else {
-				this.#host.appendChild(this.#currentElement);
+				this.#containerElement.appendChild(this.#currentElement);
 			}
 		}
 
@@ -406,6 +421,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			// we are outside the current container boundary, so lets see if there is a parent we can move.
 			const parentNode = this.#currentContainerElement.parentNode;
 			if (parentNode) {
+				// TODO: support multiple parent shadowDOMs?
 				const parentContainer = this.#config.containerSelector
 					? (parentNode as HTMLElement).closest(this.#config.containerSelector)
 					: null;
@@ -429,8 +445,8 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		// We want to retrieve the children of the container, every time to ensure we got the right order and index
 		const orderedContainerElements = Array.from(
 			this.#currentContainerElement.shadowRoot
-				? this.#currentContainerElement.shadowRoot.children
-				: this.#currentContainerElement.children
+				? this.#currentContainerElement.shadowRoot.querySelectorAll(this.#config.itemSelector)
+				: this.#currentContainerElement.querySelectorAll(this.#config.itemSelector)
 		);
 
 		const currentContainerRect = this.#currentContainerElement.getBoundingClientRect();
@@ -478,6 +494,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 
 			// If we are inside the found element, lets look for sub containers.
 			// use the itemHasNestedContainersResolver, if not configured fallback to looking for the existence of a container via DOM.
+			// TODO: Ability to look into shadowDOMs for sub containers?
 			if (
 				isInsideFound && this.#config.itemHasNestedContainersResolver
 					? this.#config.itemHasNestedContainersResolver(foundEl)
@@ -669,6 +686,13 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 
 		let newIndex = this.#model.length;
 
+		const movingItemIndex = this.#model.indexOf(movingItem);
+
+		console.log('this.#model', this.#model, movingItemIndex);
+
+		if (movingItemIndex !== -1 && movingItemIndex <= movingItemIndex) {
+			newIndex--;
+		}
 		if (nextEl) {
 			// We had a reference element, we want to get the index of it.
 			// This is might a problem if a item is being moved forward? (was also like this in the AngularJS version...)
@@ -805,9 +829,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		}
 
 		this._lastIndicationContainerVM = null;
-
-		(this.#host as any)['__umbBlockGridSorterController'] = null;
-		this.#host.removeEventListener('dragover', preventDragOver);
 
 		// TODO: Clean up items??
 		this.#observer.disconnect();
