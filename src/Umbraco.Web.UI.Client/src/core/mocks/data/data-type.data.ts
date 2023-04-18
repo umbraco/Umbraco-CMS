@@ -11,6 +11,7 @@ import type {
 export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = [
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Folder 1',
 		id: 'dt-folder1',
 		parentId: null,
@@ -18,6 +19,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 		parentId: null,
 		name: 'Textstring',
@@ -27,6 +29,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Text',
 		id: 'dt-textBox',
 		parentId: null,
@@ -41,6 +44,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Text Area',
 		id: 'dt-textArea',
 		parentId: null,
@@ -50,6 +54,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'My JS Property Editor',
 		id: 'dt-custom',
 		parentId: null,
@@ -59,6 +64,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Color Picker',
 		id: 'dt-colorPicker',
 		parentId: null,
@@ -114,6 +120,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Content Picker',
 		id: 'dt-contentPicker',
 		parentId: null,
@@ -128,6 +135,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Eye Dropper',
 		id: 'dt-eyeDropper',
 		parentId: null,
@@ -164,6 +172,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Multi URL Picker',
 		id: 'dt-multiUrlPicker',
 		parentId: null,
@@ -194,6 +203,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Multi Node Tree Picker',
 		id: 'dt-multiNodeTreePicker',
 		parentId: null,
@@ -203,6 +213,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Date Picker',
 		id: 'dt-datePicker',
 		parentId: null,
@@ -221,6 +232,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Date Picker With Time',
 		id: 'dt-datePicker-time',
 		parentId: null,
@@ -239,6 +251,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Time',
 		id: 'dt-time',
 		parentId: null,
@@ -257,6 +270,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Email',
 		id: 'dt-email',
 		parentId: null,
@@ -266,6 +280,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Multiple Text String',
 		id: 'dt-multipleTextString',
 		parentId: null,
@@ -284,6 +299,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Dropdown',
 		id: 'dt-dropdown',
 		parentId: null,
@@ -293,6 +309,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Slider',
 		id: 'dt-slider',
 		parentId: null,
@@ -327,6 +344,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Toggle',
 		id: 'dt-toggle',
 		parentId: null,
@@ -353,6 +371,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Tags',
 		id: 'dt-tags',
 		parentId: null,
@@ -362,6 +381,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Markdown Editor',
 		id: 'dt-markdownEditor',
 		parentId: null,
@@ -371,6 +391,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Radio Button List',
 		id: 'dt-radioButtonList',
 		parentId: null,
@@ -389,6 +410,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Checkbox List',
 		id: 'dt-checkboxList',
 		parentId: null,
@@ -407,6 +429,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Block List',
 		id: 'dt-blockList',
 		parentId: null,
@@ -416,6 +439,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Media Picker',
 		id: 'dt-mediaPicker',
 		parentId: null,
@@ -425,6 +449,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Image Cropper',
 		id: 'dt-imageCropper',
 		parentId: null,
@@ -434,6 +459,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Upload Field',
 		id: 'dt-uploadField',
 		parentId: null,
@@ -448,6 +474,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Block Grid',
 		id: 'dt-blockGrid',
 		parentId: null,
@@ -457,6 +484,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Collection View',
 		id: 'dt-collectionView',
 		parentId: null,
@@ -466,6 +494,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Icon Picker',
 		id: 'dt-iconPicker',
 		parentId: null,
@@ -475,6 +504,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Number Range',
 		id: 'dt-numberRange',
 		parentId: null,
@@ -484,6 +514,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Order Direction',
 		id: 'dt-orderDirection',
 		parentId: null,
@@ -493,6 +524,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Overlay Size',
 		id: 'dt-overlaySize',
 		parentId: null,
@@ -502,6 +534,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Rich Text Editor',
 		id: 'dt-richTextEditor',
 		parentId: null,
@@ -511,6 +544,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Label',
 		id: 'dt-label',
 		parentId: null,
@@ -520,6 +554,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Integer',
 		id: 'dt-integer',
 		parentId: null,
@@ -529,6 +564,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Decimal',
 		id: 'dt-decimal',
 		parentId: null,
@@ -538,6 +574,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'User Picker',
 		id: 'dt-userPicker',
 		parentId: null,
@@ -547,6 +584,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Member Picker',
 		id: 'dt-memberPicker',
 		parentId: null,
@@ -556,6 +594,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		$type: '',
+		type: 'data-type',
 		name: 'Member Group Picker',
 		id: 'dt-memberGroupPicker',
 		parentId: null,
