@@ -53,6 +53,7 @@ public class ManagementApiComposer : IComposer
             .AddMappers()
             .AddBackOfficeAuthentication();
 
+        services.ConfigureOptions<ConfigureApiVersioningOptions>();
         services.AddApiVersioning();
 
         services.AddSwaggerGen(swaggerGenOptions =>
@@ -156,6 +157,8 @@ public class ManagementApiComposer : IComposer
             swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         });
 
+
+        services.ConfigureOptions<ConfigureApiExplorerOptions>();
         services.AddVersionedApiExplorer();
         services.AddControllers()
             .AddJsonOptions(options =>
