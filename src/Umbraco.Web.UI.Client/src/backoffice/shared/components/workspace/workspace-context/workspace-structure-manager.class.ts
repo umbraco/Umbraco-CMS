@@ -13,6 +13,8 @@ import {
 	UmbObserverController,
 	MappingFunction,
 	partialUpdateFrozenArray,
+	appendToFrozenArray,
+	filterFrozenArray,
 } from '@umbraco-cms/backoffice/observable-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
@@ -216,6 +218,28 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		this.#documentTypes.updateOne(documentTypeId, { properties });
 
 		return property;
+	}
+
+	async insertProperty(documentTypeId: string | null, property: PropertyTypeResponseModelBaseModel) {
+		await this.#init;
+		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+
+		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [];
+
+		const properties = appendToFrozenArray(frozenProperties, property, (x) => x.id === property.id);
+
+		this.#documentTypes.updateOne(documentTypeId, { properties });
+	}
+
+	async removeProperty(documentTypeId: string | null, propertyId: string) {
+		await this.#init;
+		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+
+		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [];
+
+		const properties = filterFrozenArray(frozenProperties, (x) => x.id === propertyId);
+
+		this.#documentTypes.updateOne(documentTypeId, { properties });
 	}
 
 	async updateProperty(

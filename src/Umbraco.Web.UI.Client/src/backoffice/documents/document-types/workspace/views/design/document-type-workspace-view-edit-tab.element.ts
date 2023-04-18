@@ -87,6 +87,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				? html`
 						<uui-box>
 							<umb-document-type-workspace-view-edit-properties
+								container-id=${this.ownerTabId}
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-document-type-workspace-view-edit-properties>
 						</uui-box>
@@ -97,6 +98,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				(group) => group.name,
 				(group) => html`<uui-box .headline=${group.name || ''}>
 					<umb-document-type-workspace-view-edit-properties
+						container-id=${group.id}
 						container-type="Group"
 						container-name=${group.name || ''}></umb-document-type-workspace-view-edit-properties>
 				</uui-box>`

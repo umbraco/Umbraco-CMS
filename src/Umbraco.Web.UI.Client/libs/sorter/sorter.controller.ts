@@ -96,6 +96,8 @@ type INTERNAL_UmbSorterConfig<T> = {
 		placeholderIsInThisRow: boolean;
 		horizontalPlaceAfter: boolean;
 	}) => void;
+	performItemInsert?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
+	performItemRemove?: (argument: { item: T }) => Promise<boolean> | boolean;
 };
 
 // External type with some properties optional, as they have defaults:
@@ -191,7 +193,10 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 
 		// TODO: Clean up??
 		this.#observer.disconnect();
-		this.#observer.observe(this.#containerElement, { childList: true, subtree: false });
+		this.#observer.observe(this.#containerElement.shadowRoot ?? this.#containerElement, {
+			childList: true,
+			subtree: false,
+		});
 	}
 	hostDisconnected() {
 		// TODO: Clean up??
@@ -227,7 +232,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		}
 
 		if (!this.#scrollElement) {
-			this.#scrollElement = getParentScrollElement(this.#host, true);
+			this.#scrollElement = getParentScrollElement(this.#containerElement, true);
 		}
 
 		const element = (event.target as HTMLElement).closest(this.#config.itemSelector);
@@ -270,7 +275,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 
 		// We must wait one frame before changing the look of the block.
 		this.#rqaId = requestAnimationFrame(() => {
-			// It should be okay to use the same rqafId, as the move does not or is okay not to happen on first frame/drag-move.
+			// It should be okay to use the same rqaId, as the move does not or is okay not to happen on first frame/drag-move.
 			this.#rqaId = undefined;
 			if (this.#currentElement) {
 				this.#currentElement.style.transform = '';
@@ -279,7 +284,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		});
 	};
 
-	handleDragEnd = () => {
+	handleDragEnd = async () => {
 		if (!this.#currentElement || !this.#currentItem) {
 			return;
 		}
@@ -292,7 +297,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		this.stopAutoScroll();
 		this.removeAllowIndication();
 
-		if (this.#currentContainerVM.sync(this.#currentElement, this) === false) {
+		if ((await this.#currentContainerVM.sync(this.#currentElement, this)) === false) {
 			// Sync could not succeed, might be because item is not allowed here.
 
 			this.#currentContainerVM = this;
@@ -419,7 +424,11 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		}
 
 		// We want to retrieve the children of the container, every time to ensure we got the right order and index
-		const orderedContainerElements = Array.from(this.#currentContainerElement.children);
+		const orderedContainerElements = Array.from(
+			this.#currentContainerElement.shadowRoot
+				? this.#currentContainerElement.shadowRoot.children
+				: this.#currentContainerElement.children
+		);
 
 		const currentContainerRect = this.#currentContainerElement.getBoundingClientRect();
 
@@ -573,18 +582,20 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 	};
 
 	move(orderedContainerElements: Array<Element>, newElIndex: number) {
-		if (!this.#currentElement || !this.#currentItem) return;
+		if (!this.#currentElement || !this.#currentItem || !this.#currentContainerElement) return;
 
 		newElIndex = newElIndex === -1 ? orderedContainerElements.length : newElIndex;
+
+		const containerElement = this.#currentContainerElement.shadowRoot ?? this.#currentContainerElement;
 
 		const placeBeforeElement = orderedContainerElements[newElIndex];
 		if (placeBeforeElement) {
 			// We do not need to move this, if the element to be placed before is it self.
 			if (placeBeforeElement !== this.#currentElement) {
-				this.#currentContainerElement.insertBefore(this.#currentElement, placeBeforeElement);
+				containerElement.insertBefore(this.#currentElement, placeBeforeElement);
 			}
 		} else {
-			this.#currentContainerElement.appendChild(this.#currentElement);
+			containerElement.appendChild(this.#currentElement);
 		}
 
 		if (this.#config.onChange) {
@@ -605,13 +616,18 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		return this.#model.find((entry: T) => this.#config.compareElementToModel(element, entry));
 	}
 
-	public removeItem(item: T) {
+	public async removeItem(item: T) {
 		if (!item) {
 			return null;
 		}
-		const oldIndex = this.#model.indexOf(item);
-		if (oldIndex !== -1) {
-			return this.#model.splice(oldIndex, 1)[0];
+
+		if (this.#config.performItemRemove) {
+			return await this.#config.performItemRemove({ item });
+		} else {
+			const oldIndex = this.#model.indexOf(item);
+			if (oldIndex !== -1) {
+				return this.#model.splice(oldIndex, 1)[0];
+			}
 		}
 		return null;
 	}
@@ -620,7 +636,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		return this.#model.filter((x) => x !== item).length > 0;
 	}
 
-	public sync(element: HTMLElement, fromVm: UmbSorterController<T>) {
+	public async sync(element: HTMLElement, fromVm: UmbSorterController<T>) {
 		const movingItem = fromVm.getItemOfElement(element);
 		if (!movingItem) {
 			console.error('Could not find item of sync item');
@@ -651,11 +667,18 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 		let newIndex = this.#model.length;
 		if (nextEl) {
 			// We had a reference element, we want to get the index of it.
-			// This is problem if a item is being moved forward?
+			// This is might a problem if a item is being moved forward? (was also like this in the AngularJS version...)
 			newIndex = this.#model.findIndex((entry) => this.#config.compareElementToModel(nextEl! as HTMLElement, entry));
 		}
 
-		this.#model.splice(newIndex, 0, movingItem);
+		if (this.#config.performItemInsert) {
+			const result = await this.#config.performItemInsert({ item: movingItem, newIndex });
+			if (result === false) {
+				return false;
+			}
+		} else {
+			this.#model.splice(newIndex, 0, movingItem);
+		}
 
 		const eventData = { item: movingItem, fromController: fromVm, toController: this };
 		if (fromVm !== this) {

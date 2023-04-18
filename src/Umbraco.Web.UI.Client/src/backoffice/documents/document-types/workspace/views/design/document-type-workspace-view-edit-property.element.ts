@@ -50,7 +50,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 								}}></uui-textarea>
 						</p>
 					</div>
-					<div></div>
+					<div id="editor"></div>
 			  `
 			: '';
 	}
@@ -94,6 +94,10 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 				top: var(--uui-size-space-4);
 				height: min-content;
 				z-index: 2;
+			}
+
+			#editor {
+				background-color: var(--uui-color-background);
 			}
 		`,
 	];
