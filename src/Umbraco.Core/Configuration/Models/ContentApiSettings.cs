@@ -12,6 +12,8 @@ public class ContentApiSettings
 
     private const bool StaticPublicAccess = true;
 
+    private const bool StaticRichTextOutputAsJson = false;
+
     /// <summary>
     ///     Gets or sets a value indicating whether the Content API should be enabled.
     /// </summary>
@@ -39,4 +41,11 @@ public class ContentApiSettings
     /// </summary>
     /// <value>The content type aliases that are not to be exposed.</value>
     public string[] DisallowedContentTypeAliases { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the Content API should output rich text values as JSON instead of HTML.
+    /// </summary>
+    /// <value><c>true</c> if the Content API should output rich text values as JSON; <c>false</c> they should be output as HTML (default).</value>
+    [DefaultValue(StaticRichTextOutputAsJson)]
+    public bool RichTextOutputAsJson { get; set; } = StaticRichTextOutputAsJson;
 }

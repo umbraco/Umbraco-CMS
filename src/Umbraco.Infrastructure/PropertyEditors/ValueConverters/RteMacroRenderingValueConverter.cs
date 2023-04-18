@@ -4,13 +4,19 @@
 using System.Globalization;
 using System.Text;
 using HtmlAgilityPack;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ContentApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.ContentApi;
 using Umbraco.Cms.Infrastructure.Macros;
+using Umbraco.Cms.Infrastructure.Models.ContentApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -27,15 +33,34 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, ICon
     private readonly IMacroRenderer _macroRenderer;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly HtmlUrlParser _urlParser;
+    private readonly IApiRichTextParser _apiRichTextParser;
+    private ContentApiSettings _contentApiSettings;
 
+    [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
     public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
         HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser)
+        : this(
+            umbracoContextAccessor,
+            macroRenderer,
+            linkParser,
+            urlParser,
+            imageSourceParser,
+            StaticServiceProvider.Instance.GetRequiredService<IApiRichTextParser>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentApiSettings>>())
+    {
+    }
+
+    public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
+        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser, IApiRichTextParser apiRichTextParser, IOptionsMonitor<ContentApiSettings> contentApiSettingsMonitor)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
         _macroRenderer = macroRenderer;
         _linkParser = linkParser;
         _urlParser = urlParser;
         _imageSourceParser = imageSourceParser;
+        _apiRichTextParser = apiRichTextParser;
+        _contentApiSettings = contentApiSettingsMonitor.CurrentValue;
+        contentApiSettingsMonitor.OnChange(settings => _contentApiSettings = settings);
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
@@ -54,10 +79,23 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, ICon
 
     public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
+        => _contentApiSettings.RichTextOutputAsJson
+            ? typeof(RichTextElement)
+            : typeof(string);
 
     public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-        => Convert(inter, preview) ?? string.Empty;
+    {
+        if (_contentApiSettings.RichTextOutputAsJson is false)
+        {
+            return Convert(inter, preview) ?? string.Empty;
+        }
+
+        var sourceString = inter?.ToString();
+        return sourceString != null
+            ? _apiRichTextParser.Parse(sourceString)
+            : null;
+    }
 
     // NOT thread-safe over a request because it modifies the
     // global UmbracoContext.Current.InPreviewMode status. So it
