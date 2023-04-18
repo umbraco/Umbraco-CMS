@@ -10,7 +10,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Move Data Type Entity Action',
 		weight: 900,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'umb:enter',
 			label: 'Move...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			api: UmbMoveDataTypeEntityAction,
