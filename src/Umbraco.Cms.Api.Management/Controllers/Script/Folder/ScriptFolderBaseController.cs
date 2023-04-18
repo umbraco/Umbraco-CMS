@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
-public class ScriptFolderBaseController : PathFolderManagementControllerBase<ScriptOperationStatus>
+public class ScriptFolderBaseController : PathFolderManagementControllerBase<ScriptFolderOperationStatus>
 {
     private readonly IScriptFolderService _scriptFolderService;
 
@@ -27,12 +27,12 @@ public class ScriptFolderBaseController : PathFolderManagementControllerBase<Scr
     protected override async Task<PathContainer?> GetContainerAsync(string path)
         => await _scriptFolderService.GetAsync(path);
 
-    protected override Task<Attempt<PathContainer?, ScriptOperationStatus>> CreateContainerAsync(
+    protected override Task<Attempt<PathContainer?, ScriptFolderOperationStatus>> CreateContainerAsync(
         PathContainer container) =>
         _scriptFolderService.CreateAsync(container);
 
-    protected override Task<Attempt<ScriptOperationStatus>> DeleteContainerAsync(string path) =>
+    protected override Task<Attempt<ScriptFolderOperationStatus>> DeleteContainerAsync(string path) =>
         _scriptFolderService.DeleteAsync(path);
 
-    protected override IActionResult OperationStatusResult(ScriptOperationStatus status) => throw new NotImplementedException();
+    protected override IActionResult OperationStatusResult(ScriptFolderOperationStatus status) => throw new NotImplementedException();
 }

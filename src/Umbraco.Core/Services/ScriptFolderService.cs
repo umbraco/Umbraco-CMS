@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, ScriptOperationStatus>, IScriptFolderService
+public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, ScriptFolderOperationStatus>, IScriptFolderService
 {
     private readonly IScriptRepository _scriptRepository;
 
@@ -23,36 +23,36 @@ public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, Scri
 
     protected override IScriptRepository Repository => _scriptRepository;
 
-    protected override ScriptOperationStatus SuccessStatus => ScriptOperationStatus.Success;
+    protected override ScriptFolderOperationStatus SuccessStatus => ScriptFolderOperationStatus.Success;
 
-    protected override Task<Attempt<ScriptOperationStatus>> ValidateCreate(PathContainer container)
+    protected override Task<Attempt<ScriptFolderOperationStatus>> ValidateCreate(PathContainer container)
     {
         if(_scriptRepository.FolderExists(container.Path))
         {
-            return Task.FromResult(Attempt.Fail(ScriptOperationStatus.FolderAlreadyExists));
+            return Task.FromResult(Attempt.Fail(ScriptFolderOperationStatus.AlreadyExists));
         }
 
         if (string.IsNullOrWhiteSpace(container.ParentPath) is false &&
             _scriptRepository.FolderExists(container.ParentPath) is false)
         {
-            return Task.FromResult(Attempt.Fail(ScriptOperationStatus.ParentNotFound));
+            return Task.FromResult(Attempt.Fail(ScriptFolderOperationStatus.ParentNotFound));
         }
 
-        return Task.FromResult(Attempt.Succeed(ScriptOperationStatus.Success));
+        return Task.FromResult(Attempt.Succeed(ScriptFolderOperationStatus.Success));
     }
 
-    protected override Task<Attempt<ScriptOperationStatus>> ValidateDelete(string path)
+    protected override Task<Attempt<ScriptFolderOperationStatus>> ValidateDelete(string path)
     {
         if(_scriptRepository.FolderExists(path) is false)
         {
-            return Task.FromResult(Attempt.Fail(ScriptOperationStatus.FolderNotFound));
+            return Task.FromResult(Attempt.Fail(ScriptFolderOperationStatus.NotFound));
         }
 
         if (_scriptRepository.FolderHasContent(path))
         {
-            return Task.FromResult(Attempt.Fail(ScriptOperationStatus.FolderNotEmpty));
+            return Task.FromResult(Attempt.Fail(ScriptFolderOperationStatus.NotEmpty));
         }
 
-        return Task.FromResult(Attempt.Succeed(ScriptOperationStatus.Success));
+        return Task.FromResult(Attempt.Succeed(ScriptFolderOperationStatus.Success));
     }
 }
