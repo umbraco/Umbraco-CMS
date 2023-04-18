@@ -88,7 +88,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 				cursor: grab;
 			}
 
-			// PLaceholder style, used when property is being dragged.
+			/* Placeholder style, used when property is being dragged.*/
 			:host(.--umb-sorter-placeholder) {
 				height: 2px;
 			}
@@ -100,6 +100,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 				grid-column: span 2;
 				width: 100%;
 				border-top: 2px solid blue;
+				border-radius: 1px;
+				/* TODO: Make use of same highlight color as UUI and the same Animation. Consider making this a component/(available style) in UUI? */
 			}
 
 			p {
