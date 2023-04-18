@@ -4,21 +4,20 @@ import type {
 	FolderTreeItemResponseModel,
 	DataTypeResponseModel,
 	CreateFolderRequestModel,
+	DataTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: investigate why we don't get an type as part of the DataTypeModel
-export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | FolderTreeItemResponseModel> = [
+export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = [
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Folder 1',
 		id: 'dt-folder1',
 		parentId: null,
 		isFolder: true,
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 		parentId: null,
 		name: 'Textstring',
@@ -27,8 +26,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Text',
 		id: 'dt-textBox',
 		parentId: null,
@@ -42,8 +40,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Text Area',
 		id: 'dt-textArea',
 		parentId: null,
@@ -52,8 +49,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'My JS Property Editor',
 		id: 'dt-custom',
 		parentId: null,
@@ -62,8 +58,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Color Picker',
 		id: 'dt-colorPicker',
 		parentId: null,
@@ -118,8 +113,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Content Picker',
 		id: 'dt-contentPicker',
 		parentId: null,
@@ -133,8 +127,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Eye Dropper',
 		id: 'dt-eyeDropper',
 		parentId: null,
@@ -170,8 +163,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Multi URL Picker',
 		id: 'dt-multiUrlPicker',
 		parentId: null,
@@ -201,8 +193,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Multi Node Tree Picker',
 		id: 'dt-multiNodeTreePicker',
 		parentId: null,
@@ -211,8 +202,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Date Picker',
 		id: 'dt-datePicker',
 		parentId: null,
@@ -230,9 +220,8 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
+		$type: '',
 		name: 'Date Picker With Time',
-		type: 'data-type',
 		id: 'dt-datePicker-time',
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.DateTime',
@@ -249,9 +238,8 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
+		$type: '',
 		name: 'Time',
-		type: 'data-type',
 		id: 'dt-time',
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.DateTime',
@@ -268,8 +256,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Email',
 		id: 'dt-email',
 		parentId: null,
@@ -278,8 +265,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Multiple Text String',
 		id: 'dt-multipleTextString',
 		parentId: null,
@@ -297,8 +283,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Dropdown',
 		id: 'dt-dropdown',
 		parentId: null,
@@ -307,8 +292,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Slider',
 		id: 'dt-slider',
 		parentId: null,
@@ -342,8 +326,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Toggle',
 		id: 'dt-toggle',
 		parentId: null,
@@ -369,8 +352,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Tags',
 		id: 'dt-tags',
 		parentId: null,
@@ -379,8 +361,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Markdown Editor',
 		id: 'dt-markdownEditor',
 		parentId: null,
@@ -389,8 +370,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Radio Button List',
 		id: 'dt-radioButtonList',
 		parentId: null,
@@ -408,8 +388,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Checkbox List',
 		id: 'dt-checkboxList',
 		parentId: null,
@@ -427,8 +406,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Block List',
 		id: 'dt-blockList',
 		parentId: null,
@@ -437,8 +415,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Media Picker',
 		id: 'dt-mediaPicker',
 		parentId: null,
@@ -447,8 +424,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Image Cropper',
 		id: 'dt-imageCropper',
 		parentId: null,
@@ -457,8 +433,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Upload Field',
 		id: 'dt-uploadField',
 		parentId: null,
@@ -472,8 +447,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Block Grid',
 		id: 'dt-blockGrid',
 		parentId: null,
@@ -482,8 +456,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Collection View',
 		id: 'dt-collectionView',
 		parentId: null,
@@ -492,8 +465,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Icon Picker',
 		id: 'dt-iconPicker',
 		parentId: null,
@@ -502,8 +474,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Number Range',
 		id: 'dt-numberRange',
 		parentId: null,
@@ -512,8 +483,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Order Direction',
 		id: 'dt-orderDirection',
 		parentId: null,
@@ -522,8 +492,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Overlay Size',
 		id: 'dt-overlaySize',
 		parentId: null,
@@ -532,8 +501,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Rich Text Editor',
 		id: 'dt-richTextEditor',
 		parentId: null,
@@ -542,8 +510,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Label',
 		id: 'dt-label',
 		parentId: null,
@@ -552,8 +519,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Integer',
 		id: 'dt-integer',
 		parentId: null,
@@ -562,8 +528,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Decimal',
 		id: 'dt-decimal',
 		parentId: null,
@@ -572,8 +537,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'User Picker',
 		id: 'dt-userPicker',
 		parentId: null,
@@ -582,8 +546,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Member Picker',
 		id: 'dt-memberPicker',
 		parentId: null,
@@ -592,8 +555,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 	{
-		$type: 'data-type',
-		type: 'data-type',
+		$type: '',
 		name: 'Member Group Picker',
 		id: 'dt-memberGroupPicker',
 		parentId: null,
@@ -602,6 +564,13 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [],
 	},
 ];
+
+const createDataTypeItem = (item: DataTypeResponseModel | FolderTreeItemResponseModel): DataTypeItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+	};
+};
 
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
@@ -622,9 +591,9 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeIt
 		return childItems.map((item) => createFolderTreeItem(item));
 	}
 
-	getTreeItem(ids: Array<string>): Array<FolderTreeItemResponseModel> {
+	getItems(ids: Array<string>): Array<DataTypeItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createFolderTreeItem(item));
+		return items.map((item) => createDataTypeItem(item));
 	}
 
 	createFolder(folder: CreateFolderRequestModel & { id: string | undefined }) {
@@ -632,8 +601,7 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeIt
 			name: folder.name,
 			id: folder.id,
 			parentId: folder.parentId,
-			$type: 'data-type',
-			type: 'data-type',
+			$type: 'FolderTreeItemResponseModel',
 			isFolder: true,
 			isContainer: false,
 		};
