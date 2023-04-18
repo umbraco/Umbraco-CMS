@@ -3,18 +3,15 @@ import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type
 import { UmbDataTypeServerDataSource } from './sources/data-type.server.data';
 import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
 import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data';
-import type {
-	UmbTreeDataSource,
-	UmbTreeRepository,
-	UmbDetailRepository,
-	UmbFolderDataSource,
-	UmbDataSource,
-} from '@umbraco-cms/backoffice/repository';
+import { UmbDataTypeItemServerDataSource } from './sources/data-type-item.server.data';
+import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDataTypeItemStore } from './data-type-item.store';
+import type { UmbTreeRepository, UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateDataTypeRequestModel,
 	CreateFolderRequestModel,
+	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	FolderModelBaseModel,
 	FolderTreeItemResponseModel,
@@ -25,20 +22,23 @@ import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDataTypeRepository
 	implements
+		UmbItemRepository<DataTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
 		UmbDetailRepository<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>,
 		UmbFolderRepository
 {
-	#init!: Promise<unknown>;
+	#init: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
 
-	#treeSource: UmbTreeDataSource;
-	#detailSource: UmbDataSource<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>;
-	#folderSource: UmbFolderDataSource;
+	#treeSource: UmbDataTypeTreeServerDataSource;
+	#detailSource: UmbDataTypeServerDataSource;
+	#folderSource: UmbDataTypeFolderServerDataSource;
+	#itemSource: UmbDataTypeItemServerDataSource;
 
 	#detailStore?: UmbDataTypeStore;
 	#treeStore?: UmbDataTypeTreeStore;
+	#itemStore?: UmbDataTypeItemStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -49,22 +49,28 @@ export class UmbDataTypeRepository
 		this.#treeSource = new UmbDataTypeTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbDataTypeServerDataSource(this.#host);
 		this.#folderSource = new UmbDataTypeFolderServerDataSource(this.#host);
+		this.#itemSource = new UmbDataTypeItemServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#treeStore = instance;
-			}),
-
 			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
-			}),
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#treeStore = instance;
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
-			}),
+			}).asPromise(),
 		]);
 	}
 
+	// TREE:
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -90,15 +96,6 @@ export class UmbDataTypeRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
-		if (!ids) throw new Error('Keys are missing');
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
 	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems;
@@ -110,13 +107,26 @@ export class UmbDataTypeRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	// ITEMS:
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Keys are missing');
 		await this.#init;
-		return this.#treeStore!.items(ids);
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(ids: Array<string>) {
+		await this.#init;
+		return this.#itemStore!.items(ids);
 	}
 
 	// DETAILS:
-
 	async createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
@@ -210,7 +220,7 @@ export class UmbDataTypeRepository
 		return { error };
 	}
 
-	// folder
+	// Folder:
 	async createFolderScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		return this.#folderSource.createScaffold(parentId);
