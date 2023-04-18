@@ -62,7 +62,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
         builder.Services.AddUnique<IProfiler, TestProfiler>();
-        builder.Services.AddUmbracoEFCore(builder.Config);
+        builder.Services.AddUmbracoEFCore();
 
         builder.Services.AddDbContext<TestUmbracoDbContext>(
             (serviceProvider, options) =>
