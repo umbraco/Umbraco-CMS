@@ -26,7 +26,7 @@ public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, Scri
 
     protected override ScriptFolderOperationStatus SuccessStatus => ScriptFolderOperationStatus.Success;
 
-    protected override Task<Attempt<ScriptFolderOperationStatus>> ValidateCreate(PathContainer container)
+    protected override Task<Attempt<ScriptFolderOperationStatus>> ValidateCreateAsync(PathContainer container)
     {
         if (container.Name.ContainsAny(Path.GetInvalidFileNameChars()))
         {
@@ -47,7 +47,7 @@ public class ScriptFolderService : PathFolderServiceBase<IScriptRepository, Scri
         return Task.FromResult(Attempt.Succeed(ScriptFolderOperationStatus.Success));
     }
 
-    protected override Task<Attempt<ScriptFolderOperationStatus>> ValidateDelete(string path)
+    protected override Task<Attempt<ScriptFolderOperationStatus>> ValidateDeleteAsync(string path)
     {
         if(_scriptRepository.FolderExists(path) is false)
         {

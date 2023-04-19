@@ -26,7 +26,7 @@ public class PartialViewFolderService : PathFolderServiceBase<IPartialViewReposi
 
     protected override PartialViewFolderOperationStatus SuccessStatus => PartialViewFolderOperationStatus.Success;
 
-    protected override Task<Attempt<PartialViewFolderOperationStatus>> ValidateCreate(PathContainer container)
+    protected override Task<Attempt<PartialViewFolderOperationStatus>> ValidateCreateAsync(PathContainer container)
     {
         if(container.Name.ContainsAny(Path.GetInvalidFileNameChars()))
         {
@@ -47,7 +47,7 @@ public class PartialViewFolderService : PathFolderServiceBase<IPartialViewReposi
         return Task.FromResult(Attempt.Succeed(PartialViewFolderOperationStatus.Success));
     }
 
-    protected override Task<Attempt<PartialViewFolderOperationStatus>> ValidateDelete(string path)
+    protected override Task<Attempt<PartialViewFolderOperationStatus>> ValidateDeleteAsync(string path)
     {
         if (_partialViewRepository.FolderExists(path) is false)
         {
