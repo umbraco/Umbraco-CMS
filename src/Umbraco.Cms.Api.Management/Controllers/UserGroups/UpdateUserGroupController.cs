@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
-public class UpdateUserGroupController : UserGroupsControllerBase
+public class UpdateUserGroupController : UserGroupControllerBase
 {
     private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;

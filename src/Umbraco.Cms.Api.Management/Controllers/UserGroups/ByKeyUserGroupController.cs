@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
 
-public class ByKeyUserGroupController : UserGroupsControllerBase
+public class ByKeyUserGroupController : UserGroupControllerBase
 {
     private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;

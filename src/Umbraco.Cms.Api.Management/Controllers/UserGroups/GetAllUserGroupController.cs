@@ -9,7 +9,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
-public class GetAllUserGroupController : UserGroupsControllerBase
+public class GetAllUserGroupController : UserGroupControllerBase
 {
     private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupPresentationFactory _userPresentationFactory;

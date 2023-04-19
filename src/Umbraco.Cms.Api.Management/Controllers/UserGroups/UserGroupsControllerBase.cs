@@ -9,10 +9,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 // TODO: This needs to be an authorized controller.
 
 [ApiController]
-[VersionedApiBackOfficeRoute("user-groups")]
-[ApiExplorerSettings(GroupName = "User Groups")]
+[VersionedApiBackOfficeRoute("user-group")]
+[ApiExplorerSettings(GroupName = "User Group")]
 [ApiVersion("1.0")]
-public class UserGroupsControllerBase : ManagementApiControllerBase
+public class UserGroupControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserGroupOperationStatusResult(UserGroupOperationStatus status) =>
         status switch

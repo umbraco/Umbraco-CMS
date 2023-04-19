@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
 
-public class DeleteUserGroupController : UserGroupsControllerBase
+public class DeleteUserGroupController : UserGroupControllerBase
 {
     private readonly IUserGroupService _userGroupService;
 
