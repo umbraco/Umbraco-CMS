@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Item;
 
-public class ItemStaticFileItemController : ManagementApiControllerBase
+public class ItemStaticFileItemController : StaticFileItemControllerBase
 {
     private readonly IFileItemPresentationModelFactory _presentationModelFactory;
     private readonly IPhysicalFileSystem _physicalFileSystem;

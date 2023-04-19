@@ -459,6 +459,15 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.GetMany(ids);
         }
 
+        /// <inheritdoc />
+        public Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember> query = Query<IMember>().Where(x => ids.Contains(x.Key));
+            return Task.FromResult(_memberRepository.Get(query));
+        }
+
         /// <summary>
         /// Finds Members based on their display name
         /// </summary>
