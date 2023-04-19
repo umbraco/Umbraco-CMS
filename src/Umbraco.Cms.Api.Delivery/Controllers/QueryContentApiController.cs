@@ -8,7 +8,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
-public class QueryContentApiController : DeliveryApiControllerBase
+public class QueryContentApiController : ContentApiControllerBase
 {
     private readonly IApiQueryService _apiQueryService;
 

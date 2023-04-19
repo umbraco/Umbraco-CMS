@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
-public class ByRouteContentApiController : DeliveryApiControllerBase
+public class ByRouteContentApiController : ContentApiControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestRedirectService _requestRedirectService;

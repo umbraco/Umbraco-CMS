@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
-public class ByIdContentApiController : DeliveryApiControllerBase
+public class ByIdContentApiController : ContentApiControllerBase
 {
     public ByIdContentApiController(IApiPublishedContentCache apiPublishedContentCache, IApiContentResponseBuilder apiContentResponseBuilderBuilder)
         : base(apiPublishedContentCache, apiContentResponseBuilderBuilder)
