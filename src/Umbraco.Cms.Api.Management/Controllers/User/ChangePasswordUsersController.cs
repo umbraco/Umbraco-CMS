@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Users;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;

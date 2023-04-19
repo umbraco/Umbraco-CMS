@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Users;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.User;
 
 public class UpdateUserGroupsOnUserRequestModel
 {
