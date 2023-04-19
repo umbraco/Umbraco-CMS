@@ -20,7 +20,7 @@ const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
-	disabledItemSelector: ':not([data-property-of-owner-document])',
+	disabledItemSelector: '[inherited]',
 	containerSelector: '#property-list',
 };
 @customElement('umb-document-type-workspace-view-edit-properties')
@@ -117,7 +117,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 							data-umb-property-id=${property.id}
 							data-property-container-is=${property.containerId}
 							data-container-id=${this.containerId}
-							?data-property-of-owner-document=${ifDefined(property.containerId === this.containerId)}
+							?inherited=${ifDefined(property.containerId !== this.containerId)}
 							.property=${property}
 							@partial-property-update=${(event: CustomEvent) => {
 								this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
