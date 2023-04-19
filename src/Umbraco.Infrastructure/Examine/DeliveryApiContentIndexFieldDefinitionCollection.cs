@@ -2,7 +2,7 @@ using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class DeliveryApiFieldDefinitionCollection : FieldDefinitionCollection
+public class DeliveryApiContentIndexFieldDefinitionCollection : FieldDefinitionCollection
 {
     public static readonly FieldDefinition[] DeliveryApiIndexFieldDefinitions =
     {
@@ -15,7 +15,7 @@ public class DeliveryApiFieldDefinitionCollection : FieldDefinitionCollection
         new("sortOrder", FieldDefinitionTypes.Integer)
     };
 
-    public DeliveryApiFieldDefinitionCollection()
+    public DeliveryApiContentIndexFieldDefinitionCollection()
         : base(DeliveryApiIndexFieldDefinitions)
     {
     }

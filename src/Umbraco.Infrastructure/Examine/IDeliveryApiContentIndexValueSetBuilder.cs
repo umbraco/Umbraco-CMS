@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public interface IDeliveryApiValueSetBuilder : IValueSetBuilder<IContent>
+public interface IDeliveryApiContentIndexValueSetBuilder : IValueSetBuilder<IContent>
 {
 }

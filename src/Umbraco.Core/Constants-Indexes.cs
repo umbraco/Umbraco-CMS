@@ -7,6 +7,6 @@ public static partial class Constants
         public const string InternalIndexName = "InternalIndex";
         public const string ExternalIndexName = "ExternalIndex";
         public const string MembersIndexName = "MembersIndex";
-        public const string DeliveryApiIndexName = "DeliveryApiIndex";
+        public const string DeliveryApiContentIndexName = "DeliveryApiContentIndex";
     }
 }

@@ -10,14 +10,14 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 
 public class QueryContentApiController : ContentApiControllerBase
 {
-    private readonly IApiQueryService _apiQueryService;
+    private readonly IApiContentQueryService _apiContentQueryService;
 
     public QueryContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilderBuilder,
-        IApiQueryService apiQueryService)
+        IApiContentQueryService apiContentQueryService)
         : base(apiPublishedContentCache, apiContentResponseBuilderBuilder)
-        => _apiQueryService = apiQueryService;
+        => _apiContentQueryService = apiContentQueryService;
 
     /// <summary>
     ///     Gets a paginated list of content item(s) from query.
@@ -39,7 +39,7 @@ public class QueryContentApiController : ContentApiControllerBase
         int skip = 0,
         int take = 10)
     {
-        PagedModel<Guid> pagedResult = _apiQueryService.ExecuteQuery(fetch, filter, sort, skip, take);
+        PagedModel<Guid> pagedResult = _apiContentQueryService.ExecuteQuery(fetch, filter, sort, skip, take);
         IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(pagedResult.Items);
         IApiContentResponse[] apiContentItems = contentItems.Select(ApiContentResponseBuilder.Build).ToArray();
 

@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 /// <summary>
 ///     Service that handles querying of the Delivery API.
 /// </summary>
-public interface IApiQueryService
+public interface IApiContentQueryService
 {
     /// <summary>
     ///     Returns a collection of item ids that passed the search criteria as a paged model.

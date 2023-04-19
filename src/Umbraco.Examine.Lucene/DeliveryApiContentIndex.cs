@@ -6,9 +6,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class DeliveryApiIndex : UmbracoExamineIndex
+public class DeliveryApiContentIndex : UmbracoExamineIndex
 {
-    public DeliveryApiIndex(
+    public DeliveryApiContentIndex(
         ILoggerFactory loggerFactory,
         string name,
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,

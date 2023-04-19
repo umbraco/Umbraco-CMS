@@ -6,7 +6,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
-internal sealed class ApiQueryService : IApiQueryService // Examine-specific implementation - can be swapped out
+internal sealed class ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
 {
     private readonly IExamineManager _examineManager;
     private readonly SelectorHandlerCollection _selectorHandlers;
@@ -14,7 +14,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
     private readonly SortHandlerCollection _sortHandlers;
     private readonly string _fallbackGuidValue;
 
-    public ApiQueryService(
+    public ApiContentQueryService(
         IExamineManager examineManager,
         SelectorHandlerCollection selectorHandlers,
         FilterHandlerCollection filterHandlers,
@@ -35,7 +35,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
     {
         var emptyResult = new PagedModel<Guid>();
 
-        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiIndexName, out IIndex? apiIndex))
+        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? apiIndex))
         {
             return emptyResult;
         }

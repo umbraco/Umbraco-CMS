@@ -5,16 +5,16 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class DeliveryApiIndexPopulator : IndexPopulator
+public class DeliveryApiContentIndexPopulator : IndexPopulator
 {
     private readonly IContentService _contentService;
-    private readonly IDeliveryApiValueSetBuilder _deliveryValueSetBuilder;
+    private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryContentIndexValueSetBuilder;
 
-    public DeliveryApiIndexPopulator(IContentService contentService, IDeliveryApiValueSetBuilder deliveryValueSetBuilder)
+    public DeliveryApiContentIndexPopulator(IContentService contentService, IDeliveryApiContentIndexValueSetBuilder deliveryContentIndexValueSetBuilder)
     {
         _contentService = contentService;
-        _deliveryValueSetBuilder = deliveryValueSetBuilder;
-        RegisterIndex(Constants.UmbracoIndexes.DeliveryApiIndexName);
+        _deliveryContentIndexValueSetBuilder = deliveryContentIndexValueSetBuilder;
+        RegisterIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName);
     }
 
     protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
@@ -23,11 +23,11 @@ public class DeliveryApiIndexPopulator : IndexPopulator
         {
             IEnumerable<IContent> rootNodes = _contentService.GetRootContent();
 
-            index.IndexItems(_deliveryValueSetBuilder.GetValueSets(rootNodes.ToArray()));
+            index.IndexItems(_deliveryContentIndexValueSetBuilder.GetValueSets(rootNodes.ToArray()));
 
             foreach (IContent root in rootNodes)
             {
-                IEnumerable<ValueSet> valueSets = _deliveryValueSetBuilder.GetValueSets(
+                IEnumerable<ValueSet> valueSets = _deliveryContentIndexValueSetBuilder.GetValueSets(
                     _contentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _).ToArray());
 
                 index.IndexItems(valueSets);
