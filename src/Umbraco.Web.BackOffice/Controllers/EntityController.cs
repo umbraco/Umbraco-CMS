@@ -522,8 +522,9 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="query"></param>
     /// <param name="nodeContextId"></param>
     /// <param name="type"></param>
+    /// <param name="parentId"></param>
     /// <returns></returns>
-    public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
+    public ActionResult<EntityBasic?>? GetByXPath(string query, int nodeContextId, int parentId, UmbracoEntityTypes type)
     {
         // TODO: Rename this!!! It's misleading, it should be GetByXPath
 
@@ -534,7 +535,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         }
 
 
-        var q = ParseXPathQuery(query, nodeContextId);
+        var q = ParseXPathQuery(query, nodeContextId, parentId);
         IPublishedContent? node = _publishedContentQuery.ContentSingleAtXPath(q);
 
         if (node == null)
@@ -546,10 +547,11 @@ public class EntityController : UmbracoAuthorizedJsonController
     }
 
     // PP: Work in progress on the query parser
-    private string ParseXPathQuery(string query, int id) =>
+    private string ParseXPathQuery(string query, int id, int parentId) =>
         UmbracoXPathPathSyntaxParser.ParseXPathQuery(
             query,
             id,
+            parentId,
             nodeid =>
             {
                 IEntitySlim? ent = _entityService.Get(nodeid);
