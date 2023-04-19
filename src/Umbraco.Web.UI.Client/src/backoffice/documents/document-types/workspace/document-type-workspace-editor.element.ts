@@ -14,7 +14,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _iconColorAlias?: string;
-	// TODO:Should be using an alias, and look up in some dictionary/key/value) of project-colors.
+	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
 
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
