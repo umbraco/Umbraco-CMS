@@ -11,6 +11,14 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
     {
         mapper.Define<PartialViewSnippet, PartialViewSnippetsViewModel>((_, _) => new PartialViewSnippetsViewModel{ Name = string.Empty, Content = string.Empty }, Map);
         mapper.Define<CreatePartialViewRequestModel, PartialViewCreateModel>((_, _) => new PartialViewCreateModel{Name = string.Empty}, Map);
+        mapper.Define<IPartialView, PartialViewResponseModel>((_, _ ) => new PartialViewResponseModel{Name = string.Empty, Path = string.Empty}, Map);
+    }
+
+    private void Map(IPartialView source, PartialViewResponseModel target, MapperContext context)
+    {
+        target.Name = source.Name ?? string.Empty;
+        target.Content = source.Content;
+        target.Path = source.Path;
     }
 
     private void Map(CreatePartialViewRequestModel source, PartialViewCreateModel target, MapperContext context)

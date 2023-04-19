@@ -41,6 +41,15 @@ public class PartialViewService : FileServiceBase, IPartialViewService
         _auditRepository = auditRepository;
     }
 
+    public Task<IPartialView?> GetAsync(string path)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IPartialView? partialView = _partialViewRepository.Get(path);
+
+        scope.Complete();
+        return Task.FromResult(partialView);
+    }
+
     public Task<PagedModel<PartialViewSnippet>> GetPartialViewSnippetsAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);

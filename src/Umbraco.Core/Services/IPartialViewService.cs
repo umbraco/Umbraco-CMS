@@ -6,6 +6,8 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IPartialViewService : IService
 {
+    Task<IPartialView?> GetAsync(string path);
+
     Task<PagedModel<PartialViewSnippet>> GetPartialViewSnippetsAsync(int skip, int take);
 
     Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid performingUserKey);
