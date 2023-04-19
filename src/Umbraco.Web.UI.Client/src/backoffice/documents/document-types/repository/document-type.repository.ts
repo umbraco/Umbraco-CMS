@@ -160,7 +160,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
-			//this.#detailStore?.append(documentType);
+			this.#detailStore?.append(documentType);
 			// TODO: Update tree store with the new item? or ask tree to request the new item?
 		}
 

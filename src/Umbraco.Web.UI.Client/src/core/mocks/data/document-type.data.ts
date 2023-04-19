@@ -635,7 +635,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		alias: 'blogPost',
 		name: 'Page Document Type',
 		description: null,
-		icon: 'umb:item-arrangement',
+		icon: 'umb:document',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
