@@ -13,13 +13,13 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class GetAllUsersController : UsersControllerBase
+public class GetAllUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public GetAllUsersController(
+    public GetAllUserController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)

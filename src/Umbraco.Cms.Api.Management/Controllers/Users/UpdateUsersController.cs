@@ -10,13 +10,13 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class UpdateUsersController : UsersControllerBase
+public class UpdateUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public UpdateUsersController(
+    public UpdateUserController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {

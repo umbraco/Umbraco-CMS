@@ -9,12 +9,12 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class UnlockUsersController : UsersControllerBase
+public class UnlockUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public UnlockUsersController(IUserService userService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public UnlockUserController(IUserService userService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;

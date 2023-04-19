@@ -7,11 +7,11 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class SetAvatarUsersController : UsersControllerBase
+public class SetAvatarUserController : UserControllerBase
 {
     private readonly IUserService _userService;
 
-    public SetAvatarUsersController(IUserService userService)
+    public SetAvatarUserController(IUserService userService)
     {
         _userService = userService;
     }

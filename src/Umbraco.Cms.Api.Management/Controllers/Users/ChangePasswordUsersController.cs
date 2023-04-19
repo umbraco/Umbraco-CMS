@@ -10,13 +10,13 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class ChangePasswordUsersController : UsersControllerBase
+public class ChangePasswordUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUmbracoMapper _mapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public ChangePasswordUsersController(
+    public ChangePasswordUserController(
         IUserService userService,
         IUmbracoMapper mapper, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {

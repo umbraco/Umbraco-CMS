@@ -5,11 +5,11 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class UpdateUserGroupsUsersController : UsersControllerBase
+public class UpdateUserGroupsUserController : UserControllerBase
 {
     private readonly IUserGroupService _userGroupService;
 
-    public UpdateUserGroupsUsersController(IUserGroupService userGroupService)
+    public UpdateUserGroupsUserController(IUserGroupService userGroupService)
     {
         _userGroupService = userGroupService;
     }

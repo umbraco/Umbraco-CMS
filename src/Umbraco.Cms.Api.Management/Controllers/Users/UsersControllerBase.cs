@@ -8,10 +8,10 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
 [ApiController]
-[VersionedApiBackOfficeRoute("users")]
-[ApiExplorerSettings(GroupName = "Users")]
+[VersionedApiBackOfficeRoute("user")]
+[ApiExplorerSettings(GroupName = "User")]
 [ApiVersion("1.0")]
-public abstract class UsersControllerBase : ManagementApiControllerBase
+public abstract class UserControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserOperationStatusResult(UserOperationStatus status, ErrorMessageResult? errorMessageResult = null) =>
         status switch

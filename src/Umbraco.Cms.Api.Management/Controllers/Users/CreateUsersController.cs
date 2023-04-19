@@ -12,14 +12,14 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class CreateUsersController : UsersControllerBase
+public class CreateUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _presentationFactory;
     private readonly IUmbracoMapper _mapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateUsersController(
+    public CreateUserController(
         IUserService userService,
         IUserPresentationFactory presentationFactory,
         IUmbracoMapper mapper,

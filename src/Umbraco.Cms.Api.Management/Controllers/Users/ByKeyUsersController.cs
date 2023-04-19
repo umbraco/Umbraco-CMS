@@ -8,12 +8,12 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class ByKeyUsersController : UsersControllerBase
+public class ByKeyUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
-    public ByKeyUsersController(
+    public ByKeyUserController(
         IUserService userService,
         IUserPresentationFactory userPresentationFactory)
     {

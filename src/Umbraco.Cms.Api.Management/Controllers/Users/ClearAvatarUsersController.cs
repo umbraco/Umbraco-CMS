@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class ClearAvatarUsersController : UsersControllerBase
+public class ClearAvatarUserController : UserControllerBase
 {
     private readonly IUserService _userService;
 
-    public ClearAvatarUsersController(IUserService userService) => _userService = userService;
+    public ClearAvatarUserController(IUserService userService) => _userService = userService;
 
     [HttpDelete("avatar/{id:guid}")]
     public async Task<IActionResult> ClearAvatar(Guid id)

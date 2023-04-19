@@ -8,12 +8,12 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class DisableUsersController : UsersControllerBase
+public class DisableUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public DisableUsersController(IUserService userService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public DisableUserController(IUserService userService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;

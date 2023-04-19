@@ -4,9 +4,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class DeleteUsersController : UsersControllerBase
+public class DeleteUserController : UserControllerBase
 {
-    public DeleteUsersController(IUserService userService) => _userService = userService;
+    public DeleteUserController(IUserService userService) => _userService = userService;
 
     private readonly IUserService _userService;
 

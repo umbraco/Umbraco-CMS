@@ -11,13 +11,13 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Users;
 
-public class FilterUsersController : UsersControllerBase
+public class FilterUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
-    public FilterUsersController(
+    public FilterUserController(
         IUserService userService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserPresentationFactory userPresentationFactory)
