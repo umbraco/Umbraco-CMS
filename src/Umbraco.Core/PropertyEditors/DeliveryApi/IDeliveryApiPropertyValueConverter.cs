@@ -5,14 +5,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
 {
     /// <summary>
-    ///     Gets the property cache level for content API representation.
+    ///     Gets the property cache level for Delivery API representation.
     /// </summary>
     /// <param name="propertyType">The property type.</param>
     /// <returns>The property cache level.</returns>
     PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType);
 
     /// <summary>
-    ///     Gets the type of values returned by the converter for content API representation.
+    ///     Gets the type of values returned by the converter for Delivery API representation.
     /// </summary>
     /// <param name="propertyType">The property type.</param>
     /// <returns>The CLR type of values returned by the converter.</returns>
@@ -23,7 +23,7 @@ public interface IDeliveryApiPropertyValueConverter : IPropertyValueConverter
     Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType);
 
     /// <summary>
-    ///     Converts a property intermediate value to an Object value for content API representation.
+    ///     Converts a property intermediate value to an Object value for Delivery API representation.
     /// </summary>
     /// <param name="owner">The property set owning the property.</param>
     /// <param name="propertyType">The property type.</param>

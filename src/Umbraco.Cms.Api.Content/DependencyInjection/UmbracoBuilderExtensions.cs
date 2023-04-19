@@ -39,7 +39,7 @@ public static class UmbracoBuilderExtensions
             .AddControllers()
             .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
             {
-                // all content API specific JSON options go here
+                // all Delivery API specific JSON options go here
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

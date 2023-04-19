@@ -3,7 +3,7 @@ using Umbraco.New.Cms.Core.Models;
 namespace Umbraco.Cms.Core.DeliveryApi;
 
 /// <summary>
-///     Service that handles querying of the Content API.
+///     Service that handles querying of the Delivery API.
 /// </summary>
 public interface IApiQueryService
 {

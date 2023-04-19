@@ -3,7 +3,7 @@
 namespace Umbraco.Cms.Core.Configuration.Models;
 
 /// <summary>
-///     Typed configuration options for Content API settings.
+///     Typed configuration options for Delivery API settings.
 /// </summary>
 [UmbracoOptions(Constants.Configuration.ConfigDeliveryApi)]
 public class DeliveryApiSettings
@@ -15,17 +15,17 @@ public class DeliveryApiSettings
     private const bool StaticRichTextOutputAsJson = false;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the Content API should be enabled.
+    ///     Gets or sets a value indicating whether the Delivery API should be enabled.
     /// </summary>
-    /// <value><c>true</c> if the Content API should be enabled; otherwise, <c>false</c>.</value>
+    /// <value><c>true</c> if the Delivery API should be enabled; otherwise, <c>false</c>.</value>
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the Content API (if enabled) should be
+    ///     Gets or sets a value indicating whether the Delivery API (if enabled) should be
     ///     publicly available or should require an API key for access.
     /// </summary>
-    /// <value><c>true</c> if the Content API should be publicly available; <c>false</c> if an API key should be required for access.</value>
+    /// <value><c>true</c> if the Delivery API should be publicly available; <c>false</c> if an API key should be required for access.</value>
     [DefaultValue(StaticPublicAccess)]
     public bool PublicAccess { get; set; } = StaticPublicAccess;
 
@@ -36,16 +36,16 @@ public class DeliveryApiSettings
     public string? ApiKey { get; set; } = null;
 
     /// <summary>
-    ///     Gets or sets the aliases of the content types that may never be exposed through the Content API. Content of these
-    ///     types will never be returned from any Content API endpoint, nor added to the query index.
+    ///     Gets or sets the aliases of the content types that may never be exposed through the Delivery API. Content of these
+    ///     types will never be returned from any Delivery API endpoint, nor added to the query index.
     /// </summary>
     /// <value>The content type aliases that are not to be exposed.</value>
     public string[] DisallowedContentTypeAliases { get; set; } = Array.Empty<string>();
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the Content API should output rich text values as JSON instead of HTML.
+    ///     Gets or sets a value indicating whether the Delivery API should output rich text values as JSON instead of HTML.
     /// </summary>
-    /// <value><c>true</c> if the Content API should output rich text values as JSON; <c>false</c> they should be output as HTML (default).</value>
+    /// <value><c>true</c> if the Delivery API should output rich text values as JSON; <c>false</c> they should be output as HTML (default).</value>
     [DefaultValue(StaticRichTextOutputAsJson)]
     public bool RichTextOutputAsJson { get; set; } = StaticRichTextOutputAsJson;
 }
