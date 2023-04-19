@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.User.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Users.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.User.Item;
+namespace Umbraco.Cms.Api.Management.Controllers.Users.Item;
 
 public class ItemUserItemController : UserItemControllerBase
 {
