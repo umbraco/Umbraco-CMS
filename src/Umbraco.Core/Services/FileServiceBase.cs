@@ -11,10 +11,10 @@ public abstract class FileServiceBase : RepositoryService
     {
     }
 
-    protected abstract string[] GetAllowedFileExtensions();
+    protected abstract string[] AllowedFileExtensions { get; }
 
     protected virtual bool HasValidFileExtension(string fileName)
-        => GetAllowedFileExtensions().Contains(Path.GetExtension(fileName));
+        => AllowedFileExtensions.Contains(Path.GetExtension(fileName));
 
     protected virtual bool HasValidFileName(string fileName)
     {

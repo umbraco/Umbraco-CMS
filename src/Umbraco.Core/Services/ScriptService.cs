@@ -15,9 +15,7 @@ public class ScriptService : FileServiceBase, IScriptService
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILogger<ScriptService> _logger;
 
-    private readonly string[] _allowedFileExtensions = { ".js" };
-
-    protected override string[] GetAllowedFileExtensions() => _allowedFileExtensions;
+    protected override string[] AllowedFileExtensions { get; } = { ".js" };
 
     public ScriptService(
         ICoreScopeProvider provider,

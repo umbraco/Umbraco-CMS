@@ -18,9 +18,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
     private readonly ILogger<PartialViewService> _logger;
     private readonly IAuditRepository _auditRepository;
 
-    private readonly string[] _allowedFileExtensions = { ".cshtml" };
-
-    protected override string[] GetAllowedFileExtensions() => _allowedFileExtensions;
+    protected override string[] AllowedFileExtensions { get; } = { ".cshtml" };
 
     public PartialViewService(
         ICoreScopeProvider provider,
