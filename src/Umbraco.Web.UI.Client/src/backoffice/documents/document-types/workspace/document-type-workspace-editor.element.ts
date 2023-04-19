@@ -42,7 +42,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	#observeDocumentType() {
 		if (!this.#workspaceContext) return;
-		//this.observe(this.#workspaceContext.data, (data) => (this._documentType = data));
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias));
 		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon));
