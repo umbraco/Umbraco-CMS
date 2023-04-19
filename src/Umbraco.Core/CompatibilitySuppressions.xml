@@ -793,6 +793,13 @@
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
+    <DiagnosticId>CP0005</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.PublishedContent.PublishedPropertyBase.GetDeliveryApiValue(System.Boolean,System.String,System.String)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Deploy.IDataTypeConfigurationConnector.FromArtifact(Umbraco.Cms.Core.Models.IDataType,System.String,Umbraco.Cms.Core.Deploy.IContextCache)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
@@ -837,6 +844,20 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Models.IContentBase.RemoveValue(System.String)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.PublishedContent.IPublishedProperty.GetDeliveryApiValue(System.Boolean,System.String,System.String)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.PublishedContent.IPublishedPropertyType.ConvertInterToDeliveryApiObject(Umbraco.Cms.Core.Models.PublishedContent.IPublishedElement,Umbraco.Cms.Core.PropertyEditors.PropertyCacheLevel,System.Object,System.Boolean)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -1411,6 +1432,13 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>P:Umbraco.Cms.Core.Models.Membership.IUserGroup.PermissionNames</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>P:Umbraco.Cms.Core.Models.PublishedContent.IPublishedPropertyType.DeliveryApiCacheLevel</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
