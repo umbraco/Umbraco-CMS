@@ -8,6 +8,13 @@ namespace Umbraco.Cms.Core.Xml;
 /// </summary>
 public class UmbracoXPathPathSyntaxParser
 {
+    [Obsolete("This will be removed in Umbraco 13. Use constructor with parentId instead")]
+    public static string ParseXPathQuery(
+        string xpathExpression,
+        int? nodeContextId,
+        Func<int, IEnumerable<string>?> getPath,
+        Func<int, bool> publishedContentExists) => ParseXPathQuery(xpathExpression, nodeContextId, null, getPath, publishedContentExists);
+
     /// <summary>
     ///     Parses custom umbraco xpath expression
     /// </summary>
