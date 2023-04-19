@@ -1,7 +1,7 @@
 import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbContextProviderController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { BooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { BaseEntity } from '@umbraco-cms/backoffice/models';
 
 /*
@@ -15,7 +15,7 @@ export abstract class UmbWorkspaceContext<T, EntityType extends BaseEntity>
 	public host: UmbControllerHostElement;
 	public repository: T;
 
-	#isNew = new DeepState<boolean>(false);
+	#isNew = new BooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
 	constructor(host: UmbControllerHostElement, repository: T) {

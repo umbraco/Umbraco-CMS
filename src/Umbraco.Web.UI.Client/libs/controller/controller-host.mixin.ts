@@ -5,6 +5,7 @@ export declare class UmbControllerHostElement extends HTMLElement {
 	hasController(controller: UmbControllerInterface): boolean;
 	getControllers(filterMethod: (ctrl: UmbControllerInterface) => boolean): UmbControllerInterface[];
 	addController(controller: UmbControllerInterface): void;
+	removeControllerByUnique(unique: UmbControllerInterface['unique']): void;
 	removeController(controller: UmbControllerInterface): void;
 }
 
@@ -43,17 +44,25 @@ export const UmbControllerHostMixin = <T extends HTMLElementConstructor>(superCl
 		 */
 		addController(ctrl: UmbControllerInterface): void {
 			// Check if there is one already with same unique
-			if (ctrl.unique) {
-				this.#controllers.forEach((x) => {
-					if (x.unique === ctrl.unique) {
-						this.removeController(x);
-					}
-				});
-			}
+			this.removeControllerByUnique(ctrl.unique);
 
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
 				ctrl.hostConnected();
+			}
+		}
+
+		/**
+		 * Remove a controller from this element, by its unique/alias.
+		 * @param {unknown} unique/alias
+		 */
+		removeControllerByUnique(unique: UmbControllerInterface['unique']): void {
+			if (unique) {
+				this.#controllers.forEach((x) => {
+					if (x.unique === unique) {
+						this.removeController(x);
+					}
+				});
 			}
 		}
 

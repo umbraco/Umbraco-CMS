@@ -52,7 +52,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 	_isDefaultLanguage = false;
 
 	@state()
-	_isNew = false;
+	_isNew?: boolean;
 
 	@state()
 	_validationErrors?: { [key: string]: Array<any> };
@@ -81,8 +81,8 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 				}
 			});
 
-			this.observe(this.#languageWorkspaceContext.isNew, (value) => {
-				this._isNew = value;
+			this.observe(this.#languageWorkspaceContext.isNew, (isNew) => {
+				this._isNew = isNew;
 			});
 
 			this.observe(this.#languageWorkspaceContext.validationErrors, (value) => {

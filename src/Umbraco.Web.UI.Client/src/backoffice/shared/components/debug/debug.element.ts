@@ -180,10 +180,17 @@ export class UmbDebugElement extends UmbLitElement {
 
 			const props: TemplateResult[] = [];
 			instance.properties?.forEach((property) => {
-				if (property.type === 'string') {
-					props.push(html`<li>${property.key} = ${property.value}</li>`);
-				} else {
-					props.push(html`<li>${property.key} <em>(${property.type})</em></li>`);
+				switch(property.type){
+					case 'string':
+					case 'number':
+					case 'boolean':
+					case 'object':
+						props.push(html`<li>${property.key} <em>(${property.type})</em> = ${property.value}</li>`);
+						break;
+					
+					default:
+						props.push(html`<li>${property.key} <em>(${property.type})</em></li>`);
+						break;
 				}
 			});
 
