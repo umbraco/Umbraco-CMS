@@ -49,6 +49,33 @@ public class PartialViewService : FileServiceBase, IPartialViewService
         return Task.FromResult(partialView);
     }
 
+    public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IPartialView? partialView = _partialViewRepository.Get(path);
+        if (partialView is null)
+        {
+            return PartialViewOperationStatus.NotFound;
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        var deletingNotification = new PartialViewDeletingNotification(partialView, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            return PartialViewOperationStatus.CancelledByNotification;
+        }
+
+        _partialViewRepository.Delete(partialView);
+
+        scope.Notifications.Publish(
+            new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
+
+        await AuditAsync(AuditType.Delete, performingUserKey);
+        return PartialViewOperationStatus.Success;
+    }
+
     public Task<PagedModel<PartialViewSnippet>> GetPartialViewSnippetsAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
