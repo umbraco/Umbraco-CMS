@@ -51,7 +51,7 @@ public class PartialViewFolderService : PathFolderServiceBase<IPartialViewReposi
     {
         if (_partialViewRepository.FolderExists(path) is false)
         {
-            Task.FromResult(Attempt.Fail(PartialViewFolderOperationStatus.NotFound));
+            return Task.FromResult(Attempt.Fail(PartialViewFolderOperationStatus.NotFound));
         }
 
         if (_partialViewRepository.FolderHasContent(path))

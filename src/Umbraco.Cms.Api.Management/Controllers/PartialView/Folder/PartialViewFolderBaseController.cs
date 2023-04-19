@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +10,10 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
+[ApiVersion("1.0")]
+[ApiController]
+[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}/folder")]
+[ApiExplorerSettings(GroupName = "Partial View")]
 public class PartialViewFolderBaseController : PathFolderManagementControllerBase<PartialViewFolderOperationStatus>
 {
     private readonly IPartialViewFolderService _partialViewFolderService;
