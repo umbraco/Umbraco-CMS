@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Users;
+namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("user")]

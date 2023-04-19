@@ -2,33 +2,34 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Users;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Users;
+namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-public class EnableUserController : UserControllerBase
+public class UnlockUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public EnableUserController(IUserService userService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public UnlockUserController(IUserService userService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("enable")]
+    [HttpPost("unlock")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> EnableUsers(EnableUserRequestModel model)
+    public async Task<IActionResult> UnlockUsers(UnlockUsersRequestModel model)
     {
-        UserOperationStatus result = await _userService.EnableAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds);
+        Attempt<UserUnlockResult, UserOperationStatus> attempt = await _userService.UnlockAsync(CurrentUserKey(_backOfficeSecurityAccessor), model.UserIds.ToArray());
 
-        return result is UserOperationStatus.Success
+        return attempt.Success
             ? Ok()
-            : UserOperationStatusResult(result);
+            : UserOperationStatusResult(attempt.Status, attempt.Result);
     }
 }

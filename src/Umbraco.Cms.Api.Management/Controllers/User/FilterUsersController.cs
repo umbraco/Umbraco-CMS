@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.New.Cms.Core.Models;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Users;
+namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 public class FilterUserController : UserControllerBase
 {
