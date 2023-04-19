@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Users.Item;
+namespace Umbraco.Cms.Api.Management.Controllers.User.Item;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("users")]
