@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 
-namespace Umbraco.Cms.Api.Management.Controllers.UserGroups.Item;
+namespace Umbraco.Cms.Api.Management.Controllers.UserGroup.Item;
 
 [ApiController]
-[VersionedApiBackOfficeRoute("user-groups")]
-[ApiExplorerSettings(GroupName = "User Groups")]
+[VersionedApiBackOfficeRoute("user-group")]
+[ApiExplorerSettings(GroupName = "User Group")]
 [ApiVersion("1.0")]
 public class UserGroupItemControllerBase : ManagementApiControllerBase
 {

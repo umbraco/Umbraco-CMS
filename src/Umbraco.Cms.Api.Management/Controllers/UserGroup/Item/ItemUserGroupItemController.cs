@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.UserGroups.Item;
+namespace Umbraco.Cms.Api.Management.Controllers.UserGroup.Item;
 
 public class ItemUserGroupItemController : UserGroupItemControllerBase
 {
