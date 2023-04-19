@@ -40,8 +40,33 @@ public class BackOfficeController : ManagementApiControllerBase
         _securitySettings = securitySettings;
     }
 
+    // FIXME: this is a temporary solution to get the new backoffice auth rolling.
+    //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
+    [HttpPost("login")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Login(LoginRequestModel model)
+    {
+        var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
+        if (validated is false)
+        {
+            return Unauthorized();
+        }
+
+        var claims = new List<Claim> { new(ClaimTypes.Name, model.Username) };
+        var claimsIdentity = new ClaimsIdentity(claims, Constants.Security.NewBackOfficeAuthenticationType);
+        await HttpContext.SignInAsync(Constants.Security.NewBackOfficeAuthenticationType, new ClaimsPrincipal(claimsIdentity));
+
+        return Ok();
+    }
+
+    public class LoginRequestModel
+    {
+        public required string Username { get; init; }
+
+        public required string Password { get; init; }
+    }
+
     [HttpGet("authorize")]
-    [HttpPost("authorize")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
     {
@@ -67,7 +92,7 @@ public class BackOfficeController : ManagementApiControllerBase
         // by calling BackOfficeSignInManager.ExternalLoginSignInAsync
 
         // retrieve the user principal stored in the authentication cookie.
-        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
+        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.NewBackOfficeAuthenticationType);
         var userName = cookieAuthResult.Succeeded
             ? cookieAuthResult.Principal?.Identity?.Name
             : null;
@@ -140,5 +165,5 @@ public class BackOfficeController : ManagementApiControllerBase
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
     }
 
-    private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
+    private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.NewBackOfficeAuthenticationType);
 }

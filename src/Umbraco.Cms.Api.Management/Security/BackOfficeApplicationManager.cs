@@ -13,15 +13,17 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
     private readonly IOpenIddictApplicationManager _applicationManager;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly Uri? _backOfficeHost;
+    private readonly string? _authorizeCallbackPathName;
 
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
-        IOptionsMonitor<NewBackOfficeSettings> securitySettingsMonitor)
+        IOptions<NewBackOfficeSettings> securitySettings)
     {
         _applicationManager = applicationManager;
         _webHostEnvironment = webHostEnvironment;
-        _backOfficeHost = securitySettingsMonitor.CurrentValue.BackOfficeHost;
+        _backOfficeHost = securitySettings.Value.BackOfficeHost;
+        _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
     }
 
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
@@ -38,7 +40,7 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
                 ClientId = Constants.OauthClientIds.BackOffice,
                 RedirectUris =
                 {
-                    CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, "/umbraco")
+                    CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
                 },
                 Type = OpenIddictConstants.ClientTypes.Public,
                 Permissions =

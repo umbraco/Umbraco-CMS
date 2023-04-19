@@ -19,7 +19,8 @@ public static class BackOfficeAuthBuilderExtensions
     {
         builder
             .AddDbContext()
-            .AddOpenIddict();
+            .AddOpenIddict()
+            .AddBackOfficeLogin();
 
         return builder;
     }
@@ -124,6 +125,19 @@ public static class BackOfficeAuthBuilderExtensions
         return builder;
     }
 
+    private static IUmbracoBuilder AddBackOfficeLogin(this IUmbracoBuilder builder)
+    {
+        builder.Services
+            .AddAuthentication()
+            .AddCookie(Constants.Security.NewBackOfficeAuthenticationType, options =>
+            {
+                options.LoginPath = "/umbraco/login";
+                options.Cookie.Name = Constants.Security.NewBackOfficeAuthenticationType;
+            });
+
+        return builder;
+    }
+
     // TODO: remove this once EF is implemented
     public class DatabaseManager : IHostedService
     {
@@ -140,7 +154,7 @@ public static class BackOfficeAuthBuilderExtensions
 
             // TODO: add BackOfficeAuthorizationInitializationMiddleware before UseAuthorization (to make it run for unauthorized API requests) and remove this
             IBackOfficeApplicationManager backOfficeApplicationManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
-            await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(new Uri("https://localhost:44331/"), cancellationToken);
+            await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(new Uri("https://localhost:44339/"), cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
