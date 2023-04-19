@@ -296,6 +296,9 @@ export class UmbDataTypeRepository
 		if (!error) {
 			this.#treeStore?.updateItem(id, { parentId: targetId });
 			this.#treeStore?.updateItem(targetId, { hasChildren: true });
+
+			const notification = { data: { message: `Data type moved` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };
