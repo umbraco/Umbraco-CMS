@@ -309,6 +309,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IScriptService, ScriptService>();
             Services.AddUnique<IPartialViewService, PartialViewService>();
             Services.AddUnique<IScriptFolderService, ScriptFolderService>();
+            Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();
             Services.AddUnique<ITemporaryFileService, TemporaryFileService>();
             Services.AddUnique<ITemplateContentParserService, TemplateContentParserService>();
             Services.AddUnique<IEntityService, EntityService>();

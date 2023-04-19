@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
 
-public enum ScriptFolderOperationStatus
+public enum PartialViewFolderOperationStatus
 {
     Success,
     AlreadyExists,

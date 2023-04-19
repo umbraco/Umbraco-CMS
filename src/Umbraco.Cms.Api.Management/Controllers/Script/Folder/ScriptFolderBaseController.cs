@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
@@ -25,8 +26,8 @@ public class ScriptFolderBaseController : PathFolderManagementControllerBase<Scr
         _scriptFolderService = scriptFolderService;
     }
 
-    protected override async Task<PathContainer?> GetContainerAsync(string path)
-        => await _scriptFolderService.GetAsync(path);
+    protected override Task<PathContainer?> GetContainerAsync(string path)
+        => _scriptFolderService.GetAsync(path);
 
     protected override Task<Attempt<PathContainer?, ScriptFolderOperationStatus>> CreateContainerAsync(
         PathContainer container) =>
@@ -54,14 +55,10 @@ public class ScriptFolderBaseController : PathFolderManagementControllerBase<Scr
                 .WithTitle("Parent not found")
                 .WithDetail("The parent folder was not found.")
                 .Build()),
-            ScriptFolderOperationStatus.NotAllowedIsRoot => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Not allowed")
-                .WithDetail("The requested action is not allowed to be performed on the root.")
-                .Build()),
             ScriptFolderOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid name")
                 .WithDetail("The name specified is not a valid name.")
                 .Build()),
-            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown script folder operation status")
         };
 }
