@@ -459,6 +459,7 @@ namespace Umbraco.Cms.Core.Services
             return _memberRepository.GetMany(ids);
         }
 
+        /// <inheritdoc />
         public Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);

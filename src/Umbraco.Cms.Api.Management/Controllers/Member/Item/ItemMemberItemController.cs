@@ -24,7 +24,6 @@ public class ItemMemberItemController : MemberItemControllerBase
     public async Task<IActionResult> Item([FromQuery(Name = "id")] SortedSet<Guid> ids)
     {
         IEnumerable<IMember> members = await _memberService.GetByKeysAsync(ids.ToArray());
-
         List<MemberItemResponseModel> responseModels = _mapper.MapEnumerable<IMember, MemberItemResponseModel>(members);
         return Ok(responseModels);
     }
