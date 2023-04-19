@@ -5,11 +5,10 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class ScriptService : RepositoryService, IScriptService
+public class ScriptService : FileServiceBase, IScriptService
 {
     private readonly IScriptRepository _scriptRepository;
     private readonly IAuditRepository _auditRepository;
@@ -17,6 +16,8 @@ public class ScriptService : RepositoryService, IScriptService
     private readonly ILogger<ScriptService> _logger;
 
     private readonly string[] _allowedFileExtensions = { ".js" };
+
+    protected override string[] GetAllowedFileExtensions() => _allowedFileExtensions;
 
     public ScriptService(
         ICoreScopeProvider provider,
@@ -79,7 +80,7 @@ public class ScriptService : RepositoryService, IScriptService
 
         try
         {
-            ScriptOperationStatus validationResult = ValidateSave(createModel);
+            ScriptOperationStatus validationResult = await ValidateCreateAsync(createModel);
             if (validationResult is not ScriptOperationStatus.Success)
             {
                 return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(validationResult, null);
@@ -87,13 +88,13 @@ public class ScriptService : RepositoryService, IScriptService
         }
         catch (PathTooLongException exception)
         {
-            _logger.LogError(exception, "The script path is too long");
+            _logger.LogError(exception, "The script path was too long");
             return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.PathTooLong, null);
         }
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
         var script = new Script(createModel.FilePath) { Content = createModel.Content };
 
+        EventMessages eventMessages = EventMessagesFactory.Get();
         var savingNotification = new ScriptSavingNotification(script, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
@@ -110,29 +111,30 @@ public class ScriptService : RepositoryService, IScriptService
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
     }
 
-    private ScriptOperationStatus ValidateSave(ScriptCreateModel createModel)
+    private Task<ScriptOperationStatus> ValidateCreateAsync(ScriptCreateModel createModel)
     {
         if (_scriptRepository.Exists(createModel.FilePath))
         {
-            return ScriptOperationStatus.AlreadyExists;
+            return Task.FromResult(ScriptOperationStatus.AlreadyExists);
         }
 
-        if (string.IsNullOrEmpty(createModel.ParentPath) is false && _scriptRepository.FolderExists(createModel.ParentPath) is false)
+        if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false &&
+            _scriptRepository.FolderExists(createModel.ParentPath) is false)
         {
-            return ScriptOperationStatus.ParentNotFound;
+            return Task.FromResult(ScriptOperationStatus.ParentNotFound);
         }
 
-        if(HasValidName(createModel.Name) is false)
+        if(HasValidFileName(createModel.Name) is false)
         {
-            return ScriptOperationStatus.InvalidName;
+            return Task.FromResult(ScriptOperationStatus.InvalidName);
         }
 
         if (HasValidFileExtension(createModel.FilePath) is false)
         {
-            return ScriptOperationStatus.InvalidFileExtension;
+            return Task.FromResult(ScriptOperationStatus.InvalidFileExtension);
         }
 
-        return ScriptOperationStatus.Success;
+        return Task.FromResult(ScriptOperationStatus.Success);
     }
 
     public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid performingUserKey)
@@ -183,25 +185,12 @@ public class ScriptService : RepositoryService, IScriptService
             return ScriptOperationStatus.InvalidFileExtension;
         }
 
-        if (HasValidName(updateModel.Name) is false)
+        if (HasValidFileName(updateModel.Name) is false)
         {
             return ScriptOperationStatus.InvalidName;
         }
 
         return ScriptOperationStatus.Success;
-    }
-
-    private bool HasValidFileExtension(string fileName)
-        => _allowedFileExtensions.Contains(Path.GetExtension(fileName));
-
-    private bool HasValidName(string fileName)
-    {
-        if (fileName.ContainsAny(Path.GetInvalidFileNameChars()))
-        {
-            return false;
-        }
-
-        return true;
     }
 
     private void Audit(AuditType type, int userId)
