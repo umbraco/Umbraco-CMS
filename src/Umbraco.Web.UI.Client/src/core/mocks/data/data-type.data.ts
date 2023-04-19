@@ -379,7 +379,7 @@ export const data: Array<(DataTypeResponseModel & { type: 'data-type' }) | Folde
 		values: [
 			{
 				alias: 'group',
-				value: 'default',
+				value: 'Fruits',
 			},
 			{
 				alias: 'items',

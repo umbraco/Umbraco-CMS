@@ -1,18 +1,18 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-tags.element';
-import type { UmbInputTagsElement } from './input-tags.element';
+import './tag-input.element';
+import type { UmbTagInputElement } from './tag-input.element';
 
-const meta: Meta<UmbInputTagsElement> = {
+const meta: Meta<UmbTagInputElement> = {
 	title: 'Components/Inputs/Tags',
-	component: 'umb-input-tags',
+	component: 'umb-tag-input',
 };
 
 export default meta;
-type Story = StoryObj<UmbInputTagsElement>;
+type Story = StoryObj<UmbTagInputElement>;
 
 export const Overview: Story = {
 	args: {
-		group: 'default',
+		group: 'Fruits',
 		items: [],
 	},
 };
