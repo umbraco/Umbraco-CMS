@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Content.Rendering;
+using Umbraco.Cms.Api.Delivery.Rendering;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
