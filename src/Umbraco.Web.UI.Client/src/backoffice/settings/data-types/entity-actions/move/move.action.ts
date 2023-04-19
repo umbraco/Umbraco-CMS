@@ -4,6 +4,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
+// TODO: investigate what we need to make a generic move action
 export class UmbMoveDataTypeEntityAction extends UmbEntityActionBase<UmbDataTypeRepository> {
 	#modalContext?: UmbModalContext;
 
