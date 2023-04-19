@@ -67,8 +67,7 @@ public class ScriptService : FileServiceBase, IScriptService
         scope.Notifications.Publish(
             new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
 
-        int performingUserId = await _userIdKeyResolver.GetAsync(performingUserKey);
-        Audit(AuditType.Delete, performingUserId);
+        await AuditAsync(AuditType.Delete, performingUserKey);
 
         scope.Complete();
         return ScriptOperationStatus.Success;
@@ -104,8 +103,7 @@ public class ScriptService : FileServiceBase, IScriptService
         _scriptRepository.Save(script);
 
         scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
-        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
-        Audit(AuditType.Save, userId);
+        await AuditAsync(AuditType.Save, performingUserKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
@@ -171,8 +169,7 @@ public class ScriptService : FileServiceBase, IScriptService
         _scriptRepository.Save(script);
         scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
 
-        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
-        Audit(AuditType.Save, userId);
+        await AuditAsync(AuditType.Save, performingUserKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
@@ -193,6 +190,9 @@ public class ScriptService : FileServiceBase, IScriptService
         return ScriptOperationStatus.Success;
     }
 
-    private void Audit(AuditType type, int userId)
-        => _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));
+    private async Task AuditAsync(AuditType type, Guid performingUserKey)
+    {
+        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));
+    }
 }
