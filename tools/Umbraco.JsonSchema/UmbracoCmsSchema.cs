@@ -20,6 +20,8 @@ internal class UmbracoCmsSchema
     {
         public ContentSettings Content { get; set; } = null!;
 
+        public DeliveryApiSettings DeliveryApi { get; set; } = null!;
+
         public CoreDebugSettings Debug { get; set; } = null!;
 
         public ExceptionFilterSettings ExceptionFilter { get; set; } = null!;
