@@ -34,7 +34,7 @@ public class CreatePartialViewController : PartialViewControllerBase
         Attempt<IPartialView?, PartialViewOperationStatus> createAttempt = await _partialViewService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return createAttempt.Success
-            ? Ok()
+            ? CreatedAtAction<ByPathPartialViewController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path })
             : PartialViewOperationStatusResult(createAttempt.Status);
     }
 }
