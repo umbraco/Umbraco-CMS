@@ -11,4 +11,6 @@ public interface IPartialViewService : IService
     Task<PagedModel<PartialViewSnippet>> GetPartialViewSnippetsAsync(int skip, int take);
 
     Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid performingUserKey);
+
+    Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid performingUserKey);
 }

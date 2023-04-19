@@ -1,5 +1,4 @@
-﻿using System.Formats.Asn1;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -126,6 +125,60 @@ public class PartialViewService : FileServiceBase, IPartialViewService
         }
 
         return Task.FromResult(PartialViewOperationStatus.Success);
+    }
+
+    public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IPartialView? partialView = _partialViewRepository.Get(updateModel.ExistingPath);
+
+        if (partialView is null)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.NotFound, null);
+        }
+
+        PartialViewOperationStatus validationResult = ValidateUpdate(updateModel);
+        if (validationResult is not PartialViewOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(validationResult, null);
+        }
+
+        partialView.Content = updateModel.Content;
+        if (partialView.Name != updateModel.Name)
+        {
+            var newPath = partialView.Path.Replace(partialView.Name!, updateModel.Name);
+            partialView.Path = newPath;
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new PartialViewSavingNotification(partialView, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.CancelledByNotification, null);
+        }
+
+        _partialViewRepository.Save(partialView);
+        scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
+
+        await AuditAsync(AuditType.Save, performingUserKey);
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.Success, partialView);
+    }
+
+    private PartialViewOperationStatus ValidateUpdate(PartialViewUpdateModel updateModel)
+    {
+        if (HasValidFileExtension(updateModel.Name) is false)
+        {
+            return PartialViewOperationStatus.InvalidFileExtension;
+        }
+
+        if (HasValidFileName(updateModel.Name) is false)
+        {
+            return PartialViewOperationStatus.InvalidName;
+        }
+
+        return PartialViewOperationStatus.Success;
     }
 
     private async Task AuditAsync(AuditType type, Guid performingUserKey)
