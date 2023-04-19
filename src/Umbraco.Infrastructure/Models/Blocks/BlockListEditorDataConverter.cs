@@ -1,23 +1,28 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
 ///     Data converter for the block list property editor
 /// </summary>
-public class BlockListEditorDataConverter : BlockEditorDataConverter
+public class BlockListEditorDataConverter : BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>
 {
+    [Obsolete("Use the constructor that takes IJsonSerializer. Will be removed in V15.")]
     public BlockListEditorDataConverter()
-        : base(Constants.PropertyEditors.Aliases.BlockList)
+        : this(StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
     }
 
-    protected override IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout)
+    public BlockListEditorDataConverter(IJsonSerializer jsonSerializer)
+        : base(Constants.PropertyEditors.Aliases.BlockList, jsonSerializer)
     {
-        IEnumerable<BlockListLayoutItem>? blockListLayout = jsonLayout.ToObject<IEnumerable<BlockListLayoutItem>>();
-        return blockListLayout?.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
     }
+
+    protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(IEnumerable<BlockListLayoutItem> layout)
+        => layout.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
 }

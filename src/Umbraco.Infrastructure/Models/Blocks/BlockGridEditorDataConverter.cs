@@ -1,7 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
@@ -9,21 +10,21 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// <summary>
 /// Data converter for the block grid property editor
 /// </summary>
-public class BlockGridEditorDataConverter : BlockEditorDataConverter
+public class BlockGridEditorDataConverter : BlockEditorDataConverter<BlockGridValue, BlockGridLayoutItem>
 {
-    private readonly IJsonSerializer _jsonSerializer;
-
-    public BlockGridEditorDataConverter(IJsonSerializer jsonSerializer) : base(Cms.Core.Constants.PropertyEditors.Aliases.BlockGrid)
-        => _jsonSerializer = jsonSerializer;
-
-    protected override IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout)
+    [Obsolete("Use the constructor that takes IJsonSerializer. Will be removed in V15.")]
+    public BlockGridEditorDataConverter()
+        : this(StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
-        IEnumerable<BlockGridLayoutItem>? layouts = jsonLayout.ToObject<IEnumerable<BlockGridLayoutItem>>();
-        if (layouts == null)
-        {
-            return null;
-        }
+    }
 
+    public BlockGridEditorDataConverter(IJsonSerializer jsonSerializer)
+        : base(Constants.PropertyEditors.Aliases.BlockGrid, jsonSerializer)
+    {
+    }
+
+    protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(IEnumerable<BlockGridLayoutItem> layout)
+    {
         IList<ContentAndSettingsReference> ExtractContentAndSettingsReferences(BlockGridLayoutItem item)
         {
             var references = new List<ContentAndSettingsReference> { new(item.ContentUdi, item.SettingsUdi) };
@@ -31,7 +32,7 @@ public class BlockGridEditorDataConverter : BlockEditorDataConverter
             return references;
         }
 
-        ContentAndSettingsReference[] result = layouts.SelectMany(ExtractContentAndSettingsReferences).ToArray();
+        ContentAndSettingsReference[] result = layout.SelectMany(ExtractContentAndSettingsReferences).ToArray();
         return result;
     }
 }

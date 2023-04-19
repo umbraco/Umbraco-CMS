@@ -8,16 +8,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration> : PropertyValueConverterBase
+public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemModel, TBlockLayoutItem, TBlockConfiguration, TBlockValue> : PropertyValueConverterBase
     where TBlockItemModel : class, IBlockReference<IPublishedElement, IPublishedElement>
-    where TBlockLayoutItem : IBlockLayoutItem
+    where TBlockLayoutItem : class, IBlockLayoutItem, new()
     where TBlockConfiguration : IBlockConfiguration
+    where TBlockValue : BlockValue<TBlockLayoutItem>, new()
 {
     /// <summary>
     /// Creates a specific data converter for the block property implementation.
     /// </summary>
     /// <returns></returns>
-    protected abstract BlockEditorDataConverter CreateBlockEditorDataConverter();
+    protected abstract BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> CreateBlockEditorDataConverter();
 
     /// <summary>
     /// Creates a specific block item activator for the block property implementation.
@@ -88,14 +89,14 @@ public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemMod
             return createEmptyModel();
         }
 
-        BlockEditorDataConverter blockEditorDataConverter = CreateBlockEditorDataConverter();
-        BlockEditorData converted = blockEditorDataConverter.Deserialize(value);
+        BlockEditorDataConverter<TBlockValue, TBlockLayoutItem> blockEditorDataConverter = CreateBlockEditorDataConverter();
+        BlockEditorData<TBlockValue, TBlockLayoutItem> converted = blockEditorDataConverter.Deserialize(value);
         if (converted.BlockValue.ContentData.Count == 0)
         {
             return createEmptyModel();
         }
 
-        IEnumerable<TBlockLayoutItem>? layout = converted.Layout?.ToObject<IEnumerable<TBlockLayoutItem>>();
+        IEnumerable<TBlockLayoutItem>? layout = converted.Layout;
         if (layout is null)
         {
             return createEmptyModel();
@@ -183,7 +184,7 @@ public abstract class BlockPropertyValueConverterBase<TBlockModel, TBlockItemMod
             }
 
             // Create instance (use content/settings type from configuration)
-            var blockItem = blockItemActivator.CreateInstance(blockConfig.ContentElementTypeKey, blockConfig.SettingsElementTypeKey, contentGuidUdi, contentData, settingGuidUdi, settingsData);
+            TBlockItemModel? blockItem = blockItemActivator.CreateInstance(blockConfig.ContentElementTypeKey, blockConfig.SettingsElementTypeKey, contentGuidUdi, contentData, settingGuidUdi, settingsData);
             if (blockItem == null)
             {
                 return null;

@@ -1,19 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 namespace Umbraco.Cms.Core.Models.Blocks;
 
-public class BlockValue
+public abstract class BlockValue<TLayout> where TLayout : IBlockLayoutItem
 {
-    [JsonProperty("layout")]
-    public IDictionary<string, JToken> Layout { get; set; } = null!;
+    public IDictionary<string, IEnumerable<TLayout>> Layout { get; set; } = null!;
 
-    [JsonProperty("contentData")]
     public List<BlockItemData> ContentData { get; set; } = new();
 
-    [JsonProperty("settingsData")]
     public List<BlockItemData> SettingsData { get; set; } = new();
 }

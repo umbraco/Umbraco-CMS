@@ -1,21 +1,21 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json.Linq;
-
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
 ///     Convertable block data from json
 /// </summary>
-public class BlockEditorData
+public class BlockEditorData<TValue, TLayout>
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
     private readonly string _propertyEditorAlias;
 
     public BlockEditorData(
         string propertyEditorAlias,
         IEnumerable<ContentAndSettingsReference> references,
-        BlockValue blockValue)
+        BlockValue<TLayout> blockValue)
     {
         if (string.IsNullOrWhiteSpace(propertyEditorAlias))
         {
@@ -32,20 +32,20 @@ public class BlockEditorData
     private BlockEditorData()
     {
         _propertyEditorAlias = string.Empty;
-        BlockValue = new BlockValue();
+        BlockValue = new TValue();
     }
 
-    public static BlockEditorData Empty { get; } = new();
+    public static BlockEditorData<TValue, TLayout> Empty { get; } = new();
 
     /// <summary>
     ///     Returns the layout for this specific property editor
     /// </summary>
-    public JToken? Layout => BlockValue.Layout.TryGetValue(_propertyEditorAlias, out JToken? layout) ? layout : null;
+    public IEnumerable<TLayout>? Layout => BlockValue.Layout.TryGetValue(_propertyEditorAlias, out IEnumerable<TLayout>? layout) ? layout : null;
 
     /// <summary>
     ///     Returns the reference to the original BlockValue
     /// </summary>
-    public BlockValue BlockValue { get; }
+    public BlockValue<TLayout> BlockValue { get; }
 
     public List<ContentAndSettingsReference> References { get; } = new();
 }

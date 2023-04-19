@@ -2,31 +2,39 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
 ///     Converts the block json data into objects
 /// </summary>
-public abstract class BlockEditorDataConverter
+public abstract class BlockEditorDataConverter<TValue, TLayout>
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
     private readonly string _propertyEditorAlias;
+    private readonly IJsonSerializer _jsonSerializer;
 
-    protected BlockEditorDataConverter(string propertyEditorAlias) => _propertyEditorAlias = propertyEditorAlias;
-
-    public BlockEditorData ConvertFrom(JToken json)
+    [Obsolete("Use the constructor that takes IJsonSerializer. Will be removed in V15.")]
+    protected BlockEditorDataConverter(string propertyEditorAlias)
+        : this(propertyEditorAlias, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
-        BlockValue? value = json.ToObject<BlockValue>();
-        return Convert(value);
     }
 
-    public bool TryDeserialize(string json, [MaybeNullWhen(false)] out BlockEditorData blockEditorData)
+    protected BlockEditorDataConverter(string propertyEditorAlias, IJsonSerializer jsonSerializer)
+    {
+        _propertyEditorAlias = propertyEditorAlias;
+        _jsonSerializer = jsonSerializer;
+    }
+
+    public bool TryDeserialize(string json, [MaybeNullWhen(false)] out BlockEditorData<TValue, TLayout> blockEditorData)
     {
         try
         {
-            BlockValue? value = JsonConvert.DeserializeObject<BlockValue>(json);
+            TValue? value = _jsonSerializer.Deserialize<TValue>(json);
             blockEditorData = Convert(value);
             return true;
         }
@@ -37,32 +45,31 @@ public abstract class BlockEditorDataConverter
         }
     }
 
-    public BlockEditorData Deserialize(string json)
+    public BlockEditorData<TValue, TLayout> Deserialize(string json)
     {
-        BlockValue? value = JsonConvert.DeserializeObject<BlockValue>(json);
+        TValue? value = _jsonSerializer.Deserialize<TValue>(json);
         return Convert(value);
     }
 
     /// <summary>
-    ///     Return the collection of <see cref="IBlockReference" /> from the block editor's Layout (which could be an array or
-    ///     an object depending on the editor)
+    ///     Return the collection of <see cref="IBlockReference" /> from the block editor's Layout
     /// </summary>
-    /// <param name="jsonLayout"></param>
+    /// <param name="layout"></param>
     /// <returns></returns>
-    protected abstract IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout);
+    protected abstract IEnumerable<ContentAndSettingsReference> GetBlockReferences(IEnumerable<TLayout> layout);
 
-    private BlockEditorData Convert(BlockValue? value)
+    private BlockEditorData<TValue, TLayout> Convert(TValue? value)
     {
         if (value?.Layout == null)
         {
-            return BlockEditorData.Empty;
+            return BlockEditorData<TValue, TLayout>.Empty;
         }
 
-        IEnumerable<ContentAndSettingsReference>? references =
-            value.Layout.TryGetValue(_propertyEditorAlias, out JToken? layout)
+        IEnumerable<ContentAndSettingsReference> references =
+            value.Layout.TryGetValue(_propertyEditorAlias, out IEnumerable<TLayout>? layout)
                 ? GetBlockReferences(layout)
                 : Enumerable.Empty<ContentAndSettingsReference>();
 
-        return new BlockEditorData(_propertyEditorAlias, references!, value);
+        return new BlockEditorData<TValue, TLayout>(_propertyEditorAlias, references, value);
     }
 }
