@@ -622,7 +622,7 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Save(relationType);
-            var currentUser = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
             Audit(auditType, currentUser, relationType.Id, auditMessage);
             scope.Complete();
             scope.Notifications.Publish(
@@ -691,7 +691,7 @@ public class RelationService : RepositoryService, IRelationService
             }
 
             _relationTypeRepository.Delete(relationType);
-            var currentUser = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+            var currentUser = await _userIdKeyResolver.GetAsync(userKey);
             Audit(AuditType.Delete, currentUser, relationType.Id, "Deleted relation type");
             scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
             scope.Complete();

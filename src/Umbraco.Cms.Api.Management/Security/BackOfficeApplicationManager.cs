@@ -38,7 +38,7 @@ public class BackOfficeApplicationManager : IBackOfficeApplicationManager
                 ClientId = Constants.OauthClientIds.BackOffice,
                 RedirectUris =
                 {
-                    CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, "/umbraco/login/callback/")
+                    CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, "/umbraco")
                 },
                 Type = OpenIddictConstants.ClientTypes.Public,
                 Permissions =

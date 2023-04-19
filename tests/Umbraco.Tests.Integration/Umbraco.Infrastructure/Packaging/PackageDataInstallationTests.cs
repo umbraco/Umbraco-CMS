@@ -577,7 +577,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         await AddLanguages();
 
         // Act
-        PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
+        PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), Constants.Security.SuperUserId);
 
         // Assert
         await AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
@@ -600,7 +600,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
         // Act
         var dictionaryItems =
-            PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
+            PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), Constants.Security.SuperUserId);
 
         // Assert
         Assert.That(await DictionaryItemService.ExistsAsync(parentKey), "DictionaryItem parentKey does not exist");
@@ -629,7 +629,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         await AddExistingEnglishAndNorwegianParentDictionaryItem(expectedEnglishParentValue, expectedNorwegianParentValue);
 
         // Act
-        PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
+        PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), Constants.Security.SuperUserId);
 
         // Assert
         await AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
@@ -654,7 +654,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         await AddExistingEnglishParentDictionaryItem(expectedEnglishParentValue);
 
         // Act
-        PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), 0);
+        PackageDataInstallation.ImportDictionaryItems(dictionaryItemsElement.Elements("DictionaryItem"), Constants.Security.SuperUserId);
 
         // Assert
         await AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
@@ -671,7 +671,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         var languageItemsElement = newPackageXml.Elements("Languages").First();
 
         // Act
-        var languages = PackageDataInstallation.ImportLanguages(languageItemsElement.Elements("Language"), 0);
+        var languages = PackageDataInstallation.ImportLanguages(languageItemsElement.Elements("Language"), Constants.Security.SuperUserId);
         var allLanguages = await LanguageService.GetAllAsync();
 
         // Assert

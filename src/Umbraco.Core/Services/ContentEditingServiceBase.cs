@@ -85,7 +85,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
     // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid id, Func<TContent, OperationResult?> performDelete, bool allowForTrashed)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete:true);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(id);
         if (content == null)
         {
@@ -98,16 +98,85 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         }
 
         OperationResult? deleteResult = performDelete(content);
-        return deleteResult?.Result switch
-        {
-            // these are the only result states currently expected from Delete
-            OperationResultType.Success => Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content),
-            OperationResultType.FailedCancelledByEvent => Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, content),
 
-            // for any other state we'll return "unknown" so we know that we need to amend this
-            _ => Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Unknown, content)
-        };
+        scope.Complete();
+
+        return OperationResultToAttempt(content, deleteResult);
     }
+
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid id, Guid? parentId, Func<TContent, int, OperationResult?> performMove)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        TContent? content = ContentService.GetById(id);
+        if (content is null)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+        }
+
+        TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
+
+        TContent? parent = TryGetAndValidateParent(parentId, contentType, out ContentEditingOperationStatus operationStatus);
+        if (operationStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
+        }
+
+        // special case for move: short circuit the operation if the content is already under the correct parent.
+        if ((parent == null && content.ParentId == Constants.System.Root) || (parent != null && parent.Id == content.ParentId))
+        {
+            return Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content);
+        }
+
+        // special case for move: do not allow moving an item beneath itself.
+        if (parent?.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Contains(content.Id) is true)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
+        }
+
+        OperationResult? moveResult = performMove(content, parent?.Id ?? Constants.System.Root);
+
+        scope.Complete();
+
+        return OperationResultToAttempt(content, moveResult);
+    }
+
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid id, Guid? parentId, Func<TContent, int, TContent?> performCopy)
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        TContent? content = ContentService.GetById(id);
+        if (content is null)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+        }
+
+        TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;
+
+        TContent? parent = TryGetAndValidateParent(parentId, contentType, out ContentEditingOperationStatus operationStatus);
+        if (operationStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(operationStatus, content);
+        }
+
+        TContent? copy = performCopy(content, parent?.Id ?? Constants.System.Root);
+        scope.Complete();
+
+        // we'll assume that we have performed all validations for unsuccessful scenarios above, so a null result here
+        // means the copy operation was cancelled by a notification handler
+        return copy != null
+            ? Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, copy)
+            : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, null);
+    }
+
+    private Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult) =>
+        operationResult?.Result switch
+        {
+            // these are the only result states currently expected from the invoked IContentService operations
+            OperationResultType.Success => Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content),
+            OperationResultType.FailedCancelledByEvent => Attempt.FailWithStatus(ContentEditingOperationStatus.CancelledByNotification, content),
+
+            // for any other state we'll return "unknown" so we know that we need to amend this switch statement
+            _ => Attempt.FailWithStatus(ContentEditingOperationStatus.Unknown, content)
+        };
 
     private TContentType? TryGetAndValidateContentType(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase, out ContentEditingOperationStatus operationStatus)
     {
@@ -190,6 +259,12 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
 
         if (parent != null)
         {
+            if (parent.Trashed)
+            {
+                operationStatus = ContentEditingOperationStatus.InTrash;
+                return null;
+            }
+
             TContentType? parentContentType = ContentTypeService.Get(parent.ContentType.Key);
             Guid[] allowedContentTypeKeys = parentContentType?.AllowedContentTypes?.Select(c => c.Key).ToArray()
                                             ?? Array.Empty<Guid>();

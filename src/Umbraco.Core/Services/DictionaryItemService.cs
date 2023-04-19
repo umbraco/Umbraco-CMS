@@ -167,7 +167,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
                 new DictionaryItemDeletedNotification(dictionaryItem, eventMessages)
                     .WithStateFrom(deletingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
             Audit(AuditType.Delete, "Delete DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
 
             scope.Complete();
@@ -229,7 +229,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemMovedNotification(moveEventInfo, eventMessages).WithStateFrom(movingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
             Audit(AuditType.Move, "Move DictionaryItem", currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 
@@ -281,7 +281,7 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
-            var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+            var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
             Audit(auditType, auditMessage, currentUserId, dictionaryItem.Id, nameof(DictionaryItem));
             scope.Complete();
 

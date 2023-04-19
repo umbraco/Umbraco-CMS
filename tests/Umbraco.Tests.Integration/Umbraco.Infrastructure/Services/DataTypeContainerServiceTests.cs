@@ -147,13 +147,14 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Delete_Child_Container()
     {
+        Guid userKey = Constants.Security.SuperUserKey;
         EntityContainer root = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" };
-        await DataTypeContainerService.CreateAsync(root, null, Constants.Security.SuperUserKey);
+        await DataTypeContainerService.CreateAsync(root, null, userKey);
 
         EntityContainer child = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Child Container" };
-        await DataTypeContainerService.CreateAsync(child, null, root.Key);
+        await DataTypeContainerService.CreateAsync(child, root.Key, userKey);
 
-        var result = await DataTypeContainerService.DeleteAsync(child.Key, Constants.Security.SuperUserKey);
+        var result = await DataTypeContainerService.DeleteAsync(child.Key, userKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(DataTypeContainerOperationStatus.Success, result.Status);
 

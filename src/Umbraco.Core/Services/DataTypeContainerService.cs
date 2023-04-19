@@ -138,7 +138,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
 
         _dataTypeContainerRepository.Delete(container);
 
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+        var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
         Audit(AuditType.Delete, currentUserId, container.Id);
         scope.Complete();
 
@@ -172,7 +172,7 @@ internal sealed class DataTypeContainerService : RepositoryService, IDataTypeCon
 
         _dataTypeContainerRepository.Save(container);
 
-        var currentUserId = await _userIdKeyResolver.GetAsync(userKey) ?? Constants.Security.SuperUserId;
+        var currentUserId = await _userIdKeyResolver.GetAsync(userKey);
         Audit(auditType, currentUserId, container.Id);
         scope.Complete();
 

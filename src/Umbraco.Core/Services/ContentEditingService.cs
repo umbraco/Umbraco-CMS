@@ -7,12 +7,12 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
+// FIXME: add granular permissions check (for inspiration, check how the old ContentController utilizes IAuthorizationService)
 internal sealed class ContentEditingService
     : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
-    private readonly ICoreScopeProvider _scopeProvider;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public ContentEditingService(
@@ -28,7 +28,6 @@ internal sealed class ContentEditingService
     {
         _templateService = templateService;
         _logger = logger;
-        _scopeProvider = scopeProvider;
         _userIdKeyResolver = userIdKeyResolver;
     }
 
@@ -53,7 +52,7 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
         }
 
-        operationStatus = Save(content, userKey);
+        operationStatus = await Save(content, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content)
             : Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
@@ -73,7 +72,7 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus(operationStatus, content);
         }
 
-        operationStatus = Save(content, userKey);
+        operationStatus = await Save(content, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
             ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content)
             : Attempt.FailWithStatus(operationStatus, content);
@@ -81,14 +80,26 @@ internal sealed class ContentEditingService
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid id, Guid userKey)
     {
-        var currentUserId = await _userIdKeyResolver.GetAsync(id) ?? Constants.Security.SuperUserId;
+        var currentUserId = await GetUserIdAsync(userKey);
         return await HandleDeletionAsync(id, content => ContentService.MoveToRecycleBin(content, currentUserId), false);
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid id, Guid userKey)
     {
-        var currentUserId = await _userIdKeyResolver.GetAsync(id) ?? Constants.Security.SuperUserId;
+        var currentUserId = await GetUserIdAsync(userKey);
         return await HandleDeletionAsync(id, content => ContentService.Delete(content, currentUserId), false);
+    }
+
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid id, Guid? parentId, Guid userKey)
+    {
+        var currentUserId = await GetUserIdAsync(userKey);
+        return await HandleMoveAsync(id, parentId, (content, newParentId) => ContentService.Move(content, newParentId, currentUserId));
+    }
+
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid id, Guid? parentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    {
+        var currentUserId = await GetUserIdAsync(userKey);
+        return await HandleCopyAsync(id, parentId, (content, newParentId) => ContentService.Copy(content, newParentId, relateToOriginal, includeDescendants, currentUserId));
     }
 
     protected override IContent Create(string? name, int parentId, IContentType contentType) => new Content(name, parentId, contentType);
@@ -118,11 +129,11 @@ internal sealed class ContentEditingService
         return ContentEditingOperationStatus.Success;
     }
 
-    private ContentEditingOperationStatus Save(IContent content, Guid userKey)
+    private async Task<ContentEditingOperationStatus> Save(IContent content, Guid userKey)
     {
         try
         {
-            var currentUserId = _userIdKeyResolver.GetAsync(userKey).GetAwaiter().GetResult() ?? Constants.Security.SuperUserId;
+            var currentUserId = await GetUserIdAsync(userKey);
             OperationResult saveResult = ContentService.Save(content, currentUserId);
             return saveResult.Result switch
             {
@@ -140,4 +151,6 @@ internal sealed class ContentEditingService
             return ContentEditingOperationStatus.Unknown;
         }
     }
+
+    private async Task<int> GetUserIdAsync(Guid userKey) => await _userIdKeyResolver.GetAsync(userKey);
 }

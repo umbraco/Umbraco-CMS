@@ -2430,21 +2430,20 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content">The <see cref="IContent" /> to move</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
     /// <param name="userId">Optional Id of the User moving the Content</param>
-    public void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+    public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
     {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
         if(content.ParentId == parentId)
         {
-            return;
+            return OperationResult.Succeed(eventMessages);
         }
 
         // if moving to the recycle bin then use the proper method
         if (parentId == Constants.System.RecycleBinContent)
         {
-            MoveToRecycleBin(content, userId);
-            return;
+            return MoveToRecycleBin(content, userId);
         }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
 
         var moves = new List<(IContent, string)>();
 
@@ -2465,7 +2464,7 @@ public class ContentService : RepositoryService, IContentService
             if (scope.Notifications.PublishCancelable(movingNotification))
             {
                 scope.Complete();
-                return; // causes rollback
+                return OperationResult.Cancel(eventMessages); // causes rollback
             }
 
             // if content was trashed, and since we're not moving to the recycle bin,
@@ -2500,6 +2499,7 @@ public class ContentService : RepositoryService, IContentService
             Audit(AuditType.Move, userId, content.Id);
 
             scope.Complete();
+            return OperationResult.Succeed(eventMessages);
         }
     }
 
@@ -2952,7 +2952,7 @@ public class ContentService : RepositoryService, IContentService
         {
             scope.Notifications.Publish(new ContentPublishedNotification(published, eventMessages));
         }
-        
+
         return OperationResult.Succeed(eventMessages);
     }
 

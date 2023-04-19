@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0001</DiagnosticId>
@@ -870,6 +871,27 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Persistence.Repositories.IDataTypeUsageRepository.HasSavedValuesAsync(System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Persistence.Repositories.IPropertyTypeUsageRepository.ContentTypeExistAsync(System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Persistence.Repositories.IPropertyTypeUsageRepository.HasSavedPropertyValuesAsync(System.Guid,System.String)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Persistence.Repositories.ITrackedReferencesRepository.GetPagedDescendantsInReferences(System.Guid,System.Int64,System.Int64,System.Boolean,System.Int64@)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -1038,6 +1060,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IDataTypeUsageService.HasSavedValuesAsync(System.Guid)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IDomainService.GetAllAsync(System.Boolean)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
@@ -1172,6 +1201,13 @@
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Services.IPackagingService.UpdateCreatedPackageAsync(Umbraco.Cms.Core.Packaging.PackageDefinition,System.Int32)</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Services.IPropertyTypeUsageService.HasSavedPropertyValuesAsync(System.Guid,System.String)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
