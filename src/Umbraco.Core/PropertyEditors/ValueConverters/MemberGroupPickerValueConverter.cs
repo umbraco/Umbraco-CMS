@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
+public class MemberGroupPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IMemberGroupService _memberGroupService;
 
@@ -31,11 +31,11 @@ public class MemberGroupPickerValueConverter : PropertyValueConverterBase, ICont
 
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString() ?? string.Empty;
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string[]);
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string[]);
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var memberGroupIds = inter?
             .ToString()?

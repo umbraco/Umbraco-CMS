@@ -3,13 +3,13 @@
 
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -18,7 +18,7 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockListConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>, IContentApiPropertyValueConverter
+public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>, IDeliveryApiPropertyValueConverter
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IProfilingLogger _proflog;
@@ -109,14 +109,14 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     }
 
     /// <inheritdoc />
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
     /// <inheritdoc />
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IEnumerable<ApiBlockListModel>);
 
     /// <inheritdoc />
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         BlockListModel? model = ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
 

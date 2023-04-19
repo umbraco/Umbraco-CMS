@@ -86,8 +86,8 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
     private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
         => GetCacheLevels(PropertyType.CacheLevel, out cacheLevel, out referenceCacheLevel);
 
-    private void GetContentApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
-        => GetCacheLevels(PropertyType.ContentApiCacheLevel, out cacheLevel, out referenceCacheLevel);
+    private void GetDeliveryApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
+        => GetCacheLevels(PropertyType.DeliveryApiCacheLevel, out cacheLevel, out referenceCacheLevel);
 
     private void GetCacheLevels(PropertyCacheLevel propertyTypeCacheLevel, out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
     {
@@ -220,41 +220,41 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
-    public override object? GetContentApiValue(bool expanding, string? culture = null, string? segment = null)
+    public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        GetContentApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
+        GetDeliveryApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
 
         lock (_locko)
         {
             CacheValues cacheValues = GetCacheValues(cacheLevel);
 
-            object? GetContentApiObject() => PropertyType.ConvertInterToContentApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
             return expanding
-                ? GetContentApiExpandedObject(cacheValues, GetContentApiObject)
-                : GetContentApiDefaultObject(cacheValues, GetContentApiObject);
+                ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
+                : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
         }
     }
 
-    private object? GetContentApiDefaultObject(CacheValues cacheValues, Func<object?> getValue)
+    private object? GetDeliveryApiDefaultObject(CacheValues cacheValues, Func<object?> getValue)
     {
-        if (cacheValues.ContentApiDefaultObjectInitialized == false)
+        if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
         {
-            cacheValues.ContentApiDefaultObjectValue = getValue();
-            cacheValues.ContentApiDefaultObjectInitialized = true;
+            cacheValues.DeliveryApiDefaultObjectValue = getValue();
+            cacheValues.DeliveryApiDefaultObjectInitialized = true;
         }
 
-        return cacheValues.ContentApiDefaultObjectValue;
+        return cacheValues.DeliveryApiDefaultObjectValue;
     }
 
-    private object? GetContentApiExpandedObject(CacheValues cacheValues, Func<object?> getValue)
+    private object? GetDeliveryApiExpandedObject(CacheValues cacheValues, Func<object?> getValue)
     {
-        if (cacheValues.ContentApiExpandedObjectInitialized == false)
+        if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
         {
-            cacheValues.ContentApiExpandedObjectValue = getValue();
-            cacheValues.ContentApiExpandedObjectInitialized = true;
+            cacheValues.DeliveryApiExpandedObjectValue = getValue();
+            cacheValues.DeliveryApiExpandedObjectInitialized = true;
         }
 
-        return cacheValues.ContentApiExpandedObjectValue;
+        return cacheValues.DeliveryApiExpandedObjectValue;
     }
 
     protected class CacheValues
@@ -263,9 +263,9 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         public object? ObjectValue;
         public bool XPathInitialized;
         public object? XPathValue;
-        public bool ContentApiDefaultObjectInitialized;
-        public object? ContentApiDefaultObjectValue;
-        public bool ContentApiExpandedObjectInitialized;
-        public object? ContentApiExpandedObjectValue;
+        public bool DeliveryApiDefaultObjectInitialized;
+        public object? DeliveryApiDefaultObjectValue;
+        public bool DeliveryApiExpandedObjectInitialized;
+        public object? DeliveryApiExpandedObjectValue;
     }
 }

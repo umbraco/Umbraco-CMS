@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -38,7 +38,7 @@ public class NestedContentTests
         PropertyEditorCollection editors = null;
         var editor = new NestedContentPropertyEditor(
             Mock.Of<IDataValueEditorFactory>(),
-            Mock.Of<IIOHelper>(), 
+            Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<INestedContentPropertyIndexValueFactory>());
         editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
@@ -279,7 +279,7 @@ public class NestedContentTests
         public override object GetXPathValue(string culture = null, string? segment = null) =>
             throw new InvalidOperationException("This method won't be implemented.");
 
-        public override object GetContentApiValue(bool expanding, string culture = null, string segment = null) =>
-            PropertyType.ConvertInterToContentApiObject(_owner, ReferenceCacheLevel, InterValue, _preview);
+        public override object GetDeliveryApiValue(bool expanding, string culture = null, string segment = null) =>
+            PropertyType.ConvertInterToDeliveryApiObject(_owner, ReferenceCacheLevel, InterValue, _preview);
     }
 }

@@ -1,9 +1,9 @@
 using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// </summary>
 [DefaultPropertyValueConverter]
 [Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
-public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
+public class MediaPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     // hard-coding "image" here but that's how it works at UI level too
     private const string ImageTypeAlias = "image";
@@ -122,11 +122,11 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IContentApi
         return source;
     }
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMedia>);
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMedia>);
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 

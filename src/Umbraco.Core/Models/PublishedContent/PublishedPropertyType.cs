@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
 {
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         private volatile bool _initialized;
         private IPropertyValueConverter? _converter;
         private PropertyCacheLevel _cacheLevel;
-        private PropertyCacheLevel _contentApiCacheLevel;
+        private PropertyCacheLevel _deliveryApiCacheLevel;
 
         private Type? _modelClrType;
         private Type? _clrType;
@@ -192,8 +192,8 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             }
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
-            _contentApiCacheLevel = _converter is IContentApiPropertyValueConverter contentApiConverter
-                ? contentApiConverter.GetPropertyContentApiCacheLevel(this)
+            _deliveryApiCacheLevel = _converter is IDeliveryApiPropertyValueConverter deliveryApiPropertyValueConverter
+                ? deliveryApiPropertyValueConverter.GetDeliveryApiPropertyCacheLevel(this)
                 : _cacheLevel;
             _modelClrType = _converter?.GetPropertyValueType(this) ?? typeof(object);
         }
@@ -231,7 +231,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public PropertyCacheLevel ContentApiCacheLevel
+        public PropertyCacheLevel DeliveryApiCacheLevel
         {
             get
             {
@@ -240,7 +240,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                     Initialize();
                 }
 
-                return _contentApiCacheLevel;
+                return _deliveryApiCacheLevel;
             }
         }
 
@@ -301,7 +301,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object? ConvertInterToContentApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        public object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (!_initialized)
             {
@@ -310,8 +310,8 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             // use the converter if any, else just return the inter value
             return _converter != null
-                ? _converter is IContentApiPropertyValueConverter contentApiConverter
-                    ? contentApiConverter.ConvertIntermediateToContentApiObject(owner, this, referenceCacheLevel, inter, preview)
+                ? _converter is IDeliveryApiPropertyValueConverter deliveryApiPropertyValueConverter
+                    ? deliveryApiPropertyValueConverter.ConvertIntermediateToDeliveryApiObject(owner, this, referenceCacheLevel, inter, preview)
                     : _converter.ConvertIntermediateToObject(owner, this, referenceCacheLevel, inter, preview)
                 : inter;
         }

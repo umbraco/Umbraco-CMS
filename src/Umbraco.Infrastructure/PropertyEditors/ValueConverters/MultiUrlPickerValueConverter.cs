@@ -2,12 +2,12 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
@@ -17,7 +17,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
+public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IProfilingLogger _proflog;
@@ -150,11 +150,11 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IContent
         }
     }
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiLink>);
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiLink>);
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         IEnumerable<ApiLink> DefaultValue() => Array.Empty<ApiLink>();
 

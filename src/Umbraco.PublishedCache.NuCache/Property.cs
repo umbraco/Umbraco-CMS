@@ -310,47 +310,47 @@ internal class Property : PublishedPropertyBase
         }
     }
 
-    public override object? GetContentApiValue(bool expanding, string? culture = null, string? segment = null)
+    public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
         object? value;
         lock (_locko)
         {
-            CacheValue cacheValues = GetCacheValues(PropertyType.ContentApiCacheLevel).For(culture, segment);
+            CacheValue cacheValues = GetCacheValues(PropertyType.DeliveryApiCacheLevel).For(culture, segment);
 
             // initial reference cache level always is .Content
             const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
 
-            object? GetContentApiObject() => PropertyType.ConvertInterToContentApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
             value = expanding
-                ? GetContentApiExpandedObject(cacheValues, GetContentApiObject)
-                : GetContentApiDefaultObject(cacheValues, GetContentApiObject);
+                ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
+                : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
         }
 
         return value;
     }
 
-    private object? GetContentApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
+    private object? GetDeliveryApiDefaultObject(CacheValue cacheValues, Func<object?> getValue)
     {
-        if (cacheValues.ContentApiDefaultObjectInitialized == false)
+        if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
         {
-            cacheValues.ContentApiDefaultObjectValue = getValue();
-            cacheValues.ContentApiDefaultObjectInitialized = true;
+            cacheValues.DeliveryApiDefaultObjectValue = getValue();
+            cacheValues.DeliveryApiDefaultObjectInitialized = true;
         }
 
-        return cacheValues.ContentApiDefaultObjectValue;
+        return cacheValues.DeliveryApiDefaultObjectValue;
     }
 
-    private object? GetContentApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
+    private object? GetDeliveryApiExpandedObject(CacheValue cacheValues, Func<object?> getValue)
     {
-        if (cacheValues.ContentApiExpandedObjectInitialized == false)
+        if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
         {
-            cacheValues.ContentApiExpandedObjectValue = getValue();
-            cacheValues.ContentApiExpandedObjectInitialized = true;
+            cacheValues.DeliveryApiExpandedObjectValue = getValue();
+            cacheValues.DeliveryApiExpandedObjectInitialized = true;
         }
 
-        return cacheValues.ContentApiExpandedObjectValue;
+        return cacheValues.DeliveryApiExpandedObjectValue;
     }
 
     #region Classes
@@ -365,13 +365,13 @@ internal class Property : PublishedPropertyBase
 
         public object? XPathValue { get; set; }
 
-        public bool ContentApiDefaultObjectInitialized { get; set; }
+        public bool DeliveryApiDefaultObjectInitialized { get; set; }
 
-        public object? ContentApiDefaultObjectValue { get; set; }
+        public object? DeliveryApiDefaultObjectValue { get; set; }
 
-        public bool ContentApiExpandedObjectInitialized { get; set; }
+        public bool DeliveryApiExpandedObjectInitialized { get; set; }
 
-        public object? ContentApiExpandedObjectValue { get; set; }
+        public object? DeliveryApiExpandedObjectValue { get; set; }
     }
 
     private class CacheValues : CacheValue

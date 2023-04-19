@@ -158,7 +158,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSh
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{05878304-40EB-4F84-B40B-91BDB70DE094}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Content", "src\Umbraco.Cms.Api.Content\Umbraco.Cms.Api.Content.csproj", "{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Delivery", "src\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj", "{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Common", "src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj", "{D48B5D6B-82FF-4235-986C-CDE646F41DEC}"
 EndProject
 Global

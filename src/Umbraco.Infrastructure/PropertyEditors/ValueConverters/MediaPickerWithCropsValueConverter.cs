@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
+public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -120,11 +120,11 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IC
         return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
     }
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMediaWithCrops>);
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMediaWithCrops>);
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 

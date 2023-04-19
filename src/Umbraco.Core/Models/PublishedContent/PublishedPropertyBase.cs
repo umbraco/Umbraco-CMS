@@ -20,7 +20,7 @@ public abstract class PublishedPropertyBase : IPublishedProperty
 
         ValidateCacheLevel(ReferenceCacheLevel, true);
         ValidateCacheLevel(PropertyType.CacheLevel, false);
-        ValidateCacheLevel(PropertyType.ContentApiCacheLevel, false);
+        ValidateCacheLevel(PropertyType.DeliveryApiCacheLevel, false);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public abstract class PublishedPropertyBase : IPublishedProperty
     public abstract object? GetXPathValue(string? culture = null, string? segment = null);
 
     /// <inheritdoc />
-    public abstract object? GetContentApiValue(bool expanding, string? culture = null, string? segment = null);
+    public abstract object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null);
 
     // validates the cache level
     private static void ValidateCacheLevel(PropertyCacheLevel cacheLevel, bool validateUnknown)
