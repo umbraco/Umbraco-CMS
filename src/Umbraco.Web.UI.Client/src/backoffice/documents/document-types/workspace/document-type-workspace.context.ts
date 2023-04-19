@@ -114,6 +114,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// Document type specific:
 	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
+		console.log('setAllowedTemplateIds', allowedTemplateIds);
 		this.structure.updateRootDocumentType({ allowedTemplateIds });
 	}
 	setDefaultTemplateId(defaultTemplateId: string) {

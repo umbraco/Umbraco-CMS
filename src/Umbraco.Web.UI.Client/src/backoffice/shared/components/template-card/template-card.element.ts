@@ -9,10 +9,9 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @slot actions
  * @fires open
  * @fires selected
- *
- *
  */
-
+// TODO: This should extends the UUICardElement, and the visual look of this should be like the UserCard or similarly.
+// TOOD: Consider if this should be select in the 'persisted'-select style when it is selected as a default. (But its should not use the runtime-selection style)
 @customElement('umb-template-card')
 export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String })
@@ -39,12 +38,12 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 		e.preventDefault();
 		e.stopPropagation();
 		//this.selected = true;
-		this.dispatchEvent(new CustomEvent('change-default', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change', { bubbles: false, composed: true }));
 	}
 	#openTemplate(e: KeyboardEvent) {
 		e.preventDefault();
 		e.stopPropagation();
-		this.dispatchEvent(new CustomEvent('open', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('open', { bubbles: false, composed: true }));
 	}
 
 	render() {
@@ -54,7 +53,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
 			</button>
 			<uui-button id="bottom" label="Default template" ?disabled="${this.default}" @click="${this.#setSelection}">
-				${this.default ? '(Default template)' : 'Set default'}
+				${this.default ? '(Default template)' : 'Make default'}
 			</uui-button>
 			<slot name="actions"></slot>
 		</div>`;
@@ -86,14 +85,6 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				border: 1px solid var(--uui-color-divider-emphasis);
 				background-color: var(--uui-color-background);
 				padding: var(--uui-size-4);
-			}
-
-			:host([default]) #card {
-				border: 1px solid var(--uui-color-selected);
-				outline: 1px solid var(--uui-color-selected);
-			}
-			#card:has(uui-button:hover) {
-				border: 1px solid var(--uui-color-selected);
 			}
 
 			#bottom {

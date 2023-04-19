@@ -1,12 +1,63 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
+import type { UmbInputTemplateElement } from '../../../../../../backoffice/shared/components/input-template/input-template.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-type-workspace-view-templates')
 export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement {
+	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
+
+	@state()
+	private _defaultTemplateId?: string | null;
+
+	@state()
+	private _allowedTemplateIds?: Array<string>;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (documentTypeContext) => {
+			this.#workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
+			this._observeDocumentType();
+		});
+	}
+
+	private _observeDocumentType() {
+		if (!this.#workspaceContext) return;
+		this.observe(
+			this.#workspaceContext.defaultTemplateId,
+			(defaultTemplateId) => (this._defaultTemplateId = defaultTemplateId)
+		);
+		this.observe(this.#workspaceContext.allowedTemplateIds, (allowedTemplateIds) => {
+			console.log('allowedTemplateIds', allowedTemplateIds);
+			this._allowedTemplateIds = allowedTemplateIds;
+		});
+	}
+
+	#templateInputChange(e: CustomEvent) {
+		console.log('change', e);
+		// save new allowed ids
+		const input = e.target as UmbInputTemplateElement;
+		this.#workspaceContext?.setAllowedTemplateIds(input.selectedIds);
+		this.#workspaceContext?.setDefaultTemplateId(input.defaultId);
+	}
+
+	render() {
+		return html`<uui-box headline="Templates">
+			<umb-workspace-property-layout alias="Templates" label="Allowed Templates">
+				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
+				<div id="templates" slot="editor">
+					<umb-input-template
+						.defaultId=${this._defaultTemplateId}
+						.selectedIds=${this._allowedTemplateIds}
+						@change=${this.#templateInputChange}></umb-input-template>
+				</div>
+			</umb-workspace-property-layout>
+		</uui-box>`;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -34,45 +85,6 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 			}
 		`,
 	];
-
-	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (documentTypeContext) => {
-			this._workspaceContext = documentTypeContext as UmbDocumentTypeWorkspaceContext;
-			this._observeDocumentType();
-		});
-	}
-
-	private _observeDocumentType() {
-		if (!this._workspaceContext) return;
-	}
-
-	async #changeDefaultId(e: CustomEvent) {
-		// save new default id
-		console.log('workspace: default template id', e);
-	}
-
-	#changeAllowedKeys(e: CustomEvent) {
-		// save new allowed ids
-		console.log('workspace: allowed templates changed', e);
-	}
-
-	render() {
-		return html`<uui-box headline="Templates">
-			<umb-workspace-property-layout alias="Templates" label="Allowed Templates">
-				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
-				<div id="templates" slot="editor">
-					<umb-input-template-picker
-						.defaultKey="${/*this._documentType?.defaultTemplateId ??*/ ''}"
-						.allowedKeys="${/*this._documentType?.allowedTemplateIds ??*/ []}"
-						@change-default="${this.#changeDefaultId}"
-						@change-allowed="${this.#changeAllowedKeys}"></umb-input-template-picker>
-				</div>
-			</umb-workspace-property-layout>
-		</uui-box>`;
-	}
 }
 
 export default UmbDocumentTypeWorkspaceViewTemplatesElement;
