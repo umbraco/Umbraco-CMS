@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -27,6 +28,7 @@ public class CreatePartialViewController : PartialViewControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(CreatePartialViewRequestModel createRequestModel)
     {
         PartialViewCreateModel createModel = _umbracoMapper.Map<PartialViewCreateModel>(createRequestModel)!;

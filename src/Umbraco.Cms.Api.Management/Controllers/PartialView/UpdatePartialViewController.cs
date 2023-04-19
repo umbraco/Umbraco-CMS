@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -27,6 +28,7 @@ public class UpdatePartialViewController : PartialViewControllerBase
 
     [HttpPut]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(UpdatePartialViewRequestModel updateViewModel)
     {
         PartialViewUpdateModel updateModel = _mapper.Map<PartialViewUpdateModel>(updateViewModel)!;

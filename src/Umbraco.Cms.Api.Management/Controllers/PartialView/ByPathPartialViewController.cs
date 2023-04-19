@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -21,6 +22,7 @@ public class ByPathPartialViewController : PartialViewControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(PartialViewResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByPath(string path)
     {
         IPartialView? partialView = await _partialViewService.GetAsync(path);
