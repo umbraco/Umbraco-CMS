@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.New.Cms.Core.Models;
 
-namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
+namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
 public class GetAllUserGroupController : UserGroupControllerBase
 {

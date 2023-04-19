@@ -4,7 +4,7 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
+namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
 // TODO: This needs to be an authorized controller.
 

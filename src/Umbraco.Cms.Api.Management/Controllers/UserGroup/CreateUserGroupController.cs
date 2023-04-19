@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
+namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
 public class CreateUserGroupController : UserGroupControllerBase
 {

@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Api.Management.Controllers.UserGroups;
+namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
 
 public class ByKeyUserGroupController : UserGroupControllerBase
