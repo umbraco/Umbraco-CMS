@@ -11,10 +11,11 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	// TODO: notice this format is not acceptable:
 	@state()
-	private _icon = {
-		color: '#000000',
-		name: 'umb:document-dashed-line',
-	};
+	private _icon?: string;
+
+	@state()
+	private _iconColorAlias?: string;
+	// TODO:Should be using an alias, and look up in some dictionary/key/value) of project-colors.
 
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
@@ -44,6 +45,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		//this.observe(this.#workspaceContext.data, (data) => (this._documentType = data));
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name));
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias));
+		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon));
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -70,11 +72,14 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL);
+		const modalHandler = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+			icon: this._icon,
+			color: this._iconColorAlias,
+		});
 
 		modalHandler?.onSubmit().then((saved) => {
 			if (saved.icon) this.#workspaceContext?.setIcon(saved.icon);
-			// TODO save color ALIAS as well
+			// TODO: save color ALIAS as well
 		});
 	}
 
@@ -83,7 +88,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-layout alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
-						<uui-icon name="${this._icon.name}" style="color: ${this._icon.color}"></uui-icon>
+						<uui-icon name="${this._icon}" style="color: ${this._iconColorAlias}"></uui-icon>
 					</uui-button>
 
 					<uui-input id="name" .value=${this._name} @input="${this._handleNameInput}">
@@ -93,6 +98,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 				</div>
 
 				<div slot="footer">
+					<!-- TODO: Shortcuts Modal? -->
 					<uui-button label="Show keyboard shortcuts">
 						Keyboard Shortcuts
 						<uui-keyboard-shortcut>
