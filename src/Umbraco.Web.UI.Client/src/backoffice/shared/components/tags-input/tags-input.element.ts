@@ -8,8 +8,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { TagResource, TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-tag-input')
-export class UmbTagInputElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-tags-input')
+export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -398,10 +398,10 @@ export class UmbTagInputElement extends FormControlMixin(UmbLitElement) {
 	}
 }
 
-export default UmbTagInputElement;
+export default UmbTagsInputElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tag-input': UmbTagInputElement;
+		'umb-tags-input': UmbTagsInputElement;
 	}
 }

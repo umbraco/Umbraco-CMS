@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbTagInputElement } from '../../../components/tag-input/tag-input.element';
+import { UmbTagsInputElement } from '../../../components/tags-input/tags-input.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
@@ -30,7 +30,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	}
 
 	private _onChange(event: CustomEvent) {
-		this.value = ((event.target as UmbTagInputElement).value as string).split(',');
+		this.value = ((event.target as UmbTagsInputElement).value as string).split(',');
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
