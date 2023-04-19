@@ -8,7 +8,7 @@ using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
-public abstract class RecycleBinControllerBase<TItem> : Controller
+public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerBase
     where TItem : RecycleBinItemResponseModel, new()
 {
     private readonly IEntityService _entityService;

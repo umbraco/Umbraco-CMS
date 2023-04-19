@@ -1,13 +1,20 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
 
-internal class ReponseHeaderOperationFilter : IOperationFilter
+internal class ResponseHeaderOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        if (context.MethodInfo.HasMapToApiAttribute(ManagementApiConfiguration.ApiName) == false)
+        {
+            return;
+        }
+
         foreach ((var key, OpenApiResponse? value) in operation.Responses)
         {
             switch (int.Parse(key))

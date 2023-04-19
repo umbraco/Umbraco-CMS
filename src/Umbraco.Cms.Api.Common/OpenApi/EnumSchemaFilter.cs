@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Common.OpenApi;
 
 public class EnumSchemaFilter : ISchemaFilter
 {

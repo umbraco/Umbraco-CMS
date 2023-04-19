@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
+using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
@@ -47,20 +48,11 @@ public class ManagementApiComposer : IComposer
             .AddPackages()
             .AddEntitys()
             .AddBackOfficeAuthentication()
-            .AddApiVersioning()
-            .AddSwaggerGen();
+            ;
 
         services
             .ConfigureOptions<ConfigureMvcOptions>()
             .ConfigureOptions<ConfigureApiBehaviorOptions>()
-            .Configure<UmbracoPipelineOptions>(options =>
-            {
-                options.AddFilter(new UmbracoPipelineFilter(
-                    "BackOfficeManagementApiFilter",
-                    applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    applicationBuilder => applicationBuilder.UseSwagger(),
-                    applicationBuilder => applicationBuilder.UseEndpoints()));
-            })
             .AddControllers()
             .AddJsonOptions(_ =>
             {
@@ -69,6 +61,16 @@ public class ManagementApiComposer : IComposer
             .AddJsonOptions(New.Cms.Core.Constants.JsonOptionsNames.BackOffice, _ => { });
 
         services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>( );
+        services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>( );
+
+        services.Configure<UmbracoPipelineOptions>(options =>
+        {
+            options.AddFilter(new UmbracoPipelineFilter(
+                "BackOfficeManagementApiFilter",
+                applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
+                applicationBuilder => { },
+                applicationBuilder => applicationBuilder.UseEndpoints()));
+        });
 
         // FIXME: when this is moved to core, make the AddUmbracoOptions extension private again and remove core InternalsVisibleTo for Umbraco.Cms.Api.Management
         builder.AddUmbracoOptions<NewBackOfficeSettings>();

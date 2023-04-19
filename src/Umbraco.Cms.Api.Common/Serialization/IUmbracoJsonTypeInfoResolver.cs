@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization.Metadata;
 
-namespace Umbraco.Cms.Infrastructure.Serialization;
+namespace Umbraco.Cms.Api.Common.Serialization;
 
 public interface IUmbracoJsonTypeInfoResolver : IJsonTypeInfoResolver
 {

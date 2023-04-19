@@ -2,7 +2,7 @@
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Common.OpenApi;
 
 /// <summary>
 /// This filter explicitly removes all other mime types than application/json from the produced OpenAPI document when application/json is accepted.

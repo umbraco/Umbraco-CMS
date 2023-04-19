@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Umbraco Backoffice API",
+    "title": "Umbraco Management API",
     "description": "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility",
-    "version": "1.0"
+    "version": "Latest"
   },
   "paths": {
     "/umbraco/management/api/v1/audit-log": {

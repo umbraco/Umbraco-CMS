@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Common.Serialization;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Api.Management.Serialization;

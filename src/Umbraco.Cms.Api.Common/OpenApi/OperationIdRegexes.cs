@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Common.OpenApi;
 
 /// <summary>
 /// This is the regexes used to generate the operation IDs, the benefit of this being partial with GeneratedRegex

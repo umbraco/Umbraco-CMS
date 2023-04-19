@@ -35,7 +35,7 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
         var officePath = GlobalSettings.GetBackOfficePath(HostingEnvironment);
 
         var urlToContract = $"{officePath}/management/api/openapi.json";
-        var swaggerPath = $"{officePath}/swagger/v1/swagger.json";
+        var swaggerPath = $"{officePath}/swagger/management/swagger.json";
         var apiContract = JObject.Parse(await Client.GetStringAsync(urlToContract));
 
         var generatedJsonString = await Client.GetStringAsync(swaggerPath);
