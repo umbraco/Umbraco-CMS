@@ -1,12 +1,11 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
+import type { UUIToggleElement } from '@umbraco-ui/uui';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
+import type { UmbInputDocumentTypePickerElement } from '../../../../../../backoffice/shared/components/input-document-type-picker/input-document-type-picker.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { ContentTypeSortModel } from 'libs/backend-api/src';
-import type { UmbInputDocumentTypePickerElement } from 'src/backoffice/shared/components/input-document-type-picker/input-document-type-picker.element';
-import { UUIToggleElement } from '@umbraco-ui/uui';
 
 @customElement('umb-document-type-workspace-view-structure')
 export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement {
@@ -48,9 +47,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 						<uui-toggle
 							label="Allow as root"
 							.checked=${this._allowedAsRoot}
-							@change="${(e: CustomEvent) => {
+							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setAllowedAsRoot((e.target as UUIToggleElement).checked);
-							}}"></uui-toggle>
+							}}></uui-toggle>
 					</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout alias="ChildNodeType" label="Allowed child node types">
