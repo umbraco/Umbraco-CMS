@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
+using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.New.Cms.Core.Models;

@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Item;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.UserGroups.Item;
+namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup.Item;
 
 public class UserGroupItemResponseModel : ItemResponseModelBase
 {
