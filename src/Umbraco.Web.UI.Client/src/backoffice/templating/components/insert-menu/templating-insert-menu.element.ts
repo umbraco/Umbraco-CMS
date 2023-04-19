@@ -1,13 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../insert-sidebar/manifest';
 import {
-	UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_MODAL,
-	UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL,
-} from '../insert-sidebar/insert-choose-type-sidebar.element';
+	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_PARTIAL_VIEW_PICKER_MODAL,
+	UmbModalContext,
+	UmbModalToken,
+} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL } from '../../modals/insert-choose-type-sidebar.element';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
@@ -76,7 +78,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#openInsertPartialViewSidebar() {
-		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_PARTIAL_VIEW_SIDEBAR_MODAL);
+		this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
 	}
 
 	@property()
