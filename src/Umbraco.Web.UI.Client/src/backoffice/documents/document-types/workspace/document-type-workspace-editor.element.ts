@@ -9,7 +9,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
-	// TODO: notice this format is not acceptable:
 	@state()
 	private _icon?: string;
 
