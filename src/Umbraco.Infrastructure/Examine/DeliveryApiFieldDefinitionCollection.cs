@@ -2,9 +2,9 @@ using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class ContentApiFieldDefinitionCollection : FieldDefinitionCollection
+public class DeliveryApiFieldDefinitionCollection : FieldDefinitionCollection
 {
-    public static readonly FieldDefinition[] ContentDeliveryAPIIndexFieldDefinitions =
+    public static readonly FieldDefinition[] DeliveryApiIndexFieldDefinitions =
     {
         new("id", FieldDefinitionTypes.FullText),
         new("parentKey", FieldDefinitionTypes.FullText),
@@ -15,8 +15,8 @@ public class ContentApiFieldDefinitionCollection : FieldDefinitionCollection
         new("sortOrder", FieldDefinitionTypes.Integer)
     };
 
-    public ContentApiFieldDefinitionCollection()
-        : base(ContentDeliveryAPIIndexFieldDefinitions)
+    public DeliveryApiFieldDefinitionCollection()
+        : base(DeliveryApiIndexFieldDefinitions)
     {
     }
 }

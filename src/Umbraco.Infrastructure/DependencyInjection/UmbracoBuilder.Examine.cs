@@ -25,7 +25,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, ContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, ContentApiIndexPopulator>();
+        builder.Services.AddSingleton<IIndexPopulator, DeliveryApiIndexPopulator>();
 
         builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
@@ -49,7 +49,7 @@ public static partial class UmbracoBuilderExtensions
                 false));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-        builder.Services.AddSingleton<IContentApiValueSetBuilder, ContentApiValueSetBuilder>();
+        builder.Services.AddSingleton<IDeliveryApiValueSetBuilder, DeliveryApiValueSetBuilder>();
         builder.Services.AddSingleton<ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();

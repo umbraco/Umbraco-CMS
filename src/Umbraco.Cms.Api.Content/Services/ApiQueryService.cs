@@ -35,7 +35,7 @@ internal sealed class ApiQueryService : IApiQueryService // Examine-specific imp
     {
         var emptyResult = new PagedModel<Guid>();
 
-        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.ContentApiIndexName, out IIndex? apiIndex))
+        if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiIndexName, out IIndex? apiIndex))
         {
             return emptyResult;
         }

@@ -6,11 +6,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class ContentApiValueSetBuilder : IContentApiValueSetBuilder
+public class DeliveryApiValueSetBuilder : IDeliveryApiValueSetBuilder
 {
     private readonly IEntityService _entityService;
 
-    public ContentApiValueSetBuilder(IEntityService entityService)
+    public DeliveryApiValueSetBuilder(IEntityService entityService)
         => _entityService = entityService;
 
     /// <inheritdoc />
