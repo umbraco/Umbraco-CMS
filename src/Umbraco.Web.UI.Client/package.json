@@ -60,8 +60,8 @@
 		"npm": ">=9.5 < 10"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.2.0-rc.2",
-		"@umbraco-ui/uui-css": "^1.2.0-rc.2",
+		"@umbraco-ui/uui": "^1.2.0-rc.3",
+		"@umbraco-ui/uui-css": "^1.2.0-rc.3",
 		"element-internals-polyfill": "^1.1.19",
 		"lit": "^2.7.0",
 		"lodash-es": "4.17.21",
