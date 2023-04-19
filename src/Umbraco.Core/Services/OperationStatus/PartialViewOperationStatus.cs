@@ -9,4 +9,5 @@ public enum PartialViewOperationStatus
     InvalidFileExtension,
     PathTooLong,
     CancelledByNotification,
+    NotFound
 }
