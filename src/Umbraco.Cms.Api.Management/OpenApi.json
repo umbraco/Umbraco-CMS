@@ -5762,12 +5762,27 @@
             "description": "Success"
           }
         }
-      },
+      }
+    },
+    "/umbraco/management/api/v1/security/back-office/login": {
       "post": {
         "tags": [
           "Security"
         ],
-        "operationId": "PostSecurityBackOfficeAuthorize",
+        "operationId": "PostSecurityBackOfficeLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success"
@@ -9736,6 +9751,18 @@
           },
           "level": {
             "$ref": "#/components/schemas/LogLevelModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LoginRequestModel": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
           }
         },
         "additionalProperties": false
