@@ -10,13 +10,13 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.ContentApi;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.Macros;
-using Umbraco.Cms.Infrastructure.Models.ContentApi;
+using Umbraco.Cms.Infrastructure.Models.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IContentApiPropertyValueConverter
+public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
@@ -34,7 +34,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, ICon
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly HtmlUrlParser _urlParser;
     private readonly IApiRichTextParser _apiRichTextParser;
-    private ContentApiSettings _contentApiSettings;
+    private DeliveryApiSettings _deliveryApiSettings;
 
     [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
     public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
@@ -46,12 +46,12 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, ICon
             urlParser,
             imageSourceParser,
             StaticServiceProvider.Instance.GetRequiredService<IApiRichTextParser>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentApiSettings>>())
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<DeliveryApiSettings>>())
     {
     }
 
     public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
-        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser, IApiRichTextParser apiRichTextParser, IOptionsMonitor<ContentApiSettings> contentApiSettingsMonitor)
+        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser, IApiRichTextParser apiRichTextParser, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
         _macroRenderer = macroRenderer;
@@ -59,8 +59,8 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, ICon
         _urlParser = urlParser;
         _imageSourceParser = imageSourceParser;
         _apiRichTextParser = apiRichTextParser;
-        _contentApiSettings = contentApiSettingsMonitor.CurrentValue;
-        contentApiSettingsMonitor.OnChange(settings => _contentApiSettings = settings);
+        _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
+        deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
@@ -77,16 +77,16 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, ICon
         return new HtmlEncodedString(converted ?? string.Empty);
     }
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
-        => _contentApiSettings.RichTextOutputAsJson
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
+        => _deliveryApiSettings.RichTextOutputAsJson
             ? typeof(RichTextElement)
             : typeof(string);
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        if (_contentApiSettings.RichTextOutputAsJson is false)
+        if (_deliveryApiSettings.RichTextOutputAsJson is false)
         {
             return Convert(inter, preview) ?? string.Empty;
         }

@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
-public class ByRouteContentApiController : ContentApiControllerBase
+public class ByRouteContentApiController : DeliveryApiControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestRedirectService _requestRedirectService;

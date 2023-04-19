@@ -1,7 +1,7 @@
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Editors;

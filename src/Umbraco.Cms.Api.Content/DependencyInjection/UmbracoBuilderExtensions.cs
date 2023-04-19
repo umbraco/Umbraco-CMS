@@ -8,7 +8,7 @@ using Umbraco.Cms.Api.Content.Json;
 using Umbraco.Cms.Api.Content.Rendering;
 using Umbraco.Cms.Api.Content.Services;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Extensions;
@@ -37,11 +37,11 @@ public static class UmbracoBuilderExtensions
             .Services
             .ConfigureOptions<ConfigureMvcOptions>()
             .AddControllers()
-            .AddJsonOptions(Constants.JsonOptionsNames.ContentApi, options =>
+            .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
             {
                 // all content API specific JSON options go here
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.TypeInfoResolver = new ContentApiJsonTypeResolver();
+                options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 

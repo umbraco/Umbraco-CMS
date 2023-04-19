@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Content.Querying.Selectors;

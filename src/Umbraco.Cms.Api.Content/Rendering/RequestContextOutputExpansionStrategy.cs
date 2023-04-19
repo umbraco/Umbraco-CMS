@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -27,7 +27,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
     public IDictionary<string, object?> MapProperties(IEnumerable<IPublishedProperty> properties)
         => properties.ToDictionary(
             p => p.Alias,
-            p => p.GetContentApiValue(_state == ExpansionState.Expanding));
+            p => p.GetDeliveryApiValue(_state == ExpansionState.Expanding));
 
     public IDictionary<string, object?> MapContentProperties(IPublishedContent content)
     {
@@ -47,7 +47,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
                         _state = ExpansionState.Expanding;
                     }
 
-                    var value = property.GetContentApiValue(_state == ExpansionState.Expanding);
+                    var value = property.GetDeliveryApiValue(_state == ExpansionState.Expanding);
 
                     // always revert to pending after rendering the property value
                     _state = ExpansionState.Pending;
@@ -65,7 +65,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
             _state = ExpansionState.Expanded;
             var rendered = content.Properties.ToDictionary(
                 property => property.Alias,
-                property => property.GetContentApiValue(false));
+                property => property.GetDeliveryApiValue(false));
             _state = ExpansionState.Expanding;
             return rendered;
         }

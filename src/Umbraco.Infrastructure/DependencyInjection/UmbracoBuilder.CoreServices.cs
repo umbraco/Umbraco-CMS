@@ -7,8 +7,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.ContentApi.Accessors;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DeliveryApi.Accessors;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -38,7 +38,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.ContentApi;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
@@ -58,6 +58,7 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
+using ApiRichTextParser = Umbraco.Cms.Infrastructure.DeliveryApi.ApiRichTextParser;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -224,7 +225,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.AddPropertyIndexValueFactories();
 
-        builder.AddContentApiCoreServices();
+        builder.AddDeliveryApiCoreServices();
 
         return builder;
     }
@@ -417,7 +418,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddContentApiCoreServices(this IUmbracoBuilder builder)
+    private static IUmbracoBuilder AddDeliveryApiCoreServices(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
         builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();

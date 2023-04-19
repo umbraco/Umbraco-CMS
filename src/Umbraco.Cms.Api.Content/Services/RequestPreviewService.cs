@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Content.Services;
 

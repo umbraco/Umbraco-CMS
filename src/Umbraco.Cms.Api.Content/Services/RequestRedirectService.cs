@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;

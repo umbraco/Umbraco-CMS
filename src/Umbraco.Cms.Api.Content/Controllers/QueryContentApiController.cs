@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Content.Controllers;
 
-public class QueryContentApiController : ContentApiControllerBase
+public class QueryContentApiController : DeliveryApiControllerBase
 {
     private readonly IApiQueryService _apiQueryService;
 

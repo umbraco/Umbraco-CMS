@@ -4,6 +4,6 @@ public static partial class Constants
 {
     public static class JsonOptionsNames
     {
-        public const string ContentApi = "ContentApi";
+        public const string DeliveryApi = "DeliveryApi";
     }
 }

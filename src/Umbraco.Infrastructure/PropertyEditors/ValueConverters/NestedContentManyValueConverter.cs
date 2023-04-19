@@ -5,11 +5,11 @@ using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 [Obsolete("Nested content is obsolete, will be removed in V13")]
-public class NestedContentManyValueConverter : NestedContentValueConverterBase
+public class NestedContentManyValueConverter : NestedContentValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IProfilingLogger _proflog;
     private readonly IApiElementBuilder _apiElementBuilder;
@@ -115,11 +115,11 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase
         }
     }
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
         if (converted is not IEnumerable<IPublishedElement> elements)

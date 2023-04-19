@@ -1,30 +1,30 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Content.Services;
 
 internal sealed class ApiAccessService : RequestHeaderHandler, IApiAccessService
 {
-    private ContentApiSettings _contentApiSettings;
+    private DeliveryApiSettings _deliveryApiSettings;
 
-    public ApiAccessService(IHttpContextAccessor httpContextAccessor, IOptionsMonitor<ContentApiSettings> contentApiSettings)
+    public ApiAccessService(IHttpContextAccessor httpContextAccessor, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
         : base(httpContextAccessor)
     {
-        _contentApiSettings = contentApiSettings.CurrentValue;
-        contentApiSettings.OnChange(settings => _contentApiSettings = settings);
+        _deliveryApiSettings = deliveryApiSettings.CurrentValue;
+        deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     /// <inheritdoc />
-    public bool HasPublicAccess() => IfEnabled(() => _contentApiSettings.PublicAccess || HasValidApiKey());
+    public bool HasPublicAccess() => IfEnabled(() => _deliveryApiSettings.PublicAccess || HasValidApiKey());
 
     /// <inheritdoc />
     public bool HasPreviewAccess() => IfEnabled(HasValidApiKey);
 
-    private bool IfEnabled(Func<bool> condition) => _contentApiSettings.Enabled && condition();
+    private bool IfEnabled(Func<bool> condition) => _deliveryApiSettings.Enabled && condition();
 
-    private bool HasValidApiKey() => _contentApiSettings.ApiKey.IsNullOrWhiteSpace() == false
-                                     && _contentApiSettings.ApiKey.Equals(GetHeaderValue("Api-Key"));
+    private bool HasValidApiKey() => _deliveryApiSettings.ApiKey.IsNullOrWhiteSpace() == false
+                                     && _deliveryApiSettings.ApiKey.Equals(GetHeaderValue("Api-Key"));
 }

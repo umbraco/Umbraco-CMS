@@ -1,12 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
@@ -14,7 +14,7 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration>, IContentApiPropertyValueConverter
+    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration>, IDeliveryApiPropertyValueConverter
     {
         private readonly IProfilingLogger _proflog;
         private readonly IJsonSerializer _jsonSerializer;
@@ -39,12 +39,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
 
-        public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
-        public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
+        public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(ApiBlockGridModel);
 
-        public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             const int defaultColumns = 12;
 

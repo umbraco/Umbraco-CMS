@@ -1,7 +1,7 @@
 using Examine;
 using Examine.Search;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Content.Services;

@@ -1,10 +1,10 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The multi node tree picker property editor value converter.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
-public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
+public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {
@@ -181,9 +181,9 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         return source;
     }
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType)
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => GetEntityType(propertyType) switch
         {
             Constants.UdiEntityType.Media => typeof(IEnumerable<IApiMedia>),
@@ -192,7 +192,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, ICo
         };
 
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         IEnumerable<IApiContent> DefaultValue() => Array.Empty<IApiContent>();
 

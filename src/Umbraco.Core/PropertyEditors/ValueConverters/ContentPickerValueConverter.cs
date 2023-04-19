@@ -1,16 +1,16 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.ContentApi;
-using Umbraco.Cms.Core.Models.ContentApi;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ContentApi;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-public class ContentPickerValueConverter : PropertyValueConverterBase, IContentApiPropertyValueConverter
+public class ContentPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {
@@ -96,11 +96,11 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IContentA
         return inter.ToString();
     }
 
-    public PropertyCacheLevel GetPropertyContentApiCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
-    public Type GetContentApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
 
-    public object? ConvertIntermediateToContentApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         IPublishedContent? content = GetContent(propertyType, inter);
         if (content == null)

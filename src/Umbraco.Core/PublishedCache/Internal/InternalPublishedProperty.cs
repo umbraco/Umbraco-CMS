@@ -15,7 +15,7 @@ public class InternalPublishedProperty : IPublishedProperty
 
     public object? SolidXPathValue { get; set; }
 
-    public object? SolidContentApiValue { get; set; }
+    public object? SolidDeliveryApiValue { get; set; }
 
     public IPublishedPropertyType PropertyType { get; set; } = null!;
 
@@ -27,7 +27,7 @@ public class InternalPublishedProperty : IPublishedProperty
 
     public virtual object? GetXPathValue(string? culture = null, string? segment = null) => SolidXPathValue;
 
-    public virtual object? GetContentApiValue(bool expanding, string? culture = null, string? segment = null) => SolidContentApiValue;
+    public virtual object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null) => SolidDeliveryApiValue;
 
     public virtual bool HasValue(string? culture = null, string? segment = null) => SolidHasValue;
 }

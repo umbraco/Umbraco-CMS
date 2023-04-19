@@ -54,7 +54,7 @@ public interface IPublishedPropertyType
     /// <summary>
     ///     Gets the property cache level for content API representation.
     /// </summary>
-    PropertyCacheLevel ContentApiCacheLevel { get; }
+    PropertyCacheLevel DeliveryApiCacheLevel { get; }
 
     /// <summary>
     ///     Gets the property model CLR type.
@@ -123,5 +123,5 @@ public interface IPublishedPropertyType
     /// <param name="inter">The intermediate value.</param>
     /// <param name="preview">A value indicating whether content should be considered draft.</param>
     /// <returns>The object value.</returns>
-    object? ConvertInterToContentApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 }

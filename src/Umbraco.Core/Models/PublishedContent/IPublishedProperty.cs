@@ -79,5 +79,5 @@ public interface IPublishedProperty
     ///     <para>It can be null, or any type of CLR object.</para>
     ///     <para>It has been fully prepared and processed by the appropriate converter.</para>
     /// </remarks>
-    object? GetContentApiValue(bool expanding, string? culture = null, string? segment = null);
+    object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null);
 }
