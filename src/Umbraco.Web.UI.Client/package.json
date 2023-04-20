@@ -51,8 +51,8 @@
 		"storybook:build": "npm run wc-analyze && storybook build",
 		"build-storybook": "npm run wc-analyze && storybook build",
 		"generate:icons": "node ./devops/icons/index.js",
-		"wc-analyze": "wca **/*.element.ts --outFile custom-elements.json",
-		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile vscode-html-custom-data.json",
+		"wc-analyze": "wca **/*.element.ts --outFile dist/libs/custom-elements.json",
+		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist/libs/vscode-html-custom-data.json",
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
 		"check": "npm run lint && npm run compile && npm run build-storybook"

@@ -23,8 +23,6 @@ const outputDir = '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice/libs';
 // Copy package files
 cpSync(`${srcDir}/package.json`, `${inputDir}/package.json`, { recursive: true });
 cpSync(`${srcDir}/README.md`, `${inputDir}/README.md`, { recursive: true });
-cpSync(`${rootDir}/custom-elements.json`, `${inputDir}/custom-elements.json`, { recursive: true });
-cpSync(`${rootDir}/vscode-html-custom-data.json`, `${inputDir}/vscode-html-custom-data.json`, { recursive: true });
 
 const libs = readdirSync(inputDir);
 
