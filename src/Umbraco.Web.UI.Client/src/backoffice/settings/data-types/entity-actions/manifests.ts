@@ -2,6 +2,8 @@ import { DATA_TYPE_ENTITY_TYPE } from '..';
 import { DATA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
 import { manifests as createManifests } from './create/manifests';
 import { manifests as moveManifests } from './move/manifests';
+import { manifests as copyManifests } from './copy/manifests';
+
 import {
 	UmbDeleteEntityAction,
 	UmbDeleteFolderEntityAction,
@@ -57,4 +59,4 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-export const manifests = [...entityActions, ...createManifests, ...moveManifests];
+export const manifests = [...entityActions, ...createManifests, ...moveManifests, ...copyManifests];
