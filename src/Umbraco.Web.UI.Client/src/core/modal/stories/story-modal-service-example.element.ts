@@ -3,8 +3,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
-@customElement('story-modal-context-example')
-export class StoryModalContextExampleElement extends UmbLitElement {
+@customElement('umb-story-modal-context-example')
+export class UmbStoryModalContextExampleElement extends UmbLitElement {
 	@property()
 	modalLayout = 'confirm';
 

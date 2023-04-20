@@ -1,6 +1,6 @@
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -20,7 +20,7 @@ export class UmbDocumentTypeStore extends UmbStoreBase {
 		super(
 			host,
 			UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN.toString(),
-			new ArrayState<DocumentTypeResponseModel>([], (x) => x.id)
+			new UmbArrayState<DocumentTypeResponseModel>([], (x) => x.id)
 		);
 	}
 

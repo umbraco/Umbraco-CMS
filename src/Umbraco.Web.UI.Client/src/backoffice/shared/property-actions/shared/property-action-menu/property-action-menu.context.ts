@@ -1,9 +1,9 @@
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbPropertyActionMenuContext {
-	#isOpen = new DeepState(false);
+	#isOpen = new UmbDeepState(false);
 	public readonly isOpen = this.#isOpen.asObservable();
 
 	constructor(host: UmbControllerHostElement) {

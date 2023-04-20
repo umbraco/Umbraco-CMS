@@ -1,7 +1,7 @@
 import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 // TODO: get rid of this type addition & { ... }:
@@ -16,7 +16,7 @@ export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGro
  * @description - Data Store for User Groups
  */
 export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailStore<UserGroupDetails> {
-	#groups = new ArrayState<UserGroupDetails>([], (x) => x.id);
+	#groups = new UmbArrayState<UserGroupDetails>([], (x) => x.id);
 	public groups = this.#groups.asObservable();
 
 	constructor(host: UmbControllerHostElement) {

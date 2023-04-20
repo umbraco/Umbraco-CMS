@@ -4,7 +4,7 @@ import { UmbContextProviderElement } from './context-provider.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-context-test')
-export class ContextTestElement extends UmbLitElement {
+export class UmbContextTestElement extends UmbLitElement {
 	public value: string | null = null;
 	constructor() {
 		super();
@@ -16,7 +16,7 @@ export class ContextTestElement extends UmbLitElement {
 
 describe('UmbContextProvider', () => {
 	let element: UmbContextProviderElement;
-	let consumer: ContextTestElement;
+	let consumer: UmbContextTestElement;
 	const contextValue = 'test-value';
 
 	beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('UmbContextProvider', () => {
 				<umb-context-test></umb-context-test>
 			</umb-context-provider>`
 		);
-		consumer = element.getElementsByTagName('umb-context-test')[0] as ContextTestElement;
+		consumer = element.getElementsByTagName('umb-context-test')[0] as UmbContextTestElement;
 	});
 
 	it('is defined with its own instance', () => {

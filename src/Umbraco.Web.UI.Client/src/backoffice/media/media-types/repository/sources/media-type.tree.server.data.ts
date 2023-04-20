@@ -6,10 +6,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the MediaType tree that fetches data from the server
  * @export
- * @class MediaTypeTreeServerDataSource
- * @implements {MediaTypeTreeDataSource}
+ * @class UmbMediaTypeTreeServerDataSource
+ * @implements {UmbTreeDataSource}
  */
-export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
+export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -24,7 +24,7 @@ export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof MediaTypeTreeServerDataSource
+	 * @memberof UmbMediaTypeTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, MediaTypeResource.getTreeMediaTypeRoot({}));
@@ -34,7 +34,7 @@ export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof MediaTypeTreeServerDataSource
+	 * @memberof UmbMediaTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
@@ -54,7 +54,7 @@ export class MediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof MediaTypeTreeServerDataSource
+	 * @memberof UmbMediaTypeTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids || ids.length === 0) {

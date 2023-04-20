@@ -3,7 +3,7 @@ import { PropertyContainerTypes } from './workspace-structure-manager.class';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState, BooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbWorkspaceContainerStructureHelper {
 	#host: UmbControllerHostElement;
@@ -20,10 +20,10 @@ export class UmbWorkspaceContainerStructureHelper {
 	private _ownerContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
-	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
+	#containers = new UmbArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
 	readonly containers = this.#containers.asObservable();
 
-	#hasProperties = new BooleanState(false);
+	#hasProperties = new UmbBooleanState(false);
 	readonly hasProperties = this.#hasProperties.asObservable();
 
 	constructor(host: UmbControllerHostElement) {

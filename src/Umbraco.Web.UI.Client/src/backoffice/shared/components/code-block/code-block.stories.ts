@@ -1,15 +1,15 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import './code-block.element';
-import type { UUICodeBlockElement } from './code-block.element';
+import type { UmbCodeBlockElement } from './code-block.element';
 
-const meta: Meta<UUICodeBlockElement> = {
+const meta: Meta<UmbCodeBlockElement> = {
 	title: 'Components/Code Block',
-	component: 'uui-code-block',
+	component: 'umb-code-block',
 };
 
 export default meta;
-type Story = StoryObj<UUICodeBlockElement>;
+type Story = StoryObj<UmbCodeBlockElement>;
 
 export const Overview: Story = {
 	args: {},
@@ -17,5 +17,5 @@ export const Overview: Story = {
 
 export const WithCode: Story = {
 	decorators: [],
-	render: () => html` <uui-code-block> // Lets write some javascript alert("Hello World"); </uui-code-block>`,
+	render: () => html` <umb-code-block> // Lets write some javascript alert("Hello World"); </umb-code-block>`,
 };

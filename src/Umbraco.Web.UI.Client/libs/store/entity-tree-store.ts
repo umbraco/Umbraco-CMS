@@ -1,5 +1,5 @@
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -14,7 +14,7 @@ export class UmbEntityTreeStore
 	implements UmbTreeStore<EntityTreeItemResponseModel>
 {
 	constructor(host: UmbControllerHostElement, storeAlias: string) {
-		super(host, storeAlias, new ArrayState<EntityTreeItemResponseModel>([], (x) => x.id));
+		super(host, storeAlias, new UmbArrayState<EntityTreeItemResponseModel>([], (x) => x.id));
 	}
 
 	/**
