@@ -5,7 +5,7 @@ using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IPartialViewService : IService
+public interface IPartialViewService
 {
     Task<IPartialView?> GetAsync(string path);
 
