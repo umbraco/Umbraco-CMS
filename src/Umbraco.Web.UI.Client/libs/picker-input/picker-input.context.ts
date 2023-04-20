@@ -12,7 +12,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
-export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
+export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
 	modalAlias: string | UmbModalToken;
 	repository?: UmbItemRepository<ItemType>;
