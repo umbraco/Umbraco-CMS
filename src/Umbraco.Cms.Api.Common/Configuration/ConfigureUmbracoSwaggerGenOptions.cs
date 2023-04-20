@@ -104,8 +104,16 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
             .ToCamelCaseRegex()
             .Replace(formattedOperationId, m => m.Groups[1].Value.ToUpper());
 
+        //Get map to version attribute
+        string? version = null;
+
+        if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+        {
+            version = controllerActionDescriptor.MethodInfo.GetMapToApiVersionAttributeValue();
+        }
+
         // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
-        return $"{httpMethod}{formattedOperationId.ToFirstUpper()}";
+        return $"{httpMethod}{formattedOperationId.ToFirstUpper()}{version}";
     }
 
      // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
