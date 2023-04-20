@@ -25,6 +25,7 @@ export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => 
 export const createFolderTreeItem = (item: any): FolderTreeItemResponseModel => {
 	return {
 		...createEntityTreeItem(item),
+		$type: 'FolderTreeItemResponseModel',
 		isFolder: item.isFolder,
 	};
 };

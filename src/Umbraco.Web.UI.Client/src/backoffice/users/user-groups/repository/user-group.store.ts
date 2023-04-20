@@ -20,7 +20,7 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 	public groups = this.#groups.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UserGroupDetails>([], (x) => x.id));
 	}
 
 	getScaffold(entityType: string, parentId: string | null) {
