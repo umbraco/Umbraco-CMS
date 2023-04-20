@@ -294,6 +294,7 @@ export class UmbDataTypeRepository
 		const { error } = await this.#moveSource.move(id, targetId);
 
 		if (!error) {
+			// TODO: Be aware about this responsibility.
 			this.#treeStore?.updateItem(id, { parentId: targetId });
 			this.#treeStore?.updateItem(targetId, { hasChildren: true });
 
