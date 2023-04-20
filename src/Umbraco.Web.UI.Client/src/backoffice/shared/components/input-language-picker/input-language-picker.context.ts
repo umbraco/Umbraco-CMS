@@ -1,4 +1,4 @@
-import { UmbPickerInputContext } from 'libs/picker-input';
+import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UMB_LANGUAGE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
