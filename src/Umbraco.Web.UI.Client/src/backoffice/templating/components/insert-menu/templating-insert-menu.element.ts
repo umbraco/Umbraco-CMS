@@ -1,15 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UMB_MODAL_CONTEXT_TOKEN,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalContext,
+	UmbModalHandler,
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL } from '../../modals/insert-choose-type-sidebar.element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
@@ -58,7 +60,12 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		`,
 	];
 
+	@property()
+	value = '';
+
 	private _modalContext?: UmbModalContext;
+
+	#openModal?: UmbModalHandler;
 
 	constructor() {
 		super();
@@ -68,17 +75,26 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#openChooseTypeModal = () => {
-		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL, {
+		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL, {
 			hidePartialView: this.hidePartialView,
 		});
+		this.#submitOpenModal();
 	};
 
 	#openInsertValueSidebar() {
-		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
+		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
+		this.#submitOpenModal();
+	}
+
+	#submitOpenModal() {
+		this.#openModal?.onSubmit().then((value) => {
+			this.value = value;
+			this.dispatchEvent(new CustomEvent('insert', { bubbles: true, cancelable: true, composed: false }));
+		});
 	}
 
 	#openInsertPartialViewSidebar() {
-		this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
 	}
 
 	@property()

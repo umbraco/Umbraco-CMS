@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-insert-value-sidebar')
-export default class UmbInsertValueSidebarElement extends UmbModalBaseElement {
+export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<object, string> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -37,6 +37,10 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement {
 
 	private _close() {
 		this.modalHandler?.submit();
+	}
+
+	private _submit() {
+		this.modalHandler?.submit('I am some value to be inserted');
 	}
 
 	@state()
@@ -80,7 +84,7 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement {
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
-					<uui-button @click=${this._close} look="primary">Submit</uui-button>
+					<uui-button @click=${this._submit} look="primary">Submit</uui-button>
 				</div>
 			</umb-workspace-layout>
 		`;

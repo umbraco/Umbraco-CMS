@@ -8,6 +8,7 @@ import {
 	UmbModalContext,
 	UmbModalToken,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
+	UmbModalHandler,
 } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL = new UmbModalToken(
@@ -18,8 +19,12 @@ export const UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL = new UmbModalToken
 	}
 );
 
+export interface InsertSidebarData {
+	hidePartialViews?: boolean;
+}
+
 @customElement('umb-insert-sidebar')
-export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hidePartialViews: boolean }> {
+export default class UmbInsertSidebarElement extends UmbModalBaseElement<InsertSidebarData, string> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -47,7 +52,7 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hideP
 	];
 
 	private _close() {
-		this.modalHandler?.submit();
+		this.modalHandler?.reject();
 	}
 
 	private _modalContext?: UmbModalContext;
@@ -59,12 +64,17 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<{ hideP
 		});
 	}
 
+	#openModal?: UmbModalHandler;
+
 	#openInsertValueSidebar() {
-		this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
+		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
+		this.#openModal?.onSubmit().then(chosenValue => {
+			if(chosenValue)this.modalHandler?.submit(chosenValue);
+		});
 	}
 
 	#openInsertPartialViewSidebar() {
-		this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
 	}
 
 	render() {

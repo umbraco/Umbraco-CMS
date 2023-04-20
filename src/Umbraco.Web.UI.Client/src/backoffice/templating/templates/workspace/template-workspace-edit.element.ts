@@ -5,6 +5,7 @@ import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbCodeEditorElement } from '../../../shared/components/code-editor/code-editor.element';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element';
 
 @customElement('umb-template-workspace-edit')
 export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
@@ -109,10 +110,10 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	}
 
 	#insertCode(event: Event) {
-		const target = event.target as UUIInputElement;
+		const target = event.target as UmbTemplatingInsertMenuElement;
 		const value = target.value as string;
 
-		this._codeEditor?.insert(`My hovercraft is full of eels`);
+		this._codeEditor?.insert(value);
 	}
 
 	render() {
@@ -129,7 +130,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 							><uui-icon name="umb:delete"></uui-icon
 						></uui-button>
 					</uui-button-group>
-					<umb-templating-insert-menu></umb-templating-insert-menu>
+					<umb-templating-insert-menu @insert=${this.#insertCode}></umb-templating-insert-menu>
 					<uui-button look="secondary" id="query-builder-button" label="Query builder">
 						<uui-icon name="umb:wand"></uui-icon>Query builder
 					</uui-button>
