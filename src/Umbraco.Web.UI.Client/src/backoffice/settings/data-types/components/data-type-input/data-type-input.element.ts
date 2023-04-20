@@ -71,10 +71,8 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 
 	@property()
 	public set value(idsString: string) {
-		super.value = idsString;
-		if (idsString !== this._value) {
-			this.selectedIds = idsString.split(/[ ,]+/);
-		}
+		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
+		this.selectedIds = idsString.split(/[ ,]+/);
 	}
 
 	@state()
