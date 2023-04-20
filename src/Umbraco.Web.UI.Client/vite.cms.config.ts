@@ -11,7 +11,7 @@ export default defineConfig({
 			fileName: 'main',
 		},
 		rollupOptions: {
-			external: [/^@umbraco-cms\/backoffice\//]
+			external: [/^@umbraco-cms\/backoffice\//],
 		},
 		outDir: '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice',
 		emptyOutDir: false,
@@ -19,15 +19,5 @@ export default defineConfig({
 	},
 	base: '/umbraco/backoffice/',
 	mode: 'production',
-	plugins: [
-		...plugins,
-		viteStaticCopy({
-			targets: [
-				{
-					src: 'types/umbraco-package-schema.json',
-					dest: '../../../../Umbraco.Web.UI.New',
-				},
-			],
-		}),
-	],
+	plugins: [...plugins],
 });
