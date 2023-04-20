@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.PartialView.Snippets;
 
-public class PartialViewSnippetsViewModel
+public class PartialViewSnippetResponseModel
 {
     public required string Name { get; set; }
 

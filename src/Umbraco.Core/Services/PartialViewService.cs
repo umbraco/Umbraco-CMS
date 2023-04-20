@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.New.Cms.Core.Models;
+using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -74,20 +75,36 @@ public class PartialViewService : FileServiceBase, IPartialViewService
         return PartialViewOperationStatus.Success;
     }
 
-    public Task<PagedModel<PartialViewSnippet>> GetPartialViewSnippetsAsync(int skip, int take)
+    public Task<PagedModel<string>> GetSnippetNamesAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
         string[] names = _snippetCollection.GetNames().ToArray();
         var total = names.Length;
 
-        IEnumerable<PartialViewSnippet> snippets = names
+        IEnumerable<string> snippets = names
             .Skip(skip)
-            .Take(take)
-            .Select(name =>
-                new PartialViewSnippet { Name = name, Content = _snippetCollection.GetContentFromName(name) });
+            .Take(take);
 
-        return Task.FromResult(new PagedModel<PartialViewSnippet> { Items = snippets, Total = total });
+        return Task.FromResult(new PagedModel<string>(total, snippets));
+    }
+
+    public Task<PartialViewSnippet?> GetSnippetByNameAsync(string name)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        // A bit weird but the "Name" of the snippet is the file name and extensions
+        // However when getting the content it's just the name without the extension
+        var fileName = name + ".cshtml";
+        if (_snippetCollection.Any(x => x.Name == fileName) is false)
+        {
+            return Task.FromResult<PartialViewSnippet?>(null);
+        }
+
+        var content = _snippetCollection.GetContentFromName(name);
+        var snippet = new PartialViewSnippet(name, content);
+
+        return Task.FromResult<PartialViewSnippet?>(snippet);
     }
 
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid performingUserKey)
