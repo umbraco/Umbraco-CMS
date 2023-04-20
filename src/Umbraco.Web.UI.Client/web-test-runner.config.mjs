@@ -60,6 +60,7 @@ export default {
 						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
 						'@umbraco-cms/internal/router': './src/core/router/index.ts',
+						'@umbraco-cms/internal/sorter': './src/core/sorter/index.ts',
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
 				},
