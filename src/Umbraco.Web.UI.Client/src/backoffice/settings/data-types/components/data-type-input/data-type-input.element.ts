@@ -8,14 +8,6 @@ import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-
 
 @customElement('umb-data-type-input')
 export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#add-button {
-				width: 100%;
-			}
-		`,
-	];
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -126,6 +118,15 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 			</uui-ref-node-data-type>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#add-button {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDataTypeInputElement;
