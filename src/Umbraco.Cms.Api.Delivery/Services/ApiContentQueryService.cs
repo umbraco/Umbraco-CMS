@@ -154,12 +154,11 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
             SortType sortType = sort.FieldType switch
             {
-                FieldType.Number => // TODO: do we need more explicit types like float, long, double
-                    SortType.Int,
-                FieldType.Date =>
-                    // The field definition type should be FieldDefinitionTypes.DateTime
-                    SortType.Long,
-                _ => SortType.String
+                FieldType.Number => SortType.Int,
+                FieldType.Date => SortType.Long,
+                FieldType.String => SortType.String,
+                FieldType.StringSortable => SortType.String,
+                _ => throw new ArgumentOutOfRangeException(nameof(sort.FieldType))
             };
 
             orderingQuery = sort.Direction switch

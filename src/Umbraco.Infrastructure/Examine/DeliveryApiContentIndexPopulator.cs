@@ -19,19 +19,29 @@ public class DeliveryApiContentIndexPopulator : IndexPopulator
 
     protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
     {
-        foreach (IIndex index in indexes)
+        if (indexes.Any() is false)
         {
-            IEnumerable<IContent> rootNodes = _contentService.GetRootContent();
+            return;
+        }
 
-            index.IndexItems(_deliveryContentIndexValueSetBuilder.GetValueSets(rootNodes.ToArray()));
+        const int pageSize = 10000;
+        var pageIndex = 0;
 
-            foreach (IContent root in rootNodes)
+        IContent[] content;
+        do
+        {
+            content = _contentService.GetPagedDescendants(Constants.System.Root, pageIndex, pageSize, out _).ToArray();
+
+            ValueSet[] valueSets = _deliveryContentIndexValueSetBuilder.GetValueSets(content).ToArray();
+
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (IIndex index in indexes)
             {
-                IEnumerable<ValueSet> valueSets = _deliveryContentIndexValueSetBuilder.GetValueSets(
-                    _contentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _).ToArray());
-
                 index.IndexItems(valueSets);
             }
+
+            pageIndex++;
         }
+        while (content.Length == pageSize);
     }
 }

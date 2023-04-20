@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 
@@ -18,7 +19,7 @@ internal sealed class PathSort : ISortHandler
 
         return new SortOption
         {
-            FieldName = "path",
+            FieldName = PathSortIndexer.FieldName,
             Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending,
             FieldType = FieldType.String
         };

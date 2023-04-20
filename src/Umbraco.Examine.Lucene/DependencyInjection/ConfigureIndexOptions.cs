@@ -16,13 +16,16 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
 {
     private readonly IndexCreatorSettings _settings;
     private readonly IUmbracoIndexConfig _umbracoIndexConfig;
+    private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
 
     public ConfigureIndexOptions(
         IUmbracoIndexConfig umbracoIndexConfig,
-        IOptions<IndexCreatorSettings> settings)
+        IOptions<IndexCreatorSettings> settings,
+        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder)
     {
         _umbracoIndexConfig = umbracoIndexConfig;
         _settings = settings.Value;
+        _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
     }
 
     public void Configure(string? name, LuceneDirectoryIndexOptions options)
@@ -48,7 +51,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
                 // TODO: either create a dedicated validator to this index or make sure the populator handles any validation rules (i.e. published content only)
                 // options.Validator = _umbracoIndexConfig.GetPublishedContentValueSetValidator();
-                options.FieldDefinitions = new DeliveryApiContentIndexFieldDefinitionCollection();
+                options.FieldDefinitions = _deliveryApiContentIndexFieldDefinitionBuilder.Build();
                 break;
         }
 
