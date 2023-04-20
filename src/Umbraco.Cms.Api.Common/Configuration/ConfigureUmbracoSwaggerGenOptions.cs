@@ -1,70 +1,46 @@
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Umbraco.Cms.Api.Management.Controllers.Security;
-using Umbraco.Cms.Api.Management.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Api.Common.Attributes;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Extensions;
+using OperationIdRegexes = Umbraco.Cms.Api.Common.OpenApi.OperationIdRegexes;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Common.Configuration;
 
-internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
+public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
-    private readonly IUmbracoJsonTypeInfoResolver _umbracoJsonTypeInfoResolver;
-
-    public ConfigureUmbracoSwaggerGenOptions(IUmbracoJsonTypeInfoResolver umbracoJsonTypeInfoResolver)
-    {
-        _umbracoJsonTypeInfoResolver = umbracoJsonTypeInfoResolver;
-    }
-
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
         swaggerGenOptions.SwaggerDoc(
-            ManagementApiConfiguration.DefaultApiDocumentName,
+            DefaultApiConfiguration.ApiName,
             new OpenApiInfo
             {
-                Title = ManagementApiConfiguration.ApiTitle,
-                Version = ManagementApiConfiguration.DefaultApiVersion.ToString(),
-                Description =
-                    "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility"
+                Title = "Default API",
+                Version = "Latest",
+                Description = "All endpoints not defined under specific APIs"
             });
-
-        swaggerGenOptions.AddSecurityDefinition(
-            "OAuth",
-            new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Name = "Umbraco",
-                Type = SecuritySchemeType.OAuth2,
-                Description = "Umbraco Authentication",
-                Flows = new OpenApiOAuthFlows
-                {
-                    AuthorizationCode = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl =
-                            new Uri(Paths.BackOfficeApiAuthorizationEndpoint, UriKind.Relative),
-                        TokenUrl = new Uri(Paths.BackOfficeApiTokenEndpoint, UriKind.Relative)
-                    }
-                }
-            });
-
-        swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
-            // this weird looking construct works because OpenApiSecurityRequirement
-            // is a specialization of Dictionary<,>
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference { Id = "OAuth", Type = ReferenceType.SecurityScheme }
-                },
-                new List<string>()
-            }
-        });
 
         swaggerGenOptions.CustomOperationIds(CustomOperationId);
-        swaggerGenOptions.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
+
+        swaggerGenOptions.DocInclusionPredicate((name, api) =>
+        {
+            if (string.IsNullOrWhiteSpace(api.GroupName))
+            {
+                return false;
+            }
+
+            if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            {
+                return controllerActionDescriptor.MethodInfo.HasMapToApiAttribute(name);
+
+            }
+
+            return false;
+        });
         swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>();
@@ -72,10 +48,11 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
         swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
 
-        swaggerGenOptions.OperationFilter<ReponseHeaderOperationFilter>();
+
         swaggerGenOptions.UseOneOfForPolymorphism();
         swaggerGenOptions.UseAllOfForInheritance();
-        swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
+
+
 
         swaggerGenOptions.SelectDiscriminatorNameUsing(type =>
         {
@@ -89,7 +66,7 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
         swaggerGenOptions.SelectDiscriminatorValueUsing(x => x.Name);
     }
 
-    private static string CustomOperationId(ApiDescription api)
+     private static string CustomOperationId(ApiDescription api)
     {
         var httpMethod = api.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
 
@@ -127,12 +104,21 @@ internal sealed class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<Swag
             .ToCamelCaseRegex()
             .Replace(formattedOperationId, m => m.Groups[1].Value.ToUpper());
 
+        //Get map to version attribute
+        string? version = null;
+
+        if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+        {
+            version = controllerActionDescriptor.MethodInfo.GetMapToApiVersionAttributeValue();
+        }
+
         // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
-        return $"{httpMethod}{formattedOperationId.ToFirstUpper()}";
+        return $"{httpMethod}{formattedOperationId.ToFirstUpper()}{version}";
     }
 
-    // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
-    private static string ActionOrderBy(ApiDescription apiDesc)
-        =>
-            $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
+     // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
+     private static string ActionOrderBy(ApiDescription apiDesc)
+         =>
+             $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
+
 }

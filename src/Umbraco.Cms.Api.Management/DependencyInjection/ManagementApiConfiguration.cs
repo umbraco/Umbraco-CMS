@@ -4,9 +4,7 @@ namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
 internal static class ManagementApiConfiguration
 {
-    internal const string ApiTitle = "Umbraco Backoffice API";
+    internal const string ApiTitle = "Umbraco Management API";
 
-    internal const string DefaultApiDocumentName = "v1";
-
-    internal static ApiVersion DefaultApiVersion => new(1, 0);
+    internal const string ApiName = "management";
 }

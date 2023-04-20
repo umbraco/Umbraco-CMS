@@ -52,37 +52,6 @@ internal static class ApplicationBuilderExtensions
                 }));
             });
 
-    internal static IApplicationBuilder UseSwagger(this IApplicationBuilder applicationBuilder)
-    {
-        IServiceProvider provider = applicationBuilder.ApplicationServices;
-        IWebHostEnvironment webHostEnvironment = provider.GetRequiredService<IWebHostEnvironment>();
-
-        if (webHostEnvironment.IsProduction())
-        {
-            return applicationBuilder;
-        }
-
-        GlobalSettings settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
-        IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
-        var backOfficePath = settings.GetBackOfficePath(hostingEnvironment);
-
-        applicationBuilder.UseSwagger(swaggerOptions =>
-        {
-            swaggerOptions.RouteTemplate = $"{backOfficePath.TrimStart(Constants.CharArrays.ForwardSlash)}/swagger/{{documentName}}/swagger.json";
-        });
-        applicationBuilder.UseSwaggerUI(
-            swaggerUiOptions =>
-            {
-                swaggerUiOptions.SwaggerEndpoint($"{backOfficePath}/swagger/v1/swagger.json", $"{ManagementApiConfiguration.ApiTitle} {ManagementApiConfiguration.DefaultApiVersion}");
-                swaggerUiOptions.RoutePrefix = $"{backOfficePath.TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
-
-                swaggerUiOptions.OAuthClientId(New.Cms.Core.Constants.OauthClientIds.Swagger);
-                swaggerUiOptions.OAuthUsePkce();
-            });
-
-        return applicationBuilder;
-    }
-
     internal static IApplicationBuilder UseEndpoints(this IApplicationBuilder applicationBuilder)
     {
         IServiceProvider provider = applicationBuilder.ApplicationServices;

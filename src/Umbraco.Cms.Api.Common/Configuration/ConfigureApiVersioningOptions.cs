@@ -11,7 +11,8 @@ public class ConfigureApiVersioningOptions : IConfigureOptions<ApiVersioningOpti
         options.DefaultApiVersion = new ApiVersion(1, 0);
         options.ReportApiVersions = true;
         options.ApiVersionReader = new UrlSegmentApiVersionReader();
-        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
+        options.AssumeDefaultVersionWhenUnspecified = true; // This is required for the old backoffice to work
         options.UseApiBehavior = false;
     }
 }
