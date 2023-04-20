@@ -19,8 +19,11 @@ const executableDir = '../Umbraco.Web.UI.New';
 
 // Copy package files
 cpSync(`${srcDir}/package.json`, `${inputDir}/package.json`, { recursive: true });
+console.log(`Copied ${srcDir}/package.json to ${inputDir}/package.json`);
 cpSync(`${srcDir}/README.md`, `${inputDir}/README.md`, { recursive: true });
+console.log(`Copied ${srcDir}/README.md to ${inputDir}/README.md`);
 cpSync(`${inputDir}/umbraco-package-schema.json`, `${executableDir}/umbraco-json-schema.json`, { recursive: true });
+console.log(`Copied ${inputDir}/umbraco-package-schema.json to ${executableDir}/umbraco-json-schema.json`);
 
 const libs = readdirSync(inputDir);
 
@@ -33,6 +36,8 @@ try {
 
 // Transform all .d.ts files and copy all other files to the output folder
 libs.forEach(lib => {
+
+	if (lib.endsWith('.js') === false && lib.endsWith('.js.map') === false) return;
 
 	console.log(`Transforming ${lib}`);
 
