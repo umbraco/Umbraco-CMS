@@ -1,3 +1,4 @@
+// TODO: delete when the last usages are gone
 import type { Observable } from 'rxjs';
 
 export interface UmbDataStoreIdentifiers {

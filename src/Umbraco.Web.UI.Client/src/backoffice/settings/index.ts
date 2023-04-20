@@ -11,6 +11,8 @@ import { manifests as logviewerManifests } from './logviewer/manifests';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
+import './data-types/components';
+
 export const manifests = [
 	...settingsSectionManifests,
 	...settingsMenuManifests,

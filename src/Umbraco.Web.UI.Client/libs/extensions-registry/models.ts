@@ -24,7 +24,7 @@ import type { ManifestWorkspaceView } from './workspace-view.models';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.models';
 import type { ManifestRepository } from './repository.models';
 import type { ManifestModal } from './modal.models';
-import type { ManifestStore, ManifestTreeStore } from './store.models';
+import type { ManifestStore, ManifestTreeStore, ManifestItemStore } from './store.models';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 
 export * from './collection-view.models';
@@ -89,6 +89,7 @@ export type ManifestTypes =
 	| ManifestModal
 	| ManifestStore
 	| ManifestTreeStore
+	| ManifestItemStore
 	| ManifestBase;
 
 export type ManifestStandardTypes = ManifestTypes['type'];
