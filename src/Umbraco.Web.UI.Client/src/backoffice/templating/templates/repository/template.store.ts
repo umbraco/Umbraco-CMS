@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -11,7 +11,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
  * @description - Data Store for Templates
  */
 export class UmbTemplateStore extends UmbStoreBase {
-	#data = new ArrayState<TemplateResponseModel>([], (x) => x.id);
+	#data = new UmbArrayState<TemplateResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbTemplateStore.

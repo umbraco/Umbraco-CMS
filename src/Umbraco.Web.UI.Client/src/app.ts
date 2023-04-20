@@ -46,26 +46,23 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: 'upgrade',
 			component: () => import('./upgrader/upgrader.element'),
-			guards: [this._isAuthorizedGuard('/upgrade')],
+			guards: [this.#isAuthorizedGuard('/upgrade')],
 		},
 		{
 			path: '**',
 			component: () => import('./backoffice/backoffice.element'),
-			guards: [this._isAuthorizedGuard()],
+			guards: [this.#isAuthorizedGuard()],
 		},
 	];
 
-	private _umbIconRegistry = new UmbIconStore();
-
-	private _iconRegistry = new UUIIconRegistryEssential();
-	private _runtimeLevel = RuntimeLevelModel.UNKNOWN;
+	#umbIconRegistry = new UmbIconStore();
+	#uuiIconRegistry = new UUIIconRegistryEssential();
+	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
 
 	constructor() {
 		super();
-
-		this._umbIconRegistry.attach(this);
-
-		this._setup();
+		this.#umbIconRegistry.attach(this);
+		this.#uuiIconRegistry.attach(this);
 	}
 
 	connectedCallback() {
@@ -78,8 +75,7 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.WITH_CREDENTIALS = true;
 
 		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
-
-		this._setInitStatus();
+		this.#setInitStatus();
 
 		// Listen for the debug event from the <umb-debug> component
 		this.addEventListener(umbDebugContextEventType, (event: any) => {
@@ -104,19 +100,14 @@ export class UmbAppElement extends UmbLitElement {
 		});
 	}
 
-	private async _setup() {
-		await this._setInitStatus();
-		this._iconRegistry.attach(this);
-	}
-
-	private async _setInitStatus() {
+	async #setInitStatus() {
 		const { data } = await tryExecuteAndNotify(this, ServerResource.getServerStatus());
-		this._runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
-		this._redirect();
+		this.#runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
+		this.#redirect();
 	}
 
-	private _redirect() {
-		switch (this._runtimeLevel) {
+	#redirect() {
+		switch (this.#runtimeLevel) {
 			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', 'install');
 				break;
@@ -137,18 +128,18 @@ export class UmbAppElement extends UmbLitElement {
 			}
 
 			default:
-				throw new Error(`Unsupported runtime level: ${this._runtimeLevel}`);
+				throw new Error(`Unsupported runtime level: ${this.#runtimeLevel}`);
 		}
 	}
 
-	private _isAuthorized(): boolean {
+	#isAuthorized(): boolean {
 		return true; // TODO: Return true for now, until new login page is up and running
 		//return sessionStorage.getItem('is-authenticated') === 'true';
 	}
 
-	private _isAuthorizedGuard(redirectTo?: string): Guard {
+	#isAuthorizedGuard(redirectTo?: string): Guard {
 		return () => {
-			if (this._isAuthorized()) {
+			if (this.#isAuthorized()) {
 				return true;
 			}
 

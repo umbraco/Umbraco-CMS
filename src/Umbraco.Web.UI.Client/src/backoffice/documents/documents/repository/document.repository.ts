@@ -1,7 +1,7 @@
 import { UmbDocumentServerDataSource } from './sources/document.server.data';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
-import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
+import { UmbDocumentTreeServerDataSource } from './sources/document.tree.server.data';
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -32,7 +32,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new DocumentTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbDocumentTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbDocumentServerDataSource(this.#host);
 
 		this.#init = Promise.all([

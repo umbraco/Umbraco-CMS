@@ -11,7 +11,7 @@ import './workspace-view-users-selection.element';
 
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-section-view-users')
@@ -37,13 +37,13 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	// TODO: This must be turned into context api: Maybe its a Collection View (SectionView Collection View)?
 	private _userStore?: UmbUserStore;
 
-	#selection = new DeepState(<Array<string>>[]);
+	#selection = new UmbDeepState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
-	#users = new DeepState(<Array<UserDetails>>[]);
+	#users = new UmbDeepState(<Array<UserDetails>>[]);
 	public readonly users = this.#users.asObservable();
 
-	#search = new DeepState('');
+	#search = new UmbDeepState('');
 	public readonly search = this.#search.asObservable();
 
 	constructor() {

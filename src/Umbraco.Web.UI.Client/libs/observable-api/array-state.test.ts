@@ -1,11 +1,11 @@
 import { expect } from '@open-wc/testing';
-import { ArrayState } from './array-state';
+import { UmbArrayState } from './array-state';
 
 describe('ArrayState', () => {
 	type ObjectType = { key: string; another: string };
 	type ArrayType = ObjectType[];
 
-	let subject: ArrayState<ObjectType>;
+	let subject: UmbArrayState<ObjectType>;
 	let initialData: ArrayType;
 
 	beforeEach(() => {
@@ -14,7 +14,7 @@ describe('ArrayState', () => {
 			{ key: '2', another: 'myValue2' },
 			{ key: '3', another: 'myValue3' },
 		];
-		subject = new ArrayState(initialData, (x) => x.key);
+		subject = new UmbArrayState(initialData, (x) => x.key);
 	});
 
 	it('replays latests, no matter the amount of subscriptions.', (done) => {
