@@ -1,8 +1,7 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.TextFiles;
+﻿using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.PartialView;
 
-public class UpdatePartialViewRequestModel : TextFileViewModelBase
+public class UpdatePartialViewRequestModel : TextFileUpdateModel
 {
-    public required string ExistingPath { get; set; }
 }

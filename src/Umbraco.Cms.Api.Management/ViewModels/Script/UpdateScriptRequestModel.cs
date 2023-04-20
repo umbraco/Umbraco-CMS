@@ -1,6 +1,7 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Script;
+﻿using Umbraco.Cms.Api.Management.ViewModels.TextFiles;
 
-public class UpdateScriptRequestModel : ScriptViewModelBase
+namespace Umbraco.Cms.Api.Management.ViewModels.Script;
+
+public class UpdateScriptRequestModel : UpdateTextFileViewModelBase
 {
-    public required string ExistingPath { get; set; }
 }
