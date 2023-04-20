@@ -35,7 +35,7 @@ const model: Array<SortEntryType> = [
 ];
 
 @customElement('test-my-sorter-controller')
-class MyTestSorterControllerElement extends UmbLitElement {
+class UmbTestSorterControllerElement extends UmbLitElement {
 	public sorter;
 
 	constructor() {
@@ -47,7 +47,7 @@ class MyTestSorterControllerElement extends UmbLitElement {
 }
 
 describe('UmbContextConsumer', () => {
-	let hostElement: MyTestSorterControllerElement;
+	let hostElement: UmbTestSorterControllerElement;
 
 	beforeEach(async () => {
 		hostElement = await fixture(html` <test-my-sorter-controller></test-my-sorter-controller> `);
