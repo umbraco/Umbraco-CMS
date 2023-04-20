@@ -102,10 +102,31 @@ export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap |
 	T extends keyof ManifestTypeMap ? ManifestTypeMap[T] : ManifestBase;
 
 export interface ManifestBase {
+	/**
+	 * The type of extension such as dashboard etc...
+	 */
 	type: string;
+
+	/**
+	 * The alias of the extension, ensure it is unique
+	 */
 	alias: string;
-	kind?: any; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
+
+	/**
+	 * The kind of the extension, used to group extensions together
+	 *
+	 * @examples ["button"]
+	 */
+	kind?: unknown; // I had to add the optional kind property set to undefined. To make the ManifestTypes recognize the Manifest Kind types. Notice that Kinds has to Omit the kind property when extending.
+
+	/**
+	 * The friendly name of the extension
+	 */
 	name: string;
+
+	/**
+	 * Extensions such as dashboards are ordered by weight with lower numbers being first in the list
+	 */
 	weight?: number;
 }
 
@@ -118,17 +139,39 @@ export interface ManifestKind {
 }
 
 export interface ManifestWithConditions<ConditionsType> {
+	/**
+	 * Set the conditions for when the extension should be loaded
+	 */
 	conditions: ConditionsType;
 }
 
 export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
+	/**
+	 * @TJS-ignore
+	 */
 	loader?: () => Promise<LoaderReturnType>;
 }
 
+/**
+ * The type of extension such as dashboard etc...
+ */
 export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
 	//type: ManifestStandardTypes;
+
+	/**
+	 * The file location of the javascript file to load
+	 * @TJS-required
+	 */
 	js?: string;
+
+	/**
+	 * @TJS-ignore
+	 */
 	className?: string;
+
+	/**
+	 * @TJS-ignore
+	 */
 	class?: ClassConstructor<T>;
 	//loader?: () => Promise<object | HTMLElement>;
 }
@@ -139,10 +182,26 @@ export interface ManifestClassWithClassConstructor extends ManifestClass {
 
 export interface ManifestElement extends ManifestWithLoader<object | HTMLElement> {
 	//type: ManifestStandardTypes;
+
+	/**
+	 * The file location of the javascript file to load
+	 *
+	 * @TJS-require
+	 */
 	js?: string;
+
+	/**
+	 * The HTML web component name to use such as 'my-dashboard'
+	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
+	 */
 	elementName?: string;
+
 	//loader?: () => Promise<object | HTMLElement>;
-	meta?: any;
+
+	/**
+	 * This contains properties specific to the type of extension
+	 */
+	meta?: unknown;
 }
 
 export interface ManifestWithView extends ManifestElement {
@@ -156,22 +215,29 @@ export interface MetaManifestWithView {
 }
 
 export interface ManifestElementWithElementName extends ManifestElement {
+	/**
+	 * The HTML web component name to use such as 'my-dashboard'
+	 * Note it is NOT <my-dashboard></my-dashboard> but just the name
+	 */
 	elementName: string;
 }
 
-// TODO: Remove Custom as it has no purpose currently:
-/*
-export interface ManifestCustom extends ManifestBase {
-	type: 'custom';
-	meta?: unknown;
-}
-*/
-
 export interface ManifestWithMeta extends ManifestBase {
+	/**
+	 * This contains properties specific to the type of extension
+	 */
 	meta: unknown;
 }
 
+/**
+ * This type of extension gives full control and will simply load the specified JS file
+ * You could have custom logic to decide which extensions to load/register by using extensionRegistry
+ */
 export interface ManifestEntrypoint extends ManifestBase {
 	type: 'entrypoint';
+
+	/**
+	 * The file location of the javascript file to load in the backoffice
+	 */
 	js: string;
 }
