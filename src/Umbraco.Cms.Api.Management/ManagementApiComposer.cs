@@ -49,6 +49,7 @@ public class ManagementApiComposer : IComposer
             .AddPathFolders()
             .AddScripts()
             .AddPartialViews()
+            .AddStylesheets()
             .AddBackOfficeAuthentication()
             .AddApiVersioning()
             .AddSwaggerGen();

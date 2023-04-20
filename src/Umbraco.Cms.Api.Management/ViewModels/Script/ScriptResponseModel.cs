@@ -1,6 +1,7 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Script;
+﻿using Umbraco.Cms.Api.Management.ViewModels.TextFiles;
 
-public class ScriptResponseModel : ScriptViewModelBase
+namespace Umbraco.Cms.Api.Management.ViewModels.Script;
+
+public class ScriptResponseModel : TextFileResponseModelBase
 {
-    public string Path { get; set; } = string.Empty;
 }
