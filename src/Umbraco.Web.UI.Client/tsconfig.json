@@ -39,7 +39,7 @@
 			"@umbraco-cms/backoffice/store": ["libs/store"],
 			"@umbraco-cms/backoffice/utils": ["libs/utils"],
 			"@umbraco-cms/backoffice/workspace": ["libs/workspace"],
-			"@umbraco-cms/backoffice/picker": ["libs/picker-input"],
+			"@umbraco-cms/backoffice/picker-input": ["libs/picker-input"],
 			"@umbraco-cms/internal/lit-element": ["src/core/lit-element"],
 			"@umbraco-cms/internal/modal": ["src/core/modal"],
 			"@umbraco-cms/internal/router": ["src/core/router"],
