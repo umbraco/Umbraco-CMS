@@ -44,7 +44,7 @@ export class UmbPackageStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
 		// TODO: revisit this store. Is it ok to have multiple data sets?
 		// temp hack to satisfy the base class
-		super(host, UMB_PACKAGE_STORE_TOKEN.toString(), new ArrayState<UmbPackage>([], (x) => x.name));
+		super(host, UMB_PACKAGE_STORE_TOKEN.toString(), new UmbArrayState<UmbPackage>([], (x) => x.name));
 	}
 
 	/**

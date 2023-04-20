@@ -1,6 +1,6 @@
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import {
 	UMB_CONFIRM_MODAL,
@@ -20,10 +20,10 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 
 	public modalContext?: UmbModalContext;
 
-	#selection = new ArrayState<string>([]);
+	#selection = new UmbArrayState<string>([]);
 	selection = this.#selection.asObservable();
 
-	#selectedItems = new ArrayState<ItemType>([]);
+	#selectedItems = new UmbArrayState<ItemType>([]);
 	selectedItems = this.#selectedItems.asObservable();
 
 	#selectedItemsObserver?: UmbObserverController<ItemType[]>;
