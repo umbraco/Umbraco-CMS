@@ -8,14 +8,6 @@ import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-
 
 @customElement('umb-data-type-input')
 export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#add-button {
-				width: 100%;
-			}
-		`,
-	];
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -62,20 +54,17 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	private _selectedIds: Array<string> = [];
 	public get selectedIds(): Array<string> {
-		return this._selectedIds;
+		return this.#pickerContext.getSelection();
 	}
 	public set selectedIds(ids: Array<string>) {
-		this._selectedIds = ids;
-		super.value = ids.join(',');
+		this.#pickerContext.setSelection(ids);
 	}
 
 	@property()
 	public set value(idsString: string) {
-		if (idsString !== this._value) {
-			this.selectedIds = idsString.split(/[ ,]+/);
-		}
+		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
+		this.selectedIds = idsString.split(/[ ,]+/);
 	}
 
 	@state()
@@ -89,16 +78,16 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._selectedIds.length < this.min
+			() => !!this.min && this.#pickerContext.getSelection().length < this.min
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this._selectedIds.length > this.max
+			() => !!this.max && this.#pickerContext.getSelection().length > this.max
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this._selectedIds = selection));
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
@@ -129,6 +118,15 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 			</uui-ref-node-data-type>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#add-button {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDataTypeInputElement;

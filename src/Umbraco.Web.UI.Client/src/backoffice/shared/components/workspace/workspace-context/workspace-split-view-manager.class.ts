@@ -1,6 +1,6 @@
 import { UmbVariantId } from '../../../variants/variant-id.class';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export type ActiveVariant = {
 	index: number;
@@ -16,7 +16,7 @@ export type ActiveVariant = {
 export class UmbWorkspaceSplitViewManager {
 	#host: UmbControllerHostElement;
 
-	#activeVariantsInfo = new ArrayState<ActiveVariant>([], (x) => x.index);
+	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();
 
 	constructor(host: UmbControllerHostElement) {

@@ -6,10 +6,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the MemberType tree that fetches data from the server
  * @export
- * @class MemberTypeTreeServerDataSource
- * @implements {MemberTypeTreeDataSource}
+ * @class UmbMemberTypeTreeServerDataSource
+ * @implements {UmbTreeDataSource}
  */
-export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
+export class UmbMemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -24,7 +24,7 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof MemberTypeTreeServerDataSource
+	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, MemberTypeResource.getTreeMemberTypeRoot({}));
@@ -34,7 +34,7 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof MemberTypeTreeServerDataSource
+	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		const error: ProblemDetailsModel = { title: 'Not implemented for Member Type' };
@@ -45,7 +45,7 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof MemberTypeTreeServerDataSource
+	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids || ids.length === 0) {

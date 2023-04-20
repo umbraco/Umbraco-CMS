@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -17,7 +17,7 @@ export class UmbTemplateStore extends UmbStoreBase {
 	 * @memberof UmbTemplateStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_TEMPLATE_STORE_CONTEXT_TOKEN.toString(), new ArrayState<TemplateResponseModel>([], (x) => x.id));
+		super(host, UMB_TEMPLATE_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<TemplateResponseModel>([], (x) => x.id));
 	}
 
 	/**

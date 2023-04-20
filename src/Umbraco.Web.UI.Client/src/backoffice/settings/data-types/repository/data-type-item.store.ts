@@ -2,7 +2,7 @@ import { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbItemStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * @export
@@ -24,7 +24,7 @@ export class UmbDataTypeItemStore
 		super(
 			host,
 			UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN.toString(),
-			new ArrayState<DataTypeItemResponseModel>([], (x) => x.id)
+			new UmbArrayState<DataTypeItemResponseModel>([], (x) => x.id)
 		);
 	}
 

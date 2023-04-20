@@ -6,7 +6,7 @@ import {
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
 
@@ -18,7 +18,7 @@ export class UmbEntityWorkspaceManager<
 > {
 	private _host;
 
-	state = new ObjectState<EntityDetailsType | undefined>(undefined);
+	state = new UmbObjectState<EntityDetailsType | undefined>(undefined);
 
 	protected _storeSubscription?: UmbObserverController<EntityDetailsType | undefined>;
 

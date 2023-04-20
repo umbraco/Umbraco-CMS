@@ -6,10 +6,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Media tree that fetches data from the server
  * @export
- * @class MediaTreeServerDataSource
- * @implements {MediaTreeDataSource}
+ * @class UmbMediaTreeServerDataSource
+ * @implements {UmbTreeDataSource}
  */
-export class MediaTreeServerDataSource implements UmbTreeDataSource {
+export class UmbMediaTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
@@ -42,9 +42,9 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Creates an instance of MediaTreeServerDataSource.
+	 * Creates an instance of UmbMediaTreeServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof MediaTreeServerDataSource
+	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -53,7 +53,7 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof MediaTreeServerDataSource
+	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, MediaResource.getTreeMediaRoot({}));
@@ -63,7 +63,7 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof MediaTreeServerDataSource
+	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
@@ -83,7 +83,7 @@ export class MediaTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof MediaTreeServerDataSource
+	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids) {

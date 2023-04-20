@@ -9,7 +9,12 @@ import {
 	UMB_ENTITY_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ClassState, NumberState, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbClassState,
+	UmbNumberState,
+	UmbObjectState,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
 import { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 //type EntityType = DocumentModel;
@@ -22,17 +27,17 @@ export class UmbWorkspaceVariantContext {
 		return this.#workspaceContext;
 	}
 
-	#index = new NumberState(undefined);
+	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
 
-	#currentVariant = new ObjectState<DocumentVariantResponseModel | undefined>(undefined);
+	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
 	name = this.#currentVariant.getObservablePart((x) => x?.name);
 	culture = this.#currentVariant.getObservablePart((x) => x?.culture);
 	segment = this.#currentVariant.getObservablePart((x) => x?.segment);
 
-	#variantId = new ClassState<UmbVariantId | undefined>(undefined);
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	variantId = this.#variantId.asObservable();
 
 	private _currentVariantObserver?: UmbObserverController<ActiveVariant>;

@@ -1,7 +1,7 @@
 import type { Observable } from 'rxjs';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
-import { BooleanState, DeepState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
@@ -19,13 +19,13 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	host: UmbControllerHostElement;
 	public tree: ManifestTree;
 
-	#selectable = new BooleanState(false);
+	#selectable = new UmbBooleanState(false);
 	public readonly selectable = this.#selectable.asObservable();
 
-	#multiple = new BooleanState(false);
+	#multiple = new UmbBooleanState(false);
 	public readonly multiple = this.#multiple.asObservable();
 
-	#selection = new DeepState(<Array<string>>[]);
+	#selection = new UmbArrayState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
 	repository?: UmbTreeRepository;

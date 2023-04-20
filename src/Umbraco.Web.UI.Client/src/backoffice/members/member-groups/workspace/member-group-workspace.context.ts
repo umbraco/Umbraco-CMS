@@ -3,14 +3,14 @@ import { UmbMemberGroupRepository } from '../repository/member-group.repository'
 import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MemberGroupDetails;
 export class UmbWorkspaceMemberGroupContext
 	extends UmbWorkspaceContext<UmbMemberGroupRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
-	#data = new ObjectState<EntityType | undefined>(undefined);
+	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 

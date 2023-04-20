@@ -3,18 +3,18 @@ import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElement, UmbControllerHostMixin } from './controller-host.mixin';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
-class MyClass {
+class UmbTestContext {
 	prop = 'value from provider';
 }
 
 @customElement('test-my-controller-host')
-export class MyHostElement extends UmbControllerHostMixin(HTMLElement) {}
+export class UmbTestControllerHostElement extends UmbControllerHostMixin(HTMLElement) {}
 
 describe('UmbContextProvider', () => {
 	type NewType = UmbControllerHostElement;
 
 	let hostElement: NewType;
-	const contextInstance = new MyClass();
+	const contextInstance = new UmbTestContext();
 
 	beforeEach(() => {
 		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostElement;
@@ -35,7 +35,7 @@ describe('UmbContextProvider', () => {
 	describe('Unique controllers replace each other', () => {
 		it('has a host property', () => {
 			const firstCtrl = new UmbContextProviderController(hostElement, 'my-test-context', contextInstance);
-			const secondCtrl = new UmbContextProviderController(hostElement, 'my-test-context', new MyClass());
+			const secondCtrl = new UmbContextProviderController(hostElement, 'my-test-context', new UmbTestContext());
 
 			expect(hostElement.hasController(firstCtrl)).to.be.false;
 			expect(hostElement.hasController(secondCtrl)).to.be.true;

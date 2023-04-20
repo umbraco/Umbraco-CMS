@@ -1,6 +1,6 @@
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -19,7 +19,11 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @memberof UmbDataTypeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString(), new ArrayState<DataTypeResponseModel>([], (x) => x.id));
+		super(
+			host,
+			UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString(),
+			new UmbArrayState<DataTypeResponseModel>([], (x) => x.id)
+		);
 	}
 
 	/**

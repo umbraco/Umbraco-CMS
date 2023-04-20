@@ -1,6 +1,6 @@
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import {
 	UMB_CONFIRM_MODAL,
@@ -12,7 +12,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
-export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
+export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
 	modalAlias: string | UmbModalToken;
 	repository?: UmbItemRepository<ItemType>;
@@ -20,10 +20,10 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 
 	public modalContext?: UmbModalContext;
 
-	#selection = new ArrayState<string>([]);
+	#selection = new UmbArrayState<string>([]);
 	selection = this.#selection.asObservable();
 
-	#selectedItems = new ArrayState<ItemType>([]);
+	#selectedItems = new UmbArrayState<ItemType>([]);
 	selectedItems = this.#selectedItems.asObservable();
 
 	#selectedItemsObserver?: UmbObserverController<ItemType[]>;
@@ -75,6 +75,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	}
 
 	// TODO: revisit this method. How do we best pass picker data?
+	// If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
 	openPicker(pickerData?: any) {
 		if (!this.modalContext) throw new Error('Modal context is not initialized');
 

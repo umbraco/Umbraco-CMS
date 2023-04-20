@@ -3,7 +3,7 @@ import { PropertyContainerTypes } from './workspace-structure-manager.class';
 import { DocumentTypePropertyTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbWorkspacePropertyStructureHelper {
 	#host: UmbControllerHostElement;
@@ -14,7 +14,7 @@ export class UmbWorkspacePropertyStructureHelper {
 	private _isRoot?: boolean;
 	private _containerName?: string;
 
-	#propertyStructure = new ArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.id);
+	#propertyStructure = new UmbArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
