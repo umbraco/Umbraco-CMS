@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
+﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
