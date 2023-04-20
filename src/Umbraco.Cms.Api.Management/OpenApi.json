@@ -909,6 +909,9 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -918,9 +921,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           },
           "409": {
             "description": "Conflict",
@@ -2065,6 +2065,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2074,9 +2077,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -2108,6 +2108,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2117,9 +2120,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -2299,6 +2299,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2312,9 +2315,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -2336,6 +2336,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2349,9 +2352,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -2376,6 +2376,16 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2386,16 +2396,6 @@
                       "$ref": "#/components/schemas/HealthCheckResultResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2450,22 +2450,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedHelpPageResponseModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedHelpPageResponseModel"
                 }
               }
             }
@@ -2528,6 +2528,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2538,16 +2548,6 @@
                       "$ref": "#/components/schemas/IndexResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2572,22 +2572,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OkResultModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResultModel"
                 }
               }
             }
@@ -2602,20 +2602,6 @@
         ],
         "operationId": "GetInstallSettings",
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/InstallSettingsResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2632,6 +2618,20 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InstallSettingsResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -2659,9 +2659,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2681,6 +2678,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -2705,9 +2705,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2717,6 +2714,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -2779,6 +2779,19 @@
           }
         },
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -2791,19 +2804,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -2825,6 +2825,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2838,9 +2841,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       },
@@ -2860,9 +2860,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2882,6 +2879,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       },
@@ -2914,8 +2914,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
+          "404": {
+            "description": "Not Found"
           },
           "400": {
             "description": "Bad Request",
@@ -2927,8 +2927,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found"
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -3038,6 +3038,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -3048,16 +3058,6 @@
                       "$ref": "#/components/schemas/LogLevelCountsReponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3188,22 +3188,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedLogTemplateResponseModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedLogTemplateResponseModel"
                 }
               }
             }
@@ -3269,6 +3269,16 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -3278,16 +3288,6 @@
                   "type": "string",
                   "description": "Location of the newly created resource",
                   "format": "uri"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3312,6 +3312,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -3325,9 +3328,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       },
@@ -3347,11 +3347,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -3381,9 +3381,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -3393,6 +3390,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -3856,6 +3856,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -3865,9 +3868,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -3899,6 +3899,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -3908,9 +3911,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -4401,9 +4401,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -4416,6 +4413,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -4478,6 +4478,19 @@
           }
         },
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -4490,19 +4503,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -4525,6 +4525,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -4538,9 +4541,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       },
@@ -4561,11 +4561,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
           }
         }
       },
@@ -4599,11 +4599,11 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -4626,6 +4626,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -4636,9 +4639,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -4909,22 +4909,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedBooleanModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedBooleanModel"
                 }
               }
             }
@@ -5023,22 +5023,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRedirectUrlResponseModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedRedirectUrlResponseModel"
                 }
               }
             }
@@ -5838,6 +5838,16 @@
         ],
         "operationId": "GetServerStatus",
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -5848,16 +5858,6 @@
                       "$ref": "#/components/schemas/ServerStatusResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -5872,6 +5872,16 @@
         ],
         "operationId": "GetServerVersion",
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -5882,16 +5892,6 @@
                       "$ref": "#/components/schemas/VersionResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -6294,9 +6294,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -6306,6 +6303,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -6775,20 +6775,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/TemporaryFileResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -6805,6 +6791,20 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemporaryFileResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -6828,9 +6828,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -6850,6 +6847,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -7093,12 +7093,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups": {
+    "/umbraco/management/api/v1/user-group": {
       "post": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "PostUserGroups",
+        "operationId": "PostUserGroup",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7113,6 +7113,16 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -7125,24 +7135,14 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
           }
         }
       },
       "get": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "GetUserGroups",
+        "operationId": "GetUserGroup",
         "parameters": [
           {
             "name": "skip",
@@ -7177,12 +7177,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups/{id}": {
+    "/umbraco/management/api/v1/user-group/{id}": {
       "get": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "GetUserGroupsById",
+        "operationId": "GetUserGroupById",
         "parameters": [
           {
             "name": "id",
@@ -7216,9 +7216,9 @@
       },
       "delete": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "DeleteUserGroupsById",
+        "operationId": "DeleteUserGroupById",
         "parameters": [
           {
             "name": "id",
@@ -7241,9 +7241,9 @@
       },
       "put": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "PutUserGroupsById",
+        "operationId": "PutUserGroupById",
         "parameters": [
           {
             "name": "id",
@@ -7319,12 +7319,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users": {
+    "/umbraco/management/api/v1/user": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsers",
+        "operationId": "PostUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7370,9 +7370,9 @@
       },
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsers",
+        "operationId": "GetUser",
         "parameters": [
           {
             "name": "skip",
@@ -7407,12 +7407,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/{id}": {
+    "/umbraco/management/api/v1/user/{id}": {
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsersById",
+        "operationId": "GetUserById",
         "parameters": [
           {
             "name": "id",
@@ -7446,9 +7446,9 @@
       },
       "delete": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "DeleteUsersById",
+        "operationId": "DeleteUserById",
         "parameters": [
           {
             "name": "id",
@@ -7468,9 +7468,9 @@
       },
       "put": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PutUsersById",
+        "operationId": "PutUserById",
         "parameters": [
           {
             "name": "id",
@@ -7502,12 +7502,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/avatar/{id}": {
+    "/umbraco/management/api/v1/user/avatar/{id}": {
       "delete": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "DeleteUsersAvatarById",
+        "operationId": "DeleteUserAvatarById",
         "parameters": [
           {
             "name": "id",
@@ -7527,9 +7527,9 @@
       },
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersAvatarById",
+        "operationId": "PostUserAvatarById",
         "parameters": [
           {
             "name": "id",
@@ -7571,12 +7571,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/change-password/{id}": {
+    "/umbraco/management/api/v1/user/change-password/{id}": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersChangePasswordById",
+        "operationId": "PostUserChangePasswordById",
         "parameters": [
           {
             "name": "id",
@@ -7608,12 +7608,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/disable": {
+    "/umbraco/management/api/v1/user/disable": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersDisable",
+        "operationId": "PostUserDisable",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7644,12 +7644,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/enable": {
+    "/umbraco/management/api/v1/user/enable": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersEnable",
+        "operationId": "PostUserEnable",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7680,12 +7680,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/filter": {
+    "/umbraco/management/api/v1/user/filter": {
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsersFilter",
+        "operationId": "GetUserFilter",
         "parameters": [
           {
             "name": "skip",
@@ -7758,12 +7758,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/invite": {
+    "/umbraco/management/api/v1/user/invite": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersInvite",
+        "operationId": "PostUserInvite",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7780,6 +7780,68 @@
         "responses": {
           "200": {
             "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/user/set-user-groups": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserSetUserGroups",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/user/unlock": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserUnlock",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UnlockUsersRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
           }
         }
       }
@@ -7818,68 +7880,6 @@
                       }
                     ]
                   }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/users/set-user-groups": {
-      "post": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "PostUsersSetUserGroups",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/users/unlock": {
-      "post": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "PostUsersUnlock",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UnlockUsersRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -9637,7 +9637,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {},
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -10225,7 +10225,7 @@
           },
           "extensions": {
             "type": "array",
-            "items": {}
+            "items": { }
           }
         },
         "additionalProperties": false
@@ -11165,7 +11165,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {}
+        "additionalProperties": { }
       },
       "ProfilingStatusRequestModel": {
         "type": "object",
@@ -12660,7 +12660,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {}
+            "scopes": { }
           }
         }
       }
@@ -12668,7 +12668,7 @@
   },
   "security": [
     {
-      "OAuth": []
+      "OAuth": [ ]
     }
   ]
 }
