@@ -1,5 +1,5 @@
 import type { MediaDetails } from '../';
-import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
+import { UmbMediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
@@ -36,7 +36,7 @@ export class UmbMediaRepository
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new MediaTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbMediaTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbMediaDetailServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -96,7 +96,7 @@ export class UmbMediaRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -119,7 +119,7 @@ export class UmbMediaRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

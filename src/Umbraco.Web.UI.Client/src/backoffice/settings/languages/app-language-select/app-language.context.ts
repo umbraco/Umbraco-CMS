@@ -1,5 +1,5 @@
 import { UmbLanguageRepository } from '../repository/language.repository';
-import { ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -10,7 +10,7 @@ export class UmbAppLanguageContext {
 
 	#languages: Array<LanguageResponseModel> = [];
 
-	#appLanguage = new ObjectState<LanguageResponseModel | undefined>(undefined);
+	#appLanguage = new UmbObjectState<LanguageResponseModel | undefined>(undefined);
 	appLanguage = this.#appLanguage.asObservable();
 
 	constructor(host: UmbControllerHostElement) {

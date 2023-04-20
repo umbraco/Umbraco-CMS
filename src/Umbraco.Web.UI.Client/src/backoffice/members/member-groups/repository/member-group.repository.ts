@@ -1,7 +1,7 @@
 import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from './member-group.tree.store';
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store';
-import { MemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
+import { UmbMemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -26,7 +26,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new MemberGroupTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbMemberGroupTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbMemberGroupDetailServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -59,7 +59,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return { data: undefined, error };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -82,7 +82,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

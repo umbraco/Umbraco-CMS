@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -11,15 +11,13 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
  * @description - Data Store for Templates
  */
 export class UmbTemplateStore extends UmbStoreBase {
-	#data = new ArrayState<TemplateResponseModel>([], (x) => x.id);
-
 	/**
 	 * Creates an instance of UmbTemplateStore.
 	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbTemplateStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_TEMPLATE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_TEMPLATE_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<TemplateResponseModel>([], (x) => x.id));
 	}
 
 	/**
@@ -28,7 +26,7 @@ export class UmbTemplateStore extends UmbStoreBase {
 	 * @memberof UmbTemplateStore
 	 */
 	append(template: TemplateResponseModel) {
-		this.#data.append([template]);
+		this._data.append([template]);
 	}
 
 	/**
@@ -37,7 +35,7 @@ export class UmbTemplateStore extends UmbStoreBase {
 	 * @memberof UmbTemplateStore
 	 */
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 

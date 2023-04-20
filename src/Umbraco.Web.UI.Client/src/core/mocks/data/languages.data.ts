@@ -16,6 +16,10 @@ class UmbLanguagesData extends UmbData<LanguageResponseModel> {
 		return this.data.find((item) => item.isoCode === isoCode);
 	}
 
+	getItems(isoCodes: Array<string>) {
+		return this.data.filter((item) => isoCodes.indexOf(item.isoCode || '') !== -1);
+	}
+
 	insert(language: LanguageResponseModel) {
 		const foundIndex = this.data.findIndex((item) => item.isoCode === language.isoCode);
 

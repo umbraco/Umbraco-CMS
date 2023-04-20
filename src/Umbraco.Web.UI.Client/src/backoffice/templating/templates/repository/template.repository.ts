@@ -1,5 +1,5 @@
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
-import { TemplateTreeServerDataSource } from './sources/template.tree.server.data';
+import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data';
 import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
 import type { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
@@ -21,7 +21,7 @@ export class UmbTemplateRepository
 	#init;
 	#host: UmbControllerHostElement;
 
-	#treeDataSource: TemplateTreeServerDataSource;
+	#treeDataSource: UmbTemplateTreeServerDataSource;
 	#detailDataSource: UmbTemplateDetailServerDataSource;
 
 	#treeStore?: UmbTemplateTreeStore;
@@ -33,7 +33,7 @@ export class UmbTemplateRepository
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeDataSource = new TemplateTreeServerDataSource(this.#host);
+		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -82,7 +82,7 @@ export class UmbTemplateRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -105,7 +105,7 @@ export class UmbTemplateRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

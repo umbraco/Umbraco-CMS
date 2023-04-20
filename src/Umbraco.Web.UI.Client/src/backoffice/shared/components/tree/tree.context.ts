@@ -1,7 +1,7 @@
 import type { Observable } from 'rxjs';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
-import { DeepState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
@@ -10,6 +10,7 @@ export interface UmbTreeContext {
 	readonly selectable: Observable<boolean>;
 	readonly selection: Observable<Array<string>>;
 	setSelectable(value: boolean): void;
+	setMultiple(value: boolean): void;
 	setSelection(value: Array<string>): void;
 	select(id: string): void;
 }
@@ -18,10 +19,13 @@ export class UmbTreeContextBase implements UmbTreeContext {
 	host: UmbControllerHostElement;
 	public tree: ManifestTree;
 
-	#selectable = new DeepState(false);
+	#selectable = new UmbBooleanState(false);
 	public readonly selectable = this.#selectable.asObservable();
 
-	#selection = new DeepState(<Array<string>>[]);
+	#multiple = new UmbBooleanState(false);
+	public readonly multiple = this.#multiple.asObservable();
+
+	#selection = new UmbArrayState(<Array<string>>[]);
 	public readonly selection = this.#selection.asObservable();
 
 	repository?: UmbTreeRepository;
@@ -69,22 +73,36 @@ export class UmbTreeContextBase implements UmbTreeContext {
 		this.#selectable.next(value);
 	}
 
+	public getSelectable() {
+		return this.#selectable.getValue();
+	}
+
+	public setMultiple(value: boolean) {
+		this.#multiple.next(value);
+	}
+
+	public getMultiple() {
+		return this.#multiple.getValue();
+	}
+
 	public setSelection(value: Array<string>) {
 		if (!value) return;
 		this.#selection.next(value);
 	}
 
-	public select(id: string) {
-		const oldSelection = this.#selection.getValue();
-		if (oldSelection.indexOf(id) !== -1) return;
+	public getSelection() {
+		return this.#selection.getValue();
+	}
 
-		const selection = [...oldSelection, id];
-		this.#selection.next(selection);
+	public select(id: string) {
+		if (!this.getSelectable()) return;
+		const newSelection = this.getMultiple() ? [...this.getSelection(), id] : [id];
+		this.#selection.next(newSelection);
 	}
 
 	public deselect(id: string) {
-		const selection = this.#selection.getValue();
-		this.#selection.next(selection.filter((x) => x !== id));
+		const newSelection = this.getSelection().filter((x) => x !== id);
+		this.#selection.next(newSelection);
 	}
 
 	public async requestRootItems() {

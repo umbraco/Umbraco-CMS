@@ -21,7 +21,7 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 		if (!this.#modalContext || !this.repository) return;
 
 		// TODO: should we subscribe in cases like this?
-		const { data } = await this.repository.requestTreeItems(this.selection);
+		const { data } = await this.repository.requestItemsLegacy(this.selection);
 
 		if (data) {
 			// TODO: use correct markup

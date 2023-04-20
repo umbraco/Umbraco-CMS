@@ -1,7 +1,7 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
@@ -11,18 +11,20 @@ import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api
  * @description - Data Store for Dictionary
  */
 export class UmbDictionaryStore extends UmbStoreBase {
-	#data = new ArrayState<DictionaryItemResponseModel>([], (x) => x.id);
-
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DICTIONARY_STORE_CONTEXT_TOKEN.toString());
+		super(
+			host,
+			UMB_DICTIONARY_STORE_CONTEXT_TOKEN.toString(),
+			new UmbArrayState<DictionaryItemResponseModel>([], (x) => x.id)
+		);
 	}
 
 	append(dictionary: DictionaryItemResponseModel) {
-		this.#data.append([dictionary]);
+		this._data.append([dictionary]);
 	}
 
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 

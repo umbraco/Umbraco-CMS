@@ -5,7 +5,7 @@ import { UmbContextRequestEventImplementation, umbContextRequestEventType } from
 
 const testContextAlias = 'my-test-context';
 
-class MyClass {
+class UmbTestContextConsumerClass {
 	prop = 'value from provider';
 }
 
@@ -39,16 +39,20 @@ describe('UmbContextConsumer', () => {
 	});
 
 	it('works with UmbContextProvider', (done) => {
-		const provider = new UmbContextProvider(document.body, testContextAlias, new MyClass());
+		const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 		provider.hostConnected();
 
 		const element = document.createElement('div');
 		document.body.appendChild(element);
 
-		const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: MyClass) => {
-			expect(_instance.prop).to.eq('value from provider');
-			done();
-		});
+		const localConsumer = new UmbContextConsumer(
+			element,
+			testContextAlias,
+			(_instance: UmbTestContextConsumerClass) => {
+				expect(_instance.prop).to.eq('value from provider');
+				done();
+			}
+		);
 		localConsumer.hostConnected();
 
 		provider.hostDisconnected();

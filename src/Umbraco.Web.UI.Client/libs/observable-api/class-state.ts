@@ -1,16 +1,16 @@
 import { BehaviorSubject } from 'rxjs';
 
-interface ClassStateData {
-	equal(otherClass: ClassStateData): boolean;
+interface UmbClassStateData {
+	equal(otherClass: UmbClassStateData): boolean;
 }
 
 /**
  * @export
- * @class ClassState
+ * @class UmbClassState
  * @extends {BehaviorSubject<T>}
  * @description - A RxJS BehaviorSubject which can hold class instance which has a equal method to compare in coming instances for changes.
  */
-export class ClassState<T extends ClassStateData | undefined | null> extends BehaviorSubject<T> {
+export class UmbClassState<T extends UmbClassStateData | undefined | null> extends BehaviorSubject<T> {
 	constructor(initialData: T) {
 		super(initialData);
 	}
