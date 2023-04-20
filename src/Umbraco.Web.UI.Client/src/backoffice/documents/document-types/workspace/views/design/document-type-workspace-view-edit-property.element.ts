@@ -12,12 +12,22 @@ import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/back
 export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 	/**
 	 * Property, the data object for the property.
-	 * @type {string}
+	 * @type {PropertyTypeResponseModelBaseModel}
 	 * @attr
-	 * @default ''
+	 * @default undefined
 	 */
 	@property({ type: Object })
 	public property?: PropertyTypeResponseModelBaseModel;
+
+	/**
+	 * Inherited, Determines if the property is part of the main document type thats being edited.
+	 * If true, then the property is inherited from another document type, not a part of the main document type.
+	 * @type {boolean}
+	 * @attr
+	 * @default undefined
+	 */
+	@property({ type: Boolean })
+	public inherited?: boolean;
 
 	_firePartialUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
 		const partialObject = {} as any;
@@ -26,8 +36,20 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
 	}
 
-	render() {
-		// TODO: Only show alias on label if user has access to DocumentType within settings:
+	renderInheritedProperty() {
+		return this.property
+			? html`
+					<div id="header">
+						<b>${this.property.name}</b>
+						<i>${this.property.alias}</i>
+						<p>${this.property.description}</p>
+					</div>
+					<div id="editor"></div>
+			  `
+			: '';
+	}
+
+	renderEditableProperty() {
 		return this.property
 			? html`
 					<div id="header">
@@ -50,9 +72,14 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 								}}></uui-textarea>
 						</p>
 					</div>
-					<div></div>
+					<div id="editor"></div>
 			  `
 			: '';
+	}
+
+	render() {
+		// TODO: Only show alias on label if user has access to DocumentType within settings:
+		return this.inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
 	}
 
 	static styles = [
@@ -81,8 +108,27 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 				border-bottom: none;
 			}
 
-			:host-context(umb-variantable-property:first-of-type) {
+			:host(:first-of-type) {
 				padding-top: 0;
+			}
+			:host([draggable='true']) {
+				cursor: grab;
+			}
+
+			/* Placeholder style, used when property is being dragged.*/
+			:host(.--umb-sorter-placeholder) {
+				height: 2px;
+			}
+			:host(.--umb-sorter-placeholder) > div {
+				display: none;
+			}
+			:host(.--umb-sorter-placeholder)::after {
+				content: '';
+				grid-column: span 2;
+				width: 100%;
+				border-top: 2px solid blue;
+				border-radius: 1px;
+				/* TODO: Make use of same highlight color as UUI and the same Animation. Consider making this a component/(available style) in UUI? */
 			}
 
 			p {
@@ -94,6 +140,10 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 				top: var(--uui-size-space-4);
 				height: min-content;
 				z-index: 2;
+			}
+
+			#editor {
+				background-color: var(--uui-color-background);
 			}
 		`,
 	];

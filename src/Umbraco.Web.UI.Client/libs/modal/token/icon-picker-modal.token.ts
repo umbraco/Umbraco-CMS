@@ -1,8 +1,8 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbIconPickerModalData {
-	multiple: boolean;
-	selection: string[];
+	color: string | undefined;
+	icon: string | undefined;
 }
 
 export interface UmbIconPickerModalResult {

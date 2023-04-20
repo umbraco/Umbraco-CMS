@@ -36,6 +36,7 @@
 			"@umbraco-cms/backoffice/repository": ["libs/repository"],
 			"@umbraco-cms/backoffice/resources": ["libs/resources"],
 			"@umbraco-cms/backoffice/router": ["libs/router"],
+			"@umbraco-cms/backoffice/sorter": ["libs/sorter"],
 			"@umbraco-cms/backoffice/store": ["libs/store"],
 			"@umbraco-cms/backoffice/utils": ["libs/utils"],
 			"@umbraco-cms/backoffice/workspace": ["libs/workspace"],

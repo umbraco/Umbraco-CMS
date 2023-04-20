@@ -10,30 +10,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				width: 100%;
-				height: 100%;
-
-				display: flex;
-				flex: 1;
-				flex-direction: column;
-			}
-
-			#splitViews {
-				display: flex;
-				width: 100%;
-				height: calc(100% - var(--umb-footer-layout-height));
-			}
-
-			#breadcrumbs {
-				margin: 0 var(--uui-size-layout-1);
-			}
-		`,
-	];
-
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
 	@state()
@@ -82,6 +58,30 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 					</umb-workspace-footer-layout>`
 			: nothing;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				width: 100%;
+				height: 100%;
+
+				display: flex;
+				flex: 1;
+				flex-direction: column;
+			}
+
+			#splitViews {
+				display: flex;
+				width: 100%;
+				height: calc(100% - var(--umb-footer-layout-height));
+			}
+
+			#breadcrumbs {
+				margin: 0 var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceSplitViewElement;

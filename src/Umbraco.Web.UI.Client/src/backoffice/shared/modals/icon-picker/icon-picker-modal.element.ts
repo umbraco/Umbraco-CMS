@@ -2,7 +2,7 @@ import type { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import icons from '../../../../../public-assets/icons/icons.json';
@@ -13,6 +13,128 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalResult> {
+	private _iconList = icons.map((icon) => icon.name);
+
+	@state()
+	private _iconListFiltered: Array<string> = [];
+
+	@state()
+	private _colorList = [
+		'#000000',
+		'#373737',
+		'#9e9e9e',
+		'#607d8b',
+		'#2196f3',
+		'#03a9f4',
+		'#3f51b5',
+		'#9c27b0',
+		'#673ab7',
+		'#00bcd4',
+		'#4caf50',
+		'#8bc34a',
+		'#cddc39',
+		'#ffeb3b',
+		'#ffc107',
+		'#ff9800',
+		'#ff5722',
+		'#f44336',
+		'#e91e63',
+		'#795548',
+	];
+
+	@state()
+	private _currentColor?: string;
+
+	@state()
+	private _currentIcon?: string;
+
+	private _changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
+		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
+			this._currentIcon = e.target.id;
+		}
+	}
+
+	private _filterIcons(e: { target: HTMLInputElement }) {
+		if (e.target.value) {
+			this._iconListFiltered = this._iconList.filter((icon) => icon.includes(e.target.value));
+		} else {
+			this._iconListFiltered = this._iconList;
+		}
+	}
+
+	private _close() {
+		this.modalHandler?.reject();
+	}
+
+	private _submit() {
+		this.modalHandler?.submit({ color: this._currentColor, icon: this._currentIcon });
+	}
+
+	private _onColorChange(e: UUIColorSwatchesEvent) {
+		this._currentColor = e.target.value;
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+		this._currentColor = this.data?.color ?? this._colorList[0];
+		this._currentIcon = this.data?.icon ?? this._iconList[0];
+		this._iconListFiltered = this._iconList;
+	}
+
+	render() {
+		return html`
+			<umb-workspace-layout headline="Select Icon">
+				<div id="container">
+					${this.renderSearchbar()}
+					<hr />
+					<uui-color-swatches
+						.value="${this._currentColor || ''}"
+						label="Color switcher for icons"
+						@change="${this._onColorChange}">
+						${this._colorList.map(
+							(color) =>
+								html` <uui-color-swatch label="${color}" title="${color}" value="${color}"></uui-color-swatch> `
+						)}
+					</uui-color-swatches>
+
+					<hr />
+					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
+				</div>
+				<uui-button slot="actions" look="secondary" label="close" @click="${this._close}">Close</uui-button>
+				<uui-button slot="actions" color="positive" look="primary" @click="${this._submit}" label="Submit">
+					Submit
+				</uui-button>
+			</umb-workspace-layout>
+		`;
+	}
+
+	renderSearchbar() {
+		return html` <uui-input
+			@keyup="${this._filterIcons}"
+			placeholder="Type to filter..."
+			label="Type to filter icons"
+			id="searchbar">
+			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
+		</uui-input>`;
+	}
+
+	renderIconSelection() {
+		return html`${this._iconListFiltered.map((icon) => {
+			return html`
+				<uui-icon
+					tabindex="0"
+					style=${styleMap({ color: this._currentColor })}
+					class="icon ${icon === this._currentIcon ? 'selected' : ''}"
+					title="${icon}"
+					name="${icon}"
+					label="${icon}"
+					id="${icon}"
+					@click="${this._changeIcon}"
+					@keyup="${this._changeIcon}"></uui-icon>
+			`;
+		})}`;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -82,129 +204,6 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			}
 		`,
 	];
-
-	@property({ type: Array })
-	iconlist = icons.map((icon) => icon.name);
-
-	@property({ type: Array })
-	iconlistFiltered: Array<string> = [];
-
-	@property({ type: Array })
-	colorlist = [
-		'#000000',
-		'#373737',
-		'#9e9e9e',
-		'#607d8b',
-		'#2196f3',
-		'#03a9f4',
-		'#3f51b5',
-		'#9c27b0',
-		'#673ab7',
-		'#00bcd4',
-		'#4caf50',
-		'#8bc34a',
-		'#cddc39',
-		'#ffeb3b',
-		'#ffc107',
-		'#ff9800',
-		'#ff5722',
-		'#f44336',
-		'#e91e63',
-		'#795548',
-	];
-
-	@state()
-	private _currentColor?: string;
-
-	@state()
-	private _currentIcon?: string;
-
-	private _changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
-		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
-			this._currentIcon = e.target.id;
-		}
-	}
-
-	private _filterIcons(e: { target: HTMLInputElement }) {
-		if (e.target.value) {
-			this.iconlistFiltered = this.iconlist.filter((icon) => icon.includes(e.target.value));
-		} else {
-			this.iconlistFiltered = this.iconlist;
-		}
-	}
-
-	private _close() {
-		this.modalHandler?.reject();
-	}
-
-	private _save() {
-		this.modalHandler?.submit({ color: this._currentColor, icon: this._currentIcon });
-	}
-
-	private _onColorChange(e: UUIColorSwatchesEvent) {
-		this._currentColor = e.target.value;
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this._currentColor = this.colorlist[0];
-		this._currentIcon = this.iconlist[0];
-		this.iconlistFiltered = this.iconlist;
-	}
-
-	render() {
-		return html`
-			<umb-workspace-layout headline="Select Icon">
-				<div id="container">
-					${this.renderSearchbar()}
-					<hr />
-					<uui-color-swatches
-						.value="${this._currentColor || ''}"
-						label="Color switcher for icons"
-						@change="${this._onColorChange}">
-						${this.colorlist.map(
-							(color) =>
-								html` <uui-color-swatch label="${color}" title="${color}" value="${color}"></uui-color-swatch> `
-						)}
-					</uui-color-swatches>
-
-					<hr />
-					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
-				</div>
-				<uui-button slot="actions" look="secondary" label="close" @click="${this._close}">Close</uui-button>
-				<uui-button slot="actions" color="positive" look="primary" @click="${this._save}" label="save">
-					Save
-				</uui-button>
-			</umb-workspace-layout>
-		`;
-	}
-
-	renderSearchbar() {
-		return html` <uui-input
-			@keyup="${this._filterIcons}"
-			placeholder="Type to filter..."
-			label="Type to filter icons"
-			id="searchbar">
-			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
-		</uui-input>`;
-	}
-
-	renderIconSelection() {
-		return html`${this.iconlistFiltered.map((icon) => {
-			return html`
-				<uui-icon
-					tabindex="0"
-					style=${styleMap({ color: this._currentColor })}
-					class="icon ${icon === this._currentIcon ? 'selected' : ''}"
-					title="${icon}"
-					name="${icon}"
-					label="${icon}"
-					id="${icon}"
-					@click="${this._changeIcon}"
-					@keyup="${this._changeIcon}"></uui-icon>
-			`;
-		})}`;
-	}
 }
 
 export default UmbIconPickerModalElement;

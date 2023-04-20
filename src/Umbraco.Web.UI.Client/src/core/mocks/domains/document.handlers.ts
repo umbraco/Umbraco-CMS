@@ -1,6 +1,5 @@
 import { rest } from 'msw';
 import { umbDocumentData } from '../data/document.data';
-import type { DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
@@ -35,7 +34,16 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.post<DocumentResponseModel[]>('/umbraco/management/api/v1/document/:id', async (req, res, ctx) => {
+	rest.post(umbracoPath(`/document`), async (req, res, ctx) => {
+		const data = await req.json();
+		if (!data) return;
+
+		umbDocumentData.insert(data);
+
+		return res(ctx.status(200));
+	}),
+
+	rest.put(umbracoPath(`/document/:id`), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
