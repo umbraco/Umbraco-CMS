@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
@@ -10,7 +10,7 @@ export type UmbCurrentUserHistoryItem = {
 };
 
 export class UmbCurrentUserHistoryStore {
-	#history = new DeepState(<Array<UmbCurrentUserHistoryItem>>[]);
+	#history = new UmbDeepState(<Array<UmbCurrentUserHistoryItem>>[]);
 
 	public readonly history = this.#history.asObservable();
 	public readonly latestHistory = this.#history.getObservablePart((historyItems) => historyItems.slice(-10));

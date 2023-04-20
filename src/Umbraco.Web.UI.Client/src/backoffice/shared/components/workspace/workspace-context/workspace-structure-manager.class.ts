@@ -9,7 +9,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 import {
-	ArrayState,
+	UmbArrayState,
 	UmbObserverController,
 	MappingFunction,
 	partialUpdateFrozenArray,
@@ -31,13 +31,13 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	#rootDocumentTypeId?: string;
 	#documentTypeObservers = new Array<UmbControllerInterface>();
-	#documentTypes = new ArrayState<T>([], (x) => x.id);
+	#documentTypes = new UmbArrayState<T>([], (x) => x.id);
 	readonly documentTypes = this.#documentTypes.asObservable();
 	private readonly _documentTypeContainers = this.#documentTypes.getObservablePart((x) =>
 		x.flatMap((x) => x.containers ?? [])
 	);
 
-	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
+	#containers = new UmbArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement, typeRepository: R) {
 		this.#host = host;

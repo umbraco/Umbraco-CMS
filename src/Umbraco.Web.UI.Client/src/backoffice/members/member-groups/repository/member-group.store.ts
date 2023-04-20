@@ -1,6 +1,6 @@
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
@@ -11,7 +11,7 @@ import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
  * @description - Data Store for Member Groups
  */
 export class UmbMemberGroupStore extends UmbStoreBase {
-	#data = new ArrayState<MemberGroupDetails>([], (x) => x.id);
+	#data = new UmbArrayState<MemberGroupDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString());

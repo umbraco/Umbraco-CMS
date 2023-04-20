@@ -1,14 +1,14 @@
 import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
 import type { Entity } from '@umbraco-cms/backoffice/models';
-import { ObjectState, StringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type ActiveTreeItemType = Entity | undefined;
 
 export class UmbSectionContext {
-	#manifestAlias = new StringState<string | undefined>(undefined);
-	#manifestPathname = new StringState<string | undefined>(undefined);
-	#manifestLabel = new StringState<string | undefined>(undefined);
+	#manifestAlias = new UmbStringState<string | undefined>(undefined);
+	#manifestPathname = new UmbStringState<string | undefined>(undefined);
+	#manifestLabel = new UmbStringState<string | undefined>(undefined);
 	public readonly alias = this.#manifestAlias.asObservable();
 	public readonly pathname = this.#manifestPathname.asObservable();
 	public readonly label = this.#manifestLabel.asObservable();

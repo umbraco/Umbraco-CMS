@@ -1,5 +1,5 @@
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -9,7 +9,7 @@ import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
  * @description - General Tree Data Store
  */
 export class UmbEntityTreeStore extends UmbStoreBase implements UmbTreeStore<EntityTreeItemResponseModel> {
-	#data = new ArrayState<EntityTreeItemResponseModel>([], (x) => x.id);
+	#data = new UmbArrayState<EntityTreeItemResponseModel>([], (x) => x.id);
 
 	/**
 	 * Appends items to the store

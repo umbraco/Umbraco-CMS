@@ -1,4 +1,4 @@
-import { DocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data';
+import { UmbDocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data';
 import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data';
 import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store';
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store';
@@ -31,7 +31,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new DocumentTypeTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbDocumentTypeTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbDocumentTypeServerDataSource(this.#host);
 
 		this.#init = Promise.all([
