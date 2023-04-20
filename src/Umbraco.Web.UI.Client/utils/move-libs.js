@@ -3,19 +3,15 @@
 // Example: import { Foo } from '@umbraco-cms/backoffice/element' -> import { Foo } from './element'
 // This is needed because the d.ts files are not in the same folder as the source files
 // and the absolute paths are not valid when the d.ts files are copied to the dist folder
-// This is only used when building the d.ts files
+// This is only used when building the d.ts files.
 //
-// Usage: node utils/transform-dts.js
+// This script also copies the package.json and README.md files to the dist/libs folder
+// and the umbraco-package-schema.json file to the Umbraco.Web.UI.New folder
 //
-// Note: This script is not used in the build process, it is only used to transform the d.ts files
-//       when the d.ts files are copied to the dist folder
-
-// Note: Updated to help copy the two JSON files generated from webcomponant analyzer tool
-// One is specific to VSCode HTMLCutomData for intellisense and the other is a more broad format used in storybook etc
+// Usage: node utils/move-libs.js
 
 import { readdirSync, readFileSync, writeFileSync, cpSync, mkdirSync } from 'fs';
 
-const rootDir = './';
 const srcDir = './libs';
 const inputDir = './dist/libs';
 const outputDir = '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice/libs';
