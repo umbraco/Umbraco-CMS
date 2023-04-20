@@ -7093,12 +7093,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups": {
+    "/umbraco/management/api/v1/user-group": {
       "post": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "PostUserGroups1.0",
+        "operationId": "PostUserGroup1.0",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7140,9 +7140,9 @@
       },
       "get": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "GetUserGroups1.0",
+        "operationId": "GetUserGroup1.0",
         "parameters": [
           {
             "name": "skip",
@@ -7177,12 +7177,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups/{id}": {
+    "/umbraco/management/api/v1/user-group/{id}": {
       "get": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "GetUserGroupsById1.0",
+        "operationId": "GetUserGroupById1.0",
         "parameters": [
           {
             "name": "id",
@@ -7216,9 +7216,9 @@
       },
       "delete": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "DeleteUserGroupsById1.0",
+        "operationId": "DeleteUserGroupById1.0",
         "parameters": [
           {
             "name": "id",
@@ -7241,9 +7241,9 @@
       },
       "put": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "PutUserGroupsById1.0",
+        "operationId": "PutUserGroupById1.0",
         "parameters": [
           {
             "name": "id",
@@ -7319,12 +7319,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users": {
+    "/umbraco/management/api/v1/user": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsers1.0",
+        "operationId": "PostUser1.0",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7370,9 +7370,9 @@
       },
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsers1.0",
+        "operationId": "GetUser1.0",
         "parameters": [
           {
             "name": "skip",
@@ -7407,12 +7407,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/{id}": {
+    "/umbraco/management/api/v1/user/{id}": {
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsersById1.0",
+        "operationId": "GetUserById1.0",
         "parameters": [
           {
             "name": "id",
@@ -7446,9 +7446,9 @@
       },
       "delete": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "DeleteUsersById",
+        "operationId": "DeleteUserById",
         "parameters": [
           {
             "name": "id",
@@ -7468,9 +7468,9 @@
       },
       "put": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PutUsersById1.0",
+        "operationId": "PutUserById1.0",
         "parameters": [
           {
             "name": "id",
@@ -7502,12 +7502,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/avatar/{id}": {
+    "/umbraco/management/api/v1/user/avatar/{id}": {
       "delete": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "DeleteUsersAvatarById",
+        "operationId": "DeleteUserAvatarById",
         "parameters": [
           {
             "name": "id",
@@ -7527,9 +7527,9 @@
       },
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersAvatarById",
+        "operationId": "PostUserAvatarById",
         "parameters": [
           {
             "name": "id",
@@ -7571,12 +7571,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/change-password/{id}": {
+    "/umbraco/management/api/v1/user/change-password/{id}": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersChangePasswordById1.0",
+        "operationId": "PostUserChangePasswordById1.0",
         "parameters": [
           {
             "name": "id",
@@ -7608,12 +7608,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/disable": {
+    "/umbraco/management/api/v1/user/disable": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersDisable1.0",
+        "operationId": "PostUserDisable1.0",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7644,12 +7644,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/enable": {
+    "/umbraco/management/api/v1/user/enable": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersEnable1.0",
+        "operationId": "PostUserEnable1.0",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7680,12 +7680,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/filter": {
+    "/umbraco/management/api/v1/user/filter": {
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsersFilter1.0",
+        "operationId": "GetUserFilter1.0",
         "parameters": [
           {
             "name": "skip",
@@ -7758,12 +7758,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/invite": {
+    "/umbraco/management/api/v1/user/invite": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersInvite1.0",
+        "operationId": "PostUserInvite1.0",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7780,6 +7780,68 @@
         "responses": {
           "200": {
             "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/user/set-user-groups": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserSetUserGroups1.0",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/user/unlock": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserUnlock1.0",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UnlockUsersRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
           }
         }
       }
@@ -7818,68 +7880,6 @@
                       }
                     ]
                   }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/users/set-user-groups": {
-      "post": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "PostUsersSetUserGroups1.0",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UpdateUserGroupsOnUserRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/users/unlock": {
-      "post": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "PostUsersUnlock1.0",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/UnlockUsersRequestModel"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
