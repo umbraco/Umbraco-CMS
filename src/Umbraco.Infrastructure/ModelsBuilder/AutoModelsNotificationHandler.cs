@@ -62,6 +62,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     /// <summary>
     ///     Initializes a new instance of the <see cref="AutoModelsNotificationHandler" /> class.
     /// </summary>
+    [ActivatorUtilitiesConstructor]
     public AutoModelsNotificationHandler(
         ILogger<AutoModelsNotificationHandler> logger,
         IOptionsMonitor<ModelsBuilderSettings> config,

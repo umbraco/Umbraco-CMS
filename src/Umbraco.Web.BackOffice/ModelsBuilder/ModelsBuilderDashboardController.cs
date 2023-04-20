@@ -44,7 +44,8 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
 
     [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with IModelsGenerator instead.")]
     [Browsable(false)]
-    public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config,
+    public ModelsBuilderDashboardController(
+        IOptions<ModelsBuilderSettings> config,
         ModelsGenerator modelsGenerator,
         OutOfDateModelsStatus outOfDateModels,
         ModelsGenerationError mbErrors)
@@ -54,7 +55,8 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
 
     [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with only IModelsGenerator instead.")]
     [Browsable(false)]
-    public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config,
+    public ModelsBuilderDashboardController(
+        IOptions<ModelsBuilderSettings> config,
         ModelsGenerator concreteModelGenerator,
         IModelsGenerator modelsGenerator,
         OutOfDateModelsStatus outOfDateModels,
@@ -63,6 +65,7 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
     }
 
+    [ActivatorUtilitiesConstructor]
     public ModelsBuilderDashboardController(IOptions<ModelsBuilderSettings> config,
         IModelsGenerator modelsGenerator,
         OutOfDateModelsStatus outOfDateModels,

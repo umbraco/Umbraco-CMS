@@ -35,12 +35,13 @@ public class BuildModelsBuilderController : ModelsBuilderControllerBase
     public BuildModelsBuilderController(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
-        IModelsGenerator modelGenerator,
-        ModelsGenerator concreteModelGenerator)
+        ModelsGenerator concreteModelGenerator,
+        IModelsGenerator modelGenerator)
     : this(modelsBuilderSettings, mbErrors, modelGenerator)
     {
     }
 
+    [ActivatorUtilitiesConstructor]
     public BuildModelsBuilderController(
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         ModelsGenerationError mbErrors,
