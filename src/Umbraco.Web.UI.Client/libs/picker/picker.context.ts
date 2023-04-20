@@ -75,6 +75,7 @@ export class UmbPickerContext<ItemType extends ItemResponseModelBaseModel> {
 	}
 
 	// TODO: revisit this method. How do we best pass picker data?
+	// If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
 	openPicker(pickerData?: any) {
 		if (!this.modalContext) throw new Error('Modal context is not initialized');
 
