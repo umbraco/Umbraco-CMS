@@ -1,11 +1,18 @@
 import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data';
+import { UmbDataTypeMoveServerDataSource } from './sources/data-type-move.server.data';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store';
 import { UmbDataTypeServerDataSource } from './sources/data-type.server.data';
 import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
 import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data';
 import { UmbDataTypeItemServerDataSource } from './sources/data-type-item.server.data';
 import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDataTypeItemStore } from './data-type-item.store';
-import type { UmbTreeRepository, UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbTreeRepository,
+	UmbDetailRepository,
+	UmbItemRepository,
+	UmbFolderRepository,
+	UmbMoveRepository,
+} from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
@@ -18,14 +25,14 @@ import {
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDataTypeRepository
 	implements
 		UmbItemRepository<DataTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
 		UmbDetailRepository<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>,
-		UmbFolderRepository
+		UmbFolderRepository,
+		UmbMoveRepository
 {
 	#init: Promise<unknown>;
 
@@ -35,6 +42,7 @@ export class UmbDataTypeRepository
 	#detailSource: UmbDataTypeServerDataSource;
 	#folderSource: UmbDataTypeFolderServerDataSource;
 	#itemSource: UmbDataTypeItemServerDataSource;
+	#moveSource: UmbDataTypeMoveServerDataSource;
 
 	#detailStore?: UmbDataTypeStore;
 	#treeStore?: UmbDataTypeTreeStore;
@@ -50,6 +58,7 @@ export class UmbDataTypeRepository
 		this.#detailSource = new UmbDataTypeServerDataSource(this.#host);
 		this.#folderSource = new UmbDataTypeFolderServerDataSource(this.#host);
 		this.#itemSource = new UmbDataTypeItemServerDataSource(this.#host);
+		this.#moveSource = new UmbDataTypeMoveServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -156,7 +165,6 @@ export class UmbDataTypeRepository
 	async create(dataType: CreateDataTypeRequestModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.id) throw new Error('Data Type id is missing');
-
 		await this.#init;
 
 		const { error } = await this.#detailSource.insert(dataType);
@@ -177,7 +185,6 @@ export class UmbDataTypeRepository
 	async save(id: string, updatedDataType: UpdateDataTypeRequestModel) {
 		if (!id) throw new Error('Data Type id is missing');
 		if (!updatedDataType) throw new Error('Data Type is missing');
-
 		await this.#init;
 
 		const { error } = await this.#detailSource.update(id, updatedDataType);
@@ -221,6 +228,7 @@ export class UmbDataTypeRepository
 	// Folder:
 	async createFolderScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
+		await this.#init;
 		return this.#folderSource.createScaffold(parentId);
 	}
 
@@ -242,6 +250,7 @@ export class UmbDataTypeRepository
 
 	async deleteFolder(id: string) {
 		if (!id) throw new Error('Key is missing');
+		await this.#init;
 
 		const { error } = await this.#folderSource.delete(id);
 
@@ -255,6 +264,7 @@ export class UmbDataTypeRepository
 	async updateFolder(id: string, folder: FolderModelBaseModel) {
 		if (!id) throw new Error('Key is missing');
 		if (!folder) throw new Error('Folder data is missing');
+		await this.#init;
 
 		const { error } = await this.#folderSource.update(id, folder);
 
@@ -267,6 +277,7 @@ export class UmbDataTypeRepository
 
 	async requestFolder(id: string) {
 		if (!id) throw new Error('Key is missing');
+		await this.#init;
 
 		const { data, error } = await this.#folderSource.get(id);
 
@@ -275,6 +286,23 @@ export class UmbDataTypeRepository
 		}
 
 		return { data, error };
+	}
+
+	// Actions
+	async move(id: string, targetId: string) {
+		await this.#init;
+		const { error } = await this.#moveSource.move(id, targetId);
+
+		if (!error) {
+			// TODO: Be aware about this responsibility.
+			this.#treeStore?.updateItem(id, { parentId: targetId });
+			this.#treeStore?.updateItem(targetId, { hasChildren: true });
+
+			const notification = { data: { message: `Data type moved` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
 	}
 }
 

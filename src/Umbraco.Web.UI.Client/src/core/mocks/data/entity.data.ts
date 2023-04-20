@@ -44,6 +44,9 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	}
 
 	move(ids: Array<string>, destinationKey: string) {
+		const destinationItem = this.getById(destinationKey);
+		if (!destinationItem) throw new Error(`Destination item with key ${destinationKey} not found`);
+
 		const items = this.getByIds(ids);
 		const movedItems = items.map((item) => {
 			return {
@@ -53,7 +56,8 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		});
 
 		movedItems.forEach((movedItem) => this.updateData(movedItem));
-		return movedItems;
+		destinationItem.hasChildren = true;
+		this.updateData(destinationItem);
 	}
 
 	trash(ids: Array<string>) {
