@@ -47,8 +47,7 @@ public class ManagementApiComposer : IComposer
             .AddUserGroups()
             .AddPackages()
             .AddEntitys()
-            .AddBackOfficeAuthentication()
-            ;
+            .AddBackOfficeAuthentication();
 
         services
             .ConfigureOptions<ConfigureMvcOptions>()
