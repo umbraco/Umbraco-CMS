@@ -66,11 +66,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async insert(document: DocumentTypeResponseModel) {
-		if (!document.id) {
-			//const error: ProblemDetails = { title: 'Document id is missing' };
-			return Promise.reject();
-		}
-		//const payload = { id: document.id, requestBody: document };
+		if (!document.id) throw new Error('ID is missing');
 
 		let body: string;
 

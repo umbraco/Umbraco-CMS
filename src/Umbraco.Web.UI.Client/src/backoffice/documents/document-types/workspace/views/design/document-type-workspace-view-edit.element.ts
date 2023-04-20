@@ -120,6 +120,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 		this._routes = routes;
 	}
 
+	#requestRemoveTab(tabId: string | undefined) {
+		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
+		// TODO: Update URL when removing tab.
+		this.#remove(tabId);
+	}
 	#remove(tabId: string | undefined) {
 		if (!tabId) return;
 		this._workspaceContext?.structure.removeContainer(null, tabId);
@@ -142,19 +147,31 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 				: ''}
 			${repeat(
 				this._tabs,
-				(tab) => tab.id,
+				(tab) => tab.id! + tab.name,
 				(tab) => {
 					// TODO: make better url folder name:
 					const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
 					return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}>
-						${path === this._activePath
-							? html` <uui-input label="Tab name" look="placeholder" value=${tab.name!} placeholder="Enter a name">
-									<!-- todo only if its part of root: -->
+						${path === this._activePath && this._tabsStructureHelper.isOwnerContainer(tab.id!)
+							? html` <uui-input
+									label="Tab name"
+									look="placeholder"
+									value=${tab.name!}
+									placeholder="Enter a name"
+									@change=${(e: InputEvent) => {
+										const newName = (e.target as HTMLInputElement).value;
+										this._tabsStructureHelper.partialUpdateContainer(tab.id, {
+											name: newName,
+										});
+
+										// Update the current URL, so we are still on this specific tab:
+										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeURI(newName));
+									}}>
 									<uui-button
 										label="Remove tab"
 										class="trash"
 										slot="append"
-										@click=${() => this.#remove(tab.id)}
+										@click=${() => this.#requestRemoveTab(tab.id)}
 										compact>
 										<uui-icon name="umb:trash"></uui-icon>
 									</uui-button>

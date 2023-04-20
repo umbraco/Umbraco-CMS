@@ -1,9 +1,9 @@
 import { html, css } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
+import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UUIInputElement } from '@umbraco-ui/uui';
 
 @customElement('umb-log-viewer-save-search-modal')
 export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElement<

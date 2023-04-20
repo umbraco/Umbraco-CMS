@@ -14,8 +14,8 @@ export default {
 } as Meta;
 
 const data: UmbIconPickerModalData = {
-	multiple: true,
-	selection: [],
+	color: undefined,
+	icon: undefined,
 };
 
 export const Overview: Story<UmbIconPickerModalElement> = () => html`

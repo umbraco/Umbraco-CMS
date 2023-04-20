@@ -90,26 +90,7 @@ export class UmbDocumentServerDataSource
 	async insert(document: CreateDocumentRequestModel & { id: string }) {
 		if (!document.id) throw new Error('Id is missing');
 
-		let body: string;
-
-		try {
-			body = JSON.stringify(document);
-		} catch (error) {
-			console.error(error);
-			return Promise.reject();
-		}
-		//return tryExecuteAndNotify(this.#host, DocumentResource.postDocument(payload));
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<string>(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document/save', {
-				method: 'POST',
-				body: body,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any
-		);
+		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: document }));
 	}
 
 	/**
@@ -118,33 +99,10 @@ export class UmbDocumentServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async update(id: string, document: DocumentResponseModel) {
-		if (!document.id) {
-			const error: ProblemDetailsModel = { title: 'Document id is missing' };
-			return { error };
-		}
-		//const payload = { id: document.id, requestBody: document };
+	async update(id: string, document: UpdateDocumentRequestModel) {
+		if (!id) throw new Error('Id is missing');
 
-		let body: string;
-
-		try {
-			body = JSON.stringify(document);
-		} catch (error) {
-			const myError: ProblemDetailsModel = { title: 'JSON could not parse' };
-			return { error: myError };
-		}
-
-		// TODO: use resources when end point is ready:
-		return tryExecuteAndNotify<DocumentResponseModel>(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document/save', {
-				method: 'POST',
-				body: body,
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}) as any
-		);
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody: document }));
 	}
 
 	/**
