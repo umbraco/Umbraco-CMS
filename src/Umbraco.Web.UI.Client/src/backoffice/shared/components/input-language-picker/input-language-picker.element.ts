@@ -102,7 +102,6 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	private _openPicker() {
 		this.#pickerContext.openPicker({
 			filter: this.filter,
-			hello: 'world',
 		});
 	}
 
