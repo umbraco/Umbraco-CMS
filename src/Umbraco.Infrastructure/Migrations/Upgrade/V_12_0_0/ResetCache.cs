@@ -14,7 +14,19 @@ public class ResetCache : MigrationBase
     protected override void Migrate()
     {
         RebuildCache = true;
-        var distCacheFolderAbsolutePath = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads + "/DistCache");
-        File.Delete(distCacheFolderAbsolutePath);
+        var distCacheFolderAbsolutePath = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData + "/DistCache");
+        var nuCacheFolderAbsolutePath = _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData + "/NuCache");
+        DeleteAllFilesInFolder(distCacheFolderAbsolutePath);
+        DeleteAllFilesInFolder(nuCacheFolderAbsolutePath);
+    }
+
+    private void DeleteAllFilesInFolder(string path)
+    {
+        var directoryInfo = new DirectoryInfo(path);
+
+        foreach (FileInfo file in directoryInfo.GetFiles())
+        {
+            file.Delete();
+        }
     }
 }
