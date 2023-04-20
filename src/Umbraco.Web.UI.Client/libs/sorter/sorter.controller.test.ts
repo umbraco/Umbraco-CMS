@@ -1,6 +1,6 @@
-import { expect, oneEvent } from '@open-wc/testing';
+import { expect, fixture, html } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { customElement } from 'lit/decorators';
+import { customElement } from 'lit/decorators.js';
 import { UmbSorterConfig, UmbSorterController } from './sorter.controller';
 
 type SortEntryType = {
@@ -48,20 +48,9 @@ class MyTestSorterControllerElement extends UmbLitElement {
 
 describe('UmbContextConsumer', () => {
 	let hostElement: MyTestSorterControllerElement;
-	let controller: UmbSorterController<SortEntryType>;
 
-	beforeEach(() => {
-		hostElement = document.createElement('test-my-sorter-controller') as MyTestSorterControllerElement;
-		controller = (hostElement as any).__umbBlockGridSorterController();
-	});
-
-	describe('Public API', () => {
-		describe('methods', () => {
-			it('element gets a internal public method on to retrieve controller', () => {
-				//expect(hostElement).to.have.property('__umbBlockGridSorterController').that.is.a('function');
-				expect(controller).to.not.eq(undefined);
-			});
-		});
+	beforeEach(async () => {
+		hostElement = await fixture(html` <test-my-sorter-controller></test-my-sorter-controller> `);
 	});
 
 	// TODO: Testing ideas:
