@@ -6,12 +6,14 @@ import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './
 import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data';
 import { UmbDataTypeItemServerDataSource } from './sources/data-type-item.server.data';
 import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDataTypeItemStore } from './data-type-item.store';
+import { UmbDataTypeCopyServerDataSource } from './sources/data-type-copy.server.data';
 import type {
 	UmbTreeRepository,
 	UmbDetailRepository,
 	UmbItemRepository,
 	UmbFolderRepository,
 	UmbMoveRepository,
+	UmbCopyRepository,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -25,14 +27,14 @@ import {
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-
 export class UmbDataTypeRepository
 	implements
 		UmbItemRepository<DataTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
 		UmbDetailRepository<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>,
 		UmbFolderRepository,
-		UmbMoveRepository
+		UmbMoveRepository,
+		UmbCopyRepository
 {
 	#init: Promise<unknown>;
 
@@ -43,6 +45,7 @@ export class UmbDataTypeRepository
 	#folderSource: UmbDataTypeFolderServerDataSource;
 	#itemSource: UmbDataTypeItemServerDataSource;
 	#moveSource: UmbDataTypeMoveServerDataSource;
+	#copySource: UmbDataTypeCopyServerDataSource;
 
 	#detailStore?: UmbDataTypeStore;
 	#treeStore?: UmbDataTypeTreeStore;
@@ -59,6 +62,7 @@ export class UmbDataTypeRepository
 		this.#folderSource = new UmbDataTypeFolderServerDataSource(this.#host);
 		this.#itemSource = new UmbDataTypeItemServerDataSource(this.#host);
 		this.#moveSource = new UmbDataTypeMoveServerDataSource(this.#host);
+		this.#copySource = new UmbDataTypeCopyServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -303,6 +307,24 @@ export class UmbDataTypeRepository
 		}
 
 		return { error };
+	}
+
+	async copy(id: string, targetId: string) {
+		await this.#init;
+		const { data: dataTypeCopyId, error } = await this.#copySource.copy(id, targetId);
+		if (error) return { error };
+
+		if (dataTypeCopyId) {
+			const { data: dataTypeCopy } = await this.requestById(dataTypeCopyId);
+			if (!dataTypeCopy) throw new Error('Could not find copied data type');
+			this.#treeStore?.appendItems([dataTypeCopy]);
+			this.#treeStore?.updateItem(targetId, { hasChildren: true });
+
+			const notification = { data: { message: `Data type copied` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { data: dataTypeCopyId };
 	}
 }
 
