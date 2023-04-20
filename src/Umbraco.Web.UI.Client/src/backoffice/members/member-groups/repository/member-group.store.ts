@@ -14,15 +14,19 @@ export class UmbMemberGroupStore extends UmbStoreBase {
 	#data = new UmbArrayState<MemberGroupDetails>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString());
+		super(
+			host,
+			UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN.toString(),
+			new UmbArrayState<MemberGroupDetails>([], (x) => x.id)
+		);
 	}
 
 	append(memberGroup: MemberGroupDetails) {
-		this.#data.append([memberGroup]);
+		this._data.append([memberGroup]);
 	}
 
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 

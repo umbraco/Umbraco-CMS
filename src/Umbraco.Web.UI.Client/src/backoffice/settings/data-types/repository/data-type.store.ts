@@ -13,15 +13,17 @@ export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataType
  * @description - Data Store for Template Details
  */
 export class UmbDataTypeStore extends UmbStoreBase {
-	#data = new UmbArrayState<DataTypeResponseModel>([], (x) => x.id);
-
 	/**
 	 * Creates an instance of UmbDataTypeStore.
 	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDataTypeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString());
+		super(
+			host,
+			UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString(),
+			new UmbArrayState<DataTypeResponseModel>([], (x) => x.id)
+		);
 	}
 
 	/**
@@ -30,7 +32,7 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @memberof UmbDataTypeStore
 	 */
 	append(dataType: DataTypeResponseModel) {
-		this.#data.append([dataType]);
+		this._data.append([dataType]);
 	}
 
 	/**
@@ -39,7 +41,7 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @memberof UmbDataTypeStore
 	 */
 	byId(id: DataTypeResponseModel['id']) {
-		return this.#data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**
@@ -48,6 +50,6 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	 * @memberof UmbDataTypeStore
 	 */
 	remove(uniques: Array<DataTypeResponseModel['id']>) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }

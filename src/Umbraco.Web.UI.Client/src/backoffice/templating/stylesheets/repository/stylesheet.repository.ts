@@ -76,7 +76,7 @@ export class UmbStylesheetRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
 	}
 
-	async requestTreeItems(paths: Array<string>) {
+	async requestItemsLegacy(paths: Array<string>) {
 		if (!paths) throw new Error('Paths are missing');
 		await this.#init;
 		const { data, error } = await this.#treeDataSource.getItems(paths);
@@ -94,7 +94,7 @@ export class UmbStylesheetRepository
 		return this.#treeStore!.childrenOf(parentPath);
 	}
 
-	async treeItems(paths: Array<string>) {
+	async itemsLegacy(paths: Array<string>) {
 		if (!paths) throw new Error('Paths are missing');
 		await this.#init;
 		return this.#treeStore!.items(paths);

@@ -7,7 +7,7 @@ export const itemHandlers = [
 	rest.get(umbracoPath(`${slug}/item`), (req, res, ctx) => {
 		const ids = req.url.searchParams.getAll('id');
 		if (!ids) return;
-		const items = umbDataTypeData.getTreeItem(ids);
+		const items = umbDataTypeData.getItems(ids);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
