@@ -9,14 +9,6 @@ import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api'
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#add-button {
-				width: 100%;
-			}
-		`,
-	];
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -141,6 +133,15 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 			</uui-ref-node>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#add-button {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbInputLanguagePickerElement;
