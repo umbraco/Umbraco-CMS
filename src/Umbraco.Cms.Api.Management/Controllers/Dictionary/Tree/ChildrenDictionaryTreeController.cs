@@ -31,7 +31,7 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
             await DictionaryItemService.GetChildrenAsync(parentId),
             out var totalItems);
 
-        EntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModels(null, dictionaryItems);
+        EntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModels(parentId, dictionaryItems);
 
         PagedViewModel<EntityTreeItemResponseModel> result = PagedViewModel(viewModels, totalItems);
         return await Task.FromResult(Ok(result));
