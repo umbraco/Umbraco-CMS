@@ -66,20 +66,17 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: Object, attribute: false })
 	public filter: (language: LanguageResponseModel) => boolean = () => true;
 
-	private _selectedIsoCodes: Array<string> = [];
 	public get selectedIsoCodes(): Array<string> {
-		return this._selectedIsoCodes;
+		return this.#pickerContext.getSelection();
 	}
-	public set selectedIsoCodes(isoCodes: Array<string>) {
-		this._selectedIsoCodes = isoCodes;
-		super.value = isoCodes.join(',');
+	public set selectedIsoCodes(ids: Array<string>) {
+		this.#pickerContext.setSelection(ids);
 	}
 
 	@property()
 	public set value(isoCodesString: string) {
-		if (isoCodesString !== this._value) {
-			this.selectedIsoCodes = isoCodesString.split(/[ ,]+/);
-		}
+		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
+		this.selectedIsoCodes = isoCodesString.split(/[ ,]+/);
 	}
 
 	@state()
@@ -93,16 +90,16 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this._selectedIsoCodes.length < this.min
+			() => !!this.min && this.#pickerContext.getSelection().length < this.min
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this._selectedIsoCodes.length > this.max
+			() => !!this.max && this.#pickerContext.getSelection().length > this.max
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this._selectedIsoCodes = selection));
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
@@ -125,7 +122,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 				look="placeholder"
 				@click=${this._openPicker}
 				label="open"
-				?disabled="${this._selectedIsoCodes.length === this.max}"
+				?disabled="${this._items.length === this.max}"
 				>Add</uui-button
 			>
 		`;
