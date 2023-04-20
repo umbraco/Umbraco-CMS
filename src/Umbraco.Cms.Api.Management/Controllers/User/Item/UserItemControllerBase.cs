@@ -4,8 +4,8 @@ using Umbraco.Cms.Api.Management.Routing;
 namespace Umbraco.Cms.Api.Management.Controllers.User.Item;
 
 [ApiController]
-[VersionedApiBackOfficeRoute("users")]
-[ApiExplorerSettings(GroupName = "Users")]
+[VersionedApiBackOfficeRoute("user")]
+[ApiExplorerSettings(GroupName = "User")]
 [ApiVersion("1.0")]
 public class UserItemControllerBase : ManagementApiControllerBase
 {
