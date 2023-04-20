@@ -1,6 +1,6 @@
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -13,7 +13,7 @@ export const UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbRela
  * @description - Data Store for Template Details
  */
 export class UmbRelationTypeStore extends UmbStoreBase {
-	#data = new ArrayState<RelationTypeResponseModel>([], (x) => x.id);
+	#data = new UmbArrayState<RelationTypeResponseModel>([], (x) => x.id);
 
 	/**
 	 * Creates an instance of UmbRelationTypeStore.

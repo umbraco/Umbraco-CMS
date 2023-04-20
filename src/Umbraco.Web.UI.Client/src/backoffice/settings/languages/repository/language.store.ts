@@ -1,7 +1,7 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageStore>('UmbLanguageStore');
@@ -13,7 +13,7 @@ export const UMB_LANGUAGE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageS
  * @description - Details Data Store for Languages
  */
 export class UmbLanguageStore extends UmbStoreBase {
-	#data = new ArrayState<LanguageResponseModel>([], (x) => x.isoCode);
+	#data = new UmbArrayState<LanguageResponseModel>([], (x) => x.isoCode);
 	data = this.#data.asObservable();
 
 	constructor(host: UmbControllerHostElement) {

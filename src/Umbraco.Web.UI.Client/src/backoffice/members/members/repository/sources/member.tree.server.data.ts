@@ -4,16 +4,16 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 /**
  * A data source for the Member tree that fetches data from the server
  * @export
- * @class MemberTreeServerDataSource
+ * @class UmbMemberTreeServerDataSource
  * @implements {MemberTreeDataSource}
  */
-export class MemberTreeServerDataSource implements MemberTreeDataSource {
+export class UmbMemberTreeServerDataSource implements MemberTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
-	 * Creates an instance of MemberTreeServerDataSource.
+	 * Creates an instance of UmbMemberTreeServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof MemberTreeServerDataSource
+	 * @memberof UmbMemberTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -22,7 +22,7 @@ export class MemberTreeServerDataSource implements MemberTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof MemberTreeServerDataSource
+	 * @memberof UmbMemberTreeServerDataSource
 	 */
 	async getRootItems() {
 		const response = await fetch('/umbraco/management/api/v1/tree/member/root');
@@ -36,7 +36,7 @@ export class MemberTreeServerDataSource implements MemberTreeDataSource {
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof MemberTreeServerDataSource
+	 * @memberof UmbMemberTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		const response = await fetch('/umbraco/management/api/v1/tree/member/item');

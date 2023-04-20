@@ -5,13 +5,13 @@ import { UmbContextToken } from './context-token';
 
 const testContextAlias = 'my-test-context';
 
-class MyClass {
+class UmbTestContextTokenClass {
 	prop = 'value from provider';
 }
 
 describe('ContextAlias', () => {
-	const contextAlias = new UmbContextToken<MyClass>(testContextAlias);
-	const typedProvider = new UmbContextProvider(document.body, contextAlias, new MyClass());
+	const contextAlias = new UmbContextToken<UmbTestContextTokenClass>(testContextAlias);
+	const typedProvider = new UmbContextProvider(document.body, contextAlias, new UmbTestContextTokenClass());
 	typedProvider.hostConnected();
 
 	after(() => {
@@ -27,7 +27,7 @@ describe('ContextAlias', () => {
 		document.body.appendChild(element);
 
 		const localConsumer = new UmbContextConsumer(element, contextAlias, (_instance) => {
-			expect(_instance).to.be.instanceOf(MyClass);
+			expect(_instance).to.be.instanceOf(UmbTestContextTokenClass);
 			expect(_instance.prop).to.eq('value from provider');
 			done();
 		});
@@ -39,8 +39,8 @@ describe('ContextAlias', () => {
 		const element = document.createElement('div');
 		document.body.appendChild(element);
 
-		const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: MyClass) => {
-			expect(_instance).to.be.instanceOf(MyClass);
+		const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance: UmbTestContextTokenClass) => {
+			expect(_instance).to.be.instanceOf(UmbTestContextTokenClass);
 			expect(_instance.prop).to.eq('value from provider');
 			done();
 		});
