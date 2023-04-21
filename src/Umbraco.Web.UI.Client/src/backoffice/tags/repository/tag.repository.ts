@@ -13,18 +13,12 @@ export class UmbTagRepository {
 	#dataSource: UmbTagServerDataSource;
 	#tagStore?: UmbTagStore;
 
-	#notificationContext?: UmbNotificationContext;
-
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
 		this.#dataSource = new UmbTagServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-				this.#notificationContext = instance;
-			}),
-
 			new UmbContextConsumerController(this.#host, UMB_TAG_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#tagStore = instance;
 			}).asPromise(),
@@ -39,7 +33,6 @@ export class UmbTagRepository {
 		const { data, error } = await this.#dataSource.getCollection({ query, skip, take, tagGroup, culture });
 
 		if (data) {
-			// TODO: allow to append an array of items to the store
 			data.items.forEach((x) => this.#tagStore?.append(x));
 		}
 

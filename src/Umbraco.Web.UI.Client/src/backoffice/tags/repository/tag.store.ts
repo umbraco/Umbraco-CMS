@@ -1,10 +1,10 @@
-import type { PagedTagResponseModel, TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
-export const UMB_TAG_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTagStore>('UmbTAGStore');
+export const UMB_TAG_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTagStore>('UmbTagStore');
 /**
  * @export
  * @class UmbTagStore
@@ -13,6 +13,7 @@ export const UMB_TAG_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTagStore>('Umb
  */
 export class UmbTagStore extends UmbStoreBase {
 	#data = new ArrayState<TagResponseModel>([], (x) => x.id);
+	data = this.#data.asObservable();
 
 	/**
 	 * Creates an instance of UmbTagStore.
@@ -28,17 +29,29 @@ export class UmbTagStore extends UmbStoreBase {
 	 * @param {TagResponseModel} TAG
 	 * @memberof UmbTagStore
 	 */
-	append(TAG: TagResponseModel) {
-		this.#data.append([TAG]);
+	append(tag: TagResponseModel) {
+		this.#data.append([tag]);
 	}
 
 	/**
 	 * Append a tag to the store
-	 * @param {id} TAGResponseModel id.
+	 * @param {id} TagResponseModel id.
 	 * @memberof UmbTagStore
 	 */
 	byId(id: TagResponseModel['id']) {
 		return this.#data.getObservablePart((x) => x.find((y) => y.id === id));
+	}
+
+	// TODO
+	byGroup(group: TagResponseModel['group']) {
+		return this.#data.getObservablePart((x) => x.filter((y) => y.group === group));
+	}
+
+	// TODO
+	byText(text: string) {
+		return this.#data.getObservablePart((items) =>
+			items.filter((item) => item.text?.toLocaleLowerCase().includes(text.toLocaleLowerCase()))
+		);
 	}
 
 	/**
