@@ -62,10 +62,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
 	}
 
-	public setPropertyValue(alias: string, value: unknown) {
-		throw new Error('setPropertyValue is not implemented for UmbDocumentTypeWorkspaceContext');
-	}
-
 	getData() {
 		return this.structure.getRootDocumentType() || {};
 	}
