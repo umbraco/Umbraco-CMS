@@ -29,11 +29,11 @@ public class CreateScriptController : ScriptControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(CreateScriptRequestModel createRequestModel)
+    public async Task<IActionResult> Create(CreateScriptRequestModel requestModel)
     {
         Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        ScriptCreateModel createModel = _umbracoMapper.Map<ScriptCreateModel>(createRequestModel)!;
+        ScriptCreateModel createModel = _umbracoMapper.Map<ScriptCreateModel>(requestModel)!;
 
         Attempt<IScript?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, currentUserKey);
 

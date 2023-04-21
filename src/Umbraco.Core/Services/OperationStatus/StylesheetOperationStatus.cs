@@ -3,4 +3,11 @@
 public enum StylesheetOperationStatus
 {
     Success,
+    AlreadyExists,
+    CancelledByNotification,
+    InvalidFileExtension,
+    ParentNotFound,
+    PathTooLong,
+    InvalidName,
+    NotFound,
 }

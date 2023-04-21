@@ -9,6 +9,14 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IStylesheet, StylesheetResponseModel>((_, _) => new StylesheetResponseModel { Content = string.Empty, Name = string.Empty, Path = string.Empty }, Map);
+        mapper.Define<CreateStylesheetRequestModel, StylesheetCreateModel>((_, _) => new StylesheetCreateModel { Name = string.Empty }, Map);
+    }
+
+    private void Map(CreateStylesheetRequestModel source, StylesheetCreateModel target, MapperContext context)
+    {
+        target.Content = source.Content;
+        target.Name = source.Name;
+        target.ParentPath = source.ParentPath;
     }
 
     private void Map(IStylesheet source, StylesheetResponseModel target, MapperContext context)

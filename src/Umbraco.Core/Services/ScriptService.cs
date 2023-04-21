@@ -120,7 +120,7 @@ public class ScriptService : FileServiceBase, IScriptService
             return Task.FromResult(ScriptOperationStatus.ParentNotFound);
         }
 
-        if(HasValidFileName(createModel.Name) is false)
+        if (HasValidFileName(createModel.Name) is false)
         {
             return Task.FromResult(ScriptOperationStatus.InvalidName);
         }
