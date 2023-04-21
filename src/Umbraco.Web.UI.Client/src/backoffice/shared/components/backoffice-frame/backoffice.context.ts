@@ -1,9 +1,9 @@
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { StringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbBackofficeContext {
-	#activeSectionAlias = new StringState(undefined);
+	#activeSectionAlias = new UmbStringState(undefined);
 	public readonly activeSectionAlias = this.#activeSectionAlias.asObservable();
 
 	public getAllowedSections() {

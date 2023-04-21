@@ -51,6 +51,18 @@ export class UmbTreeElement extends UmbLitElement {
 		this._treeContext?.setSelection(newVal);
 	}
 
+	private _multiple = false;
+	@property({ type: Boolean, reflect: true })
+	get multiple() {
+		return this._multiple;
+	}
+	set multiple(newVal) {
+		const oldVal = this._multiple;
+		this._multiple = newVal;
+		this.requestUpdate('multiple', oldVal);
+		this._treeContext?.setMultiple(newVal);
+	}
+
 	@state()
 	private _tree?: ManifestTree;
 
@@ -86,6 +98,7 @@ export class UmbTreeElement extends UmbLitElement {
 		this._treeContext = new UmbTreeContextBase(this, this._tree);
 		this._treeContext.setSelectable(this.selectable);
 		this._treeContext.setSelection(this.selection);
+		this._treeContext.setMultiple(this.multiple);
 
 		this.#observeSelection();
 		this.#observeTreeRoot();

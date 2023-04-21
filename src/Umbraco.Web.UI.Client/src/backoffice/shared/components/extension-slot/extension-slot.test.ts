@@ -3,10 +3,9 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { InitializedExtension, UmbExtensionSlotElement } from './extension-slot.element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestDashboard } from '@umbraco-cms/backoffice/extensions-registry';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
-@customElement('test-extension-slot-manifest-element')
-class MyExtensionSlotManifestElement extends HTMLElement {}
+@customElement('umb-test-extension-slot-manifest-element')
+class UmbTestExtensionSlotManifestElement extends HTMLElement {}
 
 function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -52,7 +51,7 @@ describe('UmbExtensionSlotElement', () => {
 				type: 'dashboard',
 				alias: 'unit-test-ext-slot-element-manifest',
 				name: 'unit-test-extension',
-				elementName: 'test-extension-slot-manifest-element',
+				elementName: 'umb-test-extension-slot-manifest-element',
 				meta: {
 					pathname: 'test/test',
 				},
@@ -75,7 +74,7 @@ describe('UmbExtensionSlotElement', () => {
 
 			await sleep(0);
 
-			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(MyExtensionSlotManifestElement);
+			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
 
 		it('use the render method', async () => {
@@ -90,7 +89,9 @@ describe('UmbExtensionSlotElement', () => {
 			await sleep(0);
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
-			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(MyExtensionSlotManifestElement);
+			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
+				UmbTestExtensionSlotManifestElement
+			);
 		});
 	});
 });

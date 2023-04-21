@@ -56,6 +56,10 @@ export class UmbDataTypeServerDataSource
 		const data: CreateDataTypeRequestModel = {
 			id: uuidv4(),
 			parentId,
+			name: '',
+			propertyEditorAlias: undefined,
+			propertyEditorUiAlias: null,
+			values: [],
 		};
 
 		return { data };
@@ -67,7 +71,7 @@ export class UmbDataTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async insert(dataType: CreateDataTypeRequestModel & { id: string }) {
+	async insert(dataType: CreateDataTypeRequestModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.id) throw new Error('Data Type id is missing');
 

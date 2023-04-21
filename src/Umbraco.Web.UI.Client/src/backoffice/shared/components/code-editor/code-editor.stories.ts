@@ -111,12 +111,12 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 	"Smartypants, double quotes" and 'single quotes'`,
 	typescript: `import { UmbTemplateRepository } from '../repository/template.repository';
 	import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-	import { createObservablePart, DeepState } from '@umbraco-cms/observable-api';
+	import { createObservablePart, UmbDeepState } from '@umbraco-cms/observable-api';
 	import { TemplateModel } from '@umbraco-cms/backend-api';
 	import { UmbControllerHostElement } from '@umbraco-cms/controller';
 
 	export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateModel> {
-		#data = new DeepState<TemplateModel | undefined>(undefined);
+		#data = new UmbDeepState<TemplateModel | undefined>(undefined);
 		data = this.#data.asObservable();
 		name = createObservablePart(this.#data, (data) => data?.name);
 		content = createObservablePart(this.#data, (data) => data?.content);
@@ -190,6 +190,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 				"@umbraco-cms/workspace": ["libs/workspace"],
 				"@umbraco-cms/utils": ["libs/utils"],
 				"@umbraco-cms/router": ["libs/router"],
+				"@umbraco-cms/sorter": ["libs/sorter"],
 				"@umbraco-cms/test-utils": ["libs/test-utils"],
 				"@umbraco-cms/repository": ["libs/repository"],
 				"@umbraco-cms/resources": ["libs/resources"],

@@ -6,7 +6,7 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 @customElement('umb-controller-host-test-consumer')
-export class ControllerHostTestConsumerElement extends UmbLitElement {
+export class UmbControllerHostTestConsumerElement extends UmbLitElement {
 	public value: string | null = null;
 	constructor() {
 		super();
@@ -18,7 +18,7 @@ export class ControllerHostTestConsumerElement extends UmbLitElement {
 
 describe('UmbControllerHostTestElement', () => {
 	let element: UmbControllerHostTestElement;
-	let consumer: ControllerHostTestConsumerElement;
+	let consumer: UmbControllerHostTestConsumerElement;
 	const contextValue = 'test-value';
 
 	beforeEach(async () => {
@@ -31,7 +31,7 @@ describe('UmbControllerHostTestElement', () => {
 		);
 		consumer = element.getElementsByTagName(
 			'umb-controller-host-test-consumer'
-		)[0] as ControllerHostTestConsumerElement;
+		)[0] as UmbControllerHostTestConsumerElement;
 	});
 
 	it('element is defined with its own instance', () => {

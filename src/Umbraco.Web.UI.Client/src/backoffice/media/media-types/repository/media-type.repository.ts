@@ -1,7 +1,7 @@
 import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store';
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
-import { MediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
+import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -26,7 +26,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new MediaTypeTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbMediaTypeTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbMediaTypeDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -73,7 +73,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -96,7 +96,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

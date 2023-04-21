@@ -1,5 +1,5 @@
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
-import { ArrayState, NumberState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -15,14 +15,13 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<UserDetails> {
-	#users = new ArrayState<UserDetails>([], (x) => x.id);
-	public users = this.#users.asObservable();
+	public users = this._data.asObservable();
 
-	#totalUsers = new NumberState(0);
+	#totalUsers = new UmbNumberState(0);
 	public readonly totalUsers = this.#totalUsers.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UserDetails>([], (x) => x.id));
 	}
 
 	getScaffold(entityType: string, parentId: string | null) {
@@ -52,7 +51,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 			.then((res) => res.json())
 			.then((data) => {
 				this.#totalUsers.next(data.total);
-				this.#users.next(data.items);
+				this._data.next(data.items);
 			});
 
 		return this.users;
@@ -70,10 +69,10 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 		fetch(`/umbraco/backoffice/users/details/${id}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.#users.appendOne(data);
+				this._data.appendOne(data);
 			});
 
-		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
+		return this._data.getObservablePart((users: Array<UmbUserStoreItemType>) =>
 			users.find((user: UmbUserStoreItemType) => user.id === id)
 		);
 	}
@@ -89,10 +88,10 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 		fetch(`/umbraco/backoffice/users/getByKeys?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.#users.append(data);
+				this._data.append(data);
 			});
 
-		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
+		return this._data.getObservablePart((users: Array<UmbUserStoreItemType>) =>
 			users.filter((user: UmbUserStoreItemType) => ids.includes(user.id))
 		);
 	}
@@ -105,10 +104,10 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 		fetch(`/umbraco/backoffice/users/getByName?${params}`)
 			.then((res) => res.json())
 			.then((data) => {
-				this.#users.append(data);
+				this._data.append(data);
 			});
 
-		return this.#users.getObservablePart((users: Array<UmbUserStoreItemType>) =>
+		return this._data.getObservablePart((users: Array<UmbUserStoreItemType>) =>
 			users.filter((user: UmbUserStoreItemType) => user.name.toLocaleLowerCase().includes(name))
 		);
 	}
@@ -124,13 +123,13 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
+			const storedUsers = this._data.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.status = 'enabled';
 			});
 
-			this.#users.append(storedUsers);
+			this._data.append(storedUsers);
 		} catch (error) {
 			console.error('Enable Users failed', error);
 		}
@@ -147,17 +146,17 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
+			const storedUsers = this._data.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				if (userKeys.includes(user.id)) {
 					user.userGroups.push(userGroup);
 				} else {
-					user.userGroups = user.userGroups.filter((group) => group !== userGroup);
+					user.userGroups = user.userGroups.filter((group: any) => group !== userGroup);
 				}
 			});
 
-			this.#users.append(storedUsers);
+			this._data.append(storedUsers);
 		} catch (error) {
 			console.error('Add user group failed', error);
 		}
@@ -174,13 +173,13 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const enabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => enabledKeys.includes(user.id));
+			const storedUsers = this._data.getValue().filter((user) => enabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
-				user.userGroups = user.userGroups.filter((group) => group !== userGroup);
+				user.userGroups = user.userGroups.filter((group: any) => group !== userGroup);
 			});
 
-			this.#users.append(storedUsers);
+			this._data.append(storedUsers);
 		} catch (error) {
 			console.error('Remove user group failed', error);
 		}
@@ -197,13 +196,13 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const disabledKeys = await res.json();
-			const storedUsers = this.#users.getValue().filter((user) => disabledKeys.includes(user.id));
+			const storedUsers = this._data.getValue().filter((user) => disabledKeys.includes(user.id));
 
 			storedUsers.forEach((user) => {
 				user.status = 'disabled';
 			});
 
-			this.#users.append(storedUsers);
+			this._data.append(storedUsers);
 		} catch (error) {
 			console.error('Disable Users failed', error);
 		}
@@ -220,7 +219,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const deletedKeys = await res.json();
-			this.#users.remove(deletedKeys);
+			this._data.remove(deletedKeys);
 		} catch (error) {
 			console.error('Delete Users failed', error);
 		}
@@ -237,7 +236,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const json = await res.json();
-			this.#users.append(json);
+			this._data.append(json);
 		} catch (error) {
 			console.error('Save user error', error);
 		}
@@ -254,7 +253,7 @@ export class UmbUserStore extends UmbStoreBase implements UmbEntityDetailStore<U
 				},
 			});
 			const json = (await res.json()) as UmbUserStoreItemType[];
-			this.#users.append(json);
+			this._data.append(json);
 			return json[0];
 		} catch (error) {
 			console.error('Invite user error', error);

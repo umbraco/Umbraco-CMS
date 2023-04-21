@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, nothing, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 // TODO: Refactor this, its not a service and the data should be handled by a context api.
@@ -13,7 +13,7 @@ export class UmbTreeContextMenuPageServiceElement extends UmbLitElement {
 	@property({ type: Object })
 	public actionEntity: any = { key: '', name: '' };
 
-	#entity = new DeepState({ key: '', name: '' } as any);
+	#entity = new UmbDeepState({ key: '', name: '' } as any);
 	public readonly entity = this.#entity.asObservable();
 
 	@state()

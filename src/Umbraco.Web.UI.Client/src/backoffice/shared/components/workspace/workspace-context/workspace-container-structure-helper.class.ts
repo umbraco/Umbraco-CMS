@@ -3,10 +3,11 @@ import { PropertyContainerTypes } from './workspace-structure-manager.class';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState, BooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbWorkspaceContainerStructureHelper {
 	#host: UmbControllerHostElement;
+	#init;
 
 	#workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -17,13 +18,14 @@ export class UmbWorkspaceContainerStructureHelper {
 	private _ownerKey?: string;
 
 	// Containers defined in data might be more than actual containers to display as we merge them by name.
+	// Owner containers are the containers defining the total of this container(Multiple containers with the same name and type)
 	private _ownerContainers: PropertyTypeContainerResponseModelBaseModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
-	#containers = new ArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
+	#containers = new UmbArrayState<PropertyTypeContainerResponseModelBaseModel>([], (x) => x.id);
 	readonly containers = this.#containers.asObservable();
 
-	#hasProperties = new BooleanState(false);
+	#hasProperties = new UmbBooleanState(false);
 	readonly hasProperties = this.#hasProperties.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -31,10 +33,10 @@ export class UmbWorkspaceContainerStructureHelper {
 
 		this.#containers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-		new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		this.#init = new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
 			this._observeOwnerContainers();
-		});
+		}).asPromise();
 	}
 
 	public setType(value?: PropertyContainerTypes) {
@@ -150,11 +152,27 @@ export class UmbWorkspaceContainerStructureHelper {
 		});
 	};
 
+	/**
+	 * Returns true if the container is an owner container.
+	 */
+	isOwnerContainer(groupId?: string) {
+		if (!this.#workspaceContext || !groupId) return;
+
+		return this._ownerContainers.find((x) => x.id === groupId) !== undefined;
+	}
+
 	/** Manipulate methods: */
 
-	async addGroup(ownerKey?: string, sortOrder?: number) {
+	async addContainer(ownerId?: string, sortOrder?: number) {
 		if (!this.#workspaceContext) return;
 
-		await this.#workspaceContext.structure.createContainer(null, ownerKey, this._childType, sortOrder);
+		await this.#workspaceContext.structure.createContainer(null, ownerId, this._childType, sortOrder);
+	}
+
+	async partialUpdateContainer(groupId?: string, partialUpdate?: Partial<PropertyTypeContainerResponseModelBaseModel>) {
+		await this.#init;
+		if (!this.#workspaceContext || !groupId || !partialUpdate) return;
+
+		return await this.#workspaceContext.structure.updateContainer(null, groupId, partialUpdate);
 	}
 }

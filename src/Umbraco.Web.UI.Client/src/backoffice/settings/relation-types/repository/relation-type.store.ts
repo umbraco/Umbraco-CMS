@@ -1,6 +1,6 @@
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -13,15 +13,17 @@ export const UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbRela
  * @description - Data Store for Template Details
  */
 export class UmbRelationTypeStore extends UmbStoreBase {
-	#data = new ArrayState<RelationTypeResponseModel>([], (x) => x.id);
-
 	/**
 	 * Creates an instance of UmbRelationTypeStore.
 	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbRelationTypeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN.toString());
+		super(
+			host,
+			UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN.toString(),
+			new UmbArrayState<RelationTypeResponseModel>([], (x) => x.id)
+		);
 	}
 
 	/**
@@ -30,7 +32,7 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 	 * @memberof UmbRelationTypeStore
 	 */
 	append(RelationType: RelationTypeResponseModel) {
-		this.#data.append([RelationType]);
+		this._data.append([RelationType]);
 	}
 
 	/**
@@ -39,7 +41,7 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 	 * @memberof UmbRelationTypeStore
 	 */
 	byKey(id: RelationTypeResponseModel['id']) {
-		return this.#data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**
@@ -48,6 +50,6 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 	 * @memberof UmbRelationTypeStore
 	 */
 	remove(uniques: Array<RelationTypeResponseModel['id']>) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }

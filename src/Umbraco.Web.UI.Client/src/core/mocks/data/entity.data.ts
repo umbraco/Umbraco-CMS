@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { UmbData } from './data';
 import type { Entity } from '@umbraco-cms/backoffice/models';
 
@@ -44,6 +45,9 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	}
 
 	move(ids: Array<string>, destinationKey: string) {
+		const destinationItem = this.getById(destinationKey);
+		if (!destinationItem) throw new Error(`Destination item with key ${destinationKey} not found`);
+
 		const items = this.getByIds(ids);
 		const movedItems = items.map((item) => {
 			return {
@@ -53,7 +57,32 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		});
 
 		movedItems.forEach((movedItem) => this.updateData(movedItem));
-		return movedItems;
+		destinationItem.hasChildren = true;
+		this.updateData(destinationItem);
+	}
+
+	copy(ids: Array<string>, destinationKey: string) {
+		const destinationItem = this.getById(destinationKey);
+		if (!destinationItem) throw new Error(`Destination item with key ${destinationKey} not found`);
+
+		// TODO: Notice we don't add numbers to the 'copy' name.
+		const items = this.getByIds(ids);
+		const copyItems = items.map((item) => {
+			return {
+				...item,
+				name: item.name + ' Copy',
+				id: uuid(),
+				parentId: destinationKey,
+			};
+		});
+
+		copyItems.forEach((copyItem) => this.insert(copyItem));
+		const newIds = copyItems.map((item) => item.id);
+
+		destinationItem.hasChildren = true;
+		this.updateData(destinationItem);
+
+		return newIds;
 	}
 
 	trash(ids: Array<string>) {

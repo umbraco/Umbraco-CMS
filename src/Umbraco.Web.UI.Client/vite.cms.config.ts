@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
-import config from './vite.config';
+import { plugins } from './vite.config';
 
 export default defineConfig({
-	...config,
 	build: {
 		lib: {
 			entry: 'src/app.ts',
@@ -11,12 +11,13 @@ export default defineConfig({
 			fileName: 'main',
 		},
 		rollupOptions: {
-			external: [/^@umbraco-cms\/backoffice\//]
+			external: [/^@umbraco-cms\/backoffice\//],
 		},
 		outDir: '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice',
 		emptyOutDir: false,
 		sourcemap: true,
 	},
 	base: '/umbraco/backoffice/',
-	mode: 'production'
+	mode: 'production',
+	plugins: [...plugins],
 });

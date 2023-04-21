@@ -2,7 +2,11 @@ import { UmbWorkspaceContext } from '../../../shared/components/workspace/worksp
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
 import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
 import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	ContentTypeCompositionModel,
+	ContentTypeSortModel,
+	DocumentTypeResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = DocumentTypeResponseModel;
@@ -80,10 +84,41 @@ export class UmbDocumentTypeWorkspaceContext
 	setAlias(alias: string) {
 		this.structure.updateRootDocumentType({ alias });
 	}
+	setDescription(description: string) {
+		this.structure.updateRootDocumentType({ description });
+	}
 
-	// TODO => manage setting icon color
+	// TODO: manage setting icon color alias?
 	setIcon(icon: string) {
 		this.structure.updateRootDocumentType({ icon });
+	}
+
+	setAllowedAsRoot(allowedAsRoot: boolean) {
+		this.structure.updateRootDocumentType({ allowedAsRoot });
+	}
+	setVariesByCulture(variesByCulture: boolean) {
+		this.structure.updateRootDocumentType({ variesByCulture });
+	}
+	setVariesBySegment(variesBySegment: boolean) {
+		this.structure.updateRootDocumentType({ variesBySegment });
+	}
+	setIsElement(isElement: boolean) {
+		this.structure.updateRootDocumentType({ isElement });
+	}
+	setAllowedContentTypes(allowedContentTypes: Array<ContentTypeSortModel>) {
+		this.structure.updateRootDocumentType({ allowedContentTypes });
+	}
+	setCompositions(compositions: Array<ContentTypeCompositionModel>) {
+		this.structure.updateRootDocumentType({ compositions });
+	}
+
+	// Document type specific:
+	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
+		console.log('setAllowedTemplateIds', allowedTemplateIds);
+		this.structure.updateRootDocumentType({ allowedTemplateIds });
+	}
+	setDefaultTemplateId(defaultTemplateId: string) {
+		this.structure.updateRootDocumentType({ defaultTemplateId });
 	}
 
 	async createScaffold(parentId: string) {

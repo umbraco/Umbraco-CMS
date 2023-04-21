@@ -3,16 +3,16 @@ import { UmbContextConsumer } from '../consume/context-consumer';
 import { UmbContextRequestEventImplementation } from '../consume/context-request.event';
 import { UmbContextProvider } from './context-provider';
 
-class MyClass {
+class UmbTestContextProviderClass {
 	prop = 'value from provider';
 }
 
 describe('UmbContextProvider', () => {
-	let instance: MyClass;
+	let instance: UmbTestContextProviderClass;
 	let provider: UmbContextProvider;
 
 	beforeEach(() => {
-		instance = new MyClass();
+		instance = new UmbTestContextProviderClass();
 		provider = new UmbContextProvider(document.body, 'my-test-context', instance);
 		provider.hostConnected();
 	});
@@ -40,10 +40,13 @@ describe('UmbContextProvider', () => {
 	});
 
 	it('handles context request events', (done) => {
-		const event = new UmbContextRequestEventImplementation('my-test-context', (_instance: MyClass) => {
-			expect(_instance.prop).to.eq('value from provider');
-			done();
-		});
+		const event = new UmbContextRequestEventImplementation(
+			'my-test-context',
+			(_instance: UmbTestContextProviderClass) => {
+				expect(_instance.prop).to.eq('value from provider');
+				done();
+			}
+		);
 
 		document.body.dispatchEvent(event);
 	});
@@ -52,11 +55,15 @@ describe('UmbContextProvider', () => {
 		const element = document.createElement('div');
 		document.body.appendChild(element);
 
-		const localConsumer = new UmbContextConsumer(element, 'my-test-context', (_instance: MyClass) => {
-			expect(_instance.prop).to.eq('value from provider');
-			done();
-			localConsumer.hostDisconnected();
-		});
+		const localConsumer = new UmbContextConsumer(
+			element,
+			'my-test-context',
+			(_instance: UmbTestContextProviderClass) => {
+				expect(_instance.prop).to.eq('value from provider');
+				done();
+				localConsumer.hostDisconnected();
+			}
+		);
 		localConsumer.hostConnected();
 	});
 });

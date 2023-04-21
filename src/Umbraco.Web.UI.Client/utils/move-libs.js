@@ -3,28 +3,27 @@
 // Example: import { Foo } from '@umbraco-cms/backoffice/element' -> import { Foo } from './element'
 // This is needed because the d.ts files are not in the same folder as the source files
 // and the absolute paths are not valid when the d.ts files are copied to the dist folder
-// This is only used when building the d.ts files
+// This is only used when building the d.ts files.
 //
-// Usage: node utils/transform-dts.js
+// This script also copies the package.json and README.md files to the dist/libs folder
+// and the umbraco-package-schema.json file to the Umbraco.Web.UI.New folder
 //
-// Note: This script is not used in the build process, it is only used to transform the d.ts files
-//       when the d.ts files are copied to the dist folder
-
-// Note: Updated to help copy the two JSON files generated from webcomponant analyzer tool
-// One is specific to VSCode HTMLCutomData for intellisense and the other is a more broad format used in storybook etc
+// Usage: node utils/move-libs.js
 
 import { readdirSync, readFileSync, writeFileSync, cpSync, mkdirSync } from 'fs';
 
-const rootDir = './';
 const srcDir = './libs';
 const inputDir = './dist/libs';
 const outputDir = '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice/libs';
+const executableDir = '../Umbraco.Web.UI.New';
 
 // Copy package files
 cpSync(`${srcDir}/package.json`, `${inputDir}/package.json`, { recursive: true });
+console.log(`Copied ${srcDir}/package.json to ${inputDir}/package.json`);
 cpSync(`${srcDir}/README.md`, `${inputDir}/README.md`, { recursive: true });
-cpSync(`${rootDir}/custom-elements.json`, `${inputDir}/custom-elements.json`, { recursive: true });
-cpSync(`${rootDir}/vscode-html-custom-data.json`, `${inputDir}/vscode-html-custom-data.json`, { recursive: true });
+console.log(`Copied ${srcDir}/README.md to ${inputDir}/README.md`);
+cpSync(`${inputDir}/umbraco-package-schema.json`, `${executableDir}/umbraco-json-schema.json`, { recursive: true });
+console.log(`Copied ${inputDir}/umbraco-package-schema.json to ${executableDir}/umbraco-package-schema.json`);
 
 const libs = readdirSync(inputDir);
 
@@ -37,6 +36,8 @@ try {
 
 // Transform all .d.ts files and copy all other files to the output folder
 libs.forEach(lib => {
+
+	if (lib.endsWith('.js') === false && lib.endsWith('.js.map') === false) return;
 
 	console.log(`Transforming ${lib}`);
 

@@ -7,12 +7,12 @@ import { naiveObjectComparison } from './naive-object-comparison';
 
 /**
  * @export
- * @class DeepState
+ * @class UmbDeepState
  * @extends {BehaviorSubject<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  */
-export class DeepState<T> extends BehaviorSubject<T> {
+export class UmbDeepState<T> extends BehaviorSubject<T> {
 	constructor(initialData: T) {
 		super(deepFreeze(initialData));
 	}
