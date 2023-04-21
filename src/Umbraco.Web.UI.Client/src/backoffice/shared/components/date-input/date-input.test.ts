@@ -1,15 +1,15 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputDatePickerElement } from './input-date-picker.element';
+import { UmbDateInputElement } from './date-input.element';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-describe('UmbInputDatePickerElement', () => {
-	let element: UmbInputDatePickerElement;
+describe('UmbDateInputElement', () => {
+	let element: UmbDateInputElement;
 
 	beforeEach(async () => {
-		element = await fixture(html` <umb-input-date-picker></umb-input-date-picker> `);
+		element = await fixture(html` <umb-date-input></umb-date-input> `);
 	});
 
 	it('is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbInputDatePickerElement);
+		expect(element).to.be.instanceOf(UmbDateInputElement);
 	});
 
 	it('passes the a11y audit', async () => {
