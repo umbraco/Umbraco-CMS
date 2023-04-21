@@ -1,8 +1,8 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS } from '../config';
 
 /**
@@ -12,15 +12,17 @@ import { UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS } from '../config';
  * @description - Data Store for partial views
  */
 export class UmbPartialViewsStore extends UmbStoreBase {
-	#data = new ArrayState<TemplateResponseModel>([], (x) => x.key);
-
 	/**
 	 * Creates an instance of UmbPartialViewsStore.
 	 * @param {UmbControllerHostInterface} host
 	 * @memberof UmbPartialViewsStore
 	 */
-	constructor(host: UmbControllerHostInterface) {
-		super(host, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN.toString());
+	constructor(host: UmbControllerHostElement) {
+		super(
+			host,
+			UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN.toString(),
+			new UmbArrayState<TemplateResponseModel>([], (x) => x.id)
+		);
 	}
 
 	/**
@@ -29,7 +31,7 @@ export class UmbPartialViewsStore extends UmbStoreBase {
 	 * @memberof UmbPartialViewsStore
 	 */
 	append(template: TemplateResponseModel) {
-		this.#data.append([template]);
+		this._data.append([template]);
 	}
 
 	/**
@@ -38,7 +40,7 @@ export class UmbPartialViewsStore extends UmbStoreBase {
 	 * @memberof UmbPartialViewsStore
 	 */
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 

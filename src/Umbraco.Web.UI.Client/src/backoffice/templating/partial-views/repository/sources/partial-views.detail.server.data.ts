@@ -1,16 +1,19 @@
 import { PartialViewDetails } from '../../config';
-import type { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
-export class UmbPartialViewDetailServerDataSource implements UmbDataSource<PartialViewDetails> {
-	#host: UmbControllerHostInterface;
+//TODO Pass proper models
+export class UmbPartialViewDetailServerDataSource
+	implements UmbDataSource<PartialViewDetails, PartialViewDetails, PartialViewDetails>
+{
+	#host: UmbControllerHostElement;
 
 	/**
 	 * Creates an instance of UmbPartialViewDetailServerDataSource.
 	 * @param {UmbControllerHostInterface} host
 	 * @memberof UmbPartialViewDetailServerDataSource
 	 */
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -33,10 +36,10 @@ export class UmbPartialViewDetailServerDataSource implements UmbDataSource<Parti
 	insert(data: any): Promise<DataSourceResponse<PartialViewDetails>> {
 		throw new Error('Method not implemented.');
 	}
-	update(data: PartialViewDetails): Promise<DataSourceResponse<PartialViewDetails>> {
+	update(unique: string, data: PartialViewDetails): Promise<DataSourceResponse<PartialViewDetails>> {
 		throw new Error('Method not implemented.');
 	}
-	delete(key: string): Promise<DataSourceResponse<PartialViewDetails>> {
+	delete(unique: string): Promise<DataSourceResponse> {
 		throw new Error('Method not implemented.');
 	}
 }

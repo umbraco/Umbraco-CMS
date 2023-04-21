@@ -1,12 +1,12 @@
 import { PartialViewsTreeDataSource } from '.';
 import { PartialViewResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbPartialViewsTreeServerDataSource implements PartialViewsTreeDataSource {
-	#host: UmbControllerHostInterface;
+	#host: UmbControllerHostElement;
 
-	constructor(host: UmbControllerHostInterface) {
+	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
 
@@ -38,16 +38,16 @@ export class UmbPartialViewsTreeServerDataSource implements PartialViewsTreeData
 		);
 	}
 
-	async getItems(paths: Array<string>) {
-		if (!paths) {
+	async getItem(id: Array<string>) {
+		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Paths are missing' };
 			return { error };
 		}
 
 		return tryExecuteAndNotify(
 			this.#host,
-			PartialViewResource.getTreePartialViewItem({
-				path: paths,
+			PartialViewResource.getPartialViewItem({
+				id,
 			})
 		);
 	}

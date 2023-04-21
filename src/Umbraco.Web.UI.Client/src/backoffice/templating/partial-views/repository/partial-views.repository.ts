@@ -81,7 +81,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 			return { data: undefined, error };
 		}
 
-		const { data, error } = await this.#treeDataSource.getItems(keys);
+		const { data, error } = await this.#treeDataSource.getItem(keys);
 
 		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
 	}

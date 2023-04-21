@@ -15,5 +15,5 @@ export interface PartialViewsTreeDataSource {
 		skip?: number | undefined;
 		take?: number | undefined;
 	}): Promise<DataSourceResponse<PagedFileSystemTreeItemPresentationModel>>;
-	getItems(paths: Array<string>): Promise<DataSourceResponse<FileSystemTreeItemPresentationModel[]>>;
+	getItem(ids: Array<string>): Promise<DataSourceResponse<FileSystemTreeItemPresentationModel[]>>;
 }
