@@ -110,7 +110,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		this.#documentTypeObservers.push(
 			new UmbObserverController(this.#host, await this.#documentTypeRepository.byId(data.id), (docType) => {
 				if (docType) {
-					// TODO: Handle if there was changes made to the specific document type in this context.
+					// TODO: Handle if there was changes made to the owner document type in this context.
 					/*
 					possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones).
 					 */
