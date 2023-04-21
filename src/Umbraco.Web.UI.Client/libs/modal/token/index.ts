@@ -27,3 +27,4 @@ export * from './user-group-picker-modal.token';
 export * from './user-picker-modal.token';
 export * from './folder-modal.token';
 export * from './partial-view-picker-modal.token';
+export * from './dictionary-item-picker-modal.token';

@@ -9,6 +9,7 @@ import {
 	UmbModalToken,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalHandler,
+	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { getInsertPartialSnippet } from '../utils';
 
@@ -91,12 +92,18 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
 		this.#openModal?.onSubmit().then((partialViewPickerModalResult) => {
-			debugger;
 			if (partialViewPickerModalResult)
 				this.modalHandler?.submit({
 					type: CodeSnippetType.partialView,
 					value: getInsertPartialSnippet(partialViewPickerModalResult.selection[0]),
 				});
+		});
+	}
+
+	#openInsertDictionaryItemModal() {
+		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
+		this.#openModal?.onSubmit().then((chosenValue) => {
+			if (chosenValue) this.modalHandler?.submit({ value: chosenValue, type: CodeSnippetType.umbracoField });
 		});
 	}
 
@@ -128,7 +135,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								option to provide parameters, such as galleries, forms and lists.
 							</p></uui-button
 						>
-						<uui-button @click=${this._close} look="placeholder" label="Insert Dictionary item"
+						<uui-button @click=${this.#openInsertDictionaryItemModal} look="placeholder" label="Insert Dictionary item"
 							><h3>Dictionary item</h3>
 							<p>
 								A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create
