@@ -14,11 +14,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
-public class ScriptFolderBaseController : PathFolderManagementControllerBase<ScriptFolderOperationStatus>
+public class ScriptFolderControllerBase : PathFolderManagementControllerBase<ScriptFolderOperationStatus>
 {
     private readonly IScriptFolderService _scriptFolderService;
 
-    public ScriptFolderBaseController(
+    public ScriptFolderControllerBase(
         IUmbracoMapper mapper,
         IScriptFolderService scriptFolderService)
         : base(mapper)

@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
-public class ByPathPartialViewFolderController : PartialViewFolderBaseController
+public class ByPathPartialViewFolderController : PartialViewFolderControllerBase
 {
     public ByPathPartialViewFolderController(IUmbracoMapper mapper, IPartialViewFolderService partialViewFolderService) : base(mapper, partialViewFolderService)
     {

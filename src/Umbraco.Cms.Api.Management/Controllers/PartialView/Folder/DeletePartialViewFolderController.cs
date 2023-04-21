@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
-public class DeletePartialViewFolderController : PartialViewFolderBaseController
+public class DeletePartialViewFolderController : PartialViewFolderControllerBase
 {
     public DeletePartialViewFolderController(
         IUmbracoMapper mapper,

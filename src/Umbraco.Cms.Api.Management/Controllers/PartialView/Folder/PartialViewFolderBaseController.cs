@@ -14,11 +14,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}/folder")]
 [ApiExplorerSettings(GroupName = "Partial View")]
-public class PartialViewFolderBaseController : PathFolderManagementControllerBase<PartialViewFolderOperationStatus>
+public class PartialViewFolderControllerBase : PathFolderManagementControllerBase<PartialViewFolderOperationStatus>
 {
     private readonly IPartialViewFolderService _partialViewFolderService;
 
-    public PartialViewFolderBaseController(
+    public PartialViewFolderControllerBase(
         IUmbracoMapper mapper,
         IPartialViewFolderService partialViewFolderService)
         : base(mapper)

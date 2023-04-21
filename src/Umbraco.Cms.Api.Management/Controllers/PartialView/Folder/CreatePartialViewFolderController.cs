@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 
-public class CreatePartialViewFolderController : PartialViewFolderBaseController
+public class CreatePartialViewFolderController : PartialViewFolderControllerBase
 {
     public CreatePartialViewFolderController(
         IUmbracoMapper mapper,

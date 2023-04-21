@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 
-public class CreateScriptFolderController : ScriptFolderBaseController
+public class CreateScriptFolderController : ScriptFolderControllerBase
 {
     public CreateScriptFolderController(
         IUmbracoMapper mapper,
