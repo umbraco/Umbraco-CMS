@@ -1,8 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { PropertyValueMap, css, html } from 'lit';
+import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UUIComboboxElement, UUIInputElement } from '@umbraco-ui/uui';
+import { getUmbracoFieldSnippet } from '../utils';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-insert-value-sidebar')
 export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<object, string> {
@@ -60,7 +61,7 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 	output = '';
 
 	protected willUpdate(): void {
-		this.output = this.generateOutputSample();
+		this.output = this.field ? getUmbracoFieldSnippet(this.field, this.defaultValue, this.recursive) : '';
 	}
 
 	#setField(event: Event) {
@@ -73,25 +74,7 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 		this.defaultValue = target.value === '' ? null : (target.value as string);
 	}
 
-	generateOutputSample() {
-		let fallback = null;
 
-		if (this.recursive !== false && this.defaultValue !== null) {
-			fallback = 'Fallback.To(Fallback.Ancestors, Fallback.DefaultValue)';
-		} else if (this.recursive !== false) {
-			fallback = 'Fallback.ToAncestors';
-		} else if (this.defaultValue !== null) {
-			fallback = 'Fallback.ToDefaultValue';
-		}
-
-		const field = `${this.field !== null ? `@Model.Value("${this.field}"` : ''}, ${
-			fallback !== null ? `fallback: ${fallback}` : ''
-		}, ${this.defaultValue !== null ? `defaultValue: new HtmlString("${this.defaultValue}")` : ''}${
-			this.field ? ')' : ''
-		}`;
-
-		return field;
-	}
 
 	render() {
 		return html`
