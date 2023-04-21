@@ -1,4 +1,4 @@
-import { MemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
+import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
 import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store';
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data';
@@ -30,7 +30,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new MemberTypeTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbMemberTypeTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbMemberTypeDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -77,7 +77,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -100,7 +100,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

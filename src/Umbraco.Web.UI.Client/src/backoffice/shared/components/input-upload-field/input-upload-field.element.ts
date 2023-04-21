@@ -64,10 +64,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	multiple = false;
 
 	@state()
-	_currentFiles: Blob[] = [];
+	_currentFiles: File[] = [];
 
 	@state()
-	_currentFilesTemp?: Blob[];
+	_currentFilesTemp?: File[];
 
 	@state()
 	extensions?: string[];
@@ -114,12 +114,12 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		this.#setFiles(validated);
 	}
 
-	#validateExtensions(): Blob[] {
+	#validateExtensions(): File[] {
 		// TODO: Should property editor be able to handle allowed extensions like image/* ?
 
-		const filesValidated: Blob[] = [];
+		const filesValidated: File[] = [];
 		this._currentFilesTemp?.forEach((temp) => {
-			const type = temp.type.slice(temp.type.lastIndexOf('/') + 1, temp.length);
+			const type = temp.type.slice(temp.type.lastIndexOf('/') + 1);
 			if (this.fileExtensions?.find((x) => x === type)) filesValidated.push(temp);
 			else
 				this._notificationContext?.peek('danger', {
@@ -129,7 +129,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 		return filesValidated;
 	}
-	#setFiles(files: Blob[]) {
+	#setFiles(files: File[]) {
 		this._currentFiles = [...this._currentFiles, ...files];
 
 		//TODO: set keys when possible, not names

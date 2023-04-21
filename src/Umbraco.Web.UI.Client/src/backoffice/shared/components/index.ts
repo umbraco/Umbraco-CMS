@@ -30,7 +30,7 @@ import './input-slider/input-slider.element';
 import './input-tiny-mce/input-tiny-mce.element';
 import './input-toggle/input-toggle.element';
 import './input-upload-field/input-upload-field.element';
-import './input-template-picker/input-template-picker.element';
+import './input-template/input-template.element';
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './section/section-main/section-main.element';

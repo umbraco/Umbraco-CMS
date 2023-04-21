@@ -13,7 +13,7 @@ import { UmbDocumentTypeStore } from '../src/backoffice/documents/document-types
 import { UmbDocumentStore } from '../src/backoffice/documents/documents/repository/document.store.ts';
 import { UmbDocumentTreeStore } from '../src/backoffice/documents/documents/repository/document.tree.store.ts';
 
-import customElementManifests from '../custom-elements.json';
+import customElementManifests from '../dist/libs/custom-elements.json';
 import { UmbIconStore } from '../src/core/stores/icon/icon.store';
 import { onUnhandledRequest } from '../src/core/mocks/browser';
 import { handlers } from '../src/core/mocks/browser-handlers';

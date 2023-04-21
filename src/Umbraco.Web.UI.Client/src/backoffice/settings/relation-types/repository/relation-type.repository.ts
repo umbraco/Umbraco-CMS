@@ -1,8 +1,8 @@
 import { UmbRelationTypeTreeStore, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN } from './relation-type.tree.store';
 import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.data';
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store';
-import { RelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
-import { RelationTypeTreeDataSource } from './sources';
+import { UmbRelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
+import { UmbRelationTypeTreeDataSource } from './sources';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
@@ -23,7 +23,7 @@ export class UmbRelationTypeRepository
 
 	#host: UmbControllerHostElement;
 
-	#treeSource: RelationTypeTreeDataSource;
+	#treeSource: UmbRelationTypeTreeDataSource;
 	#treeStore?: UmbRelationTypeTreeStore;
 
 	#detailDataSource: UmbRelationTypeServerDataSource;
@@ -35,7 +35,7 @@ export class UmbRelationTypeRepository
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new RelationTypeTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbRelationTypeTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbRelationTypeServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -74,7 +74,7 @@ export class UmbRelationTypeRepository
 		return { data: undefined, error };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		if (!ids) throw new Error('Ids are missing');
 		await this.#init;
 
@@ -93,7 +93,7 @@ export class UmbRelationTypeRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

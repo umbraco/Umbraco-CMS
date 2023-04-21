@@ -259,7 +259,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	#renderDataTypeSection() {
 		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
+			<umb-data-type-input></umb-data-type-input>
 		</div>`;
 	}
 

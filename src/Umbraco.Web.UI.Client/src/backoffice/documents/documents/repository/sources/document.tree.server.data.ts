@@ -6,10 +6,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Document tree that fetches data from the server
  * @export
- * @class DocumentTreeServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @class UmbDocumentTreeServerDataSource
+ * @implements {UmbTreeDataSource}
  */
-export class DocumentTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDocumentTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
@@ -42,9 +42,9 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Creates an instance of DocumentTreeServerDataSource.
+	 * Creates an instance of UmbDocumentTreeServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -53,7 +53,7 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, DocumentResource.getTreeDocumentRoot({}));
@@ -63,7 +63,7 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
@@ -83,7 +83,7 @@ export class DocumentTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids) {

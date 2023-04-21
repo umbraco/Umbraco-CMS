@@ -6,8 +6,24 @@ export interface ManifestCollectionView extends ManifestElement, ManifestWithCon
 }
 
 export interface MetaCollectionView {
+	/**
+	 * The friendly name of the collection view
+	 */
 	label: string;
+
+	/**
+	 * An icon to represent the collection view
+	 *
+	 * @examples [
+	 *   "umb:box",
+	 *   "umb:grid"
+	 * ]
+	 */
 	icon: string;
+
+	/**
+	 * The URL pathname for this collection view that can be deep linked to by sharing the url
+	 */
 	pathName: string;
 }
 

@@ -15,7 +15,7 @@ export default {
 const Template: Story = (props) => {
 	return html`
 		Under construction
-		<story-modal-context-example .modalLayout=${props.modalLayout}></story-modal-context-example>
+		<umb-story-modal-context-example .modalLayout=${props.modalLayout}></umb-story-modal-context-example>
 	`;
 };
 

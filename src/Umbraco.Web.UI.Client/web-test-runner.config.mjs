@@ -57,10 +57,12 @@ export default {
 						'@umbraco-cms/backoffice/store': './libs/store/index.ts',
 						'@umbraco-cms/backoffice/utils': './libs/utils/index.ts',
 						'@umbraco-cms/backoffice/workspace': './libs/workspace/index.ts',
+						'@umbraco-cms/backoffice/picker-input': './libs/picker-input/index.ts',
 						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
 						'@umbraco-cms/internal/router': './src/core/router/index.ts',
-						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts'
+						'@umbraco-cms/internal/sorter': './src/core/sorter/index.ts',
+						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
 				},
 			},

@@ -2,17 +2,53 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbWorkspacePropertyStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-property-structure-helper.class';
 import { PropertyContainerTypes } from '../../../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
+import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypePropertyTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
 import './document-type-workspace-view-edit-property.element';
 
+const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
+	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeResponseModel) => {
+		return element.getAttribute('data-umb-property-id') === model.id;
+	},
+	querySelectModelToElement: (container: HTMLElement, modelEntry: DocumentTypePropertyTypeResponseModel) => {
+		return container.querySelector('data-umb-property-id[' + modelEntry.id + ']');
+	},
+	identifier: 'content-type-property-sorter',
+	itemSelector: '[data-umb-property-id]',
+	disabledItemSelector: '[inherited]',
+	containerSelector: '#property-list',
+};
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
+	#propertySorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+		performItemInsert: (args) => {
+			let sortOrder = 0;
+			if (this._propertyStructure.length > 0) {
+				if (args.newIndex === 0) {
+					// TODO: Remove 'as any' when sortOrder is added to the model:
+					sortOrder = ((this._propertyStructure[0] as any).sortOrder ?? 0) - 1;
+				} else {
+					sortOrder =
+						((this._propertyStructure[Math.min(args.newIndex, this._propertyStructure.length - 1)] as any).sortOrder ??
+							0) + 1;
+				}
+			}
+			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
+		},
+		performItemRemove: (args) => {
+			return this._propertyStructureHelper.removeProperty(args.item.id!);
+		},
+	});
+
 	private _containerId: string | undefined;
 
+	@property({ type: String, attribute: 'container-id', reflect: false })
 	public get containerId(): string | undefined {
 		return this._containerId;
 	}
@@ -52,6 +88,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
+			this.#propertySorter.setModel(this._propertyStructure);
 		});
 	}
 
@@ -70,50 +107,29 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	}
 
 	render() {
-		return html`${repeat(
-				this._propertyStructure,
-				(property) => property.alias,
-				(property) =>
-					html`<document-type-workspace-view-edit-property
-						.property=${property}
-						@partial-property-update=${(event: CustomEvent) => {
-							this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
-						}}></document-type-workspace-view-edit-property>`
-			)}<uui-button id="add" look="placeholder" @click=${this.#onAddProperty}> Add property </uui-button>`;
+		return html`<div id="property-list">
+				${repeat(
+					this._propertyStructure,
+					(property) => property.alias ?? '' + property.containerId ?? '' + (property as any).sortOrder ?? '',
+					(property) =>
+						html`<document-type-workspace-view-edit-property
+							class="property"
+							data-umb-property-id=${property.id}
+							data-property-container-is=${property.containerId}
+							data-container-id=${this.containerId}
+							?inherited=${ifDefined(property.containerId !== this.containerId)}
+							.property=${property}
+							@partial-property-update=${(event: CustomEvent) => {
+								this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
+							}}></document-type-workspace-view-edit-property>`
+				)}
+			</div>
+			<uui-button id="add" look="placeholder" @click=${this.#onAddProperty}> Add property </uui-button> `;
 	}
 
 	static styles = [
 		UUITextStyles,
 		css`
-			.property:first-of-type {
-				padding-top: 0;
-			}
-			.property {
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-			.property:last-child {
-				border-bottom: 0;
-			}
-
-			.property {
-				display: grid;
-				grid-template-columns: 200px auto;
-				column-gap: var(--uui-size-layout-2);
-				border-bottom: 1px solid var(--uui-color-divider);
-				padding: var(--uui-size-layout-1) 0;
-				container-type: inline-size;
-			}
-
-			.property > div {
-				grid-column: span 2;
-			}
-
-			@container (width > 600px) {
-				.property:not([orientation='vertical']) > div {
-					grid-column: span 1;
-				}
-			}
-
 			#add {
 				width: 100%;
 			}

@@ -1,12 +1,16 @@
 import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/workspace/document-workspace.context';
 import { PropertyContainerTypes } from './workspace-structure-manager.class';
-import { DocumentTypePropertyTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	DocumentTypePropertyTypeResponseModel,
+	PropertyTypeResponseModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbWorkspacePropertyStructureHelper {
 	#host: UmbControllerHostElement;
+	#init;
 
 	#workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -14,15 +18,17 @@ export class UmbWorkspacePropertyStructureHelper {
 	private _isRoot?: boolean;
 	private _containerName?: string;
 
-	#propertyStructure = new ArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.id);
+	#propertyStructure = new UmbArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
-		new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+		// TODO: Remove as any when sortOrder is implemented:
+		this.#propertyStructure.sortBy((a, b) => ((a as any).sortOrder ?? 0) - ((b as any).sortOrder ?? 0));
+		this.#init = new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
 			this._observeGroupContainers();
-		});
+		}).asPromise();
 	}
 
 	public setContainerType(value?: PropertyContainerTypes) {
@@ -85,11 +91,6 @@ export class UmbWorkspacePropertyStructureHelper {
 					}
 				});
 
-				if (_propertyStructure.length > 0) {
-					// TODO: End-point: Missing sort order?
-					//_propertyStructure = _propertyStructure.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-				}
-
 				// Fire update to subscribers:
 				this.#propertyStructure.next(_propertyStructure);
 			},
@@ -97,16 +98,38 @@ export class UmbWorkspacePropertyStructureHelper {
 		);
 	}
 
+	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
 
-	async addProperty(ownerKey?: string, sortOrder?: number) {
+	async addProperty(ownerId?: string, sortOrder?: number) {
+		await this.#init;
 		if (!this.#workspaceContext) return;
 
-		return await this.#workspaceContext.structure.createProperty(null, ownerKey, sortOrder);
+		return await this.#workspaceContext.structure.createProperty(null, ownerId, sortOrder);
+	}
+
+	async insertProperty(property: PropertyTypeResponseModelBaseModel, sortOrder = 0) {
+		await this.#init;
+		if (!this.#workspaceContext) return false;
+
+		const newProperty = { ...property, sortOrder };
+
+		// TODO: Remove as any when server model has gotten sortOrder:
+		await this.#workspaceContext.structure.insertProperty(null, newProperty);
+		return true;
+	}
+
+	async removeProperty(propertyId: string) {
+		await this.#init;
+		if (!this.#workspaceContext) return false;
+
+		await this.#workspaceContext.structure.removeProperty(null, propertyId);
+		return true;
 	}
 
 	// Takes optional arguments as this is easier for the implementation in the view:
 	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<DocumentTypePropertyTypeResponseModel>) {
+		await this.#init;
 		if (!this.#workspaceContext || !propertyKey || !partialUpdate) return;
 
 		return await this.#workspaceContext.structure.updateProperty(null, propertyKey, partialUpdate);

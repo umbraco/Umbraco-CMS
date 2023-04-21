@@ -3,7 +3,12 @@ import { UmbWorkspaceVariableEntityContextInterface } from '../workspace/workspa
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ClassState, ObjectState, StringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbClassState,
+	UmbObjectState,
+	UmbStringState,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
@@ -25,7 +30,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 
 	private _providerController: UmbContextProviderController;
 
-	private _data = new ObjectState<WorkspacePropertyData<ValueType>>({});
+	private _data = new UmbObjectState<WorkspacePropertyData<ValueType>>({});
 
 	public readonly alias = this._data.getObservablePart((data) => data.alias);
 	public readonly label = this._data.getObservablePart((data) => data.label);
@@ -35,10 +40,10 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 
 	#workspaceVariantId?: UmbVariantId;
 
-	#variantId = new ClassState<UmbVariantId | undefined>(undefined);
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	public readonly variantId = this.#variantId.asObservable();
 
-	private _variantDifference = new StringState(undefined);
+	private _variantDifference = new UmbStringState(undefined);
 	public readonly variantDifference = this._variantDifference.asObservable();
 
 	private _workspaceContext?: UmbWorkspaceVariableEntityContextInterface;
@@ -88,7 +93,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 		this._data.update({ description });
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
-		// Note: Do not try to compare new / old value, as it can of any type. We trust the ObjectState in doing such.
+		// Note: Do not try to compare new / old value, as it can of any type. We trust the UmbObjectState in doing such.
 		this._data.update({ value });
 	}
 	public changeValue(value: WorkspacePropertyData<ValueType>['value']) {

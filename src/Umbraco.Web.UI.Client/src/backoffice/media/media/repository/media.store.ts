@@ -1,6 +1,6 @@
 import type { MediaDetails } from '../';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
@@ -11,15 +11,13 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
  * @description - Data Store for Template Details
  */
 export class UmbMediaStore extends UmbStoreBase {
-	#data = new ArrayState<MediaDetails>([], (x) => x.id);
-
 	/**
 	 * Creates an instance of UmbMediaStore.
 	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbMediaStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEDIA_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEDIA_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<MediaDetails>([], (x) => x.id));
 	}
 
 	/**
@@ -28,7 +26,7 @@ export class UmbMediaStore extends UmbStoreBase {
 	 * @memberof UmbMediaStore
 	 */
 	append(media: MediaDetails) {
-		this.#data.append([media]);
+		this._data.append([media]);
 	}
 
 	/**
@@ -37,7 +35,7 @@ export class UmbMediaStore extends UmbStoreBase {
 	 * @memberof UmbMediaStore
 	 */
 	remove(uniques: string[]) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }
 

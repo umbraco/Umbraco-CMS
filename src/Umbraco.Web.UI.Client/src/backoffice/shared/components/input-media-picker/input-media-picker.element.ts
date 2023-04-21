@@ -129,7 +129,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		this._pickedItemsObserver?.destroy();
 
 		// TODO: consider changing this to the list data endpoint when it is available
-		const { asObservable } = await this._repository.requestTreeItems(this._selectedIds);
+		const { asObservable } = await this._repository.requestItemsLegacy(this._selectedIds);
 
 		if (!asObservable) return;
 

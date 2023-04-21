@@ -2,9 +2,10 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbTrashEntityAction<
-	T extends { trash(unique: Array<string>): Promise<void>; requestTreeItems(uniques: Array<string>): any }
+	T extends UmbItemRepository<any> & { trash(unique: Array<string>): Promise<void> }
 > extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalContext;
 
@@ -19,7 +20,7 @@ export class UmbTrashEntityAction<
 	async execute() {
 		if (!this.repository) return;
 
-		const { data } = await this.repository.requestTreeItems([this.unique]);
+		const { data } = await this.repository.requestItems([this.unique]);
 
 		if (data) {
 			const item = data[0];

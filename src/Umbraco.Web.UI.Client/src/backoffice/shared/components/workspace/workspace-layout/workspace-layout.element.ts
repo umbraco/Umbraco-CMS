@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { IRoute, PageComponent } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type {
@@ -120,6 +120,11 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 		);
 	}
 
+	// TODO: Move into a helper function:
+	private componentHasManifest(component: PageComponent): component is HTMLElement & { manifest: unknown } {
+		return component ? 'manifest' in component : false;
+	}
+
 	private _createRoutes() {
 		this._routes = [];
 
@@ -136,16 +141,8 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 						return createExtensionElement(view);
 					},
 					setup: (component, info) => {
-						if (component && 'manifest' in component) {
+						if (this.componentHasManifest(component)) {
 							component.manifest = view;
-						} else {
-							/*
-							TODO: Too noisy for my taste, so I would investigate if there is otherwise to make this more visible.
-							console.group(`[UmbWorkspaceLayout] Failed to setup component for route: ${info.match.route.path}`);
-							console.log('Matched route', info.match.route);
-							console.error('Missing property "manifest" on component', component);
-							console.groupEnd();
-							*/
 						}
 					},
 				};

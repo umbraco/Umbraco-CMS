@@ -5,6 +5,13 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema
 export const handlers = [
+	rest.get(umbracoPath('/language/item'), (req, res, ctx) => {
+		const isoCodes = req.url.searchParams.getAll('isoCode');
+		if (!isoCodes) return;
+		const items = umbLanguagesData.getItems(isoCodes);
+		return res(ctx.status(200), ctx.json(items));
+	}),
+
 	rest.get(umbracoPath('/language'), (req, res, ctx) => {
 		const skip = req.url.searchParams.get('skip');
 		const skipNumber = skip ? Number.parseInt(skip) : undefined;

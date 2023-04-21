@@ -27,3 +27,4 @@ export * from './user-group-picker-modal.token';
 export * from './user-picker-modal.token';
 export * from './code-editor-modal.token';
 export * from './folder-modal.token';
+export * from './data-type-picker-modal.token';

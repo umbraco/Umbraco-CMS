@@ -6,16 +6,16 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Template tree that fetches data from the server
  * @export
- * @class TemplateTreeServerDataSource
+ * @class UmbTemplateTreeServerDataSource
  * @implements {TemplateTreeDataSource}
  */
-export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
+export class UmbTemplateTreeServerDataSource implements TemplateTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
-	 * Creates an instance of TemplateTreeServerDataSource.
+	 * Creates an instance of UmbTemplateTreeServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -24,7 +24,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
@@ -34,7 +34,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
@@ -54,7 +54,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} id
 	 * @return {*}
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids) {

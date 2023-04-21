@@ -1,7 +1,7 @@
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictionary.store';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data';
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store';
-import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data';
+import { UmbDictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
@@ -39,7 +39,7 @@ export class UmbDictionaryRepository
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new DictionaryTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbDictionaryTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbDictionaryDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -86,7 +86,7 @@ export class UmbDictionaryRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -109,7 +109,7 @@ export class UmbDictionaryRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}

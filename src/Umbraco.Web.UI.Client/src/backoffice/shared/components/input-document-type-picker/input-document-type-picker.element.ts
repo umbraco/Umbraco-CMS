@@ -30,11 +30,12 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	// TODO: do we need both selectedIds and value? If we just use value we follow the same pattern as native form controls.
 	private _selectedIds: Array<string> = [];
+	@property({ type: Array })
 	public get selectedIds(): Array<string> {
 		return this._selectedIds;
 	}
 	public set selectedIds(ids: Array<string>) {
-		this._selectedIds = ids;
+		this._selectedIds = ids ?? [];
 		super.value = ids.join(',');
 		this._observePickedDocuments();
 	}

@@ -1,11 +1,15 @@
-import { DocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data';
+import { UmbDocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data';
 import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data';
 import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store';
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store';
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ProblemDetailsModel, DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	ProblemDetailsModel,
+	DocumentTypeResponseModel,
+	FolderTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemType = DocumentTypeResponseModel;
@@ -27,7 +31,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new DocumentTypeTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbDocumentTypeTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbDocumentTypeServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -77,7 +81,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
@@ -100,7 +104,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
@@ -141,19 +145,22 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 
 	// Could potentially be general methods:
 
-	async create(template: ItemType) {
-		if (!template || !template.id) throw new Error('Template is missing');
+	async create(documentType: ItemType) {
+		if (!documentType || !documentType.id) throw new Error('Template is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(template);
+		const { error } = await this.#detailDataSource.insert(documentType);
 
 		if (!error) {
+			const treeItem = createTreeItem(documentType);
+			this.#treeStore?.appendItems([treeItem]);
+
 			const notification = { data: { message: `Document created` } };
 			this.#notificationContext?.peek('positive', notification);
 
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
-			this.#detailStore?.append(template);
+			this.#detailStore?.append(documentType);
 			// TODO: Update tree store with the new item? or ask tree to request the new item?
 		}
 
@@ -206,3 +213,20 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		return { error };
 	}
 }
+
+export const createTreeItem = (item: ItemType): FolderTreeItemResponseModel => {
+	if (!item) throw new Error('item is null or undefined');
+	if (!item.id) throw new Error('item.id is null or undefined');
+
+	// TODO: needs parentID, this is missing in the current model. Should be good when updated to a createModel.
+	return {
+		$type: 'FolderTreeItemResponseModel',
+		type: 'data-type',
+		parentId: null,
+		name: item.name,
+		id: item.id,
+		isFolder: false,
+		isContainer: false,
+		hasChildren: false,
+	};
+};
