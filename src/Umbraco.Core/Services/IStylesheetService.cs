@@ -10,4 +10,6 @@ public interface IStylesheetService
     Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid performingUserKey);
 
     Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid performingUserKey);
+
+    Task<StylesheetOperationStatus> DeleteAsync(string path, Guid performingUserKey);
 }

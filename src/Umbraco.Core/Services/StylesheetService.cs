@@ -43,6 +43,33 @@ public class StylesheetService : FileServiceBase, IStylesheetService
         return Task.FromResult(stylesheet);
     }
 
+    public async Task<StylesheetOperationStatus> DeleteAsync(string path, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IStylesheet? stylesheet = _stylesheetRepository.Get(path);
+        if (stylesheet is null)
+        {
+            return StylesheetOperationStatus.NotFound;
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new StylesheetDeletingNotification(stylesheet, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            return StylesheetOperationStatus.CancelledByNotification;
+        }
+
+        _stylesheetRepository.Delete(stylesheet);
+
+        scope.Notifications.Publish(new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
+        await AuditAsync(AuditType.Delete, performingUserKey);
+
+        scope.Complete();
+        return StylesheetOperationStatus.Success;
+    }
+
+
     public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();

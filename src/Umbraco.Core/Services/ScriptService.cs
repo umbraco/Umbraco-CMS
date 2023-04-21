@@ -55,7 +55,7 @@ public class ScriptService : FileServiceBase, IScriptService
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         var deletingNotification = new ScriptDeletingNotification(script, eventMessages);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
             return ScriptOperationStatus.CancelledByNotification;
         }
