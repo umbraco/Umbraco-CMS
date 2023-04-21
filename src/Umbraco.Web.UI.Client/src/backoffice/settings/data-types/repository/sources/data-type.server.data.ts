@@ -56,6 +56,10 @@ export class UmbDataTypeServerDataSource
 		const data: CreateDataTypeRequestModel = {
 			id: uuidv4(),
 			parentId,
+			name: '',
+			propertyEditorAlias: undefined,
+			propertyEditorUiAlias: null,
+			values: [],
 		};
 
 		return { data };
