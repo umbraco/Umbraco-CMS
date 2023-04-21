@@ -15,7 +15,7 @@ export interface LinkListItem {
 	menu?: unknown;
 }
 
-export default class TinyMceLinkPickerPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceLinkPickerPlugin extends TinyMcePluginBase {
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {

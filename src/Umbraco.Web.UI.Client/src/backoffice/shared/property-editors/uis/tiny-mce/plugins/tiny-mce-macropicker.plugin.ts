@@ -11,7 +11,7 @@ interface DialogData {
 
 // TODO => This is a quick transplant of the existing macro plugin - needs to be finished, and need to
 // determine how to replicate the existing macro service (backend doens')
-export default class TinyMceMacroPickerPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceMacroPickerPlugin extends TinyMcePluginBase {
     #macroService = new UmbMacroService();
 
 	#modalContext?: UmbModalContext;

@@ -3,7 +3,7 @@ import { DataTypePropertyPresentationModel } from "@umbraco-cms/backoffice/backe
 import { UmbElementMixinInterface } from "@umbraco-cms/backoffice/element";
 
 // TODO => editor property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
-export class TinyMcePluginBase {
+export class UmbTinyMcePluginBase {
     host: UmbElementMixinInterface;
     editor: any;
     configuration?: Array<DataTypePropertyPresentationModel>;

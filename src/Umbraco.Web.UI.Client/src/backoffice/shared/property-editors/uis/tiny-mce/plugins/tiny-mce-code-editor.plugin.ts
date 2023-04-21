@@ -7,7 +7,7 @@ import {
 	UMB_CODE_EDITOR_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-export default class TinyMceCodeEditorPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceCodeEditorPlugin extends TinyMcePluginBase {
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {		

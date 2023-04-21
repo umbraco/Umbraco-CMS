@@ -8,7 +8,7 @@ import {
 	UMB_EMBEDDED_MEDIA_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-export default class TinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {

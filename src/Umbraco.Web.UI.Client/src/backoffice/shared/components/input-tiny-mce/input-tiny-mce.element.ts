@@ -9,6 +9,7 @@ import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store';
+import { availableLanguages } from './input-tiny-mce.languages';
 import {
 	TinyMcePluginArguments,
 	TinyMcePluginBase,
@@ -20,7 +21,6 @@ import type { ClassConstructor, UserDetails } from '@umbraco-cms/backoffice/mode
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { hasDefaultExport, loadExtension, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { availableLanguages } from './input-tiny-mce.languages';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
