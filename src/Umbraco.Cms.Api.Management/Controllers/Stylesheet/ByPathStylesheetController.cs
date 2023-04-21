@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
-public class ByPathStylesheetController : StylesheetBaseController
+public class ByPathStylesheetController : StylesheetControllerBase
 {
     private readonly IStylesheetService _stylesheetService;
     private readonly IUmbracoMapper _umbracoMapper;

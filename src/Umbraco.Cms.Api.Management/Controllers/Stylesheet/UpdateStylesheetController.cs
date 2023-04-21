@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
-public class UpdateStylesheetController : StylesheetBaseController
+public class UpdateStylesheetController : StylesheetControllerBase
 {
     private readonly IStylesheetService _stylesheetService;
     private readonly IUmbracoMapper _umbracoMapper;
