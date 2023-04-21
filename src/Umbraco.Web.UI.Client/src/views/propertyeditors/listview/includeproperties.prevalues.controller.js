@@ -24,13 +24,12 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         { value: "lockedOut", localizedKey: "user_stateLockedOut" },
         { value: "lastLockoutDate", localizedKey: "user_lastLockoutDate" },
         { value: "lastLoginDate", localizedKey: "user_lastLogin" },
-        { value: "lastPasswordChangeDate", localizedKey: "user_lastPasswordChangeDate" },
+        { value: "lastPasswordChangeDate", localizedKey: "user_lastPasswordChangeDate" }
     ];
 
     $scope.getLocalizedKey = function (alias) {
-        var tranlationKey = $scope.systemFields.find(x => x.value === alias).localizedKey;
-
-        return tranlationKey !== undefined ? tranlationKey : alias;
+        const translationKey = $scope.systemFields.find(x => x.value === alias)?.localizedKey;
+        return translationKey !== undefined ? translationKey : alias;
     }
 
     $scope.changeField = function () {
