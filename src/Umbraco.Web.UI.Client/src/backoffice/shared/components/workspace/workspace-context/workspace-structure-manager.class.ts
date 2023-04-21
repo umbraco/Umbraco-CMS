@@ -45,10 +45,6 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 		new UmbObserverController(host, this.documentTypes, (documentTypes) => {
 			documentTypes.forEach((documentType) => {
-				// We could cache by docType Key?
-				// TODO: how do we ensure a container goes away?
-
-				//this._initDocumentTypeContainers(documentType);
 				this._loadDocumentTypeCompositions(documentType);
 			});
 		});
