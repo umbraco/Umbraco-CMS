@@ -180,7 +180,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		for (const plugin of plugins) {
 			const module = await loadExtension(plugin);
-			if (hasDefaultExport<ClassConstructor<TinyMcePluginBase>>(module)) {
+			if (hasDefaultExport<ClassConstructor<UmbTinyMcePluginBase>>(module)) {
 				this.#plugins.push(module.default);
 			}
 		}
