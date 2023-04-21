@@ -57,6 +57,26 @@ public class SqliteDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool ForceCreateDatabase => true;
 
     /// <inheritdoc />
+    public bool CanRecognizeConnectionString(string? connectionString)
+    {
+        if (connectionString is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var builder = new SqliteConnectionStringBuilder(connectionString);
+
+            return !string.IsNullOrEmpty(builder.DataSource);
+
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
+    /// <inheritdoc />
     public string GenerateConnectionString(DatabaseModel databaseModel)
     {
         var builder = new SqliteConnectionStringBuilder
