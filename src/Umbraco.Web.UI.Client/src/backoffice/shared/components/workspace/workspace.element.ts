@@ -6,7 +6,7 @@ import { ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-workspace')
 export class UmbWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@property({ type: String, attribute: 'entity-type' })
 	entityType = '';
@@ -17,6 +17,8 @@ export class UmbWorkspaceElement extends UmbLitElement {
 			type="workspace"
 			.filter=${(manifest: ManifestWorkspace) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbWorkspaceElement;

@@ -7,6 +7,81 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')
 export class UmbLogViewerOverviewViewElement extends UmbLitElement {
+	
+
+	@state()
+	private _errorCount = 0;
+
+	@state()
+	private _logLevelCount: LogLevelCountsReponseModel | null = null;
+
+	@state()
+	private _canShowLogs = false;
+
+	#logViewerContext?: UmbLogViewerWorkspaceContext;
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+			this.#logViewerContext = instance;
+			this.#observeErrorCount();
+			this.#observeCanShowLogs();
+			this.#logViewerContext?.getLogLevels(0, 100);
+		});
+	}
+
+	#observeErrorCount() {
+		if (!this.#logViewerContext) return;
+
+		this.observe(this.#logViewerContext.logCount, (logLevelCount) => {
+			this._errorCount = logLevelCount?.error ?? 0;
+		});
+	}
+
+	#observeCanShowLogs() {
+		if (!this.#logViewerContext) return;
+		this.observe(this.#logViewerContext.canShowLogs, (canShowLogs) => {
+			this._canShowLogs = canShowLogs ?? false;
+		});
+	}
+
+	render() {
+		return html`
+			<div id="logviewer-layout">
+				<div id="info">
+					<uui-box id="time-period" headline="Time Period">
+						<umb-log-viewer-date-range-selector></umb-log-viewer-date-range-selector>
+					</uui-box>
+
+					<uui-box id="errors" headline="Number of Errors">
+						<uui-button
+							label="Show error logs"
+							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
+								`@Level='Fatal' or @Level='Error' or Has(@Exception)`
+							)}`}>
+							<h1 id="error-count">${this._errorCount}</h1></uui-button
+						>
+					</uui-box>
+
+					<uui-box id="level" headline="Log level">
+						<h1 id="log-lever"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h1>
+					</uui-box>
+
+					<umb-log-viewer-log-types-chart id="types"></umb-log-viewer-log-types-chart>
+				</div>
+
+				${this._canShowLogs
+					? html`<div id="saved-searches-container">
+								<umb-log-viewer-saved-searches-overview></umb-log-viewer-saved-searches-overview>
+							</div>
+
+							<div id="common-messages-container">
+								<umb-log-viewer-message-templates-overview></umb-log-viewer-message-templates-overview>
+							</div>`
+					: html`<umb-log-viewer-to-many-logs-warning id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
+			</div>
+		`;
+	}
+	
 	static styles = [
 		css`
 			:host {
@@ -83,79 +158,6 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	@state()
-	private _errorCount = 0;
-
-	@state()
-	private _logLevelCount: LogLevelCountsReponseModel | null = null;
-
-	@state()
-	private _canShowLogs = false;
-
-	#logViewerContext?: UmbLogViewerWorkspaceContext;
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
-			this.#logViewerContext = instance;
-			this.#observeErrorCount();
-			this.#observeCanShowLogs();
-			this.#logViewerContext?.getLogLevels(0, 100);
-		});
-	}
-
-	#observeErrorCount() {
-		if (!this.#logViewerContext) return;
-
-		this.observe(this.#logViewerContext.logCount, (logLevelCount) => {
-			this._errorCount = logLevelCount?.error ?? 0;
-		});
-	}
-
-	#observeCanShowLogs() {
-		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.canShowLogs, (canShowLogs) => {
-			this._canShowLogs = canShowLogs ?? false;
-		});
-	}
-
-	render() {
-		return html`
-			<div id="logviewer-layout">
-				<div id="info">
-					<uui-box id="time-period" headline="Time Period">
-						<umb-log-viewer-date-range-selector></umb-log-viewer-date-range-selector>
-					</uui-box>
-
-					<uui-box id="errors" headline="Number of Errors">
-						<uui-button
-							label="Show error logs"
-							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
-								`@Level='Fatal' or @Level='Error' or Has(@Exception)`
-							)}`}>
-							<h1 id="error-count">${this._errorCount}</h1></uui-button
-						>
-					</uui-box>
-
-					<uui-box id="level" headline="Log level">
-						<h1 id="log-lever"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h1>
-					</uui-box>
-
-					<umb-log-viewer-log-types-chart id="types"></umb-log-viewer-log-types-chart>
-				</div>
-
-				${this._canShowLogs
-					? html`<div id="saved-searches-container">
-								<umb-log-viewer-saved-searches-overview></umb-log-viewer-saved-searches-overview>
-							</div>
-
-							<div id="common-messages-container">
-								<umb-log-viewer-message-templates-overview></umb-log-viewer-message-templates-overview>
-							</div>`
-					: html`<umb-log-viewer-to-many-logs-warning id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
-			</div>
-		`;
-	}
 }
 
 declare global {

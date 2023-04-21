@@ -14,53 +14,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display:block;
-				margin:var(--uui-size-layout-1);
-			}
-
-			uui-box + uui-box {
-				margin-top: var(--uui-size-space-5);
-			}
-
-			uui-box p {
-				margin-top: 0;
-			}
-
-			a {
-				color: var(--uui-color-text);
-				background: transparent;
-				border: none;
-				text-decoration: underline;
-				cursor: pointer;
-			}
-
-			uui-table-cell {
-				line-height: 0;
-				vertical-align: middle;
-			}
-
-			uui-table-row:last-child uui-table-cell {
-				padding-bottom: 0;
-			}
-
-			.positive {
-				color: var(--uui-color-positive);
-			}
-
-			.danger {
-				color: var(--uui-color-danger);
-			}
-
-			.not-found-message {
-				font-style: italic;
-				color: var(--uui-color-text-alt);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _indexers?: IndexResponseModel[];
@@ -161,6 +115,54 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 			</uui-table>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display:block;
+				margin:var(--uui-size-layout-1);
+			}
+
+			uui-box + uui-box {
+				margin-top: var(--uui-size-space-5);
+			}
+
+			uui-box p {
+				margin-top: 0;
+			}
+
+			a {
+				color: var(--uui-color-text);
+				background: transparent;
+				border: none;
+				text-decoration: underline;
+				cursor: pointer;
+			}
+
+			uui-table-cell {
+				line-height: 0;
+				vertical-align: middle;
+			}
+
+			uui-table-row:last-child uui-table-cell {
+				padding-bottom: 0;
+			}
+
+			.positive {
+				color: var(--uui-color-positive);
+			}
+
+			.danger {
+				color: var(--uui-color-danger);
+			}
+
+			.not-found-message {
+				font-style: italic;
+				color: var(--uui-color-text-alt);
+			}
+		`,
+	];
 }
 
 export default UmbDashboardExamineOverviewElement;

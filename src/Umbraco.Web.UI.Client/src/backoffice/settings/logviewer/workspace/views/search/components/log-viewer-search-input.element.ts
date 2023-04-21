@@ -29,84 +29,7 @@ export const UMB_LOG_VIEWER_SAVE_SEARCH_MODAL = new UmbModalToken<UmbContextSave
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				gap: var(--uui-size-space-4);
-			}
-
-			#search-input {
-				width: 100%;
-			}
-
-			#saved-searches-button {
-				flex-shrink: 0;
-			}
-
-			#saved-searches-popover {
-				flex: 1;
-			}
-
-			#saved-searches-container {
-				width: 100%;
-				max-height: 300px;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-1);
-			}
-
-			#loader-container {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				margin: 0 var(--uui-size-space-4);
-			}
-
-			.saved-search-item {
-				display: flex;
-				justify-content: space-between;
-				align-items: stretch;
-				border-bottom: 1px solid #e9e9eb;
-			}
-
-			.saved-search-item-button {
-				display: flex;
-				font-family: inherit;
-				flex: 1;
-				background: 0 0;
-				padding: 0 0;
-				border: 0;
-				clear: both;
-				cursor: pointer;
-				display: flex;
-				font-weight: 400;
-				line-height: 20px;
-				text-align: left;
-				align-items: center;
-				white-space: nowrap;
-				color: var(--uui-color-interactive);
-			}
-
-			.saved-search-item-button:hover {
-				background-color: var(--uui-color-surface-emphasis, rgb(250, 250, 250));
-				color: var(--color-standalone);
-			}
-
-			.saved-search-item-name {
-				font-weight: 600;
-				margin: 0 var(--uui-size-space-3);
-			}
-
-			#polling-symbol-expand,
-			#saved-search-expand-symbol,
-			uui-symbol-sort {
-				margin-left: var(--uui-size-space-3);
-			}
-		`,
-	];
+	
 
 	@query('#saved-searches-popover')
 	private _savedSearchesPopover!: UUIPopoverElement;
@@ -276,6 +199,85 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			</uui-popover>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--uui-size-space-4);
+			}
+
+			#search-input {
+				width: 100%;
+			}
+
+			#saved-searches-button {
+				flex-shrink: 0;
+			}
+
+			#saved-searches-popover {
+				flex: 1;
+			}
+
+			#saved-searches-container {
+				width: 100%;
+				max-height: 300px;
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-1);
+			}
+
+			#loader-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin: 0 var(--uui-size-space-4);
+			}
+
+			.saved-search-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: stretch;
+				border-bottom: 1px solid #e9e9eb;
+			}
+
+			.saved-search-item-button {
+				display: flex;
+				font-family: inherit;
+				flex: 1;
+				background: 0 0;
+				padding: 0 0;
+				border: 0;
+				clear: both;
+				cursor: pointer;
+				display: flex;
+				font-weight: 400;
+				line-height: 20px;
+				text-align: left;
+				align-items: center;
+				white-space: nowrap;
+				color: var(--uui-color-interactive);
+			}
+
+			.saved-search-item-button:hover {
+				background-color: var(--uui-color-surface-emphasis, rgb(250, 250, 250));
+				color: var(--color-standalone);
+			}
+
+			.saved-search-item-name {
+				font-weight: 600;
+				margin: 0 var(--uui-size-space-3);
+			}
+
+			#polling-symbol-expand,
+			#saved-search-expand-symbol,
+			uui-symbol-sort {
+				margin-left: var(--uui-size-space-3);
+			}
+		`,
+	];
 }
 
 declare global {

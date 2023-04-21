@@ -11,40 +11,7 @@ export class UmbDocumentTypePickerModalElement extends UmbModalBaseElement<
 	UmbDocumentTypePickerModalData,
 	UmbDocumentTypePickerModalResult
 > {
-	static styles = [
-		UUITextStyles,
-		css`
-			h3 {
-				margin-left: var(--uui-size-space-5);
-				margin-right: var(--uui-size-space-5);
-			}
-
-			uui-input {
-				width: 100%;
-			}
-
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				margin: 16px 0;
-			}
-
-			#content-list {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-
-			.content-item {
-				cursor: pointer;
-			}
-
-			.content-item.selected {
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-			}
-		`,
-	];
+	
 
 	@state()
 	_selection: Array<string> = [];
@@ -92,6 +59,41 @@ export class UmbDocumentTypePickerModalElement extends UmbModalBaseElement<
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			h3 {
+				margin-left: var(--uui-size-space-5);
+				margin-right: var(--uui-size-space-5);
+			}
+
+			uui-input {
+				width: 100%;
+			}
+
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+				margin: 16px 0;
+			}
+
+			#content-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+
+			.content-item {
+				cursor: pointer;
+			}
+
+			.content-item.selected {
+				background-color: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTypePickerModalElement;

@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-language-root-table-name-column-layout')
 export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@property({ attribute: false })
 	value!: { isoCode: string; name: string };
@@ -14,6 +14,8 @@ export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
 
 		return html`<a href=${'section/settings/workspace/language/edit/' + this.value.isoCode}>${this.value.name}</a>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

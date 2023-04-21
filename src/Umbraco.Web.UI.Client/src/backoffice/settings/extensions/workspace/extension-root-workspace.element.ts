@@ -8,13 +8,7 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@um
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
-	static styles = [
-		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _extensions?: Array<ManifestTypes> = undefined;
@@ -101,6 +95,14 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		css`
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbExtensionRootWorkspaceElement;

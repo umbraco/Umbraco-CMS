@@ -24,21 +24,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-view-user-groups')
 export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-				margin: var(--uui-size-layout-1);
-			}
-
-			umb-table {
-				padding: 0;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _userGroups: Array<UserGroupDetails> = [];
@@ -154,6 +140,22 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 				@ordered="${this._handleOrdering}"></umb-table>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				margin: var(--uui-size-layout-1);
+			}
+
+			umb-table {
+				padding: 0;
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceViewUserGroupsElement;

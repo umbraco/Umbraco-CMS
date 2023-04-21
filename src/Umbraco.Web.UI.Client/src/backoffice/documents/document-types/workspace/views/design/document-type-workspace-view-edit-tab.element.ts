@@ -9,18 +9,7 @@ import './document-type-workspace-view-edit-properties.element';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-
-			#add {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	private _ownerTabId?: string | undefined;
 
@@ -106,6 +95,19 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			<uui-button id="add" look="placeholder" @click=${this.#onAddGroup}> Add Group </uui-button>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+
+			#add {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTypeWorkspaceViewEditTabElement;

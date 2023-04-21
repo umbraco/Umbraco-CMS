@@ -18,25 +18,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-workspace-variant')
 export class UmbWorkspaceVariantContentElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			:host(:not(:last-child)) {
-				border-right: 1px solid var(--uui-color-border);
-			}
-
-			#header {
-				margin: 0 var(--uui-size-layout-1);
-				flex: 1 1 auto;
-			}
-		`,
-	];
+	
 
 	// TODO: stop prop drilling this alias. Instead use the workspace context.
 	@property()
@@ -73,6 +55,26 @@ export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			:host(:not(:last-child)) {
+				border-right: 1px solid var(--uui-color-border);
+			}
+
+			#header {
+				margin: 0 var(--uui-size-layout-1);
+				flex: 1 1 auto;
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceVariantContentElement;

@@ -11,42 +11,7 @@ import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-
-			input {
-				font-family: inherit;
-				padding: var(--uui-size-1) var(--uui-size-space-3);
-				font-size: inherit;
-				color: inherit;
-				border-radius: 0;
-				box-sizing: border-box;
-				border: none;
-				background: none;
-				width: 100%;
-				height: 100%;
-				outline: none;
-				position: relative;
-				border-bottom: 2px solid transparent;
-			}
-
-			/* find out better validation for that  */
-			input:out-of-range {
-				border-color: var(--uui-color-danger);
-			}
-
-			:host([horizontal]) .input-container {
-				display: flex;
-				align-items: baseline;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _startDate = '';
@@ -130,6 +95,43 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
         </div>
         `;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+
+			input {
+				font-family: inherit;
+				padding: var(--uui-size-1) var(--uui-size-space-3);
+				font-size: inherit;
+				color: inherit;
+				border-radius: 0;
+				box-sizing: border-box;
+				border: none;
+				background: none;
+				width: 100%;
+				height: 100%;
+				outline: none;
+				position: relative;
+				border-bottom: 2px solid transparent;
+			}
+
+			/* find out better validation for that  */
+			input:out-of-range {
+				border-color: var(--uui-color-danger);
+			}
+
+			:host([horizontal]) .input-container {
+				display: flex;
+				align-items: baseline;
+			}
+		`,
+	];
 }
 
 declare global {

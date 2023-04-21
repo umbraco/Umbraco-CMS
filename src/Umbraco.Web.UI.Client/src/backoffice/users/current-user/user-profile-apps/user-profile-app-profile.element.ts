@@ -8,7 +8,7 @@ import { UmbModalContext, UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_CONTEXT_TOKEN } f
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@state()
 	private _currentUser?: UserDetails;
@@ -62,6 +62,8 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbUserProfileAppProfileElement;

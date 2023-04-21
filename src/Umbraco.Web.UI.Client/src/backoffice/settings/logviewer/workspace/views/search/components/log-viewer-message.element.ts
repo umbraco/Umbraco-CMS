@@ -9,110 +9,7 @@ import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router
 //TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
 export class UmbLogViewerMessageElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host > details {
-				border-top: 1px solid var(--uui-color-border);
-			}
-
-			:host(:last-child) > details {
-				border-bottom: 1px solid var(--uui-color-border);
-			}
-
-			summary {
-				display: flex;
-			}
-
-			details[open] {
-				margin-bottom: var(--uui-size-space-3);
-			}
-
-			summary:hover,
-			#properties-list {
-				background-color: var(--uui-color-background);
-			}
-
-			#properties-list {
-				margin: 0;
-				padding: 0;
-				list-style: none;
-				margin-bottom: var(--uui-size-space-3);
-			}
-
-			.property {
-				padding: 10px 20px;
-				display: flex;
-				border-top: 1px solid var(--uui-color-border);
-			}
-
-			summary > div {
-				box-sizing: border-box;
-				padding: 10px 20px;
-				display: flex;
-				align-items: center;
-			}
-
-			#timestamp {
-				flex: 1 0 14ch;
-			}
-
-			#level,
-			#machine {
-				flex: 1 0 14ch;
-			}
-
-			#message {
-				flex: 6 0 14ch;
-			}
-
-			.property-name,
-			.property-value {
-				display: flex;
-				align-items: center;
-			}
-
-			.property-name {
-				font-weight: 600;
-				flex: 1 1 20ch;
-			}
-
-			.property-value {
-				flex: 3 0 20ch;
-			}
-
-			#search-menu {
-				margin: 0;
-				padding: 0;
-				margin-top: var(--uui-size-space-3);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				max-width: 25%;
-			}
-
-			#search-menu > li {
-				padding: 0;
-			}
-
-			.search-item {
-				width: 100%;
-			}
-
-			pre {
-				background-color: var(--uui-color-background);
-				border-top: 1px solid #d8d7d9;
-				border-left: 4px solid #d42054;
-				color: #303033;
-				display: block;
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
-				line-height: 20px;
-				margin: 0;
-				overflow-x: auto;
-				padding: 9.5px;
-				white-space: pre-wrap;
-			}
-		`,
-	];
+	
 
 	@query('details')
 	details!: HTMLDetailsElement;
@@ -298,6 +195,111 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			</details>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host > details {
+				border-top: 1px solid var(--uui-color-border);
+			}
+
+			:host(:last-child) > details {
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			summary {
+				display: flex;
+			}
+
+			details[open] {
+				margin-bottom: var(--uui-size-space-3);
+			}
+
+			summary:hover,
+			#properties-list {
+				background-color: var(--uui-color-background);
+			}
+
+			#properties-list {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				margin-bottom: var(--uui-size-space-3);
+			}
+
+			.property {
+				padding: 10px 20px;
+				display: flex;
+				border-top: 1px solid var(--uui-color-border);
+			}
+
+			summary > div {
+				box-sizing: border-box;
+				padding: 10px 20px;
+				display: flex;
+				align-items: center;
+			}
+
+			#timestamp {
+				flex: 1 0 14ch;
+			}
+
+			#level,
+			#machine {
+				flex: 1 0 14ch;
+			}
+
+			#message {
+				flex: 6 0 14ch;
+			}
+
+			.property-name,
+			.property-value {
+				display: flex;
+				align-items: center;
+			}
+
+			.property-name {
+				font-weight: 600;
+				flex: 1 1 20ch;
+			}
+
+			.property-value {
+				flex: 3 0 20ch;
+			}
+
+			#search-menu {
+				margin: 0;
+				padding: 0;
+				margin-top: var(--uui-size-space-3);
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				max-width: 25%;
+			}
+
+			#search-menu > li {
+				padding: 0;
+			}
+
+			.search-item {
+				width: 100%;
+			}
+
+			pre {
+				background-color: var(--uui-color-background);
+				border-top: 1px solid #d8d7d9;
+				border-left: 4px solid #d42054;
+				color: #303033;
+				display: block;
+				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				line-height: 20px;
+				margin: 0;
+				overflow-x: auto;
+				padding: 9.5px;
+				white-space: pre-wrap;
+			}
+		`,
+	];
 }
 
 declare global {

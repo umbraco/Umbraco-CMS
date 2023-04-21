@@ -7,15 +7,7 @@ import './auth-layout.element';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			#email,
-			#password {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _loggingIn = false;
@@ -109,6 +101,16 @@ export default class UmbLoginElement extends LitElement {
 			</umb-auth-layout>
 		`;
 	}
+	
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			#email,
+			#password {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 declare global {

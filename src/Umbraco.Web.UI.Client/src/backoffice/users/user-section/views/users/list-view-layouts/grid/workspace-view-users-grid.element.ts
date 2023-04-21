@@ -14,32 +14,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-view-users-grid')
 export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-			}
-
-			#user-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-				gap: var(--uui-size-space-4);
-				margin: var(--uui-size-layout-1);
-				margin-top: var(--uui-size-space-2);
-			}
-
-			uui-card-user {
-				width: 100%;
-				height: 180px;
-			}
-
-			.user-login-time {
-				margin-top: auto;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _users: Array<UserDetails> = [];
@@ -155,6 +130,33 @@ export class UmbWorkspaceViewUsersGridElement extends UmbLitElement {
 			</div>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
+
+			#user-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+				gap: var(--uui-size-space-4);
+				margin: var(--uui-size-layout-1);
+				margin-top: var(--uui-size-space-2);
+			}
+
+			uui-card-user {
+				width: 100%;
+				height: 180px;
+			}
+
+			.user-login-time {
+				margin-top: auto;
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceViewUsersGridElement;

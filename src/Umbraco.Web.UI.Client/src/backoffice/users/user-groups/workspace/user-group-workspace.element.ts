@@ -11,7 +11,7 @@ import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	#workspaceContext = new UmbUserGroupWorkspaceContext(this);
 	#element = new UmbUserGroupWorkspaceEditElement();
@@ -61,6 +61,8 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbUserGroupWorkspaceElement;

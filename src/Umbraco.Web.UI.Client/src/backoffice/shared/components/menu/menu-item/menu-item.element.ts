@@ -11,7 +11,7 @@ export interface UmbMenuItemExtensionElement {
 
 @customElement('umb-menu-item')
 export class UmbMenuItemElement extends UmbLitElement implements UmbMenuItemExtensionElement {
-	static styles = [UUITextStyles];
+	
 
 	@property({ type: Object, attribute: false })
 	manifest!: ManifestMenuItem;
@@ -22,6 +22,8 @@ export class UmbMenuItemElement extends UmbLitElement implements UmbMenuItemExte
 			icon-name=${this.manifest.meta.icon}
 			entity-type=${ifDefined(this.manifest.meta.entityType)}></umb-menu-item-base>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 declare global {

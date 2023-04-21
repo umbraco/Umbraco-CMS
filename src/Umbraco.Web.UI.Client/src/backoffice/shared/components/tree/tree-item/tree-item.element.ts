@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-tree-item')
 export class UmbTreeItemElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@property({ type: Object, attribute: false })
 	item?: TreeItemPresentationModel;
@@ -21,6 +21,8 @@ export class UmbTreeItemElement extends UmbLitElement {
 				item: this.item,
 			}}></umb-extension-slot>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

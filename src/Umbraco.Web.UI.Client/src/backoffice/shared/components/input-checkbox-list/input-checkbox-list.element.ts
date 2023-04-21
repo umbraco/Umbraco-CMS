@@ -8,14 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-checkbox-list')
 export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-checkbox {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	/**
 	 * List of items.
@@ -71,6 +64,15 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	renderCheckbox(item: { key: string; checked: boolean; value: string }) {
 		return html`<uui-checkbox value="${item.value}" label="${item.value}" ?checked="${item.checked}"></uui-checkbox>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-checkbox {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbInputCheckboxListElement;

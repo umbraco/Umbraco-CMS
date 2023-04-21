@@ -59,67 +59,7 @@ export class UmbTableOrderedEvent extends Event {
  */
 @customElement('umb-table')
 export class UmbTableElement extends LitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				height: 100%;
-				overflow: auto;
-				padding: var(--uui-size-space-4);
-				padding-top: 0;
-			}
-
-			uui-table {
-				box-shadow: var(--uui-shadow-depth-1);
-			}
-
-			uui-table-head {
-				position: sticky;
-				top: 0;
-				background: white;
-				z-index: 1;
-				background-color: var(--uui-color-surface);
-			}
-
-			uui-table-row uui-checkbox {
-				display: none;
-			}
-
-			uui-table-row[selectable]:focus uui-icon,
-			uui-table-row[selectable]:focus-within uui-icon,
-			uui-table-row[selectable]:hover uui-icon,
-			uui-table-row[select-only] uui-icon {
-				display: none;
-			}
-
-			uui-table-row[selectable]:focus uui-checkbox,
-			uui-table-row[selectable]:focus-within uui-checkbox,
-			uui-table-row[selectable]:hover uui-checkbox,
-			uui-table-row[select-only] uui-checkbox {
-				display: inline-block;
-			}
-
-			uui-table-head-cell:focus,
-			uui-table-head-cell:focus-within,
-			uui-table-head-cell:hover {
-				--uui-symbol-sort-hover: 1;
-			}
-
-			uui-table-head-cell button {
-				padding: 0;
-				background-color: transparent;
-				color: inherit;
-				border: none;
-				cursor: pointer;
-				font-weight: inherit;
-				font-size: inherit;
-				display: inline-flex;
-				align-items: center;
-				justify-content: space-between;
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	/**
 	 * Table Items
@@ -302,6 +242,68 @@ export class UmbTableElement extends LitElement {
 
 		return value;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				height: 100%;
+				overflow: auto;
+				padding: var(--uui-size-space-4);
+				padding-top: 0;
+			}
+
+			uui-table {
+				box-shadow: var(--uui-shadow-depth-1);
+			}
+
+			uui-table-head {
+				position: sticky;
+				top: 0;
+				background: white;
+				z-index: 1;
+				background-color: var(--uui-color-surface);
+			}
+
+			uui-table-row uui-checkbox {
+				display: none;
+			}
+
+			uui-table-row[selectable]:focus uui-icon,
+			uui-table-row[selectable]:focus-within uui-icon,
+			uui-table-row[selectable]:hover uui-icon,
+			uui-table-row[select-only] uui-icon {
+				display: none;
+			}
+
+			uui-table-row[selectable]:focus uui-checkbox,
+			uui-table-row[selectable]:focus-within uui-checkbox,
+			uui-table-row[selectable]:hover uui-checkbox,
+			uui-table-row[select-only] uui-checkbox {
+				display: inline-block;
+			}
+
+			uui-table-head-cell:focus,
+			uui-table-head-cell:focus-within,
+			uui-table-head-cell:hover {
+				--uui-symbol-sort-hover: 1;
+			}
+
+			uui-table-head-cell button {
+				padding: 0;
+				background-color: transparent;
+				color: inherit;
+				border: none;
+				cursor: pointer;
+				font-weight: inherit;
+				font-size: inherit;
+				display: inline-flex;
+				align-items: center;
+				justify-content: space-between;
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbTableElement;

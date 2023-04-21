@@ -15,7 +15,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-menu-item-base')
 export class UmbMenuItemBaseElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	private _entityType?: string;
 	@property({ type: String, attribute: 'entity-type' })
@@ -116,6 +116,8 @@ export class UmbMenuItemBaseElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

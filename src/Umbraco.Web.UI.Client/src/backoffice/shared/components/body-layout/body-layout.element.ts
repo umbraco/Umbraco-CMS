@@ -16,44 +16,7 @@ import { customElement, property, state } from 'lit/decorators.js';
  */
 @customElement('umb-body-layout')
 export class UmbBodyLayoutElement extends LitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				background-color: var(--uui-color-background);
-				width: 100%;
-				height: 100%;
-				flex-direction: column;
-			}
-
-			#header {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				width: 100%;
-				height: var(--umb-header-layout-height);
-				background-color: var(--uui-color-surface);
-				border-bottom: 1px solid var(--uui-color-border);
-				box-sizing: border-box;
-			}
-
-			#headline {
-				display: block;
-				margin: 0 var(--uui-size-layout-1);
-			}
-
-			#tabs {
-				margin-left: auto;
-			}
-
-			#main {
-				display: flex;
-				flex: 1;
-				flex-direction: column;
-			}
-		`,
-	];
+	
 
 	/**
 	 * Renders a headline in the header.
@@ -132,6 +95,45 @@ export class UmbBodyLayoutElement extends LitElement {
 			</umb-footer-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				background-color: var(--uui-color-background);
+				width: 100%;
+				height: 100%;
+				flex-direction: column;
+			}
+
+			#header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				width: 100%;
+				height: var(--umb-header-layout-height);
+				background-color: var(--uui-color-surface);
+				border-bottom: 1px solid var(--uui-color-border);
+				box-sizing: border-box;
+			}
+
+			#headline {
+				display: block;
+				margin: 0 var(--uui-size-layout-1);
+			}
+
+			#tabs {
+				margin-left: auto;
+			}
+
+			#main {
+				display: flex;
+				flex: 1;
+				flex-direction: column;
+			}
+		`,
+	];
 }
 
 declare global {

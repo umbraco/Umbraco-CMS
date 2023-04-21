@@ -28,23 +28,7 @@ const CORE_PACKAGES = [
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-				width: 100%;
-				color: var(--uui-color-text);
-				font-size: 14px;
-				box-sizing: border-box;
-			}
-			umb-backoffice-modal-container {
-				z-index: 1000;
-			}
-		`,
-	];
+	
 
 	constructor() {
 		super();
@@ -64,6 +48,24 @@ export class UmbBackofficeElement extends UmbLitElement {
 			<umb-backoffice-modal-container></umb-backoffice-modal-container>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				width: 100%;
+				color: var(--uui-color-text);
+				font-size: 14px;
+				box-sizing: border-box;
+			}
+			umb-backoffice-modal-container {
+				z-index: 1000;
+			}
+		`,
+	];
 }
 
 export default UmbBackofficeElement;

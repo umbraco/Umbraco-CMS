@@ -13,25 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-input-multiple-text-string-item')
 export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				align-items: center;
-				margin-bottom: var(--uui-size-space-3);
-				gap: var(--uui-size-space-3);
-			}
-
-			#validation-message {
-				flex: 1;
-			}
-
-			#input {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	/**
 	 * Disables the input
@@ -139,6 +121,26 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 				  </uui-button>`}
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				align-items: center;
+				margin-bottom: var(--uui-size-space-3);
+				gap: var(--uui-size-space-3);
+			}
+
+			#validation-message {
+				flex: 1;
+			}
+
+			#input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbInputMultipleTextStringItemElement;

@@ -7,24 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		css`
-			:host,
-			#container {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
-
-			h1 {
-				text-align: center;
-			}
-
-			#error-message {
-				color: var(--uui-color-danger, #d42054);
-			}
-		`,
-	];
+	
 
 	@state()
 	_error?: ProblemDetailsModel;
@@ -92,6 +75,25 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 			</uui-form>
 		</div>`;
 	}
+	
+	static styles: CSSResultGroup = [
+		css`
+			:host,
+			#container {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			h1 {
+				text-align: center;
+			}
+
+			#error-message {
+				color: var(--uui-color-danger, #d42054);
+			}
+		`,
+	];
 }
 
 declare global {

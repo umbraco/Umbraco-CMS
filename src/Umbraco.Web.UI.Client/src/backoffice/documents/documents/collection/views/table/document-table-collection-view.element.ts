@@ -23,23 +23,7 @@ type EntityType = DocumentTreeItemResponseModel;
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				box-sizing: border-box;
-				height: 100%;
-				width: 100%;
-				padding: var(--uui-size-space-3) var(--uui-size-space-6);
-			}
-
-			/* TODO: Should we have embedded padding in the table component? */
-			umb-table {
-				padding: 0; /* To fix the embedded padding in the table component. */
-			}
-		`,
-	];
+	
 
 	@state()
 	private _items?: Array<EntityTreeItemResponseModel>;
@@ -150,6 +134,24 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				@ordered="${this._handleOrdering}"></umb-table>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				box-sizing: border-box;
+				height: 100%;
+				width: 100%;
+				padding: var(--uui-size-space-3) var(--uui-size-space-6);
+			}
+
+			/* TODO: Should we have embedded padding in the table component? */
+			umb-table {
+				padding: 0; /* To fix the embedded padding in the table component. */
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTableCollectionViewElement;

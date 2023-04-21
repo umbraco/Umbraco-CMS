@@ -7,25 +7,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-media-workspace-edit')
 export class UmbMediaWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			#header {
-				margin: 0 var(--uui-size-layout-1);
-				flex: 1 1 auto;
-			}
-
-			#footer {
-				margin: 0 var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	@state()
 	_id?: string;
@@ -56,6 +38,26 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 				unique="${this._id}"></umb-workspace-action-menu>
 		</umb-workspace-layout>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#header {
+				margin: 0 var(--uui-size-layout-1);
+				flex: 1 1 auto;
+			}
+
+			#footer {
+				margin: 0 var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbMediaWorkspaceEditElement;

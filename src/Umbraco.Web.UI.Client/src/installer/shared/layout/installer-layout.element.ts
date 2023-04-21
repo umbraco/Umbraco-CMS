@@ -5,6 +5,24 @@ import installerImg from '/installer.jpg';
 
 @customElement('umb-installer-layout')
 export class UmbInstallerLayoutElement extends LitElement {
+	
+
+	render() {
+		return html`<div>
+			<div id="background" aria-hidden="true"></div>
+
+			<div id="logo" aria-hidden="true">
+				<img src="${logoImg}" alt="Umbraco" />
+			</div>
+
+			<main id="container">
+				<div id="box">
+					<slot></slot>
+				</div>
+			</main>
+		</div>`;
+	}
+	
 	static styles: CSSResultGroup = [
 		css`
 			#background {
@@ -49,22 +67,6 @@ export class UmbInstallerLayoutElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html`<div>
-			<div id="background" aria-hidden="true"></div>
-
-			<div id="logo" aria-hidden="true">
-				<img src="${logoImg}" alt="Umbraco" />
-			</div>
-
-			<main id="container">
-				<div id="box">
-					<slot></slot>
-				</div>
-			</main>
-		</div>`;
-	}
 }
 
 declare global {

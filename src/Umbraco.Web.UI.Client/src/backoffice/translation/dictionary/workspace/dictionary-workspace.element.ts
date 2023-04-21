@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dictionary-workspace')
 export class UmbWorkspaceDictionaryElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	#workspaceContext = new UmbDictionaryWorkspaceContext(this);
 	#element = new UmbDictionaryWorkspaceEditElement();
@@ -28,6 +28,8 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbWorkspaceDictionaryElement;

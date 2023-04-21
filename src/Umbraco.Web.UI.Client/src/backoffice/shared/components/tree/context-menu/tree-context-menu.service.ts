@@ -6,47 +6,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-tree-context-menu-service')
 export class UmbTreeContextMenuServiceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-				z-index: 1;
-			}
-			#backdrop {
-				content: '';
-				position: absolute;
-				inset: 0px;
-				background-color: black;
-				opacity: 0.5;
-				width: 100vw;
-				height: 100vh;
-				z-index: -1;
-			}
-			#relative-wrapper {
-				background-color: var(--uui-color-surface);
-				position: relative;
-				display: flex;
-				flex-direction: column;
-				width: 100%;
-				height: 100%;
-			}
-			#action-modal {
-				position: absolute;
-				left: 300px;
-				height: 100%;
-				z-index: 1;
-				top: 0;
-				width: 300px;
-				border: none;
-				border-left: 1px solid var(--uui-color-border);
-				border-right: 1px solid var(--uui-color-border);
-				background-color: var(--uui-color-surface);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _modalOpen = false;
@@ -90,6 +50,48 @@ export class UmbTreeContextMenuServiceElement extends UmbLitElement {
 			</div>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+				z-index: 1;
+			}
+			#backdrop {
+				content: '';
+				position: absolute;
+				inset: 0px;
+				background-color: black;
+				opacity: 0.5;
+				width: 100vw;
+				height: 100vh;
+				z-index: -1;
+			}
+			#relative-wrapper {
+				background-color: var(--uui-color-surface);
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				height: 100%;
+			}
+			#action-modal {
+				position: absolute;
+				left: 300px;
+				height: 100%;
+				z-index: 1;
+				top: 0;
+				width: 300px;
+				border: none;
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+				background-color: var(--uui-color-surface);
+			}
+		`,
+	];
 }
 
 export const UMB_TREE_CONTEXT_MENU_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbTreeContextMenuServiceElement>(

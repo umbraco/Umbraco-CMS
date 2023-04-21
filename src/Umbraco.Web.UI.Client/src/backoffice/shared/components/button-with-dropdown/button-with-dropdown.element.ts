@@ -8,14 +8,7 @@ import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 // TODO: consider not using this, but instead use dropdown, which is more generic shared component of backoffice. (this is at the movement only used in Log Viewer)
 @customElement('umb-button-with-dropdown')
 export class UmbButtonWithDropdownElement extends LitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-symbol-expand {
-				margin-left: var(--uui-size-space-3);
-			}
-		`,
-	];
+	
 
 	@property()
 	label = '';
@@ -73,6 +66,15 @@ export class UmbButtonWithDropdownElement extends LitElement {
 			</uui-popover>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-symbol-expand {
+				margin-left: var(--uui-size-space-3);
+			}
+		`,
+	];
 }
 
 declare global {

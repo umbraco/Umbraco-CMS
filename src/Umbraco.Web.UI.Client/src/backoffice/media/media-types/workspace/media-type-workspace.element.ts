@@ -8,20 +8,7 @@ import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-type-workspace')
 export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-layout-1);
-				gap: var(--uui-size-space-4);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	#workspaceContext = new UmbWorkspaceMediaTypeContext(this);
 	#element = new UmbMediaTypeWorkspaceEditElement();
@@ -41,6 +28,21 @@ export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				display: flex;
+				padding: 0 var(--uui-size-layout-1);
+				gap: var(--uui-size-space-4);
+				width: 100%;
+			}
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbMediaTypeWorkspaceElement;
