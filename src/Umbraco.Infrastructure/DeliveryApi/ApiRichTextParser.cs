@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Infrastructure.Models.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
@@ -137,7 +137,6 @@ public partial class ApiRichTextParser : IApiRichTextParser
         IPublishedContent? media = publishedSnapshot.Media?.GetById(udi);
         if (media is not null)
         {
-            // var currentSrc = attributes.ContainsKey("src") ? attributes["src"] as string : null;
             attributes["src"] = _publishedUrlProvider.GetMediaUrl(media, UrlMode.Absolute);
 
             // this may be relevant if we can't find width and height in the attributes ... for now we seem quite able to, though
