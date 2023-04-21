@@ -10,6 +10,14 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
     {
         mapper.Define<IStylesheet, StylesheetResponseModel>((_, _) => new StylesheetResponseModel { Content = string.Empty, Name = string.Empty, Path = string.Empty }, Map);
         mapper.Define<CreateStylesheetRequestModel, StylesheetCreateModel>((_, _) => new StylesheetCreateModel { Name = string.Empty }, Map);
+        mapper.Define<UpdateStylesheetRequestModel, StylesheetUpdateModel>((_, _) => new StylesheetUpdateModel { Content = string.Empty, Name = string.Empty, ExistingPath = string.Empty }, Map);
+    }
+
+    private void Map(UpdateStylesheetRequestModel source, StylesheetUpdateModel target, MapperContext context)
+    {
+        target.Content = source.Content;
+        target.Name = source.Name;
+        target.ExistingPath = source.ExistingPath;
     }
 
     private void Map(CreateStylesheetRequestModel source, StylesheetCreateModel target, MapperContext context)

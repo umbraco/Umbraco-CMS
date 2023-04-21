@@ -105,6 +105,63 @@ public class StylesheetService : FileServiceBase, IStylesheetService
         return Task.FromResult(StylesheetOperationStatus.Success);
     }
 
+    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid performingUserKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IStylesheet? stylesheet = _stylesheetRepository.Get(updateModel.ExistingPath);
+
+        if(stylesheet is null)
+        {
+            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.NotFound, null);
+        }
+
+        StylesheetOperationStatus validationResult = ValidateUpdate(updateModel);
+        if (validationResult is not StylesheetOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(validationResult, null);
+        }
+
+        stylesheet.Content = updateModel.Content;
+        if (stylesheet.Name != updateModel.Name)
+        {
+            // Name has been updated, so we need to update the path as well
+            var newPath = stylesheet.Path.Replace(stylesheet.Name!, updateModel.Name);
+            stylesheet.Path = newPath;
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new StylesheetSavingNotification(stylesheet, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.CancelledByNotification, null);
+        }
+
+        _stylesheetRepository.Save(stylesheet);
+
+        scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
+        await AuditAsync(AuditType.Save, performingUserKey);
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.Success, stylesheet);
+    }
+
+    private StylesheetOperationStatus ValidateUpdate(StylesheetUpdateModel updateModel)
+    {
+        if (HasValidFileExtension(updateModel.Name) is false)
+        {
+            return StylesheetOperationStatus.InvalidFileExtension;
+        }
+
+        if (HasValidFileName(updateModel.Name) is false)
+        {
+            return StylesheetOperationStatus.InvalidName;
+        }
+
+        return StylesheetOperationStatus.Success;
+    }
+
+
     private async Task AuditAsync(AuditType type, Guid performingUserKey)
     {
         var userId = await _userIdKeyResolver.GetAsync(performingUserKey);
