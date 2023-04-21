@@ -324,7 +324,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		});
 	}
 
-	// TODO: Maybe this must take parentId into account as well?
+	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should nto be merged.
 	containersByNameAndType(name: string, containerType: PropertyContainerTypes) {
 		return this.#containers.getObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
