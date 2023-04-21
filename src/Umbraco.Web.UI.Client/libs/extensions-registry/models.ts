@@ -234,7 +234,7 @@ export interface ManifestWithMeta extends ManifestBase {
  * You could have custom logic to decide which extensions to load/register by using extensionRegistry
  */
 export interface ManifestEntrypoint extends ManifestBase {
-	type: 'entrypoint';
+	type: 'entryPoint';
 
 	/**
 	 * The file location of the javascript file to load in the backoffice
