@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS } from './manifests';
+import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS } from './manifests';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -10,21 +10,36 @@ import {
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalHandler,
 } from '@umbraco-cms/backoffice/modal';
+import { getInsertPartialSnippet } from '../utils';
 
-export const UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL = new UmbModalToken(
-	UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS,
+export const UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL = new UmbModalToken(
+	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS,
 	{
 		type: 'sidebar',
 		size: 'small',
 	}
 );
 
-export interface InsertSidebarData {
+export interface ChooseInsertTypeModalData {
 	hidePartialViews?: boolean;
 }
 
-@customElement('umb-insert-sidebar')
-export default class UmbInsertSidebarElement extends UmbModalBaseElement<InsertSidebarData, string> {
+export enum CodeSnippetType {
+	partialView = 'partialView',
+	umbracoField = 'umbracoField',
+	dictionaryItem = 'dictionaryItem',
+	macro = 'macro',
+}
+export interface ChooseInsertTypeModalResult {
+	value: string;
+	type: CodeSnippetType;
+}
+
+@customElement('umb-templating-choose-insert-type-modal')
+export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement<
+	ChooseInsertTypeModalData,
+	ChooseInsertTypeModalResult
+> {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -67,14 +82,22 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<InsertS
 	#openModal?: UmbModalHandler;
 
 	#openInsertValueSidebar() {
-		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
-		this.#openModal?.onSubmit().then(chosenValue => {
-			if(chosenValue)this.modalHandler?.submit(chosenValue);
+		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL);
+		this.#openModal?.onSubmit().then((chosenValue) => {
+			if (chosenValue) this.modalHandler?.submit({ value: chosenValue, type: CodeSnippetType.umbracoField });
 		});
 	}
 
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		this.#openModal?.onSubmit().then((partialViewPickerModalResult) => {
+			debugger;
+			if (partialViewPickerModalResult)
+				this.modalHandler?.submit({
+					type: CodeSnippetType.partialView,
+					value: getInsertPartialSnippet(partialViewPickerModalResult.selection[0]),
+				});
+		});
 	}
 
 	render() {
@@ -124,6 +147,6 @@ export default class UmbInsertSidebarElement extends UmbModalBaseElement<InsertS
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-insert-sidebar': UmbInsertSidebarElement;
+		'umb-templating-choose-insert-type-modal': UmbChooseInsertTypeModalElement;
 	}
 }

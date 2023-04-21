@@ -10,8 +10,12 @@ import {
 	UmbModalHandler,
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL } from '../../modals/insert-choose-type-sidebar.element';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
+import {
+	ChooseInsertTypeModalResult,
+	CodeSnippetType,
+	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL,
+} from '../../modals/insert-choose-type-sidebar.element';
+import { getInsertPartialSnippet } from '../../utils';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
@@ -78,23 +82,30 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL, {
 			hidePartialView: this.hidePartialView,
 		});
-		this.#submitOpenModal();
+		this.#openModal?.onSubmit().then((closedModal: ChooseInsertTypeModalResult) => {
+			this.value = closedModal.value;
+			this.#dispatchInsertEvent();
+		});
 	};
 
 	#openInsertValueSidebar() {
-		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_MODAL);
-		this.#submitOpenModal();
-	}
-
-	#submitOpenModal() {
+		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL);
 		this.#openModal?.onSubmit().then((value) => {
 			this.value = value;
-			this.dispatchEvent(new CustomEvent('insert', { bubbles: true, cancelable: true, composed: false }));
+			this.#dispatchInsertEvent();
 		});
 	}
 
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		this.#openModal?.onSubmit().then((value) => {
+			this.value = getInsertPartialSnippet(value.selection?.[0]) ?? '';
+			this.#dispatchInsertEvent();
+		});
+	}
+
+	#dispatchInsertEvent() {
+		this.dispatchEvent(new CustomEvent('insert', { bubbles: true, cancelable: true, composed: false }));
 	}
 
 	@property()

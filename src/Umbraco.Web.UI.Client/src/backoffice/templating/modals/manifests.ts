@@ -2,7 +2,7 @@ import { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
 import { UMB_PARTIAL_VIEW_PICKER_MODAL_ALIAS } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS = 'Umb.Modal.Templating.Insert.ChooseType.Sidebar';
-export const UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS = 'Umb.Modal.Templating.Insert.Value.Sidebar';
+export const UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS = 'Umb.Modal.Templating.Insert.Value.Sidebar';
 
 const modals: Array<ManifestModal> = [
 	{
@@ -13,7 +13,7 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: UMB_MODAL_TEMPLATING_INSERT_VALUE_SIDEBAR_ALIAS,
+		alias: UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS,
 		name: 'Insert value type sidebar',
 		loader: () => import('./insert-value-sidebar.element'),
 	},
