@@ -29,9 +29,8 @@ public class ScriptFolderControllerBase : PathFolderManagementControllerBase<Scr
     protected override Task<PathContainer?> GetContainerAsync(string path)
         => _scriptFolderService.GetAsync(path);
 
-    protected override Task<Attempt<PathContainer?, ScriptFolderOperationStatus>> CreateContainerAsync(
-        PathContainer container) =>
-        _scriptFolderService.CreateAsync(container);
+    protected override Task<Attempt<PathContainer?, ScriptFolderOperationStatus>> CreateContainerAsync(PathContainer container)
+        => _scriptFolderService.CreateAsync(container);
 
     protected override Task<Attempt<ScriptFolderOperationStatus>> DeleteContainerAsync(string path) =>
         _scriptFolderService.DeleteAsync(path);
