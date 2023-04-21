@@ -14,9 +14,8 @@ import {
 } from './languages/app-language-select/app-language.context';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests = [
 	...settingsSectionManifests,
 	...settingsMenuManifests,
 	...dashboardManifests,

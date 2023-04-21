@@ -4,9 +4,8 @@ import { manifests as memberGroupManifests } from './member-groups/manifests';
 import { manifests as memberTypeManifests } from './member-types/manifests';
 import { manifests as memberManifests } from './members/manifests';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests = [
 	...memberSectionManifests,
 	...menuSectionManifests,
 	...memberGroupManifests,

@@ -4,11 +4,10 @@ import { manifests as propertyEditorManifests } from './property-editors/manifes
 import { manifests as modalManifests } from './modals/manifests';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests = [
 	...componentManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,

@@ -3,9 +3,8 @@ import { manifests as packageBuilderManifests } from './package-builder/manifest
 import { manifests as packageRepoManifests } from './package-repo/manifests';
 import { manifests as packageSectionManifests } from './package-section/manifests';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests = [
 	...repositoryManifests,
 	...packageBuilderManifests,
 	...packageRepoManifests,
