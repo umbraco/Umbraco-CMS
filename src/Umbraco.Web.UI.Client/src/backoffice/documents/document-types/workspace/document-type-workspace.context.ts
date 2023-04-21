@@ -23,7 +23,6 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	// TODO: Consider if each of these should go the view it self, but only if its used in that one view, otherwise make then go here.
 	readonly allowedAsRoot;
 	readonly variesByCulture;
 	readonly variesBySegment;
@@ -110,7 +109,6 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// Document type specific:
 	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
-		console.log('setAllowedTemplateIds', allowedTemplateIds);
 		this.structure.updateRootDocumentType({ allowedTemplateIds });
 	}
 	setDefaultTemplateId(defaultTemplateId: string) {
