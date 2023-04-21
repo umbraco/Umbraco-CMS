@@ -12,7 +12,7 @@ import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/
  */
 @customElement('umb-property-editor-ui-radio-button-list')
 export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	#value = '';
 	@property({ type: String })
@@ -59,6 +59,8 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 			.selectedKey="${this.#value}"
 			.list="${this._list}"></umb-input-radio-button-list>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIRadioButtonListElement;

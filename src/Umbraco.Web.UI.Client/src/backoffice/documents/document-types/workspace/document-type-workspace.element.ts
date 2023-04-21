@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	#workspaceContext = new UmbDocumentTypeWorkspaceContext(this);
 	#element = new UmbDocumentTypeWorkspaceEditorElement();
@@ -28,6 +28,8 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbDocumentTypeWorkspaceElement;

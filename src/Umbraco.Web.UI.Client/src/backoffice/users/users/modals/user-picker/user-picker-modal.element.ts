@@ -7,6 +7,54 @@ import type { UserDetails } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-user-picker-modal')
 export class UmbUserPickerModalElement extends UmbModalElementPickerBase<UserDetails> {
+	
+
+	@state()
+	private _users: Array<UserDetails> = [];
+
+	private _userStore?: UmbUserStore;
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (userStore) => {
+			this._userStore = userStore;
+			this._observeUsers();
+		});
+	}
+
+	private _observeUsers() {
+		if (!this._userStore) return;
+		this.observe(this._userStore.getAll(), (users) => (this._users = users));
+	}
+
+	render() {
+		return html`
+			<umb-workspace-layout headline="Select users">
+				<uui-box>
+					<uui-input label="search"></uui-input>
+					<hr />
+					<div id="item-list">
+						${this._users.map(
+							(item) => html`
+								<div
+									@click=${() => this.handleSelection(item.id)}
+									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
+									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
+									<uui-avatar .name=${item.name}></uui-avatar>
+									<span>${item.name}</span>
+								</div>
+							`
+						)}
+					</div>
+				</uui-box>
+				<div slot="actions">
+					<uui-button label="Close" @click=${this.close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
+				</div>
+			</umb-workspace-layout>
+		`;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -57,52 +105,6 @@ export class UmbUserPickerModalElement extends UmbModalElementPickerBase<UserDet
 			}
 		`,
 	];
-
-	@state()
-	private _users: Array<UserDetails> = [];
-
-	private _userStore?: UmbUserStore;
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (userStore) => {
-			this._userStore = userStore;
-			this._observeUsers();
-		});
-	}
-
-	private _observeUsers() {
-		if (!this._userStore) return;
-		this.observe(this._userStore.getAll(), (users) => (this._users = users));
-	}
-
-	render() {
-		return html`
-			<umb-workspace-layout headline="Select users">
-				<uui-box>
-					<uui-input label="search"></uui-input>
-					<hr />
-					<div id="item-list">
-						${this._users.map(
-							(item) => html`
-								<div
-									@click=${() => this.handleSelection(item.id)}
-									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
-									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
-									<uui-avatar .name=${item.name}></uui-avatar>
-									<span>${item.name}</span>
-								</div>
-							`
-						)}
-					</div>
-				</uui-box>
-				<div slot="actions">
-					<uui-button label="Close" @click=${this.close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
-				</div>
-			</umb-workspace-layout>
-		`;
-	}
 }
 
 export default UmbUserPickerModalElement;

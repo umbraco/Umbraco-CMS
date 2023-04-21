@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-user-picker')
 export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -20,6 +20,8 @@ export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implemen
 	render() {
 		return html`<div>umb-property-editor-ui-user-picker</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIUserPickerElement;

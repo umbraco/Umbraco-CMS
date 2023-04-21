@@ -6,67 +6,7 @@ import { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/backend-api'
 
 @customElement('umb-log-viewer-log-types-chart')
 export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
-	static styles = [
-		css`
-			#log-types-container {
-				display: flex;
-				gap: var(--uui-size-space-4);
-				flex-direction: column-reverse;
-				align-items: center;
-				justify-content: space-between;
-			}
-
-			button {
-				all: unset;
-				display: flex;
-				align-items: center;
-				cursor: pointer;
-			}
-
-			button:focus {
-				outline: 1px solid var(--uui-color-focus);
-			}
-
-			button.active {
-				text-decoration: line-through;
-			}
-
-			#chart {
-				width: 150px;
-				aspect-ratio: 1;
-				background: radial-gradient(white 40%, transparent 41%),
-					conic-gradient(
-						var(--umb-log-viewer-debug-color) 0% 20%,
-						var(--umb-log-viewer-information-color) 20% 40%,
-						var(--umb-log-viewer-warning-color) 40% 60%,
-						var(--umb-log-viewer-error-color) 60% 80%,
-						var(--umb-log-viewer-fatal-color) 80% 100%
-					);
-				margin: 10px;
-				display: inline-block;
-				border-radius: 50%;
-			}
-
-			ul {
-				list-style: none;
-				margin: 0;
-				padding: 0;
-				border: 0;
-				font-size: 100%;
-				font: inherit;
-				vertical-align: baseline;
-			}
-
-			li {
-				display: flex;
-				align-items: center;
-			}
-
-			li uui-icon {
-				margin-right: 1em;
-			}
-		`,
-	];
+	
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
@@ -158,6 +98,68 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+	
+	static styles = [
+		css`
+			#log-types-container {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				flex-direction: column-reverse;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			button {
+				all: unset;
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+			}
+
+			button:focus {
+				outline: 1px solid var(--uui-color-focus);
+			}
+
+			button.active {
+				text-decoration: line-through;
+			}
+
+			#chart {
+				width: 150px;
+				aspect-ratio: 1;
+				background: radial-gradient(white 40%, transparent 41%),
+					conic-gradient(
+						var(--umb-log-viewer-debug-color) 0% 20%,
+						var(--umb-log-viewer-information-color) 20% 40%,
+						var(--umb-log-viewer-warning-color) 40% 60%,
+						var(--umb-log-viewer-error-color) 60% 80%,
+						var(--umb-log-viewer-fatal-color) 80% 100%
+					);
+				margin: 10px;
+				display: inline-block;
+				border-radius: 50%;
+			}
+
+			ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+
+			li {
+				display: flex;
+				align-items: center;
+			}
+
+			li uui-icon {
+				margin-right: 1em;
+			}
+		`,
+	];
 }
 
 declare global {

@@ -14,7 +14,7 @@ import './relation-type-workspace-edit.element';
  */
 @customElement('umb-relation-type-workspace')
 export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	#workspaceContext = new UmbRelationTypeWorkspaceContext(this);
 
@@ -50,6 +50,8 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 				this.#routerPath = event.target.absoluteRouterPath;
 			}}></umb-router-slot>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbRelationTypeWorkspaceElement;

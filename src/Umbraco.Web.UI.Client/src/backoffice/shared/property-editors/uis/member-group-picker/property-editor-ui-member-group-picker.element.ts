@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-member-group-picker')
 export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -20,6 +20,8 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 	render() {
 		return html`<div>umb-property-editor-ui-member-group-picker</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIMemberGroupPickerElement;

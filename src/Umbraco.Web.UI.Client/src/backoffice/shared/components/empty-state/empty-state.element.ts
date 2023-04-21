@@ -4,6 +4,26 @@ import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-empty-state')
 export class UmbEmptyStateElement extends LitElement {
+	
+
+	/**
+	 * Set the text size
+	 */
+	@property({ type: String })
+	size: 'small' | 'large' = 'large';
+
+	/**
+	 * Set the element position
+	 * 'center' => element is absolutely centered
+	 * undefined => element has auto margin, to center in parent
+	 */
+	@property({ type: String })
+	position: 'center' | undefined;
+
+	render() {
+		return html`<slot></slot>`;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -39,24 +59,6 @@ export class UmbEmptyStateElement extends LitElement {
 			}
 		`,
 	];
-
-	/**
-	 * Set the text size
-	 */
-	@property({ type: String })
-	size: 'small' | 'large' = 'large';
-
-	/**
-	 * Set the element position
-	 * 'center' => element is absolutely centered
-	 * undefined => element has auto margin, to center in parent
-	 */
-	@property({ type: String })
-	position: 'center' | undefined;
-
-	render() {
-		return html`<slot></slot>`;
-	}
 }
 
 declare global {

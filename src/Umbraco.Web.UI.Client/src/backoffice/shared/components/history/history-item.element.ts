@@ -5,6 +5,33 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-history-item')
 export class UmbHistoryItemElement extends UmbLitElement {
+	
+
+	@property({ type: String })
+	src?: string;
+
+	@property({ type: String })
+	name?: string;
+
+	@property({ type: String })
+	detail?: string;
+
+	render() {
+		return html`<div id="wrapper">
+			<div class="user-info">
+				<uui-avatar .name="${this.name ?? 'Unknown'}" ?src="${this.src}"></uui-avatar>
+				<div>
+					<span class="name">${this.name}</span>
+					<span class="detail">${this.detail}</span>
+				</div>
+			</div>
+			<div class="slots-wrapper">
+				<slot id="description"></slot>
+				<slot id="actions-container" name="actions"></slot>
+			</div>
+		</div>`;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -61,31 +88,6 @@ export class UmbHistoryItemElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	@property({ type: String })
-	src?: string;
-
-	@property({ type: String })
-	name?: string;
-
-	@property({ type: String })
-	detail?: string;
-
-	render() {
-		return html`<div id="wrapper">
-			<div class="user-info">
-				<uui-avatar .name="${this.name ?? 'Unknown'}" ?src="${this.src}"></uui-avatar>
-				<div>
-					<span class="name">${this.name}</span>
-					<span class="detail">${this.detail}</span>
-				</div>
-			</div>
-			<div class="slots-wrapper">
-				<slot id="description"></slot>
-				<slot id="actions-container" name="actions"></slot>
-			</div>
-		</div>`;
-	}
 }
 
 export default UmbHistoryItemElement;

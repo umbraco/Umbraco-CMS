@@ -23,11 +23,7 @@ export type InitializedExtension = { alias: string; weight: number; component: H
  */
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
-	static styles = css`
-		:host {
-			display: contents;
-		}
-	`;
+	
 
 	@state()
 	private _extensions: InitializedExtension[] = [];
@@ -131,6 +127,12 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 			(ext) => this.renderMethod(ext) || nothing
 		);
 	}
+	
+	static styles = css`
+		:host {
+			display: contents;
+		}
+	`;
 }
 
 declare global {

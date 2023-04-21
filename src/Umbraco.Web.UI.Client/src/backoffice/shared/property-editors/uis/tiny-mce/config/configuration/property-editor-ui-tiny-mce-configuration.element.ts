@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tiny-mce-configuration')
 export class UmbPropertyEditorUITinyMceConfigurationElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -19,6 +19,8 @@ export class UmbPropertyEditorUITinyMceConfigurationElement extends UmbLitElemen
 	render() {
 		return html`<div>umb-property-editor-ui-tiny-mce-configuration</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUITinyMceConfigurationElement;

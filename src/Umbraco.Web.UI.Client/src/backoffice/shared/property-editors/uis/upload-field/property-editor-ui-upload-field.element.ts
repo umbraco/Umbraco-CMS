@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-upload-field')
 export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -42,6 +42,8 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 			?multiple="${this._multiple}"
 			.fileExtensions="${this._fileExtensions}"></umb-input-upload-field>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIUploadFieldElement;

@@ -11,7 +11,7 @@ import { generateRoutePathBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this);
 
@@ -74,6 +74,8 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 				this.#routerPath = event.target.absoluteRouterPath;
 			}}></umb-router-slot>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbLanguageWorkspaceElement;

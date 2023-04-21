@@ -9,15 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-telemetry')
 export class UmbDashboardTelemetryElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _telemetryFormData = TelemetryLevelModel.BASIC;
@@ -145,6 +137,16 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDashboardTelemetryElement;

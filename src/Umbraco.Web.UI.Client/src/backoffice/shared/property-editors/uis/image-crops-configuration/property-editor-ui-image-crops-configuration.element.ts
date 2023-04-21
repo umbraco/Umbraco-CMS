@@ -12,7 +12,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorElement
 {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -23,6 +23,8 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	render() {
 		return html`<div>umb-property-editor-ui-image-crops-configuration</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIImageCropsConfigurationElement;

@@ -8,14 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-radio-button-list')
 export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-		`,
-	];
+	
 
 	/**
 	 * List of items.
@@ -60,6 +53,15 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 	renderRadioButton(item: { key: string; sortOrder: number; value: string }) {
 		return html`<uui-radio value="${item.value}" label="${item.value}"></uui-radio>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+		`,
+	];
 }
 
 export default UmbInputRadioButtonListElement;

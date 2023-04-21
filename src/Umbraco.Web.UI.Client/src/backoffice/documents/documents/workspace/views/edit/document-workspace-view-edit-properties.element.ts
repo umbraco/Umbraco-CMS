@@ -9,17 +9,7 @@ import { DocumentTypePropertyTypeResponseModel } from '@umbraco-cms/backoffice/b
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			.property {
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-			.property:last-child {
-				border-bottom: 0;
-			}
-		`,
-	];
+	
 
 	@property({ type: String, attribute: 'container-name', reflect: false })
 	public get containerName(): string | undefined {
@@ -57,6 +47,18 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 			(property) => html`<umb-variantable-property class="property" .property=${property}></umb-variantable-property> `
 		);
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			.property {
+				border-bottom: 1px solid var(--uui-color-divider);
+			}
+			.property:last-child {
+				border-bottom: 0;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceViewEditPropertiesElement;

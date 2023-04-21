@@ -11,14 +11,7 @@ import { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-folder-modal')
 export class UmbFolderModalElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#name {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler<UmbFolderModalData, UmbFolderModalResult>;
@@ -166,6 +159,15 @@ export class UmbFolderModalElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#name {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbFolderModalElement;

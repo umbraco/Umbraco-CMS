@@ -6,36 +6,7 @@ import type { SearchResultResponseModel } from '@umbraco-cms/backoffice/backend-
 
 @customElement('umb-modal-element-fields-viewer')
 export class UmbModalElementFieldsViewerElement extends UmbModalBaseElement<SearchResultResponseModel & { name: string }> {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: relative;
-			}
-			uui-dialog-layout {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
-
-			span {
-				display: block;
-				padding-right: var(--uui-size-space-5);
-			}
-
-			uui-scroll-container {
-				line-height: 0;
-				overflow-y: scroll;
-				max-height: 100%;
-				min-height: 0;
-			}
-			div {
-				margin-top: var(--uui-size-space-5);
-				display: flex;
-				flex-direction: row-reverse;
-			}
-		`,
-	];
+	
 
 	private _handleClose() {
 		this.modalHandler?.reject();
@@ -68,6 +39,37 @@ export class UmbModalElementFieldsViewerElement extends UmbModalBaseElement<Sear
 			</uui-dialog-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: relative;
+			}
+			uui-dialog-layout {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			span {
+				display: block;
+				padding-right: var(--uui-size-space-5);
+			}
+
+			uui-scroll-container {
+				line-height: 0;
+				overflow-y: scroll;
+				max-height: 100%;
+				min-height: 0;
+			}
+			div {
+				margin-top: var(--uui-size-space-5);
+				display: flex;
+				flex-direction: row-reverse;
+			}
+		`,
+	];
 }
 
 declare global {

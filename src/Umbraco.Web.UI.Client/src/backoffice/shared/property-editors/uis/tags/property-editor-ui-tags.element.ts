@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tags')
 export class UmbPropertyEditorUITagsElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -20,6 +20,8 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	render() {
 		return html`<div>umb-property-editor-ui-tags</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUITagsElement;

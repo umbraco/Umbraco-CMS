@@ -8,30 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			umb-code-editor {
-				--editor-height: calc(100vh - 300px);
-			}
-
-			uui-box {
-				margin: 1em;
-				--uui-box-default-padding: 0;
-			}
-
-			uui-input {
-				width: 100%;
-				margin: 1em;
-			}
-		`,
-	];
+	
 
 	public load(entityId: string) {
 		this.#templateWorkspaceContext.load(entityId);
@@ -104,6 +81,31 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 			</uui-box>
 		</umb-workspace-layout>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			umb-code-editor {
+				--editor-height: calc(100vh - 300px);
+			}
+
+			uui-box {
+				margin: 1em;
+				--uui-box-default-padding: 0;
+			}
+
+			uui-input {
+				width: 100%;
+				margin: 1em;
+			}
+		`,
+	];
 }
 
 export default UmbTemplateWorkspaceElement;

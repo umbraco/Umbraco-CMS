@@ -14,62 +14,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-user-group-workspace-edit')
 export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				height: 100%;
-			}
-
-			#main {
-				display: grid;
-				grid-template-columns: 1fr 350px;
-				gap: var(--uui-size-layout-1);
-				padding: var(--uui-size-layout-1);
-			}
-			#left-column {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			#right-column > uui-box > div {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-2);
-			}
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-			.faded-text {
-				color: var(--uui-color-text-alt);
-				font-size: 0.8rem;
-			}
-			#default-permissions {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			.default-permission {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-4);
-				padding: var(--uui-size-space-2);
-			}
-			.default-permission:not(:last-child) {
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-			.permission-info {
-				display: flex;
-				flex-direction: column;
-			}
-		`,
-	];
+	
 
 	defaultPermissions: Array<{
 		name: string;
@@ -361,6 +306,63 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				height: 100%;
+			}
+
+			#main {
+				display: grid;
+				grid-template-columns: 1fr 350px;
+				gap: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
+			}
+			#left-column {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			#right-column > uui-box > div {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-2);
+			}
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+				width: 100%;
+			}
+			uui-input {
+				width: 100%;
+			}
+			.faded-text {
+				color: var(--uui-color-text-alt);
+				font-size: 0.8rem;
+			}
+			#default-permissions {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			.default-permission {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-4);
+				padding: var(--uui-size-space-2);
+			}
+			.default-permission:not(:last-child) {
+				border-bottom: 1px solid var(--uui-color-divider);
+			}
+			.permission-info {
+				display: flex;
+				flex-direction: column;
+			}
+		`,
+	];
 }
 
 export default UmbUserGroupWorkspaceEditElement;

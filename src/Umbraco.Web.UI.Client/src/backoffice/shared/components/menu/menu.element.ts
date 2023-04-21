@@ -8,7 +8,7 @@ import './menu-item/menu-item.element';
 
 @customElement('umb-menu')
 export class UmbMenuElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	manifest?: ManifestMenu;
@@ -19,6 +19,8 @@ export class UmbMenuElement extends UmbLitElement {
 			.filter=${(items: ManifestMenuItem) => items.conditions.menus.includes(this.manifest!.alias)}
 			default-element="umb-menu-item"></umb-extension-slot>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbMenuElement;

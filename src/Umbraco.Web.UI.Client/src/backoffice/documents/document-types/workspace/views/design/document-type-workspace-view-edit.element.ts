@@ -13,25 +13,7 @@ import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				--uui-tab-background: var(--uui-color-surface);
-			}
-
-			/* TODO: This should be replaced with a general workspace bar — naming is hard */
-			#workspace-tab-bar {
-				padding: 0 var(--uui-size-layout-1);
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				background-color: var(--uui-color-surface);
-				flex-wrap: nowrap;
-			}
-		`,
-	];
+	
 
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
@@ -215,6 +197,26 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 			</umb-router-slot>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				--uui-tab-background: var(--uui-color-surface);
+			}
+
+			/* TODO: This should be replaced with a general workspace bar — naming is hard */
+			#workspace-tab-bar {
+				padding: 0 var(--uui-size-layout-1);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background-color: var(--uui-color-surface);
+				flex-wrap: nowrap;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTypeWorkspaceViewEditElement;

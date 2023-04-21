@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-dropdown')
 export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -20,6 +20,8 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	render() {
 		return html`<div>umb-property-editor-ui-dropdown</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIDropdownElement;

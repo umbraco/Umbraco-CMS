@@ -10,7 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-icon-picker')
 export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -42,6 +42,8 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 			</uui-button>
 		`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIIconPickerElement;

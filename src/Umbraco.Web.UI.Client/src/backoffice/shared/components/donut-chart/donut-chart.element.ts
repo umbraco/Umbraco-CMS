@@ -30,66 +30,7 @@ export class UmbDonutChartElement extends LitElement {
 		return percent * 3.6;
 	}
 
-	static styles = [
-		UUITextStyles,
-		css`
-			path {
-				pointer-events: visibleFill;
-			}
-			.circle {
-				filter: url(#erode);
-			}
-
-			.highlight {
-				transition: opacity 200ms linear;
-				filter: url(#filter);
-				opacity: 0;
-			}
-
-			.highlight:hover {
-				opacity: 0.5;
-			}
-
-			#container {
-				position: relative;
-				width: 200px;
-			}
-
-			#details-box {
-				background: #ffffffe6;
-				border: 1px solid var(--uui-color-border-standalone);
-				border-radius: var(--uui-border-radius);
-				box-sizing: border-box;
-				top: 0;
-				left: 0;
-				position: absolute;
-				opacity: 0;
-				padding: 0.5em;
-				line-height: 1.5;
-				font-size: var(--uui-type-small-size);
-				box-shadow: var(--uui-shadow-depth-1);
-				transform: translate3d(var(--pos-x), var(--pos-y), 0);
-				transition: transform 0.2s cubic-bezier(0.02, 1.23, 0.79, 1.08);
-				transition: opacity 150ms linear;
-			}
-
-			#details-box.show {
-				opacity: 1;
-			}
-
-			#details-box uui-icon {
-				/* optically correct alignment */
-				color: var(--umb-donut-detail-color);
-				margin-right: 0.2em;
-			}
-
-			#details-title {
-				font-weight: bold;
-				display: flex;
-				align-items: center;
-			}
-		`,
-	];
+	
 
 	/**
 	 * Circle radius in pixels
@@ -328,6 +269,67 @@ export class UmbDonutChartElement extends LitElement {
 			</div>
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			path {
+				pointer-events: visibleFill;
+			}
+			.circle {
+				filter: url(#erode);
+			}
+
+			.highlight {
+				transition: opacity 200ms linear;
+				filter: url(#filter);
+				opacity: 0;
+			}
+
+			.highlight:hover {
+				opacity: 0.5;
+			}
+
+			#container {
+				position: relative;
+				width: 200px;
+			}
+
+			#details-box {
+				background: #ffffffe6;
+				border: 1px solid var(--uui-color-border-standalone);
+				border-radius: var(--uui-border-radius);
+				box-sizing: border-box;
+				top: 0;
+				left: 0;
+				position: absolute;
+				opacity: 0;
+				padding: 0.5em;
+				line-height: 1.5;
+				font-size: var(--uui-type-small-size);
+				box-shadow: var(--uui-shadow-depth-1);
+				transform: translate3d(var(--pos-x), var(--pos-y), 0);
+				transition: transform 0.2s cubic-bezier(0.02, 1.23, 0.79, 1.08);
+				transition: opacity 150ms linear;
+			}
+
+			#details-box.show {
+				opacity: 1;
+			}
+
+			#details-box uui-icon {
+				/* optically correct alignment */
+				color: var(--umb-donut-detail-color);
+				margin-right: 0.2em;
+			}
+
+			#details-title {
+				font-weight: bold;
+				display: flex;
+				align-items: center;
+			}
+		`,
+	];
 }
 
 declare global {

@@ -7,14 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-modal-container')
 export class UmbBackofficeModalContainerElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			:host {
-				position: absolute;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _modals?: UmbModalHandler[];
@@ -45,6 +38,15 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 			</uui-modal-container>
 		`;
 	}
+	
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			:host {
+				position: absolute;
+			}
+		`,
+	];
 }
 
 declare global {

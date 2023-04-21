@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-order-direction')
 export class UmbPropertyEditorUIOrderDirectionElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -20,6 +20,8 @@ export class UmbPropertyEditorUIOrderDirectionElement extends UmbLitElement impl
 	render() {
 		return html`<div>umb-property-editor-ui-order-direction</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIOrderDirectionElement;

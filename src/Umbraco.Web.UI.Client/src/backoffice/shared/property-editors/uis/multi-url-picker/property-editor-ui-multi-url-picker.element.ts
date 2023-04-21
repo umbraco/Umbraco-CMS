@@ -14,7 +14,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-multi-url-picker')
 export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property({ type: Array })
 	value: UmbLinkPickerLink[] = [];
@@ -87,6 +87,8 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 			.min=${this._minNumber}
 			.urls="${this.value}"></umb-input-multi-url-picker>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIMultiUrlPickerElement;

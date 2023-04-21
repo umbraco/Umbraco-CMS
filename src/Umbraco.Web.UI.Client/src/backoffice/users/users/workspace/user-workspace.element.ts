@@ -12,7 +12,7 @@ import '../../../shared/components/workspace/workspace-layout/workspace-layout.e
 
 @customElement('umb-user-workspace')
 export class UmbUserWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	#workspaceContext = new UmbUserWorkspaceContext(this);
 	#element = new UmbUserWorkspaceEditElement();
@@ -32,6 +32,8 @@ export class UmbUserWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbUserWorkspaceElement;

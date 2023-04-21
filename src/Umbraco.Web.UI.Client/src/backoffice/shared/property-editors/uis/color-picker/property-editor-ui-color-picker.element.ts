@@ -12,7 +12,7 @@ import type { SwatchDetails } from '@umbraco-cms/backoffice/models';
  */
 @customElement('umb-property-editor-ui-color-picker')
 export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -43,6 +43,8 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 			.swatches="${this._swatches}"
 			.showLabels="${this._showLabels}"></umb-input-color-picker>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIColorPickerElement;

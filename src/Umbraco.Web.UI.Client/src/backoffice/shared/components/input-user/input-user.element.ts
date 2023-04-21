@@ -8,29 +8,7 @@ import type { UserEntity } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-user')
 export class UmbPickerUserElement extends UmbInputListBaseElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			#user-list {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			.user {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-2);
-			}
-			.user uui-button {
-				margin-left: auto;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _users: Array<UserEntity> = [];
@@ -86,6 +64,30 @@ export class UmbPickerUserElement extends UmbInputListBaseElement {
 	renderContent() {
 		return html`${this._renderUserList()}`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			#user-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			.user {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+			}
+			.user uui-button {
+				margin-left: auto;
+			}
+		`,
+	];
 }
 
 declare global {

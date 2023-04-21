@@ -12,29 +12,7 @@ import '../components/entity-bulk-action/entity-bulk-action.element';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				gap: var(--uui-size-3);
-				width: 100%;
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-				align-items: center;
-				box-sizing: border-box;
-				justify-content: space-between;
-			}
-			#selection-info,
-			#actions {
-				display: flex;
-				align-items: center;
-				box-sizing: border-box;
-				gap: var(--uui-size-3);
-			}
-		`,
-	];
+	
 
 	@property()
 	public entityType: string | null = null;
@@ -130,6 +108,30 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 				)}
 			</div>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				gap: var(--uui-size-3);
+				width: 100%;
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				background-color: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
+				align-items: center;
+				box-sizing: border-box;
+				justify-content: space-between;
+			}
+			#selection-info,
+			#actions {
+				display: flex;
+				align-items: center;
+				box-sizing: border-box;
+				gap: var(--uui-size-3);
+			}
+		`,
+	];
 }
 
 declare global {

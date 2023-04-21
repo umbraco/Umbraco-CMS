@@ -7,51 +7,7 @@ import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<UserGroupDetails> {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-input {
-				width: 100%;
-			}
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				margin: 16px 0;
-			}
-			#item-list {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-1);
-			}
-			.item {
-				color: var(--uui-color-interactive);
-				display: grid;
-				grid-template-columns: var(--uui-size-8) 1fr;
-				padding: var(--uui-size-4) var(--uui-size-2);
-				gap: var(--uui-size-space-5);
-				align-items: center;
-				border-radius: var(--uui-border-radius);
-				cursor: pointer;
-			}
-			.item.selected {
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-			}
-			.item:not(.selected):hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-			}
-			.item.selected:hover {
-				background-color: var(--uui-color-selected-emphasis);
-			}
-			.item uui-icon {
-				width: 100%;
-				box-sizing: border-box;
-				display: flex;
-				height: fit-content;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _userGroups: Array<UserGroupDetails> = [];
@@ -98,6 +54,52 @@ export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<Us
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+				margin: 16px 0;
+			}
+			#item-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-1);
+			}
+			.item {
+				color: var(--uui-color-interactive);
+				display: grid;
+				grid-template-columns: var(--uui-size-8) 1fr;
+				padding: var(--uui-size-4) var(--uui-size-2);
+				gap: var(--uui-size-space-5);
+				align-items: center;
+				border-radius: var(--uui-border-radius);
+				cursor: pointer;
+			}
+			.item.selected {
+				background-color: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
+			}
+			.item:not(.selected):hover {
+				background-color: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
+			}
+			.item.selected:hover {
+				background-color: var(--uui-color-selected-emphasis);
+			}
+			.item uui-icon {
+				width: 100%;
+				box-sizing: border-box;
+				display: flex;
+				height: fit-content;
+			}
+		`,
+	];
 }
 
 export default UmbUserGroupPickerModalElement;

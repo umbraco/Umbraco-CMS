@@ -19,14 +19,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-type-picker')
 export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#add-button {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	// TODO: do we need both selectedIds and value? If we just use value we follow the same pattern as native form controls.
 	private _selectedIds: Array<string> = [];
@@ -131,6 +124,15 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 			</uui-ref-node>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#add-button {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbInputDocumentTypePickerElement;

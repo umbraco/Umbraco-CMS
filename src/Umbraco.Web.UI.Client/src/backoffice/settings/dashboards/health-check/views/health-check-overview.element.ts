@@ -13,31 +13,7 @@ import './health-check-group-box-overview.element';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-
-			uui-box + uui-box {
-				margin-top: var(--uui-size-space-5);
-			}
-
-			.flex {
-				display: flex;
-				justify-content: space-between;
-				align-items:center;
-			}
-
-			.grid {
-				display: grid;
-				gap: var(--uui-size-space-4);
-				grid-template-columns: repeat(auto-fit, minmax(250px, auto));
-			}
-		`,
-	];
+	
 
 	@state()
 	private _buttonState: UUIButtonState;
@@ -76,6 +52,32 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
+			uui-box + uui-box {
+				margin-top: var(--uui-size-space-5);
+			}
+
+			.flex {
+				display: flex;
+				justify-content: space-between;
+				align-items:center;
+			}
+
+			.grid {
+				display: grid;
+				gap: var(--uui-size-space-4);
+				grid-template-columns: repeat(auto-fit, minmax(250px, auto));
+			}
+		`,
+	];
 }
 
 export default UmbDashboardHealthCheckOverviewElement;

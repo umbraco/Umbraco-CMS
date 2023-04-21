@@ -13,22 +13,7 @@ import type { IRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				box-sizing: border-box;
-				gap: var(--uui-size-space-5);
-				height: 100%;
-			}
-			router-slot {
-				width: 100%;
-				height: 100%;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _routes: Array<IRoute> = [];
@@ -111,6 +96,23 @@ export class UmbCollectionElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
+				gap: var(--uui-size-space-5);
+				height: 100%;
+			}
+			router-slot {
+				width: 100%;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 declare global {

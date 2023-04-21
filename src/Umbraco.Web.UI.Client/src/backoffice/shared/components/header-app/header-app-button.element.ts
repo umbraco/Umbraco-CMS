@@ -20,15 +20,7 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-header-app-button')
 export class UmbHeaderAppButtonElement extends LitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			uui-button {
-				font-size: 18px;
-				--uui-button-background-color: transparent;
-			}
-		`,
-	];
+	
 
 	public manifest?: ManifestHeaderAppButtonKind;
 
@@ -43,6 +35,16 @@ export class UmbHeaderAppButtonElement extends LitElement {
 			</uui-button>
 		`;
 	}
+	
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			uui-button {
+				font-size: 18px;
+				--uui-button-background-color: transparent;
+			}
+		`,
+	];
 }
 
 export default UmbHeaderAppButtonElement;

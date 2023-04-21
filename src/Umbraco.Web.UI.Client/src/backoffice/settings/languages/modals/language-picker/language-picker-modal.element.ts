@@ -10,7 +10,7 @@ import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-language-picker-modal')
 export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<LanguageResponseModel> {
-	static styles = [UUITextStyles, css``];
+	
 
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
@@ -63,6 +63,8 @@ export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<Lan
 			</div>
 		</umb-body-layout> `;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbLanguagePickerModalElement;

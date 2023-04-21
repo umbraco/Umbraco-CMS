@@ -22,28 +22,7 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
 
 @customElement('umb-workspace-property')
 export class UmbWorkspacePropertyElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-
-			p {
-				color: var(--uui-color-text-alt);
-			}
-
-			#property-action-menu {
-				opacity: 0;
-			}
-
-			#layout:focus-within #property-action-menu,
-			#layout:hover #property-action-menu,
-			#property-action-menu[open] {
-				opacity: 1;
-			}
-		`,
-	];
+	
 
 	/**
 	 * Label. Name of the property
@@ -264,6 +243,29 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 					.value="${this._value}"></umb-property-action-menu>`
 			: ''}`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+
+			p {
+				color: var(--uui-color-text-alt);
+			}
+
+			#property-action-menu {
+				opacity: 0;
+			}
+
+			#layout:focus-within #property-action-menu,
+			#layout:hover #property-action-menu,
+			#property-action-menu[open] {
+				opacity: 1;
+			}
+		`,
+	];
 }
 
 declare global {
