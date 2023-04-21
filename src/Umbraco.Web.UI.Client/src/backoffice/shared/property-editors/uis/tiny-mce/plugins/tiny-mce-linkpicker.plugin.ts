@@ -1,5 +1,5 @@
 import { Editor } from 'tinymce';
-import { TinyMcePluginArguments, TinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -15,7 +15,7 @@ export interface LinkListItem {
 	menu?: unknown;
 }
 
-export default class UmbTinyMceLinkPickerPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {

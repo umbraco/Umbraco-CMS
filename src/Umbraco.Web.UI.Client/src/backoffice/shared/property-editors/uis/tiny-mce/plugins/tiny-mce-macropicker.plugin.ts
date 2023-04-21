@@ -1,5 +1,5 @@
 import { AstNode } from 'tinymce';
-import { TinyMcePluginArguments, TinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
 
@@ -11,7 +11,7 @@ interface DialogData {
 
 // TODO => This is a quick transplant of the existing macro plugin - needs to be finished, and need to
 // determine how to replicate the existing macro service (backend doens')
-export default class UmbTinyMceMacroPickerPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
     #macroService = new UmbMacroService();
 
 	#modalContext?: UmbModalContext;

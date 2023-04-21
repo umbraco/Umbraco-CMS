@@ -12,7 +12,7 @@ import {
 import { availableLanguages } from './input-tiny-mce.languages';
 import {
 	TinyMcePluginArguments,
-	TinyMcePluginBase,
+	UmbTinyMcePluginBase,
 	ManifestTinyMcePlugin,
 } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
@@ -121,7 +121,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
 	#currentUser?: UserDetails;
-	#plugins: Array<new (args: TinyMcePluginArguments) => TinyMcePluginBase> = [];
+	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 
 	protected getFormElement() {
 		return undefined;

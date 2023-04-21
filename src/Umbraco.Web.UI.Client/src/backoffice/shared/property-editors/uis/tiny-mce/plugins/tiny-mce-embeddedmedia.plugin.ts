@@ -1,5 +1,5 @@
 import { UmbEmbeddedMediaModalElement as ModalElement } from '../../../../modals/embedded-media/embedded-media-modal.element';
-import { TinyMcePluginArguments, TinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -8,7 +8,7 @@ import {
 	UMB_EMBEDDED_MEDIA_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-export default class UmbTinyMceEmbeddedMediaPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {

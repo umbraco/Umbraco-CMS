@@ -1,4 +1,4 @@
-import { TinyMcePluginArguments, TinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -7,7 +7,7 @@ import {
 	UMB_CODE_EDITOR_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-export default class UmbTinyMceCodeEditorPlugin extends TinyMcePluginBase {
+export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalContext;
 
 	constructor(args: TinyMcePluginArguments) {		
