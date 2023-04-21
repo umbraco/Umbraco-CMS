@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
 
@@ -15,5 +16,6 @@ public class DeletePartialViewFolderController : PartialViewFolderControllerBase
 
     [HttpDelete]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public Task<IActionResult> Delete(string path) => DeleteAsync(path);
 }
