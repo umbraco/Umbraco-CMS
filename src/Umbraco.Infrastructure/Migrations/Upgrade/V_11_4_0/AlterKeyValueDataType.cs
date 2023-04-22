@@ -12,6 +12,13 @@ public class AlterKeyValueDataType : MigrationBase
 
     protected override void Migrate()
     {
+        //SQL Lite doesn't need this upgrade
+        if (Database.DatabaseType is not null &&
+            Database.DatabaseType.GetProviderName()?.ToLower() == "system.data.sqlite")
+        {
+            return;
+        }
+
         string tableName = KeyValueDto.TableName;
         string colName = "value";
 
