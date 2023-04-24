@@ -69,9 +69,9 @@ public partial class ApiRichTextParser : IApiRichTextParser
 
         SanitizeAttributes(attributes);
 
-        IEnumerable<RichTextElement> childElements = childNodes?.Any() is true
-            ? childNodes.Select(child => ParseRecursively(child, publishedSnapshot))
-            : Enumerable.Empty<RichTextElement>();
+        RichTextElement[] childElements = childNodes?.Any() is true
+            ? childNodes.Select(child => ParseRecursively(child, publishedSnapshot)).ToArray()
+            : Array.Empty<RichTextElement>();
 
         return new RichTextElement(tag, innerText, attributes, childElements);
     }
