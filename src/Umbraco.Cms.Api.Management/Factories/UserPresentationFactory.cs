@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Users;
+﻿using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;

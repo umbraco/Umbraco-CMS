@@ -1,7 +1,4 @@
 @model Umbraco.Cms.Web.UI.BackOfficeLoginModel
-@{
-    var authUrlLogin = Model.AuthUrl + "PostLogin";
-}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +40,7 @@
 
 <script>
     !(function () {
-        const authUrlLogin = "@authUrlLogin"
+        const authUrlLogin = "@Model.AuthUrl/login"
         const returnUrl = "@Model.ReturnUrl".replaceAll("&amp;", "&")
 
         console.log('urls', {authUrlLogin, returnUrl})
@@ -72,22 +69,10 @@
                 })
 
                 const content = await res.text()
-                console.log('raw content', content)
+                console.log('login success', content)
 
-                if (!content) throw new Error('No content from server')
-
-                // Special AngularJS scraping
-                const splitContent = content.split("\n")
-
-                if (splitContent.length < 2) throw new Error('Invalid content from server')
-
-                const response = JSON.parse(splitContent[1])
-
-                if (response) {
-                    console.log('login success', response)
-                    if (returnUrl) {
-                        location.href = returnUrl
-                    }
+                if (returnUrl) {
+                    location.href = returnUrl
                 }
             } catch (err) {
                 alert('Could not login: ' + err.message)

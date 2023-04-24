@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 builder.ConfigureTestServices(services =>
                 {
                     services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
-                    
+
                     // Add a test auth scheme with a test auth handler to authn and assign the user
                     services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
                         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
@@ -245,6 +245,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
+                .AddDeliveryApi()
                 .AddTestServices(TestHelper); // This is the important one!
 
             CustomTestSetup(builder);
@@ -256,7 +257,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// </summary>
         protected virtual void ConfigureTestServices(IServiceCollection services)
         {
-            
+
         }
 
         protected void Configure(IApplicationBuilder app)

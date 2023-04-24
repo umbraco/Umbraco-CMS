@@ -1,10 +1,11 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 [DefaultPropertyValueConverter]
-public class TextStringValueConverter : PropertyValueConverterBase
+public class TextStringValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private static readonly string[] PropertyTypeAliases =
     {
@@ -54,4 +55,13 @@ public class TextStringValueConverter : PropertyValueConverterBase
 
         // source should come from ConvertSource and be a string (or null) already
         inter;
+
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => PropertyCacheLevel.Element;
+
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
+        => GetPropertyValueType(propertyType);
+
+    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
 }

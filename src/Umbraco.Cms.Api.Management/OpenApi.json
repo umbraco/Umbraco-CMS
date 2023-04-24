@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Umbraco Backoffice API",
+    "title": "Umbraco Management API",
     "description": "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility",
-    "version": "1.0"
+    "version": "Latest"
   },
   "paths": {
     "/umbraco/management/api/v1/audit-log": {
@@ -4232,6 +4232,47 @@
         }
       }
     },
+    "/umbraco/management/api/v1/member/item": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "operationId": "GetMemberItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/MemberItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/models-builder/build": {
       "post": {
         "tags": [
@@ -5762,12 +5803,27 @@
             "description": "Success"
           }
         }
-      },
+      }
+    },
+    "/umbraco/management/api/v1/security/back-office/login": {
       "post": {
         "tags": [
           "Security"
         ],
-        "operationId": "PostSecurityBackOfficeAuthorize",
+        "operationId": "PostSecurityBackOfficeLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success"
@@ -5836,6 +5892,46 @@
                       "$ref": "#/components/schemas/VersionResponseModel"
                     }
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/static-file/item": {
+      "get": {
+        "tags": [
+          "Static File"
+        ],
+        "operationId": "GetStaticFileItem",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/StaticFileItemResponseModel"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -6997,12 +7093,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups": {
+    "/umbraco/management/api/v1/user-group": {
       "post": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "PostUserGroups",
+        "operationId": "PostUserGroup",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7044,9 +7140,9 @@
       },
       "get": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "GetUserGroups",
+        "operationId": "GetUserGroup",
         "parameters": [
           {
             "name": "skip",
@@ -7081,12 +7177,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups/{id}": {
+    "/umbraco/management/api/v1/user-group/{id}": {
       "get": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "GetUserGroupsById",
+        "operationId": "GetUserGroupById",
         "parameters": [
           {
             "name": "id",
@@ -7120,9 +7216,9 @@
       },
       "delete": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "DeleteUserGroupsById",
+        "operationId": "DeleteUserGroupById",
         "parameters": [
           {
             "name": "id",
@@ -7145,9 +7241,9 @@
       },
       "put": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "PutUserGroupsById",
+        "operationId": "PutUserGroupById",
         "parameters": [
           {
             "name": "id",
@@ -7182,12 +7278,53 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users": {
+    "/umbraco/management/api/v1/user-groups/item": {
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "operationId": "GetUserGroupsItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserGroupItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/user": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsers",
+        "operationId": "PostUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7233,9 +7370,9 @@
       },
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsers",
+        "operationId": "GetUser",
         "parameters": [
           {
             "name": "skip",
@@ -7270,12 +7407,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/{id}": {
+    "/umbraco/management/api/v1/user/{id}": {
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsersById",
+        "operationId": "GetUserById",
         "parameters": [
           {
             "name": "id",
@@ -7309,9 +7446,9 @@
       },
       "delete": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "DeleteUsersById",
+        "operationId": "DeleteUserById",
         "parameters": [
           {
             "name": "id",
@@ -7331,9 +7468,9 @@
       },
       "put": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PutUsersById",
+        "operationId": "PutUserById",
         "parameters": [
           {
             "name": "id",
@@ -7365,12 +7502,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/avatar/{id}": {
+    "/umbraco/management/api/v1/user/avatar/{id}": {
       "delete": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "DeleteUsersAvatarById",
+        "operationId": "DeleteUserAvatarById",
         "parameters": [
           {
             "name": "id",
@@ -7390,9 +7527,9 @@
       },
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersAvatarById",
+        "operationId": "PostUserAvatarById",
         "parameters": [
           {
             "name": "id",
@@ -7434,12 +7571,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/change-password/{id}": {
+    "/umbraco/management/api/v1/user/change-password/{id}": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersChangePasswordById",
+        "operationId": "PostUserChangePasswordById",
         "parameters": [
           {
             "name": "id",
@@ -7471,12 +7608,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/disable": {
+    "/umbraco/management/api/v1/user/disable": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersDisable",
+        "operationId": "PostUserDisable",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7507,12 +7644,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/enable": {
+    "/umbraco/management/api/v1/user/enable": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersEnable",
+        "operationId": "PostUserEnable",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7543,12 +7680,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/filter": {
+    "/umbraco/management/api/v1/user/filter": {
       "get": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "GetUsersFilter",
+        "operationId": "GetUserFilter",
         "parameters": [
           {
             "name": "skip",
@@ -7621,12 +7758,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/invite": {
+    "/umbraco/management/api/v1/user/invite": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersInvite",
+        "operationId": "PostUserInvite",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7647,12 +7784,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/set-user-groups": {
+    "/umbraco/management/api/v1/user/set-user-groups": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersSetUserGroups",
+        "operationId": "PostUserSetUserGroups",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7673,12 +7810,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/users/unlock": {
+    "/umbraco/management/api/v1/user/unlock": {
       "post": {
         "tags": [
-          "Users"
+          "User"
         ],
-        "operationId": "PostUsersUnlock",
+        "operationId": "PostUserUnlock",
         "requestBody": {
           "content": {
             "application/json": {
@@ -7709,21 +7846,22 @@
         }
       }
     },
-    "/item": {
+    "/umbraco/management/api/v1/users/item": {
       "get": {
         "tags": [
-          "v1"
+          "Users"
         ],
-        "operationId": "GetItem",
+        "operationId": "GetUsersItem",
         "parameters": [
           {
-            "name": "path",
+            "name": "id",
             "in": "query",
             "schema": {
               "uniqueItems": true,
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               }
             }
           }
@@ -7738,7 +7876,7 @@
                   "items": {
                     "oneOf": [
                       {
-                        "$ref": "#/components/schemas/StaticFileItemResponseModel"
+                        "$ref": "#/components/schemas/UserItemResponseModel"
                       }
                     ]
                   }
@@ -9740,6 +9878,18 @@
         },
         "additionalProperties": false
       },
+      "LoginRequestModel": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaItemResponseModel": {
         "type": "object",
         "allOf": [
@@ -9873,6 +10023,21 @@
             "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "MemberItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "MemberTypeItemResponseModel": {
@@ -12136,6 +12301,21 @@
         },
         "additionalProperties": false
       },
+      "UserGroupItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UserGroupPresentationModel": {
         "required": [
           "$type"
@@ -12190,6 +12370,15 @@
             "readOnly": true
           }
         },
+        "additionalProperties": false
+      },
+      "UserItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+          }
+        ],
         "additionalProperties": false
       },
       "UserOrderModel": {

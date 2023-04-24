@@ -1,5 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping;
-using Umbraco.Cms.Api.Management.ViewModels.UserGroups;
+using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
