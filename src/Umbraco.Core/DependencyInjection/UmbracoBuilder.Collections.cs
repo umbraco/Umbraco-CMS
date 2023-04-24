@@ -323,7 +323,7 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<SortHandlerCollectionBuilder>();
 
     /// <summary>
-    /// Gets the Delivery API sort handler collection builder
+    /// Gets the Delivery API content index handler collection builder
     /// </summary>
     public static ContentIndexHandlerCollectionBuilder ContentIndexHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ContentIndexHandlerCollectionBuilder>();
