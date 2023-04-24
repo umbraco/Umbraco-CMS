@@ -1,10 +1,18 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings.Css;
 
 namespace Umbraco.Cms.Core.Services;
 
 public class RichTextStylesheetService : IRichTextStylesheetService
 {
+    private readonly IStylesheetService _stylesheetService;
+
+    public RichTextStylesheetService(IStylesheetService stylesheetService)
+    {
+        _stylesheetService = stylesheetService;
+    }
+
     public Task<string> InterpolateRichTextRules(RichTextStylesheetData data)
     {
         // First we remove all existing rules, from the content, in case some of the rules has changed or been removed
@@ -45,5 +53,21 @@ public class RichTextStylesheetService : IRichTextStylesheetService
         }
 
         return Task.FromResult(StylesheetHelper.ParseRules(data.Content));
+    }
+
+    public async Task<Attempt<IEnumerable<StylesheetRule>, StylesheetOperationStatus>> GetRulesByPathAsync(string path)
+    {
+        IStylesheet? stylesheet = await _stylesheetService.GetAsync(path);
+
+        if (stylesheet is null)
+        {
+            return Attempt.FailWithStatus(StylesheetOperationStatus.NotFound, Enumerable.Empty<StylesheetRule>());
+        }
+
+        IEnumerable<StylesheetRule> rules = stylesheet.Properties is null
+            ? Enumerable.Empty<StylesheetRule>()
+            : stylesheet.Properties.Select(x => new StylesheetRule { Name = x.Name, Selector = x.Alias, Styles = x.Value });
+
+        return Attempt.SucceedWithStatus(StylesheetOperationStatus.Success, rules);
     }
 }
