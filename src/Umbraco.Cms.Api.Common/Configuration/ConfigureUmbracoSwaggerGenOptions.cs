@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Extensions;
 using OperationIdRegexes = Umbraco.Cms.Api.Common.OpenApi.OperationIdRegexes;
@@ -13,6 +14,11 @@ namespace Umbraco.Cms.Api.Common.Configuration;
 
 public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
+    private readonly IOptions<ApiVersioningOptions> _apiVersioningOptions;
+
+    public ConfigureUmbracoSwaggerGenOptions(IOptions<ApiVersioningOptions> apiVersioningOptions)
+        => _apiVersioningOptions = apiVersioningOptions;
+
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
         swaggerGenOptions.SwaggerDoc(
@@ -24,7 +30,8 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
                 Description = "All endpoints not defined under specific APIs"
             });
 
-        swaggerGenOptions.CustomOperationIds(CustomOperationId);
+        swaggerGenOptions.CustomOperationIds(description =>
+            CustomOperationId(description, _apiVersioningOptions.Value));
 
         swaggerGenOptions.DocInclusionPredicate((name, api) =>
         {
@@ -47,13 +54,8 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(SchemaIdGenerator.Generate);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
-
-
         swaggerGenOptions.UseOneOfForPolymorphism();
         swaggerGenOptions.UseAllOfForInheritance();
-
-
-
         swaggerGenOptions.SelectDiscriminatorNameUsing(type =>
         {
             if (type.GetInterfaces().Any())
@@ -66,8 +68,9 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.SelectDiscriminatorValueUsing(x => x.Name);
     }
 
-     private static string CustomOperationId(ApiDescription api)
+    private static string CustomOperationId(ApiDescription api, ApiVersioningOptions apiVersioningOptions)
     {
+        ApiVersion defaultVersion = apiVersioningOptions.DefaultApiVersion;
         var httpMethod = api.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
 
         // if the route info "Name" is supplied we'll use this explicitly as the operation ID
@@ -109,16 +112,21 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
 
         if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
         {
-            version = controllerActionDescriptor.MethodInfo.GetMapToApiVersionAttributeValue();
+            var versionAttributeValue = controllerActionDescriptor.MethodInfo.GetMapToApiVersionAttributeValue();
+
+            // We only wanna add a version, if it is not the default one.
+            if (string.Equals(versionAttributeValue, defaultVersion.ToString()) == false)
+            {
+                version = versionAttributeValue;
+            }
         }
 
         // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
         return $"{httpMethod}{formattedOperationId.ToFirstUpper()}{version}";
     }
 
-     // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
-     private static string ActionOrderBy(ApiDescription apiDesc)
-         =>
-             $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
+    // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
+    private static string ActionOrderBy(ApiDescription apiDesc)
+        => $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
 
 }
