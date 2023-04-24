@@ -27,7 +27,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	#host: UmbControllerHostElement;
 	#init!: Promise<unknown>;
 
-	#documentTypeRepository: R;
+	#contentTypeRepository: R;
 
 	#rootDocumentTypeId?: string;
 	#documentTypeObservers = new Array<UmbControllerInterface>();
@@ -41,7 +41,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 	constructor(host: UmbControllerHostElement, typeRepository: R) {
 		this.#host = host;
-		this.#documentTypeRepository = typeRepository;
+		this.#contentTypeRepository = typeRepository;
 
 		new UmbObserverController(host, this.documentTypes, (documentTypes) => {
 			documentTypes.forEach((documentType) => {
@@ -73,7 +73,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 
 		if (!parentId) return {};
 
-		const { data } = await this.#documentTypeRepository.createScaffold(parentId);
+		const { data } = await this.#contentTypeRepository.createScaffold(parentId);
 		if (!data) return {};
 
 		this.#rootDocumentTypeId = data.id;
@@ -92,7 +92,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	private async _loadType(id?: string) {
 		if (!id) return {};
 
-		const { data } = await this.#documentTypeRepository.requestById(id);
+		const { data } = await this.#contentTypeRepository.requestById(id);
 		if (!data) return {};
 
 		await this._observeDocumentType(data);
@@ -108,7 +108,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		this._loadDocumentTypeCompositions(data);
 
 		this.#documentTypeObservers.push(
-			new UmbObserverController(this.#host, await this.#documentTypeRepository.byId(data.id), (docType) => {
+			new UmbObserverController(this.#host, await this.#contentTypeRepository.byId(data.id), (docType) => {
 				if (docType) {
 					// TODO: Handle if there was changes made to the owner document type in this context.
 					/*
