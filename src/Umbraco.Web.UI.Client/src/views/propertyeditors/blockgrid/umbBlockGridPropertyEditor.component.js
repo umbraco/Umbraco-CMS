@@ -382,7 +382,7 @@
 
 
                 const contextColumns = getContextColumns(parentBlock, areaKey);
-                const relevantColumnSpanOptions = block.config.columnSpanOptions.filter(option => option.columnSpan <= contextColumns);
+                const relevantColumnSpanOptions = block.config.columnSpanOptions?.filter(option => option.columnSpan <= contextColumns) ?? [];
 
                 // if no columnSpan or no columnSpanOptions configured, then we set(or rewrite) one:
                 if (!layoutEntry.columnSpan || layoutEntry.columnSpan > contextColumns || relevantColumnSpanOptions.length === 0) {
