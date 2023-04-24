@@ -27,43 +27,6 @@ export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModa
 
 @customElement('umb-templating-insert-menu')
 export class UmbTemplatingInsertMenuElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#insert-menu {
-				margin: 0;
-				padding: 0;
-				margin-top: var(--uui-size-space-3);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				min-width: 150px;
-			}
-
-			#insert-menu > li,
-			ul {
-				padding: 0;
-				width: 100%;
-				list-style: none;
-			}
-
-			ul {
-				transform: translateX(-100px);
-			}
-
-			.insert-menu-item {
-				width: 100%;
-			}
-
-			umb-button-with-dropdown {
-				--umb-button-with-dropdown-symbol-expand-margin-left: 0;
-			}
-
-			uui-icon[name='umb:add'] {
-				margin-right: var(--uui-size-4);
-			}
-		`,
-	];
-
 	@property()
 	value = '';
 
@@ -154,6 +117,43 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 			</uui-button-group>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#insert-menu {
+				margin: 0;
+				padding: 0;
+				margin-top: var(--uui-size-space-3);
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				min-width: 150px;
+			}
+
+			#insert-menu > li,
+			ul {
+				padding: 0;
+				width: 100%;
+				list-style: none;
+			}
+
+			ul {
+				transform: translateX(-100px);
+			}
+
+			.insert-menu-item {
+				width: 100%;
+			}
+
+			umb-button-with-dropdown {
+				--umb-button-with-dropdown-symbol-expand-margin-left: 0;
+			}
+
+			uui-icon[name='umb:add'] {
+				margin-right: var(--uui-size-4);
+			}
+		`,
+	];
 }
 
 declare global {

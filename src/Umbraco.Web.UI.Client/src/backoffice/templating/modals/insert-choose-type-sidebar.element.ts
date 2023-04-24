@@ -41,32 +41,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	ChooseInsertTypeModalData,
 	ChooseInsertTypeModalResult
 > {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-			}
-
-			#main {
-				box-sizing: border-box;
-				padding: var(--uui-size-space-5);
-				height: calc(100vh - 124px);
-			}
-
-			#main uui-button:not(:last-of-type) {
-				display: block;
-				margin-bottom: var(--uui-size-space-5);
-			}
-
-			h3,
-			p {
-				text-align: left;
-			}
-		`,
-	];
-
 	private _close() {
 		this.modalHandler?.reject();
 	}
@@ -150,6 +124,32 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			</umb-workspace-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				color: var(--uui-color-text);
+			}
+
+			#main {
+				box-sizing: border-box;
+				padding: var(--uui-size-space-5);
+				height: calc(100vh - 124px);
+			}
+
+			#main uui-button:not(:last-of-type) {
+				display: block;
+				margin-bottom: var(--uui-size-space-5);
+			}
+
+			h3,
+			p {
+				text-align: left;
+			}
+		`,
+	];
 }
 
 declare global {

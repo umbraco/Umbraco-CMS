@@ -3,67 +3,12 @@ import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbCodeEditorElement } from '../../../shared/components/code-editor/code-editor.element';
+import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element';
 
 @customElement('umb-template-workspace-edit')
 export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			umb-code-editor {
-				--editor-height: calc(100vh - 300px);
-			}
-
-			uui-box {
-				margin: 1em;
-				--uui-box-default-padding: 0;
-			}
-
-			uui-input {
-				width: 100%;
-				margin: 1em;
-			}
-
-			#code-editor-menu-container uui-icon {
-				margin-right: var(--uui-size-space-3);
-			}
-
-			#insert-menu {
-				margin: 0;
-				padding: 0;
-				margin-top: var(--uui-size-space-3);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				min-width: calc(100% + var(--uui-size-8, 24px));
-			}
-
-			#insert-menu > li,
-			ul {
-				padding: 0;
-				width: 100%;
-				list-style: none;
-			}
-
-			.insert-menu-item {
-				width: 100%;
-			}
-
-			#code-editor-menu-container {
-				display: flex;
-				justify-content: flex-end;
-				gap: var(--uui-size-space-3);
-			}
-		`,
-	];
-
 	@state()
 	private _name?: string | null = '';
 
@@ -144,6 +89,61 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 			</uui-box>
 		</umb-workspace-layout>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			umb-code-editor {
+				--editor-height: calc(100vh - 300px);
+			}
+
+			uui-box {
+				margin: 1em;
+				--uui-box-default-padding: 0;
+			}
+
+			uui-input {
+				width: 100%;
+				margin: 1em;
+			}
+
+			#code-editor-menu-container uui-icon {
+				margin-right: var(--uui-size-space-3);
+			}
+
+			#insert-menu {
+				margin: 0;
+				padding: 0;
+				margin-top: var(--uui-size-space-3);
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				min-width: calc(100% + var(--uui-size-8, 24px));
+			}
+
+			#insert-menu > li,
+			ul {
+				padding: 0;
+				width: 100%;
+				list-style: none;
+			}
+
+			.insert-menu-item {
+				width: 100%;
+			}
+
+			#code-editor-menu-container {
+				display: flex;
+				justify-content: flex-end;
+				gap: var(--uui-size-space-3);
+			}
+		`,
+	];
 }
 
 export default UmbTemplateWorkspaceEditElement;

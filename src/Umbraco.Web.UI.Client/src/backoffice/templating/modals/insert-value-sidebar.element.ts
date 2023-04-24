@@ -7,36 +7,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-insert-value-sidebar')
 export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<object, string> {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-			}
-
-			#main {
-				box-sizing: border-box;
-				padding: var(--uui-size-space-5);
-				height: calc(100vh - 124px);
-			}
-
-			#main uui-button {
-				width: 100%;
-			}
-
-			h3,
-			p {
-				text-align: left;
-			}
-
-			uui-combobox,
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
-
 	private _close() {
 		this.modalHandler?.submit();
 	}
@@ -73,8 +43,6 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 		const target = event.target as UUIInputElement;
 		this.defaultValue = target.value === '' ? null : (target.value as string);
 	}
-
-
 
 	render() {
 		return html`
@@ -125,6 +93,36 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 			</umb-workspace-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				color: var(--uui-color-text);
+			}
+
+			#main {
+				box-sizing: border-box;
+				padding: var(--uui-size-space-5);
+				height: calc(100vh - 124px);
+			}
+
+			#main uui-button {
+				width: 100%;
+			}
+
+			h3,
+			p {
+				text-align: left;
+			}
+
+			uui-combobox,
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 declare global {

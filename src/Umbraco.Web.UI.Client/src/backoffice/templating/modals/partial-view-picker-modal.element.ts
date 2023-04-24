@@ -10,31 +10,6 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 	UmbPartialViewPickerModalData,
 	UmbPartialViewPickerModalResult
 > {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-			}
-
-			#main {
-				box-sizing: border-box;
-				padding: var(--uui-size-space-5);
-				height: calc(100vh - 124px);
-			}
-
-			#main uui-button {
-				width: 100%;
-			}
-
-			h3,
-			p {
-				text-align: left;
-			}
-		`,
-	];
-
 	@state()
 	_selection: Array<string> = [];
 
@@ -80,6 +55,31 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 			</umb-workspace-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				color: var(--uui-color-text);
+			}
+
+			#main {
+				box-sizing: border-box;
+				padding: var(--uui-size-space-5);
+				height: calc(100vh - 124px);
+			}
+
+			#main uui-button {
+				width: 100%;
+			}
+
+			h3,
+			p {
+				text-align: left;
+			}
+		`,
+	];
 }
 
 declare global {

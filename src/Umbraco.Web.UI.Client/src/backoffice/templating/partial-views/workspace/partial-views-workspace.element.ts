@@ -2,15 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context';
-import { UmbRouterSlotInitEvent, IRoute, IRoutingInfo } from '@umbraco-cms/internal/router';
+import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './partial-views-workspace-edit.element';
+import { IRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-partial-views-workspace')
 export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
-
 	#partialViewsWorkspaceContext = new UmbPartialViewsWorkspaceContext(this);
 
 	#routerPath? = '';
@@ -23,7 +22,7 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 		{
 			path: 'create/:parentKey',
 			component: () => this.#element,
-			setup: async (component: HTMLElement, info: IRoutingInfo) => {
+			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
 				this.#partialViewsWorkspaceContext.createScaffold(parentKey);
 			},
@@ -31,7 +30,7 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 		{
 			path: 'edit/:key',
 			component: () => this.#element,
-			setup: (component: HTMLElement, info: IRoutingInfo) => {
+			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const key = info.match.params.key;
 				this.#partialViewsWorkspaceContext.load(key);
 			},
@@ -45,6 +44,8 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 				this.#routerPath = event.target.absoluteRouterPath;
 			}}></umb-router-slot>`;
 	}
+
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbPartialViewsWorkspaceElement;
