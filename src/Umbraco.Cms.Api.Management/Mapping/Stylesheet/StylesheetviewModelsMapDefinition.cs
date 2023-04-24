@@ -16,6 +16,13 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
         mapper.Define<InterpolateRichTextStylesheetRequestModel, RichTextStylesheetData>((_, _) => new RichTextStylesheetData(), Map);
         mapper.Define<ExtractRichTextStylesheetRulesRequestModel, RichTextStylesheetData>((_, _) => new RichTextStylesheetData(), Map);
         mapper.Define<StylesheetRule, RichTextRuleViewModel>((_, _) => new RichTextRuleViewModel { Name = string.Empty, Selector = string.Empty, Styles = string.Empty }, Map);
+        mapper.Define<IStylesheet, StylesheetOverviewResponseModel>((_, _) => new StylesheetOverviewResponseModel{ Name = string.Empty, Path = string.Empty }, Map);
+    }
+
+    private void Map(IStylesheet source, StylesheetOverviewResponseModel target, MapperContext context)
+    {
+        target.Name = source.Alias;
+        target.Path = source.Path;
     }
 
     private void Map(StylesheetRule source, RichTextRuleViewModel target, MapperContext context)

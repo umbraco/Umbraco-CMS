@@ -43,6 +43,13 @@ public class StylesheetService : FileServiceBase, IStylesheetService
         return Task.FromResult(stylesheet);
     }
 
+    public Task<IEnumerable<IStylesheet>> GetAllAsync(params string[] paths)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<IStylesheet> stylesheets = _stylesheetRepository.GetMany(paths);
+        return Task.FromResult(stylesheets);
+    }
+
     public async Task<StylesheetOperationStatus> DeleteAsync(string path, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();

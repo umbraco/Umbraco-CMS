@@ -7,6 +7,8 @@ public interface IStylesheetService
 {
     Task<IStylesheet?> GetAsync(string path);
 
+    Task<IEnumerable<IStylesheet>> GetAllAsync(params string[] paths);
+
     Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid performingUserKey);
 
     Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid performingUserKey);
