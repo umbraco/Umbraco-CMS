@@ -8,7 +8,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@state()
 	private _saveButtonState?: UUIButtonState;
@@ -45,6 +45,8 @@ export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 			label="save"
 			.state="${this._saveButtonState}"></uui-button>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbWorkspaceActionUserGroupSaveElement;

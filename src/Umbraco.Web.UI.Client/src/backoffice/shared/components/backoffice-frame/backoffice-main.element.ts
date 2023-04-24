@@ -13,16 +13,7 @@ import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extens
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				background-color: var(--uui-color-background);
-				display: block;
-				height: calc(100% - 60px); // 60 => top header height
-			}
-		`,
-	];
+	
 
 	@state()
 	private _routes: Array<IRoute> = [];
@@ -96,6 +87,17 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	render() {
 		return html` <umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				background-color: var(--uui-color-background);
+				display: block;
+				height: calc(100% - 60px); // 60 => top header height
+			}
+		`,
+	];
 }
 
 declare global {

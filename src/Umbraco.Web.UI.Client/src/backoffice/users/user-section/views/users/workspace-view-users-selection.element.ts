@@ -7,21 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-view-users-selection')
 export class UmbWorkspaceViewUsersSelectionElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				gap: var(--uui-size-3);
-				width: 100%;
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-				align-items: center;
-				box-sizing: border-box;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _selection: Array<string> = [];
@@ -71,6 +57,22 @@ export class UmbWorkspaceViewUsersSelectionElement extends UmbLitElement {
 			<uui-button label="Unlock" disabled look="secondary"></uui-button>
 			<uui-button label="Disable" look="secondary"></uui-button> `;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				gap: var(--uui-size-3);
+				width: 100%;
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				background-color: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
+				align-items: center;
+				box-sizing: border-box;
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceViewUsersSelectionElement;

@@ -2,11 +2,9 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
-import { UmbFolderRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbDeleteFolderEntityAction<
-	T extends UmbItemRepository<any> & UmbFolderRepository
-> extends UmbEntityActionBase<T> {
+export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
@@ -20,14 +18,12 @@ export class UmbDeleteFolderEntityAction<
 	async execute() {
 		if (!this.repository || !this.#modalContext) return;
 
-		const { data } = await this.repository.requestItems([this.unique]);
+		const { data: folder } = await this.repository.requestFolder(this.unique);
 
-		if (data) {
-			const item = data[0];
-
+		if (folder) {
 			// TODO: maybe we can show something about how many items are part of the folder?
 			const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
-				headline: `Delete folder ${item.name}`,
+				headline: `Delete folder ${folder.name}`,
 				content: 'Are you sure you want to delete this folder?',
 				color: 'danger',
 				confirmLabel: 'Delete',

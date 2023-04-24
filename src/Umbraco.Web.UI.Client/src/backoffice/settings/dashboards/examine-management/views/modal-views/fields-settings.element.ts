@@ -9,38 +9,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 	UmbExamineFieldsSettingsModalData,
 	UmbCreateDocumentModalResultData
 > {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: relative;
-			}
-
-			uui-dialog-layout {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24));
-				border-radius: var(--uui-border-radius);
-				padding: var(--uui-size-space-5);
-				box-sizing: border-box;
-			}
-
-			uui-scroll-container {
-				overflow-y: scroll;
-				max-height: 100%;
-				min-height: 0;
-				flex: 1;
-			}
-
-			div {
-				margin-top: var(--uui-size-space-5);
-				display: flex;
-				flex-direction: row-reverse;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _fields?: UmbExamineFieldsSettingsModalData;
@@ -86,6 +55,39 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 			`;
 		} else return html``;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: relative;
+			}
+
+			uui-dialog-layout {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-1, 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24));
+				border-radius: var(--uui-border-radius);
+				padding: var(--uui-size-space-5);
+				box-sizing: border-box;
+			}
+
+			uui-scroll-container {
+				overflow-y: scroll;
+				max-height: 100%;
+				min-height: 0;
+				flex: 1;
+			}
+
+			div {
+				margin-top: var(--uui-size-space-5);
+				display: flex;
+				flex-direction: row-reverse;
+			}
+		`,
+	];
 }
 
 declare global {

@@ -16,7 +16,7 @@ type ValueType = {
  */
 @customElement('umb-property-editor-ui-number-range')
 export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property({ type: Object })
 	private _value: ValueType = { min: undefined, max: undefined };
@@ -51,6 +51,8 @@ export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement impleme
 			.maxValue=${this._maxValue}
 			@change=${this._onChange}></umb-input-number-range>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUINumberRangeElement;

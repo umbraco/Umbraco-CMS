@@ -11,7 +11,7 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
  */
 @customElement('umb-property-editor-ui-toggle')
 export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = false;
@@ -53,6 +53,8 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 			?showLabels="${this._showLabels}"
 			@change="${this._onChange}"></umb-input-toggle>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIToggleElement;

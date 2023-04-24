@@ -4,29 +4,7 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-dashboard-settings-welcome')
 export class UmbDashboardSettingsWelcomeElement extends LitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#settings-dashboard {
-				display: grid;
-				grid-gap: var(--uui-size-7);
-				grid-template-columns: repeat(3, 1fr);
-				margin: var(--uui-size-layout-1);
-			}
-
-			@media (max-width: 1200px) {
-				#settings-dashboard {
-					grid-template-columns: repeat(2, 1fr);
-				}
-			}
-
-			@media (max-width: 800px) {
-				#settings-dashboard {
-					grid-template-columns: repeat(1, 1fr);
-				}
-			}
-		`,
-	];
+	
 
 	render() {
 		return html`
@@ -110,6 +88,30 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 			</section>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#settings-dashboard {
+				display: grid;
+				grid-gap: var(--uui-size-7);
+				grid-template-columns: repeat(3, 1fr);
+				margin: var(--uui-size-layout-1);
+			}
+
+			@media (max-width: 1200px) {
+				#settings-dashboard {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+
+			@media (max-width: 800px) {
+				#settings-dashboard {
+					grid-template-columns: repeat(1, 1fr);
+				}
+			}
+		`,
+	];
 }
 
 export default UmbDashboardSettingsWelcomeElement;

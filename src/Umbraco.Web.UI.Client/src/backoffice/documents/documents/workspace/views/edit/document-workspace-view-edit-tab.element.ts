@@ -9,14 +9,7 @@ import './document-workspace-view-edit-properties.element';
 
 @customElement('umb-document-workspace-view-edit-tab')
 export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	private _tabName?: string | undefined;
 
@@ -81,6 +74,15 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 			)}
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceViewEditTabElement;

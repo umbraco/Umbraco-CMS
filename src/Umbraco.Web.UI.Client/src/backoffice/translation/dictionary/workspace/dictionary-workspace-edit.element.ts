@@ -8,20 +8,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-dictionary-workspace-edit')
 export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-layout-1);
-				gap: var(--uui-size-space-4);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _name?: string | null = '';
@@ -65,6 +52,21 @@ export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				display: flex;
+				padding: 0 var(--uui-size-layout-1);
+				gap: var(--uui-size-space-4);
+				width: 100%;
+			}
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDictionaryWorkspaceEditElement;

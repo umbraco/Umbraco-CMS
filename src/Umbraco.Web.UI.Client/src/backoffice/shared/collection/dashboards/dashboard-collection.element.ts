@@ -11,18 +11,7 @@ import '../collection.element';
 
 @customElement('umb-dashboard-collection')
 export class UmbDashboardCollectionElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				box-sizing: border-box;
-				gap: var(--uui-size-space-5);
-				height: 100%;
-			}
-		`,
-	];
+	
 
 	// TODO: Use the right type here:
 	private _collectionContext?: UmbCollectionContext<FolderTreeItemResponseModel>;
@@ -46,6 +35,19 @@ export class UmbDashboardCollectionElement extends UmbLitElement {
 	render() {
 		return html`<umb-collection entity-type=${ifDefined(this._entityType)}></umb-collection>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
+				gap: var(--uui-size-space-5);
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDashboardCollectionElement;

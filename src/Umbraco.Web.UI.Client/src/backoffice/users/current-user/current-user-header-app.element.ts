@@ -8,15 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			uui-button {
-				font-size: 14px;
-				--uui-button-background-color: transparent;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _currentUser?: UserDetails;
@@ -56,6 +48,16 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 			</uui-button>
 		`;
 	}
+	
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			uui-button {
+				font-size: 14px;
+				--uui-button-background-color: transparent;
+			}
+		`,
+	];
 }
 
 export default UmbCurrentUserHeaderAppElement;

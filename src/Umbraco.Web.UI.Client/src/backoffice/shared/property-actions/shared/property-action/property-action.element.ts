@@ -8,7 +8,7 @@ import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extensions-
 
 @customElement('umb-property-action')
 export class UmbPropertyActionElement extends LitElement implements UmbPropertyAction {
-	static styles: CSSResultGroup = [UUITextStyles];
+	
 
 	private _propertyAction?: ManifestPropertyAction;
 	@property({ type: Object })
@@ -43,4 +43,6 @@ export class UmbPropertyActionElement extends LitElement implements UmbPropertyA
 	render() {
 		return html`${this._element}`;
 	}
+	
+	static styles: CSSResultGroup = [UUITextStyles];
 }

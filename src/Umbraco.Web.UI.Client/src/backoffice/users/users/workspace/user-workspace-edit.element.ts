@@ -19,64 +19,7 @@ import '../../../shared/components/workspace/workspace-layout/workspace-layout.e
 
 @customElement('umb-user-workspace-edit')
 export class UmbUserWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				height: 100%;
-			}
-
-			#main {
-				display: grid;
-				grid-template-columns: 1fr 350px;
-				gap: var(--uui-size-layout-1);
-				padding: var(--uui-size-layout-1);
-			}
-
-			#left-column {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			#right-column > uui-box > div {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-2);
-			}
-			uui-avatar {
-				font-size: var(--uui-size-16);
-				place-self: center;
-			}
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-			.faded-text {
-				color: var(--uui-color-text-alt);
-				font-size: 0.8rem;
-			}
-			uui-tag {
-				width: fit-content;
-			}
-			#user-info {
-				display: flex;
-				gap: var(--uui-size-space-6);
-			}
-			#user-info > div {
-				display: flex;
-				flex-direction: column;
-			}
-			#assign-access {
-				display: flex;
-				flex-direction: column;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _currentUser?: UserDetails;
@@ -337,6 +280,65 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				height: 100%;
+			}
+
+			#main {
+				display: grid;
+				grid-template-columns: 1fr 350px;
+				gap: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
+			}
+
+			#left-column {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			#right-column > uui-box > div {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-2);
+			}
+			uui-avatar {
+				font-size: var(--uui-size-16);
+				place-self: center;
+			}
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+				width: 100%;
+			}
+			uui-input {
+				width: 100%;
+			}
+			.faded-text {
+				color: var(--uui-color-text-alt);
+				font-size: 0.8rem;
+			}
+			uui-tag {
+				width: fit-content;
+			}
+			#user-info {
+				display: flex;
+				gap: var(--uui-size-space-6);
+			}
+			#user-info > div {
+				display: flex;
+				flex-direction: column;
+			}
+			#assign-access {
+				display: flex;
+				flex-direction: column;
+			}
+		`,
+	];
 }
 
 export default UmbUserWorkspaceEditElement;

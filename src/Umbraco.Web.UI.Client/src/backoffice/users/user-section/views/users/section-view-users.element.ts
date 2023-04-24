@@ -16,18 +16,7 @@ import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-regis
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				height: 100%;
-			}
-
-			#router-slot {
-				height: calc(100% - var(--umb-header-layout-height));
-			}
-		`,
-	];
+	
 
 	@state()
 	private _routes: IRoute[] = [];
@@ -135,6 +124,19 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				height: 100%;
+			}
+
+			#router-slot {
+				height: calc(100% - var(--umb-header-layout-height));
+			}
+		`,
+	];
 }
 
 export default UmbSectionViewUsersElement;

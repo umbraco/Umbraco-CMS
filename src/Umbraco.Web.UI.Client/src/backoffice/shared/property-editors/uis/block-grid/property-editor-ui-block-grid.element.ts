@@ -14,7 +14,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-block-grid')
 export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	private _variantContext?: typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE;
 
@@ -110,6 +110,8 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 			  </div>`
 			: 'loading...';
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridElement;

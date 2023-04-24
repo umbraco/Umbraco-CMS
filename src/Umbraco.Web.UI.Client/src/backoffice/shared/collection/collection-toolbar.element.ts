@@ -10,26 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-collection-toolbar')
 export class UmbCollectionToolbarElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				gap: var(--uui-size-3);
-				width: 100%;
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
-				align-items: center;
-				box-sizing: border-box;
-			}
-
-			uui-popover {
-				width: min-content;
-			}
-			#search {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	@property()
 	public actions: Array<TooltipMenuItem> = [
@@ -167,6 +148,27 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 			${this._renderLayoutButton()}
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				gap: var(--uui-size-3);
+				width: 100%;
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				align-items: center;
+				box-sizing: border-box;
+			}
+
+			uui-popover {
+				width: min-content;
+			}
+			#search {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 declare global {

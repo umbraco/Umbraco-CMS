@@ -9,61 +9,7 @@ import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				box-sizing: border-box;
-				position: relative;
-				height: 100%;
-				width: 100%;
-				padding: var(--uui-size-space-3) var(--uui-size-space-6);
-			}
-			:host([dragging]) #dropzone {
-				opacity: 1;
-				pointer-events: all;
-			}
-			[dropzone] {
-				opacity: 0;
-			}
-			#dropzone {
-				opacity: 0;
-				pointer-events: none;
-				display: block;
-				position: absolute;
-				inset: 0px;
-				z-index: 100;
-				backdrop-filter: opacity(1); /* Removes the built in blur effect */
-				border-radius: var(--uui-border-radius);
-				overflow: clip;
-				border: 1px solid var(--uui-color-focus);
-			}
-			#dropzone:after {
-				content: '';
-				display: block;
-				position: absolute;
-				inset: 0;
-				border-radius: var(--uui-border-radius);
-				background-color: var(--uui-color-focus);
-				opacity: 0.2;
-			}
-			#media-folders {
-				margin-bottom: var(--uui-size-space-5);
-			}
-			#media-folders,
-			#media-files {
-				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-				grid-template-rows: repeat(auto-fill, 200px);
-				gap: var(--uui-size-space-5);
-			}
-			.media-item img {
-				object-fit: contain;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _mediaItems?: Array<EntityTreeItemResponseModel>;
@@ -174,6 +120,62 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			</div>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
+				position: relative;
+				height: 100%;
+				width: 100%;
+				padding: var(--uui-size-space-3) var(--uui-size-space-6);
+			}
+			:host([dragging]) #dropzone {
+				opacity: 1;
+				pointer-events: all;
+			}
+			[dropzone] {
+				opacity: 0;
+			}
+			#dropzone {
+				opacity: 0;
+				pointer-events: none;
+				display: block;
+				position: absolute;
+				inset: 0px;
+				z-index: 100;
+				backdrop-filter: opacity(1); /* Removes the built in blur effect */
+				border-radius: var(--uui-border-radius);
+				overflow: clip;
+				border: 1px solid var(--uui-color-focus);
+			}
+			#dropzone:after {
+				content: '';
+				display: block;
+				position: absolute;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-focus);
+				opacity: 0.2;
+			}
+			#media-folders {
+				margin-bottom: var(--uui-size-space-5);
+			}
+			#media-folders,
+			#media-files {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				grid-template-rows: repeat(auto-fill, 200px);
+				gap: var(--uui-size-space-5);
+			}
+			.media-item img {
+				object-fit: contain;
+			}
+		`,
+	];
 }
 
 export default UmbMediaGridCollectionViewElement;

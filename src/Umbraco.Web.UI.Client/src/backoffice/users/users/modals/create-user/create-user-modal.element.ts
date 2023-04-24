@@ -15,44 +15,7 @@ import {
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-create-user-modal')
 export class UmbCreateUserModalElement extends UmbModalBaseElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				height: 100%;
-				width: 100%;
-			}
-			uui-box {
-				max-width: 500px;
-			}
-			uui-form-layout-item {
-				display: flex;
-				flex-direction: column;
-			}
-			uui-input,
-			uui-input-password {
-				width: 100%;
-			}
-			form {
-				display: flex;
-				flex-direction: column;
-				box-sizing: border-box;
-			}
-			uui-form-layout-item {
-				margin-bottom: 0;
-			}
-			uui-textarea {
-				--uui-textarea-min-height: 100px;
-			}
-			/* TODO: Style below is to fix a11y contrast issue, find a proper solution */
-			[slot='description'] {
-				color: black;
-			}
-		`,
-	];
+	
 
 	@query('#form')
 	private _form!: HTMLFormElement;
@@ -208,6 +171,45 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 				  `}
 		</uui-dialog-layout>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				width: 100%;
+			}
+			uui-box {
+				max-width: 500px;
+			}
+			uui-form-layout-item {
+				display: flex;
+				flex-direction: column;
+			}
+			uui-input,
+			uui-input-password {
+				width: 100%;
+			}
+			form {
+				display: flex;
+				flex-direction: column;
+				box-sizing: border-box;
+			}
+			uui-form-layout-item {
+				margin-bottom: 0;
+			}
+			uui-textarea {
+				--uui-textarea-min-height: 100px;
+			}
+			/* TODO: Style below is to fix a11y contrast issue, find a proper solution */
+			[slot='description'] {
+				color: black;
+			}
+		`,
+	];
 }
 
 export default UmbCreateUserModalElement;

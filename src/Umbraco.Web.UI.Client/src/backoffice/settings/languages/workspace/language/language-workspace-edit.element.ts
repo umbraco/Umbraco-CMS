@@ -10,34 +10,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-language-workspace-edit')
 export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-space-6);
-				gap: var(--uui-size-space-4);
-				width: 100%;
-			}
-
-			uui-input {
-				width: 100%;
-			}
-
-			strong {
-				display: flex;
-				align-items: center;
-			}
-
-			#footer {
-				padding: 0 var(--uui-size-layout-1);
-			}
-
-			uui-input:not(:focus) {
-				border: 1px solid transparent;
-			}
-		`,
-	];
+	
 
 	#workspaceContext?: UmbLanguageWorkspaceContext;
 
@@ -95,6 +68,35 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 			</div>
 		</umb-workspace-layout>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				display: flex;
+				padding: 0 var(--uui-size-space-6);
+				gap: var(--uui-size-space-4);
+				width: 100%;
+			}
+
+			uui-input {
+				width: 100%;
+			}
+
+			strong {
+				display: flex;
+				align-items: center;
+			}
+
+			#footer {
+				padding: 0 var(--uui-size-layout-1);
+			}
+
+			uui-input:not(:focus) {
+				border: 1px solid transparent;
+			}
+		`,
+	];
 }
 
 export default UmbLanguageWorkspaceEditElement;

@@ -15,15 +15,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				height: 100%;
-			}
-		`,
-	];
+	
 
 	public manifest!: ManifestWorkspaceViewCollection;
 
@@ -62,6 +54,16 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	render() {
 		return html`<umb-collection entity-type=${ifDefined(this._workspaceContext?.getEntityType())}></umb-collection>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceViewCollectionElement;

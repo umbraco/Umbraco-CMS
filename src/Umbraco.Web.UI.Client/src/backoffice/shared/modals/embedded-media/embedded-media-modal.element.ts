@@ -26,43 +26,7 @@ interface UmbEmbeddedMediaModalModel {
 
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			h3 {
-				margin-left: var(--uui-size-space-5);
-				margin-right: var(--uui-size-space-5);
-			}
-
-			uui-input {
-				width: 100%;
-				--uui-button-border-radius: 0;
-			}
-
-			.sr-only {
-				clip: rect(0, 0, 0, 0);
-				border: 0;
-				height: 1px;
-				margin: -1px;
-				overflow: hidden;
-				padding: 0;
-				position: absolute;
-				width: 1px;
-			}
-
-			umb-workspace-property-layout:first-child {
-				padding-top: 0;
-			}
-
-			umb-workspace-property-layout:last-child {
-				padding-bottom: 0;
-			}
-
-			p {
-				margin-bottom: 0;
-			}
-		`,
-	];
+	
 
 	#loading = false;
 	#embedResult!: OEmbedResult;
@@ -266,6 +230,44 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			h3 {
+				margin-left: var(--uui-size-space-5);
+				margin-right: var(--uui-size-space-5);
+			}
+
+			uui-input {
+				width: 100%;
+				--uui-button-border-radius: 0;
+			}
+
+			.sr-only {
+				clip: rect(0, 0, 0, 0);
+				border: 0;
+				height: 1px;
+				margin: -1px;
+				overflow: hidden;
+				padding: 0;
+				position: absolute;
+				width: 1px;
+			}
+
+			umb-workspace-property-layout:first-child {
+				padding-top: 0;
+			}
+
+			umb-workspace-property-layout:last-child {
+				padding-bottom: 0;
+			}
+
+			p {
+				margin-bottom: 0;
+			}
+		`,
+	];
 }
 
 export default UmbEmbeddedMediaModalElement;

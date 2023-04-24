@@ -8,41 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		css`
-			:host,
-			#container {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
-
-			uui-form {
-				height: 100%;
-			}
-
-			form {
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-			}
-
-			h1 {
-				text-align: center;
-				margin-bottom: var(--uui-size-layout-3);
-			}
-
-			#buttons {
-				display: flex;
-				margin-top: auto;
-			}
-
-			#button-install {
-				margin-left: auto;
-				min-width: 120px;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _telemetryLevels: ConsentLevelPresentationModel[] = [];
@@ -132,6 +98,42 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 			</div>
 		`;
 	}
+	
+	static styles: CSSResultGroup = [
+		css`
+			:host,
+			#container {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			uui-form {
+				height: 100%;
+			}
+
+			form {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			h1 {
+				text-align: center;
+				margin-bottom: var(--uui-size-layout-3);
+			}
+
+			#buttons {
+				display: flex;
+				margin-top: auto;
+			}
+
+			#button-install {
+				margin-left: auto;
+				min-width: 120px;
+			}
+		`,
+	];
 }
 
 declare global {

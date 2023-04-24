@@ -9,22 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-
-			uui-box + uui-box {
-				margin-top: var(--uui-size-space-5);
-			}
-			uui-box p:first-child {
-				margin-block-start: 0;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _publishedStatusText = '';
@@ -202,6 +187,23 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
+			uui-box + uui-box {
+				margin-top: var(--uui-size-space-5);
+			}
+			uui-box p:first-child {
+				margin-block-start: 0;
+			}
+		`,
+	];
 }
 
 export default UmbDashboardPublishedStatusElement;

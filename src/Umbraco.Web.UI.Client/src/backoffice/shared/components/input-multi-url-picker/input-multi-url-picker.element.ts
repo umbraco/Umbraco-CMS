@@ -20,14 +20,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-input-multi-url-picker')
 export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-button {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	protected getFormElement() {
 		return undefined;
@@ -229,6 +222,15 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			</uui-action-bar>
 		</uui-ref-node>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-button {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 declare global {

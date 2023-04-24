@@ -6,23 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 400px;
-			}
-			uui-input-password {
-				width: 100%;
-			}
-			#actions {
-				display: flex;
-				justify-content: flex-end;
-				margin-top: var(--uui-size-layout-2);
-			}
-		`,
-	];
+	
 
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
@@ -99,6 +83,24 @@ export class UmbChangePasswordModalElement extends UmbLitElement {
 			</uui-dialog-layout>
 		`;
 	}
+	
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 400px;
+			}
+			uui-input-password {
+				width: 100%;
+			}
+			#actions {
+				display: flex;
+				justify-content: flex-end;
+				margin-top: var(--uui-size-layout-2);
+			}
+		`,
+	];
 }
 
 export default UmbChangePasswordModalElement;

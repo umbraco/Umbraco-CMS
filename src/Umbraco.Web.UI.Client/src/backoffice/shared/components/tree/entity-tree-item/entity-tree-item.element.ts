@@ -22,7 +22,7 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-entity-tree-item')
 export class UmbEntityTreeItemElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	private _item?: EntityTreeItemResponseModel;
 	@property({ type: Object, attribute: false })
@@ -40,6 +40,8 @@ export class UmbEntityTreeItemElement extends UmbLitElement {
 		if (!this.item) return nothing;
 		return html`<umb-tree-item-base></umb-tree-item-base>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

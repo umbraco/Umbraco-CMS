@@ -7,40 +7,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#layout {
-				margin: 20px;
-				padding-bottom: 20px;
-			}
-			#levels-container,
-			#input-container {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-4);
-				width: 100%;
-				margin-bottom: 20px;
-			}
-
-			#levels-container {
-				justify-content: space-between;
-			}
-
-			#dates-polling-container {
-				display: flex;
-				align-items: baseline;
-			}
-
-			umb-log-viewer-search-input {
-				flex: 1;
-			}
-
-			umb-log-viewer-date-range-selector {
-				flex-direction: row;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _canShowLogs = false;
@@ -85,6 +52,41 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			</div>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#layout {
+				margin: 20px;
+				padding-bottom: 20px;
+			}
+			#levels-container,
+			#input-container {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-4);
+				width: 100%;
+				margin-bottom: 20px;
+			}
+
+			#levels-container {
+				justify-content: space-between;
+			}
+
+			#dates-polling-container {
+				display: flex;
+				align-items: baseline;
+			}
+
+			umb-log-viewer-search-input {
+				flex: 1;
+			}
+
+			umb-log-viewer-date-range-selector {
+				flex-direction: row;
+			}
+		`,
+	];
 }
 
 declare global {

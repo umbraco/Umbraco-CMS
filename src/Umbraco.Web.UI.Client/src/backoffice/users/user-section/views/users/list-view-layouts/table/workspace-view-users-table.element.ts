@@ -23,20 +23,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-view-users-table')
 export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-			}
-
-			umb-table {
-				padding: 0;
-				margin: 0 var(--uui-size-layout-1) var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _users: Array<UserDetails> = [];
@@ -191,6 +178,21 @@ export class UmbWorkspaceViewUsersTableElement extends UmbLitElement {
 				@ordered="${this._handleOrdering}"></umb-table>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
+
+			umb-table {
+				padding: 0;
+				margin: 0 var(--uui-size-layout-1) var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceViewUsersTableElement;

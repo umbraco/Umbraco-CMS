@@ -12,7 +12,7 @@ import './user/installer-user.element';
 
 @customElement('umb-installer')
 export class UmbInstallerElement extends UmbLitElement {
-	static styles: CSSResultGroup = [css``];
+	
 
 	@state()
 	step = 1;
@@ -59,6 +59,8 @@ export class UmbInstallerElement extends UmbLitElement {
 	render() {
 		return html`<umb-installer-layout data-test="installer">${this._renderSection()}</umb-installer-layout> `;
 	}
+	
+	static styles: CSSResultGroup = [css``];
 }
 
 export default UmbInstallerElement;

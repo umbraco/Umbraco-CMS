@@ -9,6 +9,25 @@ import '../section-sidebar-context-menu/section-sidebar-context-menu.element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
+	
+
+	#sectionSidebarContext = new UmbSectionSidebarContext(this);
+
+	constructor() {
+		super();
+		this.provideContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, this.#sectionSidebarContext);
+	}
+
+	render() {
+		return html`
+			<umb-section-sidebar-context-menu>
+				<uui-scroll-container id="scroll-container">
+					<slot></slot>
+				</uui-scroll-container>
+			</umb-section-sidebar-context-menu>
+		`;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -29,23 +48,6 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	#sectionSidebarContext = new UmbSectionSidebarContext(this);
-
-	constructor() {
-		super();
-		this.provideContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, this.#sectionSidebarContext);
-	}
-
-	render() {
-		return html`
-			<umb-section-sidebar-context-menu>
-				<uui-scroll-container id="scroll-container">
-					<slot></slot>
-				</uui-scroll-container>
-			</umb-section-sidebar-context-menu>
-		`;
-	}
 }
 
 declare global {

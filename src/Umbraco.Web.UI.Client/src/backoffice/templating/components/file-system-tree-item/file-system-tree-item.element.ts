@@ -22,7 +22,7 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-file-system-tree-item')
 export class UmbFileSystemTreeItemElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	private _item?: FileSystemTreeItemPresentationModel;
 	@property({ type: Object, attribute: false })
@@ -40,6 +40,8 @@ export class UmbFileSystemTreeItemElement extends UmbLitElement {
 		if (!this.item) return nothing;
 		return html`<umb-tree-item-base></umb-tree-item-base>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

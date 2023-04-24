@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-creator')
 export class UmbPropertyCreatorElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	#modalContext?: UmbModalContext;
 
@@ -30,6 +30,8 @@ export class UmbPropertyCreatorElement extends UmbLitElement {
 			<uui-button look="outline" @click=${this.#onAddProperty}> Add property </uui-button>
 		`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbPropertyCreatorElement;

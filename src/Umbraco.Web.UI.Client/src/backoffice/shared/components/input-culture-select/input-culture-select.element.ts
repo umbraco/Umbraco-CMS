@@ -12,7 +12,7 @@ import { CultureReponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-input-culture-select')
 export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement) {
-	static styles = [UUITextStyles, css``];
+	
 
 	/**
 	 * Disables the input
@@ -104,6 +104,8 @@ export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement
 				  `}
 		`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbInputCultureSelectElement;

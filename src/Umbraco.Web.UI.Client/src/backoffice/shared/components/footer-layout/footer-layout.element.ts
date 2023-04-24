@@ -13,6 +13,15 @@ import { customElement, state } from 'lit/decorators.js';
  */
 @customElement('umb-footer-layout')
 export class UmbFooterLayoutElement extends LitElement {
+	
+
+	render() {
+		return html`
+			<slot></slot>
+			<slot id="actions" name="actions"></slot>
+		`;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -35,13 +44,6 @@ export class UmbFooterLayoutElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html`
-			<slot></slot>
-			<slot id="actions" name="actions"></slot>
-		`;
-	}
 }
 
 declare global {

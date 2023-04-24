@@ -5,11 +5,13 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-media-info-workspace-view')
 export class UmbMediaInfoWorkspaceViewElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	render() {
 		return html`<div>Media info</div>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbMediaInfoWorkspaceViewElement;

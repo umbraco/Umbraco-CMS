@@ -11,7 +11,24 @@ import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+
+	public load(entityId: string) {
+		this.#templateWorkspaceContext.load(entityId);
+	}
+
+	public create(parentId: string | null) {
+		this.#isNew = true;
+		this.#templateWorkspaceContext.createScaffold(parentId);
+	}
+
+	@state()
+	private _name?: string | null = '';
+
+	@state()
+	private _content?: string | null = '';
+
+	@query('umb-code-editor')
+	private _codeEditor?: UmbCodeEditorElement;
 
 	#templateWorkspaceContext = new UmbTemplateWorkspaceContext(this);
 
@@ -47,6 +64,31 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 				this.#routerPath = event.target.absoluteRouterPath;
 			}}></umb-router-slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			umb-code-editor {
+				--editor-height: calc(100vh - 300px);
+			}
+
+			uui-box {
+				margin: 1em;
+				--uui-box-default-padding: 0;
+			}
+
+			uui-input {
+				width: 100%;
+				margin: 1em;
+			}
+		`,
+	];
 }
 
 export default UmbTemplateWorkspaceElement;
