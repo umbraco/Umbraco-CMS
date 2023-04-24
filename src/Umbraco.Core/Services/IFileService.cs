@@ -209,12 +209,14 @@ public interface IFileService : IService
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     IEnumerable<ITemplate> GetTemplates(params string[] aliases);
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
 
     /// <summary>
@@ -222,6 +224,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="alias">The alias of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the alias, or null.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     ITemplate? GetTemplate(string? alias);
 
     /// <summary>
@@ -229,6 +232,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="id">The identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     ITemplate? GetTemplate(int id);
 
     /// <summary>
@@ -236,6 +240,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="id">The guid identifier of the template.</param>
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     ITemplate? GetTemplate(Guid id);
 
     /// <summary>
@@ -243,6 +248,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="masterTemplateId"></param>
     /// <returns></returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId);
 
     /// <summary>
@@ -250,6 +256,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="template"><see cref="ITemplate" /> to save</param>
     /// <param name="userId">Optional id of the user saving the template</param>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -261,11 +268,13 @@ public interface IFileService : IService
     /// <returns>
     ///     The template created
     /// </returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
         string contentTypeAlias,
         string? contentTypeName,
         int userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -273,6 +282,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="alias">Alias of the <see cref="ITemplate" /> to delete</param>
     /// <param name="userId">Optional id of the user deleting the template</param>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -280,6 +290,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="templates">List of <see cref="Template" /> to save</param>
     /// <param name="userId">Optional id of the user</param>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -287,6 +298,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the template.</param>
     /// <returns>The content of the template.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     Stream GetTemplateFileContentStream(string filepath);
 
     /// <summary>
@@ -294,6 +306,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the template.</param>
     /// <param name="content">The content of the template.</param>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     void SetTemplateFileContent(string filepath, Stream content);
 
     /// <summary>
@@ -301,6 +314,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the template.</param>
     /// <returns>The size of the template.</returns>
+    [Obsolete("Please use ITemplateService for template operations - will be removed in Umbraco 15")]
     long GetTemplateFileSize(string filepath);
 
     /// <summary>
