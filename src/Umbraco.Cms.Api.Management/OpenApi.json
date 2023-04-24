@@ -7278,12 +7278,12 @@
         }
       }
     },
-    "/umbraco/management/api/v1/user-groups/item": {
+    "/umbraco/management/api/v1/user-group/item": {
       "get": {
         "tags": [
-          "User Groups"
+          "User Group"
         ],
-        "operationId": "GetUserGroupsItem",
+        "operationId": "GetUserGroupItem",
         "parameters": [
           {
             "name": "id",
@@ -7784,6 +7784,47 @@
         }
       }
     },
+    "/umbraco/management/api/v1/user/item": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/UserItemResponseModel"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/user/set-user-groups": {
       "post": {
         "tags": [
@@ -7839,47 +7880,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/umbraco/management/api/v1/users/item": {
-      "get": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "GetUsersItem",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "schema": {
-              "uniqueItems": true,
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/UserItemResponseModel"
-                      }
-                    ]
-                  }
                 }
               }
             }
