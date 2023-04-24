@@ -69,7 +69,6 @@ public class StylesheetService : FileServiceBase, IStylesheetService
         return StylesheetOperationStatus.Success;
     }
 
-
     public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -187,7 +186,6 @@ public class StylesheetService : FileServiceBase, IStylesheetService
 
         return StylesheetOperationStatus.Success;
     }
-
 
     private async Task AuditAsync(AuditType type, Guid performingUserKey)
     {
