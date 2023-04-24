@@ -30,7 +30,7 @@ public class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContent
             {
                 var type = field.FieldType switch
                 {
-                    FieldType.Date => FieldDefinitionTypes.Long,
+                    FieldType.Date => FieldDefinitionTypes.DateTime,
                     FieldType.Number => FieldDefinitionTypes.Integer,
                     FieldType.String => FieldDefinitionTypes.FullText,
                     FieldType.StringSortable => FieldDefinitionTypes.FullTextSortable,
