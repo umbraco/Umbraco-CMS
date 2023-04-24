@@ -67,5 +67,8 @@ public class UmbracoPlan : MigrationPlan
 
         // To 11.3.0
         To<V_11_3_0.AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
+
+        // To 11.4.0
+        To<V_11_4_0.AlterKeyValueDataType>("{FFB6B9B0-F1A8-45E9-9CD7-25700577D1CA}");
     }
 }
