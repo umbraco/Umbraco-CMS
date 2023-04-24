@@ -1,20 +1,21 @@
 using System.Reflection;
 using NPoco;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_11_4_0;
 
 public class AlterKeyValueDataType : MigrationBase
 {
+    private readonly IMigrationContext _context;
+
     public AlterKeyValueDataType(IMigrationContext context)
-        : base(context)
-    { }
+        : base(context) => _context = context;
 
     protected override void Migrate()
     {
-        //SQL Lite doesn't need this upgrade
-        if (Database.DatabaseType is not null &&
-            Database.DatabaseType.GetProviderName()?.ToLower() == "system.data.sqlite")
+        // SQLite doesn't need this upgrade
+        if (_context.Database.DatabaseType.IsSqlite())
         {
             return;
         }
