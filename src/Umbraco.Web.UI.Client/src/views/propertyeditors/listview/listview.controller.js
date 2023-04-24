@@ -213,7 +213,13 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         e.alias === "email" ||
         e.alias === "updateDate" ||
         e.alias === "createDate" ||
-        e.alias === "contentTypeAlias";
+        e.alias === "contentTypeAlias" ||
+        e.alias === "failedPasswordAttempts" ||
+        e.alias === "approved" ||
+        e.alias === "lockedOut" ||
+        e.alias === "lastLockoutDate" ||
+        e.alias === "lastLoginDate" ||
+        e.alias === "lastPasswordChangeDate";
     }
 
     if (e.isSystem) {
