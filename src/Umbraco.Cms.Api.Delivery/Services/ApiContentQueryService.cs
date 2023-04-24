@@ -1,5 +1,6 @@
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.New.Cms.Core.Models;
@@ -174,7 +175,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
     private IOrdering? DefaultSort(IBooleanOperation queryCriteria)
     {
-        var defaultSorts = new[] { "path:asc", "sortOrder:asc" };
+        var defaultSorts = new[] { $"{PathSortIndexer.FieldName}:asc", $"{SortOrderSortIndexer.FieldName}:asc" };
 
         return HandleSorting(defaultSorts, queryCriteria);
     }
