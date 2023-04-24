@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Infrastructure.Serialization;
+namespace Umbraco.Cms.Api.Common.Serialization;
 
 public sealed class UmbracoJsonTypeInfoResolver : DefaultJsonTypeInfoResolver, IUmbracoJsonTypeInfoResolver
 {

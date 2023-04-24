@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.OpenApi;
+namespace Umbraco.Cms.Api.Common.OpenApi;
 
 internal static class SchemaIdGenerator
 {

@@ -20,6 +20,6 @@ public class ConfigureApiExplorerOptions : IConfigureOptions<ApiExplorerOptions>
         options.GroupNameFormat = "'v'VVV";
         options.SubstituteApiVersionInUrl = true;
         options.AddApiVersionParametersWhenVersionNeutral = true;
-        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.AssumeDefaultVersionWhenUnspecified = false;
     }
 }
