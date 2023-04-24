@@ -77,7 +77,7 @@ public class ScriptService : FileServiceBase, IScriptService
 
         try
         {
-            ScriptOperationStatus validationResult = await ValidateCreateAsync(createModel);
+            ScriptOperationStatus validationResult = ValidateCreate(createModel);
             if (validationResult is not ScriptOperationStatus.Success)
             {
                 return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(validationResult, null);
@@ -107,30 +107,30 @@ public class ScriptService : FileServiceBase, IScriptService
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
     }
 
-    private Task<ScriptOperationStatus> ValidateCreateAsync(ScriptCreateModel createModel)
+    private ScriptOperationStatus ValidateCreate(ScriptCreateModel createModel)
     {
         if (_scriptRepository.Exists(createModel.FilePath))
         {
-            return Task.FromResult(ScriptOperationStatus.AlreadyExists);
+            return ScriptOperationStatus.AlreadyExists;
         }
 
         if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false &&
             _scriptRepository.FolderExists(createModel.ParentPath) is false)
         {
-            return Task.FromResult(ScriptOperationStatus.ParentNotFound);
+            return ScriptOperationStatus.ParentNotFound;
         }
 
         if (HasValidFileName(createModel.Name) is false)
         {
-            return Task.FromResult(ScriptOperationStatus.InvalidName);
+            return ScriptOperationStatus.InvalidName;
         }
 
         if (HasValidFileExtension(createModel.FilePath) is false)
         {
-            return Task.FromResult(ScriptOperationStatus.InvalidFileExtension);
+            return ScriptOperationStatus.InvalidFileExtension;
         }
 
-        return Task.FromResult(ScriptOperationStatus.Success);
+        return ScriptOperationStatus.Success;
     }
 
     public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid performingUserKey)

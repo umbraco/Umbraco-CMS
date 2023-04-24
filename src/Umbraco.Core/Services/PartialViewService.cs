@@ -113,7 +113,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
 
         try
         {
-            PartialViewOperationStatus validationResult = await ValidateCreateAsync(createModel);
+            PartialViewOperationStatus validationResult = ValidateCreate(createModel);
             if (validationResult is not PartialViewOperationStatus.Success)
             {
                 return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(validationResult, null);
@@ -143,30 +143,30 @@ public class PartialViewService : FileServiceBase, IPartialViewService
         return Attempt.SucceedWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.Success, partialView);
     }
 
-    private Task<PartialViewOperationStatus> ValidateCreateAsync(PartialViewCreateModel createModel)
+    private PartialViewOperationStatus ValidateCreate(PartialViewCreateModel createModel)
     {
         if (_partialViewRepository.Exists(createModel.FilePath))
         {
-            return Task.FromResult(PartialViewOperationStatus.AlreadyExists);
+            return PartialViewOperationStatus.AlreadyExists;
         }
 
         if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false &&
             _partialViewRepository.FolderExists(createModel.ParentPath) is false)
         {
-            return Task.FromResult(PartialViewOperationStatus.ParentNotFound);
+            return PartialViewOperationStatus.ParentNotFound;
         }
 
         if (HasValidFileName(createModel.Name) is false)
         {
-            return Task.FromResult(PartialViewOperationStatus.InvalidName);
+            return PartialViewOperationStatus.InvalidName;
         }
 
         if (HasValidFileExtension(createModel.FilePath) is false)
         {
-            return Task.FromResult(PartialViewOperationStatus.InvalidFileExtension);
+            return PartialViewOperationStatus.InvalidFileExtension;
         }
 
-        return Task.FromResult(PartialViewOperationStatus.Success);
+        return PartialViewOperationStatus.Success;
     }
 
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid performingUserKey)

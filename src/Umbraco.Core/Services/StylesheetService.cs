@@ -82,7 +82,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
 
         try
         {
-            StylesheetOperationStatus validationResult = await ValidateCreateAsync(createModel);
+            StylesheetOperationStatus validationResult = ValidateCreate(createModel);
             if (validationResult is not StylesheetOperationStatus.Success)
             {
                 return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(validationResult, null);
@@ -112,30 +112,30 @@ public class StylesheetService : FileServiceBase, IStylesheetService
         return Attempt.SucceedWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.Success, stylesheet);
     }
 
-    private Task<StylesheetOperationStatus> ValidateCreateAsync(StylesheetCreateModel createModel)
+    private StylesheetOperationStatus ValidateCreate(StylesheetCreateModel createModel)
     {
         if (_stylesheetRepository.Exists(createModel.FilePath))
         {
-            return Task.FromResult(StylesheetOperationStatus.AlreadyExists);
+            return StylesheetOperationStatus.AlreadyExists;
         }
 
         if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false
            && _stylesheetRepository.Exists(createModel.ParentPath) is false)
         {
-            return Task.FromResult(StylesheetOperationStatus.ParentNotFound);
+            return StylesheetOperationStatus.ParentNotFound;
         }
 
         if (HasValidFileName(createModel.Name) is false)
         {
-            return Task.FromResult(StylesheetOperationStatus.InvalidName);
+            return StylesheetOperationStatus.InvalidName;
         }
 
         if (HasValidFileExtension(createModel.FilePath) is false)
         {
-            return Task.FromResult(StylesheetOperationStatus.InvalidFileExtension);
+            return StylesheetOperationStatus.InvalidFileExtension;
         }
 
-        return Task.FromResult(StylesheetOperationStatus.Success);
+        return StylesheetOperationStatus.Success;
     }
 
     public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid performingUserKey)
