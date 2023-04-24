@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -13,6 +14,13 @@ namespace Umbraco.Cms.Api.Common.Configuration;
 
 public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
 {
+    private readonly IOptions<ApiVersioningOptions> _apiVersioningOptions;
+
+    public ConfigureUmbracoSwaggerGenOptions(IOptions<ApiVersioningOptions> apiVersioningOptions)
+    {
+        _apiVersioningOptions = apiVersioningOptions;
+    }
+
     public void Configure(SwaggerGenOptions swaggerGenOptions)
     {
         swaggerGenOptions.SwaggerDoc(
@@ -24,7 +32,7 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
                 Description = "All endpoints not defined under specific APIs"
             });
 
-        swaggerGenOptions.CustomOperationIds(CustomOperationId);
+        swaggerGenOptions.CustomOperationIds(description => CustomOperationId(description, _apiVersioningOptions.Value));
 
         swaggerGenOptions.DocInclusionPredicate((name, api) =>
         {
@@ -66,8 +74,9 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.SelectDiscriminatorValueUsing(x => x.Name);
     }
 
-     private static string CustomOperationId(ApiDescription api)
-    {
+     private static string CustomOperationId(ApiDescription api, ApiVersioningOptions apiVersioningOptions)
+     {
+         var defaultVersion = apiVersioningOptions.DefaultApiVersion;
         var httpMethod = api.HttpMethod?.ToLower().ToFirstUpper() ?? "Get";
 
         // if the route info "Name" is supplied we'll use this explicitly as the operation ID
@@ -109,7 +118,15 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
 
         if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
         {
-            version = controllerActionDescriptor.MethodInfo.GetMapToApiVersionAttributeValue();
+            var versionAttributeValue = controllerActionDescriptor.MethodInfo.GetMapToApiVersionAttributeValue();
+
+            // We only wanna add a version, if it is not the default one.
+            if (string.Equals(versionAttributeValue, defaultVersion.ToString()) == false)
+            {
+                version = versionAttributeValue;
+            }
+
+
         }
 
         // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById
