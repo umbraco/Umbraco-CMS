@@ -1,9 +1,9 @@
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ApiError, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbLanguageWorkspaceContext
 	extends UmbWorkspaceContext<UmbLanguageRepository, LanguageResponseModel>
@@ -83,8 +83,8 @@ export class UmbLanguageWorkspaceContext
 			const { error } = await this.repository.create(data);
 			// TODO: this is temp solution to bubble validation errors to the UI
 			if (error) {
-				if (error.type === 'validation') {
-					this.setValidationErrors?.(error.errors);
+				if (error instanceof ApiError && error.body.type === 'validation') {
+					this.setValidationErrors?.(error.body.errors);
 				}
 			} else {
 				this.setValidationErrors?.(undefined);

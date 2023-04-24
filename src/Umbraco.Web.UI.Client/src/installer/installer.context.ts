@@ -124,7 +124,6 @@ export class UmbInstallerContext {
 		if (data) {
 			this._settings.next(data);
 		} else if (error) {
-			console.error(error.detail, error);
 			this._installStatus.next(error);
 		}
 	}

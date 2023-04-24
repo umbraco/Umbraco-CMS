@@ -3,11 +3,10 @@ import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store';
 import { UmbRelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
 import { UmbRelationTypeTreeDataSource } from './sources';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateRelationTypeRequestModel,
-	ProblemDetailsModel,
 	RelationTypeResponseModel,
 	UpdateRelationTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -70,8 +69,7 @@ export class UmbRelationTypeRepository
 
 	//TODO RelationTypes can't have children. But this method is required by the tree interface.
 	async requestTreeItemsOf(parentId: string | null) {
-		const error: ProblemDetailsModel = { title: 'Not implemented' };
-		return { data: undefined, error };
+		return { data: undefined, error: { title: 'Not implemented', message: 'Not implemented' } };
 	}
 
 	async requestItemsLegacy(ids: Array<string>) {
@@ -116,9 +114,9 @@ export class UmbRelationTypeRepository
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
+
 		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {

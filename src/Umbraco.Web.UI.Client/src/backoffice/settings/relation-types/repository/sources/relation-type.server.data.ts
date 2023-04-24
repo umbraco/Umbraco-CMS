@@ -1,12 +1,11 @@
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
-	ProblemDetailsModel,
 	RelationTypeResource,
 	RelationTypeResponseModel,
 	CreateRelationTypeRequestModel,
 	UpdateRelationTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -37,8 +36,7 @@ export class UmbRelationTypeServerDataSource
 	 */
 	async get(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		return tryExecuteAndNotify(
@@ -104,8 +102,7 @@ export class UmbRelationTypeServerDataSource
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'RelationType id is missing' };
-			return { error };
+			throw new Error('RelationType id is missing');
 		}
 
 		return tryExecuteAndNotify(

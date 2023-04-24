@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import {
+	ApiError,
 	DatabaseInstallResponseModel,
 	DatabaseSettingsPresentationModel,
 	InstallResource,
@@ -153,7 +154,9 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				);
 
 				if (error) {
-					this._validationErrorMessage = `The server could not validate the database connection. Details: ${error.detail}`;
+					this._validationErrorMessage = `The server could not validate the database connection. Details: ${
+						error instanceof ApiError ? error.body.detail : error.message
+					}`;
 					this._installButton.state = 'failed';
 					return;
 				}
