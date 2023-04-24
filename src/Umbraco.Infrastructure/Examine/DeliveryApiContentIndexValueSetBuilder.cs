@@ -49,7 +49,7 @@ public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexVa
 
     private bool CanIndex(IContent content)
     {
-        if (content.Published is false)
+        if (content.Published is false || content.Trashed)
         {
             return false;
         }

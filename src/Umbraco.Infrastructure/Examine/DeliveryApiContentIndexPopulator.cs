@@ -33,7 +33,7 @@ public class DeliveryApiContentIndexPopulator : IndexPopulator
         var publishedContentIds = new HashSet<int>();
 
         IContent[] descendants;
-        IQuery<IContent> publishedQuery = _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published);
+        IQuery<IContent> publishedQuery = _umbracoDatabaseFactory.SqlContext.Query<IContent>().Where(x => x.Published && x.Trashed == false);
         do
         {
             descendants = _contentService.GetPagedDescendants(Constants.System.Root, pageIndex, pageSize, out _, publishedQuery, Ordering.By("Path")).ToArray();
