@@ -181,152 +181,6 @@
         }
       }
     },
-    "/umbraco/delivery/api/v1/content": {
-      "get": {
-        "tags": [
-          "Content"
-        ],
-        "operationId": "GetContent",
-        "parameters": [
-          {
-            "name": "fetch",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filter",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedIApiContentResponseModel"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/umbraco/delivery/api/v1/content/item/{path}": {
-      "get": {
-        "tags": [
-          "Content"
-        ],
-        "operationId": "GetContentItemByPath",
-        "parameters": [
-          {
-            "name": "path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "/"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiContentResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
-    "/umbraco/delivery/api/v1/content/item/{id}": {
-      "get": {
-        "tags": [
-          "Content"
-        ],
-        "operationId": "GetContentItemById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiContentResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      }
-    },
     "/umbraco/management/api/v1/culture": {
       "get": {
         "tags": [
@@ -1055,6 +909,9 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found"
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1064,9 +921,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           },
           "409": {
             "description": "Conflict",
@@ -2211,6 +2065,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2220,9 +2077,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -2254,6 +2108,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2263,9 +2120,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -2445,6 +2299,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2458,9 +2315,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -2482,6 +2336,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2495,9 +2352,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -2522,6 +2376,16 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2532,16 +2396,6 @@
                       "$ref": "#/components/schemas/HealthCheckResultResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2596,22 +2450,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedHelpPageResponseModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedHelpPageResponseModel"
                 }
               }
             }
@@ -2674,6 +2528,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2684,16 +2548,6 @@
                       "$ref": "#/components/schemas/IndexResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -2718,22 +2572,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OkResultModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResultModel"
                 }
               }
             }
@@ -2748,20 +2602,6 @@
         ],
         "operationId": "GetInstallSettings",
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/InstallSettingsResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2778,6 +2618,20 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InstallSettingsResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -2805,9 +2659,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2827,6 +2678,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -2851,9 +2705,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -2863,6 +2714,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -2925,6 +2779,19 @@
           }
         },
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -2937,19 +2804,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -2971,6 +2825,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -2984,9 +2841,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       },
@@ -3006,9 +2860,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -3028,6 +2879,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       },
@@ -3060,8 +2914,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
+          "404": {
+            "description": "Not Found"
           },
           "400": {
             "description": "Bad Request",
@@ -3073,8 +2927,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found"
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -3184,6 +3038,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -3194,16 +3058,6 @@
                       "$ref": "#/components/schemas/LogLevelCountsReponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3334,22 +3188,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedLogTemplateResponseModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedLogTemplateResponseModel"
                 }
               }
             }
@@ -3415,6 +3269,16 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -3424,16 +3288,6 @@
                   "type": "string",
                   "description": "Location of the newly created resource",
                   "format": "uri"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -3458,6 +3312,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -3471,9 +3328,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       },
@@ -3493,11 +3347,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -3527,9 +3381,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -3539,6 +3390,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -4002,6 +3856,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -4011,9 +3868,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -4045,6 +3899,9 @@
           }
         ],
         "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -4054,9 +3911,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -4547,9 +4401,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -4562,6 +4413,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -4624,6 +4478,19 @@
           }
         },
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -4636,19 +4503,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -4671,6 +4525,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -4684,9 +4541,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       },
@@ -4707,11 +4561,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
           }
         }
       },
@@ -4745,11 +4599,11 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "404": {
             "description": "Not Found"
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -4772,6 +4626,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Not Found"
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -4782,9 +4639,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
@@ -5055,22 +4909,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedBooleanModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedBooleanModel"
                 }
               }
             }
@@ -5169,22 +5023,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedRedirectUrlResponseModel"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedRedirectUrlResponseModel"
                 }
               }
             }
@@ -5984,6 +5838,16 @@
         ],
         "operationId": "GetServerStatus",
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -5994,16 +5858,6 @@
                       "$ref": "#/components/schemas/ServerStatusResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -6018,6 +5872,16 @@
         ],
         "operationId": "GetServerVersion",
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Success",
             "content": {
@@ -6028,16 +5892,6 @@
                       "$ref": "#/components/schemas/VersionResponseModel"
                     }
                   ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -6440,9 +6294,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -6452,6 +6303,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -6921,20 +6775,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/TemporaryFileResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -6951,6 +6791,20 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemporaryFileResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -6974,9 +6828,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Success"
-          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -6996,6 +6847,9 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -7259,6 +7113,16 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsModel"
+                }
+              }
+            }
+          },
           "201": {
             "description": "Created",
             "headers": {
@@ -7268,16 +7132,6 @@
                   "type": "string",
                   "description": "Location of the newly created resource",
                   "format": "uri"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetailsModel"
                 }
               }
             }
@@ -8036,159 +7890,6 @@
   },
   "components": {
     "schemas": {
-      "ApiContentModel": {
-        "required": [
-          "$type"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiElementModel"
-          }
-        ],
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "route": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ApiContentRouteModel"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiContent": "#/components/schemas/ApiContentModel",
-            "ApiContentResponse": "#/components/schemas/ApiContentResponseModel"
-          }
-        }
-      },
-      "ApiContentResponseModel": {
-        "required": [
-          "$type"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiContentModel"
-          }
-        ],
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "cultures": {
-            "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ApiContentRouteModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiContentResponse": "#/components/schemas/ApiContentResponseModel"
-          }
-        }
-      },
-      "ApiContentRouteModel": {
-        "required": [
-          "$type"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          },
-          "startItem": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ApiContentStartItemModel"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiContentRoute": "#/components/schemas/ApiContentRouteModel"
-          }
-        }
-      },
-      "ApiContentStartItemModel": {
-        "required": [
-          "$type"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "path": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiContentStartItem": "#/components/schemas/ApiContentStartItemModel"
-          }
-        }
-      },
-      "ApiElementModel": {
-        "required": [
-          "$type"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "contentType": {
-            "type": "string"
-          },
-          "properties": {
-            "type": "object",
-            "additionalProperties": {
-
-            }
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiElement": "#/components/schemas/ApiElementModel",
-            "ApiContent": "#/components/schemas/ApiContentModel",
-            "ApiContentResponse": "#/components/schemas/ApiContentResponseModel"
-          }
-        }
-      },
       "AuditLogBaseModel": {
         "type": "object",
         "properties": {
@@ -9936,9 +9637,7 @@
           },
           "providerProperties": {
             "type": "object",
-            "additionalProperties": {
-
-            },
+            "additionalProperties": { },
             "nullable": true
           }
         },
@@ -10526,9 +10225,7 @@
           },
           "extensions": {
             "type": "array",
-            "items": {
-
-            }
+            "items": { }
           }
         },
         "additionalProperties": false
@@ -10971,30 +10668,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/HelpPageResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedIApiContentResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ApiContentResponseModel"
                 }
               ]
             }
@@ -11492,9 +11165,7 @@
             "nullable": true
           }
         },
-        "additionalProperties": {
-
-        }
+        "additionalProperties": { }
       },
       "ProfilingStatusRequestModel": {
         "type": "object",
@@ -12989,9 +12660,7 @@
           "authorizationCode": {
             "authorizationUrl": "/umbraco/management/api/v1.0/security/back-office/authorize",
             "tokenUrl": "/umbraco/management/api/v1.0/security/back-office/token",
-            "scopes": {
-
-            }
+            "scopes": { }
           }
         }
       }
@@ -12999,9 +12668,7 @@
   },
   "security": [
     {
-      "OAuth": [
-
-      ]
+      "OAuth": [ ]
     }
   ]
 }
