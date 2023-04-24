@@ -11,13 +11,9 @@ export default meta;
 type Story = StoryObj<UmbDateInputElement>;
 
 export const Overview: Story = {
-	args: {},
-};
-
-export const WithOpacity: Story = {
-	args: {},
-};
-
-export const WithSwatches: Story = {
-	args: {},
+	args: {
+		type: 'datetime-local',
+		value: '2023-04-01T10:00:00Z',
+		offsetTime: true,
+	},
 };
