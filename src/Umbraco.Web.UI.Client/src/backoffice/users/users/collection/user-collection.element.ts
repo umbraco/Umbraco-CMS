@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/components/collection/collection.context';
 import { UmbUserCollectionContext } from './user-collection.context';
 
-import './views/table/user-table-collection-view.element';
-import './views/grid/user-grid-collection-view.element';
+import './views/table/user-collection-table-view.element';
+import './views/grid/user-collection-grid-view.element';
 import './user-collection-header.element';
 
 export type UsersViewType = 'list' | 'grid';
@@ -19,11 +19,11 @@ export class UmbUserCollectionElement extends UmbLitElement {
 	private _routes: IRoute[] = [
 		{
 			path: 'grid',
-			component: () => import('./views/grid/user-grid-collection-view.element'),
+			component: () => import('./views/grid/user-collection-grid-view.element'),
 		},
 		{
 			path: 'list',
-			component: () => import('./views/table/user-table-collection-view.element'),
+			component: () => import('./views/table/user-collection-table-view.element'),
 		},
 		{
 			path: '**',

@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import type { IRoute } from '@umbraco-cms/backoffice/router';
 
-import '../collection/views/table/user-table-collection-view.element';
-import '../collection/views/grid/user-grid-collection-view.element';
+import '../collection/views/table/user-collection-table-view.element';
+import '../collection/views/grid/user-collection-grid-view.element';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

@@ -9,8 +9,8 @@ import { UmbUserCollectionContext } from '../../user-collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-user-grid-collection-view')
-export class UmbUserGridCollectionViewElement extends UmbLitElement {
+@customElement('umb-user-collection-grid-view')
+export class UmbUserCollectionGridViewElement extends UmbLitElement {
 	@state()
 	private _users: Array<UserResponseModel> = [];
 
@@ -25,7 +25,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		//TODO: Get user group names
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
-			this.#collectionContext = instance;
+			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
 			this.observe(this.#collectionContext.items, (items) => (this._users = items));
 		});
@@ -126,10 +126,10 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserGridCollectionViewElement;
+export default UmbUserCollectionGridViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-grid-collection-view': UmbUserGridCollectionViewElement;
+		'umb-user-collection-grid-view': UmbUserCollectionGridViewElement;
 	}
 }

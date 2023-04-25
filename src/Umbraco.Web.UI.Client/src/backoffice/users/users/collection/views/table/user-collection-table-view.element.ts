@@ -14,20 +14,18 @@ import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../user-groups/repository/user-group.store';
-import {
-	UMB_COLLECTION_CONTEXT_TOKEN,
-	UmbCollectionContext,
-} from '../../../../../shared/components/collection/collection.context';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../../../shared/components/collection/collection.context';
+import { UmbUserCollectionContext } from '../../user-collection.context';
 import type { UserGroupEntity } from '@umbraco-cms/backoffice/models';
+
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbUserCollectionContext } from '../../user-collection.context';
 
-@customElement('umb-user-table-collection-view')
-export class UmbUserTableCollectionViewElement extends UmbLitElement {
+@customElement('umb-user-collection-table-view')
+export class UmbUserCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: true,
@@ -80,7 +78,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
-			this.#collectionContext = instance;
+			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
 			this.observe(this.#collectionContext.items, (items) => (this._users = items));
 		});
@@ -183,10 +181,10 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserTableCollectionViewElement;
+export default UmbUserCollectionTableViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-users-table': UmbUserTableCollectionViewElement;
+		'umb-workspace-view-users-table': UmbUserCollectionTableViewElement;
 	}
 }
