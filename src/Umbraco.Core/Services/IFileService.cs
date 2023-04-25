@@ -157,6 +157,7 @@ public interface IFileService : IService
     ///     Gets a list of all <see cref="IScript" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="IScript" /> objects</returns>
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     IEnumerable<IScript> GetScripts(params string[] names);
 
     /// <summary>
@@ -164,6 +165,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="name">Name of the script incl. extension</param>
     /// <returns>A <see cref="IScript" /> object</returns>
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     IScript? GetScript(string? name);
 
     /// <summary>
@@ -171,6 +173,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="script"><see cref="IScript" /> to save</param>
     /// <param name="userId">Optional id of the user saving the script</param>
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     void SaveScript(IScript? script, int? userId = Constants.Security.SuperUserId);
 
     /// <summary>
@@ -178,6 +181,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="path">Name incl. extension of the Script to delete</param>
     /// <param name="userId">Optional id of the user deleting the script</param>
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     void DeleteScript(string path, int? userId = null);
 
     /// <summary>
@@ -185,12 +189,14 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="folderPath"></param>
     /// <returns></returns>
+    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
     void CreateScriptFolder(string folderPath);
 
     /// <summary>
     ///     Deletes a folder for scripts
     /// </summary>
     /// <param name="folderPath"></param>
+    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
     void DeleteScriptFolder(string folderPath);
 
     /// <summary>
@@ -198,6 +204,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the script.</param>
     /// <returns>The content of the script file.</returns>
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     Stream GetScriptFileContentStream(string filepath);
 
     /// <summary>
@@ -205,6 +212,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the script.</param>
     /// <param name="content">The content of the script file.</param>
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     void SetScriptFileContent(string filepath, Stream content);
 
     /// <summary>
@@ -212,6 +220,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the script file.</param>
     /// <returns>The size of the script file.</returns>
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     long GetScriptFileSize(string filepath);
 
     /// <summary>

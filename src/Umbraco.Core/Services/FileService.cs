@@ -242,6 +242,7 @@ public class FileService : RepositoryService, IFileService
     #region Scripts
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public IEnumerable<IScript> GetScripts(params string[] names)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -251,6 +252,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public IScript? GetScript(string? name)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -260,6 +262,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public void SaveScript(IScript? script, int? userId)
     {
         if (userId is null)
@@ -292,6 +295,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public void DeleteScript(string path, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -322,6 +326,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
     public void CreateScriptFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -332,6 +337,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptFolderService for script folder operations - will be removed in Umbraco 15")]
     public void DeleteScriptFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -342,6 +348,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public Stream GetScriptFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -351,6 +358,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public void SetScriptFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -361,6 +369,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IScriptService for script operations - will be removed in Umbraco 15")]
     public long GetScriptFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
