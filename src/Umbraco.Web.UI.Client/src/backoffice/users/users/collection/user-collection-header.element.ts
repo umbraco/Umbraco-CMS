@@ -48,12 +48,15 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		});
 	}
 
+	// TODO: we need to render collection view extension
 	private _toggleViewType() {
+		/*
 		const isList = window.location.pathname.split('/').pop() === 'list';
 
 		isList
 			? history.pushState(null, '', 'section/users/view/users/overview/grid')
 			: history.pushState(null, '', 'section/users/view/users/overview/list');
+			*/
 	}
 
 	#onDropdownClick(event: PointerEvent) {
