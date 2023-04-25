@@ -5,9 +5,8 @@ using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IPartialViewService
+public interface IPartialViewService : IBasicFileService<IPartialView>
 {
-    Task<IPartialView?> GetAsync(string path);
 
     Task<PartialViewOperationStatus> DeleteAsync(string path, Guid performingUserKey);
 

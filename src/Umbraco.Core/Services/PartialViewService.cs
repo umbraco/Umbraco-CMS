@@ -11,7 +11,7 @@ using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class PartialViewService : FileServiceBase<IPartialViewRepository>, IPartialViewService
+public class PartialViewService : FileServiceBase<IPartialViewRepository, IPartialView>, IPartialViewService
 {
     private readonly PartialViewSnippetCollection _snippetCollection;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -35,15 +35,6 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository>, IPart
         _userIdKeyResolver = userIdKeyResolver;
         _logger = logger;
         _auditRepository = auditRepository;
-    }
-
-    public Task<IPartialView?> GetAsync(string path)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IPartialView? partialView = Repository.Get(path);
-
-        scope.Complete();
-        return Task.FromResult(partialView);
     }
 
     public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid performingUserKey)

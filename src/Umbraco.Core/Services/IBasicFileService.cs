@@ -1,7 +1,23 @@
-﻿namespace Umbraco.Cms.Core.Services;
+﻿using Umbraco.Cms.Core.Models;
 
-public interface IBasicFileService
+namespace Umbraco.Cms.Core.Services;
+
+public interface IBasicFileService<TEntity> where TEntity : IFile
 {
+    /// <summary>
+    /// Gets <see cref="TEntity"/> by path.
+    /// </summary>
+    /// <param name="path">The path to get <see cref="TEntity"/> from.</param>
+    /// <returns><see cref="TEntity"/>, or null if not found</returns>
+    Task<TEntity?> GetAsync(string path);
+
+    /// <summary>
+    /// Gets all <see cref="TEntity"/> by path, or all if no paths are specified.
+    /// </summary>
+    /// <param name="paths">Optional paths of <see cref="TEntity"/> to get.</param>
+    /// <returns>IEnumerable of <see cref="TEntity"/></returns>
+    Task<IEnumerable<TEntity>> GetAllAsync(params string[] paths);
+
     /// <summary>
     /// Get the content of a file as a stream.
     /// </summary>

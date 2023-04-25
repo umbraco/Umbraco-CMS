@@ -3,13 +3,11 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IScriptService
+public interface IScriptService : IBasicFileService<IScript>
 {
     Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey);
 
     Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid performingUserKey);
-
-    Task<IScript?> GetAsync(string path);
 
     Task<ScriptOperationStatus> DeleteAsync(string path, Guid performingUserKey);
 }

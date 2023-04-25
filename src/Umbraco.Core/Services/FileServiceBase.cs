@@ -1,13 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public abstract class FileServiceBase<TRepository> : RepositoryService, IBasicFileService
-    where TRepository : IFileRepository
+public abstract class FileServiceBase<TRepository, TEntity> : RepositoryService, IBasicFileService<TEntity>
+    where TRepository : IFileRepository, IReadRepository<string, TEntity>
+    where TEntity : IFile
 {
     public TRepository Repository { get; }
 
@@ -34,6 +37,20 @@ public abstract class FileServiceBase<TRepository> : RepositoryService, IBasicFi
         }
 
         return true;
+    }
+
+    /// <inheritdoc />
+    public Task<TEntity?> GetAsync(string path)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(Repository.Get(path));
+    }
+
+    /// <inheritdoc />
+    public Task<IEnumerable<TEntity>> GetAllAsync(params string[] paths)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(Repository.GetMany(paths));
     }
 
     /// <inheritdoc />

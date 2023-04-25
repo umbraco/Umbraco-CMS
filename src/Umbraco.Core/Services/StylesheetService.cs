@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class StylesheetService : FileServiceBase<IStylesheetRepository>, IStylesheetService
+public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesheet>, IStylesheetService
 {
     private readonly ILogger<StylesheetService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -29,16 +29,6 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository>, IStyles
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _auditRepository = auditRepository;
-    }
-
-    /// <inheritdoc />
-    public Task<IStylesheet?> GetAsync(string path)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IStylesheet? stylesheet = Repository.Get(path);
-
-        scope.Complete();
-        return Task.FromResult(stylesheet);
     }
 
     public Task<IEnumerable<IStylesheet>> GetAllAsync(params string[] paths)

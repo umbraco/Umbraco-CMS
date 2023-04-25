@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class ScriptService : FileServiceBase<IScriptRepository>, IScriptService
+public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScriptService
 {
     private readonly IAuditRepository _auditRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -29,15 +29,6 @@ public class ScriptService : FileServiceBase<IScriptRepository>, IScriptService
         _auditRepository = auditRepository;
         _userIdKeyResolver = userIdKeyResolver;
         _logger = logger;
-    }
-
-    public Task<IScript?> GetAsync(string path)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IScript? script = Repository.Get(path);
-
-        scope.Complete();
-        return Task.FromResult(script);
     }
 
     public async Task<ScriptOperationStatus> DeleteAsync(string path, Guid performingUserKey)
