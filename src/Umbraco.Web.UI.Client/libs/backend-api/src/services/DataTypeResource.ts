@@ -137,6 +137,27 @@ export class DataTypeResource {
     }
 
     /**
+     * @returns boolean Success
+     * @throws ApiError
+     */
+    public static getDataTypeByIdIsUsed({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<boolean> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/data-type/{id}/is-used',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */

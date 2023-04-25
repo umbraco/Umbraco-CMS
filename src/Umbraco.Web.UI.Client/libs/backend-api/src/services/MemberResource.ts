@@ -1,28 +1,28 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { StaticFileItemResponseModel } from '../models/StaticFileItemResponseModel';
+import type { MemberItemResponseModel } from '../models/MemberItemResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
-export class V1Resource {
+export class MemberResource {
 
     /**
      * @returns any Success
      * @throws ApiError
      */
-    public static getItem({
-        path,
+    public static getMemberItem({
+        id,
     }: {
-        path?: Array<string>,
-    }): CancelablePromise<Array<StaticFileItemResponseModel>> {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MemberItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/item',
+            url: '/umbraco/management/api/v1/member/item',
             query: {
-                'path': path,
+                'id': id,
             },
         });
     }
