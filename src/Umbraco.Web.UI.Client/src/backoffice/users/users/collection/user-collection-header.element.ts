@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUICheckboxElement, UUIRadioGroupElement, UUIRadioGroupEvent } from '@umbraco-ui/uui';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/components/collection/collection.context';
 import { UmbDropdownElement } from '../../../shared/components/dropdown/dropdown.element';
 import { UmbUserCollectionContext } from './user-collection.context';
@@ -12,7 +12,7 @@ import {
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
@@ -20,10 +20,16 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	private _isCloud = true; //NOTE: Used to show either invite or create user buttons and views.
 
 	@state()
-	private _userStateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);
+	private _stateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);
 
 	@state()
-	private _userStateFilterSelection: Array<UserStateModel> = [];
+	private _stateFilterSelection: Array<UserStateModel> = [];
+
+	@state()
+	private _orderByOptions: Array<UserOrderModel> = Object.values(UserOrderModel);
+
+	@state()
+	private _orderBy?: UserOrderModel;
 
 	#modalContext?: UmbModalContext;
 	#collectionContext?: UmbUserCollectionContext;
@@ -84,11 +90,21 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		const value = target.value as UserStateModel;
 		const isChecked = target.checked;
 
-		this._userStateFilterSelection = isChecked
-			? [...this._userStateFilterSelection, value]
-			: this._userStateFilterSelection.filter((v) => v !== value);
+		this._stateFilterSelection = isChecked
+			? [...this._stateFilterSelection, value]
+			: this._stateFilterSelection.filter((v) => v !== value);
 
-		this.#collectionContext?.setStateFilter(this._userStateFilterSelection);
+		this.#collectionContext?.setStateFilter(this._stateFilterSelection);
+	}
+
+	#onOrderByChange(event: UUIRadioGroupEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUIRadioGroupElement | null;
+
+		if (target) {
+			this._orderBy = target.value as UserOrderModel;
+			this.#collectionContext?.setOrderByFilter(this._orderBy);
+		}
 	}
 
 	render() {
@@ -104,10 +120,10 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 						<umb-dropdown margin="8">
 							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-								State: ${this._userStateFilterSelection}
+								State: ${this._stateFilterSelection}
 							</uui-button>
 							<div slot="dropdown" class="filter-dropdown">
-								${this._userStateFilterOptions.map(
+								${this._stateFilterOptions.map(
 									(option) =>
 										html`<uui-checkbox
 											label=${option}
@@ -120,9 +136,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 						<umb-dropdown margin="8">
-							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="groups">
-								Groups: <b>All</b>
-							</uui-button>
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by"> Group: </uui-button>
 							<div slot="dropdown" class="filter-dropdown">
 								<uui-checkbox label="Active"></uui-checkbox>
 								<uui-checkbox label="Inactive"></uui-checkbox>
@@ -133,14 +147,13 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 						<umb-dropdown margin="8">
-							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by">
-								Order by: <b>Name (A-Z)</b>
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="Order By">
+								Order By: <b>${this._orderBy}</b>
 							</uui-button>
-							<div slot="dropdown" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
+							<div slot="dropdown" class="filter-dropdown" name="orderBy">
+								<uui-radio-group name="radioGroup" @change=${this.#onOrderByChange}>
+									${this._orderByOptions.map((option) => html`<uui-radio label=${option} value=${option}></uui-radio>`)}
+								</uui-radio-group>
 							</div>
 						</umb-dropdown>
 
