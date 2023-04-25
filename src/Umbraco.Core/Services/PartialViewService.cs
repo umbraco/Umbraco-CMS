@@ -37,6 +37,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         _auditRepository = auditRepository;
     }
 
+    /// <inheritdoc />
     public async Task<PartialViewOperationStatus> DeleteAsync(string path, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -64,6 +65,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         return PartialViewOperationStatus.Success;
     }
 
+    /// <inheritdoc />
     public Task<PagedModel<string>> GetSnippetNamesAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -78,6 +80,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         return Task.FromResult(new PagedModel<string>(total, snippets));
     }
 
+    /// <inheritdoc />
     public Task<PartialViewSnippet?> GetSnippetByNameAsync(string name)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
@@ -96,6 +99,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         return Task.FromResult<PartialViewSnippet?>(snippet);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> CreateAsync(PartialViewCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -158,6 +162,7 @@ public class PartialViewService : FileServiceBase<IPartialViewRepository, IParti
         return PartialViewOperationStatus.Success;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();

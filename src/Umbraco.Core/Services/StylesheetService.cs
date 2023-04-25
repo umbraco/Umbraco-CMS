@@ -31,13 +31,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         _auditRepository = auditRepository;
     }
 
-    public Task<IEnumerable<IStylesheet>> GetAllAsync(params string[] paths)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IStylesheet> stylesheets = Repository.GetMany(paths);
-        return Task.FromResult(stylesheets);
-    }
-
+    /// <inheritdoc />
     public async Task<StylesheetOperationStatus> DeleteAsync(string path, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -64,6 +58,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         return StylesheetOperationStatus.Success;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -126,6 +121,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         return StylesheetOperationStatus.Success;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();

@@ -31,6 +31,7 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public async Task<ScriptOperationStatus> DeleteAsync(string path, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -60,6 +61,7 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
         return ScriptOperationStatus.Success;
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -122,6 +124,7 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
         return Task.FromResult(ScriptOperationStatus.Success);
     }
 
+    /// <inheritdoc />
     public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
