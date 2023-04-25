@@ -149,7 +149,7 @@ public class DataEditor : IDataEditor
     ///         simple enough for now.
     ///     </para>
     /// </remarks>
-    public virtual IDataValueEditor GetValueEditor(object? configuration)
+    public virtual IDataValueEditor GetValueEditor(object? configurationObject)
     {
         // if an explicit value editor has been set (by the manifest parser)
         // then return it, and ignore the configuration, which is going to be
@@ -160,9 +160,9 @@ public class DataEditor : IDataEditor
         }
 
         IDataValueEditor editor = CreateValueEditor();
-        if (configuration is not null)
+        if (configurationObject is not null)
         {
-            ((DataValueEditor)editor).Configuration = configuration; // TODO: casting is bad
+            ((DataValueEditor)editor).ConfigurationObject = configurationObject; // TODO: casting is bad
         }
 
         return editor;

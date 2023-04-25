@@ -193,9 +193,9 @@ public class RichTextPropertyEditor : DataEditor
         }
 
         /// <inheritdoc />
-        public override object? Configuration
+        public override object? ConfigurationObject
         {
-            get => base.Configuration;
+            get => base.ConfigurationObject;
             set
             {
                 if (value == null)
@@ -210,7 +210,7 @@ public class RichTextPropertyEditor : DataEditor
                         nameof(value));
                 }
 
-                base.Configuration = value;
+                base.ConfigurationObject = value;
 
                 HideLabel = configuration.HideLabel;
             }

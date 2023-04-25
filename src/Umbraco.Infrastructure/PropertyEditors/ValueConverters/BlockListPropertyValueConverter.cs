@@ -63,7 +63,7 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
         if (isSingleBlockMode)
         {
             BlockListConfiguration.BlockConfiguration? block =
-                ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.Configuration)?.Blocks.FirstOrDefault();
+                ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.ConfigurationObject)?.Blocks.FirstOrDefault();
 
             ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.Get(contentElementTypeKey) is IContentType contentType ? ModelType.For(contentType.Alias) : null;
             ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.Get(settingsElementTypeKey) is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
@@ -87,7 +87,7 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     private bool IsSingleBlockMode(PublishedDataType dataType)
     {
         BlockListConfiguration? config =
-            ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.Configuration);
+            ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(dataType.ConfigurationObject);
         return (config?.UseSingleBlockMode ?? false) && config?.Blocks.Length == 1 && config?.ValidationLimit?.Min == 1 && config?.ValidationLimit?.Max == 1;
     }
 

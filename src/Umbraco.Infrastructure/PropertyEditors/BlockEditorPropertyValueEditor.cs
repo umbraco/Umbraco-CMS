@@ -105,9 +105,9 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataVa
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
+                object? configurationObject = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
 
-                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
+                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configurationObject, languageId));
             }
         }
 

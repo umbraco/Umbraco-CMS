@@ -59,7 +59,7 @@ public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataVa
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>())
         {
-            Configuration = configuration,
+            ConfigurationObject = configuration,
             View = view,
             HideLabel = hideLabel,
             ValueType = valueType
