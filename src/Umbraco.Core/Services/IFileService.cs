@@ -87,6 +87,7 @@ public interface IFileService : IService
     ///     Gets a list of all <see cref="IStylesheet" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="IStylesheet" /> objects</returns>
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     IEnumerable<IStylesheet> GetStylesheets(params string[] paths);
 
     /// <summary>
@@ -94,6 +95,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="path">Path of the stylesheet incl. extension</param>
     /// <returns>A <see cref="IStylesheet" /> object</returns>
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     IStylesheet? GetStylesheet(string? path);
 
     /// <summary>
@@ -101,6 +103,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="stylesheet"><see cref="IStylesheet" /> to save</param>
     /// <param name="userId">Optional id of the user saving the stylesheet</param>
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     void SaveStylesheet(IStylesheet? stylesheet, int? userId = null);
 
     /// <summary>
@@ -108,6 +111,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
     /// <param name="userId">Optional id of the user deleting the stylesheet</param>
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     void DeleteStylesheet(string path, int? userId = null);
 
     /// <summary>
@@ -115,12 +119,14 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="folderPath"></param>
     /// <returns></returns>
+    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations - will be removed in Umbraco 15")]
     void CreateStyleSheetFolder(string folderPath);
 
     /// <summary>
     ///     Deletes a folder for style sheets
     /// </summary>
     /// <param name="folderPath"></param>
+    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations - will be removed in Umbraco 15")]
     void DeleteStyleSheetFolder(string folderPath);
 
     /// <summary>
@@ -128,6 +134,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the stylesheet.</param>
     /// <returns>The content of the stylesheet.</returns>
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     Stream GetStylesheetFileContentStream(string filepath);
 
     /// <summary>
@@ -135,6 +142,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the stylesheet.</param>
     /// <param name="content">The content of the stylesheet.</param>
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     void SetStylesheetFileContent(string filepath, Stream content);
 
     /// <summary>
@@ -142,6 +150,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the stylesheet.</param>
     /// <returns>The size of the stylesheet.</returns>
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     long GetStylesheetFileSize(string filepath);
 
     /// <summary>

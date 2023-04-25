@@ -101,6 +101,7 @@ public class FileService : RepositoryService, IFileService
     #region Stylesheets
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public IEnumerable<IStylesheet> GetStylesheets(params string[] paths)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -113,6 +114,7 @@ public class FileService : RepositoryService, IFileService
         _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public IStylesheet? GetStylesheet(string? path)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -122,6 +124,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void SaveStylesheet(IStylesheet? stylesheet, int? userId = null)
     {
         if (stylesheet is null)
@@ -150,6 +153,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void DeleteStylesheet(string path, int? userId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -181,6 +185,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void CreateStyleSheetFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -191,6 +196,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetFolderService for stylesheet folder operations - will be removed in Umbraco 15")]
     public void DeleteStyleSheetFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -201,6 +207,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public Stream GetStylesheetFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -210,6 +217,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public void SetStylesheetFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -220,6 +228,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IStylesheetService for stylesheet operations - will be removed in Umbraco 15")]
     public long GetStylesheetFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
