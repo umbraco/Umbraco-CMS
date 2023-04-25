@@ -52,7 +52,6 @@ public class DeliveryApiContentIndexPopulator : IndexPopulator
             IContent[] allowedDescendants = descendants.Where(content => publishedContentIds.Contains(content.Id)).ToArray();
             ValueSet[] valueSets = _deliveryContentIndexValueSetBuilder.GetValueSets(allowedDescendants).ToArray();
 
-            // ReSharper disable once PossibleMultipleEnumeration
             foreach (IIndex index in indexes)
             {
                 index.IndexItems(valueSets);
