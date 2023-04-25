@@ -1,8 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UUIPopoverElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-ui/uui';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/components/collection/collection.context';
+import { UmbDropdownElement } from '../../../shared/components/dropdown/dropdown.element';
 import { UmbUserCollectionContext } from './user-collection.context';
 import {
 	UMB_CREATE_USER_MODAL,
@@ -11,12 +12,18 @@ import {
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDropdownElement } from 'src/backoffice/shared/components/dropdown/dropdown.element';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
-	private isCloud = true; //NOTE: Used to show either invite or create user buttons and views.
+	private _isCloud = true; //NOTE: Used to show either invite or create user buttons and views.
+
+	@state()
+	private _userStateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);
+
+	@state()
+	private _userStateFilterSelection: Array<UserStateModel> = [];
 
 	#modalContext?: UmbModalContext;
 	#collectionContext?: UmbUserCollectionContext;
@@ -31,7 +38,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
-			this.#collectionContext = instance;
+			this.#collectionContext = instance as UmbUserCollectionContext;
 		});
 	}
 
@@ -62,7 +69,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	private _showInviteOrCreate() {
 		let token = undefined;
 		// TODO: we need to find a better way to determine if we should create or invite
-		if (this.isCloud) {
+		if (this._isCloud) {
 			token = UMB_INVITE_USER_MODAL;
 		} else {
 			token = UMB_CREATE_USER_MODAL;
@@ -71,28 +78,47 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.#modalContext?.open(token);
 	}
 
+	#onStateFilterChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUICheckboxElement;
+		const value = target.value as UserStateModel;
+		const isChecked = target.checked;
+
+		this._userStateFilterSelection = isChecked
+			? [...this._userStateFilterSelection, value]
+			: this._userStateFilterSelection.filter((v) => v !== value);
+
+		this.#collectionContext?.setStateFilter(this._userStateFilterSelection);
+	}
+
 	render() {
 		return html`
 			<div id="sticky-top">
 				<div id="user-list-top-bar">
 					<uui-button
 						@click=${this._showInviteOrCreate}
-						label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
+						label=${this._isCloud ? 'Invite' : 'Create' + ' user'}
 						look="outline"></uui-button>
 					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
 					<div>
+						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 						<umb-dropdown margin="8">
 							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-								Status: <b>All</b>
+								State: ${this._userStateFilterSelection}
 							</uui-button>
 							<div slot="dropdown" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
+								${this._userStateFilterOptions.map(
+									(option) =>
+										html`<uui-checkbox
+											label=${option}
+											@change=${this.#onStateFilterChange}
+											name="state"
+											value=${option}></uui-checkbox>`
+								)}
 							</div>
 						</umb-dropdown>
 
+						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 						<umb-dropdown margin="8">
 							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="groups">
 								Groups: <b>All</b>
@@ -105,6 +131,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 							</div>
 						</umb-dropdown>
 
+						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
 						<umb-dropdown margin="8">
 							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by">
 								Order by: <b>Name (A-Z)</b>
@@ -149,10 +176,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 				align-items: center;
 			}
+
 			#user-list {
 				padding: var(--uui-size-layout-1);
 				padding-top: var(--uui-size-space-2);
 			}
+
 			#input-search {
 				width: 100%;
 			}
@@ -162,11 +191,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
 				width: fit-content;
-			}
-
-			a {
-				color: inherit;
-				text-decoration: none;
 			}
 		`,
 	];
