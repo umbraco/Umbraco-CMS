@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Filters;
 using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Filters;
@@ -17,7 +18,7 @@ internal sealed class ContentTypeFilter : IFilterHandler
 
         var filterOption = new FilterOption
         {
-            FieldName = "__NodeTypeAlias",
+            FieldName = ContentTypeFilterIndexer.FieldName,
             Value = string.Empty
         };
 

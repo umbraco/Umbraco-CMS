@@ -8,12 +8,3 @@ public class FilterOption
 
     public FilterOperation Operator { get; set; }
 }
-
-public enum FilterOperation
-{
-    Is,
-    IsNot,
-    // TODO: how to handle these in Examine?
-    Contains,
-    DoesNotContain
-}

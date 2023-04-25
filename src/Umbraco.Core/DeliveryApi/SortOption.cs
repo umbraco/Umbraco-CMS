@@ -8,10 +8,3 @@ public class SortOption
 
     public FieldType FieldType { get; set; }
 }
-
-public enum FieldType
-{
-    String,
-    Number,
-    Date
-}

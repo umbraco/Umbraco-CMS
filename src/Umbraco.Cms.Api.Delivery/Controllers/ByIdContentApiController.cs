@@ -3,13 +3,17 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
-public class ByIdContentApiController : ContentApiControllerBase
+public class ByIdContentApiController : ContentApiItemControllerBase
 {
-    public ByIdContentApiController(IApiPublishedContentCache apiPublishedContentCache, IApiContentResponseBuilder apiContentResponseBuilderBuilder)
-        : base(apiPublishedContentCache, apiContentResponseBuilderBuilder)
+    public ByIdContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IPublicAccessService publicAccessService)
+        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
     {
     }
 
@@ -29,6 +33,11 @@ public class ByIdContentApiController : ContentApiControllerBase
         if (contentItem is null)
         {
             return NotFound();
+        }
+
+        if (IsProtected(contentItem))
+        {
+            return Unauthorized();
         }
 
         return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));

@@ -3,9 +3,11 @@ using Examine.Lucene;
 using Examine.Lucene.Analyzers;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 
@@ -16,13 +18,24 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
 {
     private readonly IndexCreatorSettings _settings;
     private readonly IUmbracoIndexConfig _umbracoIndexConfig;
+    private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
 
+    [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
     public ConfigureIndexOptions(
         IUmbracoIndexConfig umbracoIndexConfig,
         IOptions<IndexCreatorSettings> settings)
+        : this(umbracoIndexConfig, settings, StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiContentIndexFieldDefinitionBuilder>())
+    {
+    }
+
+    public ConfigureIndexOptions(
+        IUmbracoIndexConfig umbracoIndexConfig,
+        IOptions<IndexCreatorSettings> settings,
+        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder)
     {
         _umbracoIndexConfig = umbracoIndexConfig;
         _settings = settings.Value;
+        _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
     }
 
     public void Configure(string? name, LuceneDirectoryIndexOptions options)
@@ -48,7 +61,7 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
                 options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
                 // TODO: either create a dedicated validator to this index or make sure the populator handles any validation rules (i.e. published content only)
                 // options.Validator = _umbracoIndexConfig.GetPublishedContentValueSetValidator();
-                options.FieldDefinitions = new DeliveryApiContentIndexFieldDefinitionCollection();
+                options.FieldDefinitions = _deliveryApiContentIndexFieldDefinitionBuilder.Build();
                 break;
         }
 

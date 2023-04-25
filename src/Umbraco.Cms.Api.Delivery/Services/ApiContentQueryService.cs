@@ -1,5 +1,6 @@
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.New.Cms.Core.Models;
@@ -154,12 +155,11 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
             SortType sortType = sort.FieldType switch
             {
-                FieldType.Number => // TODO: do we need more explicit types like float, long, double
-                    SortType.Int,
-                FieldType.Date =>
-                    // The field definition type should be FieldDefinitionTypes.DateTime
-                    SortType.Long,
-                _ => SortType.String
+                FieldType.Number => SortType.Int,
+                FieldType.Date => SortType.Long,
+                FieldType.String => SortType.String,
+                FieldType.StringSortable => SortType.String,
+                _ => throw new ArgumentOutOfRangeException(nameof(sort.FieldType))
             };
 
             orderingQuery = sort.Direction switch
@@ -175,7 +175,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
     private IOrdering? DefaultSort(IBooleanOperation queryCriteria)
     {
-        var defaultSorts = new[] { "path:asc", "sortOrder:asc" };
+        var defaultSorts = new[] { $"{PathSortIndexer.FieldName}:asc", $"{SortOrderSortIndexer.FieldName}:asc" };
 
         return HandleSorting(defaultSorts, queryCriteria);
     }
