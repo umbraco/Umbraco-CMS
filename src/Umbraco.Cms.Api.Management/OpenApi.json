@@ -4710,6 +4710,183 @@
         }
       }
     },
+    "/umbraco/management/api/v1/partial-view": {
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetPartialView",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PartialViewResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "PostPartialView",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePartialViewRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "DeletePartialView",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "PutPartialView",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdatePartialViewRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/partial-view/folder": {
+      "post": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "PostPartialViewFolder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePathFolderRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "DeletePartialViewFolder",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetPartialViewFolder",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/partial-view/item": {
       "get": {
         "tags": [
@@ -4743,6 +4920,80 @@
                       }
                     ]
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/partial-view/snippet": {
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetPartialViewSnippet",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedSnippetItemResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/partial-view/snippet/{name}": {
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetPartialViewSnippetByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PartialViewSnippetResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -5564,6 +5815,183 @@
         }
       }
     },
+    "/umbraco/management/api/v1/script": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "GetScript",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ScriptResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "PostScript",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateScriptRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "DeleteScript",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "PutScript",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateScriptRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/script/folder": {
+      "get": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "GetScriptFolder",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "PostScriptFolder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePathFolderRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Script"
+        ],
+        "operationId": "DeleteScriptFolder",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/script/item": {
       "get": {
         "tags": [
@@ -6026,6 +6454,223 @@
         }
       }
     },
+    "/umbraco/management/api/v1/stylesheet": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "GetStylesheet",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/StylesheetResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "PostStylesheet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateStylesheetRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "DeleteStylesheet",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "PutStylesheet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateStylesheetRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/stylesheet/all": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "GetStylesheetAll",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedStylesheetOverviewResponseModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/stylesheet/folder": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "GetStylesheetFolder",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "PostStylesheetFolder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePathFolderRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "DeleteStylesheetFolder",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/umbraco/management/api/v1/stylesheet/item": {
       "get": {
         "tags": [
@@ -6059,6 +6704,116 @@
                       }
                     ]
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/stylesheet/rich-text/extract-rules": {
+      "post": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "PostStylesheetRichTextExtractRules",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ExtractRichTextStylesheetRulesRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ExtractRichTextStylesheetRulesResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/stylesheet/rich-text/interpolate-rules": {
+      "post": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "PostStylesheetRichTextInterpolateRules",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/InterpolateRichTextStylesheetRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InterpolateRichTextStylesheetResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/umbraco/management/api/v1/stylesheet/rich-text/rules": {
+      "get": {
+        "tags": [
+          "Stylesheet"
+        ],
+        "operationId": "GetStylesheetRichTextRules",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RichTextStylesheetRulesResponseModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExtractRichTextStylesheetRulesResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -8507,6 +9262,30 @@
         ],
         "additionalProperties": false
       },
+      "CreatePartialViewRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateTextFileViewModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "CreatePathFolderRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PathFolderModelBaseModel"
+          }
+        ],
+        "properties": {
+          "parentPath": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateRelationTypeRequestModel": {
         "type": "object",
         "allOf": [
@@ -8523,6 +9302,24 @@
         },
         "additionalProperties": false
       },
+      "CreateScriptRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateTextFileViewModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "CreateStylesheetRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateTextFileViewModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "CreateTemplateRequestModel": {
         "type": "object",
         "allOf": [
@@ -8530,6 +9327,21 @@
             "$ref": "#/components/schemas/TemplateModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "CreateTextFileViewModelBaseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileViewModelBaseModel"
+          }
+        ],
+        "properties": {
+          "parentPath": {
+            "type": "string",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "CreateUserRequestModel": {
@@ -9275,6 +10087,24 @@
           }
         }
       },
+      "ExtractRichTextStylesheetRulesRequestModel": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExtractRichTextStylesheetRulesResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RichTextStylesheetRulesResponseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "FieldPresentationModel": {
         "type": "object",
         "properties": {
@@ -9689,6 +10519,36 @@
           },
           "telemetryLevel": {
             "$ref": "#/components/schemas/TelemetryLevelModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "InterpolateRichTextStylesheetRequestModel": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RichTextRuleModel"
+                }
+              ]
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InterpolateRichTextStylesheetResponseModel": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -11035,6 +11895,54 @@
         },
         "additionalProperties": false
       },
+      "PagedSnippetItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SnippetItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedStylesheetOverviewResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/StylesheetOverviewResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedTagResponseModel": {
         "required": [
           "items",
@@ -11138,6 +12046,64 @@
             "$ref": "#/components/schemas/FileItemResponseModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "PartialViewResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "PartialViewSnippetResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PartialViewUpdateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileUpdateModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "PathFolderModelBaseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "PathFolderResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderModelBaseModel"
+          }
+        ],
+        "properties": {
+          "parentPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "path": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
         "additionalProperties": false
       },
       "ProblemDetailsModel": {
@@ -11521,6 +12487,37 @@
         },
         "additionalProperties": false
       },
+      "RichTextRuleModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "selector": {
+            "type": "string"
+          },
+          "styles": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RichTextStylesheetRulesResponseModel": {
+        "type": "object",
+        "properties": {
+          "rules": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RichTextRuleModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "RuntimeLevelModel": {
         "enum": [
           "Unknown",
@@ -11581,6 +12578,33 @@
         ],
         "additionalProperties": false
       },
+      "ScriptResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "ScriptUpdateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileUpdateModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "ScriptViewModelBaseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileViewModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "SearchResultResponseModel": {
         "type": "object",
         "properties": {
@@ -11637,6 +12661,15 @@
         },
         "additionalProperties": false
       },
+      "SnippetItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "StaticFileItemResponseModel": {
         "type": "object",
         "allOf": [
@@ -11661,6 +12694,36 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/FileItemResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "StylesheetOverviewResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StylesheetResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "StylesheetUpdateModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileUpdateModel"
           }
         ],
         "additionalProperties": false
@@ -11975,6 +13038,47 @@
         },
         "additionalProperties": false
       },
+      "TextFileResponseModelBaseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileViewModelBaseModel"
+          }
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TextFileUpdateModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "existingPath": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TextFileViewModelBaseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "TreeItemPresentationModel": {
         "type": "object",
         "properties": {
@@ -12155,11 +13259,38 @@
         },
         "additionalProperties": false
       },
+      "UpdatePartialViewRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileUpdateModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "UpdateRelationTypeRequestModel": {
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/RelationTypeBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdateScriptRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UpdateTextFileViewModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "UpdateStylesheetRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UpdateTextFileViewModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -12171,6 +13302,20 @@
             "$ref": "#/components/schemas/TemplateModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "UpdateTextFileViewModelBaseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TextFileViewModelBaseModel"
+          }
+        ],
+        "properties": {
+          "existingPath": {
+            "type": "string"
+          }
+        },
         "additionalProperties": false
       },
       "UpdateUserGroupRequestModel": {
