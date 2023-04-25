@@ -589,6 +589,7 @@ public class FileService : RepositoryService, IFileService
 
     #region Partial Views
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
     {
         var snippetProvider =
@@ -608,6 +609,7 @@ public class FileService : RepositoryService, IFileService
         return empty.Union(files.Except(empty)).WhereNotNull();
     }
 
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     public void DeletePartialViewFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -626,6 +628,7 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public IEnumerable<IPartialView> GetPartialViews(params string[] names)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -634,6 +637,7 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public IPartialView? GetPartialView(string path)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -650,12 +654,14 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
         CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
 
     public Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
         CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public bool DeletePartialView(string path, int? userId = null) =>
         DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
 
@@ -737,6 +743,7 @@ public class FileService : RepositoryService, IFileService
     public bool DeletePartialViewMacro(string path, int? userId = null) =>
         DeletePartialViewMacro(path, PartialViewType.PartialViewMacro, userId);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null) =>
         SavePartialView(partialView, PartialViewType.PartialView, userId);
 
@@ -775,6 +782,7 @@ public class FileService : RepositoryService, IFileService
     public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null) =>
         SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
 
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     public void CreatePartialViewFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -790,6 +798,7 @@ public class FileService : RepositoryService, IFileService
         return headerMatch.Replace(contents, string.Empty);
     }
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -841,6 +850,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public Stream GetPartialViewFileContentStream(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -863,6 +873,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public void SetPartialViewFileContent(string filepath, Stream content)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -873,6 +884,7 @@ public class FileService : RepositoryService, IFileService
     }
 
     /// <inheritdoc />
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     public long GetPartialViewFileSize(string filepath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

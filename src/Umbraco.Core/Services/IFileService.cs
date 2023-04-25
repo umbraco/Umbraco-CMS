@@ -11,10 +11,12 @@ public interface IFileService : IService
     [Obsolete("Please use SnippetCollection.GetPartialViewSnippetNames() or SnippetCollection.GetPartialViewMacroSnippetNames() instead. Scheduled for removal in V12.")]
     IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
 
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     void CreatePartialViewFolder(string folderPath);
 
     void CreatePartialViewMacroFolder(string folderPath);
 
+    [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     void DeletePartialViewFolder(string folderPath);
 
     void DeletePartialViewMacroFolder(string folderPath);
@@ -23,20 +25,25 @@ public interface IFileService : IService
     ///     Gets a list of all <see cref="IPartialView" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="IPartialView" /> objects</returns>
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     IEnumerable<IPartialView> GetPartialViews(params string[] names);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     IPartialView? GetPartialView(string path);
 
     IPartialView? GetPartialViewMacro(string path);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
 
     Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     bool DeletePartialView(string path, int? userId = null);
 
     bool DeletePartialViewMacro(string path, int? userId = null);
 
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null);
 
     Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null);
@@ -46,6 +53,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the partial view.</param>
     /// <returns>The content of the partial view.</returns>
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     Stream GetPartialViewFileContentStream(string filepath);
 
     /// <summary>
@@ -53,6 +61,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the partial view.</param>
     /// <param name="content">The content of the partial view.</param>
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     void SetPartialViewFileContent(string filepath, Stream content);
 
     /// <summary>
@@ -60,6 +69,7 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="filepath">The filesystem path to the partial view.</param>
     /// <returns>The size of the partial view.</returns>
+    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
     long GetPartialViewFileSize(string filepath);
 
     /// <summary>
