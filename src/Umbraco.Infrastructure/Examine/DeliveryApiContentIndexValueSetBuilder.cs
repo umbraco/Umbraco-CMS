@@ -1,4 +1,6 @@
 using Examine;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -12,12 +14,19 @@ public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexVa
     private readonly ContentIndexHandlerCollection _contentIndexHandlerCollection;
     private readonly IScopeProvider _scopeProvider;
     private readonly IPublicAccessService _publicAccessService;
+    private DeliveryApiSettings _deliveryApiSettings;
 
-    public DeliveryApiContentIndexValueSetBuilder(ContentIndexHandlerCollection contentIndexHandlerCollection, IScopeProvider scopeProvider, IPublicAccessService publicAccessService)
+    public DeliveryApiContentIndexValueSetBuilder(
+        ContentIndexHandlerCollection contentIndexHandlerCollection,
+        IScopeProvider scopeProvider,
+        IPublicAccessService publicAccessService,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
     {
         _contentIndexHandlerCollection = contentIndexHandlerCollection;
         _scopeProvider = scopeProvider;
         _publicAccessService = publicAccessService;
+        _deliveryApiSettings = deliveryApiSettings.CurrentValue;
+        deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     /// <inheritdoc />
@@ -49,11 +58,19 @@ public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexVa
 
     private bool CanIndex(IContent content)
     {
+        // is the content in a state that is allowed in the index?
         if (content.Published is false || content.Trashed)
         {
             return false;
         }
 
+        // is the content type allowed in the index?
+        if (_deliveryApiSettings.IsDisallowedContentType(content.ContentType.Alias))
+        {
+            return false;
+        }
+
+        // is the content protected?
         using (_scopeProvider.CreateScope(autoComplete: true))
         {
             if (_publicAccessService.IsProtected(content.Path).Success)
