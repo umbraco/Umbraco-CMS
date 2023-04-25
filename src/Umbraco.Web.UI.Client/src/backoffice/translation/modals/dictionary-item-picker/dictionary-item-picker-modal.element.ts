@@ -4,37 +4,13 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbTreeElement } from '../../../shared/components/tree/tree.element';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbDictionaryItemPickerModalData, UmbDictionaryItemPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-dictionary-item-picker-modal')
 export default class UmbDictionaryItemPickerModalElement extends UmbModalBaseElement<
 	UmbDictionaryItemPickerModalData,
 	UmbDictionaryItemPickerModalResult
 > {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-			}
-
-			#main {
-				box-sizing: border-box;
-				padding: var(--uui-size-space-5);
-				height: calc(100vh - 124px);
-			}
-
-			#main uui-button {
-				width: 100%;
-			}
-
-			h3,
-			p {
-				text-align: left;
-			}
-		`,
-	];
-
 	@state()
 	_selection: Array<string> = [];
 
@@ -80,6 +56,31 @@ export default class UmbDictionaryItemPickerModalElement extends UmbModalBaseEle
 			</umb-workspace-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				color: var(--uui-color-text);
+			}
+
+			#main {
+				box-sizing: border-box;
+				padding: var(--uui-size-space-5);
+				height: calc(100vh - 124px);
+			}
+
+			#main uui-button {
+				width: 100%;
+			}
+
+			h3,
+			p {
+				text-align: left;
+			}
+		`,
+	];
 }
 
 declare global {

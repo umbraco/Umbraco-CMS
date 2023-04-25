@@ -11,8 +11,6 @@ export class UmbDocumentPickerModalElement extends UmbModalBaseElement<
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalResult
 > {
-	
-
 	@state()
 	_selection: Array<string> = [];
 
@@ -59,7 +57,7 @@ export class UmbDocumentPickerModalElement extends UmbModalBaseElement<
 			</umb-workspace-layout>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

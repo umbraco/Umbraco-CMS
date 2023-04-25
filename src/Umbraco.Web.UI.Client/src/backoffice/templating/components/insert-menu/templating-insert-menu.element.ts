@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
+	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UMB_MODAL_CONTEXT_TOKEN,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalContext,
@@ -15,7 +16,8 @@ import {
 	CodeSnippetType,
 	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL,
 } from '../../modals/insert-choose-type-sidebar.element';
-import { getInsertPartialSnippet } from '../../utils';
+import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils';
+import { UmbDictionaryRepository } from '../../../translation/dictionary/repository/dictionary.repository';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
@@ -34,6 +36,8 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	#openModal?: UmbModalHandler;
 
+	#dictionaryRepository = new UmbDictionaryRepository(this);
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
@@ -41,13 +45,37 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		});
 	}
 
+	async determineInsertValue(modalResult: ChooseInsertTypeModalResult) {
+		const { type, value } = modalResult;
+		debugger;
+
+		const snipperOutputMap = {
+			[CodeSnippetType.partialView]: async (value: any) =>
+				(this.value = getInsertPartialSnippet(value.selection?.[0]) ?? ''),
+			[CodeSnippetType.umbracoField]: async () => (this.value = value),
+			[CodeSnippetType.dictionaryItem]: async (value: any) => {
+				const { data, error } = await this.#dictionaryRepository.requestById(value.selection?.[0]);
+				this.value = getInsertDictionarySnippet(data?.name ?? '');
+			},
+			[CodeSnippetType.macro]: async () => (value: any) =>
+				(this.value = getInsertPartialSnippet(value.selection?.[0]) ?? ''),
+		};
+
+		try {
+			await snipperOutputMap[type](value);
+			this.#dispatchInsertEvent();
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 	#openChooseTypeModal = () => {
 		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL, {
 			hidePartialView: this.hidePartialView,
 		});
 		this.#openModal?.onSubmit().then((closedModal: ChooseInsertTypeModalResult) => {
-			this.value = closedModal.value;
-			this.#dispatchInsertEvent();
+			this.determineInsertValue(closedModal);
+			// this.#dispatchInsertEvent();
 		});
 	};
 
@@ -61,6 +89,14 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		this.#openModal?.onSubmit().then((value) => {
+			this.value = getInsertPartialSnippet(value.selection?.[0]) ?? '';
+			this.#dispatchInsertEvent();
+		});
+	}
+
+	#openInsertDictionaryItemModal() {
+		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
 		this.#openModal?.onSubmit().then((value) => {
 			this.value = getInsertPartialSnippet(value.selection?.[0]) ?? '';
 			this.#dispatchInsertEvent();
@@ -107,7 +143,12 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 									</uui-menu-item>
 							  </li>`}
 						<li>
-							<uui-menu-item class="insert-menu-item" label="Dictionary item" title="Dictionary item"> </uui-menu-item>
+							<uui-menu-item
+								class="insert-menu-item"
+								label="Dictionary item"
+								title="Dictionary item"
+								@click=${this.#openInsertDictionaryItemModal}>
+							</uui-menu-item>
 						</li>
 						<li>
 							<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>

@@ -69,15 +69,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			if (partialViewPickerModalResult)
 				this.modalHandler?.submit({
 					type: CodeSnippetType.partialView,
-					value: getInsertPartialSnippet(partialViewPickerModalResult.selection[0]),
+					value: partialViewPickerModalResult.selection[0],
 				});
 		});
 	}
 
 	#openInsertDictionaryItemModal() {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
-		this.#openModal?.onSubmit().then((chosenValue) => {
-			if (chosenValue) this.modalHandler?.submit({ value: chosenValue, type: CodeSnippetType.umbracoField });
+		this.#openModal?.onSubmit().then((dictionaryItemPickerModalResult) => {
+			if (dictionaryItemPickerModalResult) this.modalHandler?.submit({ value: dictionaryItemPickerModalResult, type: CodeSnippetType.dictionaryItem });
 		});
 	}
 

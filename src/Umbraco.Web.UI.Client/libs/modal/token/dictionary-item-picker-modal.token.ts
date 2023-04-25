@@ -1,3 +1,4 @@
+import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDictionaryItemPickerModalData {
@@ -6,7 +7,7 @@ export interface UmbDictionaryItemPickerModalData {
 }
 
 export interface UmbDictionaryItemPickerModalResult {
-	selection: string[] | undefined;
+	selection: string[];
 }
 
 export const UMB_DICTIONARY_ITEM_PICKER_MODAL_ALIAS = 'Umb.Modal.DictionaryItemPicker';
