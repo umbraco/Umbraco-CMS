@@ -9,7 +9,7 @@ test.describe('media File Types', () => {
         await umbracoUi.goToSection(ConstantHelper.sections.media);
         await umbracoApi.media.deleteAllMedia();
     });
-    
+
     test.describe('create each File Types', () => {
         test('create Article', async ({page, umbracoApi, umbracoUi}) => {
             const articleName = "Article";
@@ -53,7 +53,7 @@ test.describe('media File Types', () => {
             const path = 'mediaLibrary/' + fileName;
             const mimeType = "*/*";
             await umbracoApi.media.ensureNameNotExists(fileItemName);
-            
+
             // Action
             await umbracoApi.media.createFileWithFile(fileItemName, fileName, path, mimeType);
             await umbracoUi.refreshMediaTree();
@@ -222,7 +222,7 @@ test.describe('media File Types', () => {
             const childName = 'ChildFolder';
             await umbracoApi.media.ensureNameNotExists(parentName);
             await umbracoApi.media.ensureNameNotExists(childName);
-            
+
             // Action
             await umbracoApi.media.createDefaultFolder(parentName);
             await umbracoUi.refreshMediaTree();
@@ -325,7 +325,7 @@ test.describe('media File Types', () => {
             await umbracoApi.media.ensureNameNotExists(childName);
         });
     });
-    
+
     test('Delete one of each Files in media', async ({page, umbracoApi, umbracoUi}) => {
         const articleName = 'ArticleToDelete';
         const audioName = 'AudioToDelete';
@@ -341,7 +341,7 @@ test.describe('media File Types', () => {
         await page.reload();
         // Needs to close tours when page has reloaded
         await page.click('.umb-tour-step__close');
-        
+
         // Takes all the child elements in folder-grid.
         await page.locator(".umb-folder-grid").locator("xpath=/*", {hasText: folderName}).click({
             position: {

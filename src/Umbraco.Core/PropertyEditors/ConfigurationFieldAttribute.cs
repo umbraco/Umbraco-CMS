@@ -125,6 +125,11 @@ public class ConfigurationFieldAttribute : Attribute
     public string? View { get; }
 
     /// <summary>
+    ///     Gets or sets the sort order to use to render the field editor.
+    /// </summary>
+    public int SortOrder { get; set; }
+
+    /// <summary>
     ///     Gets or sets the description of the field.
     /// </summary>
     public string? Description { get; set; }

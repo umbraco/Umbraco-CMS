@@ -28,7 +28,7 @@ test.describe('Languages', () => {
 
     const doesExistDA = await umbracoApi.languages.exists(culture);
     await expect(doesExistDA).toBe(true);
-    
+
     // Cleanup
     await umbracoApi.languages.ensureCultureNotExists(culture);
   });
@@ -70,7 +70,7 @@ test.describe('Languages', () => {
     await expect(page.getByRole('button', {name: language2})).not.toBeVisible();
     doesExistEN = await umbracoApi.languages.exists(language2);
     await expect(doesExistEN).toBe(false);
-    
+
     // Cleanup
     await umbracoApi.languages.ensureCultureNotExists(language1);
   });
