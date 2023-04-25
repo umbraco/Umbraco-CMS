@@ -12484,7 +12484,7 @@
             "format": "date-time",
             "nullable": true
           },
-          "lastlockoutDate": {
+          "lastLockoutDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true
