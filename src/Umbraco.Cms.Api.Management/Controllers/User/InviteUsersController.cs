@@ -29,7 +29,7 @@ public class InviteUserController : UserControllerBase
 
     [HttpPost("invite")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Invite(InviteUserRequestModel model)
     {
         UserInviteModel userInvite = await _userPresentationFactory.CreateInviteModelAsync(model);
@@ -37,7 +37,7 @@ public class InviteUserController : UserControllerBase
         Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(CurrentUserKey(_backOfficeSecurityAccessor), userInvite);
 
         return result.Success
-            ? Ok()
+            ? CreatedAtAction<ByKeyUserController>(controller => nameof(controller.ByKey), result.Result.InvitedUser!.Key)
             : UserOperationStatusResult(result.Status, result.Result);
     }
 }
