@@ -11,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbMediaDetailServerDataSource
-	implements UmbDataSource<CreateMediaRequestModel, UpdateMediaRequestModel, MediaDetails>
+	implements UmbDataSource<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>
 {
 	#host: UmbControllerHostElement;
 

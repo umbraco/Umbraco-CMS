@@ -17,7 +17,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentServerDataSource
-	implements UmbDataSource<CreateDocumentRequestModel, UpdateDocumentRequestModel, DocumentResponseModel>
+	implements UmbDataSource<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
 {
 	#host: UmbControllerHostElement;
 

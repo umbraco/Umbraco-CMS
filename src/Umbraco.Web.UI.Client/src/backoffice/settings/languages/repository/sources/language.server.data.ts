@@ -14,7 +14,7 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbLanguageServerDataSource
-	implements UmbDataSource<CreateLanguageRequestModel, any, LanguageResponseModel>
+	implements UmbDataSource<CreateLanguageRequestModel, any, any, LanguageResponseModel>
 {
 	#host: UmbControllerHostElement;
 

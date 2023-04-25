@@ -2,30 +2,21 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbInputPickerUserGroupElement } from '../../../../shared/components/input-user-group/input-user-group.element';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
+import { UmbUserRepository } from '../../repository/user.repository';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UsersViewType = 'list' | 'grid';
 @customElement('umb-invite-user-modal')
 export class UmbInviteUserModalElement extends UmbModalBaseElement {
-	
-
 	@query('#form')
 	private _form!: HTMLFormElement;
 
 	@state()
-	private _invitedUser?: UserDetails;
+	private _invitedUser?: UserResponseModel;
 
-	protected _userStore?: UmbUserStore;
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (usersContext) => {
-			this._userStore = usersContext;
-		});
-	}
+	// TODO: get from extension registry
+	#userRepository = new UmbUserRepository(this);
 
 	private _handleSubmit(e: Event) {
 		e.preventDefault();
@@ -40,17 +31,29 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 
 		const name = formData.get('name') as string;
 		const email = formData.get('email') as string;
+
 		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbInputPickerUserGroupElement;
-		const userGroups = userGroupPicker?.value || [];
+		const userGroupIds = userGroupPicker?.value || [];
 
 		const message = formData.get('message') as string;
 
-		this._userStore?.invite(name, email, message, userGroups).then((user) => {
-			if (user) {
-				this._invitedUser = user;
-			}
+		alert('implement invite');
+
+		// TODO: figure out when to use email or username
+		/*
+		const { data } = this.#userRepository.invite({
+			name,
+			email,
+			userName: email,
+			message,
+			userGroupIds,
 		});
+
+		if (data) {
+			this._invitedUser = data;
+		}
+		*/
 	}
 
 	private _submitForm() {
@@ -144,7 +147,7 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 				  `}
 		</uui-dialog-layout>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

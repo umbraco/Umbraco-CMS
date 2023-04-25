@@ -1,9 +1,9 @@
 export interface UmbPickerModalData<T> {
 	multiple: boolean;
 	selection: Array<string>;
-	filter?: (language: T) => boolean;
+	filter?: (item: T) => boolean;
 }
 
-export interface UmbPickerModalResult<T> {
+export interface UmbPickerModalResult {
 	selection: Array<string>;
 }

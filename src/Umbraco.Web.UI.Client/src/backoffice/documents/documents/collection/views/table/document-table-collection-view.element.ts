@@ -1,10 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import {
-	UmbCollectionContext,
-	UMB_COLLECTION_CONTEXT_TOKEN,
-} from '../../../../../shared/collection/collection.context';
+
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -14,6 +11,10 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../../../../shared/components/table';
+import {
+	UMB_COLLECTION_CONTEXT_TOKEN,
+	UmbCollectionContext,
+} from '../../../../../shared/components/collection/collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -23,8 +24,6 @@ type EntityType = DocumentTreeItemResponseModel;
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
-	
-
 	@state()
 	private _items?: Array<EntityTreeItemResponseModel>;
 
@@ -55,7 +54,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbCollectionContext<EntityType>;
+	private _collectionContext?: UmbCollectionContext<EntityType, any>;
 
 	constructor() {
 		super();
@@ -68,7 +67,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		this.observe(this._collectionContext.data, (items) => {
+		this.observe(this._collectionContext.items, (items) => {
 			this._items = items;
 			this._createTableItems(this._items);
 		});
@@ -134,7 +133,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				@ordered="${this._handleOrdering}"></umb-table>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
