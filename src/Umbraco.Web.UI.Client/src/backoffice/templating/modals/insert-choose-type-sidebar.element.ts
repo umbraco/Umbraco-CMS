@@ -10,8 +10,8 @@ import {
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalHandler,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
+	UmbDictionaryItemPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
-import { getInsertPartialSnippet } from '../utils';
 
 export const UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS,
@@ -32,7 +32,7 @@ export enum CodeSnippetType {
 	macro = 'macro',
 }
 export interface ChooseInsertTypeModalResult {
-	value: string;
+	value: string | UmbDictionaryItemPickerModalResult;
 	type: CodeSnippetType;
 }
 
