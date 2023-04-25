@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Cms.Infrastructure.Serialization;
-
 namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
