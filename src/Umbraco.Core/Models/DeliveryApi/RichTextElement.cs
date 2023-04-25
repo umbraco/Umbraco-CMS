@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Models.DeliveryApi;
+﻿namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 public class RichTextElement
 {

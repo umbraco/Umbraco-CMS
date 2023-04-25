@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
-public class ByRouteContentApiController : ContentApiControllerBase
+public class ByRouteContentApiController : ContentApiItemControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestRedirectService _requestRedirectService;
@@ -14,9 +15,10 @@ public class ByRouteContentApiController : ContentApiControllerBase
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
+        IPublicAccessService publicAccessService,
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService)
-        : base(apiPublishedContentCache, apiContentResponseBuilder)
+        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
     {
         _requestRoutingService = requestRoutingService;
         _requestRedirectService = requestRedirectService;
@@ -42,6 +44,11 @@ public class ByRouteContentApiController : ContentApiControllerBase
         IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
         if (contentItem is not null)
         {
+            if (IsProtected(contentItem))
+            {
+                return Unauthorized();
+            }
+
             return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
         }
 

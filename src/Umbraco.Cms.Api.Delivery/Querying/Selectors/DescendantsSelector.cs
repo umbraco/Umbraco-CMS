@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -7,8 +8,7 @@ internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string DescendantsSpecifier = "descendants:";
 
-    public DescendantsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IRequestRoutingService requestRoutingService)
+    public DescendantsSelector(IPublishedSnapshotAccessor publishedSnapshotAccessor, IRequestRoutingService requestRoutingService)
         : base(publishedSnapshotAccessor, requestRoutingService)
     {
     }
@@ -25,7 +25,7 @@ internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 
         return new SelectorOption
         {
-            FieldName = "ancestorKeys",
+            FieldName = DescendantsSelectorIndexer.FieldName,
             Value = id.ToString() ?? string.Empty
         };
     }
