@@ -45,7 +45,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
-            LastlockoutDate = user.LastLockoutDate,
+            LastLockoutDate = user.LastLockoutDate,
             LastPasswordChangeDate = user.LastPasswordChangeDate,
         };
 
