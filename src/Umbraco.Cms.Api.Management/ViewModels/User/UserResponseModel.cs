@@ -24,7 +24,7 @@ public class UserResponseModel : UserPresentationBase, INamedEntityPresentationM
 
     public DateTime? LastLoginDate { get; set; }
 
-    public DateTime? LastlockoutDate { get; set; }
+    public DateTime? LastLockoutDate { get; set; }
 
     public DateTime? LastPasswordChangeDate { get; set; }
 }
