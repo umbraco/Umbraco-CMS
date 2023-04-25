@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Filters;
 
-internal sealed class ContentTypeFilter : IFilterHandler
+public sealed class ContentTypeFilter : IFilterHandler
 {
     private const string ContentTypeSpecifier = "contentType:";
 
