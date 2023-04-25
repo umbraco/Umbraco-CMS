@@ -11,6 +11,7 @@ import {
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDropdownElement } from 'src/backoffice/shared/components/dropdown/dropdown.element';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
@@ -42,12 +43,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			: history.pushState(null, '', 'section/users/view/users/overview/list');
 	}
 
-	private _handleTogglePopover(event: PointerEvent) {
+	#onDropdownClick(event: PointerEvent) {
 		const composedPath = event.composedPath();
 
-		const popover = composedPath.find((el) => el instanceof UUIPopoverElement) as UUIPopoverElement;
-		if (popover) {
-			popover.open = !popover.open;
+		const dropdown = composedPath.find((el) => el instanceof UmbDropdownElement) as UmbDropdownElement;
+		if (dropdown) {
+			dropdown.open = !dropdown.open;
 		}
 	}
 
@@ -80,40 +81,42 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 						look="outline"></uui-button>
 					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
 					<div>
-						<!-- TODO: consider making this a shared component, as we need similar for other locations, example media library, members. -->
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
+						<umb-dropdown margin="8">
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
 								Status: <b>All</b>
 							</uui-button>
-							<div slot="popover" class="filter-dropdown">
+							<div slot="dropdown" class="filter-dropdown">
 								<uui-checkbox label="Active"></uui-checkbox>
 								<uui-checkbox label="Inactive"></uui-checkbox>
 								<uui-checkbox label="Invited"></uui-checkbox>
 								<uui-checkbox label="Disabled"></uui-checkbox>
 							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="groups">
+						</umb-dropdown>
+
+						<umb-dropdown margin="8">
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="groups">
 								Groups: <b>All</b>
 							</uui-button>
-							<div slot="popover" class="filter-dropdown">
+							<div slot="dropdown" class="filter-dropdown">
 								<uui-checkbox label="Active"></uui-checkbox>
 								<uui-checkbox label="Inactive"></uui-checkbox>
 								<uui-checkbox label="Invited"></uui-checkbox>
 								<uui-checkbox label="Disabled"></uui-checkbox>
 							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="order by">
+						</umb-dropdown>
+
+						<umb-dropdown margin="8">
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by">
 								Order by: <b>Name (A-Z)</b>
 							</uui-button>
-							<div slot="popover" class="filter-dropdown">
+							<div slot="dropdown" class="filter-dropdown">
 								<uui-checkbox label="Active"></uui-checkbox>
 								<uui-checkbox label="Inactive"></uui-checkbox>
 								<uui-checkbox label="Invited"></uui-checkbox>
 								<uui-checkbox label="Disabled"></uui-checkbox>
 							</div>
-						</uui-popover>
+						</umb-dropdown>
+
 						<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
 							<uui-icon name="settings"></uui-icon>
 						</uui-button>
@@ -154,20 +157,13 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				width: 100%;
 			}
 
-			uui-popover {
-				width: unset;
-			}
-
 			.filter-dropdown {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
-				background-color: var(--uui-color-surface);
-				padding: var(--uui-size-space-4);
-				border-radius: var(--uui-size-border-radius);
-				box-shadow: var(--uui-shadow-depth-2);
 				width: fit-content;
 			}
+
 			a {
 				color: inherit;
 				text-decoration: none;
