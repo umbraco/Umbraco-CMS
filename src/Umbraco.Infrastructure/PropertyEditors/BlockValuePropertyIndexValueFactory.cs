@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 internal sealed class BlockValuePropertyIndexValueFactory :
-    NestedPropertyIndexValueFactoryBase<BlockValue, BlockItemData>,
+    NestedPropertyIndexValueFactoryBase<BlockValuePropertyIndexValueFactory.IndexValueFactoryBlockValue, BlockItemData>,
     IBlockValuePropertyIndexValueFactory
 {
     private readonly IContentTypeService _contentTypeService;
@@ -31,5 +31,16 @@ internal sealed class BlockValuePropertyIndexValueFactory :
     protected override IDictionary<string, object?> GetRawProperty(BlockItemData blockItemData) =>
         blockItemData.RawPropertyValues;
 
-    protected override IEnumerable<BlockItemData> GetDataItems(BlockValue input) => input.ContentData;
+    protected override IEnumerable<BlockItemData> GetDataItems(IndexValueFactoryBlockValue input) => input.ContentData;
+
+    internal class IndexValueFactoryBlockValue : BlockValue<IndexValueFactoryBlockLayoutItem>
+    {
+    }
+
+    internal class IndexValueFactoryBlockLayoutItem : IBlockLayoutItem
+    {
+        public Udi? ContentUdi { get; set; }
+
+        public Udi? SettingsUdi { get; set; }
+    }
 }

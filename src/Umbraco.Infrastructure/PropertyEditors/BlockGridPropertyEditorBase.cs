@@ -45,14 +45,14 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockGridEditorPropertyValueEditor>(Attribute!);
 
-    private class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor
+    private class BlockGridEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockGridValue, BlockGridLayoutItem>
     {
         public BlockGridEditorPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
             ILocalizedTextService textService,
-            ILogger<BlockEditorPropertyValueEditor> logger,
+            ILogger<BlockGridEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
@@ -60,16 +60,16 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
             IPropertyValidationService propertyValidationService)
             : base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues(new BlockGridEditorDataConverter(jsonSerializer), contentTypeService, logger);
-            Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));
+            BlockEditorValues = new BlockEditorValues<BlockGridValue, BlockGridLayoutItem>(new BlockGridEditorDataConverter(jsonSerializer), contentTypeService, logger);
+            Validators.Add(new BlockEditorValidator<BlockGridValue, BlockGridLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
-        private class MinMaxValidator : BlockEditorMinMaxValidatorBase
+        private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockGridValue, BlockGridLayoutItem>
         {
-            private readonly BlockEditorValues _blockEditorValues;
+            private readonly BlockEditorValues<BlockGridValue, BlockGridLayoutItem> _blockEditorValues;
 
-            public MinMaxValidator(BlockEditorValues blockEditorValues, ILocalizedTextService textService)
+            public MinMaxValidator(BlockEditorValues<BlockGridValue, BlockGridLayoutItem> blockEditorValues, ILocalizedTextService textService)
                 : base(textService) =>
                 _blockEditorValues = blockEditorValues;
 
@@ -80,7 +80,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
                     return Array.Empty<ValidationResult>();
                 }
 
-                BlockEditorData? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+                BlockEditorData<BlockGridValue, BlockGridLayoutItem>? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
 
                 var validationResults = new List<ValidationResult>();
                 validationResults.AddRange(ValidateNumberOfBlocks(blockEditorData, blockConfig.ValidationLimit.Min, blockConfig.ValidationLimit.Max));
@@ -94,7 +94,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
                     return areas;
                 }
 
-                BlockGridLayoutAreaItem[]? areas = blockEditorData?.Layout?.ToObject<IEnumerable<BlockGridLayoutItem>>()?.SelectMany(ExtractLayoutAreaItems).ToArray();
+                BlockGridLayoutAreaItem[]? areas = blockEditorData?.Layout?.SelectMany(ExtractLayoutAreaItems).ToArray();
 
                 if (areas?.Any() != true)
                 {

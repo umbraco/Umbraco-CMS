@@ -1,8 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
-using Umbraco.Cms.Infrastructure.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks;
 
@@ -11,7 +10,6 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 /// </summary>
 public class BlockItemData
 {
-    [JsonProperty("contentTypeKey")]
     public Guid ContentTypeKey { get; set; }
 
     /// <summary>
@@ -20,8 +18,6 @@ public class BlockItemData
     [JsonIgnore]
     public string ContentTypeAlias { get; set; } = string.Empty;
 
-    [JsonProperty("udi")]
-    [JsonConverter(typeof(UdiJsonConverter))]
     public Udi? Udi { get; set; }
 
     [JsonIgnore]
@@ -32,7 +28,7 @@ public class BlockItemData
     /// </summary>
     /// <remarks>
     ///     The JsonExtensionDataAttribute is used to put the non-typed properties into a bucket
-    ///     http://www.newtonsoft.com/json/help/html/DeserializeExtensionData.htm
+    ///     https://docs.microsoft.com/en-us/dotnet/api/system.text.json.serialization.jsonextensiondataattribute
     ///     NestedContent serializes to string, int, whatever eg
     ///     "stringValue":"Some String","numericValue":125,"otherNumeric":null
     /// </remarks>

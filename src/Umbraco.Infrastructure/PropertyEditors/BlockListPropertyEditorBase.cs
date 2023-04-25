@@ -41,7 +41,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!);
 
-    internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor
+    internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
     {
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
@@ -49,23 +49,23 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
             ILocalizedTextService textService,
-            ILogger<BlockEditorPropertyValueEditor> logger,
+            ILogger<BlockListEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IPropertyValidationService propertyValidationService) :
             base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, logger);
-            Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));
+            BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(new BlockListEditorDataConverter(jsonSerializer), contentTypeService, logger);
+            Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
-        private class MinMaxValidator : BlockEditorMinMaxValidatorBase
+        private class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockListValue, BlockListLayoutItem>
         {
-            private readonly BlockEditorValues _blockEditorValues;
+            private readonly BlockEditorValues<BlockListValue, BlockListLayoutItem> _blockEditorValues;
 
-            public MinMaxValidator(BlockEditorValues blockEditorValues, ILocalizedTextService textService)
+            public MinMaxValidator(BlockEditorValues<BlockListValue, BlockListLayoutItem> blockEditorValues, ILocalizedTextService textService)
                 : base(textService) =>
                 _blockEditorValues = blockEditorValues;
 
@@ -79,7 +79,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
                     return Array.Empty<ValidationResult>();
                 }
 
-                BlockEditorData? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
+                BlockEditorData<BlockListValue, BlockListLayoutItem>? blockEditorData = _blockEditorValues.DeserializeAndClean(value);
 
                 return ValidateNumberOfBlocks(blockEditorData, validationLimit.Min, validationLimit.Max);
             }

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
@@ -10,6 +9,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
@@ -18,11 +18,12 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockListConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration>, IDeliveryApiPropertyValueConverter
+public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockConfiguration, BlockListValue>, IDeliveryApiPropertyValueConverter
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IProfilingLogger _proflog;
     private readonly IApiElementBuilder _apiElementBuilder;
+    private readonly IJsonSerializer _jsonSerializer;
 
     [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
@@ -36,12 +37,19 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
     {
     }
 
+    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
+        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
+    {
+    }
+
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, IJsonSerializer jsonSerializer)
         : base(blockConverter)
     {
         _proflog = proflog;
         _contentTypeService = contentTypeService;
         _apiElementBuilder = apiElementBuilder;
+        _jsonSerializer = jsonSerializer;
     }
 
     /// <inheritdoc />
@@ -153,7 +161,7 @@ public class BlockListPropertyValueConverter : BlockPropertyValueConverterBase<B
         }
     }
 
-    protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
+    protected override BlockListEditorDataConverter CreateBlockEditorDataConverter() => new(_jsonSerializer);
 
     protected override BlockItemActivator<BlockListItem> CreateBlockItemActivator() => new BlockListItemActivator(BlockEditorConverter);
 

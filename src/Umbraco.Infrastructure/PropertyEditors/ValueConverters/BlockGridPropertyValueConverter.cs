@@ -14,7 +14,7 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration>, IDeliveryApiPropertyValueConverter
+    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration, BlockGridValue>, IDeliveryApiPropertyValueConverter
     {
         private readonly IProfilingLogger _proflog;
         private readonly IJsonSerializer _jsonSerializer;
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             using (_proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
                 // Get configuration
-                var configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();
+                BlockGridConfiguration? configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();
                 if (configuration is null)
                 {
                     return null;
@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             }
         }
 
-        protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockGridEditorDataConverter(_jsonSerializer);
+        protected override BlockGridEditorDataConverter CreateBlockEditorDataConverter() => new(_jsonSerializer);
 
         protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter);
 
