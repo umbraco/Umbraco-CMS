@@ -8,9 +8,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class StylesheetService : FileServiceBase, IStylesheetService
+public class StylesheetService : FileServiceBase<IStylesheetRepository>, IStylesheetService
 {
-    private readonly IStylesheetRepository _stylesheetRepository;
     private readonly ILogger<StylesheetService> _logger;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IAuditRepository _auditRepository;
@@ -25,9 +24,8 @@ public class StylesheetService : FileServiceBase, IStylesheetService
         ILogger<StylesheetService> logger,
         IUserIdKeyResolver userIdKeyResolver,
         IAuditRepository auditRepository)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : base(provider, loggerFactory, eventMessagesFactory, stylesheetRepository)
     {
-        _stylesheetRepository = stylesheetRepository;
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
         _auditRepository = auditRepository;
@@ -37,7 +35,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
     public Task<IStylesheet?> GetAsync(string path)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IStylesheet? stylesheet = _stylesheetRepository.Get(path);
+        IStylesheet? stylesheet = Repository.Get(path);
 
         scope.Complete();
         return Task.FromResult(stylesheet);
@@ -46,7 +44,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
     public Task<IEnumerable<IStylesheet>> GetAllAsync(params string[] paths)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IStylesheet> stylesheets = _stylesheetRepository.GetMany(paths);
+        IEnumerable<IStylesheet> stylesheets = Repository.GetMany(paths);
         return Task.FromResult(stylesheets);
     }
 
@@ -54,7 +52,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IStylesheet? stylesheet = _stylesheetRepository.Get(path);
+        IStylesheet? stylesheet = Repository.Get(path);
         if (stylesheet is null)
         {
             return StylesheetOperationStatus.NotFound;
@@ -67,7 +65,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
             return StylesheetOperationStatus.CancelledByNotification;
         }
 
-        _stylesheetRepository.Delete(stylesheet);
+        Repository.Delete(stylesheet);
 
         scope.Notifications.Publish(new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
         await AuditAsync(AuditType.Delete, performingUserKey);
@@ -103,7 +101,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
             return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.CancelledByNotification, null);
         }
 
-        _stylesheetRepository.Save(stylesheet);
+        Repository.Save(stylesheet);
 
         scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
         await AuditAsync(AuditType.Save, performingUserKey);
@@ -114,13 +112,13 @@ public class StylesheetService : FileServiceBase, IStylesheetService
 
     private StylesheetOperationStatus ValidateCreate(StylesheetCreateModel createModel)
     {
-        if (_stylesheetRepository.Exists(createModel.FilePath))
+        if (Repository.Exists(createModel.FilePath))
         {
             return StylesheetOperationStatus.AlreadyExists;
         }
 
         if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false
-           && _stylesheetRepository.Exists(createModel.ParentPath) is false)
+           && Repository.Exists(createModel.ParentPath) is false)
         {
             return StylesheetOperationStatus.ParentNotFound;
         }
@@ -142,7 +140,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IStylesheet? stylesheet = _stylesheetRepository.Get(updateModel.ExistingPath);
+        IStylesheet? stylesheet = Repository.Get(updateModel.ExistingPath);
 
         if(stylesheet is null)
         {
@@ -170,7 +168,7 @@ public class StylesheetService : FileServiceBase, IStylesheetService
             return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.CancelledByNotification, null);
         }
 
-        _stylesheetRepository.Save(stylesheet);
+        Repository.Save(stylesheet);
 
         scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
         await AuditAsync(AuditType.Save, performingUserKey);

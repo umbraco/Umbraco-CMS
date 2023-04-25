@@ -8,9 +8,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class ScriptService : FileServiceBase, IScriptService
+public class ScriptService : FileServiceBase<IScriptRepository>, IScriptService
 {
-    private readonly IScriptRepository _scriptRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILogger<ScriptService> _logger;
@@ -25,9 +24,8 @@ public class ScriptService : FileServiceBase, IScriptService
         IAuditRepository auditRepository,
         IUserIdKeyResolver userIdKeyResolver,
         ILogger<ScriptService> logger)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : base(provider, loggerFactory, eventMessagesFactory, scriptRepository)
     {
-        _scriptRepository = scriptRepository;
         _auditRepository = auditRepository;
         _userIdKeyResolver = userIdKeyResolver;
         _logger = logger;
@@ -36,7 +34,7 @@ public class ScriptService : FileServiceBase, IScriptService
     public Task<IScript?> GetAsync(string path)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IScript? script = _scriptRepository.Get(path);
+        IScript? script = Repository.Get(path);
 
         scope.Complete();
         return Task.FromResult(script);
@@ -46,7 +44,7 @@ public class ScriptService : FileServiceBase, IScriptService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IScript? script = _scriptRepository.Get(path);
+        IScript? script = Repository.Get(path);
         if (script is null)
         {
             return ScriptOperationStatus.NotFound;
@@ -55,12 +53,12 @@ public class ScriptService : FileServiceBase, IScriptService
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         var deletingNotification = new ScriptDeletingNotification(script, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        if (scope.Notifications.PublishCancelable(deletingNotification))
         {
             return ScriptOperationStatus.CancelledByNotification;
         }
 
-        _scriptRepository.Delete(script);
+        Repository.Delete(script);
 
         scope.Notifications.Publish(
             new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
@@ -77,7 +75,7 @@ public class ScriptService : FileServiceBase, IScriptService
 
         try
         {
-            ScriptOperationStatus validationResult = ValidateCreate(createModel);
+            ScriptOperationStatus validationResult = await ValidateCreateAsync(createModel);
             if (validationResult is not ScriptOperationStatus.Success)
             {
                 return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(validationResult, null);
@@ -98,7 +96,7 @@ public class ScriptService : FileServiceBase, IScriptService
             return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByNotification, null);
         }
 
-        _scriptRepository.Save(script);
+        Repository.Save(script);
 
         scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
         await AuditAsync(AuditType.Save, performingUserKey);
@@ -107,36 +105,36 @@ public class ScriptService : FileServiceBase, IScriptService
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
     }
 
-    private ScriptOperationStatus ValidateCreate(ScriptCreateModel createModel)
+    private Task<ScriptOperationStatus> ValidateCreateAsync(ScriptCreateModel createModel)
     {
-        if (_scriptRepository.Exists(createModel.FilePath))
+        if (Repository.Exists(createModel.FilePath))
         {
-            return ScriptOperationStatus.AlreadyExists;
+            return Task.FromResult(ScriptOperationStatus.AlreadyExists);
         }
 
         if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false &&
-            _scriptRepository.FolderExists(createModel.ParentPath) is false)
+            Repository.FolderExists(createModel.ParentPath) is false)
         {
-            return ScriptOperationStatus.ParentNotFound;
+            return Task.FromResult(ScriptOperationStatus.ParentNotFound);
         }
 
-        if (HasValidFileName(createModel.Name) is false)
+        if(HasValidFileName(createModel.Name) is false)
         {
-            return ScriptOperationStatus.InvalidName;
+            return Task.FromResult(ScriptOperationStatus.InvalidName);
         }
 
         if (HasValidFileExtension(createModel.FilePath) is false)
         {
-            return ScriptOperationStatus.InvalidFileExtension;
+            return Task.FromResult(ScriptOperationStatus.InvalidFileExtension);
         }
 
-        return ScriptOperationStatus.Success;
+        return Task.FromResult(ScriptOperationStatus.Success);
     }
 
     public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IScript? script = _scriptRepository.Get(updateModel.ExistingPath);
+        IScript? script = Repository.Get(updateModel.ExistingPath);
 
         if (script is null)
         {
@@ -164,7 +162,7 @@ public class ScriptService : FileServiceBase, IScriptService
             return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByNotification, null);
         }
 
-        _scriptRepository.Save(script);
+        Repository.Save(script);
         scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
 
         await AuditAsync(AuditType.Save, performingUserKey);

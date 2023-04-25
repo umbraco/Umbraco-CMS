@@ -11,10 +11,9 @@ using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class PartialViewService : FileServiceBase, IPartialViewService
+public class PartialViewService : FileServiceBase<IPartialViewRepository>, IPartialViewService
 {
     private readonly PartialViewSnippetCollection _snippetCollection;
-    private readonly IPartialViewRepository _partialViewRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILogger<PartialViewService> _logger;
     private readonly IAuditRepository _auditRepository;
@@ -30,10 +29,9 @@ public class PartialViewService : FileServiceBase, IPartialViewService
         IUserIdKeyResolver userIdKeyResolver,
         ILogger<PartialViewService> logger,
         IAuditRepository auditRepository)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : base(provider, loggerFactory, eventMessagesFactory, partialViewRepository)
     {
         _snippetCollection = snippetCollection;
-        _partialViewRepository = partialViewRepository;
         _userIdKeyResolver = userIdKeyResolver;
         _logger = logger;
         _auditRepository = auditRepository;
@@ -42,7 +40,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
     public Task<IPartialView?> GetAsync(string path)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IPartialView? partialView = _partialViewRepository.Get(path);
+        IPartialView? partialView = Repository.Get(path);
 
         scope.Complete();
         return Task.FromResult(partialView);
@@ -52,7 +50,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IPartialView? partialView = _partialViewRepository.Get(path);
+        IPartialView? partialView = Repository.Get(path);
         if (partialView is null)
         {
             return PartialViewOperationStatus.NotFound;
@@ -66,7 +64,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
             return PartialViewOperationStatus.CancelledByNotification;
         }
 
-        _partialViewRepository.Delete(partialView);
+        Repository.Delete(partialView);
 
         scope.Notifications.Publish(
             new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
@@ -135,7 +133,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
                 PartialViewOperationStatus.CancelledByNotification, null);
         }
 
-        _partialViewRepository.Save(partialView);
+        Repository.Save(partialView);
         scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
         await AuditAsync(AuditType.Save, performingUserKey);
 
@@ -145,13 +143,13 @@ public class PartialViewService : FileServiceBase, IPartialViewService
 
     private PartialViewOperationStatus ValidateCreate(PartialViewCreateModel createModel)
     {
-        if (_partialViewRepository.Exists(createModel.FilePath))
+        if (Repository.Exists(createModel.FilePath))
         {
             return PartialViewOperationStatus.AlreadyExists;
         }
 
         if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false &&
-            _partialViewRepository.FolderExists(createModel.ParentPath) is false)
+            Repository.FolderExists(createModel.ParentPath) is false)
         {
             return PartialViewOperationStatus.ParentNotFound;
         }
@@ -172,7 +170,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
     public async Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IPartialView? partialView = _partialViewRepository.Get(updateModel.ExistingPath);
+        IPartialView? partialView = Repository.Get(updateModel.ExistingPath);
 
         if (partialView is null)
         {
@@ -199,7 +197,7 @@ public class PartialViewService : FileServiceBase, IPartialViewService
             return Attempt.FailWithStatus<IPartialView?, PartialViewOperationStatus>(PartialViewOperationStatus.CancelledByNotification, null);
         }
 
-        _partialViewRepository.Save(partialView);
+        Repository.Save(partialView);
         scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
 
         await AuditAsync(AuditType.Save, performingUserKey);

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IStylesheetService
+public interface IStylesheetService : IBasicFileService
 {
     Task<IStylesheet?> GetAsync(string path);
 

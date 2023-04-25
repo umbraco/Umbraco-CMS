@@ -1,14 +1,24 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public abstract class FileServiceBase : RepositoryService
+public abstract class FileServiceBase<TRepository> : RepositoryService, IBasicFileService
+    where TRepository : IFileRepository
 {
-    public FileServiceBase(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory) : base(provider, loggerFactory, eventMessagesFactory)
+    public TRepository Repository { get; }
+
+    public FileServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        TRepository repository)
+        : base(provider, loggerFactory, eventMessagesFactory)
     {
+        Repository = repository;
     }
 
     protected abstract string[] AllowedFileExtensions { get; }
@@ -24,5 +34,27 @@ public abstract class FileServiceBase : RepositoryService
         }
 
         return true;
+    }
+
+    /// <inheritdoc />
+    public Task<Stream> GetContentStreamAsync(string path)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(Repository.GetFileContentStream(path));
+    }
+
+    /// <inheritdoc />
+    public Task SetContentStreamAsync(string path, Stream content)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        Repository.SetFileContent(path, content);
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public Task<long> GetFileSizeAsync(string path)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(Repository.GetFileSize(path));
     }
 }
