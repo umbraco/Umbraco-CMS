@@ -24,7 +24,7 @@ public class AllStylesheetController : StylesheetControllerBase
     [HttpGet("all")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<StylesheetOverviewResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll(int skip = 0, int take = 100)
+    public async Task<IActionResult> All(int skip = 0, int take = 100)
     {
         IStylesheet[] stylesheets = (await _stylesheetService.GetAllAsync()).ToArray();
 
