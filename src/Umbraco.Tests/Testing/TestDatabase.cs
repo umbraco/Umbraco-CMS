@@ -116,6 +116,11 @@ namespace Umbraco.Tests.Testing
             throw new NotImplementedException();
         }
 
+        public void AddParameter(DbCommand cmd, PocoColumn column, object value)
+        {
+            throw new NotImplementedException();
+        }
+
         public DbCommand CreateCommand(DbConnection connection, CommandType commandType, string sql, params object[] args)
         {
             throw new NotImplementedException();

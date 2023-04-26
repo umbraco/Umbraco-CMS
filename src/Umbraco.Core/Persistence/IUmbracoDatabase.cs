@@ -1,4 +1,5 @@
 ﻿using NPoco;
+using System.Data.Common;
 
 namespace Umbraco.Core.Persistence
 {
@@ -20,5 +21,7 @@ namespace Umbraco.Core.Persistence
         /// Gets a value indicating whether the database is currently in a transaction.
         /// </summary>
         bool InTransaction { get; }
+
+        void AddParameter(DbCommand cmd, PocoColumn column, object value);
     }
 }
