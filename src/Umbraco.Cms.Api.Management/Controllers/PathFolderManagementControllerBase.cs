@@ -11,7 +11,8 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
 {
     protected readonly IUmbracoMapper Mapper;
 
-    protected PathFolderManagementControllerBase(IUmbracoMapper mapper) =>
+    protected PathFolderManagementControllerBase(
+        IUmbracoMapper mapper) =>
         Mapper = mapper;
 
     protected async Task<IActionResult> GetFolderAsync(string path)
@@ -31,13 +32,13 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
         PathContainer folderModel = Mapper.Map<PathContainer>(requestModel)!;
 
         Attempt<PathContainer?, TStatus> attempt = await CreateContainerAsync(folderModel);
-        if (attempt.Success)
+        if (attempt.Success is false)
         {
-            PathFolderResponseModel? viewModel = Mapper.Map<PathFolderResponseModel>(attempt.Result);
-            return Ok(viewModel);
+            return OperationStatusResult(attempt.Status);
         }
 
-        return OperationStatusResult(attempt.Status);
+        PathFolderResponseModel? viewModel = Mapper.Map<PathFolderResponseModel>(attempt.Result);
+        return Ok(viewModel);
     }
 
     protected async Task<IActionResult> DeleteAsync(string path)
