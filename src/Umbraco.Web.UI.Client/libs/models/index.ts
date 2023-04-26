@@ -108,3 +108,9 @@ export type PackageManifestResponse = UmbPackage[];
 export type UmbPackageWithMigrationStatus = UmbPackage & {
 	hasPendingMigrations: boolean;
 };
+
+export interface UmbFilterModel {
+	skip?: number;
+	take?: number;
+	filter?: string;
+}

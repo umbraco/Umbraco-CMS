@@ -22,7 +22,7 @@ cpSync(`${srcDir}/package.json`, `${inputDir}/package.json`, { recursive: true }
 console.log(`Copied ${srcDir}/package.json to ${inputDir}/package.json`);
 cpSync(`${srcDir}/README.md`, `${inputDir}/README.md`, { recursive: true });
 console.log(`Copied ${srcDir}/README.md to ${inputDir}/README.md`);
-cpSync(`${inputDir}/umbraco-package-schema.json`, `${executableDir}/umbraco-json-schema.json`, { recursive: true });
+cpSync(`${inputDir}/umbraco-package-schema.json`, `${executableDir}/umbraco-package-schema.json`, { recursive: true });
 console.log(`Copied ${inputDir}/umbraco-package-schema.json to ${executableDir}/umbraco-package-schema.json`);
 
 const libs = readdirSync(inputDir);

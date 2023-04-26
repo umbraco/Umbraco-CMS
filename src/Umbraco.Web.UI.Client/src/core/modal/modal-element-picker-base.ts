@@ -4,7 +4,7 @@ import { UmbPickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffic
 
 // TODO: we should consider moving this into a class/context instead of an element.
 // So we don't have to extend an element to get basic picker/selection logic
-export class UmbModalElementPickerBase<T> extends UmbModalBaseElement<UmbPickerModalData<T>, UmbPickerModalResult<T>> {
+export class UmbModalElementPickerBase<T> extends UmbModalBaseElement<UmbPickerModalData<T>, UmbPickerModalResult> {
 	@property()
 	selection: Array<string> = [];
 

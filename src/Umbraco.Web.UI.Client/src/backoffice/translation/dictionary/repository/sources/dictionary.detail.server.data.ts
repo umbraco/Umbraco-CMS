@@ -19,7 +19,7 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  */
 export class UmbDictionaryDetailServerDataSource
 	implements
-		UmbDataSource<CreateDictionaryItemRequestModel, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
+		UmbDataSource<CreateDictionaryItemRequestModel, any, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
 {
 	#host: UmbControllerHostElement;
 

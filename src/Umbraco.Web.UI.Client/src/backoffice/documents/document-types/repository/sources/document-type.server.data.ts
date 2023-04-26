@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, DocumentTypeResponseModel> {
+export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, any, DocumentTypeResponseModel> {
 	#host: UmbControllerHostElement;
 
 	/**

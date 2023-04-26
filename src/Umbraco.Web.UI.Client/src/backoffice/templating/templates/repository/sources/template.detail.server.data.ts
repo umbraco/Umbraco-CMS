@@ -16,7 +16,7 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbTemplateDetailServerDataSource
-	implements UmbDataSource<CreateTemplateRequestModel, UpdateTemplateRequestModel, TemplateResponseModel>
+	implements UmbDataSource<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>
 {
 	#host: UmbControllerHostElement;
 

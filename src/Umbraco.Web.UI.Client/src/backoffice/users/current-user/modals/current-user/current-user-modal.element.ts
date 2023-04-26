@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
-	
-
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
 
@@ -42,7 +40,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private _logout() {
-		this._currentUserStore?.logout();
+		alert('implement log out');
 	}
 
 	render() {
@@ -58,7 +56,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`

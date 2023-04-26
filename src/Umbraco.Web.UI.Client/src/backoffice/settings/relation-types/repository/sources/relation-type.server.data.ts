@@ -15,7 +15,8 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbRelationTypeServerDataSource
-	implements UmbDataSource<CreateRelationTypeRequestModel, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
+	implements
+		UmbDataSource<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
 {
 	#host: UmbControllerHostElement;
 

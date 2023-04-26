@@ -18,6 +18,7 @@ export class UmbDictionaryRepository
 		UmbTreeRepository,
 		UmbDetailRepository<
 			CreateDictionaryItemRequestModel,
+			any,
 			UpdateDictionaryItemRequestModel,
 			DictionaryOverviewResponseModel
 		>

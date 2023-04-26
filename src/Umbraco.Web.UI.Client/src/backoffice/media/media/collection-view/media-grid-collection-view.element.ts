@@ -2,22 +2,23 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
+import {
+	UmbCollectionContext,
+	UMB_COLLECTION_CONTEXT_TOKEN,
+} from '../../../shared/components/collection/collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 // TODO: this should be a lib import
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
-	
-
 	@state()
 	private _mediaItems?: Array<EntityTreeItemResponseModel>;
 
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbCollectionContext<EntityTreeItemResponseModel>;
+	private _collectionContext?: UmbCollectionContext<EntityTreeItemResponseModel, any>;
 
 	constructor() {
 		super();
@@ -53,7 +54,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		this.observe(this._collectionContext.data, (mediaItems) => {
+		this.observe(this._collectionContext.items, (mediaItems) => {
 			this._mediaItems = [...mediaItems].sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
@@ -120,7 +121,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			</div>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

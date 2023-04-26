@@ -10,7 +10,7 @@ import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {MemberGroupDetailDataSource}
  */
 // TODO => Provide type when it is available
-export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, any, any> {
+export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, any, any, any> {
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {
