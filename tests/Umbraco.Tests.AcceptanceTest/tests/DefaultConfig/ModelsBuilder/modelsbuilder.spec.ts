@@ -33,7 +33,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -81,7 +81,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     const savedDocType = await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -150,7 +150,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     const savedDocType = await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -183,7 +183,7 @@ test.describe('Modelsbuilder tests', () => {
     // We only have to type out the opening tag, the editor adds the closing tag automatically.
     await editor.type("<p>Edited");
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
+
     await umbracoUi.isSuccessNotificationVisible({timeout:10000});
 
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Edited</p>", true);
@@ -195,7 +195,7 @@ test.describe('Modelsbuilder tests', () => {
 
   test('Can update view and document type', async ({page, umbracoApi, umbracoUi},testInfo) => {
     await testInfo.slow();
-    
+
     const docTypeName = "TestDocument";
     const docTypeAlias = AliasHelper.toAlias(docTypeName);
     const propertyAlias = "title";
@@ -219,7 +219,7 @@ test.describe('Modelsbuilder tests', () => {
       .done()
       .build();
     const savedDocType = await umbracoApi.documentTypes.save(docType);
-    
+
     await umbracoApi.templates.edit(docTypeName, `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Testdocument>
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
@@ -276,7 +276,7 @@ test.describe('Modelsbuilder tests', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
     await page.waitForTimeout(2000);
-    
+
     await umbracoApi.content.verifyRenderedContent("/", "<h1>" + propertyValue + "</h1><p>Fancy body text</p>", true);
 
     await umbracoApi.content.deleteAllContent();
