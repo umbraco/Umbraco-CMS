@@ -254,8 +254,6 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	getLogs = async () => {
-		console.trace('getLogs');
-
 		if (this.#canShowLogs.getValue() === false) {
 			return;
 		}
