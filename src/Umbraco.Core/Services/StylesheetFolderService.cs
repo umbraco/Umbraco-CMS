@@ -17,10 +17,8 @@ public class StylesheetFolderService : PathFolderServiceBase<IStylesheetReposito
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IStylesheetRepository stylesheetRepository)
-        : base(provider, loggerFactory, eventMessagesFactory)
-    {
+        : base(provider, loggerFactory, eventMessagesFactory) =>
         _stylesheetRepository = stylesheetRepository;
-    }
 
     protected override IStylesheetRepository Repository => _stylesheetRepository;
 
