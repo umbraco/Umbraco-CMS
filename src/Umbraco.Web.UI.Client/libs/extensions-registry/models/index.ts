@@ -158,7 +158,7 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
  */
 export interface ManifestClass<ClassType = unknown> extends ManifestWithLoader<{ default: ClassConstructor<ClassType> }> {
 	//type: ManifestStandardTypes;
-	readonly CLASS_TYPE: ClassType;
+	readonly CLASS_TYPE?: ClassType;
 
 	/**
 	 * The file location of the javascript file to load
@@ -185,7 +185,7 @@ export interface ManifestClassWithClassConstructor<T = unknown> extends Manifest
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	extends ManifestWithLoader<{ default: ClassConstructor<ElementType> } | Omit<object, 'default'>> {
 	//type: ManifestStandardTypes;
-	readonly ELEMENT_TYPE: ElementType;
+	readonly ELEMENT_TYPE?: ElementType;
 
 	/**
 	 * The file location of the javascript file to load
