@@ -11,11 +11,8 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
 {
     protected readonly IUmbracoMapper Mapper;
 
-    protected PathFolderManagementControllerBase(
-        IUmbracoMapper mapper)
-    {
+    protected PathFolderManagementControllerBase(IUmbracoMapper mapper) =>
         Mapper = mapper;
-    }
 
     protected async Task<IActionResult> GetFolderAsync(string path)
     {
