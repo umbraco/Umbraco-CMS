@@ -2,10 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('umb-dashboard-welcome')
-export class UmbDashboardWelcomeElement extends LitElement {
-	
-
+@customElement('umb-umbraco-news-dashboard')
+export class UmbUmbracoNewsDashboardElement extends LitElement {
 	render() {
 		return html`
 			<uui-box>
@@ -14,7 +12,7 @@ export class UmbDashboardWelcomeElement extends LitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -26,10 +24,10 @@ export class UmbDashboardWelcomeElement extends LitElement {
 	];
 }
 
-export default UmbDashboardWelcomeElement;
+export default UmbUmbracoNewsDashboardElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard-welcome': UmbDashboardWelcomeElement;
+		'umb-umbraco-news-dashboard': UmbUmbracoNewsDashboardElement;
 	}
 }
