@@ -156,8 +156,9 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 /**
  * The type of extension such as dashboard etc...
  */
-export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
+export interface ManifestClass<ClassType = unknown> extends ManifestWithLoader<{ default: ClassConstructor<ClassType> }> {
 	//type: ManifestStandardTypes;
+	readonly CLASS_TYPE: ClassType;
 
 	/**
 	 * The file location of the javascript file to load
@@ -173,7 +174,7 @@ export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
 	/**
 	 * @TJS-ignore
 	 */
-	class?: ClassConstructor<T>;
+	class?: ClassConstructor<ClassType>;
 	//loader?: () => Promise<object | HTMLElement>;
 }
 
