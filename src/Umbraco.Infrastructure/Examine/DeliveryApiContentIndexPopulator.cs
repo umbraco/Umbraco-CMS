@@ -50,7 +50,7 @@ public class DeliveryApiContentIndexPopulator : IndexPopulator
 
             // there are a few rules we need to abide to when populating the index:
             // - children of unpublished content can still be published; we need to filter them out, as they're not supposed to go into the index.
-            // - content of disallowed content types are not allowed in the index; thus we need to filter out all their children too as they become un-routable
+            // - content of disallowed content types are not allowed in the index; thus we need to filter out all their children too as they become un-routable.
             // as we're querying published content and ordering by path, we can construct a list of "allowed" published content IDs like this.
             foreach (IContent content in descendants)
             {
