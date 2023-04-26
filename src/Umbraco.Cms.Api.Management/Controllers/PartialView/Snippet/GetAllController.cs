@@ -11,10 +11,7 @@ public class GetAllController : PartialViewControllerBase
 {
     private readonly IPartialViewService _partialViewService;
 
-    public GetAllController(IPartialViewService partialViewService)
-    {
-        _partialViewService = partialViewService;
-    }
+    public GetAllController(IPartialViewService partialViewService) => _partialViewService = partialViewService;
 
     [HttpGet("snippet")]
     [MapToApiVersion("1.0")]
