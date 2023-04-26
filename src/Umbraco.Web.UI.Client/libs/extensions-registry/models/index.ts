@@ -177,7 +177,7 @@ export interface ManifestClass<T = unknown> extends ManifestWithLoader<object> {
 	//loader?: () => Promise<object | HTMLElement>;
 }
 
-export interface ManifestClassWithClassConstructor<T = unknown> extends ManifestClass {
+export interface ManifestClassWithClassConstructor<T = unknown> extends ManifestClass<T> {
 	class: ClassConstructor<T>;
 }
 
