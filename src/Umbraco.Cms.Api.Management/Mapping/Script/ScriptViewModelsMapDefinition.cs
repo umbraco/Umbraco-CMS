@@ -13,6 +13,7 @@ public class ScriptViewModelsMapDefinition : IMapDefinition
         mapper.Define<IScript, ScriptResponseModel>((_, _) => new ScriptResponseModel { Name = string.Empty, Content = string.Empty }, Map);
     }
 
+    // Umbraco.Code.MapAll
     private void Map(UpdateScriptRequestModel source, ScriptUpdateModel target, MapperContext context)
     {
         target.Name = source.Name;
@@ -20,6 +21,7 @@ public class ScriptViewModelsMapDefinition : IMapDefinition
         target.ExistingPath = source.ExistingPath;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(IScript source, ScriptResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
@@ -27,6 +29,7 @@ public class ScriptViewModelsMapDefinition : IMapDefinition
         target.Path = source.Path;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(CreateScriptRequestModel source, ScriptCreateModel target, MapperContext context)
     {
         target.Name = source.Name;

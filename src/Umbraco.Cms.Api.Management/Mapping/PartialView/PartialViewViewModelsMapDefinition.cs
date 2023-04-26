@@ -16,6 +16,7 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
         mapper.Define<UpdatePartialViewRequestModel, PartialViewUpdateModel>((_, _) => new PartialViewUpdateModel { Content = string.Empty, ExistingPath = string.Empty, Name = string.Empty }, Map);
     }
 
+    // Umbraco.Code.MapAll
     private void Map(UpdatePartialViewRequestModel source, PartialViewUpdateModel target, MapperContext context)
     {
         target.Name = source.Name;
@@ -23,6 +24,7 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
         target.ExistingPath = source.ExistingPath;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(IPartialView source, PartialViewResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
@@ -30,6 +32,7 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
         target.Path = source.Path;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(CreatePartialViewRequestModel source, PartialViewCreateModel target, MapperContext context)
     {
         target.Name = source.Name;
@@ -37,6 +40,7 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
         target.ParentPath = source.ParentPath;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(PartialViewSnippet source, PartialViewSnippetResponseModel target, MapperContext context)
     {
         target.Name = source.Name;

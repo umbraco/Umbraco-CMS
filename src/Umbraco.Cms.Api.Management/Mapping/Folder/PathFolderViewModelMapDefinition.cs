@@ -12,12 +12,14 @@ public class PathFolderViewModelMapDefinition : IMapDefinition
         mapper.Define<CreatePathFolderRequestModel, PathContainer>((_, _) => new PathContainer { Name = string.Empty }, Map);
     }
 
+    // Umbraco.Code.MapAll
     private void Map(CreatePathFolderRequestModel source, PathContainer target, MapperContext context)
     {
         target.Name = source.Name;
         target.ParentPath = source.ParentPath;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(PathContainer source, PathFolderResponseModel target, MapperContext context)
     {
         target.Name = source.Name;

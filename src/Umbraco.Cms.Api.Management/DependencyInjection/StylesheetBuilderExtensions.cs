@@ -9,7 +9,7 @@ internal static class StylesheetBuilderExtensions
     internal static IUmbracoBuilder AddStylesheets(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<StylesheetviewModelsMapDefinition>();
+            .Add<StylesheetViewModelsMapDefinition>();
 
         return builder;
     }

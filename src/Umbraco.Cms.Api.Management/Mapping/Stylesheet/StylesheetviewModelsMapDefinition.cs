@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Strings.Css;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Stylesheet;
 
-public class StylesheetviewModelsMapDefinition : IMapDefinition
+public class StylesheetViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
@@ -19,12 +19,14 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
         mapper.Define<IStylesheet, StylesheetOverviewResponseModel>((_, _) => new StylesheetOverviewResponseModel{ Name = string.Empty, Path = string.Empty }, Map);
     }
 
+    // Umbraco.Code.MapAll
     private void Map(IStylesheet source, StylesheetOverviewResponseModel target, MapperContext context)
     {
         target.Name = source.Alias;
         target.Path = source.Path;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(StylesheetRule source, RichTextRuleViewModel target, MapperContext context)
     {
         target.Name = source.Name;
@@ -32,9 +34,11 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
         target.Styles = source.Styles;
     }
 
+    // Umbraco.Code.MapAll -Rules
     private void Map(ExtractRichTextStylesheetRulesRequestModel source, RichTextStylesheetData target, MapperContext context)
         => target.Content = source.Content;
 
+    // Umbraco.Code.MapAll
     private void Map(InterpolateRichTextStylesheetRequestModel source, RichTextStylesheetData target, MapperContext context)
     {
         target.Content = source.Content;
@@ -44,6 +48,7 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
         }).ToArray() ?? Array.Empty<StylesheetRule>();
     }
 
+    // Umbraco.Code.MapAll
     private void Map(UpdateStylesheetRequestModel source, StylesheetUpdateModel target, MapperContext context)
     {
         target.Content = source.Content;
@@ -51,6 +56,7 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
         target.ExistingPath = source.ExistingPath;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(CreateStylesheetRequestModel source, StylesheetCreateModel target, MapperContext context)
     {
         target.Content = source.Content;
@@ -58,6 +64,7 @@ public class StylesheetviewModelsMapDefinition : IMapDefinition
         target.ParentPath = source.ParentPath;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(IStylesheet source, StylesheetResponseModel target, MapperContext context)
     {
         target.Name = source.Name ?? string.Empty;
