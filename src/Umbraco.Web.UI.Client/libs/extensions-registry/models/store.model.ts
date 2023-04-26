@@ -1,4 +1,4 @@
-import type { ManifestClass } from './models';
+import type { ManifestClass } from '.';
 import { UmbItemStore, UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
 
 export interface ManifestStore extends ManifestClass<UmbStoreBase> {

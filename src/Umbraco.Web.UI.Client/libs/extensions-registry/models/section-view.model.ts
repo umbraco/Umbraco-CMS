@@ -1,4 +1,4 @@
-import type { ManifestElement, ManifestWithConditions } from './models';
+import type { ManifestElement, ManifestWithConditions } from '.';
 
 export interface ManifestSectionView extends ManifestElement, ManifestWithConditions<ConditionsSectionView> {
 	type: 'sectionView';

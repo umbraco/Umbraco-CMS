@@ -1,4 +1,4 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement } from '.';
 
 /**
  * An action to perform on an entity

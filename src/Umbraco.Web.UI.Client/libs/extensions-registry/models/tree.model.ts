@@ -1,4 +1,4 @@
-import type { ManifestBase } from './models';
+import type { ManifestBase } from '.';
 
 export interface ManifestTree extends ManifestBase {
 	type: 'tree';

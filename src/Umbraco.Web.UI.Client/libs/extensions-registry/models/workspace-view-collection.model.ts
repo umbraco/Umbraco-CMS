@@ -1,4 +1,4 @@
-import type { ManifestBase, ManifestWithConditions } from './models';
+import type { ManifestBase, ManifestWithConditions } from '.';
 
 export interface ManifestWorkspaceViewCollection
 	extends ManifestBase,

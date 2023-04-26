@@ -1,4 +1,4 @@
-import type { ManifestElement, ManifestWithConditions } from './models';
+import type { ManifestElement, ManifestWithConditions } from '.';
 
 /**
  * An action to perform on multiple entities

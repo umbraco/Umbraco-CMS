@@ -1,4 +1,4 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement } from '.';
 
 export interface ManifestTreeItem extends ManifestElement {
 	type: 'treeItem';

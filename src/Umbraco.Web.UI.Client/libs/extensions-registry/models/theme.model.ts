@@ -1,4 +1,4 @@
-import type { ManifestWithLoader } from './models';
+import type { ManifestWithLoader } from '.';
 
 // TODO: make or find type for JS Module with default export: Would be nice to support css file directly.
 

@@ -1,4 +1,4 @@
-import type { ManifestWithView } from './models';
+import type { ManifestWithView } from '.';
 
 export interface ManifestWorkspaceView extends ManifestWithView {
 	type: 'workspaceView';

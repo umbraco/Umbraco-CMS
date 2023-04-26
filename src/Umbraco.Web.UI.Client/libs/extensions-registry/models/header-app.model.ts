@@ -1,4 +1,4 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement } from '.';
 
 /**
  * Header apps are displayed in the top right corner of the backoffice

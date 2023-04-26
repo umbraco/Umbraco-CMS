@@ -1,4 +1,4 @@
-import type { ManifestElement } from './models';
+import type { ManifestElement } from '.';
 
 export interface ManifestExternalLoginProvider extends ManifestElement {
 	type: 'externalLoginProvider';
