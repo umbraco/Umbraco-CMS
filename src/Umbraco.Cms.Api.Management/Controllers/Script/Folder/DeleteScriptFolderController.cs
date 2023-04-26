@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 
 public class DeleteScriptFolderController : ScriptFolderControllerBase
 {
-    public DeleteScriptFolderController(IUmbracoMapper mapper, IScriptFolderService scriptFolderService) : base(mapper, scriptFolderService)
+    public DeleteScriptFolderController(IUmbracoMapper mapper, IScriptFolderService scriptFolderService)
+        : base(mapper, scriptFolderService)
     {
     }
 
