@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView.Snippets;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
-using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
+using Umbraco.Cms.Core.Snippets;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Snippet;
 
