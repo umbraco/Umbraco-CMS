@@ -9,8 +9,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
-internal sealed class
-    ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
+internal sealed class ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
 {
     private readonly IExamineManager _examineManager;
     private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
