@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Sorts;
 
-internal sealed class LevelSort : ISortHandler
+public sealed class LevelSort : ISortHandler
 {
     private const string SortOptionSpecifier = "level:";
 

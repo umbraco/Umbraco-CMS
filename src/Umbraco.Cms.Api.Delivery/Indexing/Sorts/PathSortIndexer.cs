@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 
-internal sealed class PathSortIndexer : IContentIndexHandler
+public sealed class PathSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "path";
 

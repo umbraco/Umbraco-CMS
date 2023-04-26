@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Selectors;
 
-internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
+public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string AncestorsSpecifier = "ancestors:";
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
