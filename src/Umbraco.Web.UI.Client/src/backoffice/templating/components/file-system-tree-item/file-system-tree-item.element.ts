@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestKind } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTreeItemElement } from 'src/backoffice/shared/components/tree/tree-item/tree-item.element';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {
@@ -21,7 +22,7 @@ const manifest: ManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-file-system-tree-item')
-export class UmbFileSystemTreeItemElement extends UmbLitElement {
+export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
 	
 
 	private _item?: FileSystemTreeItemPresentationModel;
