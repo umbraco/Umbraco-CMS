@@ -8,8 +8,6 @@ import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backoffice
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
-	
-
 	@query('#logs-scroll-container')
 	private _logsScrollContainer!: UUIScrollContainerElement;
 
@@ -21,6 +19,9 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	@state()
 	private _logsTotal = 0;
+
+	@state()
+	private _isLoading = true;
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -38,6 +39,10 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 		this.observe(this.#logViewerContext.logs, (logs) => {
 			this._logs = logs ?? [];
+		});
+
+		this.observe(this.#logViewerContext.isLoadingLogs, (isLoading) => {
+			this._isLoading = isLoading === null ? this._isLoading : isLoading;
 		});
 
 		this.observe(this.#logViewerContext.logsTotal, (total) => {
@@ -74,6 +79,24 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		</div>`;
 	}
 
+	#renderLogs() {
+		return html`${this._logs.length > 0
+			? html` ${this._logs.map(
+					(log) => html`<umb-log-viewer-message
+						.timestamp=${log.timestamp ?? ''}
+						.level=${log.level ?? ''}
+						.renderedMessage=${log.renderedMessage ?? ''}
+						.properties=${log.properties ?? []}
+						.exception=${log.exception ?? ''}
+						.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
+			  )}`
+			: html`<umb-empty-state size="small"
+					><span id="empty">
+						<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
+					</span></umb-empty-state
+			  >`}`;
+	}
+
 	render() {
 		return html`<uui-box>
 			<p style="font-weight: bold;">Total items: ${this._logsTotal}</p>
@@ -90,25 +113,14 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				<div id="machine">Machine name</div>
 				<div id="message">Message</div>
 			</div>
-			${this._logs.length > 0
-				? html` ${this._logs.map(
-						(log) => html`<umb-log-viewer-message
-							.timestamp=${log.timestamp ?? ''}
-							.level=${log.level ?? ''}
-							.renderedMessage=${log.renderedMessage ?? ''}
-							.properties=${log.properties ?? []}
-							.exception=${log.exception ?? ''}
-							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
-				  )}`
-				: html`<umb-empty-state size="small"
-						><span id="empty">
-							<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
-						</span></umb-empty-state
-				  >`}
-			${this._renderPagination()}
+			${this._isLoading
+				? html`<umb-empty-state size="small"
+						><span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span></umb-empty-state
+				  >`
+				: html`${this.#renderLogs()}${this._renderPagination()}`}
 		</uui-box>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -7,10 +7,8 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
-	
-
 	@state()
-	private _canShowLogs = false;
+	private _canShowLogs = true;
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 
@@ -29,7 +27,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 		if (!this.#logViewerContext) return;
 
 		this.#canShowLogsObserver = this.observe(this.#logViewerContext.canShowLogs, (canShowLogs) => {
-			this._canShowLogs = canShowLogs ?? false;
+			this._canShowLogs = canShowLogs ?? this._canShowLogs;
 		});
 	}
 
@@ -52,7 +50,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 			</div>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

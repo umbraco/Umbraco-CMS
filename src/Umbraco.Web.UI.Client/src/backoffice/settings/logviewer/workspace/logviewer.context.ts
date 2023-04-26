@@ -73,6 +73,9 @@ export class UmbLogViewerWorkspaceContext {
 	#canShowLogs = new UmbBasicState<boolean | null>(null);
 	canShowLogs = createObservablePart(this.#canShowLogs, (data) => data);
 
+	#isLoadingLogs = new UmbBasicState<boolean | null>(null);
+	isLoadingLogs = createObservablePart(this.#isLoadingLogs, (data) => data);
+
 	#filterExpression = new UmbStringState<string>('');
 	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
 
@@ -85,6 +88,8 @@ export class UmbLogViewerWorkspaceContext {
 	#logs = new UmbDeepState<PagedLogMessageResponseModel | null>(null);
 	logs = createObservablePart(this.#logs, (data) => data?.items);
 	logsTotal = createObservablePart(this.#logs, (data) => data?.total);
+
+
 
 	#polling = new UmbObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
 	polling = createObservablePart(this.#polling, (data) => data);
@@ -105,13 +110,7 @@ export class UmbLogViewerWorkspaceContext {
 		this.validateLogSize();
 	}
 
-	reset() {
-		this.#logs.next({ items: [], total: 0 });
-		this.setCurrentPage(1);
-	}
-
 	onChangeState = () => {
-		this.reset();
 
 		const searchQuery = query();
 		let sanitizedQuery = '';
@@ -266,6 +265,9 @@ export class UmbLogViewerWorkspaceContext {
 			return;
 		}
 
+		this.#isLoadingLogs.next(true);
+
+
 		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
 
@@ -279,9 +281,10 @@ export class UmbLogViewerWorkspaceContext {
 		};
 
 		const { data } = await this.#repository.getLogs(options);
-
+		this.#isLoadingLogs.next(false);
 		if (data) {
 			this.#logs.next(data);
+
 		}
 	};
 
