@@ -14,5 +14,5 @@ public class ByPathPartialViewFolderController : PartialViewFolderControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Get(string path) => GetFolderAsync(path);
+    public Task<IActionResult> ByPath(string path) => GetFolderAsync(path);
 }
