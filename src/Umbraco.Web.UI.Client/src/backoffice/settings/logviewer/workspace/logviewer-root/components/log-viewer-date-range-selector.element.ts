@@ -11,8 +11,6 @@ import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/
 
 @customElement('umb-log-viewer-date-range-selector')
 export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
-	
-
 	@state()
 	private _startDate = '';
 
@@ -95,7 +93,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
         </div>
         `;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -115,7 +113,6 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 				border: none;
 				background: none;
 				width: 100%;
-				height: 100%;
 				outline: none;
 				position: relative;
 				border-bottom: 2px solid transparent;
