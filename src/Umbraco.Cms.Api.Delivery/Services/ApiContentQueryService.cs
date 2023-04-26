@@ -1,15 +1,19 @@
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
-internal sealed class ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
+internal sealed class
+    ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
 {
     private readonly IExamineManager _examineManager;
+    private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
     private readonly SelectorHandlerCollection _selectorHandlers;
     private readonly FilterHandlerCollection _filterHandlers;
     private readonly SortHandlerCollection _sortHandlers;
@@ -17,11 +21,13 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
     public ApiContentQueryService(
         IExamineManager examineManager,
+        IRequestStartItemProviderAccessor requestStartItemProviderAccessor,
         SelectorHandlerCollection selectorHandlers,
         FilterHandlerCollection filterHandlers,
         SortHandlerCollection sortHandlers)
     {
         _examineManager = examineManager;
+        _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
         _selectorHandlers = selectorHandlers;
         _filterHandlers = filterHandlers;
         _sortHandlers = sortHandlers;
@@ -92,10 +98,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         }
         else
         {
-            // TODO: If no params or no fetch value, get everything from the index - make a default selector and register it by the end of the collection
-            // TODO: This selects everything without regard to the current start-item header - make sure we honour that if it is present
-            // This is a temp Examine solution
-            queryOperation = baseQuery.Field("__IndexType", "content");
+            // If no params or no fetch value, get everything from the index while taking into account a "start-item" header
+            queryOperation = DefaultSelect(baseQuery);
         }
 
         return queryOperation;
@@ -171,6 +175,24 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         }
 
         return orderingQuery;
+    }
+
+    private IBooleanOperation DefaultSelect(IQuery baseQuery)
+    {
+        // Take into account the "start-item" header if present, as it defines a starting root node to query from
+        if (_requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider))
+        {
+            IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
+            if (startItem is not null)
+            {
+                // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
+                return baseQuery.Field(DescendantsSelectorIndexer.FieldName, startItem.Key.ToString());
+            }
+        }
+
+        // TODO: If no params or no fetch value, get everything from the index - make a default selector and register it by the end of the collection
+        // This is a temp Examine solution
+        return baseQuery.Field("__IndexType", "content");
     }
 
     private IOrdering? DefaultSort(IBooleanOperation queryCriteria)
