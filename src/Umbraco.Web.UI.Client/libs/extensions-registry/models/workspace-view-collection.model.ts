@@ -1,15 +1,12 @@
-import type { ManifestBase, ManifestWithConditions } from '.';
+import type { ManifestWithConditions, ManifestWithView, MetaManifestWithView } from '.';
 
 export interface ManifestWorkspaceViewCollection
-	extends ManifestBase,
+	extends ManifestWithView,
 		ManifestWithConditions<ConditionsEditorViewCollection> {
 	type: 'workspaceViewCollection';
 	meta: MetaEditorViewCollection;
 }
-export interface MetaEditorViewCollection {
-	pathname: string;
-	label: string;
-	icon: string;
+export interface MetaEditorViewCollection extends MetaManifestWithView {
 	entityType: string;
 	repositoryAlias: string;
 }

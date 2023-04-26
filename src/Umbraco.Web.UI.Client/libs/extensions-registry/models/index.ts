@@ -208,7 +208,7 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	meta?: unknown;
 }
 
-export interface ManifestWithView extends ManifestElement {
+export interface ManifestWithView<ElementType extends HTMLElement = HTMLElement> extends ManifestElement<ElementType> {
 	meta: MetaManifestWithView;
 }
 
