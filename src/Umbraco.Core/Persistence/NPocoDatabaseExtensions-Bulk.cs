@@ -156,7 +156,9 @@ namespace Umbraco.Core.Persistence
                     var recordValues = new string[columns.Length];
                     for (var columnIndex = 0; columnIndex < columns.Length; columnIndex++)
                     {
-                        database.AddParameter(command, columns[columnIndex].Value.GetValue(record));
+                        var column = columns[columnIndex].Value;
+                        database.AddParameter(command, column, column.GetValue(record));
+                        //database.AddParameter(command, columns[columnIndex].Value.GetValue(record));
                         recordValues[columnIndex] = prefix + parameterIndex++;
                     }
                     recordsValues[commandRecordIndex] = "(" + string.Join(",", recordValues) + ")";
