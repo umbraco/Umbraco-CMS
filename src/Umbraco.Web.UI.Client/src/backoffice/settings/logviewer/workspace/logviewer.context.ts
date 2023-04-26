@@ -258,7 +258,9 @@ export class UmbLogViewerWorkspaceContext {
 			return;
 		}
 
-		this.#isLoadingLogs.next(true);
+		const isPollingEnabled = this.#polling.getValue().enabled;
+
+		if (!isPollingEnabled) this.#isLoadingLogs.next(true);
 
 		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
