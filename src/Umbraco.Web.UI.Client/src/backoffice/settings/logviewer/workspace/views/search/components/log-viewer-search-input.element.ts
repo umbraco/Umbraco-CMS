@@ -29,8 +29,6 @@ export const UMB_LOG_VIEWER_SAVE_SEARCH_MODAL = new UmbModalToken<UmbContextSave
 
 @customElement('umb-log-viewer-search-input')
 export class UmbLogViewerSearchInputElement extends UmbLitElement {
-	
-
 	@query('#saved-searches-popover')
 	private _savedSearchesPopover!: UUIPopoverElement;
 
@@ -133,9 +131,10 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#logViewerContext?.saveSearch(savedSearch);
 	}
 
-	#removeSearch(event: Event) {
-		const target = event.target as UUIButtonElement;
-		this.#logViewerContext?.removeSearch({ name: target.id });
+	#removeSearch(name: string) {
+		debugger;
+
+		this.#logViewerContext?.removeSearch({ name });
 	}
 
 	#openSaveSearchDialog() {
@@ -189,7 +188,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 									@click=${() => this.#setQueryFromSavedSearch(search.query ?? '')}>
 									<span class="saved-search-item-name">${search.name}</span>
 									<span class="saved-search-item-query">${search.query}</span></button
-								><uui-button label="Remove saved search" id="${search.name}" color="danger" @click=${this.#removeSearch}
+								><uui-button label="Remove saved search" color="danger" @click=${() => this.#removeSearch(search.name)}
 									><uui-icon name="umb:trash"></uui-icon
 								></uui-button>
 							</li>`
@@ -198,7 +197,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			</uui-popover>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
