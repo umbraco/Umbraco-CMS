@@ -128,7 +128,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
 
         IStylesheet? stylesheet = Repository.Get(updateModel.ExistingPath);
 
-        if(stylesheet is null)
+        if (stylesheet is null)
         {
             return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.NotFound, null);
         }
