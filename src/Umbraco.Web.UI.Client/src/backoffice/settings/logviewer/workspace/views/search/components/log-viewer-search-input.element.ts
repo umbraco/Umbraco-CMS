@@ -122,7 +122,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	#clearQuery() {
 		this.inputQuery$.next('');
 		this.#logViewerContext?.setFilterExpression('');
-		this.#logViewerContext?.getLogs();
 	}
 
 	#modalHandler?: UmbModalHandler;
@@ -132,7 +131,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#removeSearch(name: string) {
-		debugger;
 
 		this.#logViewerContext?.removeSearch({ name });
 	}
@@ -188,7 +186,10 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 									@click=${() => this.#setQueryFromSavedSearch(search.query ?? '')}>
 									<span class="saved-search-item-name">${search.name}</span>
 									<span class="saved-search-item-query">${search.query}</span></button
-								><uui-button label="Remove saved search" color="danger" @click=${() => this.#removeSearch(search.name)}
+								><uui-button
+									label="Remove saved search"
+									color="danger"
+									@click=${() => this.#removeSearch(search.name ?? '')}
 									><uui-icon name="umb:trash"></uui-icon
 								></uui-button>
 							</li>`
