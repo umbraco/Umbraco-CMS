@@ -44,6 +44,9 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	@state()
 	private _showLoader = false;
 
+	@state()
+	private _isQuerySaved = false;
+
 	private inputQuery$ = new Subject<string>();
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
@@ -70,6 +73,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			.subscribe((query) => {
 				this.#logViewerContext?.setFilterExpression(query);
 				this.#persist(query);
+				this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
 				this._showLoader = false;
 			});
 	}
@@ -78,10 +82,12 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		if (!this.#logViewerContext) return;
 		this.observe(this.#logViewerContext.savedSearches, (savedSearches) => {
 			this._savedSearches = savedSearches ?? [];
+			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
 		});
 
 		this.observe(this.#logViewerContext.filterExpression, (query) => {
 			this._inputQuery = query;
+			this._isQuerySaved = this._savedSearches.some((search) => search.query === query);
 		});
 	}
 
@@ -109,14 +115,14 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#persist(filter: string) {
-		let q = getQuery();
+		let query = getQuery();
 
-		q = {
-			...q,
+		query = {
+			...query,
 			lq: filter,
 		};
 
-		window.history.pushState({}, '', `${path()}?${toQueryString(q)}`);
+		window.history.pushState({}, '', `${path()}?${toQueryString(query)}`);
 	}
 
 	#clearQuery() {
@@ -131,7 +137,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#removeSearch(name: string) {
-
 		this.#logViewerContext?.removeSearch({ name });
 	}
 
@@ -140,6 +145,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#modalHandler?.onSubmit().then((savedSearch) => {
 			if (savedSearch) {
 				this.#saveSearch(savedSearch);
+				this._isQuerySaved = true;
 			}
 		});
 	}
@@ -160,9 +166,11 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 						  </div>`
 						: ''}
 					${this._inputQuery
-						? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
-									><uui-icon name="umb:favorite"></uui-icon></uui-button
-								><uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
+						? html`${!this._isQuerySaved
+									? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
+											><uui-icon name="umb:favorite"></uui-icon
+									  ></uui-button>`
+									: ''}<uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
 									><uui-icon name="umb:delete"></uui-icon
 								></uui-button>`
 						: html``}
