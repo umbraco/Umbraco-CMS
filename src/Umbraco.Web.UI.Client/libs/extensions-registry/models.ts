@@ -180,7 +180,8 @@ export interface ManifestClassWithClassConstructor extends ManifestClass {
 	class: ClassConstructor<unknown>;
 }
 
-export interface ManifestElement extends ManifestWithLoader<object | HTMLElement> {
+export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
+	extends ManifestWithLoader<{ default: ClassConstructor<ElementType> } | Omit<object, 'default'>> {
 	//type: ManifestStandardTypes;
 
 	/**

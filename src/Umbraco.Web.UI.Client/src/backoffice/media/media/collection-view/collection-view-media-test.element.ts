@@ -4,12 +4,12 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-collection-view-media-test')
 export class UmbCollectionViewMediaTestElement extends LitElement {
-	
+
 
 	render() {
 		return html`umb-collection-view-media-test`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 
