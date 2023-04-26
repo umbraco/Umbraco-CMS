@@ -58,7 +58,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
 			this.#logViewerContext?.getSavedSearches();
-			this.#logViewerContext.getLogs();
 		});
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {

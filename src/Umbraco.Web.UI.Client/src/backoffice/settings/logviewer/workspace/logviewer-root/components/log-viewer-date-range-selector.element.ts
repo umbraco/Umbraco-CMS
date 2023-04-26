@@ -29,7 +29,6 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 		this.addEventListener('input', this.#setDates);
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
-			this.#logViewerContext?.getMessageTemplates(0, 10);
 			this.#observeStuff();
 		});
 	}

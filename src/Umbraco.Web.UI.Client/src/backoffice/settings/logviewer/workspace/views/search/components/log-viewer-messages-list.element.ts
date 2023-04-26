@@ -30,7 +30,6 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeLogs();
-			this.#logViewerContext.getLogs();
 		});
 	}
 

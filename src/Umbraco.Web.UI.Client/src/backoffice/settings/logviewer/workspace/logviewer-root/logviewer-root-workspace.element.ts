@@ -34,7 +34,6 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.#logViewerContext.init();
 		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this.#logViewerContext);
 	}
 
