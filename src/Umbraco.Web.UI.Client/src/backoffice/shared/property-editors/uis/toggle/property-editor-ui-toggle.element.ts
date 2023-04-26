@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 

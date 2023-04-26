@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-editor-ui-text-box')

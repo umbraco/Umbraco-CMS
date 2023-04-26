@@ -183,6 +183,7 @@ export interface ManifestClassWithClassConstructor extends ManifestClass {
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	extends ManifestWithLoader<{ default: ClassConstructor<ElementType> } | Omit<object, 'default'>> {
 	//type: ManifestStandardTypes;
+	readonly ELEMENT_TYPE: ElementType;
 
 	/**
 	 * The file location of the javascript file to load

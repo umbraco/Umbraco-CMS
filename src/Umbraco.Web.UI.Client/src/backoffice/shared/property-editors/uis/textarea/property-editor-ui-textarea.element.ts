@@ -6,7 +6,7 @@ import {
 	UmbWorkspacePropertyContext,
 	UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN,
 } from '../../../../shared/components/workspace-property/workspace-property.context';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-editor-ui-textarea')

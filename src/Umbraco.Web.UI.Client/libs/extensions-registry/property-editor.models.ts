@@ -1,4 +1,4 @@
-import type { UmbPropertyEditorElement } from '../property-editor';
+import type { UmbPropertyEditorElement } from './interfaces';
 import type { ManifestElement, ManifestBase } from './models';
 
 export interface ManifestPropertyEditorUI extends ManifestElement<UmbPropertyEditorElement> {

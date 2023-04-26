@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { InputType } from '@umbraco-ui/uui';
 import { UmbPropertyValueChangeEvent } from '../..';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyEditorConfigDefaultData } from '@umbraco-cms/backoffice/extensions-registry';
 
