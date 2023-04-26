@@ -46,7 +46,11 @@ public class ManagementApiComposer : IComposer
             .AddUsers()
             .AddUserGroups()
             .AddPackages()
-            .AddEntitys()
+            .AddEntities()
+            .AddPathFolders()
+            .AddScripts()
+            .AddPartialViews()
+            .AddStylesheets()
             .AddBackOfficeAuthentication();
 
         services

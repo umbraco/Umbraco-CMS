@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
 internal static class EntityBuilderExtensions
 {
-    internal static IUmbracoBuilder AddEntitys(this IUmbracoBuilder builder)
+    internal static IUmbracoBuilder AddEntities(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<ItemTypeMapDefinition>();

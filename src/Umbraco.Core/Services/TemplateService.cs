@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -37,27 +35,6 @@ public class TemplateService : RepositoryService, ITemplateService
         _auditRepository = auditRepository;
         _templateContentParserService = templateContentParserService;
         _userIdKeyResolver = userIdKeyResolver;
-    }
-
-    [Obsolete("Please use ctor that takes all parameters, scheduled for removal in v15")]
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            auditRepository,
-            templateContentParserService,
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
     }
 
     /// <inheritdoc />
