@@ -4,7 +4,7 @@ import type {
 	UUIModalSidebarElement,
 	UUIModalSidebarSize,
 } from '@umbraco-ui/uui';
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { BehaviorSubject } from 'rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
@@ -62,7 +62,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		config?: UmbModalConfig
 	) {
 		this.#host = host;
-		this.key = config?.key || uuidv4();
+		this.key = config?.key || UmbId.new();
 
 		if (modalAlias instanceof UmbModalToken) {
 			this.type = modalAlias.getDefaultConfig()?.type || this.type;
