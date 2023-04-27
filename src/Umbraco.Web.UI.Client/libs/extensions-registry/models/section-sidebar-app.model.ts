@@ -1,6 +1,7 @@
+import type { UmbSectionSidebarAppExtensionElement } from '../interfaces/section-sidebar-app-extension-element.interface';
 import type { ManifestElement } from '.';
 
-export interface ManifestSectionSidebarApp extends ManifestElement {
+export interface ManifestSectionSidebarApp extends ManifestElement<UmbSectionSidebarAppExtensionElement> {
 	type: 'sectionSidebarApp';
 	conditions: ConditionsSectionSidebarApp;
 }
