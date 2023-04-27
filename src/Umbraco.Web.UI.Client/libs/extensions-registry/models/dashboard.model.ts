@@ -1,6 +1,9 @@
+import type { UmbDashboardElement } from '../interfaces';
 import type { ManifestElement, ManifestWithConditions } from '.';
 
-export interface ManifestDashboard extends ManifestElement, ManifestWithConditions<ConditionsDashboard> {
+export interface ManifestDashboard
+	extends ManifestElement<UmbDashboardElement>,
+		ManifestWithConditions<ConditionsDashboard> {
 	type: 'dashboard';
 	meta: MetaDashboard;
 }

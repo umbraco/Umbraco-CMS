@@ -18,8 +18,6 @@ import './section-sidebar-menu/section-sidebar-menu.element';
  */
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
-	
-
 	@property()
 	public manifest?: ManifestSection;
 
@@ -36,8 +34,6 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	#createRoutes() {
-		this._routes = [];
-
 		this._routes = [
 			{
 				path: 'workspace/:entityType',
@@ -93,7 +89,7 @@ export class UmbSectionElement extends UmbLitElement {
 			</umb-section-main>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

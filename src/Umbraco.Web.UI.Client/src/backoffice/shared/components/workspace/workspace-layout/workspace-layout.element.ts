@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 
-import type { IRoute, PageComponent } from '@umbraco-cms/backoffice/router';
+import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type {
@@ -32,8 +32,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-layout')
 export class UmbWorkspaceLayoutElement extends UmbLitElement {
-	
-
 	@property()
 	public headline = '';
 
@@ -68,7 +66,7 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _routes?: IRoute[];
+	private _routes?: UmbRoute[];
 
 	@state()
 	private _routerPath?: string;
@@ -99,23 +97,23 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 		this._routes = [];
 
 		if (this._workspaceViews.length > 0) {
-			this._routes = this._workspaceViews.map((view) => {
+			this._routes = this._workspaceViews.map((manifest) => {
 				return {
-					path: `view/${view.meta.pathname}`,
+					path: `view/${manifest.meta.pathname}`,
 					component: () => {
-						if (view.type === 'workspaceViewCollection') {
+						if (manifest.type === 'workspaceViewCollection') {
 							return import(
 								'../../../../shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
 							) as unknown as Promise<HTMLElement>;
 						}
-						return createExtensionElement(view);
+						return createExtensionElement(manifest);
 					},
-					setup: (component, info) => {
+					setup: (component) => {
 						if (this.componentHasManifest(component)) {
-							component.manifest = view;
+							component.manifest = manifest;
 						}
 					},
-				};
+				} as UmbRoute;
 			});
 
 			// If we have a post fix then we need to add a direct from the empty url of the split-view-index:
@@ -190,7 +188,7 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
