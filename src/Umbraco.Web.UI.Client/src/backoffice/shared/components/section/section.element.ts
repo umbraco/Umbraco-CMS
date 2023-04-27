@@ -4,7 +4,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
-import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extensions-registry';
+import type {
+	ManifestSection,
+	ManifestSectionSidebarApp,
+	UmbSectionElement,
+} from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -13,11 +17,11 @@ import './section-sidebar-menu/section-sidebar-menu.element';
 
 /**
  * @export
- * @class UmbSectionElement
+ * @class UmbBaseSectionElement
  * @description - Element hosting sections and section navigation.
  */
-@customElement('umb-section')
-export class UmbSectionElement extends UmbLitElement {
+@customElement('umb-section-default')
+export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionElement {
 	@property()
 	public manifest?: ManifestSection;
 
@@ -108,6 +112,6 @@ export class UmbSectionElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section': UmbSectionElement;
+		'umb-section-default': UmbSectionDefaultElement;
 	}
 }
