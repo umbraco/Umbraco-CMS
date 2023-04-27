@@ -639,10 +639,10 @@
                         mapToPropertyModel(this.settings, this.settingsData);
                     }
                 };
-
+              debugger;
                 // first time instant update of label.
-              blockObject.label = (blockObject.labelInterpolator(blockObject.data) || blockObject.content?.contentTypeName) ?? "";
-                blockObject.index = 0;
+              blockObject.label = blockObject.content?.contentTypeName || "";
+                blockObject.index = 0; 
 
                 if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
                     var labelElement = $('<div></div>', { text: blockObject.config.label});
