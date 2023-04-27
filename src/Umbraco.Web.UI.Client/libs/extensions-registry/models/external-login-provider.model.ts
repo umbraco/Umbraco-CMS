@@ -1,6 +1,7 @@
+import type { UmbExternalLoginProviderExtensionElement } from '../interfaces/external-login-provider-extension-element.interface';
 import type { ManifestElement } from '.';
 
-export interface ManifestExternalLoginProvider extends ManifestElement {
+export interface ManifestExternalLoginProvider extends ManifestElement<UmbExternalLoginProviderExtensionElement> {
 	type: 'externalLoginProvider';
 	meta: MetaExternalLoginProvider;
 }
