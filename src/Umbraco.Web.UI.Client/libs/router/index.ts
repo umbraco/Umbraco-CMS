@@ -1,5 +1,4 @@
 export type {
-	IRoute,
 	PageComponent,
 	Guard,
 	IRoutingInfo,

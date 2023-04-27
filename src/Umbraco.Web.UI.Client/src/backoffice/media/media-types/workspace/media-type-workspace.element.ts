@@ -4,17 +4,15 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceMediaTypeContext } from './media-type-workspace.context';
 import { UmbMediaTypeWorkspaceEditElement } from './media-type-workspace-edit.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-media-type-workspace')
 export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
-	
-
 	#workspaceContext = new UmbWorkspaceMediaTypeContext(this);
 	#element = new UmbMediaTypeWorkspaceEditElement();
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
@@ -28,7 +26,7 @@ export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

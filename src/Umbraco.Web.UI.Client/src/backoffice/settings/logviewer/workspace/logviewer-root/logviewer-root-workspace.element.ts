@@ -9,20 +9,18 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
-	
-
 	private _alias = 'Umb.Workspace.LogviewerRoot';
 
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _routes: IRoute[] = [];
+	private _routes: UmbRoute[] = [];
 
 	@state()
 	private _activePath?: string;
@@ -153,7 +151,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

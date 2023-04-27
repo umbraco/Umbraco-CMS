@@ -6,7 +6,7 @@ import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
 import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './section-sidebar-menu/section-sidebar-menu.element';
@@ -22,7 +22,7 @@ export class UmbSectionElement extends UmbLitElement {
 	public manifest?: ManifestSection;
 
 	@state()
-	private _routes?: Array<IRoute>;
+	private _routes?: Array<UmbRoute>;
 
 	@state()
 	private _menus?: Array<Omit<ManifestSectionSidebarApp, 'kind'>>;

@@ -9,17 +9,15 @@ import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
-	
-
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
 
 	@state()
-	private _routes: IRoute[] = [];
+	private _routes: UmbRoute[] = [];
 
 	@state()
 	_tabs: Array<PropertyTypeContainerResponseModelBaseModel> = [];
@@ -66,7 +64,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: IRoute[] = [];
+		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
@@ -197,7 +195,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 			</umb-router-slot>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
