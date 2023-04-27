@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
@@ -78,7 +79,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
     {
-        IBooleanOperation? queryOperation;
+        string fieldName;
+        string fieldValue;
 
         if (fetch is not null)
         {
@@ -90,18 +92,32 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
                 return null;
             }
 
-            var value = string.IsNullOrWhiteSpace(selector.Value) == false
+            fieldName = selector.FieldName;
+            fieldValue = string.IsNullOrWhiteSpace(selector.Value) == false
                 ? selector.Value
                 : _fallbackGuidValue;
-            queryOperation = baseQuery.Field(selector.FieldName, value);
         }
         else
         {
-            // If no params or no fetch value, get everything from the index while taking into account a "start-item" header
-            queryOperation = DefaultSelect(baseQuery);
+            // If no params or no fetch value, get everything from the index - this is a way to do that with Examine
+            // TODO: Make a default selector to fetch everything from the index and register it by the end of the SelectorHandlerCollection collection
+            fieldName = UmbracoExamineFieldNames.CategoryFieldName;
+            fieldValue = "content";
+
+            // Take into account the "start-item" header if present, as it defines a starting root node to query from
+            if (_requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider))
+            {
+                IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
+                if (startItem is not null)
+                {
+                    // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
+                    fieldName = DescendantsSelectorIndexer.FieldName;
+                    fieldValue = startItem.Key.ToString();
+                }
+            }
         }
 
-        return queryOperation;
+        return baseQuery.Field(fieldName, fieldValue);
     }
 
     private void HandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
@@ -174,24 +190,6 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         }
 
         return orderingQuery;
-    }
-
-    private IBooleanOperation DefaultSelect(IQuery baseQuery)
-    {
-        // Take into account the "start-item" header if present, as it defines a starting root node to query from
-        if (_requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider))
-        {
-            IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
-            if (startItem is not null)
-            {
-                // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
-                return baseQuery.Field(DescendantsSelectorIndexer.FieldName, startItem.Key.ToString());
-            }
-        }
-
-        // TODO: If no params or no fetch value, get everything from the index - make a default selector and register it by the end of the collection
-        // This is a temp Examine solution
-        return baseQuery.Field("__IndexType", "content");
     }
 
     private IOrdering? DefaultSort(IBooleanOperation queryCriteria)
