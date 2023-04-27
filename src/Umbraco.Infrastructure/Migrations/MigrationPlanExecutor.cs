@@ -179,7 +179,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         {
             Successful = true,
             InitialState = fromState,
-            FinalState = transition?.TargetState ?? completedTransitions.Last().TargetState,
+            FinalState = transition?.TargetState ?? completedTransitions.LastOrDefault()?.TargetState ?? fromState,
             CompletedTransitions = completedTransitions,
             Plan = plan,
         };
