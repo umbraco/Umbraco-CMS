@@ -21,7 +21,7 @@ export class UmbInputPickerSectionElement extends UmbInputListBaseElement {
 
 	private _observeSections() {
 		if (this.value.length > 0) {
-			umbExtensionsRegistry.extensionsOfType('section').subscribe((sections: Array<ManifestSection>) => {
+			this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections: Array<ManifestSection>) => {
 				this._sections = sections.filter((section) => this.value.includes(section.alias));
 			});
 		} else {

@@ -37,7 +37,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private async _observeBackoffice() {
 		if (this._backofficeContext) {
 			this.observe(
-				this._backofficeContext.getAllowedSections(),
+				this._backofficeContext.allowedSections,
 				(sections) => {
 					this._sections = sections;
 					this._createRoutes();

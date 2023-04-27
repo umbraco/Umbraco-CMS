@@ -14,7 +14,7 @@ export class UmbSectionPickerModalElement extends UmbModalElementPickerBase<Mani
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		umbExtensionsRegistry.extensionsOfType('section').subscribe((sections: Array<ManifestSection>) => {
+		this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections: Array<ManifestSection>) => {
 			this._sections = sections;
 		});
 	}
