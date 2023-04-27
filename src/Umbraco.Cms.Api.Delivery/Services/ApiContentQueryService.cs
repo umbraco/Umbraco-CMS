@@ -62,9 +62,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         HandleFiltering(filters, queryOperation);
 
         // Handle Sorting
-        IOrdering? sortQuery = HandleSorting(sorts, queryOperation);
+        IOrdering sortQuery = HandleSorting(sorts, queryOperation);
 
-        ISearchResults? results = (sortQuery ?? DefaultSort(queryOperation))?.Execute(QueryOptions.SkipTake(skip, take));
+        ISearchResults? results = sortQuery.Execute(QueryOptions.SkipTake(skip, take));
 
         if (results is null)
         {
@@ -157,7 +157,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         }
     }
 
-    private IOrdering? HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
+    private IOrdering HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
     {
         IOrdering? orderingQuery = null;
 
@@ -188,13 +188,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
             };
         }
 
-        return orderingQuery;
-    }
-
-    private IOrdering? DefaultSort(IBooleanOperation queryCriteria)
-    {
-        var defaultSorts = new[] { $"{PathSortIndexer.FieldName}:asc", $"{SortOrderSortIndexer.FieldName}:asc" };
-
-        return HandleSorting(defaultSorts, queryCriteria);
+        return orderingQuery ?? // Apply default sorting (left-aligning the content tree) if no valid sort query params
+               queryCriteria
+                   .OrderBy(new SortableField(PathSortIndexer.FieldName, SortType.String))
+                   .OrderBy(new SortableField(SortOrderSortIndexer.FieldName, SortType.Int));
     }
 }
