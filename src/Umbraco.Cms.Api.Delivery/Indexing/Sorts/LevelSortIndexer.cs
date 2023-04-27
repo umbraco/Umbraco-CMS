@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 
-internal sealed class LevelSortIndexer : IContentIndexHandler
+public sealed class LevelSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "level";
 

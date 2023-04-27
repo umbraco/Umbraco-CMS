@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Selectors;
 
-internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
+public sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
 {
     private const string ChildrenSpecifier = "children:";
 

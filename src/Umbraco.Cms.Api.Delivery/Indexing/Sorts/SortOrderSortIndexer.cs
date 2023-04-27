@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 
-internal sealed class SortOrderSortIndexer : IContentIndexHandler
+public sealed class SortOrderSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "sortOrder";
 

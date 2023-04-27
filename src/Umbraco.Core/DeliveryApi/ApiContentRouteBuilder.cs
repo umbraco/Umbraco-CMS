@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
@@ -12,11 +13,17 @@ public class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly GlobalSettings _globalSettings;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    public ApiContentRouteBuilder(IPublishedUrlProvider publishedUrlProvider, IOptions<GlobalSettings> globalSettings, IVariationContextAccessor variationContextAccessor)
+    public ApiContentRouteBuilder(
+        IPublishedUrlProvider publishedUrlProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor)
     {
         _publishedUrlProvider = publishedUrlProvider;
         _variationContextAccessor = variationContextAccessor;
+        _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _globalSettings = globalSettings.Value;
     }
 
@@ -30,8 +37,17 @@ public class ApiContentRouteBuilder : IApiContentRouteBuilder
         IPublishedContent root = content.Root();
         var rootPath = root.UrlSegment(_variationContextAccessor, culture) ?? string.Empty;
 
-        var contentPath = _publishedUrlProvider.GetUrl(content, UrlMode.Relative, culture).EnsureStartsWith("/");
+        var contentPath = _publishedUrlProvider.GetUrl(content, UrlMode.Relative, culture);
 
+        // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
+        // the URL provider resolves the content URL as empty string or "#". since the Delivery API handles routing explicitly,
+        // we can perform fallback to the content route.
+        if (contentPath.IsNullOrWhiteSpace() || "#".Equals(contentPath))
+        {
+            contentPath = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content?.GetRouteById(content.Id, culture) ?? contentPath;
+        }
+
+        contentPath = contentPath.EnsureStartsWith("/");
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
             contentPath = contentPath.TrimStart(rootPath.EnsureStartsWith("/")).EnsureStartsWith("/");
