@@ -58,7 +58,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 						name: 'My Custom Package View',
 						js: '/App_Plugins/package-view.js',
 						meta: {
-							packageName: 'my.package',
+							packageName: 'Package with a view',
 						},
 					},
 				],

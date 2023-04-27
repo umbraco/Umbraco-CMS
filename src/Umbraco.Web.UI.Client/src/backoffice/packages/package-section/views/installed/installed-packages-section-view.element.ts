@@ -11,8 +11,6 @@ import './installed-packages-section-view-item.element';
 
 @customElement('umb-installed-packages-section-view')
 export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
-	
-
 	@state()
 	private _installedPackages: UmbPackageWithMigrationStatus[] = [];
 
@@ -38,7 +36,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
 
 		const [package$, migration$] = data;
 
-		combineLatest([package$, migration$]).subscribe(([packages, migrations]) => {
+		this.observe(combineLatest([package$, migration$]), ([packages, migrations]) => {
 			this._installedPackages = packages.map((p) => {
 				const migration = migrations.find((m) => m.packageName === p.name);
 				if (migration) {
@@ -109,7 +107,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
 			</uui-ref-list>
 		</uui-box>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
