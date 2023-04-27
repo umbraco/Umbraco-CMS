@@ -52,9 +52,9 @@ export class UmbDataTypeWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.DataType">
+			<umb-workspace-editor alias="Umb.Workspace.DataType">
 				<uui-input slot="header" id="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 

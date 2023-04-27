@@ -19,7 +19,7 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 	{
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
@@ -132,4 +132,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceEditorViews, ...workspaceViewCollections, ...workspaceActions];

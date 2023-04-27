@@ -2,7 +2,7 @@ import type { UmbWorkspaceEditorViewExtensionElement } from '../interfaces/works
 import type { ManifestWithView } from '.';
 
 export interface ManifestWorkspaceEditorView extends ManifestWithView<UmbWorkspaceEditorViewExtensionElement> {
-	type: 'workspaceView';
+	type: 'workspaceEditorView';
 	conditions: ConditionsWorkspaceView;
 }
 

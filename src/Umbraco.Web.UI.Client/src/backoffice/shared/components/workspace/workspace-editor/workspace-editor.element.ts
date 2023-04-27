@@ -17,7 +17,7 @@ import '../../extension-slot/extension-slot.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
- * @element umb-workspace-layout
+ * @element umb-workspace-editor
  * @description
  * @slot icon - Slot for icon
  * @slot header - Slot for workspace header
@@ -30,8 +30,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @extends {UmbLitElement}
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
-@customElement('umb-workspace-layout')
-export class UmbWorkspaceLayoutElement extends UmbLitElement {
+@customElement('umb-workspace-editor')
+export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()
 	public headline = '';
 
@@ -103,7 +103,7 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 					component: () => {
 						if (manifest.type === 'workspaceViewCollection') {
 							return import(
-								'../../../../shared/components/workspace/workspace-content/views/collection/workspace-view-collection.element'
+								'../workspace-content/views/collection/workspace-view-collection.element'
 							) as unknown as Promise<HTMLElement>;
 						}
 						return createExtensionElement(manifest);
@@ -224,6 +224,6 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-layout': UmbWorkspaceLayoutElement;
+		'umb-workspace-editor': UmbWorkspaceEditorElement;
 	}
 }

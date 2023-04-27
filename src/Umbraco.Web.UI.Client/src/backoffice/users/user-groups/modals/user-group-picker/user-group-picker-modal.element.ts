@@ -7,7 +7,7 @@ import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<UserGroupDetails> {
-	
+
 
 	@state()
 	private _userGroups: Array<UserGroupDetails> = [];
@@ -29,7 +29,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<Us
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select user groups">
+			<umb-workspace-editor headline="Select user groups">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
@@ -51,10 +51,10 @@ export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<Us
 					<uui-button label="Close" @click=${this.close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

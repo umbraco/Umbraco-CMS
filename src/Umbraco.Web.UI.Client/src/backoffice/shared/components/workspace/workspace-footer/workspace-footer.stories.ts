@@ -1,4 +1,4 @@
-import '../workspace-layout/workspace-layout.element';
+import '../workspace-editor/workspace-editor.element';
 import './workspace-footer.element';
 
 import { Meta, Story } from '@storybook/web-components';

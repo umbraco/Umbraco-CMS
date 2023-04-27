@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import '../workspace-layout/workspace-layout.element';
+import '../workspace-editor/workspace-editor.element';
 import '../../../../shared/components/variant-selector/variant-selector.element.ts';
 
 // Lazy load
@@ -18,8 +18,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-workspace-variant')
 export class UmbWorkspaceVariantContentElement extends UmbLitElement {
-	
-
 	// TODO: stop prop drilling this alias. Instead use the workspace context.
 	@property()
 	alias!: string;
@@ -40,7 +38,7 @@ export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout
+			<umb-workspace-editor
 				.splitViewIndex=${this._splitViewIndex.toString()}
 				alias=${this.alias}
 				.hideNavigation=${!this.displayNavigation}
@@ -52,10 +50,10 @@ export class UmbWorkspaceVariantContentElement extends UmbLitElement {
 					? html`<umb-workspace-action-menu slot="action-menu"></umb-workspace-action-menu>`
 					: ''}
 				<slot name="action-menu" slot="action-menu"></slot>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -14,7 +14,7 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceEditorView> = [];
+const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [];
 const workspaceActions: Array<ManifestWorkspaceAction> = [];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceEditorViews, ...workspaceActions];
