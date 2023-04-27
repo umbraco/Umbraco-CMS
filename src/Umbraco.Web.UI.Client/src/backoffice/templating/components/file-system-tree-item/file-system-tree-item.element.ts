@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestKind } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTreeItemElement } from 'src/backoffice/shared/components/tree/tree-item/tree-item.element';
+import { UmbTreeItemElement } from '../../../../backoffice/shared/components/tree/tree-item/tree-item.element';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {
