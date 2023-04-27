@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DocumentResource,
@@ -59,7 +59,7 @@ export class UmbDocumentServerDataSource
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
-			id: uuidv4(),
+			id: UmbId.new(),
 			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
