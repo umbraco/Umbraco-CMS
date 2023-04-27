@@ -6,7 +6,7 @@ import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
- * @element umb-workspace-footer-layout
+ * @element umb-workspace-footer
  * @description Uses the alias to insert extensions that targets this workspace-alias.
  * @slot - Slot for workspace footer items
  * @slot actions - Slot for workspace actions
@@ -15,10 +15,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @extends {UmbLitElement}
  */
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
-@customElement('umb-workspace-footer-layout')
+@customElement('umb-workspace-footer')
 export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
-	
-
 	private _alias = '';
 	/**
 	 * Alias of the workspace. The Layout will render the workspace actions that are registered for this workspace alias.
@@ -54,7 +52,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 			</umb-footer-layout>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -73,6 +71,6 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-footer-layout': UmbWorkspaceFooterLayoutElement;
+		'umb-workspace-footer': UmbWorkspaceFooterLayoutElement;
 	}
 }

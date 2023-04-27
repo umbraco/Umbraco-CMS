@@ -138,10 +138,10 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 				${this.enforceNoFooter
 					? ''
 					: html`
-							<umb-workspace-footer-layout alias=${this.alias}>
+							<umb-workspace-footer alias=${this.alias}>
 								<slot name="footer"></slot>
 								<slot name="actions" slot="actions"></slot>
-							</umb-workspace-footer-layout>
+							</umb-workspace-footer>
 					  `}
 			</umb-body-layout>
 		`;

@@ -1,19 +1,19 @@
 import '../workspace-layout/workspace-layout.element';
-import './workspace-footer-layout.element';
+import './workspace-footer.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer-layout.element';
+import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element';
 
 export default {
 	title: 'Workspaces/Shared/Footer Layout',
-	component: 'umb-workspace-footer-layout',
-	id: 'umb-workspace-footer-layout',
+	component: 'umb-workspace-footer',
+	id: 'umb-workspace-footer',
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceFooterLayoutElement> = () => html` <umb-workspace-footer-layout>
+export const AAAOverview: Story<UmbWorkspaceFooterLayoutElement> = () => html` <umb-workspace-footer>
 	<div><uui-button color="" look="placeholder">Footer slot</uui-button></div>
 	<div slot="actions"><uui-button color="" look="placeholder">Actions slot</uui-button></div>
-</umb-workspace-footer-layout>`;
+</umb-workspace-footer>`;
 AAAOverview.storyName = 'Overview';
