@@ -6,14 +6,14 @@ import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../../shared/componen
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../../shared/components/workspace-property/workspace-property.context';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
-export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorElement {
+export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
 	private _variantContext?: typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE;
 
 	@property()

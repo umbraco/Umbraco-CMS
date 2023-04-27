@@ -1,7 +1,7 @@
-import type { UmbSectionElement } from '../interfaces';
+import type { UmbSectionExtensionElement } from '../interfaces';
 import type { ManifestElement } from '.';
 
-export interface ManifestSection extends ManifestElement<UmbSectionElement> {
+export interface ManifestSection extends ManifestElement<UmbSectionExtensionElement> {
 	type: 'section';
 	meta: MetaSection;
 }

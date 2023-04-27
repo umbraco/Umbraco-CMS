@@ -1,8 +1,8 @@
-import type { UmbSectionViewElement } from '../interfaces/section-view-element.interface';
+import type { UmbSectionViewExtensionElement } from '../interfaces/section-view-extension-element.interface';
 import type { ManifestElement, ManifestWithConditions } from '.';
 
 export interface ManifestSectionView
-	extends ManifestElement<UmbSectionViewElement>,
+	extends ManifestElement<UmbSectionViewExtensionElement>,
 		ManifestWithConditions<ConditionsSectionView> {
 	type: 'sectionView';
 	meta: MetaSectionView;

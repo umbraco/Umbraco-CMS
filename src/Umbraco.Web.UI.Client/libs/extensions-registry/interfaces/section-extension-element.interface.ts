@@ -1,5 +1,5 @@
 import type { ManifestSection } from '../models';
 
-export interface UmbSectionElement extends HTMLElement {
+export interface UmbSectionExtensionElement extends HTMLElement {
 	manifest?: ManifestSection;
 }

@@ -1,6 +1,6 @@
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbPropertyEditorElement extends HTMLElement {
+export interface UmbPropertyEditorExtensionElement extends HTMLElement {
 	value: unknown;
 	config: DataTypePropertyPresentationModel[];
 }

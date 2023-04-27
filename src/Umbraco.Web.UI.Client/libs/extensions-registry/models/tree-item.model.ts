@@ -1,7 +1,7 @@
-import { UmbTreeItemElement } from '../interfaces';
+import { UmbTreeItemExtensionElement } from '../interfaces';
 import type { ManifestElement } from '.';
 
-export interface ManifestTreeItem extends ManifestElement<UmbTreeItemElement> {
+export interface ManifestTreeItem extends ManifestElement<UmbTreeItemExtensionElement> {
 	type: 'treeItem';
 	conditions: ConditionsTreeItem;
 }

@@ -6,7 +6,7 @@ import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extensions-api';
 
@@ -53,7 +53,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				path: this._routePrefix + section.meta.pathname,
 				component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
 				setup: (component) => {
-					(component as UmbSectionElement).manifest = section;
+					(component as UmbSectionExtensionElement).manifest = section;
 				},
 			};
 		});

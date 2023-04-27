@@ -1,10 +1,10 @@
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbSectionViewElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-packages-market-place-section-view')
-export class UmbPackagesMarketPlaceSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
+export class UmbPackagesMarketPlaceSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {
 	// TODO: This URL comes from the server
 	// Was previously found in 'Umbraco.Sys.ServerVariables.umbracoUrls.marketplaceUrl'
 	@property()
