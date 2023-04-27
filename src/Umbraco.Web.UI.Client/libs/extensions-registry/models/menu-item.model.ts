@@ -1,6 +1,7 @@
+import type { UmbMenuItemExtensionElement } from '../interfaces/menu-item-extension-element.interface';
 import type { ManifestElement } from '.';
 
-export interface ManifestMenuItem extends ManifestElement {
+export interface ManifestMenuItem extends ManifestElement<UmbMenuItemExtensionElement> {
 	type: 'menuItem';
 	meta: MetaMenuItem;
 	conditions: ConditionsMenuItem;

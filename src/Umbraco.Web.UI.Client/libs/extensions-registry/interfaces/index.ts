@@ -1,5 +1,6 @@
 export * from './dashboard-extension-element.interface';
 export * from './external-login-provider-extension-element.interface';
+export * from './menu-item-extension-element.interface';
 export * from './modal-extension-element.interface';
 export * from './property-editor-ui-extension-element.interface';
 export * from './section-extension-element.interface';
