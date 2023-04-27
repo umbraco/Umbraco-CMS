@@ -18,7 +18,7 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
             PublishedSnapshotAccessor,
             new ApiContentBuilder(
                 nameProvider ?? new ApiContentNameProvider(),
-                new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>()),
+                new ApiContentRouteBuilder(PublishedUrlProvider, CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>(), Mock.Of<IPublishedSnapshotAccessor>()),
                 CreateOutputExpansionStrategyAccessor()));
 
     [Test]

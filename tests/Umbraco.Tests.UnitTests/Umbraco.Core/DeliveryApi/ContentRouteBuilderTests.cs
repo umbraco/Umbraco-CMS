@@ -19,11 +19,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var rootKey = Guid.NewGuid();
         var root = SetupInvariantPublishedContent("The Root", rootKey);
 
-        // yes... actually testing the mock setup here. but it's important!
-        var publishedUrlProvider = SetupPublishedUrlProvider(hideTopLevelNodeFromPath);
-        Assert.AreEqual(hideTopLevelNodeFromPath ? "/" : "/the-root", publishedUrlProvider.GetUrl(root));
-
-        var builder = new ApiContentRouteBuilder(publishedUrlProvider, CreateGlobalSettings(hideTopLevelNodeFromPath), Mock.Of<IVariationContextAccessor>());
+        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
         var result = builder.Build(root);
         Assert.AreEqual("/", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
@@ -40,11 +36,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupInvariantPublishedContent("The Child", childKey, root);
 
-        // yes... actually testing the mock setup here. but it's important!
-        var publishedUrlProvider = SetupPublishedUrlProvider(hideTopLevelNodeFromPath);
-        Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child" : "/the-root/the-child", publishedUrlProvider.GetUrl(child));
-
-        var builder = new ApiContentRouteBuilder(publishedUrlProvider, CreateGlobalSettings(hideTopLevelNodeFromPath), Mock.Of<IVariationContextAccessor>());
+        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
         var result = builder.Build(child);
         Assert.AreEqual("/the-child", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
@@ -64,11 +56,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var grandchildKey = Guid.NewGuid();
         var grandchild = SetupInvariantPublishedContent("The Grandchild", grandchildKey, child);
 
-        // yes... actually testing the mock setup here. but it's important!
-        var publishedUrlProvider = SetupPublishedUrlProvider(hideTopLevelNodeFromPath);
-        Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child/the-grandchild" : "/the-root/the-child/the-grandchild", publishedUrlProvider.GetUrl(grandchild));
-
-        var builder = new ApiContentRouteBuilder(publishedUrlProvider, CreateGlobalSettings(hideTopLevelNodeFromPath), Mock.Of<IVariationContextAccessor>());
+        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
         var result = builder.Build(grandchild);
         Assert.AreEqual("/the-child/the-grandchild", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
@@ -84,9 +72,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupVariantPublishedContent("The Child", childKey, root);
 
-        var publishedUrlProvider = SetupPublishedUrlProvider(false);
-
-        var builder = new ApiContentRouteBuilder(publishedUrlProvider, CreateGlobalSettings(false), Mock.Of<IVariationContextAccessor>());
+        var builder = CreateApiContentRouteBuilder(false);
         var result = builder.Build(child, "en-us");
         Assert.AreEqual("/the-child-en-us", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
@@ -107,9 +93,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupInvariantPublishedContent("The Child", childKey, root);
 
-        var publishedUrlProvider = SetupPublishedUrlProvider(false);
-
-        var builder = new ApiContentRouteBuilder(publishedUrlProvider, CreateGlobalSettings(false), Mock.Of<IVariationContextAccessor>());
+        var builder = CreateApiContentRouteBuilder(false);
         var result = builder.Build(child, "en-us");
         Assert.AreEqual("/the-child", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
@@ -130,9 +114,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var childKey = Guid.NewGuid();
         var child = SetupVariantPublishedContent("The Child", childKey, root);
 
-        var publishedUrlProvider = SetupPublishedUrlProvider(false);
-
-        var builder = new ApiContentRouteBuilder(publishedUrlProvider, CreateGlobalSettings(false), Mock.Of<IVariationContextAccessor>());
+        var builder = CreateApiContentRouteBuilder(false);
         var result = builder.Build(child, "en-us");
         Assert.AreEqual("/the-child-en-us", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
@@ -153,8 +135,65 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var content = new Mock<IPublishedContent>();
         content.SetupGet(c => c.ItemType).Returns(itemType);
 
-        var builder = new ApiContentRouteBuilder(SetupPublishedUrlProvider(true), CreateGlobalSettings(), Mock.Of<IVariationContextAccessor>());
+        var builder = CreateApiContentRouteBuilder(true);
         Assert.Throws<ArgumentException>(() => builder.Build(content.Object));
+    }
+
+    [TestCase("")]
+    [TestCase(" ")]
+    [TestCase("#")]
+    public void FallsBackToContentPathIfUrlProviderCannotResolveUrl(string resolvedUrl)
+    {
+        var publishedUrlProviderMock = new Mock<IPublishedUrlProvider>();
+        publishedUrlProviderMock
+            .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Returns(resolvedUrl);
+
+        var publishedContentCacheMock = new Mock<IPublishedContentCache>();
+        publishedContentCacheMock
+            .Setup(c => c.GetRouteById(It.IsAny<int>(), It.IsAny<string?>()))
+            .Returns("/the/content/route");
+
+        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
+        publishedSnapshotMock
+            .SetupGet(s => s.Content)
+            .Returns(publishedContentCacheMock.Object);
+        var publishedSnapshot = publishedSnapshotMock.Object;
+
+        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
+        publishedSnapshotAccessorMock
+            .Setup(a => a.TryGetPublishedSnapshot(out publishedSnapshot))
+            .Returns(true);
+
+        var content = SetupVariantPublishedContent("The Content", Guid.NewGuid());
+
+        var builder = new ApiContentRouteBuilder(
+            publishedUrlProviderMock.Object,
+            CreateGlobalSettings(),
+            Mock.Of<IVariationContextAccessor>(),
+            publishedSnapshotAccessorMock.Object);
+
+        Assert.AreEqual("/the/content/route", builder.Build(content).Path);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void VerifyPublishedUrlProviderSetup(bool hideTopLevelNodeFromPath)
+    {
+        var rootKey = Guid.NewGuid();
+        var root = SetupInvariantPublishedContent("The Root", rootKey);
+
+        var childKey = Guid.NewGuid();
+        var child = SetupInvariantPublishedContent("The Child", childKey, root);
+
+        var grandchildKey = Guid.NewGuid();
+        var grandchild = SetupInvariantPublishedContent("The Grandchild", grandchildKey, child);
+
+        // yes... actually testing the mock setup here. but it's important for the rest of the tests that this behave correct, so we better test it.
+        var publishedUrlProvider = SetupPublishedUrlProvider(hideTopLevelNodeFromPath);
+        Assert.AreEqual(hideTopLevelNodeFromPath ? "/" : "/the-root", publishedUrlProvider.GetUrl(root));
+        Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child" : "/the-root/the-child", publishedUrlProvider.GetUrl(child));
+        Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child/the-grandchild" : "/the-root/the-child/the-grandchild", publishedUrlProvider.GetUrl(grandchild));
     }
 
     private IPublishedContent SetupInvariantPublishedContent(string name, Guid key, IPublishedContent? parent = null)
@@ -207,4 +246,11 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             .Returns((IPublishedContent content, UrlMode mode, string? culture, Uri? current) => Url(content, culture));
         return publishedUrlProvider.Object;
     }
+
+    private ApiContentRouteBuilder CreateApiContentRouteBuilder(bool hideTopLevelNodeFromPath)
+        => new(
+            SetupPublishedUrlProvider(hideTopLevelNodeFromPath),
+            CreateGlobalSettings(hideTopLevelNodeFromPath),
+            Mock.Of<IVariationContextAccessor>(),
+            Mock.Of<IPublishedSnapshotAccessor>());
 }
