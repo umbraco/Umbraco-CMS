@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DataTypeResource,
@@ -37,7 +37,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		const scaffold: FolderReponseModel = {
 			$type: 'FolderReponseModel',
 			name: '',
-			id: uuidv4(),
+			id: UmbId.new(),
 			parentId,
 		};
 
