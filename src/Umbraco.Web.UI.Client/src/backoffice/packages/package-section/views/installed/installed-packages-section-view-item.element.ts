@@ -42,17 +42,17 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@state()
 	private _packageView?: ManifestPackageView;
 
-	private _notificationContext?: UmbNotificationContext;
-	private _modalContext?: UmbModalContext;
+	#notificationContext?: UmbNotificationContext;
+	#modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-			this._notificationContext = instance;
+			this.#notificationContext = instance;
 		});
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
-			this._modalContext = instance;
+			this.#modalContext = instance;
 		});
 	}
 
@@ -76,7 +76,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 
 	async _onMigration() {
 		if (!this.name) return;
-		const modalHandler = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
 			color: 'positive',
 			headline: `Run migrations for ${this.name}?`,
 			content: `Do you want to start run migrations for ${this.name}`,
@@ -91,7 +91,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 			PackageResource.postPackageByNameRunMigration({ name: this.name })
 		);
 		if (error) return;
-		this._notificationContext?.peek('positive', { data: { message: 'Migrations completed' } });
+		this.#notificationContext?.peek('positive', { data: { message: 'Migrations completed' } });
 		this._migrationButtonState = 'success';
 		this.hasPendingMigrations = false;
 	}
