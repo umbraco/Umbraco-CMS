@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Selectors;
 
-internal sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
+public sealed class DescendantsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string DescendantsSpecifier = "descendants:";
 

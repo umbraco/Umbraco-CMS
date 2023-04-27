@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Filters;
 
-internal sealed class ContentTypeFilterIndexer : IContentIndexHandler
+public sealed class ContentTypeFilterIndexer : IContentIndexHandler
 {
     internal const string FieldName = "contentType";
 

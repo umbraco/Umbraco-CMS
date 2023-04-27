@@ -70,5 +70,5 @@ public class ApiPublishedContentCache : IApiPublishedContentCache
             : null;
 
     private bool IsAllowedContentType(IPublishedContent content)
-        => _deliveryApiSettings.DisallowedContentTypeAliases.InvariantContains(content.ContentType.Alias) is false;
+        => _deliveryApiSettings.IsAllowedContentType(content);
 }
