@@ -100,7 +100,6 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         else
         {
             // If no params or no fetch value, get everything from the index - this is a way to do that with Examine
-            // TODO: Make a default selector to fetch everything from the index and register it by the end of the SelectorHandlerCollection collection
             fieldName = UmbracoExamineFieldNames.CategoryFieldName;
             fieldValue = "content";
 
