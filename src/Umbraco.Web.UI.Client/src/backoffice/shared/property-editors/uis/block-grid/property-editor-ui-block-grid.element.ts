@@ -56,8 +56,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component, info) => {
-						console.log('block route', info);
+					setup: (component) => {
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-1';
 						}
@@ -69,8 +68,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component, info) => {
-						console.log('block route', info);
+					setup: (component) => {
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-2';
 						}

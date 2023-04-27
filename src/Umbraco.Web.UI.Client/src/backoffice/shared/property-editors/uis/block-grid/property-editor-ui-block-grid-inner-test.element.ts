@@ -28,8 +28,7 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 			component: () => {
 				return import('./property-editor-ui-block-grid-inner-test.element');
 			},
-			setup: (component, info) => {
-				console.log('block route inner', info);
+			setup: (component) => {
 				if (component instanceof HTMLElement) {
 					(component as any).name = 'inner-1';
 				}
@@ -37,12 +36,10 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 		},
 		{
 			path: 'inner-2',
-			//pathMatch: 'full',
 			component: () => {
 				return import('./property-editor-ui-block-grid-inner-test.element');
 			},
-			setup: (component, info) => {
-				console.log('block route inner', info);
+			setup: (component) => {
 				if (component instanceof HTMLElement) {
 					(component as any).name = 'inner-2';
 				}
