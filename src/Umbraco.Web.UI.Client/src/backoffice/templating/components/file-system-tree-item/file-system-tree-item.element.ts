@@ -1,12 +1,12 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbTreeItemElement } from '../../../../backoffice/shared/components/tree/tree-item/tree-item.element';
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestKind } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTreeItemElement } from '../../../../backoffice/shared/components/tree/tree-item/tree-item.element';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {

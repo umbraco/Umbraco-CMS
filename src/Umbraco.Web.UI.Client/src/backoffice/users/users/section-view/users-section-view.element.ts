@@ -10,18 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				height: 100%;
-			}
-
-			#router-slot {
-				height: calc(100% - var(--umb-header-layout-height));
-			}
-		`,
-	];
+	
 
 	#routes: IRoute[] = [
 		{
@@ -75,6 +64,19 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				height: 100%;
+			}
+
+			#router-slot {
+				height: calc(100% - var(--umb-header-layout-height));
+			}
+		`,
+	];
 }
 
 export default UmbSectionViewUsersElement;

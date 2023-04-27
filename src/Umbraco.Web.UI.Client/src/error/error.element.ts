@@ -27,53 +27,7 @@ export class UmbErrorElement extends UmbLitElement {
 	@property()
 	error?: unknown;
 
-	static styles = css`
-		#background {
-			position: fixed;
-			overflow: hidden;
-			background-position: 50%;
-			background-repeat: no-repeat;
-			background-size: cover;
-			background-image: url('${unsafeCSS(backgroundImg)}');
-			width: 100vw;
-			height: 100vh;
-		}
-
-		#logo {
-			position: fixed;
-			top: var(--uui-size-space-5);
-			left: var(--uui-size-space-5);
-			height: 30px;
-		}
-
-		#logo img {
-			height: 100%;
-		}
-
-		#container {
-			position: relative;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: 100vw;
-			height: 100vh;
-		}
-
-		#box {
-			width: 50vw;
-			padding: var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-5) var(--uui-size-space-5);
-		}
-
-		details {
-			padding: var(--uui-size-space-2) var(--uui-size-space-3);
-			background: var(--uui-color-surface-alt);
-		}
-
-		pre {
-			width: 100%;
-			overflow: auto;
-		}
-	`;
+	
 
 	private renderProblemDetails = (problemDetails: ProblemDetailsModel) => html`
 		<h2>${problemDetails.title}</h2>
@@ -126,6 +80,54 @@ export class UmbErrorElement extends UmbLitElement {
 					: nothing}
 			</uui-box>
 		</div>
+	`;
+	
+	static styles = css`
+		#background {
+			position: fixed;
+			overflow: hidden;
+			background-position: 50%;
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-image: url('${unsafeCSS(backgroundImg)}');
+			width: 100vw;
+			height: 100vh;
+		}
+
+		#logo {
+			position: fixed;
+			top: var(--uui-size-space-5);
+			left: var(--uui-size-space-5);
+			height: 30px;
+		}
+
+		#logo img {
+			height: 100%;
+		}
+
+		#container {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100vw;
+			height: 100vh;
+		}
+
+		#box {
+			width: 50vw;
+			padding: var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-5) var(--uui-size-space-5);
+		}
+
+		details {
+			padding: var(--uui-size-space-2) var(--uui-size-space-3);
+			background: var(--uui-color-surface-alt);
+		}
+
+		pre {
+			width: 100%;
+			overflow: auto;
+		}
 	`;
 }
 
