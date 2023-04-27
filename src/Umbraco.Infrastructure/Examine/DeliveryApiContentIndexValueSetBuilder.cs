@@ -37,8 +37,9 @@ public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexVa
             // mandatory index values go here
             var indexValues = new Dictionary<string, object>
             {
-                ["id"] = content.Key,
-                [UmbracoExamineFieldNames.NodeNameFieldName] = content.PublishName ?? string.Empty
+                ["id"] = content.Id, // required for unpublishing/deletion handling
+                [UmbracoExamineFieldNames.IndexPathFieldName] = content.Path, // required for unpublishing/deletion handling
+                [UmbracoExamineFieldNames.NodeNameFieldName] = content.PublishName ?? string.Empty, // primarily needed for backoffice index browsing
             };
 
             // add custom field values from index handlers (selectors, filters, sorts)
@@ -52,7 +53,8 @@ public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexVa
                 indexValues[fieldValue.FieldName] = fieldValue.Value;
             }
 
-            yield return new ValueSet(content.Key.ToString(), IndexTypes.Content, content.ContentType.Alias, indexValues);
+            // NOTE: must use content.Id here, not content.Key - otherwise automatic clean-up i.e. on deletion or unpublishing will not work
+            yield return new ValueSet(content.Id.ToString(), IndexTypes.Content, content.ContentType.Alias, indexValues);
         }
     }
 

@@ -14,9 +14,12 @@ public class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContent
     public FieldDefinitionCollection Build()
     {
         // mandatory field definitions go here
+        // see also the field definitions in the Delivery API content index value set builder
         var fieldDefinitions = new List<FieldDefinition>
         {
-            new("id", FieldDefinitionTypes.FullText)
+            new("id", FieldDefinitionTypes.Integer),
+            new(UmbracoExamineFieldNames.IndexPathFieldName, FieldDefinitionTypes.Raw),
+            new(UmbracoExamineFieldNames.NodeNameFieldName, FieldDefinitionTypes.Raw)
         };
 
         // add custom fields from index handlers (selectors, filters, sorts)
