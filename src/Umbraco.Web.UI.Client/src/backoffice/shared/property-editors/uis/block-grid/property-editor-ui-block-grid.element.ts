@@ -64,7 +64,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 				},
 				{
 					path: 'modal-2',
-					//pathMatch: 'full',
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
