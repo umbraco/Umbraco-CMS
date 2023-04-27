@@ -2,7 +2,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
@@ -15,9 +15,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Language.Details',
 		name: 'Language Workspace Details View',
 		loader: () => import('./views/details/language-details-workspace-view.element'),

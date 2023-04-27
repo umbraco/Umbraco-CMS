@@ -1,5 +1,5 @@
-import type { ManifestWorkspaceView } from '../models';
+import type { ManifestWorkspaceEditorView } from '../models';
 
 export interface UmbWorkspaceEditorViewExtensionElement extends HTMLElement {
-	manifest?: ManifestWorkspaceView;
+	manifest?: ManifestWorkspaceEditorView;
 }

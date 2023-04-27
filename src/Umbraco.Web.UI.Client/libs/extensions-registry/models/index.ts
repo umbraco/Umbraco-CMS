@@ -23,7 +23,7 @@ import type { ManifestTreeItem } from './tree-item.model';
 import type { ManifestUserProfileApp } from './user-profile-app.model';
 import type { ManifestWorkspace } from './workspace.model';
 import type { ManifestWorkspaceAction } from './workspace-action.model';
-import type { ManifestWorkspaceView } from './workspace-view.model';
+import type { ManifestWorkspaceEditorView } from './workspace-editor-view.model';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model';
 
 import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
@@ -53,7 +53,7 @@ export * from './tree.model';
 export * from './user-profile-app.model';
 export * from './workspace-action.model';
 export * from './workspace-view-collection.model';
-export * from './workspace-view.model';
+export * from './workspace-editor-view.model';
 export * from './workspace.model';
 
 export type ManifestTypes =
@@ -89,7 +89,7 @@ export type ManifestTypes =
 	| ManifestUserProfileApp
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
-	| ManifestWorkspaceView
+	| ManifestWorkspaceEditorView
 	| ManifestWorkspaceViewCollection
 	| ManifestBase;
 
@@ -156,7 +156,8 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 /**
  * The type of extension such as dashboard etc...
  */
-export interface ManifestClass<ClassType = unknown> extends ManifestWithLoader<{ default: ClassConstructor<ClassType> }> {
+export interface ManifestClass<ClassType = unknown>
+	extends ManifestWithLoader<{ default: ClassConstructor<ClassType> }> {
 	//type: ManifestStandardTypes;
 	readonly CLASS_TYPE?: ClassType;
 

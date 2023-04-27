@@ -7,7 +7,10 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
+import {
+	ManifestWorkspaceEditorView,
+	ManifestWorkspaceViewCollection,
+} from '@umbraco-cms/backoffice/extensions-registry';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
@@ -17,7 +20,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	private _alias = 'Umb.Workspace.LogviewerRoot';
 
 	@state()
-	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
+	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
 	private _routes: UmbRoute[] = [];
@@ -60,7 +63,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	private _observeWorkspaceViews() {
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView'])
+				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView'])
 				.pipe(
 					map((extensions) => extensions.filter((extension) => extension.conditions.workspaces.includes(this._alias)))
 				),

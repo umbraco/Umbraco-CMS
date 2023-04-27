@@ -8,7 +8,7 @@ import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type {
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
@@ -63,7 +63,7 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 	}
 
 	@state()
-	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
+	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
 	private _routes?: UmbRoute[];
@@ -77,7 +77,7 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 	private _observeWorkspaceViews() {
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView', 'workspaceViewCollection'])
+				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView', 'workspaceViewCollection'])
 				.pipe(
 					map((extensions) => extensions.filter((extension) => extension.conditions.workspaces.includes(this.alias)))
 				),
