@@ -1,8 +1,11 @@
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
@@ -10,6 +13,7 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 internal sealed class ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
 {
     private readonly IExamineManager _examineManager;
+    private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
     private readonly SelectorHandlerCollection _selectorHandlers;
     private readonly FilterHandlerCollection _filterHandlers;
     private readonly SortHandlerCollection _sortHandlers;
@@ -17,11 +21,13 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
     public ApiContentQueryService(
         IExamineManager examineManager,
+        IRequestStartItemProviderAccessor requestStartItemProviderAccessor,
         SelectorHandlerCollection selectorHandlers,
         FilterHandlerCollection filterHandlers,
         SortHandlerCollection sortHandlers)
     {
         _examineManager = examineManager;
+        _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
         _selectorHandlers = selectorHandlers;
         _filterHandlers = filterHandlers;
         _sortHandlers = sortHandlers;
@@ -56,9 +62,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         HandleFiltering(filters, queryOperation);
 
         // Handle Sorting
-        IOrdering? sortQuery = HandleSorting(sorts, queryOperation);
+        IOrdering sortQuery = HandleSorting(sorts, queryOperation);
 
-        ISearchResults? results = (sortQuery ?? DefaultSort(queryOperation))?.Execute(QueryOptions.SkipTake(skip, take));
+        ISearchResults? results = sortQuery.Execute(QueryOptions.SkipTake(skip, take));
 
         if (results is null)
         {
@@ -73,7 +79,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
     {
-        IBooleanOperation? queryOperation;
+        string? fieldName = null;
+        string? fieldValue = null;
 
         if (fetch is not null)
         {
@@ -85,20 +92,29 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
                 return null;
             }
 
-            var value = string.IsNullOrWhiteSpace(selector.Value) == false
+            fieldName = selector.FieldName;
+            fieldValue = string.IsNullOrWhiteSpace(selector.Value) == false
                 ? selector.Value
                 : _fallbackGuidValue;
-            queryOperation = baseQuery.Field(selector.FieldName, value);
-        }
-        else
-        {
-            // TODO: If no params or no fetch value, get everything from the index - make a default selector and register it by the end of the collection
-            // TODO: This selects everything without regard to the current start-item header - make sure we honour that if it is present
-            // This is a temp Examine solution
-            queryOperation = baseQuery.Field("__IndexType", "content");
         }
 
-        return queryOperation;
+        // Take into account the "start-item" header if present, as it defines a starting root node to query from
+        if (fieldName is null && _requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider))
+        {
+            IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
+            if (startItem is not null)
+            {
+                // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
+                fieldName = DescendantsSelectorIndexer.FieldName;
+                fieldValue = startItem.Key.ToString();
+            }
+        }
+
+        // If no params or no fetch value, get everything from the index - this is a way to do that with Examine
+        fieldName ??= UmbracoExamineFieldNames.CategoryFieldName;
+        fieldValue ??= "content";
+
+        return baseQuery.Field(fieldName, fieldValue);
     }
 
     private void HandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
@@ -139,7 +155,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         }
     }
 
-    private IOrdering? HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
+    private IOrdering HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
     {
         IOrdering? orderingQuery = null;
 
@@ -170,13 +186,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
             };
         }
 
-        return orderingQuery;
-    }
-
-    private IOrdering? DefaultSort(IBooleanOperation queryCriteria)
-    {
-        var defaultSorts = new[] { $"{PathSortIndexer.FieldName}:asc", $"{SortOrderSortIndexer.FieldName}:asc" };
-
-        return HandleSorting(defaultSorts, queryCriteria);
+        return orderingQuery ?? // Apply default sorting (left-aligning the content tree) if no valid sort query params
+               queryCriteria
+                   .OrderBy(new SortableField(PathSortIndexer.FieldName, SortType.String))
+                   .OrderBy(new SortableField(SortOrderSortIndexer.FieldName, SortType.Int));
     }
 }
