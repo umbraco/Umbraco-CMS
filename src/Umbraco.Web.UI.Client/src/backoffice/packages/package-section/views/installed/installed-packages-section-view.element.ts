@@ -8,9 +8,10 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPackageWithMigrationStatus } from '@umbraco-cms/backoffice/models';
 
 import './installed-packages-section-view-item.element';
+import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-installed-packages-section-view')
-export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
+export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {
 	@state()
 	private _installedPackages: UmbPackageWithMigrationStatus[] = [];
 
