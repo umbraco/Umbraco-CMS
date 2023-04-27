@@ -79,8 +79,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
     {
-        string fieldName;
-        string fieldValue;
+        string? fieldName = null;
+        string? fieldValue = null;
 
         if (fetch is not null)
         {
@@ -97,24 +97,22 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
                 ? selector.Value
                 : _fallbackGuidValue;
         }
-        else
-        {
-            // If no params or no fetch value, get everything from the index - this is a way to do that with Examine
-            fieldName = UmbracoExamineFieldNames.CategoryFieldName;
-            fieldValue = "content";
 
-            // Take into account the "start-item" header if present, as it defines a starting root node to query from
-            if (_requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider))
+        // Take into account the "start-item" header if present, as it defines a starting root node to query from
+        if (fieldName is null && _requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider))
+        {
+            IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
+            if (startItem is not null)
             {
-                IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
-                if (startItem is not null)
-                {
-                    // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
-                    fieldName = DescendantsSelectorIndexer.FieldName;
-                    fieldValue = startItem.Key.ToString();
-                }
+                // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
+                fieldName = DescendantsSelectorIndexer.FieldName;
+                fieldValue = startItem.Key.ToString();
             }
         }
+
+        // If no params or no fetch value, get everything from the index - this is a way to do that with Examine
+        fieldName ??= UmbracoExamineFieldNames.CategoryFieldName;
+        fieldValue ??= "content";
 
         return baseQuery.Field(fieldName, fieldValue);
     }
