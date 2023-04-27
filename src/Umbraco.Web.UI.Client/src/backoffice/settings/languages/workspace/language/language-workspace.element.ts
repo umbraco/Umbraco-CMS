@@ -48,7 +48,6 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 				this.observe(
 					this.#languageWorkspaceContext.isNew,
 					(isNew) => {
-						console.log('observe', isNew);
 						if (isNew === false) {
 							const isoCode = this.#languageWorkspaceContext.getEntityId();
 							if (this.#routerPath && isoCode) {
