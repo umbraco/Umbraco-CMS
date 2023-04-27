@@ -639,7 +639,6 @@
                         mapToPropertyModel(this.settings, this.settingsData);
                     }
                 };
-              debugger;
                 // first time instant update of label.
               blockObject.label = blockObject.content?.contentTypeName || "";
                 blockObject.index = 0; 
