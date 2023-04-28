@@ -12,7 +12,6 @@ import type {
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
-import '../../extension-slot/extension-slot.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
