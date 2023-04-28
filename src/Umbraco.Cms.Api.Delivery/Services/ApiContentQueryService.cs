@@ -18,6 +18,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
     private readonly FilterHandlerCollection _filterHandlers;
     private readonly SortHandlerCollection _sortHandlers;
     private readonly string _fallbackGuidValue;
+    private readonly ISet<string> _itemIdOnlyFieldSet = new HashSet<string> { "itemId" };
 
     public ApiContentQueryService(
         IExamineManager examineManager,
@@ -63,18 +64,20 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
         // Handle Sorting
         IOrdering sortQuery = HandleSorting(sorts, queryOperation);
+        IOrdering? selectedFields = sortQuery.SelectFields(_itemIdOnlyFieldSet);
 
-        ISearchResults? results = sortQuery.Execute(QueryOptions.SkipTake(skip, take));
+        ISearchResults? results = selectedFields.Execute(QueryOptions.SkipTake(skip, take));
 
         if (results is null)
         {
             return emptyResult;
         }
-        else
-        {
-            Guid[] items = results.Select(x => Guid.Parse(x.Id)).ToArray();
-            return new PagedModel<Guid>(results.TotalItemCount, items);
-        }
+
+        Guid[] items = results
+            .Where(r => r.Values.ContainsKey("itemId"))
+            .Select(r => Guid.Parse(r.Values["itemId"]))
+            .ToArray();
+        return new PagedModel<Guid>(results.TotalItemCount, items);
     }
 
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
