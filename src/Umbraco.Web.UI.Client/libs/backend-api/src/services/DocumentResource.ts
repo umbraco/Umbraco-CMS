@@ -1,10 +1,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CopyDocumentRequestModel } from '../models/CopyDocumentRequestModel';
 import type { CreateDocumentRequestModel } from '../models/CreateDocumentRequestModel';
 import type { DocumentItemResponseModel } from '../models/DocumentItemResponseModel';
 import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
+import type { MoveDocumentRequestModel } from '../models/MoveDocumentRequestModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
 import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
 import type { UpdateDocumentNotificationsRequestModel } from '../models/UpdateDocumentNotificationsRequestModel';
@@ -109,6 +111,33 @@ export class DocumentResource {
     }
 
     /**
+     * @returns string Created
+     * @throws ApiError
+     */
+    public static postDocumentByIdCopy({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: CopyDocumentRequestModel,
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/document/{id}/copy',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Location',
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -145,6 +174,32 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putDocumentByIdMove({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveDocumentRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/document/{id}/move',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
         });
     }
 

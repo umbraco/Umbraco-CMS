@@ -13,37 +13,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-language-details-workspace-view')
 export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				padding: var(--uui-size-space-6);
-			}
-
-			uui-combobox {
-				width: 100%;
-			}
-
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-
-			#default-language-warning {
-				background-color: var(--uui-color-warning);
-				color: var(--uui-color-warning-contrast);
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				border: 1px solid var(--uui-color-warning-standalone);
-				margin-top: var(--uui-size-space-4);
-				border-radius: var(--uui-border-radius);
-			}
-
-			.validation-message {
-				color: var(--uui-color-danger);
-			}
-		`,
-	];
+	
 
 	@state()
 	_language?: LanguageResponseModel;
@@ -215,6 +185,38 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				padding: var(--uui-size-space-6);
+			}
+
+			uui-combobox {
+				width: 100%;
+			}
+
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+			}
+
+			#default-language-warning {
+				background-color: var(--uui-color-warning);
+				color: var(--uui-color-warning-contrast);
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				border: 1px solid var(--uui-color-warning-standalone);
+				margin-top: var(--uui-size-space-4);
+				border-radius: var(--uui-border-radius);
+			}
+
+			.validation-message {
+				color: var(--uui-color-danger);
+			}
+		`,
+	];
 }
 
 export default UmbLanguageDetailsWorkspaceViewElement;

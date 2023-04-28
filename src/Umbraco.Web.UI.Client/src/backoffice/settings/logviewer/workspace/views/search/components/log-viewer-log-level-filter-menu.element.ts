@@ -10,28 +10,7 @@ import { path, query, toQueryString } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-log-viewer-log-level-filter-menu')
 export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#log-level-selector {
-				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));
-				width: 150px;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-
-			.log-level-button-indicator {
-				font-weight: 600;
-			}
-
-			.log-level-button-indicator:not(:last-of-type)::after {
-				content: ', ';
-			}
-		`,
-	];
+	
 
 	@queryAll('#log-level-selector > uui-checkbox')
 	private _logLevelSelectorCheckboxes!: NodeListOf<UUICheckboxElement>;
@@ -121,6 +100,29 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 			</umb-button-with-dropdown>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#log-level-selector {
+				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));
+				width: 150px;
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+
+			.log-level-button-indicator {
+				font-weight: 600;
+			}
+
+			.log-level-button-indicator:not(:last-of-type)::after {
+				content: ', ';
+			}
+		`,
+	];
 }
 
 declare global {

@@ -16,25 +16,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 
 @customElement('umb-input-media-picker')
 export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: grid;
-				gap: var(--uui-size-space-3);
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-			}
-			#add-button {
-				text-align: center;
-				height: 160px;
-			}
-
-			uui-icon {
-				display: block;
-				margin: 0 auto;
-			}
-		`,
-	];
+	
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -202,6 +184,26 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 		`;
 		//TODO: <uui-button-inline-create vertical></uui-button-inline-create>
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: grid;
+				gap: var(--uui-size-space-3);
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+			}
+			#add-button {
+				text-align: center;
+				height: 160px;
+			}
+
+			uui-icon {
+				display: block;
+				margin: 0 auto;
+			}
+		`,
+	];
 }
 
 export default UmbInputMediaPickerElement;

@@ -7,29 +7,7 @@ import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-a
 
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#icon-container {
-				position: relative;
-			}
-
-			#icon {
-				vertical-align: middle;
-			}
-
-			#status-symbol {
-				width: 8px;
-				height: 8px;
-				background-color: blue;
-				display: block;
-				position: absolute;
-				bottom: 0;
-				right: 0;
-				border-radius: 100%;
-			}
-		`,
-	];
+	
 
 	private _item?: DocumentTreeItemResponseModel;
 	@property({ type: Object, attribute: false })
@@ -67,6 +45,30 @@ export class UmbDocumentTreeItemElement extends UmbLitElement {
 	#renderLabel() {
 		return html` <span id="label" slot="label">${this.item?.name}</span> `;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#icon-container {
+				position: relative;
+			}
+
+			#icon {
+				vertical-align: middle;
+			}
+
+			#status-symbol {
+				width: 8px;
+				height: 8px;
+				background-color: blue;
+				display: block;
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				border-radius: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTreeItemElement;

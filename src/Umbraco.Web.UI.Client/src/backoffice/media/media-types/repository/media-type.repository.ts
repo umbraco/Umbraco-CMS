@@ -2,7 +2,6 @@ import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from '
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
 import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
@@ -60,8 +59,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
+			throw new Error('Parent id is missing');
 		}
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
@@ -77,8 +75,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -114,8 +111,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Id is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 		const { data, error } = await this.#detailSource.get(id);
 
@@ -136,8 +132,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		// TODO: should we show a notification if the media type is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!mediaType || !mediaType.id) {
-			const error: ProblemDetailsModel = { title: 'Media Type is missing' };
-			return { error };
+			throw new Error('Media type is missing');
 		}
 
 		const { error } = await this.#detailSource.update(mediaType);
@@ -161,8 +156,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!mediaType.name) {
-			const error: ProblemDetailsModel = { title: 'Name is missing' };
-			return { error };
+			throw new Error('Name is missing');
 		}
 
 		const { data, error } = await this.#detailSource.insert(mediaType);

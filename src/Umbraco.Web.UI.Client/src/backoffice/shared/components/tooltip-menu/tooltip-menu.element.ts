@@ -11,39 +11,7 @@ export interface TooltipMenuItem {
 
 @customElement('umb-tooltip-menu')
 export class UmbTooltipMenuElement extends LitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				width: max-content;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				border-radius: var(--uui-border-radius);
-				overflow: clip;
-			}
-			.item {
-				color: var(--uui-color-interactive);
-				align-items: center;
-				display: flex;
-				gap: var(--uui-size-space-2);
-				cursor: pointer;
-			}
-			.item:hover {
-				color: var(--uui-color-interactive-emphasis);
-				background-color: var(--uui-color-surface-emphasis);
-			}
-			.item.label {
-				padding: var(--uui-size-space-2) var(--uui-size-space-4);
-			}
-			.item.icon {
-				padding: var(--uui-size-space-4);
-				aspect-ratio: 1/1;
-				justify-content: center;
-			}
-		`,
-	];
+	
 
 	@property({ type: Boolean, reflect: true, attribute: 'icon-only' })
 	public iconOnly = false;
@@ -87,6 +55,40 @@ export class UmbTooltipMenuElement extends LitElement {
 			(item) => this._renderItem(item)
 		);
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				width: max-content;
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				border-radius: var(--uui-border-radius);
+				overflow: clip;
+			}
+			.item {
+				color: var(--uui-color-interactive);
+				align-items: center;
+				display: flex;
+				gap: var(--uui-size-space-2);
+				cursor: pointer;
+			}
+			.item:hover {
+				color: var(--uui-color-interactive-emphasis);
+				background-color: var(--uui-color-surface-emphasis);
+			}
+			.item.label {
+				padding: var(--uui-size-space-2) var(--uui-size-space-4);
+			}
+			.item.icon {
+				padding: var(--uui-size-space-4);
+				aspect-ratio: 1/1;
+				justify-content: center;
+			}
+		`,
+	];
 }
 
 declare global {

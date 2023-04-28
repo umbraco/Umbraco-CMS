@@ -9,18 +9,7 @@ import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-ap
  */
 @customElement('umb-upgrader-view')
 export class UmbUpgraderViewElement extends LitElement {
-	static styles: CSSResultGroup = [
-		css`
-			.center {
-				display: grid;
-				place-items: center;
-				height: 100vh;
-			}
-			.error {
-				color: var(--uui-color-danger);
-			}
-		`,
-	];
+	
 
 	@property({ type: Boolean })
 	fetching = false;
@@ -98,6 +87,19 @@ export class UmbUpgraderViewElement extends LitElement {
 		e.preventDefault();
 		this.dispatchEvent(new CustomEvent('onAuthorizeUpgrade', { detail: e, bubbles: true }));
 	};
+	
+	static styles: CSSResultGroup = [
+		css`
+			.center {
+				display: grid;
+				place-items: center;
+				height: 100vh;
+			}
+			.error {
+				color: var(--uui-color-danger);
+			}
+		`,
+	];
 }
 
 export default UmbUpgraderViewElement;

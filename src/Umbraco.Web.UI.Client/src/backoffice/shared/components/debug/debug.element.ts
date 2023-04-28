@@ -8,54 +8,7 @@ import { UmbModalContext, UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_CONTEXT_TOKEN } 
 
 @customElement('umb-debug')
 export class UmbDebugElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				float: right;
-			}
-
-			#container {
-				display: block;
-				font-family: monospace;
-
-				z-index: 10000;
-
-				position: relative;
-				width: 100%;
-				padding: 10px 0;
-			}
-
-			uui-badge {
-				cursor: pointer;
-			}
-
-			uui-icon {
-				font-size: 15px;
-			}
-
-			.events {
-				background-color: var(--uui-color-danger);
-				color: var(--uui-color-selected-contrast);
-				max-height: 0;
-				transition: max-height 0.25s ease-out;
-				overflow: hidden;
-			}
-
-			.events.open {
-				max-height: 500px;
-				overflow: auto;
-			}
-
-			.events > div {
-				padding: 10px;
-			}
-
-			h4 {
-				margin: 0;
-			}
-		`,
-	];
+	
 
 	@property({ reflect: true, type: Boolean })
 	visible = false;
@@ -209,6 +162,55 @@ export class UmbDebugElement extends UmbLitElement {
 
 		return instanceTemplates;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				float: right;
+			}
+
+			#container {
+				display: block;
+				font-family: monospace;
+
+				z-index: 10000;
+
+				position: relative;
+				width: 100%;
+				padding: 10px 0;
+			}
+
+			uui-badge {
+				cursor: pointer;
+			}
+
+			uui-icon {
+				font-size: 15px;
+			}
+
+			.events {
+				background-color: var(--uui-color-danger);
+				color: var(--uui-color-selected-contrast);
+				max-height: 0;
+				transition: max-height 0.25s ease-out;
+				overflow: hidden;
+			}
+
+			.events.open {
+				max-height: 500px;
+				overflow: auto;
+			}
+
+			.events > div {
+				padding: 10px;
+			}
+
+			h4 {
+				margin: 0;
+			}
+		`,
+	];
 }
 
 declare global {

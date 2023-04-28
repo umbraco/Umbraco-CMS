@@ -12,34 +12,7 @@ import type { UserGroupEntity } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-input-user-group')
 export class UmbInputPickerUserGroupElement extends UmbInputListBaseElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			#user-group-list {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			.user-group {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-2);
-			}
-			.user-group div {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-4);
-			}
-			.user-group uui-button {
-				margin-left: auto;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _userGroups: Array<UserGroupEntity> = [];
@@ -92,6 +65,35 @@ export class UmbInputPickerUserGroupElement extends UmbInputListBaseElement {
 	renderContent() {
 		return html`${this._renderUserGroupList()}`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			#user-group-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			.user-group {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-space-2);
+			}
+			.user-group div {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-4);
+			}
+			.user-group uui-button {
+				margin-left: auto;
+			}
+		`,
+	];
 }
 
 declare global {

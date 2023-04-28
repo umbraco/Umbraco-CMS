@@ -11,7 +11,7 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
  */
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value: {
@@ -81,6 +81,8 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 			?enable-range=${this._enableRange}
 			@change="${this._onChange}"></umb-input-slider>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUISliderElement;

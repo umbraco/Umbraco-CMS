@@ -9,14 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-variantable-property')
 export class UmbVariantablePropertyElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-		`,
-	];
+	
 
 	private _property?: PropertyTypeResponseModelBaseModel | undefined;
 	@property({ type: Object, attribute: false })
@@ -69,6 +62,15 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 			.property=${this._property}
 			.propertyVariantId=${this._propertyVariantId}></umb-property-type-based-property>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+		`,
+	];
 }
 
 declare global {

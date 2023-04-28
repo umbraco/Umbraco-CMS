@@ -11,20 +11,7 @@ import './components/language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			#main {
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -135,6 +122,21 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#main {
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbLanguageRootWorkspaceElement;

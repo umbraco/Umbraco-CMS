@@ -11,7 +11,7 @@ import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/
  */
 @customElement('umb-property-editor-ui-checkbox-list')
 export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	#value: Array<string> = [];
 	@property({ type: Array })
@@ -57,6 +57,8 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 			.selectedIds="${this.#value}"
 			.list="${this._list}"></umb-input-checkbox-list>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUICheckboxListElement;

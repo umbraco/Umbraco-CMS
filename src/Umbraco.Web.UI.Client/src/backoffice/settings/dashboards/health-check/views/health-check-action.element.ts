@@ -10,48 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-health-check-action')
 export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				margin: var(--uui-size-space-4) 0;
-				display: block;
-				border-radius: var(--uui-border-radius);
-				background-color: var(--uui-color-surface-alt);
-			}
-			form {
-				margin: 0;
-				padding: 0;
-			}
-
-			p {
-				padding-top: 0;
-				margin-top: 0;
-			}
-
-			.action {
-				padding: var(--uui-size-space-5) var(--uui-size-space-6);
-				width: 100%;
-			}
-
-			.action uui-label {
-				display: block;
-			}
-
-			.action uui-button {
-				flex-shrink: 1;
-			}
-
-			.no-description {
-				color: var(--uui-color-border-emphasis);
-				font-style: italic;
-			}
-
-			.required-value {
-				margin: 0 0 var(--uui-size-space-4);
-			}
-		`,
-	];
+	
 
 	@property({ reflect: true })
 	action!: HealthCheckActionRequestModel;
@@ -139,6 +98,49 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 
 		return nothing;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				margin: var(--uui-size-space-4) 0;
+				display: block;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-surface-alt);
+			}
+			form {
+				margin: 0;
+				padding: 0;
+			}
+
+			p {
+				padding-top: 0;
+				margin-top: 0;
+			}
+
+			.action {
+				padding: var(--uui-size-space-5) var(--uui-size-space-6);
+				width: 100%;
+			}
+
+			.action uui-label {
+				display: block;
+			}
+
+			.action uui-button {
+				flex-shrink: 1;
+			}
+
+			.no-description {
+				color: var(--uui-color-border-emphasis);
+				font-style: italic;
+			}
+
+			.required-value {
+				margin: 0 0 var(--uui-size-space-4);
+			}
+		`,
+	];
 }
 
 export default UmbDashboardHealthCheckActionElement;

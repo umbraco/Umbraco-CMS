@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-block-grid-group-configuration')
 export class UmbPropertyEditorUIBlockGridGroupConfigurationElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -19,6 +19,8 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement extends UmbLi
 	render() {
 		return html`<div>umb-property-editor-ui-block-grid-group-configuration</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridGroupConfigurationElement;

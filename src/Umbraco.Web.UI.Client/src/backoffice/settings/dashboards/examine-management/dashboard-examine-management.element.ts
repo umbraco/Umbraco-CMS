@@ -10,18 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbLitElement {
-	static styles = [
-		css`
-			a {
-				color: var(--uui-color-text);
-				background: transparent;
-				border: none;
-				text-decoration: underline;
-				cursor: pointer;
-				display: inline-block;
-			}
-		`,
-	];
+	
 	@state()
 	private _routes: IRoute[] = [
 		{
@@ -65,6 +54,19 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 					this._activePath = event.target.localActiveViewPath || '';
 				}}></umb-router-slot>`;
 	}
+	
+	static styles = [
+		css`
+			a {
+				color: var(--uui-color-text);
+				background: transparent;
+				border: none;
+				text-decoration: underline;
+				cursor: pointer;
+				display: inline-block;
+			}
+		`,
+	];
 }
 
 export default UmbDashboardExamineManagementElement;

@@ -17,15 +17,7 @@ import '../../../../../shared/components/ref-property-editor-ui/ref-property-edi
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	@state()
 	_dataType?: DataTypeResponseModel;
@@ -170,6 +162,16 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDataTypeDetailsWorkspaceViewEditElement;

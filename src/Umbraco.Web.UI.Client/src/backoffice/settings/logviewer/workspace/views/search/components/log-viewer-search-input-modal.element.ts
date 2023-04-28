@@ -10,14 +10,7 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 	{ query: string },
 	SavedLogSearchPresenationBaseModel
 > {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	@query('uui-input')
 	private _input!: UUIInputElement;
@@ -64,6 +57,15 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 			</uui-dialog-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 declare global {

@@ -11,7 +11,7 @@ import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/
  */
 @customElement('umb-property-editor-ui-eye-dropper')
 export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -42,6 +42,8 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 			.swatches=${this._swatches}
 			.opacity="${this._opacity}"></umb-input-eye-dropper>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIEyeDropperElement;

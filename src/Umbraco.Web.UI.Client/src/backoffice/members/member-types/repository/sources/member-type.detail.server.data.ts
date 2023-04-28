@@ -1,6 +1,5 @@
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
@@ -97,8 +96,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		//return await tryExecuteAndNotify(this.#host, MemberTypeResource.deleteMemberTypeByKey({ id }));

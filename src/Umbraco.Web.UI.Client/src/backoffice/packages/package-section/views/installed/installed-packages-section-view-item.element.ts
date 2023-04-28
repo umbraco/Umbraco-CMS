@@ -14,12 +14,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 @customElement('umb-installed-packages-section-view-item')
 export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
-	static styles = css`
-		:host {
-			display: flex;
-			min-height: 47px;
-		}
-	`;
+	
 
 	@property()
 	name?: string;
@@ -147,6 +142,13 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		});
 		*/
 	}
+	
+	static styles = css`
+		:host {
+			display: flex;
+			min-height: 47px;
+		}
+	`;
 }
 
 declare global {

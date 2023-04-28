@@ -6,14 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	@property()
 	value = '';
@@ -29,6 +22,15 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 	render() {
 		return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUITextBoxElement;

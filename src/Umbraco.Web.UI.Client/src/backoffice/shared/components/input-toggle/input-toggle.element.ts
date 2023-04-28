@@ -7,14 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-toggle')
 export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-toggle {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	_checked = false;
 	@property({ type: Boolean })
@@ -68,6 +61,15 @@ export class UmbInputToggleElement extends FormControlMixin(UmbLitElement) {
 			.label="${this._currentLabel}"
 			@change="${this.#onChange}"></uui-toggle>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-toggle {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbInputToggleElement;

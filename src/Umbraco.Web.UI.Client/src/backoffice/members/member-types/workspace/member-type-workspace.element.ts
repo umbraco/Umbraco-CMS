@@ -8,16 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-type-workspace')
 export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-		`,
-	];
+	
 
 	#workspaceContext = new UmbMemberTypeWorkspaceContext(this);
 	#element = new UmbMemberTypeWorkspaceEditElement();
@@ -37,6 +28,17 @@ export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbMemberTypeWorkspaceElement;

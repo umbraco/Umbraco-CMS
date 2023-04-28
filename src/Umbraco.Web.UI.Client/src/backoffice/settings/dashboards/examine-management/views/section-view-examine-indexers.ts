@@ -11,71 +11,7 @@ import './section-view-examine-searchers';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-
-			uui-box,
-			umb-dashboard-examine-searcher {
-				margin-top: var(--uui-size-space-5);
-			}
-
-			uui-box p {
-				margin-top: 0;
-			}
-
-			div.flex {
-				display: flex;
-			}
-			div.flex > uui-button {
-				padding-left: var(--uui-size-space-4);
-				height: 0;
-			}
-
-			uui-input {
-				width: 100%;
-				margin-bottom: var(--uui-size-space-5);
-			}
-
-			uui-table.info uui-table-row:first-child uui-table-cell {
-				border-top: none;
-			}
-
-			uui-table-head-cell {
-				text-transform: capitalize;
-			}
-
-			uui-table-row:last-child uui-table-cell {
-				padding-bottom: 0;
-			}
-
-			uui-icon {
-				vertical-align: top;
-				padding-right: var(--uui-size-space-5);
-			}
-
-			.positive {
-				color: var(--uui-color-positive);
-			}
-			.danger {
-				color: var(--uui-color-danger);
-			}
-
-			button {
-				background: none;
-				border: none;
-				text-decoration: underline;
-				cursor: pointer;
-			}
-			button.bright {
-				font-style: italic;
-				color: var(--uui-color-positive-emphasis);
-			}
-		`,
-	];
+	
 
 	@property()
 	indexName!: string;
@@ -217,6 +153,72 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			</uui-button>
 		</uui-box>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+
+			uui-box,
+			umb-dashboard-examine-searcher {
+				margin-top: var(--uui-size-space-5);
+			}
+
+			uui-box p {
+				margin-top: 0;
+			}
+
+			div.flex {
+				display: flex;
+			}
+			div.flex > uui-button {
+				padding-left: var(--uui-size-space-4);
+				height: 0;
+			}
+
+			uui-input {
+				width: 100%;
+				margin-bottom: var(--uui-size-space-5);
+			}
+
+			uui-table.info uui-table-row:first-child uui-table-cell {
+				border-top: none;
+			}
+
+			uui-table-head-cell {
+				text-transform: capitalize;
+			}
+
+			uui-table-row:last-child uui-table-cell {
+				padding-bottom: 0;
+			}
+
+			uui-icon {
+				vertical-align: top;
+				padding-right: var(--uui-size-space-5);
+			}
+
+			.positive {
+				color: var(--uui-color-positive);
+			}
+			.danger {
+				color: var(--uui-color-danger);
+			}
+
+			button {
+				background: none;
+				border: none;
+				text-decoration: underline;
+				cursor: pointer;
+			}
+			button.bright {
+				font-style: italic;
+				color: var(--uui-color-positive-emphasis);
+			}
+		`,
+	];
 }
 
 export default UmbDashboardExamineIndexElement;

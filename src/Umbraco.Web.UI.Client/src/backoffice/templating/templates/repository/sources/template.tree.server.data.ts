@@ -1,6 +1,6 @@
-import { TemplateTreeDataSource } from '.';
-import { ProblemDetailsModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { TemplateTreeDataSource } from '.';
+import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -38,8 +38,7 @@ export class UmbTemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { error };
+			throw new Error('Parent id is missing');
 		}
 
 		return tryExecuteAndNotify(
@@ -58,8 +57,7 @@ export class UmbTemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

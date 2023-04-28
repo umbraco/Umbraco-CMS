@@ -1,10 +1,9 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store';
 import { UmbMemberTreeServerDataSource } from './sources/member.tree.server.data';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMemberRepository implements UmbTreeRepository {
 	#host: UmbControllerHostElement;
@@ -54,16 +53,14 @@ export class UmbMemberRepository implements UmbTreeRepository {
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
-		const error: ProblemDetailsModel = { title: 'Not implemented' };
-		return { data: undefined, error };
+		return { data: undefined, error: { title: 'Not implemented', message: 'Not implemented' } };
 	}
 
 	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#dataSource.getItems(ids);

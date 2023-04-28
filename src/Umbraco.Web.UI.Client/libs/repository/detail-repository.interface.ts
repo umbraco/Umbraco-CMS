@@ -7,10 +7,15 @@ export interface UmbRepositoryResponse<T> extends UmbRepositoryErrorResponse {
 	data?: T;
 }
 
-export interface UmbDetailRepository<CreateRequestType = any, UpdateRequestType = any, ResponseType = any> {
+export interface UmbDetailRepository<
+	CreateRequestType = any,
+	CreateResponseType = any,
+	UpdateRequestType = any,
+	ResponseType = any
+> {
 	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<CreateRequestType>>;
 	requestById(id: string): Promise<UmbRepositoryResponse<ResponseType>>;
-	create(data: CreateRequestType): Promise<UmbRepositoryErrorResponse>;
+	create(data: CreateRequestType): Promise<UmbRepositoryResponse<CreateResponseType>>;
 	save(id: string, data: UpdateRequestType): Promise<UmbRepositoryErrorResponse>;
 	delete(id: string): Promise<UmbRepositoryErrorResponse>;
 }

@@ -13,27 +13,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
  */
 @customElement('umb-member-group-workspace-edit')
 export class UmbMemberGroupWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			#header {
-				margin: 0 var(--uui-size-layout-1);
-				flex: 1 1 auto;
-			}
-
-			#name {
-				width: 100%;
-				flex: 1 1 auto;
-				align-items: center;
-			}
-		`,
-	];
+	
 
 	#workspaceContext?: UmbWorkspaceMemberGroupContext;
 
@@ -72,6 +52,28 @@ export class UmbMemberGroupWorkspaceEditElement extends UmbLitElement {
 			</div>
 		</umb-workspace-layout> `;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#header {
+				margin: 0 var(--uui-size-layout-1);
+				flex: 1 1 auto;
+			}
+
+			#name {
+				width: 100%;
+				flex: 1 1 auto;
+				align-items: center;
+			}
+		`,
+	];
 }
 
 export default UmbMemberGroupWorkspaceEditElement;

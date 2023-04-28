@@ -12,31 +12,34 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
+import { UmbAuthFlow } from './core/auth/auth-flow';
 import { UmbIconStore } from './core/stores/icon/icon.store';
+import type { UmbErrorElement } from './error/error.element';
 import type { Guard, IRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UMB_SERVER_URL, tryExecute } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
-	static styles = css`
-		:host {
-			overflow: hidden;
-		}
-
-		:host,
-		#router-slot {
-			display: block;
-			width: 100%;
-			height: 100vh;
-		}
-	`;
-
+	/**
+	 * The base URL of the configured Umbraco server.
+	 *
+	 * @attr
+	 * @remarks This is the base URL of the Umbraco server, not the base URL of the backoffice.
+	 */
 	@property({ type: String })
-	private umbracoUrl?: string;
+	private serverUrl = import.meta.env.VITE_UMBRACO_API_URL ?? '';
+
+	/**
+	 * The base path of the backoffice.
+	 *
+	 * @attr
+	 */
+	@property({ type: String })
+	private backofficePath = '/umbraco';
 
 	private _routes: IRoute[] = [
 		{
@@ -46,7 +49,7 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: 'upgrade',
 			component: () => import('./upgrader/upgrader.element'),
-			guards: [this.#isAuthorizedGuard('/upgrade')],
+			guards: [this.#isAuthorizedGuard()],
 		},
 		{
 			path: '**',
@@ -55,28 +58,71 @@ export class UmbAppElement extends UmbLitElement {
 		},
 	];
 
+	#authFlow: UmbAuthFlow;
 	#umbIconRegistry = new UmbIconStore();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
 	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
+	#isMocking = import.meta.env.VITE_UMBRACO_USE_MSW === 'on';
 
 	constructor() {
 		super();
+
+		// TODO: get all mocking logic out of this element. The app element doesn't need to know who is serving the data.
+		OpenAPI.BASE = this.#isMocking ? '' : this.serverUrl;
+
+		this.#authFlow = new UmbAuthFlow(
+			OpenAPI.BASE !== '' ? OpenAPI.BASE : window.location.origin,
+			`${window.location.origin}${this.backofficePath}`
+		);
+
+		this.provideContext(UMB_SERVER_URL, OpenAPI.BASE);
+
+		this._setup();
+
 		this.#umbIconRegistry.attach(this);
 		this.#uuiIconRegistry.attach(this);
 	}
 
-	connectedCallback() {
-		super.connectedCallback();
+	private async _setup() {
+		// Try to initialise the auth flow and get the runtime status
+		try {
+			// Get the current runtime level
+			await this.#setInitStatus();
 
-		OpenAPI.BASE =
-			import.meta.env.VITE_UMBRACO_USE_MSW === 'on'
-				? ''
-				: this.umbracoUrl ?? import.meta.env.VITE_UMBRACO_API_URL ?? '';
-		OpenAPI.WITH_CREDENTIALS = true;
+			// If we are not mocking, we need to initialise the connection to the Umbraco authentication server
+			if (!this.#isMocking) {
+				// Get service configuration from authentication server
+				await this.#authFlow.setInitialState();
 
-		this.provideContext('UMBRACOBASE', OpenAPI.BASE);
-		this.#setInitStatus();
+				// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
+				OpenAPI.TOKEN = () => this.#authFlow.performWithFreshTokens();
+				OpenAPI.WITH_CREDENTIALS = true;
+			}
 
+			// Initialise the router
+			this.#redirect();
+		} catch (error) {
+			// If the auth flow fails, there is most likely something wrong with the connection to the backend server
+			// and we should redirect to the error page
+			let errorMsg =
+				'An error occured while trying to initialise the connection to the Umbraco server (check console for details)';
+
+			// Get the type of the error and check http status codes
+			if (error instanceof Error) {
+				// If the error is a "TypeError" it means that the server is not reachable
+				if (error.name === 'TypeError') {
+					errorMsg = 'The Umbraco server is unreachable (check console for details)';
+				}
+			}
+
+			// Log the error
+			console.error(errorMsg, error);
+
+			// Redirect to the error page
+			this.#errorPage(errorMsg, error);
+		}
+
+		// TODO: wrap all debugging logic in a separate class
 		// Listen for the debug event from the <umb-debug> component
 		this.addEventListener(umbDebugContextEventType, (event: any) => {
 			// Once we got to the outter most component <umb-app>
@@ -101,9 +147,11 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setInitStatus() {
-		const { data } = await tryExecuteAndNotify(this, ServerResource.getServerStatus());
+		const { data, error } = await tryExecute(ServerResource.getServerStatus());
+		if (error) {
+			throw error;
+		}
 		this.#runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
-		this.#redirect();
 	}
 
 	#redirect() {
@@ -116,48 +164,87 @@ export class UmbAppElement extends UmbLitElement {
 				history.replaceState(null, '', 'upgrade');
 				break;
 
+			case RuntimeLevelModel.BOOT_FAILED:
+				this.#errorPage('The Umbraco server failed to boot');
+				break;
+
 			case RuntimeLevelModel.RUN: {
 				const pathname = pathWithoutBasePath({ start: true, end: false });
 
 				// If we are on the installer or upgrade page, redirect to the root
 				// but if not, keep the current path but replace state anyway to initialize the router
-				const finalPath = pathname === '/install' || pathname === '/upgrade' ? '/' : location.href;
+				let currentRoute = location.href;
+				const savedRoute = sessionStorage.getItem('umb:auth:redirect');
+				if (savedRoute) {
+					sessionStorage.removeItem('umb:auth:redirect');
+					currentRoute = savedRoute;
+				}
+				const finalPath = pathname === '/install' || pathname === '/upgrade' ? '/' : currentRoute;
 
 				history.replaceState(null, '', finalPath);
 				break;
 			}
 
 			default:
-				throw new Error(`Unsupported runtime level: ${this.#runtimeLevel}`);
+				// Redirect to the error page
+				this.#errorPage(`Unsupported runtime level: ${this.#runtimeLevel}`);
 		}
 	}
 
 	#isAuthorized(): boolean {
-		return true; // TODO: Return true for now, until new login page is up and running
-		//return sessionStorage.getItem('is-authenticated') === 'true';
+		return this.#isMocking ? true : this.#authFlow.loggedIn();
 	}
 
-	#isAuthorizedGuard(redirectTo?: string): Guard {
+	#isAuthorizedGuard(): Guard {
 		return () => {
 			if (this.#isAuthorized()) {
 				return true;
 			}
 
-			let returnPath = `${OpenAPI.BASE}/umbraco/login`;
+			// Save location.href so we can redirect to it after login
+			window.sessionStorage.setItem('umb:auth:redirect', location.href);
 
-			if (redirectTo) {
-				returnPath += `?redirectTo=${redirectTo}`;
-			}
+			// Make a request to the auth server to start the auth flow
+			this.#authFlow.makeAuthorizationRequest();
 
-			// Redirect user completely to login page
-			location.href = returnPath;
+			// Return false to prevent the route from being rendered
 			return false;
 		};
+	}
+
+	#errorPage(errorMsg: string, error?: unknown) {
+		// Redirect to the error page
+		this._routes = [
+			{
+				path: '**',
+				component: () => import('./error/error.element'),
+				setup: (component) => {
+					(component as UmbErrorElement).errorMessage = errorMsg;
+					(component as UmbErrorElement).error = error;
+				},
+			},
+		];
+
+		// Re-render the router
+		this.requestUpdate();
 	}
 
 	render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
+
+	static styles = css`
+		:host {
+			overflow: hidden;
+		}
+
+		:host,
+		#router-slot {
+			display: block;
+			width: 100%;
+			height: 100vh;
+		}
+	`;
 }
 
 declare global {

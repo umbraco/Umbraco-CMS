@@ -6,15 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-search-header-app')
 export class UmbSearchHeaderAppElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			uui-button {
-				font-size: 18px;
-				--uui-button-background-color: transparent;
-			}
-		`,
-	];
+	
 
 	private _modalContext?: UmbModalContext;
 
@@ -37,6 +29,16 @@ export class UmbSearchHeaderAppElement extends UmbLitElement {
 			</uui-button>
 		`;
 	}
+	
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			uui-button {
+				font-size: 18px;
+				--uui-button-background-color: transparent;
+			}
+		`,
+	];
 }
 
 export default UmbSearchHeaderAppElement;

@@ -17,20 +17,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-footer-layout')
 export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-			}
-
-			umb-extension-slot[slot='actions'] {
-				display: flex;
-				gap: var(--uui-size-space-2);
-			}
-		`,
-	];
+	
 
 	private _alias = '';
 	/**
@@ -67,6 +54,21 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 			</umb-footer-layout>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+			}
+
+			umb-extension-slot[slot='actions'] {
+				display: flex;
+				gap: var(--uui-size-space-2);
+			}
+		`,
+	];
 }
 
 declare global {

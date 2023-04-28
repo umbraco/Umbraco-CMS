@@ -12,7 +12,7 @@ import { PropertyEditorConfigDefaultData } from '@umbraco-cms/backoffice/extensi
  */
 @customElement('umb-property-editor-ui-date-picker')
 export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+	
 
 	private _value?: Date;
 	private _valueString?: string;
@@ -81,6 +81,8 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 			.value=${this._valueString}
 			label="Pick a date or time"></uui-input>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIDatePickerElement;

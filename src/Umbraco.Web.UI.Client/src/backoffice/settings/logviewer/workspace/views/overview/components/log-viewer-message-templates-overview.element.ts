@@ -8,35 +8,7 @@ import { PagedLogTemplateResponseModel, SavedLogSearchResponseModel } from '@umb
 //TODO: fix pagination bug when API is fixed
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#show-more-templates-btn {
-				margin-top: var(--uui-size-space-5);
-			}
-
-			a {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				text-decoration: none;
-				color: inherit;
-			}
-
-			uui-table-cell {
-				padding: 10px 20px;
-				height: unset;
-			}
-
-			uui-table-row {
-				cursor: pointer;
-			}
-
-			uui-table-row:hover > uui-table-cell {
-				background-color: var(--uui-color-surface-alt);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _messageTemplates: PagedLogTemplateResponseModel | null = null;
@@ -111,6 +83,36 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#show-more-templates-btn {
+				margin-top: var(--uui-size-space-5);
+			}
+
+			a {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				text-decoration: none;
+				color: inherit;
+			}
+
+			uui-table-cell {
+				padding: 10px 20px;
+				height: unset;
+			}
+
+			uui-table-row {
+				cursor: pointer;
+			}
+
+			uui-table-row:hover > uui-table-cell {
+				background-color: var(--uui-color-surface-alt);
+			}
+		`,
+	];
 }
 
 declare global {

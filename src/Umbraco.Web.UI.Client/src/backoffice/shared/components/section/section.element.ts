@@ -18,20 +18,7 @@ import './section-sidebar-menu/section-sidebar-menu.element';
  */
 @customElement('umb-section')
 export class UmbSectionElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				flex: 1 1 auto;
-				height: 100%;
-				display: flex;
-			}
-
-			h3 {
-				padding: var(--uui-size-4) var(--uui-size-8);
-			}
-		`,
-	];
+	
 
 	@property()
 	public manifest?: ManifestSection;
@@ -106,6 +93,21 @@ export class UmbSectionElement extends UmbLitElement {
 			</umb-section-main>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				flex: 1 1 auto;
+				height: 100%;
+				display: flex;
+			}
+
+			h3 {
+				padding: var(--uui-size-4) var(--uui-size-8);
+			}
+		`,
+	];
 }
 
 declare global {

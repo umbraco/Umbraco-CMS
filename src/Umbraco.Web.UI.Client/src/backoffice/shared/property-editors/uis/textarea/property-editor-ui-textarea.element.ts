@@ -11,14 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-textarea {
-				width: 100%;
-			}
-		`,
-	];
+	
 
 	@property()
 	value = '';
@@ -44,6 +37,15 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	render() {
 		return html` <uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-textarea {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUITextareaElement;

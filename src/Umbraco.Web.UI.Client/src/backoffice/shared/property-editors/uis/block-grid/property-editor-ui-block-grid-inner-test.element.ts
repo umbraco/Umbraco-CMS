@@ -10,7 +10,7 @@ import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-
  */
 @customElement('umb-property-editor-ui-block-grid-inner-test')
 export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property({ type: String })
 	public name = '';
@@ -76,6 +76,8 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 				}}></umb-router-slot>
 		</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridInnerTestElement;

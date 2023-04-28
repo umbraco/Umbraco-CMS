@@ -9,17 +9,18 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-user-picker')
 export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
-
 	@property()
 	value = '';
 
 	@property({ type: Array, attribute: false })
 	public config = [];
 
+	// TODO: implement config
 	render() {
-		return html`<div>umb-property-editor-ui-user-picker</div>`;
+		return html` <umb-user-input></umb-user-input>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIUserPickerElement;

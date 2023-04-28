@@ -6,25 +6,290 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
+import { getLookAndColorFromUserStatus } from '../../utils';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { getLookAndColorFromUserStatus } from '@umbraco-cms/backoffice/utils';
 import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../../shared/components/input-user-group/input-user-group.element';
-import '../../../shared/property-editors/uis/document-picker/property-editor-ui-document-picker.element';
-import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-workspace-edit')
 export class UmbUserWorkspaceEditElement extends UmbLitElement {
+	@state()
+	private _currentUser?: UserDetails;
+
+	@state()
+	private _user?: UserResponseModel;
+
+	#currentUserStore?: UmbCurrentUserStore;
+	#modalContext?: UmbModalContext;
+	#languages = []; //TODO Add languages
+	#workspaceContext?: UmbUserWorkspaceContext;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (store) => {
+			this.#currentUserStore = store;
+			this.#observeCurrentUser();
+		});
+
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext as UmbUserWorkspaceContext;
+			this.#observeUser();
+		});
+	}
+
+	#observeUser() {
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.data, (user) => (this._user = user));
+	}
+
+	#observeCurrentUser() {
+		if (!this.#currentUserStore) return;
+		this.observe(this.#currentUserStore.currentUser, (currentUser) => (this._currentUser = currentUser));
+	}
+
+	#onUserStatusChange() {
+		if (!this._user) return;
+
+		if (this._user.state === UserStateModel.ACTIVE) {
+			//TODO: This should go directly to the user repository instead of the context so that the request is send immediately.
+			this.#workspaceContext?.updateProperty('state', UserStateModel.DISABLED);
+		}
+
+		if (this._user.state === UserStateModel.DISABLED) {
+			//TODO: This should go directly to the user repository instead of the context so that the request is send immediately.
+			this.#workspaceContext?.updateProperty('state', UserStateModel.ACTIVE);
+		}
+	}
+
+	#onUserDelete() {
+		//TODO: Delete user and redirect to user list.
+	}
+
+	// TODO. find a way where we don't have to do this for all workspaces.
+	#onNameChange(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this.#workspaceContext?.updateProperty('name', target.value);
+			}
+		}
+	}
+
+	#onPasswordChange() {
+		// TODO: check if current user is admin
+		this.#modalContext?.open(UMB_CHANGE_PASSWORD_MODAL, {
+			requireOldPassword: false,
+		});
+	}
+
+	render() {
+		if (!this._user) return html`User not found`;
+
+		return html`
+			<umb-workspace-layout alias="Umb.Workspace.User">
+				${this.#renderHeader()}
+				<div id="main">
+					<div id="left-column">${this.#renderLeftColumn()}</div>
+					<div id="right-column">${this.#renderRightColumn()}</div>
+				</div>
+			</umb-workspace-layout>
+		`;
+	}
+
+	#renderHeader() {
+		return html`
+			<div id="header" slot="header">
+				<a href="/section/users">
+					<uui-icon name="umb:arrow-left"></uui-icon>
+				</a>
+				<uui-input id="name" .value=${this._user?.name ?? ''} @input="${this.#onNameChange}"></uui-input>
+			</div>
+		`;
+	}
+
+	#renderLeftColumn() {
+		if (!this._user) return nothing;
+
+		return html` <uui-box>
+				<div slot="headline">Profile</div>
+				<umb-workspace-property-layout label="Email">
+					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
+				</umb-workspace-property-layout>
+				<umb-workspace-property-layout label="Language">
+					<uui-select slot="editor" name="language" label="language" .options=${this.#languages}> </uui-select>
+				</umb-workspace-property-layout>
+			</uui-box>
+			<uui-box>
+				<div slot="headline">Assign access</div>
+				<div id="assign-access">
+					<umb-workspace-property-layout label="Groups" description="Add groups to assign access and permissions">
+						<umb-input-user-group
+							slot="editor"
+							.value=${this._user.userGroupIds ?? []}
+							@change=${(e: any) =>
+								this.#workspaceContext?.updateProperty('userGroupIds', e.target.value)}></umb-input-user-group>
+					</umb-workspace-property-layout>
+					<umb-workspace-property-layout
+						label="Content start node"
+						description="Limit the content tree to specific start nodes">
+						<umb-property-editor-ui-document-picker
+							.value=${this._user.contentStartNodeIds}
+							@property-value-change=${(e: any) =>
+								this.#workspaceContext?.updateProperty('contentStartNodeIds', e.target.value)}
+							slot="editor"></umb-property-editor-ui-document-picker>
+					</umb-workspace-property-layout>
+					<umb-workspace-property-layout
+						label="Media start nodes"
+						description="Limit the media library to specific start nodes">
+						<b slot="editor">NEED MEDIA PICKER</b>
+					</umb-workspace-property-layout>
+				</div>
+			</uui-box>
+			<uui-box headline="Access">
+				<div slot="header" class="faded-text">
+					Based on the assigned groups and start nodes, the user has access to the following nodes
+				</div>
+
+				<b>Content</b>
+				${this.#renderContentStartNodes()}
+				<hr />
+				<b>Media</b>
+				<uui-ref-node name="Media Root">
+					<uui-icon slot="icon" name="folder"></uui-icon>
+				</uui-ref-node>
+			</uui-box>`;
+	}
+
+	#renderRightColumn() {
+		if (!this._user || !this.#workspaceContext) return nothing;
+
+		const statusLook = getLookAndColorFromUserStatus(this._user.state);
+
+		return html` <uui-box>
+			<div id="user-info">
+				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
+				<uui-button label="Change photo"></uui-button>
+				<hr />
+				${this.#renderActionButtons()}
+
+				<div>
+					<b>Status:</b>
+					<uui-tag look="${ifDefined(statusLook?.look)}" color="${ifDefined(statusLook?.color)}">
+						${this._user.state}
+					</uui-tag>
+				</div>
+
+				${this._user?.state === UserStateModel.INVITED
+					? html`
+							<uui-textarea placeholder="Enter a message..."> </uui-textarea>
+							<uui-button look="primary" label="Resend invitation"></uui-button>
+					  `
+					: nothing}
+				${this.#renderInfoItem('Last login', this._user.lastLoginDate || `${this._user.name} has not logged in yet`)}
+				${this.#renderInfoItem('Failed login attempts', this._user.failedLoginAttempts)}
+				${this.#renderInfoItem(
+					'Last lockout date',
+					this._user.lastlockoutDate || `${this._user.name} has not been locked out`
+				)}
+				${this.#renderInfoItem(
+					'Password last changed',
+					this._user.lastLoginDate || `${this._user.name} has not changed password`
+				)}
+				${this.#renderInfoItem('User created', this._user.createDate)}
+				${this.#renderInfoItem('User last updated', this._user.updateDate)}
+				${this.#renderInfoItem('Key', this._user.id)}
+			</div>
+		</uui-box>`;
+	}
+
+	#renderInfoItem(label: string, value?: string | number) {
+		return html`
+			<div>
+				<b>${label}</b>
+				<span>${value}</span>
+			</div>
+		`;
+	}
+
+	#renderActionButtons() {
+		if (!this._user) return nothing;
+
+		//TODO: Find out if the current user is an admin. If not, show no buttons.
+		// if (this._currentUserStore?.isAdmin === false) return nothing;
+
+		const buttons: TemplateResult[] = [];
+
+		if (this._user.state !== UserStateModel.INVITED) {
+			const button = html`
+				<uui-button
+					@click=${this.#onUserStatusChange}
+					look="primary"
+					color="${this._user.state === UserStateModel.DISABLED ? 'positive' : 'warning'}"
+					label="${this._user.state === UserStateModel.DISABLED ? 'Enable' : 'Disable'}"></uui-button>
+			`;
+
+			buttons.push(button);
+		}
+
+		if (this._currentUser?.id !== this._user?.id) {
+			const button = html`
+				<uui-button @click=${this.#onUserDelete} look="primary" color="danger" label="Delete User"></uui-button>
+			`;
+
+			buttons.push(button);
+		}
+
+		buttons.push(
+			html`<uui-button @click=${this.#onPasswordChange} look="primary" label="Change password"></uui-button>`
+		);
+
+		return buttons;
+	}
+
+	#renderContentStartNodes() {
+		if (!this._user || !this._user.contentStartNodeIds) return;
+
+		if (this._user.contentStartNodeIds.length < 1)
+			return html`
+				<uui-ref-node name="Content Root">
+					<uui-icon slot="icon" name="folder"></uui-icon>
+				</uui-ref-node>
+			`;
+
+		//TODO Render the name of the content start node instead of it's id.
+		return repeat(
+			this._user.contentStartNodeIds,
+			(node) => node,
+			(node) => {
+				return html`
+					<uui-ref-node name=${node}>
+						<uui-icon slot="icon" name="folder"></uui-icon>
+					</uui-ref-node>
+				`;
+			}
+		);
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
 				display: block;
 				height: 100%;
+			}
+
+			#header {
+				width: 100%;
+				display: grid;
+				grid-template-columns: var(--uui-size-layout-1) 1fr;
+				padding: var(--uui-size-layout-1);
 			}
 
 			#main {
@@ -77,266 +342,6 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	@state()
-	private _currentUser?: UserDetails;
-
-	private _currentUserStore?: UmbCurrentUserStore;
-	private _modalContext?: UmbModalContext;
-
-	private _languages = []; //TODO Add languages
-
-	private _workspaceContext: UmbUserWorkspaceContext = new UmbUserWorkspaceContext(this);
-
-	@state()
-	private _user?: UserDetails;
-
-	@state()
-	private _userName = '';
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (store) => {
-			this._currentUserStore = store;
-			this._observeCurrentUser();
-		});
-
-		this.observe(this._workspaceContext.data, (user) => {
-			// TODO: fix type mismatch:
-			this._user = user as any;
-			if (user && user.name !== this._userName) {
-				this._userName = user.name || '';
-			}
-		});
-	}
-
-	private async _observeCurrentUser() {
-		if (!this._currentUserStore) return;
-
-		// TODO: do not have static current user service, we need to make a ContextAPI for this.
-		this.observe(this._currentUserStore.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
-		});
-	}
-
-	private _updateUserStatus() {
-		if (!this._user || !this._workspaceContext) return;
-
-		const isDisabled = this._user.status === 'disabled';
-		// TODO: make sure we use the workspace for this:
-		/*
-		isDisabled
-			? this._workspaceContext.getStore()?.enableUsers([this._user.id])
-			: this._workspaceContext.getStore()?.disableUsers([this._user.id]);
-			*/
-	}
-
-	private _deleteUser() {
-		if (!this._user || !this._workspaceContext) return;
-
-		// TODO: make sure we use the workspace for this:
-		//this._workspaceContext.getStore()?.deleteUsers([this._user.id]);
-
-		history.pushState(null, '', 'section/users/view/users/overview');
-	}
-
-	// TODO. find a way where we don't have to do this for all workspaces.
-	private _handleInput(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this._updateProperty('name', target.value);
-			}
-		}
-	}
-
-	private _updateProperty(propertyName: string, value: unknown) {
-		this._workspaceContext?.update({ [propertyName]: value });
-	}
-
-	private _renderContentStartNodes() {
-		if (!this._user) return;
-
-		if (this._user.contentStartNodes.length < 1)
-			return html`
-				<uui-ref-node name="Content Root">
-					<uui-icon slot="icon" name="folder"></uui-icon>
-				</uui-ref-node>
-			`;
-
-		//TODO Render the name of the content start node instead of it's id.
-		return repeat(
-			this._user.contentStartNodes,
-			(node) => node,
-			(node) => {
-				return html`
-					<uui-ref-node name=${node}>
-						<uui-icon slot="icon" name="folder"></uui-icon>
-					</uui-ref-node>
-				`;
-			}
-		);
-	}
-
-	private _changePassword() {
-		this._modalContext?.open(UMB_CHANGE_PASSWORD_MODAL, {
-			requireOldPassword: this._currentUserStore?.isAdmin === false,
-		});
-	}
-
-	private _renderActionButtons() {
-		if (!this._user) return;
-
-		const buttons: TemplateResult[] = [];
-
-		if (this._currentUserStore?.isAdmin === false) return nothing;
-
-		if (this._user?.status !== 'invited')
-			buttons.push(
-				html`
-					<uui-button
-						@click=${this._updateUserStatus}
-						look="primary"
-						color="${this._user.status === 'disabled' ? 'positive' : 'warning'}"
-						label="${this._user.status === 'disabled' ? 'Enable' : 'Disable'}"></uui-button>
-				`
-			);
-
-		if (this._currentUser?.id !== this._user?.id)
-			buttons.push(html` <uui-button
-				@click=${this._deleteUser}
-				look="primary"
-				color="danger"
-				label="Delete User"></uui-button>`);
-
-		buttons.push(
-			html` <uui-button @click=${this._changePassword} look="primary" label="Change password"></uui-button> `
-		);
-
-		return buttons;
-	}
-
-	private _renderLeftColumn() {
-		if (!this._user) return nothing;
-
-		return html` <uui-box>
-				<div slot="headline">Profile</div>
-				<umb-workspace-property-layout label="Email">
-					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout label="Language">
-					<uui-select slot="editor" name="language" label="language" .options=${this._languages}> </uui-select>
-				</umb-workspace-property-layout>
-			</uui-box>
-			<uui-box>
-				<div slot="headline">Assign access</div>
-				<div id="assign-access">
-					<umb-workspace-property-layout label="Groups" description="Add groups to assign access and permissions">
-						<umb-input-user-group
-							slot="editor"
-							.value=${this._user.userGroups}
-							@change=${(e: any) => this._updateProperty('userGroups', e.target.value)}></umb-input-user-group>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout
-						label="Content start node"
-						description="Limit the content tree to specific start nodes">
-						<umb-property-editor-ui-document-picker
-							.value=${this._user.contentStartNodes}
-							@property-editor-change=${(e: any) => this._updateProperty('contentStartNodes', e.target.value)}
-							slot="editor"></umb-property-editor-ui-document-picker>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout
-						label="Media start nodes"
-						description="Limit the media library to specific start nodes">
-						<b slot="editor">NEED MEDIA PICKER</b>
-					</umb-workspace-property-layout>
-				</div>
-			</uui-box>
-			<uui-box headline="Access">
-				<div slot="header" class="faded-text">
-					Based on the assigned groups and start nodes, the user has access to the following nodes
-				</div>
-
-				<b>Content</b>
-				${this._renderContentStartNodes()}
-				<hr />
-				<b>Media</b>
-				<uui-ref-node name="Media Root">
-					<uui-icon slot="icon" name="folder"></uui-icon>
-				</uui-ref-node>
-			</uui-box>`;
-	}
-
-	private _renderRightColumn() {
-		if (!this._user || !this._workspaceContext) return nothing;
-
-		const statusLook = getLookAndColorFromUserStatus(this._user.status);
-
-		return html` <uui-box>
-			<div id="user-info">
-				<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
-				<uui-button label="Change photo"></uui-button>
-				<hr />
-				${this._renderActionButtons()}
-				<div>
-					<b>Status:</b>
-					<uui-tag look="${ifDefined(statusLook?.look)}" color="${ifDefined(statusLook?.color)}">
-						${this._user.status}
-					</uui-tag>
-				</div>
-				${this._user?.status === 'invited'
-					? html`
-							<uui-textarea placeholder="Enter a message..."> </uui-textarea>
-							<uui-button look="primary" label="Resend invitation"></uui-button>
-					  `
-					: nothing}
-				<div>
-					<b>Last login:</b>
-					<span>${this._user.lastLoginDate || `${this._user.name} has not logged in yet`}</span>
-				</div>
-				<div>
-					<b>Failed login attempts</b>
-					<span>${this._user.failedLoginAttempts}</span>
-				</div>
-				<div>
-					<b>Last lockout date:</b>
-					<span>${this._user.lastLockoutDate || `${this._user.name} has not been locked out`}</span>
-				</div>
-				<div>
-					<b>Password last changed:</b>
-					<span>${this._user.lastLoginDate || `${this._user.name} has not changed password`}</span>
-				</div>
-				<div>
-					<b>User created:</b>
-					<span>${this._user.createDate}</span>
-				</div>
-				<div>
-					<b>User last updated:</b>
-					<span>${this._user.updateDate}</span>
-				</div>
-				<div>
-					<b>Key:</b>
-					<span>${this._user.id}</span>
-				</div>
-			</div>
-		</uui-box>`;
-	}
-
-	render() {
-		if (!this._user) return html`User not found`;
-
-		return html`
-			<umb-workspace-layout alias="Umb.Workspace.User">
-				<uui-input id="name" slot="name" .value=${this._userName} @input="${this._handleInput}"></uui-input>
-				<div id="main">
-					<div id="left-column">${this._renderLeftColumn()}</div>
-					<div id="right-column">${this._renderRightColumn()}</div>
-				</div>
-			</umb-workspace-layout>
-		`;
-	}
 }
 
 export default UmbUserWorkspaceEditElement;

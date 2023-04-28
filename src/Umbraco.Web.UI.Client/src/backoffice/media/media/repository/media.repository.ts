@@ -6,11 +6,7 @@ import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.da
 import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import {
-	CreateMediaRequestModel,
-	ProblemDetailsModel,
-	UpdateMediaRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
@@ -83,8 +79,7 @@ export class UmbMediaRepository
 		await this.#init;
 
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
+			throw new Error('Parent id is missing');
 		}
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
@@ -100,8 +95,7 @@ export class UmbMediaRepository
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);

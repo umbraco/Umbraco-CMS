@@ -8,7 +8,7 @@ export type { UmbNotificationDefaultData };
 
 @customElement('umb-notification-layout-default')
 export class UmbNotificationLayoutDefaultElement extends LitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property({ attribute: false })
 	notificationHandler!: UmbNotificationHandler;
@@ -23,6 +23,8 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 			</uui-toast-notification-layout>
 		`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 declare global {

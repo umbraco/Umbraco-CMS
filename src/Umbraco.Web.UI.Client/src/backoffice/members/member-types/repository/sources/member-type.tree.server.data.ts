@@ -1,6 +1,6 @@
-import { MemberTypeResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { ApiError, MemberTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -37,8 +37,11 @@ export class UmbMemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		const error: ProblemDetailsModel = { title: 'Not implemented for Member Type' };
-		return { error };
+		if (!parentId) {
+			throw new Error('Parent id is missing');
+		}
+
+		return { error: new ApiError({} as any, {} as any, 'Not implemented for Member Type') };
 	}
 
 	/**
@@ -49,8 +52,7 @@ export class UmbMemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids || ids.length === 0) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

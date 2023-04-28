@@ -7,15 +7,7 @@ import { RelationResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-workspace-view-relation-type-relation')
 export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
+	
 
 	//TODO Use real data
 	@state()
@@ -76,6 +68,16 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		</uui-box>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 const MockData: Array<RelationResponseModel> = [

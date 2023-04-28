@@ -32,37 +32,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO: stop naming this something with layout. as its not just an layout. it hooks up with extensions.
 @customElement('umb-workspace-layout')
 export class UmbWorkspaceLayoutElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			#router-slot {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
-
-			uui-input {
-				width: 100%;
-			}
-
-			uui-tab-group {
-				--uui-tab-divider: var(--uui-color-border);
-				border-left: 1px solid var(--uui-color-border);
-				border-right: 1px solid var(--uui-color-border);
-			}
-
-			umb-extension-slot[slot='actions'] {
-				display: flex;
-				gap: var(--uui-size-space-2);
-			}
-		`,
-	];
+	
 
 	@property()
 	public headline = '';
@@ -220,6 +190,38 @@ export class UmbWorkspaceLayoutElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#router-slot {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			uui-input {
+				width: 100%;
+			}
+
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
+
+			umb-extension-slot[slot='actions'] {
+				display: flex;
+				gap: var(--uui-size-space-2);
+			}
+		`,
+	];
 }
 
 declare global {

@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-collection-view-bulk-action-permissions')
 export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -19,6 +19,8 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement exten
 	render() {
 		return html`<div>umb-property-editor-ui-collection-view-bulk-action-permissions</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUICollectionViewBulkActionPermissionsElement;

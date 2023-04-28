@@ -17,14 +17,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-		`,
-	];
+	
 
 	@property({ type: Object, attribute: false })
 	public get property(): PropertyTypeResponseModelBaseModel | undefined {
@@ -121,6 +114,15 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			.propertyVariantId=${this.propertyVariantId}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+		`,
+	];
 }
 
 declare global {

@@ -24,88 +24,7 @@ interface ExposedSearchResultField {
 
 @customElement('umb-dashboard-examine-searcher')
 export class UmbDashboardExamineSearcherElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-			uui-box {
-				margin-top: var(--uui-size-space-5);
-			}
-
-			uui-box p {
-				margin-top: 0;
-			}
-
-			div.flex {
-				display: flex;
-			}
-			div.flex > uui-button {
-				padding-left: var(--uui-size-space-4);
-				height: 0;
-			}
-
-			uui-input {
-				width: 100%;
-				margin-bottom: var(--uui-size-space-5);
-			}
-
-			uui-table-head-cell {
-				text-transform: capitalize;
-			}
-
-			uui-table-row:last-child uui-table-cell {
-				padding-bottom: 0;
-			}
-
-			uui-table-cell {
-				min-width: 100px;
-			}
-
-			button.bright {
-				font-style: italic;
-				color: var(--uui-color-positive-emphasis);
-			}
-
-			.field-adder {
-				line-height: 0;
-				cursor: pointer;
-				vertical-align: top;
-				background: transparent;
-				border: none;
-			}
-
-			.table-container uui-scroll-container {
-				padding-bottom: var(--uui-size-space-4);
-				max-width: 100%;
-				overflow-x: scroll;
-				flex: 1;
-			}
-
-			.table-container {
-				display: flex;
-				align-items: flex-start;
-			}
-			uui-tag {
-				margin-block: var(--uui-size-5, 15px);
-			}
-
-			.exposed-field uui-button {
-				align-items: center;
-				font-weight: normal;
-				font-size: 10px;
-				height: 10px;
-				width: 10px;
-				margin-top: -5px;
-			}
-
-			.exposed-field-container {
-				display: flex;
-				justify-content: space-between;
-			}
-		`,
-	];
+	
 
 	private _modalContext?: UmbModalContext;
 
@@ -300,6 +219,89 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			});
 		})}`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+			uui-box {
+				margin-top: var(--uui-size-space-5);
+			}
+
+			uui-box p {
+				margin-top: 0;
+			}
+
+			div.flex {
+				display: flex;
+			}
+			div.flex > uui-button {
+				padding-left: var(--uui-size-space-4);
+				height: 0;
+			}
+
+			uui-input {
+				width: 100%;
+				margin-bottom: var(--uui-size-space-5);
+			}
+
+			uui-table-head-cell {
+				text-transform: capitalize;
+			}
+
+			uui-table-row:last-child uui-table-cell {
+				padding-bottom: 0;
+			}
+
+			uui-table-cell {
+				min-width: 100px;
+			}
+
+			button.bright {
+				font-style: italic;
+				color: var(--uui-color-positive-emphasis);
+			}
+
+			.field-adder {
+				line-height: 0;
+				cursor: pointer;
+				vertical-align: top;
+				background: transparent;
+				border: none;
+			}
+
+			.table-container uui-scroll-container {
+				padding-bottom: var(--uui-size-space-4);
+				max-width: 100%;
+				overflow-x: scroll;
+				flex: 1;
+			}
+
+			.table-container {
+				display: flex;
+				align-items: flex-start;
+			}
+			uui-tag {
+				margin-block: var(--uui-size-5, 15px);
+			}
+
+			.exposed-field uui-button {
+				align-items: center;
+				font-weight: normal;
+				font-size: 10px;
+				height: 10px;
+				width: 10px;
+				margin-top: -5px;
+			}
+
+			.exposed-field-container {
+				display: flex;
+				justify-content: space-between;
+			}
+		`,
+	];
 }
 
 export default UmbDashboardExamineSearcherElement;

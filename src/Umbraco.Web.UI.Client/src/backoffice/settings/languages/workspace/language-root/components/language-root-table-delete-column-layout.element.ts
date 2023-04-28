@@ -7,7 +7,7 @@ import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-language-root-table-delete-column-layout')
 export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@property({ attribute: false })
 	value!: LanguageResponseModel;
@@ -45,6 +45,8 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 			</umb-dropdown>
 		`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

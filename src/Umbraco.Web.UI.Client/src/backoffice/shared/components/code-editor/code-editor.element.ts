@@ -22,24 +22,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-code-editor')
 export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditorHost {
-	static styles = [
-		monacoEditorStyles,
-		monacoJumpingCursorHack,
-		css`
-			:host {
-				display: block;
-			}
-			#editor-container {
-				width: var(--editor-width);
-				height: var(--editor-height, 100%);
-
-				--vscode-scrollbar-shadow: #dddddd;
-				--vscode-scrollbarSlider-background: var(--uui-color-disabled-contrast);
-				--vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
-				--vscode-scrollbarSlider-activeBackground: rgba(0, 0, 0, 0.6);
-			}
-		`,
-	];
+	
 
 	private containerRef: Ref<HTMLElement> = createRef();
 
@@ -163,6 +146,25 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	render() {
 		return html` <div id="editor-container" ${ref(this.containerRef)}></div> `;
 	}
+	
+	static styles = [
+		monacoEditorStyles,
+		monacoJumpingCursorHack,
+		css`
+			:host {
+				display: block;
+			}
+			#editor-container {
+				width: var(--editor-width);
+				height: var(--editor-height, 100%);
+
+				--vscode-scrollbar-shadow: #dddddd;
+				--vscode-scrollbarSlider-background: var(--uui-color-disabled-contrast);
+				--vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+				--vscode-scrollbarSlider-activeBackground: rgba(0, 0, 0, 0.6);
+			}
+		`,
+	];
 }
 
 declare global {

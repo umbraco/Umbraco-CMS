@@ -8,37 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-			}
-			:host,
-			umb-workspace-layout {
-				width: 100%;
-				height: 100%;
-			}
-			#main {
-				padding: var(--uui-size-space-5);
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-			#umbraco-id-buttons {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-			#userProfileApps {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-		`,
-	];
-
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
 
@@ -71,7 +40,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private _logout() {
-		this._currentUserStore?.logout();
+		alert('implement log out');
 	}
 
 	render() {
@@ -87,6 +56,37 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 			</umb-workspace-layout>
 		`;
 	}
+
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				color: var(--uui-color-text);
+			}
+			:host,
+			umb-workspace-layout {
+				width: 100%;
+				height: 100%;
+			}
+			#main {
+				padding: var(--uui-size-space-5);
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+			#umbraco-id-buttons {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+			#userProfileApps {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+		`,
+	];
 }
 
 export default UmbCurrentUserModalElement;

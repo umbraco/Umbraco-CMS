@@ -17,7 +17,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	/**
 	 * Property Editor UI Alias. The element will render configuration for a Property Editor UI with this alias.
@@ -122,6 +122,8 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 				: html`<div>No configuration</div>`}
 		`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorConfigElement;

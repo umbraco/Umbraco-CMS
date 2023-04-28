@@ -13,29 +13,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 // TODO: this might need a new name, since it's both view and dashboard now
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				background-color: var(--uui-color-surface);
-				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				height: var(--umb-header-layout-height);
-				box-sizing: border-box;
-			}
-
-			#views {
-				justify-content: flex-end;
-				--uui-tab-divider: var(--uui-color-divider-standalone);
-			}
-
-			#views uui-tab:first-child {
-				border-left: 1px solid var(--uui-color-divider-standalone);
-			}
-		`,
-	];
+	
 
 	@property({ type: String, attribute: 'section-alias' })
 	public sectionAlias?: string;
@@ -185,6 +163,30 @@ export class UmbSectionViewsElement extends UmbLitElement {
 			</uui-tab-group>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				background-color: var(--uui-color-surface);
+				border-bottom: 1px solid var(--uui-color-divider-standalone);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				height: var(--umb-header-layout-height);
+				box-sizing: border-box;
+			}
+
+			#views {
+				justify-content: flex-end;
+				--uui-tab-divider: var(--uui-color-divider-standalone);
+			}
+
+			#views uui-tab:first-child {
+				border-left: 1px solid var(--uui-color-divider-standalone);
+			}
+		`,
+	];
 }
 
 export default UmbSectionViewsElement;

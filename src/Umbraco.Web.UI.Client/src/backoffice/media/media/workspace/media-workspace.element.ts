@@ -8,16 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-media-workspace')
 export class UmbMediaWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-		`,
-	];
+	
 
 	#workspaceContext = new UmbMediaWorkspaceContext(this);
 	#element = new UmbMediaWorkspaceEditElement();
@@ -37,6 +28,17 @@ export class UmbMediaWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbMediaWorkspaceElement;

@@ -11,36 +11,7 @@ import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				position: relative;
-				z-index: 10;
-			}
-
-			#toggle {
-				display: block;
-				width: 100%;
-				text-align: left;
-				background: none;
-				border: none;
-				height: 70px;
-				padding: 0 var(--uui-size-8);
-				border-bottom: 1px solid var(--uui-color-border);
-				font-size: 14px;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				cursor: pointer;
-			}
-
-			#toggle:hover {
-				background-color: var(--uui-color-surface-emphasis);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
@@ -140,6 +111,37 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			)}
 		</div>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				position: relative;
+				z-index: 10;
+			}
+
+			#toggle {
+				display: block;
+				width: 100%;
+				text-align: left;
+				background: none;
+				border: none;
+				height: 70px;
+				padding: 0 var(--uui-size-8);
+				border-bottom: 1px solid var(--uui-color-border);
+				font-size: 14px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				cursor: pointer;
+			}
+
+			#toggle:hover {
+				background-color: var(--uui-color-surface-emphasis);
+			}
+		`,
+	];
 }
 
 export default UmbAppLanguageSelectElement;

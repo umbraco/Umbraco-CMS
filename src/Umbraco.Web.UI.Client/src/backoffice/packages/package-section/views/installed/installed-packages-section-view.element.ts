@@ -11,34 +11,7 @@ import './installed-packages-section-view-item.element';
 
 @customElement('umb-installed-packages-section-view')
 export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-			uui-box {
-				margin-top: var(--uui-size-space-5);
-				padding-bottom: var(--uui-size-space-1);
-			}
-
-			umb-installed-packages-section-view-item {
-				padding: var(--uui-size-space-3) 0 var(--uui-size-space-2);
-			}
-
-			umb-installed-packages-section-view-item:not(:first-child) {
-				border-top: 1px solid var(--uui-color-border, #d8d7d9);
-			}
-
-			.no-packages {
-				display: flex;
-				justify-content: space-around;
-				flex-direction: column;
-				align-items: center;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _installedPackages: UmbPackageWithMigrationStatus[] = [];
@@ -136,6 +109,35 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
 			</uui-ref-list>
 		</uui-box>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+			uui-box {
+				margin-top: var(--uui-size-space-5);
+				padding-bottom: var(--uui-size-space-1);
+			}
+
+			umb-installed-packages-section-view-item {
+				padding: var(--uui-size-space-3) 0 var(--uui-size-space-2);
+			}
+
+			umb-installed-packages-section-view-item:not(:first-child) {
+				border-top: 1px solid var(--uui-color-border, #d8d7d9);
+			}
+
+			.no-packages {
+				display: flex;
+				justify-content: space-around;
+				flex-direction: column;
+				align-items: center;
+			}
+		`,
+	];
 }
 
 export default UmbInstalledPackagesSectionViewElement;

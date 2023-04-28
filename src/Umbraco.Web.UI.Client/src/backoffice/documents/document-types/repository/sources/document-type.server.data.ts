@@ -1,10 +1,6 @@
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	DocumentTypeResource,
-	ProblemDetailsModel,
-	DocumentTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import { DocumentTypeResource, DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -13,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, DocumentTypeResponseModel> {
+export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, any, DocumentTypeResponseModel> {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -33,8 +29,7 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	 */
 	async get(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Id is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		return tryExecuteAndNotify(
@@ -104,8 +99,8 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 		try {
 			body = JSON.stringify(document);
 		} catch (error) {
-			const myError: ProblemDetailsModel = { title: 'JSON could not parse' };
-			return { error: myError };
+			console.error(error);
+			return Promise.reject();
 		}
 
 		// TODO: use resources when end point is ready:
@@ -129,32 +124,19 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Id is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
-		let problemDetails: ProblemDetailsModel | undefined = undefined;
-
-		try {
-			await fetch('/umbraco/management/api/v1/document-type/trash', {
+		return tryExecuteAndNotify(
+			this.#host,
+			fetch('/umbraco/management/api/v1/document-type/trash', {
 				method: 'POST',
 				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			});
-		} catch (error) {
-			problemDetails = { title: 'Delete document Failed' };
-		}
-
-		return { error: problemDetails };
-
-		// TODO: use resources when end point is ready:
-		/*
-		return tryExecuteAndNotify(
-			this.#host,
+			}).then((res) => res.json())
 		);
-		*/
 	}
 
 	/**
@@ -166,21 +148,14 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	async getAllowedChildrenOf(id: string) {
 		if (!id) throw new Error('Id is missing');
 
-		let problemDetails: ProblemDetailsModel | undefined = undefined;
-		let data = undefined;
-
-		try {
-			const res = await fetch(`/umbraco/management/api/v1/document-type/allowed-children-of/${id}`, {
+		return tryExecuteAndNotify(
+			this.#host,
+			fetch(`/umbraco/management/api/v1/document-type/allowed-children-of/${id}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			});
-			data = await res.json();
-		} catch (error) {
-			problemDetails = { title: `Get allowed children of ${id} failed` };
-		}
-
-		return { data, error: problemDetails };
+			}).then((res) => res.json())
+		);
 	}
 }

@@ -9,7 +9,7 @@ import './data-type-workspace-edit.element';
 
 @customElement('umb-data-type-workspace')
 export class UmbDataTypeWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
@@ -38,6 +38,8 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbDataTypeWorkspaceElement;
