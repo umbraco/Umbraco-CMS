@@ -8,7 +8,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-dictionary-workspace-edit')
 export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
-	
+
 
 	@state()
 	private _name?: string | null = '';
@@ -42,17 +42,17 @@ export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.Dictionary">
+			<umb-workspace-editor alias="Umb.Workspace.Dictionary">
 				<div id="header" slot="header">
 					<uui-button href="/section/translation/dashboard" label="Back to list" compact>
 						<uui-icon name="umb:arrow-left"></uui-icon>
 					</uui-button>
 					<uui-input .value=${this._name} @input="${this.#handleInput}" label="Dictionary name"></uui-input>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

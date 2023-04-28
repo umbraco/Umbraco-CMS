@@ -6,11 +6,13 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-workspace-view-data-type-info')
-export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
-	
-
+export class UmbWorkspaceViewDataTypeInfoElement
+	extends UmbLitElement
+	implements UmbWorkspaceEditorViewExtensionElement
+{
 	@state()
 	_dataType?: DataTypeResponseModel;
 
@@ -59,7 +61,7 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement {
 	private _renderReferences() {
 		return html` <uui-box headline="References"> </uui-box> `;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

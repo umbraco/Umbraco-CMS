@@ -2,15 +2,14 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-media-info-workspace-view')
-export class UmbMediaInfoWorkspaceViewElement extends UmbLitElement {
-	
-
+export class UmbMediaInfoWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceEditorViewExtensionElement {
 	render() {
 		return html`<div>Media info</div>`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

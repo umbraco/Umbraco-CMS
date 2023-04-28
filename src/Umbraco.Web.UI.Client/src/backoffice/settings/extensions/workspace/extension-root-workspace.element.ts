@@ -8,8 +8,6 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@um
 
 @customElement('umb-extension-root-workspace')
 export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
-	
-
 	@state()
 	private _extensions?: Array<ManifestTypes> = undefined;
 
@@ -40,7 +38,8 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 			),
 			(extensions) => {
 				this._extensions = extensions || undefined;
-			}
+			},
+			'_observeExtensionRegistry'
 		);
 	}
 
@@ -58,7 +57,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Extensions" alias="Umb.Workspace.ExtensionRoot" .enforceNoFooter=${true}>
+			<umb-workspace-editor headline="Extensions" alias="Umb.Workspace.ExtensionRoot" .enforceNoFooter=${true}>
 				<uui-box>
 					<uui-table>
 						<uui-table-head>
@@ -92,10 +91,10 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 						)}
 					</uui-table>
 				</uui-box>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		css`
 			uui-box {

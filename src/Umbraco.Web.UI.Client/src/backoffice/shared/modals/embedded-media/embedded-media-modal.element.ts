@@ -26,7 +26,7 @@ interface UmbEmbeddedMediaModalModel {
 
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbLitElement {
-	
+
 
 	#loading = false;
 	#embedResult!: OEmbedResult;
@@ -164,7 +164,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Embed">
+			<umb-workspace-editor headline="Embed">
 				<uui-box>
 					<umb-workspace-property-layout label="URL" orientation="vertical">
 						<div slot="editor">
@@ -227,10 +227,10 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 					look="primary"
 					label="Submit"
 					@click=${this.#handleConfirm}></uui-button>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
