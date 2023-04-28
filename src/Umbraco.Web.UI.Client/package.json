@@ -57,8 +57,8 @@
     "wicg-inert": "3.1.2"
   },
   "devDependencies": {
-    "@babel/core": "7.20.12",
-    "@babel/preset-env": "7.20.2",
+    "@babel/core": "7.21.4",
+    "@babel/preset-env": "7.21.4",
     "autoprefixer": "10.4.13",
     "cssnano": "5.1.14",
     "eslint": "8.33.0",
