@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 
 public sealed class CreateDateSortIndexer : IContentIndexHandler
 {
-    internal const string FieldName = "created";
+    internal const string FieldName = "createDate";
 
     public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
         => new[] { new IndexFieldValue { FieldName = FieldName, Value = content.CreateDate } };

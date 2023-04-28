@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 
 public sealed class UpdateDateSortIndexer : IContentIndexHandler
 {
-    internal const string FieldName = "updated";
+    internal const string FieldName = "updateDate";
 
     public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
         => new[] { new IndexFieldValue { FieldName = FieldName, Value = content.UpdateDate } };
