@@ -1,18 +1,17 @@
-import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/workspace/document-workspace.context';
-import { PropertyContainerTypes } from './workspace-structure-manager.class';
+import { PropertyContainerTypes, UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class';
 import {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbWorkspacePropertyStructureHelper {
+export class UmbContentTypePropertyStructureHelper {
 	#host: UmbControllerHostElement;
 	#init;
+	#initResolver?: (value: unknown) => void;
 
-	#workspaceContext?: UmbDocumentWorkspaceContext;
+	#structure?: UmbContentTypePropertyStructureManager;
 
 	private _containerType?: PropertyContainerTypes;
 	private _isRoot?: boolean;
@@ -23,12 +22,18 @@ export class UmbWorkspacePropertyStructureHelper {
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
+		this.#init = new Promise((resolve) => {
+			this.#initResolver = resolve;
+		});
 		// TODO: Remove as any when sortOrder is implemented:
 		this.#propertyStructure.sortBy((a, b) => ((a as any).sortOrder ?? 0) - ((b as any).sortOrder ?? 0));
-		this.#init = new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
-			this._observeGroupContainers();
-		}).asPromise();
+	}
+
+	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {
+		this.#structure = structure;
+		this.#initResolver?.(undefined);
+		this.#initResolver = undefined;
+		this._observeGroupContainers();
 	}
 
 	public setContainerType(value?: PropertyContainerTypes) {
@@ -59,14 +64,14 @@ export class UmbWorkspacePropertyStructureHelper {
 	}
 
 	private _observeGroupContainers() {
-		if (!this.#workspaceContext || !this._containerType) return;
+		if (!this.#structure || !this._containerType) return;
 
 		if (this._isRoot === true) {
 			this._observePropertyStructureOf(null);
 		} else if (this._containerName !== undefined) {
 			new UmbObserverController(
 				this.#host,
-				this.#workspaceContext!.structure.containersByNameAndType(this._containerName, this._containerType),
+				this.#structure.containersByNameAndType(this._containerName, this._containerType),
 				(groupContainers) => {
 					groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
 				},
@@ -76,11 +81,11 @@ export class UmbWorkspacePropertyStructureHelper {
 	}
 
 	private _observePropertyStructureOf(groupId?: string | null) {
-		if (!this.#workspaceContext || groupId === undefined) return;
+		if (!this.#structure || groupId === undefined) return;
 
 		new UmbObserverController(
 			this.#host,
-			this.#workspaceContext.structure.propertyStructuresOf(groupId),
+			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.id before inserting them:
 				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerId !== groupId);
@@ -103,35 +108,35 @@ export class UmbWorkspacePropertyStructureHelper {
 
 	async addProperty(ownerId?: string, sortOrder?: number) {
 		await this.#init;
-		if (!this.#workspaceContext) return;
+		if (!this.#structure) return;
 
-		return await this.#workspaceContext.structure.createProperty(null, ownerId, sortOrder);
+		return await this.#structure.createProperty(null, ownerId, sortOrder);
 	}
 
 	async insertProperty(property: PropertyTypeResponseModelBaseModel, sortOrder = 0) {
 		await this.#init;
-		if (!this.#workspaceContext) return false;
+		if (!this.#structure) return false;
 
 		const newProperty = { ...property, sortOrder };
 
 		// TODO: Remove as any when server model has gotten sortOrder:
-		await this.#workspaceContext.structure.insertProperty(null, newProperty);
+		await this.#structure.insertProperty(null, newProperty);
 		return true;
 	}
 
 	async removeProperty(propertyId: string) {
 		await this.#init;
-		if (!this.#workspaceContext) return false;
+		if (!this.#structure) return false;
 
-		await this.#workspaceContext.structure.removeProperty(null, propertyId);
+		await this.#structure.removeProperty(null, propertyId);
 		return true;
 	}
 
 	// Takes optional arguments as this is easier for the implementation in the view:
 	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<DocumentTypePropertyTypeResponseModel>) {
 		await this.#init;
-		if (!this.#workspaceContext || !propertyKey || !partialUpdate) return;
+		if (!this.#structure || !propertyKey || !partialUpdate) return;
 
-		return await this.#workspaceContext.structure.updateProperty(null, propertyKey, partialUpdate);
+		return await this.#structure.updateProperty(null, propertyKey, partialUpdate);
 	}
 }

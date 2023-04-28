@@ -1,15 +1,14 @@
-import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/workspace/document-workspace.context';
-import { PropertyContainerTypes } from './workspace-structure-manager.class';
+import { PropertyContainerTypes, UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbWorkspaceContainerStructureHelper {
+export class UmbContentTypeContainerStructureHelper {
 	#host: UmbControllerHostElement;
 	#init;
+	#initResolver?: (value: unknown) => void;
 
-	#workspaceContext?: UmbDocumentWorkspaceContext;
+	#structure?: UmbContentTypePropertyStructureManager;
 
 	private _ownerType?: PropertyContainerTypes = 'Tab';
 	private _childType?: PropertyContainerTypes = 'Group';
@@ -30,13 +29,18 @@ export class UmbWorkspaceContainerStructureHelper {
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
+		this.#init = new Promise((resolve) => {
+			this.#initResolver = resolve;
+		});
 
 		this.#containers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+	}
 
-		this.#init = new UmbContextConsumerController(host, UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context as UmbDocumentWorkspaceContext;
-			this._observeOwnerContainers();
-		}).asPromise();
+	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {
+		this.#structure = structure;
+		this.#initResolver?.(undefined);
+		this.#initResolver = undefined;
+		this._observeOwnerContainers();
 	}
 
 	public setType(value?: PropertyContainerTypes) {
@@ -76,7 +80,7 @@ export class UmbWorkspaceContainerStructureHelper {
 	}
 
 	private _observeOwnerContainers() {
-		if (!this.#workspaceContext) return;
+		if (!this.#structure) return;
 
 		if (this._isRoot) {
 			this.#containers.next([]);
@@ -86,7 +90,7 @@ export class UmbWorkspaceContainerStructureHelper {
 		} else if (this._ownerName && this._ownerType) {
 			new UmbObserverController(
 				this.#host,
-				this.#workspaceContext.structure.containersByNameAndType(this._ownerName, this._ownerType),
+				this.#structure.containersByNameAndType(this._ownerName, this._ownerType),
 				(ownerContainers) => {
 					this.#containers.next([]);
 					this._ownerContainers = ownerContainers || [];
@@ -101,12 +105,12 @@ export class UmbWorkspaceContainerStructureHelper {
 	}
 
 	private _observeOwnerProperties() {
-		if (!this.#workspaceContext) return;
+		if (!this.#structure) return;
 
 		this._ownerContainers.forEach((container) => {
 			new UmbObserverController(
 				this.#host,
-				this.#workspaceContext!.structure.hasPropertyStructuresOf(container.id!),
+				this.#structure!.hasPropertyStructuresOf(container.id!),
 				(hasProperties) => {
 					this.#hasProperties.next(hasProperties);
 				},
@@ -116,12 +120,12 @@ export class UmbWorkspaceContainerStructureHelper {
 	}
 
 	private _observeChildContainers() {
-		if (!this.#workspaceContext || !this._ownerName || !this._childType) return;
+		if (!this.#structure || !this._ownerName || !this._childType) return;
 
 		this._ownerContainers.forEach((container) => {
 			new UmbObserverController(
 				this.#host,
-				this.#workspaceContext!.structure.containersOfParentKey(container.id, this._childType!),
+				this.#structure!.containersOfParentKey(container.id, this._childType!),
 				this._insertGroupContainers,
 				'_observeGroupsOf_' + container.id
 			);
@@ -129,11 +133,11 @@ export class UmbWorkspaceContainerStructureHelper {
 	}
 
 	private _observeRootContainers() {
-		if (!this.#workspaceContext || !this._isRoot) return;
+		if (!this.#structure || !this._isRoot) return;
 
 		new UmbObserverController(
 			this.#host,
-			this.#workspaceContext!.structure.rootContainers(this._childType!),
+			this.#structure.rootContainers(this._childType!),
 			(rootContainers) => {
 				this.#containers.next([]);
 				this._insertGroupContainers(rootContainers);
@@ -156,7 +160,7 @@ export class UmbWorkspaceContainerStructureHelper {
 	 * Returns true if the container is an owner container.
 	 */
 	isOwnerContainer(groupId?: string) {
-		if (!this.#workspaceContext || !groupId) return;
+		if (!this.#structure || !groupId) return;
 
 		return this._ownerContainers.find((x) => x.id === groupId) !== undefined;
 	}
@@ -164,15 +168,15 @@ export class UmbWorkspaceContainerStructureHelper {
 	/** Manipulate methods: */
 
 	async addContainer(ownerId?: string, sortOrder?: number) {
-		if (!this.#workspaceContext) return;
+		if (!this.#structure) return;
 
-		await this.#workspaceContext.structure.createContainer(null, ownerId, this._childType, sortOrder);
+		await this.#structure.createContainer(null, ownerId, this._childType, sortOrder);
 	}
 
 	async partialUpdateContainer(groupId?: string, partialUpdate?: Partial<PropertyTypeContainerResponseModelBaseModel>) {
 		await this.#init;
-		if (!this.#workspaceContext || !groupId || !partialUpdate) return;
+		if (!this.#structure || !groupId || !partialUpdate) return;
 
-		return await this.#workspaceContext.structure.updateContainer(null, groupId, partialUpdate);
+		return await this.#structure.updateContainer(null, groupId, partialUpdate);
 	}
 }

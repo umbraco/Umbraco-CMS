@@ -1,6 +1,6 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	EntityTreeItemResponseModel,
 	PagedEntityTreeItemResponseModel,

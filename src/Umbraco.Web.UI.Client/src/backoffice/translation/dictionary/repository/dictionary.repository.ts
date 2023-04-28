@@ -132,6 +132,12 @@ export class UmbDictionaryRepository
 		return { data, error };
 	}
 
+	async byId(id: string) {
+		if (!id) throw new Error('Key is missing');
+		await this.#init;
+		return this.#detailStore!.byId(id);
+	}
+
 	async list(skip = 0, take = 1000) {
 		await this.#init;
 		return this.#detailSource.list(skip, take);

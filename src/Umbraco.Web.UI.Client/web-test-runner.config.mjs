@@ -39,6 +39,7 @@ export default {
 					imports: {
 						'src/': './src/',
 						'@umbraco-cms/backoffice/backend-api': './libs/backend-api/index.ts',
+						'@umbraco-cms/backoffice/content-type': './libs/content-type/index.ts',
 						'@umbraco-cms/backoffice/context-api': './libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller': './libs/controller/index.ts',
 						'@umbraco-cms/backoffice/element': './libs/element/index.ts',

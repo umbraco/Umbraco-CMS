@@ -13,7 +13,7 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  * @description - Data Store for Users
  */
 export class UmbUserStore extends UmbStoreBase {
-	#data = new UmbArrayState<UserResponseModel>([], (x) => x.id);
+	//#data = new UmbArrayState<UserResponseModel>([], (x) => x.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UserResponseModel>([], (x) => x.id));
@@ -25,16 +25,16 @@ export class UmbUserStore extends UmbStoreBase {
 	 * @memberof UmbUserStore
 	 */
 	append(user: UserResponseModel) {
-		this.#data.append([user]);
+		this._data.append([user]);
 	}
 
 	/**
 	 * Get a user by id
-	 * @param {id} UserResponseModel id.
+	 * @param {id} string id.
 	 * @memberof UmbUserStore
 	 */
 	byId(id: UserResponseModel['id']) {
-		return this.#data.getObservablePart((x) => x.find((y) => y.id === id));
+		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
 	/**
@@ -43,6 +43,6 @@ export class UmbUserStore extends UmbStoreBase {
 	 * @memberof UmbUserStore
 	 */
 	remove(uniques: Array<UserResponseModel['id']>) {
-		this.#data.remove(uniques);
+		this._data.remove(uniques);
 	}
 }

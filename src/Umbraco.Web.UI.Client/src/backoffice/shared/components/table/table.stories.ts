@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import './table.element';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbTableElement, UmbTableColumn, UmbTableConfig, UmbTableItem } from './table.element';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 const meta: Meta<UmbTableElement> = {
 	title: 'Components/Table',

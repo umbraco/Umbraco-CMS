@@ -126,9 +126,9 @@ export class UmbRelationTypeRepository
 		return { data, error };
 	}
 
-	async byKey(id: string) {
+	async byId(id: string) {
 		await this.#init;
-		return this.#detailStore!.byKey(id);
+		return this.#detailStore!.byId(id);
 	}
 
 	// Could potentially be general methods:

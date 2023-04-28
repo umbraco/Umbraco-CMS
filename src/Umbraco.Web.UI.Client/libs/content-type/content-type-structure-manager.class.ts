@@ -1,11 +1,10 @@
+import { UmbDetailRepository } from '../repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbDocumentTypeRepository } from '../../../../documents/document-types/repository/document-type.repository';
 import {
-	DocumentTypeResponseModel,
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeContainerResponseModelBaseModel,
-	ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel,
 	PropertyTypeResponseModelBaseModel,
+	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
 import {
@@ -19,11 +18,10 @@ import {
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
 
-// TODO: get this type from the repository, or use some generic type.
 type T = DocumentTypeResponseModel;
 
-// TODO: make general interface for NodeTypeRepository, to replace UmbDocumentTypeRepository:
-export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepository = UmbDocumentTypeRepository> {
+// TODO: get this type from the repository, or use some generic type.
+export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepository<T> = UmbDetailRepository<T>> {
 	#host: UmbControllerHostElement;
 	#init!: Promise<unknown>;
 
@@ -99,9 +97,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		return { data };
 	}
 
-	public async _observeDocumentType(
-		data: ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel
-	) {
+	public async _observeDocumentType(data: T) {
 		if (!data.id) return;
 
 		// Load inherited and composed types:
@@ -149,13 +145,13 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 	// We could move the actions to another class?
 
 	async createContainer(
-		documentTypeKey: string | null,
+		contentTypeId: string | null,
 		parentId: string | null = null,
 		type: PropertyContainerTypes = 'Group',
 		sortOrder?: number
 	) {
 		await this.#init;
-		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeId!;
+		contentTypeId = contentTypeId ?? this.#rootDocumentTypeId!;
 
 		const container: PropertyTypeContainerResponseModelBaseModel = {
 			id: UmbId.new(),
@@ -165,10 +161,10 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 			sortOrder: sortOrder ?? 0,
 		};
 
-		const containers = [...(this.#documentTypes.getValue().find((x) => x.id === documentTypeKey)?.containers ?? [])];
+		const containers = [...(this.#documentTypes.getValue().find((x) => x.id === contentTypeId)?.containers ?? [])];
 		containers.push(container);
 
-		this.#documentTypes.updateOne(documentTypeKey, { containers });
+		this.#documentTypes.updateOne(contentTypeId, { containers });
 
 		return container;
 	}

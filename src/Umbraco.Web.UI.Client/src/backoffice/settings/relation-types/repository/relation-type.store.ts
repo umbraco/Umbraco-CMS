@@ -40,7 +40,7 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 	 * @param {id} RelationTypeResponseModel id.
 	 * @memberof UmbRelationTypeStore
 	 */
-	byKey(id: RelationTypeResponseModel['id']) {
+	byId(id: RelationTypeResponseModel['id']) {
 		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 

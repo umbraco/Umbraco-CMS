@@ -1,7 +1,7 @@
 import { assert, expect } from '@open-wc/testing';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbNotificationHandler } from './notification-handler';
 import type { UmbNotificationOptions } from './notification.context';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 describe('UmbNotificationHandler', () => {
 	let notificationHandler: UmbNotificationHandler;

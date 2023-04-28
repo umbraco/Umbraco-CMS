@@ -16,6 +16,7 @@ import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco
 // TODO: implement
 export class UmbUserRepository implements UmbUserDetailRepository, UmbCollectionRepository {
 	#host: UmbControllerHostElement;
+	#init;
 
 	#detailSource: UmbUserDetailDataSource;
 	#detailStore?: UmbUserStore;
@@ -30,13 +31,15 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 		this.#detailSource = new UmbUserServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserCollectionServerDataSource(this.#host);
 
-		new UmbContextConsumerController(this.#host, UMB_USER_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#detailStore = instance;
-		});
+		this.#init = Promise.all([
+			new UmbContextConsumerController(this.#host, UMB_USER_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#detailStore = instance;
+			}),
 
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-			this.#notificationContext = instance;
-		});
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
+			}),
+		]);
 	}
 
 	// COLLECTION
@@ -65,6 +68,12 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 		}
 
 		return { data, error };
+	}
+
+	async byId(id: string) {
+		if (!id) throw new Error('Key is missing');
+		await this.#init;
+		return this.#detailStore!.byId(id);
 	}
 
 	async create(userRequestData: CreateUserRequestModel) {
