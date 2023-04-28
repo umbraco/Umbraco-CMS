@@ -61,7 +61,7 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 	}
 
 	#renderUserTag(user: UserResponseModel) {
-		if (user.state || user.state === UserStateModel.ACTIVE) {
+		if (user.state && user.state === UserStateModel.ACTIVE) {
 			return nothing;
 		}
 
