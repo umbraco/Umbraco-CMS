@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -33,7 +34,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             // it means that CanHandle() returned true, meaning that this Selector should be able to handle the selector value
             return new SelectorOption
             {
-                FieldName = "id",
+                FieldName = AncestorsSelectorIndexer.FieldName,
                 Value = string.Empty
             };
         }
@@ -44,7 +45,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 
         return new SelectorOption
         {
-            FieldName = "id",
+            FieldName = AncestorsSelectorIndexer.FieldName,
             Value = string.Join(" ", ancestorKeys)
         };
     }
