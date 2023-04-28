@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../../../shared/components/collection/collection.context';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { getLookAndColorFromUserStatus } from '../../../../utils';
 import { UmbUserCollectionContext } from '../../user-collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

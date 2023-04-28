@@ -4,11 +4,13 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbTableColumn, UmbTableConfig } from '../../../../../shared/components/table';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-workspace-view-relation-type-relation')
-export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
-	
-
+export class UmbWorkspaceViewRelationTypeRelationElement
+	extends UmbLitElement
+	implements UmbWorkspaceEditorViewExtensionElement
+{
 	//TODO Use real data
 	@state()
 	_relations: Array<RelationResponseModel> = MockData;
@@ -68,7 +70,7 @@ export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement {
 			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		</uui-box>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

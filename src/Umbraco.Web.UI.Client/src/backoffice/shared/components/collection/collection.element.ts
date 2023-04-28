@@ -4,17 +4,17 @@ import { customElement, state, property } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from './collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
 	@state()
-	private _routes: Array<IRoute> = [];
+	private _routes: Array<UmbRoute> = [];
 
 	@state()
 	private _selection?: Array<string> | null;

@@ -1,14 +1,18 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
-import type { ManifestTree, ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type {
+	ManifestTree,
+	ManifestWorkspace,
+	UmbSectionViewExtensionElement,
+} from '@umbraco-cms/backoffice/extensions-registry';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-created-packages-section-view')
-export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
+export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {
 	@state()
-	private _routes: IRoute[] = [];
+	private _routes: UmbRoute[] = [];
 
 	private _workspaces: Array<ManifestWorkspace> = [];
 
@@ -23,7 +27,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: IRoute[] = [
+		const routes: UmbRoute[] = [
 			{
 				path: 'overview',
 				component: () => import('./packages-created-overview.element'),

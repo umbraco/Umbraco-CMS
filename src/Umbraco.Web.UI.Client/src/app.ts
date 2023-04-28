@@ -15,7 +15,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbAuthFlow } from './core/auth/auth-flow';
 import { UmbIconStore } from './core/stores/icon/icon.store';
 import type { UmbErrorElement } from './error/error.element';
-import type { Guard, IRoute } from '@umbraco-cms/backoffice/router';
+import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_SERVER_URL, tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -41,7 +41,7 @@ export class UmbAppElement extends UmbLitElement {
 	@property({ type: String })
 	private backofficePath = '/umbraco';
 
-	private _routes: IRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
 			path: 'install',
 			component: () => import('./installer/installer.element'),

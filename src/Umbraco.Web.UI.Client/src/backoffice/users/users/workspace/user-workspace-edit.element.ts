@@ -93,13 +93,13 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.User">
+			<umb-workspace-editor alias="Umb.Workspace.User">
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
 					<div id="right-column">${this.#renderRightColumn()}</div>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 

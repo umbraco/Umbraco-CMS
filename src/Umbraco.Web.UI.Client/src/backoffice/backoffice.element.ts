@@ -24,12 +24,11 @@ const CORE_PACKAGES = [
 	import('./packages/umbraco-package'),
 	import('./search/umbraco-package'),
 	import('./templating/umbraco-package'),
+	import('./umbraco-news/umbraco-package'),
 ];
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
-	
-
 	constructor() {
 		super();
 		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
@@ -48,7 +47,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 			<umb-backoffice-modal-container></umb-backoffice-modal-container>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -2,7 +2,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 const DATA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DataType';
@@ -17,9 +17,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.DataType.Edit',
 		name: 'Data Type Workspace Edit View',
 		loader: () => import('./views/details/data-type-details-workspace-view.element'),
@@ -34,7 +34,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 	},
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.DataType.Info',
 		name: 'Data Type Workspace Info View',
 		loader: () => import('./views/info/workspace-view-data-type-info.element'),

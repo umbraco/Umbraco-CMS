@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
@@ -35,7 +35,7 @@ export class UmbDictionaryDetailServerDataSource
 	 */
 	async createScaffold(parentId?: string | null, name?: string) {
 		const data = {
-			id: uuidv4(),
+			id: UmbId.new(),
 			parentId,
 			name,
 			translations: [],

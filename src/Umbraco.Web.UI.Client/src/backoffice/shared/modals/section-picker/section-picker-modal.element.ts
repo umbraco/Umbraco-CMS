@@ -7,21 +7,21 @@ import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registr
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalElementPickerBase<ManifestSection> {
-	
+
 
 	@state()
 	private _sections: Array<ManifestSection> = [];
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		umbExtensionsRegistry.extensionsOfType('section').subscribe((sections: Array<ManifestSection>) => {
+		this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections: Array<ManifestSection>) => {
 			this._sections = sections;
 		});
 	}
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select sections">
+			<umb-workspace-editor headline="Select sections">
 				<uui-box>
 					<uui-input label="search"></uui-input>
 					<hr />
@@ -42,10 +42,10 @@ export class UmbSectionPickerModalElement extends UmbModalElementPickerBase<Mani
 					<uui-button label="Close" @click=${this.close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

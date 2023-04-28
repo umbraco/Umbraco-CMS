@@ -5,7 +5,7 @@ import { UmbPropertyValueChangeEvent } from '../..';
 import UmbInputMultipleTextStringElement, {
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -18,7 +18,10 @@ export type MultipleTextStringConfigData = Array<{
  * @element umb-property-editor-ui-multiple-text-string
  */
 @customElement('umb-property-editor-ui-multiple-text-string')
-export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement implements UmbPropertyEditorElement {
+export class UmbPropertyEditorUIMultipleTextStringElement
+	extends UmbLitElement
+	implements UmbPropertyEditorExtensionElement
+{
 	@property({ type: Array })
 	public value: MultipleTextStringValue = [];
 

@@ -83,7 +83,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select Icon">
+			<umb-workspace-editor headline="Select Icon">
 				<div id="container">
 					${this.renderSearchbar()}
 					<hr />
@@ -104,7 +104,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				<uui-button slot="actions" color="positive" look="primary" @click="${this._submit}" label="Submit">
 					Submit
 				</uui-button>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 

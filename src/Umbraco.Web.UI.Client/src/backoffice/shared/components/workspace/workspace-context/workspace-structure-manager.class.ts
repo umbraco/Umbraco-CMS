@@ -1,5 +1,5 @@
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDocumentTypeRepository } from '../../../../documents/document-types/repository/document-type.repository';
-import { generateGuid } from '@umbraco-cms/backoffice/utils';
 import {
 	DocumentTypeResponseModel,
 	DocumentTypePropertyTypeResponseModel,
@@ -158,7 +158,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeId!;
 
 		const container: PropertyTypeContainerResponseModelBaseModel = {
-			id: generateGuid(),
+			id: UmbId.new(),
 			parentId: parentId,
 			name: 'New',
 			type: type,
@@ -203,7 +203,7 @@ export class UmbWorkspacePropertyStructureManager<R extends UmbDocumentTypeRepos
 		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
 
 		const property: PropertyTypeResponseModelBaseModel = {
-			id: generateGuid(),
+			id: UmbId.new(),
 			containerId: containerId,
 			//sortOrder: sortOrder ?? 0,
 		};

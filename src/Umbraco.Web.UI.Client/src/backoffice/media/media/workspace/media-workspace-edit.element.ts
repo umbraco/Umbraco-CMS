@@ -7,7 +7,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-media-workspace-edit')
 export class UmbMediaWorkspaceEditElement extends UmbLitElement {
-	
+
 
 	@state()
 	_id?: string;
@@ -30,15 +30,15 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		if (!this._id) return nothing;
-		return html` <umb-workspace-layout alias="Umb.Workspace.Media">
+		return html` <umb-workspace-editor alias="Umb.Workspace.Media">
 			<div id="header" slot="header">TODO: MISSING INPUT COMPONENT</div>
 			<umb-workspace-action-menu
 				slot="action-menu"
 				entity-type="media"
 				unique="${this._id}"></umb-workspace-action-menu>
-		</umb-workspace-layout>`;
+		</umb-workspace-editor>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

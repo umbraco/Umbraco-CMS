@@ -1,10 +1,10 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/components/collection/collection.context';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbUserCollectionContext } from './user-collection.context';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './views/table/user-table-collection-view.element';
 import './views/grid/user-grid-collection-view.element';
@@ -16,7 +16,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 	#collectionContext = new UmbUserCollectionContext(this);
 
 	@state()
-	private _routes: IRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
 			path: 'grid',
 			component: () => import('./views/grid/user-grid-collection-view.element'),
