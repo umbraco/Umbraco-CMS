@@ -64,4 +64,6 @@ import './workspace/workspace-footer/workspace-footer.element';
 import './template-card/template-card.element';
 import './code-editor';
 
+import './tooltip-menu/tooltip-menu.element';
+
 export const manifests = [...debugManifests];
