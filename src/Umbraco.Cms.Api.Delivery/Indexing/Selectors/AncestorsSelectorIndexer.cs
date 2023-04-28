@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 
-public class AncestorsSelectorIndexer : IContentIndexHandler
+public sealed class AncestorsSelectorIndexer : IContentIndexHandler
 {
     // NOTE: "id" is a reserved field name
     internal const string FieldName = "itemId";
