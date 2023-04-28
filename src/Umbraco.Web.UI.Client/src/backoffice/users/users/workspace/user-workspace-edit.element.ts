@@ -7,6 +7,7 @@ import { repeat } from 'lit/directives/repeat.js';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
 import { getLookAndColorFromUserStatus } from '../../utils';
+import { UmbUserRepository } from '../repository/user.repository';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -15,6 +16,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-user-workspace-edit')
 export class UmbUserWorkspaceEditElement extends UmbLitElement {
@@ -29,6 +32,8 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 	#languages = []; //TODO Add languages
 	#workspaceContext?: UmbUserWorkspaceContext;
 
+	#userRepository?: UmbUserRepository;
+
 	constructor() {
 		super();
 
@@ -41,6 +46,22 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 			this.#workspaceContext = workspaceContext as UmbUserWorkspaceContext;
 			this.#observeUser();
 		});
+
+		// TODO: this code is reused in multiple places, so it should be extracted to a function
+		new UmbObserverController(
+			this,
+			umbExtensionsRegistry.getByTypeAndAlias('repository', 'Umb.Repository.User'),
+			async (repositoryManifest) => {
+				if (!repositoryManifest) return;
+
+				try {
+					const result = await createExtensionClass<UmbUserRepository>(repositoryManifest, [this]);
+					this.#userRepository = result;
+				} catch (error) {
+					throw new Error('Could not create repository with alias: Umb.Repository.User');
+				}
+			}
+		);
 	}
 
 	#observeUser() {
@@ -54,21 +75,21 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 	}
 
 	#onUserStatusChange() {
-		if (!this._user) return;
+		if (!this._user || !this._user.id) return;
 
-		if (this._user.state === UserStateModel.ACTIVE) {
-			//TODO: This should go directly to the user repository instead of the context so that the request is send immediately.
-			this.#workspaceContext?.updateProperty('state', UserStateModel.DISABLED);
+		if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
+			this.#userRepository?.disable([this._user.id]);
 		}
 
 		if (this._user.state === UserStateModel.DISABLED) {
-			//TODO: This should go directly to the user repository instead of the context so that the request is send immediately.
-			this.#workspaceContext?.updateProperty('state', UserStateModel.ACTIVE);
+			this.#userRepository?.enable([this._user.id]);
 		}
 	}
 
 	#onUserDelete() {
-		//TODO: Delete user and redirect to user list.
+		if (!this._user || !this._user.id) return;
+
+		this.#userRepository?.delete(this._user.id);
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.
@@ -226,16 +247,20 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 
 		const buttons: TemplateResult[] = [];
 
-		if (this._user.state !== UserStateModel.INVITED) {
-			const button = html`
-				<uui-button
-					@click=${this.#onUserStatusChange}
-					look="primary"
-					color="${this._user.state === UserStateModel.DISABLED ? 'positive' : 'warning'}"
-					label="${this._user.state === UserStateModel.DISABLED ? 'Enable' : 'Disable'}"></uui-button>
-			`;
+		if (this._user.state === UserStateModel.DISABLED) {
+			buttons.push(
+				html`
+					<uui-button @click=${this.#onUserStatusChange} look="primary" color="positive" label="Enable"></uui-button>
+				`
+			);
+		}
 
-			buttons.push(button);
+		if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
+			buttons.push(
+				html`
+					<uui-button @click=${this.#onUserStatusChange} look="primary" color="warning" label="Disable"></uui-button>
+				`
+			);
 		}
 
 		if (this._currentUser?.id !== this._user?.id) {

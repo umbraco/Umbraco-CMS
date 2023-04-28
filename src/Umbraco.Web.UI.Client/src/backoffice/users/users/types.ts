@@ -2,6 +2,8 @@ import type {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	DirectionModel,
+	DisableUserRequestModel,
+	EnableUserRequestModel,
 	InviteUserRequestModel,
 	UpdateUserRequestModel,
 	UserOrderModel,
@@ -28,6 +30,8 @@ export interface UmbUserCollectionFilterModel {
 export interface UmbUserDetailDataSource
 	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UserResponseModel> {
 	invite(data: InviteUserRequestModel): Promise<any>;
+	enable(data: EnableUserRequestModel): Promise<any>;
+	disable(data: DisableUserRequestModel): Promise<any>;
 }
 
 export interface UmbUserDetailRepository
