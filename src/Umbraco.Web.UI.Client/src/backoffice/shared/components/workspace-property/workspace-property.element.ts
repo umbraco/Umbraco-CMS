@@ -4,7 +4,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 
@@ -22,8 +21,6 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
 
 @customElement('umb-workspace-property')
 export class UmbWorkspacePropertyElement extends UmbLitElement {
-	
-
 	/**
 	 * Label. Name of the property
 	 * @type {string}
@@ -114,7 +111,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	private _variantDifference?: string;
 
 	@state()
-	private _element?: UmbPropertyEditorElement;
+	private _element?: ManifestPropertyEditorUI["ELEMENT_TYPE"];
 
 	@state()
 	private _value?: unknown;
@@ -182,7 +179,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 				oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
-				this._element = el as UmbPropertyEditorElement;
+				this._element = el as ManifestPropertyEditorUI["ELEMENT_TYPE"];
 
 				this._valueObserver?.destroy();
 				this._configObserver?.destroy();
@@ -243,7 +240,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 					.value="${this._value}"></umb-property-action-menu>`
 			: ''}`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

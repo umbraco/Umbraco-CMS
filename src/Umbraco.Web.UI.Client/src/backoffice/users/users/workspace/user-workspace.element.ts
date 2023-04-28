@@ -1,14 +1,14 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
 import { UmbUserWorkspaceEditElement } from './user-workspace-edit.element';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 import '../../../shared/components/input-user-group/input-user-group.element';
 import '../../../shared/property-editors/uis/document-picker/property-editor-ui-document-picker.element';
-import '../../../shared/components/workspace/workspace-layout/workspace-layout.element';
+import '../../../shared/components/workspace/workspace-editor/workspace-editor.element';
 
 @customElement('umb-user-workspace')
 export class UmbUserWorkspaceElement extends UmbLitElement {
@@ -16,7 +16,7 @@ export class UmbUserWorkspaceElement extends UmbLitElement {
 	#element = new UmbUserWorkspaceEditElement();
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: ':id',
 			component: () => this.#element,

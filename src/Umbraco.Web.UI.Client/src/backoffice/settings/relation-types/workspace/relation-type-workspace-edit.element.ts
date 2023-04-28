@@ -13,7 +13,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
  */
 @customElement('umb-relation-type-workspace-edit-element')
 export class UmbRelationTypeWorkspaceEditElement extends UmbLitElement {
-	
+
 
 	#workspaceContext?: UmbRelationTypeWorkspaceContext;
 
@@ -47,16 +47,16 @@ export class UmbRelationTypeWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.RelationType">
+			<umb-workspace-editor alias="Umb.Workspace.RelationType">
 				<div id="header" slot="header">
 					<uui-input id="name" .value=${this._relationType?.name} @input="${this._handleInput}">
 						<div id="alias" slot="append">${this._relationType?.alias}</div>
 					</uui-input>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

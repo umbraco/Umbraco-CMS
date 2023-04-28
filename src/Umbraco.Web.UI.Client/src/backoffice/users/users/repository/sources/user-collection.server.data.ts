@@ -1,8 +1,8 @@
+import type { UmbUserCollectionFilterModel } from '../../types';
 import { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import { UserResponseModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbUserCollectionFilterModel } from '../../types';
 
 /**
  * A data source for the User that fetches data from the server

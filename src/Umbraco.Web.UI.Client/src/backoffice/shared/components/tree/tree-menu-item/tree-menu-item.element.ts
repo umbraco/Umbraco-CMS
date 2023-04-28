@@ -4,7 +4,11 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestKind, ManifestMenuItemTreeKind } from '@umbraco-cms/backoffice/extensions-registry';
+import {
+	ManifestKind,
+	ManifestMenuItemTreeKind,
+	UmbMenuItemExtensionElement,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {
@@ -20,7 +24,7 @@ const manifest: ManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-menu-item-tree')
-export class UmbMenuItemTreeElement extends UmbLitElement {
+export class UmbMenuItemTreeElement extends UmbLitElement implements UmbMenuItemExtensionElement {
 	@state()
 	private _renderTree = false;
 

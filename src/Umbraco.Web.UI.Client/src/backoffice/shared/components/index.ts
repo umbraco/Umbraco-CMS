@@ -56,8 +56,8 @@ import './history/history-list.element';
 import './history/history-item.element';
 
 import './workspace/workspace-action/workspace-action.element';
-import './workspace/workspace-layout/workspace-layout.element';
-import './workspace/workspace-footer-layout/workspace-footer-layout.element';
+import './workspace/workspace-editor/workspace-editor.element';
+import './workspace/workspace-footer/workspace-footer.element';
 
 import './template-card/template-card.element';
 import './code-editor';

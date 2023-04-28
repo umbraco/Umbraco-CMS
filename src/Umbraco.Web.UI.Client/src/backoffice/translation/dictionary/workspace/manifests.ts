@@ -3,7 +3,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspaceAlias = 'Umb.Workspace.Dictionary';
@@ -18,9 +18,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Dictionary.Edit',
 		name: 'Dictionary Workspace Edit View',
 		loader: () => import('./views/edit/workspace-view-dictionary-edit.element'),

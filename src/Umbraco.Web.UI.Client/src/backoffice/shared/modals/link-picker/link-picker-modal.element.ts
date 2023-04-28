@@ -14,7 +14,7 @@ import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
-	
+
 
 	@state()
 	_selectedKey?: string;
@@ -91,7 +91,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select Link">
+			<umb-workspace-editor headline="Select Link">
 				<uui-box>
 					<div class="url-link">${this._renderLinkUrlInput()} ${this._renderAnchorInput()}</div>
 
@@ -121,7 +121,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -170,7 +170,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				.selection=${[this._selectedKey ?? '']}
 				selectable></umb-tree>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

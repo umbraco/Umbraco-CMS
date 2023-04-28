@@ -5,14 +5,14 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-type-workspace-edit')
 export class UmbMemberTypeWorkspaceEditElement extends UmbLitElement {
-	
+
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.MemberType"> Member Type Workspace </umb-workspace-layout>
+			<umb-workspace-editor alias="Umb.Workspace.MemberType"> Member Type Workspace </umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
