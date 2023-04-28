@@ -1,6 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -11,10 +12,6 @@ import type {
 	UmbTableSelectedEvent,
 } from '../../../shared/components/table';
 import type { MediaDetails } from '../';
-import {
-	UmbCollectionContext,
-	UMB_COLLECTION_CONTEXT_TOKEN,
-} from '../../../shared/components/collection/collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

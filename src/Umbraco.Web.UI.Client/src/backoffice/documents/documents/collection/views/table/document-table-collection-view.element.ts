@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
+import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -11,10 +12,6 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../../../../shared/components/table';
-import {
-	UMB_COLLECTION_CONTEXT_TOKEN,
-	UmbCollectionContext,
-} from '../../../../../shared/components/collection/collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

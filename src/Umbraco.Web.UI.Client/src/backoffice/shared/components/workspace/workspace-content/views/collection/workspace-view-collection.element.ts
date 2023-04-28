@@ -2,11 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import {
-	UmbCollectionContext,
-	UMB_COLLECTION_CONTEXT_TOKEN,
-} from '../../../../../../shared/components/collection/collection.context';
-
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
