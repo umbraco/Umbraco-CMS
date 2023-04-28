@@ -63,10 +63,11 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         HandleFiltering(filters, queryOperation);
 
         // Handle Sorting
-        IOrdering sortQuery = HandleSorting(sorts, queryOperation);
-        IOrdering? selectedFields = sortQuery.SelectFields(_itemIdOnlyFieldSet);
+        IOrdering sortQuery = HandleSorting(sorts, queryOperation).SelectFields(_itemIdOnlyFieldSet);
 
-        ISearchResults? results = selectedFields.Execute(QueryOptions.SkipTake(skip, take));
+        ISearchResults? results = sortQuery
+            .SelectFields(_itemIdOnlyFieldSet)
+            .Execute(QueryOptions.SkipTake(skip, take));
 
         if (results is null)
         {
