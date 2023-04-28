@@ -8,11 +8,10 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPackageWithMigrationStatus } from '@umbraco-cms/backoffice/models';
 
 import './installed-packages-section-view-item.element';
+import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-installed-packages-section-view')
-export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
-	
-
+export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {
 	@state()
 	private _installedPackages: UmbPackageWithMigrationStatus[] = [];
 
@@ -38,7 +37,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
 
 		const [package$, migration$] = data;
 
-		combineLatest([package$, migration$]).subscribe(([packages, migrations]) => {
+		this.observe(combineLatest([package$, migration$]), ([packages, migrations]) => {
 			this._installedPackages = packages.map((p) => {
 				const migration = migrations.find((m) => m.packageName === p.name);
 				if (migration) {
@@ -109,7 +108,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement {
 			</uui-ref-list>
 		</uui-box>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -1,6 +1,6 @@
-import { ManifestJSType } from './load-extension.function';
-import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestBase, ManifestWithLoader } from '@umbraco-cms/backoffice/extensions-registry';
 
-export function isManifestJSType(manifest: ManifestBase | unknown): manifest is ManifestJSType {
-	return (manifest as ManifestJSType).js !== undefined;
+export type ManifestJSType<T> = ManifestWithLoader<T> & { js: string };
+export function isManifestJSType<T>(manifest: ManifestBase | unknown): manifest is ManifestJSType<T> {
+	return (manifest as ManifestJSType<T>).js !== undefined;
 }

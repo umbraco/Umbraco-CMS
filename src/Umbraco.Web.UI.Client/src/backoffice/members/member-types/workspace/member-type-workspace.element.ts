@@ -3,18 +3,16 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbMemberTypeWorkspaceEditElement } from './member-type-workspace-edit.element';
 import { UmbMemberTypeWorkspaceContext } from './member-type-workspace.context';
-import { IRoute } from '@umbraco-cms/backoffice/router';
+import { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-type-workspace')
 export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
-	
-
 	#workspaceContext = new UmbMemberTypeWorkspaceContext(this);
 	#element = new UmbMemberTypeWorkspaceEditElement();
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
@@ -28,7 +26,7 @@ export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

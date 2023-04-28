@@ -57,7 +57,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _observeSections() {
 		if (!this._backofficeContext) return;
 
-		this.observe(this._backofficeContext.getAllowedSections(), (allowedSections) => {
+		this.observe(this._backofficeContext.allowedSections, (allowedSections) => {
 			this._sections = allowedSections;
 			this._visibleSections = this._sections;
 		});

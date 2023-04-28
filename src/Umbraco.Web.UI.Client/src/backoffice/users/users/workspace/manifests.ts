@@ -2,7 +2,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
@@ -15,7 +15,7 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [];
+const workspaceViews: Array<ManifestWorkspaceEditorView> = [];
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',

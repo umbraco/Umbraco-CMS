@@ -42,7 +42,7 @@ export class UmbTemplatePickerModalElement extends UmbModalBaseElement<
 	// TODO: make umb-tree have a disabled option (string array like selection)?
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select Content">
+			<umb-workspace-editor headline="Select Content">
 				<uui-box>
 					<uui-input></uui-input>
 					<hr />
@@ -56,7 +56,7 @@ export class UmbTemplatePickerModalElement extends UmbModalBaseElement<
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
