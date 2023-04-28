@@ -50,7 +50,6 @@ import './entity-bulk-action/entity-bulk-action.element';
 import './menu/menu-item-base/menu-item-base.element';
 
 import './variantable-property/variantable-property.element';
-import './workspace/workspace-action-menu/workspace-action-menu.element';
 
 import './header-app/header-app-button.element';
 
@@ -60,6 +59,9 @@ import './history/history-item.element';
 import './workspace/workspace-action/workspace-action.element';
 import './workspace/workspace-editor/workspace-editor.element';
 import './workspace/workspace-footer/workspace-footer.element';
+import './workspace/workspace-action-menu/workspace-action-menu.element';
+
+import './variant-selector/variant-selector.element.ts';
 
 import './template-card/template-card.element';
 import './code-editor';
