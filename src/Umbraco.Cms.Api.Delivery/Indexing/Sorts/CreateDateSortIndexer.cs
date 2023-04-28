@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 
-public class CreateDateSortIndexer : IContentIndexHandler
+public sealed class CreateDateSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "created";
 

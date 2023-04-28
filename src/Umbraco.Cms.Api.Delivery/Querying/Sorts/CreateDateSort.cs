@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Sorts;
 
-public class CreateDateSort : ISortHandler
+public sealed class CreateDateSort : ISortHandler
 {
     private const string SortOptionSpecifier = "createDate:";
 
