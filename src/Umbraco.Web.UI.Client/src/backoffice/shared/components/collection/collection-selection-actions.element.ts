@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
-import '../entity-bulk-action/entity-bulk-action.element';
-
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	#entityType?: string;
