@@ -21,7 +21,6 @@ import './empty-state/empty-state.element';
 import './extension-slot/extension-slot.element';
 import './input-checkbox-list/input-checkbox-list.element';
 import './input-color-picker/input-color-picker.element';
-import './input-culture-select/input-culture-select.element';
 import './input-eye-dropper/input-eye-dropper.element';
 import './input-language-picker/input-language-picker.element';
 import './input-media-picker/input-media-picker.element';
