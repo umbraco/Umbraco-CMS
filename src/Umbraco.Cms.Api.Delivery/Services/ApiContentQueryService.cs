@@ -191,8 +191,6 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         }
 
         return orderingQuery ?? // Apply default sorting (left-aligning the content tree) if no valid sort query params
-               queryCriteria
-                   .OrderBy(new SortableField(PathSortIndexer.FieldName, SortType.String))
-                   .OrderBy(new SortableField(SortOrderSortIndexer.FieldName, SortType.Int));
+               queryCriteria.OrderBy(new SortableField(PathSortIndexer.FieldName, SortType.String));
     }
 }
