@@ -4,7 +4,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbTreeElement } from '../../../shared/components/tree/tree.element';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbDictionaryItemPickerModalData, UmbDictionaryItemPickerModalResult } from '@umbraco-cms/backoffice/modal';
-import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-dictionary-item-picker-modal')
 export default class UmbDictionaryItemPickerModalElement extends UmbModalBaseElement<

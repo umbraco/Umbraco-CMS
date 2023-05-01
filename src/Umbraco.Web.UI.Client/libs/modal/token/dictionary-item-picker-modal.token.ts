@@ -1,4 +1,3 @@
-import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDictionaryItemPickerModalData {

@@ -1,8 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDictionaryRepository } from '../../../translation/dictionary/repository/dictionary.repository';
+import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils';
+import {
+	ChooseInsertTypeModalResult,
+	CodeSnippetType,
+	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL,
+} from '../../modals/insert-choose-type-sidebar.element';
 import {
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -13,13 +19,7 @@ import {
 	UmbModalToken,
 	UmbPartialViewPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
-import {
-	ChooseInsertTypeModalResult,
-	CodeSnippetType,
-	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL,
-} from '../../modals/insert-choose-type-sidebar.element';
-import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils';
-import { UmbDictionaryRepository } from '../../../translation/dictionary/repository/dictionary.repository';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
@@ -28,8 +28,6 @@ export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModa
 		size: 'small',
 	}
 );
-
-type snippetHandler<T> = (value: T) => Promise<void>;
 
 @customElement('umb-templating-insert-menu')
 export class UmbTemplatingInsertMenuElement extends UmbLitElement {
@@ -48,8 +46,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 			this._modalContext = instance;
 		});
 	}
-
-	//((value: string)=> Promise<void>) |( (modalResult: UmbDictionaryItemPickerModalResult)=> Promise<void>)
 
 	async determineInsertValue(modalResult: ChooseInsertTypeModalResult) {
 		const { type, value } = modalResult;
@@ -74,7 +70,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#getDictionaryItemSnippet = async (modalResult: UmbDictionaryItemPickerModalResult) => {
-		const { data, error } = await this.#dictionaryRepository.requestById(modalResult.selection[0]);
+		const { data } = await this.#dictionaryRepository.requestById(modalResult.selection[0]);
 		this.value = getInsertDictionarySnippet(data?.name ?? '');
 	};
 
