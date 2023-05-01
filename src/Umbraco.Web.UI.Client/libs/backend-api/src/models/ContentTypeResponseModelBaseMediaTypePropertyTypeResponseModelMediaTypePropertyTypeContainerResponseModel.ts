@@ -22,4 +22,3 @@ export type ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaT
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
 };
-

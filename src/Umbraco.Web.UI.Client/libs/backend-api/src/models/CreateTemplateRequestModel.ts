@@ -5,4 +5,3 @@
 import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
 
 export type CreateTemplateRequestModel = TemplateModelBaseModel;
-

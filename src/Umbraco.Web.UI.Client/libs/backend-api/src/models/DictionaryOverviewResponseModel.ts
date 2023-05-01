@@ -8,4 +8,3 @@ export type DictionaryOverviewResponseModel = {
     parentId?: string | null;
     translatedIsoCodes?: Array<string>;
 };
-

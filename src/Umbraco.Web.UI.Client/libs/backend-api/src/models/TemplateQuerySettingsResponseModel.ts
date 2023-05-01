@@ -10,4 +10,3 @@ export type TemplateQuerySettingsResponseModel = {
     properties?: Array<TemplateQueryPropertyPresentationModel>;
     operators?: Array<TemplateQueryOperatorModel>;
 };
-

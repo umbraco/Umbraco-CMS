@@ -8,4 +8,3 @@ export type UserPresentationBaseModel = {
     name?: string;
     userGroupIds?: Array<string>;
 };
-

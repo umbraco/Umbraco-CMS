@@ -5,6 +5,5 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type UserGroupItemResponseModel = (ItemResponseModelBaseModel & {
-    icon?: string | null;
+icon?: string | null;
 });
-
