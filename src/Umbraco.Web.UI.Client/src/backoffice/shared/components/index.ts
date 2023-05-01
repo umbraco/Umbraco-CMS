@@ -23,8 +23,6 @@ import './extension-slot/extension-slot.element';
 import './input-checkbox-list/input-checkbox-list.element';
 import './input-color-picker/input-color-picker.element';
 import './input-culture-select/input-culture-select.element';
-import '../../documents/documents/components/input-document-picker/input-document-picker.element';
-import './input-document-type-picker/input-document-type-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
 import './input-language-picker/input-language-picker.element';
 import './input-media-picker/input-media-picker.element';
