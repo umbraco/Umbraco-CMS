@@ -7,9 +7,9 @@ public sealed class PathSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "path";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
-        => new[] { new IndexFieldValue { FieldName = FieldName, Value = content.Path } };
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+        => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.Path } } };
 
     public IEnumerable<IndexField> GetFields()
-        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.StringSortable } };
+        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.StringSortable, VariesByCulture = false } };
 }

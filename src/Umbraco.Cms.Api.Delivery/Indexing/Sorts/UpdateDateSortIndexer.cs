@@ -7,9 +7,16 @@ public sealed class UpdateDateSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "updateDate";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
-        => new[] { new IndexFieldValue { FieldName = FieldName, Value = content.UpdateDate } };
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+        => new[]
+        {
+            new IndexFieldValue
+            {
+                FieldName = FieldName,
+                Values = new object[] { (culture is not null ? content.GetUpdateDate(culture) : null) ?? content.UpdateDate }
+            }
+        };
 
     public IEnumerable<IndexField> GetFields()
-        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.Date } };
+        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.Date, VariesByCulture = true } };
 }

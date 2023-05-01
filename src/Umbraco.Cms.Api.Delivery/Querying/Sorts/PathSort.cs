@@ -20,8 +20,7 @@ public sealed class PathSort : ISortHandler
         return new SortOption
         {
             FieldName = PathSortIndexer.FieldName,
-            Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending,
-            FieldType = FieldType.String
+            Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending
         };
     }
 }

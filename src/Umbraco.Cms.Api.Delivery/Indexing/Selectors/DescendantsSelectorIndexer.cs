@@ -15,22 +15,22 @@ public sealed class DescendantsSelectorIndexer : IContentIndexHandler
     public DescendantsSelectorIndexer(IEntityService entityService)
         => _entityService = entityService;
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
     {
-        Guid[] ancestorKeys = content.GetAncestorIds()?.Select(id =>
+        var ancestorKeys = content.GetAncestorIds()?.Select(id =>
         {
             Attempt<Guid> getKeyAttempt = _entityService.GetKey(id, UmbracoObjectTypes.Document);
-            return getKeyAttempt.Success ? getKeyAttempt.Result : Guid.Empty;
-        }).ToArray() ?? Array.Empty<Guid>();
+            return getKeyAttempt.Success ? getKeyAttempt.Result : (object)Guid.Empty;
+        }).ToArray() ?? Array.Empty<object>();
 
         yield return new IndexFieldValue
         {
             FieldName = FieldName,
-            Value = string.Join(" ", ancestorKeys) // TODO: investigate if search executes faster if we store this as an array
+            Values = ancestorKeys
         };
     }
 
     public IEnumerable<IndexField> GetFields()
-        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.String } };
+        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.StringRaw, VariesByCulture = false } };
 
 }
