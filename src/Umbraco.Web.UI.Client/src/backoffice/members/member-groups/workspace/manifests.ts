@@ -2,7 +2,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
@@ -15,9 +15,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.MemberGroup.Info',
 		name: 'Member Group Workspace Info View',
 		loader: () => import('./views/info/workspace-view-member-group-info.element'),

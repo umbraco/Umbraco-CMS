@@ -14,7 +14,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object, UmbPropertySettingsModalResult> {
-	
+
 
 	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
 	@state() private _selectedPropertyEditorUIAlias = '';
@@ -200,7 +200,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object,
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-layout headline="Property settings">
+					<umb-workspace-editor headline="Property settings">
 						<div id="content">
 							<uui-box>
 								<div class="container">
@@ -241,7 +241,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object,
 							<uui-button label="Close" @click=${this.#onClose}></uui-button>
 							<uui-button label="Submit" look="primary" color="positive" type="submit"></uui-button>
 						</div>
-					</umb-workspace-layout>
+					</umb-workspace-editor>
 				</form>
 			</uui-form>
 		`;
@@ -333,7 +333,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object,
 				  `
 				: nothing} `;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

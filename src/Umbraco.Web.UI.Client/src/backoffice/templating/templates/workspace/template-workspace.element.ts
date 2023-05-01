@@ -11,6 +11,8 @@ import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {
+
+
 	public load(entityId: string) {
 		this.#templateWorkspaceContext.load(entityId);
 	}

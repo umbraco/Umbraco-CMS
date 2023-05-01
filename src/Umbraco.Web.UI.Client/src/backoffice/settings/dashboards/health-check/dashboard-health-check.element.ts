@@ -6,7 +6,7 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 } from './health-check-dashboard.context';
 import { UmbHealthCheckContext } from './health-check.context';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
@@ -16,7 +16,7 @@ import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	@state()
-	private _routes: IRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
 			path: `/:groupName`,
 			component: () => import('./views/health-check-group.element'),

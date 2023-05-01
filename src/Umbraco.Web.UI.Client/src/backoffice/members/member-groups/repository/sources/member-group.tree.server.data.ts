@@ -1,5 +1,5 @@
-import { MemberGroupResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -49,8 +49,7 @@ export class UmbMemberGroupTreeServerDataSource implements UmbTreeDataSource {
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids || ids.length === 0) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

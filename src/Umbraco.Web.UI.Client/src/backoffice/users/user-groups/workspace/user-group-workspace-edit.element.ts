@@ -8,14 +8,12 @@ import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../../shared/components/input-user/input-user.element';
+import '../../users/components/user-input/user-input.element';
 import '../../../shared/components/input-section/input-section.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-user-group-workspace-edit')
 export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
-	
-
 	defaultPermissions: Array<{
 		name: string;
 		permissions: Array<{ name: string; description: string; value: boolean }>;
@@ -151,23 +149,23 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup as any));
 	}
 
-	private _observeUsers() {
-		if (!this._userStore) return;
+	// private _observeUsers() {
+	// 	if (!this._userStore) return;
 
-		// TODO: Create method to only get users from this userGroup
-		// TODO: Find a better way to only call this once at the start
-		this.observe(this._userStore.getAll(), (users) => {
-			// TODO: handle if there is no users.
-			if (!this._userKeys && users.length > 0) {
-				const entityId = this.#workspaceContext?.getEntityId();
-				if (!entityId) return;
-				this._userKeys = users.filter((user) => user.userGroups.includes(entityId)).map((user) => user.id);
-				//this._updateProperty('users', this._userKeys);
-				// TODO: make a method on the UmbWorkspaceUserGroupContext:
-				//this._workspaceContext.setUsers();
-			}
-		});
-	}
+	// 	// TODO: Create method to only get users from this userGroup
+	// 	// TODO: Find a better way to only call this once at the start
+	// 	this.observe(this._userStore.getAll(), (users) => {
+	// 		// TODO: handle if there is no users.
+	// 		if (!this._userKeys && users.length > 0) {
+	// 			const entityId = this.#workspaceContext?.getEntityId();
+	// 			if (!entityId) return;
+	// 			this._userKeys = users.filter((user) => user.userGroups.includes(entityId)).map((user) => user.id);
+	// 			//this._updateProperty('users', this._userKeys);
+	// 			// TODO: make a method on the UmbWorkspaceUserGroupContext:
+	// 			//this._workspaceContext.setUsers();
+	// 		}
+	// 	});
+	// }
 
 	private _updateUserKeys(userKeys: Array<string>) {
 		this._userKeys = userKeys;
@@ -297,16 +295,16 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		if (!this._userGroup) return nothing;
 
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.UserGroup">
+			<umb-workspace-editor alias="Umb.Workspace.UserGroup">
 				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

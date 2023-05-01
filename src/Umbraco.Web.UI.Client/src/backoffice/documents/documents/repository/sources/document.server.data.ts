@@ -1,14 +1,13 @@
-import { v4 as uuidv4 } from 'uuid';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DocumentResource,
-	ProblemDetailsModel,
 	DocumentResponseModel,
 	ContentStateModel,
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -18,7 +17,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentServerDataSource
-	implements UmbDataSource<CreateDocumentRequestModel, UpdateDocumentRequestModel, DocumentResponseModel>
+	implements UmbDataSource<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
 {
 	#host: UmbControllerHostElement;
 
@@ -39,8 +38,7 @@ export class UmbDocumentServerDataSource
 	 */
 	async get(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		return tryExecuteAndNotify(
@@ -61,7 +59,7 @@ export class UmbDocumentServerDataSource
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
-			id: uuidv4(),
+			id: UmbId.new(),
 			contentTypeId: documentTypeId,
 			values: [],
 			variants: [
@@ -113,8 +111,7 @@ export class UmbDocumentServerDataSource
 	 */
 	async trash(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		// TODO: use resources when end point is ready:
@@ -138,28 +135,18 @@ export class UmbDocumentServerDataSource
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
-		let problemDetails: ProblemDetailsModel | undefined = undefined;
-
-		try {
-			await fetch('/umbraco/management/api/v1/document/trash', {
+		return tryExecuteAndNotify(
+			this.#host,
+			fetch('/umbraco/management/api/v1/document/trash', {
 				method: 'POST',
 				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			});
-		} catch (error) {
-			problemDetails = { title: 'Delete document Failed' };
-		}
-
-		return { error: problemDetails };
-
-		/* TODO: use resources when end point is ready:
-		return tryExecuteAndNotify(this.#host);
-		*/
+			}).then((res) => res.json())
+		);
 	}
 }

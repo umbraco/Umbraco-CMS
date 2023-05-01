@@ -8,8 +8,10 @@ import {
 	UmbCurrentUserHistoryStore,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './current-user/current-user-history.store';
-import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+
+import './users/components';
 
 export const manifests = [...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests];
 

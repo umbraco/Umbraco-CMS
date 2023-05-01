@@ -3,12 +3,11 @@ import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.
 import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
 import type { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateTemplateRequestModel,
-	ProblemDetailsModel,
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -69,8 +68,7 @@ export class UmbTemplateRepository
 		await this.#init;
 
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
+			throw new Error('Parent id is missing');
 		}
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf(parentId);
@@ -86,8 +84,7 @@ export class UmbTemplateRepository
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeDataSource.getItems(ids);
@@ -129,8 +126,7 @@ export class UmbTemplateRepository
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 		const { data, error } = await this.#detailDataSource.get(id);
 
@@ -139,6 +135,11 @@ export class UmbTemplateRepository
 		}
 
 		return { data, error };
+	}
+	async byId(id: string) {
+		if (!id) throw new Error('Key is missing');
+		await this.#init;
+		return this.#store!.byId(id);
 	}
 
 	// Could potentially be general methods:

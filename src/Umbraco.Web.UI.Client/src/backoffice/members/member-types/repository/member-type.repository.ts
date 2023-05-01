@@ -5,7 +5,6 @@ import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detai
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 
@@ -64,8 +63,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		await this.#init;
 
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
+			throw new Error('Parent id is missing');
 		}
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
@@ -81,8 +79,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -118,8 +115,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 		const { data, error } = await this.#detailSource.requestById(id);
 
@@ -128,13 +124,17 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		}
 		return { data, error };
 	}
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#store!.byId(id);
+	}
 
 	async delete(id: string) {
 		await this.#init;
 
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		const { error } = await this.#detailSource.delete(id);
@@ -160,7 +160,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 
 		await this.#init;
 
-		const { error } = await this.#detailSource.save(id, updatedMemberType);
+		const { error } = await this.#detailSource.update(id, updatedMemberType);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.
@@ -181,11 +181,10 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		await this.#init;
 
 		if (!detail.name) {
-			const error: ProblemDetailsModel = { title: 'Name is missing' };
-			return { error };
+			throw new Error('Name is missing');
 		}
 
-		const { data, error } = await this.#detailSource.create(detail);
+		const { data, error } = await this.#detailSource.insert(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' created` } };

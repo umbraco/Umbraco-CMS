@@ -6,6 +6,7 @@ import type { CreateMediaRequestModel } from '../models/CreateMediaRequestModel'
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
 import type { DocumentTreeItemResponseModel } from '../models/DocumentTreeItemResponseModel';
 import type { MediaItemResponseModel } from '../models/MediaItemResponseModel';
+import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
 import type { PagedContentTreeItemResponseModel } from '../models/PagedContentTreeItemResponseModel';
 import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
@@ -95,6 +96,32 @@ export class MediaResource {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putMediaByIdMove({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveMediaRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/media/{id}/move',
             path: {
                 'id': id,
             },

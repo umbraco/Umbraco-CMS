@@ -1,6 +1,6 @@
 import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
-import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ContentTypeCompositionModel,
@@ -23,7 +23,6 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	// TODO: Consider if each of these should go the view it self, but only if its used in that one view, otherwise make then go here.
 	readonly allowedAsRoot;
 	readonly variesByCulture;
 	readonly variesBySegment;
@@ -41,7 +40,7 @@ export class UmbDocumentTypeWorkspaceContext
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDocumentTypeRepository(host));
 
-		this.structure = new UmbWorkspacePropertyStructureManager(this.host, this.repository);
+		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
 		// General for content types:
 		this.data = this.structure.rootDocumentType;
@@ -60,10 +59,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.allowedTemplateIds = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedTemplateIds);
 		this.defaultTemplateId = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
 		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
-	}
-
-	public setPropertyValue(alias: string, value: unknown) {
-		throw new Error('setPropertyValue is not implemented for UmbDocumentTypeWorkspaceContext');
 	}
 
 	getData() {
@@ -114,7 +109,6 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// Document type specific:
 	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
-		console.log('setAllowedTemplateIds', allowedTemplateIds);
 		this.structure.updateRootDocumentType({ allowedTemplateIds });
 	}
 	setDefaultTemplateId(defaultTemplateId: string) {

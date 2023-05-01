@@ -10,11 +10,13 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-language-details-workspace-view')
-export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
-	
-
+export class UmbLanguageDetailsWorkspaceViewElement
+	extends UmbLitElement
+	implements UmbWorkspaceEditorViewExtensionElement
+{
 	@state()
 	_language?: LanguageResponseModel;
 
@@ -185,7 +187,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

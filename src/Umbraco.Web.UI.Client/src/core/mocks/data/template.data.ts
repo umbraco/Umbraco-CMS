@@ -1,6 +1,6 @@
-import { v4 as uuid } from 'uuid';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	EntityTreeItemResponseModel,
 	PagedEntityTreeItemResponseModel,
@@ -101,7 +101,7 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	create(templateData: TemplateModelBaseModel) {
 		const template = {
 			$type: '',
-			id: uuid(),
+			id: UmbId.new(),
 			...templateData,
 		};
 		this.data.push(template);

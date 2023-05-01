@@ -15,20 +15,6 @@ const dashboards: Array<ManifestDashboard> = [
 			sections: ['Umb.Section.Content'],
 		},
 	},
-	{
-		type: 'dashboard',
-		alias: 'Umb.Dashboard.Welcome',
-		name: 'Welcome Dashboard',
-		loader: () => import('../../documents/dashboards/welcome/dashboard-welcome.element'),
-		weight: 20,
-		meta: {
-			label: 'Welcome',
-			pathname: 'welcome',
-		},
-		conditions: {
-			sections: ['Umb.Section.Content'],
-		},
-	},
 ];
 
 export const manifests = [...dashboards];

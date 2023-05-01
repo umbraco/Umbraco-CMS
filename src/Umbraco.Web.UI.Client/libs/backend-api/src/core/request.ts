@@ -177,7 +177,7 @@ const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions): Pr
 };
 
 const getRequestBody = (options: ApiRequestOptions): any => {
-    if (options.body) {
+    if (options.body !== undefined) {
         if (options.mediaType?.includes('/json')) {
             return JSON.stringify(options.body)
         } else if (isString(options.body) || isBlob(options.body) || isFormData(options.body)) {
@@ -231,7 +231,8 @@ const getResponseBody = async (response: Response): Promise<any> => {
         try {
             const contentType = response.headers.get('Content-Type');
             if (contentType) {
-                const isJSON = contentType.toLowerCase().startsWith('application/json');
+                const jsonTypes = ['application/json', 'application/problem+json']
+                const isJSON = jsonTypes.some(type => contentType.toLowerCase().startsWith(type));
                 if (isJSON) {
                     return await response.json();
                 } else {

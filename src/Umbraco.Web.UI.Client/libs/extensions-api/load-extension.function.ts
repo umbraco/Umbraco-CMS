@@ -1,17 +1,14 @@
 import { isManifestJSType } from './is-manifest-js-type.function';
 import { isManifestLoaderType } from './is-manifest-loader-type.function';
-import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestWithLoader } from '@umbraco-cms/backoffice/extensions-registry';
 
-export type ManifestLoaderType = ManifestElement & { loader: () => Promise<object | HTMLElement> };
-export type ManifestJSType = ManifestElement & { js: string };
-
-export async function loadExtension(manifest: ManifestElement): Promise<object | HTMLElement | null> {
+export async function loadExtension<T = unknown>(manifest: ManifestWithLoader<T>): Promise<T | null> {
 	try {
-		if (isManifestLoaderType(manifest)) {
+		if (isManifestLoaderType<T>(manifest)) {
 			return manifest.loader();
 		}
 
-		if (isManifestJSType(manifest) && manifest.js) {
+		if (isManifestJSType<T>(manifest) && manifest.js) {
 			return await import(/* @vite-ignore */ manifest.js);
 		}
 	} catch (err: any) {

@@ -8,8 +8,6 @@ import { UmbModalContext, UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_CONTEXT_TOKEN } f
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
-	
-
 	@state()
 	private _currentUser?: UserDetails;
 
@@ -48,8 +46,9 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	private _changePassword() {
 		if (!this._modalContext) return;
 
+		// TODO: check if current user is admin
 		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL, {
-			requireOldPassword: this._currentUserStore?.isAdmin || false,
+			requireOldPassword: false,
 		});
 	}
 
@@ -62,7 +61,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

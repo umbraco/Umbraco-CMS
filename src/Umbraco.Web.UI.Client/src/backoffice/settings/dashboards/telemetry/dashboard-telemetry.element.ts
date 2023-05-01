@@ -3,7 +3,12 @@ import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { TelemetryResponseModel, TelemetryLevelModel, TelemetryResource } from '@umbraco-cms/backoffice/backend-api';
+import {
+	TelemetryResponseModel,
+	TelemetryLevelModel,
+	TelemetryResource,
+	ApiError,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -50,7 +55,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 		if (error) {
 			this._buttonState = 'failed';
-			this._errorMessage = error.detail;
+			this._errorMessage = error instanceof ApiError ? error.body.detail : error.message;
 			return;
 		}
 

@@ -3,7 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
-import { UmbRouteLocation } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
@@ -14,13 +13,8 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
  */
 @customElement('umb-data-type-workspace-edit-element')
 export class UmbDataTypeWorkspaceEditElement extends UmbLitElement {
-	
-
 	@property()
 	manifest?: ManifestWorkspace;
-
-	@property()
-	location?: UmbRouteLocation;
 
 	@state()
 	private _dataTypeName = '';
@@ -58,12 +52,12 @@ export class UmbDataTypeWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.DataType">
+			<umb-workspace-editor alias="Umb.Workspace.DataType">
 				<uui-input slot="header" id="header" .value=${this._dataTypeName} @input="${this.#handleInput}"></uui-input>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -13,7 +13,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
-	
+
 
 	@property()
 	entityId?: string;
@@ -85,11 +85,11 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.PackageBuilder">
+			<umb-workspace-editor alias="Umb.Workspace.PackageBuilder">
 				${this.#renderHeader()}
 				<uui-box class="wrapper" headline="Package Content"> ${this.#renderEditors()} </uui-box>
 				${this.#renderActions()}
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -264,7 +264,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-input-checkbox-list></umb-input-checkbox-list>
 		</div>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

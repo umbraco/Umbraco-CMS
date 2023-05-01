@@ -1,6 +1,6 @@
-import { UmbRelationTypeTreeDataSource } from '.';
-import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbRelationTypeTreeDataSource } from '.';
+import { RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -16,8 +16,7 @@ export class UmbRelationTypeTreeServerDataSource implements UmbRelationTypeTreeD
 	// TODO: how do we handle trashed items?
 	async trashItems(ids: Array<string>) {
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'RelationType ids is missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		// TODO: use resources when end point is ready:
@@ -72,8 +71,7 @@ export class UmbRelationTypeTreeServerDataSource implements UmbRelationTypeTreeD
 	 */
 	async getItems(ids: Array<string>) {
 		if (ids) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

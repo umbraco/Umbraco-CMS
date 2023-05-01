@@ -30,11 +30,11 @@ export class UmbDocumentStore extends UmbStoreBase {
 	}
 
 	/**
-	 * Append a document to the store
-	 * @param {DocumentModel} document
+	 * Retrieve a document from the store
+	 * @param {string} id
 	 * @memberof UmbDocumentStore
 	 */
-	byKey(id: DocumentResponseModel['id']) {
+	byId(id: DocumentResponseModel['id']) {
 		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 

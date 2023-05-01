@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
-	
-
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
 
@@ -42,12 +40,12 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private _logout() {
-		this._currentUserStore?.logout();
+		alert('implement log out');
 	}
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="${this._currentUser?.name || ''}">
+			<umb-workspace-editor headline="${this._currentUser?.name || ''}">
 				<div id="main">
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
@@ -55,10 +53,10 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -67,7 +65,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 				color: var(--uui-color-text);
 			}
 			:host,
-			umb-workspace-layout {
+			umb-workspace-editor {
 				width: 100%;
 				height: 100%;
 			}

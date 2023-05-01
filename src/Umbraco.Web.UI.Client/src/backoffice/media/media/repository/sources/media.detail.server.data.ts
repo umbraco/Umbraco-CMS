@@ -1,11 +1,7 @@
 import type { MediaDetails } from '../../';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	CreateMediaRequestModel,
-	ProblemDetailsModel,
-	UpdateMediaRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -15,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbMediaDetailServerDataSource
-	implements UmbDataSource<CreateMediaRequestModel, UpdateMediaRequestModel, MediaDetails>
+	implements UmbDataSource<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>
 {
 	#host: UmbControllerHostElement;
 
@@ -36,8 +32,7 @@ export class UmbMediaDetailServerDataSource
 	 */
 	async get(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		return tryExecuteAndNotify(
@@ -96,7 +91,7 @@ export class UmbMediaDetailServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}) as any
+			}).then((res) => res.json())
 		);
 	}
 
@@ -111,14 +106,7 @@ export class UmbMediaDetailServerDataSource
 		if (!id) throw new Error('Key is missing');
 		if (!media) throw new Error('Media is missing');
 
-		let body: string;
-
-		try {
-			body = JSON.stringify(media);
-		} catch (error) {
-			const myError: ProblemDetailsModel = { title: 'JSON could not parse' };
-			return { error: myError };
-		}
+		const body = JSON.stringify(media);
 
 		return tryExecuteAndNotify<MediaDetails>(
 			this.#host,
@@ -128,7 +116,7 @@ export class UmbMediaDetailServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}) as any
+			}).then((res) => res.json())
 		);
 	}
 
@@ -140,8 +128,7 @@ export class UmbMediaDetailServerDataSource
 	 */
 	async trash(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		return tryExecuteAndNotify<MediaDetails>(
@@ -152,7 +139,7 @@ export class UmbMediaDetailServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}) as any
+			}).then((res) => res.json())
 		);
 	}
 
@@ -164,28 +151,18 @@ export class UmbMediaDetailServerDataSource
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Key is missing');
 		}
 
-		let problemDetails: ProblemDetailsModel | undefined = undefined;
-
-		try {
-			await fetch('/umbraco/management/api/v1/media/delete', {
+		return tryExecuteAndNotify<undefined>(
+			this.#host,
+			fetch('/umbraco/management/api/v1/media/delete', {
 				method: 'POST',
 				body: JSON.stringify([id]),
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			});
-		} catch (error) {
-			problemDetails = { title: 'Delete document Failed' };
-		}
-
-		return { error: problemDetails };
-
-		/* TODO: use backend cli when available.
-		return tryExecuteAndNotify(this.#host);
-		*/
+			}).then((res) => res.json())
+		);
 	}
 }

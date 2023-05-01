@@ -25,6 +25,15 @@ export class UmbMemberGroupStore extends UmbStoreBase {
 		this._data.append([memberGroup]);
 	}
 
+	/**
+	 * Retrieve a member from the store
+	 * @param {string} id
+	 * @memberof UmbMemberGroupStore
+	 */
+	byId(id: MemberGroupDetails['id']) {
+		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+	}
+
 	remove(uniques: string[]) {
 		this._data.remove(uniques);
 	}

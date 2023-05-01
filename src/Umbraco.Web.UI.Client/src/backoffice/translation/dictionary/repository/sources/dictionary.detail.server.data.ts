@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
 	CreateDictionaryItemRequestModel,
@@ -7,10 +7,9 @@ import {
 	DictionaryResource,
 	ImportDictionaryRequestModel,
 	LanguageResource,
-	ProblemDetailsModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @description - A data source for the Dictionary detail that fetches data from the server
@@ -20,7 +19,7 @@ import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  */
 export class UmbDictionaryDetailServerDataSource
 	implements
-		UmbDataSource<CreateDictionaryItemRequestModel, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
+		UmbDataSource<CreateDictionaryItemRequestModel, any, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
 {
 	#host: UmbControllerHostElement;
 
@@ -36,7 +35,7 @@ export class UmbDictionaryDetailServerDataSource
 	 */
 	async createScaffold(parentId?: string | null, name?: string) {
 		const data = {
-			id: uuidv4(),
+			id: UmbId.new(),
 			parentId,
 			name,
 			translations: [],
@@ -97,8 +96,7 @@ export class UmbDictionaryDetailServerDataSource
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		return await tryExecuteAndNotify(this.#host, DictionaryResource.deleteDictionaryById({ id }));
@@ -149,6 +147,6 @@ export class UmbDictionaryDetailServerDataSource
 		// TODO => temp until language service exists. Need languages as the dictionary response
 		// includes the translated iso codes only, no friendly names and no way to tell if a dictionary
 		// is missing a translation
-		return await tryExecuteAndNotify(this.#host, LanguageResource.getLanguage({ skip: 0, take: 1000 }));
+		return tryExecuteAndNotify(this.#host, LanguageResource.getLanguage({ skip: 0, take: 1000 }));
 	}
 }
