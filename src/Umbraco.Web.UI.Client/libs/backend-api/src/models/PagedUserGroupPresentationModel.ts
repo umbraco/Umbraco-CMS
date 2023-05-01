@@ -8,4 +8,3 @@ export type PagedUserGroupPresentationModel = {
     total: number;
     items: Array<UserGroupPresentationModel>;
 };
-

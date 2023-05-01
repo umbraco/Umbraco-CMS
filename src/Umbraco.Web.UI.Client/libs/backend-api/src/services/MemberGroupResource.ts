@@ -15,10 +15,10 @@ export class MemberGroupResource {
      * @throws ApiError
      */
     public static getMemberGroupItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<MemberGroupItemReponseModel>> {
+id,
+}: {
+id?: Array<string>,
+}): CancelablePromise<Array<MemberGroupItemReponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/member-group/item',
@@ -33,12 +33,12 @@ export class MemberGroupResource {
      * @throws ApiError
      */
     public static getTreeMemberGroupRoot({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/member-group/root',

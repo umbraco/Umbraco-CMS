@@ -196,7 +196,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				${this.#renderInfoItem('Failed login attempts', this._user.failedLoginAttempts)}
 				${this.#renderInfoItem(
 					'Last lockout date',
-					this._user.lastlockoutDate || `${this._user.name} has not been locked out`
+					this._user.lastLockoutDate || `${this._user.name} has not been locked out`
 				)}
 				${this.#renderInfoItem(
 					'Password last changed',

@@ -5,7 +5,6 @@
 import type { PackageModelBaseModel } from './PackageModelBaseModel';
 
 export type PackageDefinitionResponseModel = (PackageModelBaseModel & {
-    id?: string;
-    packagePath?: string;
+id?: string;
+packagePath?: string;
 });
-

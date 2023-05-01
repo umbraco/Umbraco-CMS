@@ -8,4 +8,3 @@ export type VariantModelBaseModel = {
     segment?: string | null;
     name?: string;
 };
-

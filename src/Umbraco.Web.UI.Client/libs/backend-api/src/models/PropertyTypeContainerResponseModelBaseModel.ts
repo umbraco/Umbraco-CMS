@@ -9,4 +9,3 @@ export type PropertyTypeContainerResponseModelBaseModel = {
     type?: string;
     sortOrder?: number;
 };
-
