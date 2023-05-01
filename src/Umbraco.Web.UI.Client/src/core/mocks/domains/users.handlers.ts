@@ -4,10 +4,17 @@ import { v4 as uuidv4 } from 'uuid';
 import { umbUsersData } from '../data/users.data';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-const slug = '/users';
+const slug = '/user';
 
 export const handlers = [
 	rest.get(umbracoPath(`${slug}`), (req, res, ctx) => {
+		const response = umbUsersData.getAll();
+
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.get(umbracoPath(`${slug}/filter`), (req, res, ctx) => {
+		//TODO: Implementer filter
 		const response = umbUsersData.getAll();
 
 		return res(ctx.status(200), ctx.json(response));
