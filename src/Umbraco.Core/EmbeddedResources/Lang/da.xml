@@ -2240,7 +2240,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areasConfigurations">Opsætning af områder</key>
     <key alias="areasConfigurationsHelp">Hvis det skal være muligt at indsætte nye blokke indeni denne blok, skal der oprettes ét eller flere områder til at indsætte de nye blokke i.</key>
     <key alias="invalidDropPosition">Ikke tilladt placering.</key>
-    <key alias="defaultLayoutStylesheet">Standart layout stylesheet</key>
+    <key alias="defaultLayoutStylesheet">Standard layout stylesheet</key>
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Ikke tilladt indhold blev afvist</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">
       <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>
