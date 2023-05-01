@@ -16,7 +16,6 @@ import './collection/collection.element';
 import './collection/collection-toolbar.element';
 import './collection/collection-selection-actions.element';
 import './debug/debug.element';
-import './donut-chart';
 import './dropdown/dropdown.element';
 import './empty-state/empty-state.element';
 import './extension-slot/extension-slot.element';
