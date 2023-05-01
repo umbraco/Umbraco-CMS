@@ -3,7 +3,7 @@ import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-u
 import { css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbInputDocumentPickerElement } from '../../../shared/components/input-document-picker/input-document-picker.element';
+import { UmbInputDocumentPickerElement } from '../../../documents/documents/components/input-document-picker/input-document-picker.element';
 import { UmbInputMediaPickerElement } from '../../../shared/components/input-media-picker/input-media-picker.element';
 import { UmbInputLanguagePickerElement } from '../../../shared/components/input-language-picker/input-language-picker.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -13,8 +13,6 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
-
-
 	@property()
 	entityId?: string;
 
