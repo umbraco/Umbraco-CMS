@@ -250,7 +250,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		if (this._user.state === UserStateModel.DISABLED) {
 			buttons.push(
 				html`
-					<uui-button @click=${this.#onUserStatusChange} look="primary" color="positive" label="Enable"></uui-button>
+					<uui-button @click=${this.#onUserStatusChange} look="secondary" color="positive" label="Enable"></uui-button>
 				`
 			);
 		}
@@ -258,21 +258,21 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		if (this._user.state === UserStateModel.ACTIVE || this._user.state === UserStateModel.INACTIVE) {
 			buttons.push(
 				html`
-					<uui-button @click=${this.#onUserStatusChange} look="primary" color="warning" label="Disable"></uui-button>
+					<uui-button @click=${this.#onUserStatusChange} look="secondary" color="warning" label="Disable"></uui-button>
 				`
 			);
 		}
 
 		if (this._currentUser?.id !== this._user?.id) {
 			const button = html`
-				<uui-button @click=${this.#onUserDelete} look="primary" color="danger" label="Delete User"></uui-button>
+				<uui-button @click=${this.#onUserDelete} look="secondary" color="danger" label="Delete User"></uui-button>
 			`;
 
 			buttons.push(button);
 		}
 
 		buttons.push(
-			html`<uui-button @click=${this.#onPasswordChange} look="primary" label="Change password"></uui-button>`
+			html`<uui-button @click=${this.#onPasswordChange} look="secondary" label="Change password"></uui-button>`
 		);
 
 		return buttons;
