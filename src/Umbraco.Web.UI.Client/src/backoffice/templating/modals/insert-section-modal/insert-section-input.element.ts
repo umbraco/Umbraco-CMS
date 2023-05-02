@@ -1,15 +1,74 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { UUIBooleanInputElement } from '@umbraco-ui/uui';
+import { customElement, property, query } from 'lit/decorators.js';
+import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-ui/uui';
 
 @customElement('umb-insert-section-checkbox')
 export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	renderCheckbox() {
+		return html``;
+	}
+
+	@property({ type: Boolean, attribute: 'show-mandatory' })
+	showMandatory = false;
+
+	@property({ type: Boolean, attribute: 'show-input' })
+	showInput = false;
+
+	@query('uui-input')
+	input!: UUIInputElement;
+
+	@query('form')
+	form!: HTMLFormElement;
+
+	@query('uui-checkbox')
+	checkbox!: HTMLFormElement;
+
+	validate() {
+		this.form.requestSubmit();
+		return this.form.checkValidity();
+	}
+
+	#preventDefault(event: Event) {
+		event.preventDefault();
+	}
+
+	get inputValue() {
+		return this.input.value;
+	}
+
+	get isMandatory() {
+		return this.checkbox.checked;
+	}
+
+	render() {
 		return html`
-			<h3>${this.checked ? html`<uui-icon name="umb:check"></uui-icon>` : ''}${this.label}</h3>
-			<slot><p>here goes some description</p></slot>
-			${this.checked ? html`<slot name="if-checked"></slot>` : ''}
+			${super.render()}
+			<h3 @click=${this.click}>${this.checked ? html`<uui-icon name="umb:check"></uui-icon>` : ''}${this.label}</h3>
+			<div @click=${this.click}>
+				<slot name="description"><p>here goes some description</p></slot>
+			</div>
+			${this.checked && this.showInput
+				? html`<uui-form>
+						<form @submit=${this.#preventDefault}>
+							<uui-form-layout-item>
+								<uui-label slot="label" for="section-name-input" required>Section name</uui-label>
+								<uui-input
+									required
+									placeholder="Enter section name"
+									id="section-name-input"></uui-input> </uui-form-layout-item
+							>${this.showMandatory
+								? html`<p slot="if-checked">
+										<uui-checkbox label="Section is mandatory">Section is mandatory </uui-checkbox><br />
+										<small
+											>If mandatory, the child template must contain a <code>@section</code> definition, otherwise an
+											error is shown.</small
+										>
+								  </p>`
+								: ''}
+						</form>
+				  </uui-form>`
+				: ''}
 		`;
 	}
 
@@ -26,17 +85,15 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 				border-radius: var(--uui-border-radius, 3px);
 				border-width: 1px;
 				line-height: normal;
+				padding: 6px 18px;
 			}
 
-			:host(:hover) {
+			:host(:hover),
+			:host(:focus),
+			:host(:focus-within) {
 				background-color: var(--uui-button-background-color-hover, transparent);
 				color: var(--uui-color-default-emphasis, #3544b1);
 				border-color: var(--uui-color-default-emphasis, #3544b1);
-			}
-
-			label {
-				padding: 6px 18px;
-				display: block;
 			}
 
 			uui-icon {
@@ -54,6 +111,15 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 
 			.label {
 				display: none;
+			}
+
+			h3,
+			p {
+				text-align: left;
+			}
+
+			uui-input {
+				width: 100%;
 			}
 		`,
 	];
