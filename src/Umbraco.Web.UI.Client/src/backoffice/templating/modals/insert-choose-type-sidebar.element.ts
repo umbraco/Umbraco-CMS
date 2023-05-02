@@ -83,7 +83,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Insert">
+			<umb-body-layout headline="Insert">
 				<div id="main">
 					<uui-box>
 						<uui-button @click=${this.#openInsertValueSidebar} look="placeholder" label="Insert value"
@@ -121,7 +121,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
 

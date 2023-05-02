@@ -46,7 +46,7 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Insert">
+			<umb-body-layout headline="Insert">
 				<div id="main">
 					<uui-box>
 						<uui-form-layout-item>
@@ -90,7 +90,7 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 					<uui-button @click=${this._submit} look="primary">Submit</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
 

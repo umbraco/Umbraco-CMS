@@ -6,6 +6,8 @@ import { UmbCodeEditorElement } from '../../../shared/components/code-editor/cod
 import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element';
 
 @customElement('umb-template-workspace-edit')
 export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
@@ -23,6 +25,10 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
+		});
 
 		this.consumeContext('UmbEntityWorkspaceContext', (workspaceContext: UmbTemplateWorkspaceContext) => {
 			this.#templateWorkspaceContext = workspaceContext;
@@ -61,9 +67,18 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		this._codeEditor?.insert(value);
 	}
 
+	private _modalContext?: UmbModalContext;
+
+	#openInsertSectionModal() {
+		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
+		sectionModal?.onSubmit().then((insertSectionModalResult) => {
+			console.log(insertSectionModalResult);
+		});
+	}
+
 	render() {
 		// TODO: add correct UI elements
-		return html`<umb-workspace-layout alias="Umb.Workspace.Template">
+		return html`<umb-body-layout alias="Umb.Workspace.Template">
 			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
@@ -79,6 +94,14 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 					<uui-button look="secondary" id="query-builder-button" label="Query builder">
 						<uui-icon name="umb:wand"></uui-icon>Query builder
 					</uui-button>
+
+					<uui-button
+						look="secondary"
+						id="sections-button"
+						label="Query builder"
+						@click=${this.#openInsertSectionModal}>
+						<uui-icon name="umb:indent"></uui-icon>Sections
+					</uui-button>
 				</div>
 
 				<umb-code-editor
@@ -87,7 +110,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 					.code=${this._content ?? ''}
 					@input=${this.#onCodeEditorInput}></umb-code-editor>
 			</uui-box>
-		</umb-workspace-layout>`;
+		</umb-body-layout>`;
 	}
 
 	static styles = [

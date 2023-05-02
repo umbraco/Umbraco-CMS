@@ -63,7 +63,7 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		// TODO: add correct UI elements
-		return html`<umb-workspace-layout alias="Umb.Workspace.Template">
+		return html`<umb-body-layout alias="Umb.Workspace.Template">
 			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-box>
 				<uui-button color="danger" look="primary" slot="header" @click=${this.#insertCode}
@@ -76,7 +76,7 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 					.code=${this._content ?? ''}
 					@input=${this.#onCodeEditorInput}></umb-code-editor>
 			</uui-box>
-		</umb-workspace-layout>`;
+		</umb-body-layout>`;
 	}
 
 	static styles = [

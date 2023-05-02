@@ -39,7 +39,7 @@ export default class UmbDictionaryItemPickerModalElement extends UmbModalBaseEle
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Dictionary item">
+			<umb-body-layout headline="Dictionary item">
 				<div id="main">
 					<uui-box>
 						<umb-tree
@@ -52,7 +52,7 @@ export default class UmbDictionaryItemPickerModalElement extends UmbModalBaseEle
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
 

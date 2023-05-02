@@ -39,7 +39,7 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Insert Partial view">
+			<umb-body-layout headline="Insert Partial view">
 				<div id="main">
 					<uui-box>
 						<umb-tree
@@ -52,7 +52,7 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 				<div slot="actions">
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
 
