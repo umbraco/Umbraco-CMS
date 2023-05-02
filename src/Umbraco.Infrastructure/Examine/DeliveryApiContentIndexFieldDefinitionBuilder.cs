@@ -1,5 +1,8 @@
 ﻿using Examine;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -11,15 +14,18 @@ public class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContent
     private readonly ContentIndexHandlerCollection _indexHandlers;
     private readonly ILocalizationService _localizationService;
     private readonly ILogger<DeliveryApiContentIndexFieldDefinitionBuilder> _logger;
+    private readonly IOptionsMonitor<InstallDefaultDataSettings> _installDefaultDataSettings;
 
     public DeliveryApiContentIndexFieldDefinitionBuilder(
         ContentIndexHandlerCollection indexHandlers,
         ILocalizationService localizationService,
-        ILogger<DeliveryApiContentIndexFieldDefinitionBuilder> logger)
+        ILogger<DeliveryApiContentIndexFieldDefinitionBuilder> logger,
+        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
     {
         _indexHandlers = indexHandlers;
         _localizationService = localizationService;
         _logger = logger;
+        _installDefaultDataSettings = installDefaultDataSettings;
     }
 
     public FieldDefinitionCollection Build()
@@ -44,7 +50,7 @@ public class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContent
 
     private void AddContentIndexHandlerFieldDefinitions(ICollection<FieldDefinition> fieldDefinitions)
     {
-        var cultures = _localizationService.GetAllLanguages().Select(language => language.IsoCode).ToArray();
+        var cultures = GetCultures();
 
         // add index fields from index handlers (selectors, filters, sorts)
         foreach (IContentIndexHandler handler in _indexHandlers)
@@ -62,6 +68,25 @@ public class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContent
                 FieldDefinition fieldDefinition = CreateFieldDefinition(field);
                 fieldDefinitions.Add(fieldDefinition);
             }
+        }
+    }
+
+    private string[] GetCultures()
+    {
+        try
+        {
+            return _localizationService.GetAllLanguages().Select(language => language.IsoCode).ToArray();
+        }
+        catch (Exception)
+        {
+            // the field definition collection is built during boot, which may happen without an actual database (i.e. before install). if an exception occurs here,
+            // we'll assume the database does not yet exist and continue using the default install culture (fallback to en-US).
+
+            InstallDefaultDataSettings languageInstallDefaultDataSettings = _installDefaultDataSettings.Get(Constants.Configuration.NamedOptions.InstallDefaultData.Languages);
+            return languageInstallDefaultDataSettings.InstallData is InstallDefaultDataOption.Values
+                   && languageInstallDefaultDataSettings.Values.Any()
+                ? languageInstallDefaultDataSettings.Values.ToArray()
+                : new[] { "en-US" };
         }
     }
 
