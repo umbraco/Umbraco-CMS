@@ -27,7 +27,6 @@ import './input-multi-url-picker/input-multi-url-picker.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
 import './input-upload-field/input-upload-field.element';
-import './input-template/input-template.element';
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './section/section-main/section-main.element';
@@ -58,7 +57,6 @@ import './workspace/workspace-action-menu/workspace-action-menu.element';
 
 import './variant-selector/variant-selector.element.ts';
 
-import './template-card/template-card.element';
 import './code-editor';
 
 import './tooltip-menu/tooltip-menu.element';
