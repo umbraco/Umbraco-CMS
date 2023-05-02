@@ -22,7 +22,25 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
     {
     }
-
+    
+    [Obsolete($"Use the overload accepting includeFields and excludeFields instead. This overload will be removed in Umbraco 13.")]
+    public ContentValueSetValidator(
+        bool publishedValuesOnly,
+        bool supportProtectedContent,
+        IPublicAccessService? publicAccessService,
+        IScopeProvider? scopeProvider,
+        int? parentId = null,
+        IEnumerable<string>? includeItemTypes = null,
+        IEnumerable<string>? excludeItemTypes = null)
+        : base(includeItemTypes, excludeItemTypes, null, null)
+    {
+        PublishedValuesOnly = publishedValuesOnly;
+        SupportProtectedContent = supportProtectedContent;
+        ParentId = parentId;
+        _publicAccessService = publicAccessService;
+        _scopeProvider = scopeProvider;
+    }
+    
     public ContentValueSetValidator(
         bool publishedValuesOnly,
         bool supportProtectedContent,
