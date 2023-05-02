@@ -61,6 +61,14 @@ export class UmbTreeElement extends UmbLitElement {
 		this.requestUpdate('hideTreeRoot', oldVal);
 	}
 
+	@property()
+	get selectableFilter() {
+		return this.#treeContext.selectableFilter;
+	}
+	set selectableFilter(newVal) {
+		this.#treeContext.selectableFilter = newVal;
+	}
+
 	@state()
 	private _items: TreeItemPresentationModel[] = [];
 
