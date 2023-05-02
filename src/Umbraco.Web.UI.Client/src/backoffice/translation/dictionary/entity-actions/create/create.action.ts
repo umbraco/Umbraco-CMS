@@ -1,9 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
-import {
-	UmbSectionSidebarContext,
-	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
-} from '../../../../../backoffice/shared/components/section/section-sidebar/section-sidebar.context';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
