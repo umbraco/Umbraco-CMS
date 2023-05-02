@@ -12,8 +12,6 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-	
-
 	// TODO: we need to investigate context api vs values props and events
 	@property()
 	public value?: string;
@@ -48,6 +46,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	private _observeActions(alias: string) {
 		this._actionsObserver?.destroy();
+		// TODO: Align property actions with entity actions.
 		this._actionsObserver = this.observe(
 			umbExtensionsRegistry.extensionsOfType('propertyAction').pipe(
 				map((propertyActions) => {
@@ -94,7 +93,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			  `
 			: '';
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`

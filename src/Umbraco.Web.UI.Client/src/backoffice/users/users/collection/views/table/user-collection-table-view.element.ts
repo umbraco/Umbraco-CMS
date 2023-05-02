@@ -14,8 +14,13 @@ import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../user-groups/repository/user-group.store';
+<<<<<<< HEAD:src/backoffice/users/users/collection/views/table/user-collection-table-view.element.ts
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../../../shared/components/collection/collection.context';
 import { UmbUserCollectionContext } from '../../user-collection.context';
+=======
+import { UmbUserCollectionContext } from '../../user-collection.context';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+>>>>>>> main:src/backoffice/users/users/collection/views/table/user-table-collection-view.element.ts
 import type { UserGroupEntity } from '@umbraco-cms/backoffice/models';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

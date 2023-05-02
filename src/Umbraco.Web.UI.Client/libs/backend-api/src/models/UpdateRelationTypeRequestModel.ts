@@ -5,4 +5,3 @@
 import type { RelationTypeBaseModel } from './RelationTypeBaseModel';
 
 export type UpdateRelationTypeRequestModel = RelationTypeBaseModel;
-

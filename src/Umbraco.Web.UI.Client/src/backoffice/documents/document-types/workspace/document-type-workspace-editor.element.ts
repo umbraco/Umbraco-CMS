@@ -83,7 +83,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.DocumentType">
+			<umb-workspace-editor alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} compact>
 						<uui-icon name="${this._icon}" style="color: ${this._iconColorAlias}"></uui-icon>
@@ -108,7 +108,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 						</uui-keyboard-shortcut>
 					</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 

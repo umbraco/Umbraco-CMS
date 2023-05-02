@@ -1,6 +1,6 @@
 import { UUIToastNotificationElement } from '@umbraco-ui/uui';
-import { v4 as uuidv4 } from 'uuid';
 import type { UmbNotificationOptions, UmbNotificationColor, UmbNotificationDefaultData } from './notification.context';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * @export
@@ -27,7 +27,7 @@ export class UmbNotificationHandler {
 	 * @memberof UmbNotificationHandler
 	 */
 	constructor(options: UmbNotificationOptions) {
-		this.key = uuidv4();
+		this.key = UmbId.new();
 		this.color = options.color || this._defaultColor;
 		this.duration = options.duration !== undefined ? options.duration : this._defaultDuration;
 

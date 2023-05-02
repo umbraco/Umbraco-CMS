@@ -6,12 +6,12 @@ import {
 	UmbWorkspacePropertyContext,
 	UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN,
 } from '../../../../shared/components/workspace-property/workspace-property.context';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-editor-ui-textarea')
-export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorElement {
-	
+export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property()
 	value = '';
@@ -37,7 +37,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	render() {
 		return html` <uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -2,16 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { TooltipMenuItem } from '../tooltip-menu';
-import '../tooltip-menu/tooltip-menu.element';
+import type { TooltipMenuItem } from '../tooltip-menu';
 import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-collection-toolbar')
 export class UmbCollectionToolbarElement extends UmbLitElement {
-	
-
 	@property()
 	public actions: Array<TooltipMenuItem> = [
 		{
@@ -148,7 +145,7 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 			${this._renderLayoutButton()}
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

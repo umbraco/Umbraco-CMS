@@ -17,16 +17,16 @@ export class AuditLogResource {
      * @throws ApiError
      */
     public static getAuditLog({
-        orderDirection,
-        sinceDate,
-        skip,
-        take = 100,
-    }: {
-        orderDirection?: DirectionModel,
-        sinceDate?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedAuditLogWithUsernameResponseModel> {
+orderDirection,
+sinceDate,
+skip,
+take = 100,
+}: {
+orderDirection?: DirectionModel,
+sinceDate?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedAuditLogWithUsernameResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/audit-log',
@@ -44,18 +44,18 @@ export class AuditLogResource {
      * @throws ApiError
      */
     public static getAuditLogById({
-        id,
-        orderDirection,
-        sinceDate,
-        skip,
-        take = 100,
-    }: {
-        id: string,
-        orderDirection?: DirectionModel,
-        sinceDate?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedAuditLogResponseModel> {
+id,
+orderDirection,
+sinceDate,
+skip,
+take = 100,
+}: {
+id: string,
+orderDirection?: DirectionModel,
+sinceDate?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedAuditLogResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/audit-log/{id}',
@@ -76,16 +76,16 @@ export class AuditLogResource {
      * @throws ApiError
      */
     public static getAuditLogTypeByLogType({
-        logType,
-        sinceDate,
-        skip,
-        take = 100,
-    }: {
-        logType: AuditTypeModel,
-        sinceDate?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedAuditLogResponseModel> {
+logType,
+sinceDate,
+skip,
+take = 100,
+}: {
+logType: AuditTypeModel,
+sinceDate?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedAuditLogResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/audit-log/type/{logType}',

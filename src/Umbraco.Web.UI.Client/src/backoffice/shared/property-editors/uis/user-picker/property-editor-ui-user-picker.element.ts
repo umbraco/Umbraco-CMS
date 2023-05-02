@@ -1,14 +1,14 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-user-picker
  */
 @customElement('umb-property-editor-ui-user-picker')
-export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
+export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
 	@property()
 	value = '';
 

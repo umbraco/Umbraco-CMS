@@ -5,4 +5,3 @@
 import type { TelemetryRepresentationBaseModel } from './TelemetryRepresentationBaseModel';
 
 export type TelemetryRequestModel = TelemetryRepresentationBaseModel;
-

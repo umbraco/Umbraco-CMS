@@ -107,6 +107,12 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return { data, error };
 	}
 
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#store!.byId(id);
+	}
+
 	async create(detail: MemberGroupDetails) {
 		await this.#init;
 

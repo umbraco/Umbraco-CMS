@@ -5,6 +5,9 @@ import { UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/components/collect
 import { UmbUserCollectionContext } from './user-collection.context';
 import type { IRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './views/table/user-collection-table-view.element';
 import './views/grid/user-collection-grid-view.element';
@@ -16,7 +19,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 	#collectionContext = new UmbUserCollectionContext(this);
 
 	@state()
-	private _routes: IRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
 			path: 'grid',
 			component: () => import('./views/grid/user-collection-grid-view.element'),

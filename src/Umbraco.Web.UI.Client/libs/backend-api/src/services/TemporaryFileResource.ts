@@ -14,13 +14,13 @@ export class TemporaryFileResource {
      * @throws ApiError
      */
     public static postTemporaryfile({
-        formData,
-    }: {
-        formData?: {
-            Id?: string;
-            File?: Blob;
-        },
-    }): CancelablePromise<string> {
+formData,
+}: {
+formData?: {
+Id?: string;
+File?: Blob;
+},
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/temporaryfile',
@@ -38,10 +38,10 @@ export class TemporaryFileResource {
      * @throws ApiError
      */
     public static getTemporaryfileById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<TemporaryFileResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<TemporaryFileResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/temporaryfile/{id}',
@@ -60,10 +60,10 @@ export class TemporaryFileResource {
      * @throws ApiError
      */
     public static deleteTemporaryfileById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/temporaryfile/{id}',

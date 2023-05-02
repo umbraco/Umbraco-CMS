@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DataTypeResource,
@@ -54,7 +54,7 @@ export class UmbDataTypeServerDataSource
 	 */
 	async createScaffold(parentId?: string | null) {
 		const data: CreateDataTypeRequestModel = {
-			id: uuidv4(),
+			id: UmbId.new(),
 			parentId,
 			name: '',
 			propertyEditorAlias: undefined,

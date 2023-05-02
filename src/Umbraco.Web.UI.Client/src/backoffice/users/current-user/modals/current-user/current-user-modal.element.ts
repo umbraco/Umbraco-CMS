@@ -45,7 +45,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="${this._currentUser?.name || ''}">
+			<umb-workspace-editor headline="${this._currentUser?.name || ''}">
 				<div id="main">
 					<umb-extension-slot id="userProfileApps" type="userProfileApp"></umb-extension-slot>
 				</div>
@@ -53,7 +53,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 					<uui-button @click=${this._close} look="secondary">Close</uui-button>
 					<uui-button @click=${this._logout} look="primary" color="danger">Logout</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -65,7 +65,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 				color: var(--uui-color-text);
 			}
 			:host,
-			umb-workspace-layout {
+			umb-workspace-editor {
 				width: 100%;
 				height: 100%;
 			}

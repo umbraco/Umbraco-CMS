@@ -11,10 +11,7 @@ import type {
 	UmbTableSelectedEvent,
 } from '../../../shared/components/table';
 import type { MediaDetails } from '../';
-import {
-	UmbCollectionContext,
-	UMB_COLLECTION_CONTEXT_TOKEN,
-} from '../../../shared/components/collection/collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

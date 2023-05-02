@@ -10,4 +10,3 @@ export type CreateContentRequestModelBaseDocumentValueModelDocumentVariantReques
     variants?: Array<DocumentVariantRequestModel>;
     parentId?: string | null;
 };
-

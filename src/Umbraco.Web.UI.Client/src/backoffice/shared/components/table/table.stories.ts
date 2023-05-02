@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import './table.element';
-import { v4 as uuidv4 } from 'uuid';
 import type { UmbTableElement, UmbTableColumn, UmbTableConfig, UmbTableItem } from './table.element';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 const meta: Meta<UmbTableElement> = {
 	title: 'Components/Table',
@@ -26,7 +26,7 @@ const columns: Array<UmbTableColumn> = [
 
 const items: Array<UmbTableItem> = [
 	{
-		id: uuidv4(),
+		id: UmbId.new(),
 		icon: 'umb:wand',
 		data: [
 			{
@@ -40,7 +40,7 @@ const items: Array<UmbTableItem> = [
 		],
 	},
 	{
-		id: uuidv4(),
+		id: UmbId.new(),
 		icon: 'umb:document',
 		data: [
 			{
@@ -54,7 +54,7 @@ const items: Array<UmbTableItem> = [
 		],
 	},
 	{
-		id: uuidv4(),
+		id: UmbId.new(),
 		icon: 'umb:user',
 		data: [
 			{

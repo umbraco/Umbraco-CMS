@@ -1,5 +1,5 @@
-import { v4 as uuid } from 'uuid';
 import { UmbData } from './data';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Entity } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
@@ -71,7 +71,7 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 			return {
 				...item,
 				name: item.name + ' Copy',
-				id: uuid(),
+				id: UmbId.new(),
 				parentId: destinationKey,
 			};
 		});

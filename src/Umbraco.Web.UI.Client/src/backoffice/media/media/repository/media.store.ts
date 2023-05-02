@@ -30,6 +30,15 @@ export class UmbMediaStore extends UmbStoreBase {
 	}
 
 	/**
+	 * Retrieve a media from the store
+	 * @param {string} id
+	 * @memberof UmbMediaStore
+	 */
+	byId(id: MediaDetails['id']) {
+		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+	}
+
+	/**
 	 * Removes media in the store with the given uniques
 	 * @param {string[]} uniques
 	 * @memberof UmbMediaStore

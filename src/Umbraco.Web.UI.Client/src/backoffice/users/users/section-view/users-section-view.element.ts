@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 import '../collection/views/table/user-collection-table-view.element';
 import '../collection/views/grid/user-collection-grid-view.element';
@@ -10,20 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				height: 100%;
-			}
-
-			#router-slot {
-				height: calc(100% - var(--umb-header-layout-height));
-			}
-		`,
-	];
-
-	#routes: IRoute[] = [
+	#routes: UmbRoute[] = [
 		{
 			path: 'collection',
 			component: () => import('../collection/user-collection.element'),
@@ -75,6 +62,19 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				height: 100%;
+			}
+
+			#router-slot {
+				height: calc(100% - var(--umb-header-layout-height));
+			}
+		`,
+	];
 }
 
 export default UmbSectionViewUsersElement;

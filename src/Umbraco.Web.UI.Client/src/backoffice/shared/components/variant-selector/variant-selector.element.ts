@@ -13,8 +13,6 @@ import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/ba
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
-	
-
 	// TODO: not jet used:
 	@property()
 	alias!: string;
@@ -247,7 +245,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		</div>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

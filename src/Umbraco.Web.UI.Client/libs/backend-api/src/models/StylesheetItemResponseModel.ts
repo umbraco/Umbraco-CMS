@@ -5,4 +5,3 @@
 import type { FileItemResponseModelBaseModel } from './FileItemResponseModelBaseModel';
 
 export type StylesheetItemResponseModel = FileItemResponseModelBaseModel;
-

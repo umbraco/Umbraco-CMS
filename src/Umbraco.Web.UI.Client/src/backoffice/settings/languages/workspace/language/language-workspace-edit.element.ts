@@ -10,7 +10,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-language-workspace-edit')
 export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
-	
+
 
 	#workspaceContext?: UmbLanguageWorkspaceContext;
 
@@ -50,7 +50,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-layout alias="Umb.Workspace.Language">
+		return html`<umb-workspace-editor alias="Umb.Workspace.Language">
 			<div id="header" slot="header">
 				<uui-button label="Navigate back" href="section/settings/workspace/language-root" compact>
 					<uui-icon name="umb:arrow-left"></uui-icon>
@@ -66,9 +66,9 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 				<a href="section/settings/workspace/language-root">Languages</a> /
 				${this._isNew ? 'Create' : this._language?.name}
 			</div>
-		</umb-workspace-layout>`;
+		</umb-workspace-editor>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -30,6 +30,15 @@ export class UmbTemplateStore extends UmbStoreBase {
 	}
 
 	/**
+	 * Retrieve a template from the store
+	 * @param {string} id
+	 * @memberof UmbTemplateStore
+	 */
+	byId(id: TemplateResponseModel['id']) {
+		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+	}
+
+	/**
 	 * Removes templates in the store with the given uniques
 	 * @param {string[]} uniques
 	 * @memberof UmbTemplateStore

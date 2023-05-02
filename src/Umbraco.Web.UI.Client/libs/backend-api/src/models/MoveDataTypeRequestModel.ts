@@ -5,4 +5,3 @@
 export type MoveDataTypeRequestModel = {
     targetId?: string | null;
 };
-

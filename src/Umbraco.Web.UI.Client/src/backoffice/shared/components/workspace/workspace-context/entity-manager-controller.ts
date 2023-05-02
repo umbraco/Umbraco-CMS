@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
@@ -90,7 +90,7 @@ export class UmbEntityWorkspaceManager<
 
 	create = (parentId: string | null) => {
 		this.#isNew = true;
-		this._entityId = uuidv4();
+		this._entityId = UmbId.new();
 		this._createAtParentKey = parentId;
 	};
 

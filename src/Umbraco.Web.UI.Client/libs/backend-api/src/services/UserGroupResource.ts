@@ -18,10 +18,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static postUserGroup({
-        requestBody,
-    }: {
-        requestBody?: SaveUserGroupRequestModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: SaveUserGroupRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user-group',
@@ -39,12 +39,12 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static getUserGroup({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedUserGroupPresentationModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedUserGroupPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group',
@@ -60,10 +60,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static getUserGroupById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<UserGroupPresentationModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<UserGroupPresentationModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -81,10 +81,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static deleteUserGroupById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -102,12 +102,12 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static putUserGroupById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdateUserGroupRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdateUserGroupRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -127,10 +127,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static getUserGroupItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserGroupItemResponseModel>> {
+id,
+}: {
+id?: Array<string>,
+}): CancelablePromise<Array<UserGroupItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group/item',

@@ -136,6 +136,11 @@ export class UmbTemplateRepository
 
 		return { data, error };
 	}
+	async byId(id: string) {
+		if (!id) throw new Error('Key is missing');
+		await this.#init;
+		return this.#store!.byId(id);
+	}
 
 	// Could potentially be general methods:
 

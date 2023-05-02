@@ -4,11 +4,10 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbDocumentTreeItemContext } from './document-tree-item.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-document-tree-item')
-export class UmbDocumentTreeItemElement extends UmbLitElement {
-	
-
+export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {
 	private _item?: DocumentTreeItemResponseModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
@@ -45,7 +44,7 @@ export class UmbDocumentTreeItemElement extends UmbLitElement {
 	#renderLabel() {
 		return html` <span id="label" slot="label">${this.item?.name}</span> `;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

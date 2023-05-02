@@ -114,13 +114,13 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		if (!this._user) return html`User not found`;
 
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.User">
+			<umb-workspace-editor alias="Umb.Workspace.User">
 				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.#renderLeftColumn()}</div>
 					<div id="right-column">${this.#renderRightColumn()}</div>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -217,7 +217,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				${this.#renderInfoItem('Failed login attempts', this._user.failedLoginAttempts)}
 				${this.#renderInfoItem(
 					'Last lockout date',
-					this._user.lastlockoutDate || `${this._user.name} has not been locked out`
+					this._user.lastLockoutDate || `${this._user.name} has not been locked out`
 				)}
 				${this.#renderInfoItem(
 					'Password last changed',
