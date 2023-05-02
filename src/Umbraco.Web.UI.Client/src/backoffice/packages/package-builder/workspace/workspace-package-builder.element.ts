@@ -5,7 +5,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbInputDocumentPickerElement } from '../../../documents/documents/components/input-document-picker/input-document-picker.element';
 import { UmbInputMediaPickerElement } from '../../../shared/components/input-media-picker/input-media-picker.element';
-import { UmbInputLanguagePickerElement } from '../../../shared/components/input-language-picker/input-language-picker.element';
+import { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
