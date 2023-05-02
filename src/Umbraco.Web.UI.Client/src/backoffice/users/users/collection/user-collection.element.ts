@@ -6,8 +6,6 @@ import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-import './views/table/user-collection-table-view.element';
-import './views/grid/user-collection-grid-view.element';
 import './user-collection-header.element';
 
 export type UsersViewType = 'list' | 'grid';
