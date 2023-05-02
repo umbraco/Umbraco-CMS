@@ -11,30 +11,12 @@ import type {
 	UmbTableSelectedEvent,
 } from '../../../shared/components/table';
 import type { MediaDetails } from '../';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '../../../shared/collection/collection.context';
+import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-media-table-collection-view')
 export class UmbMediaTableCollectionViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				box-sizing: border-box;
-				height: 100%;
-				width: 100%;
-				padding: var(--uui-size-space-3) var(--uui-size-space-6);
-			}
-
-			/* TODO: Should we have embedded padding in the table component? */
-			umb-table {
-				padding: 0; /* To fix the embedded padding in the table component. */
-			}
-		`,
-	];
-
 	@state()
 	private _mediaItems?: Array<EntityTreeItemResponseModel>;
 
@@ -57,7 +39,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbCollectionContext<MediaDetails>;
+	private _collectionContext?: UmbCollectionContext<MediaDetails, any>;
 
 	constructor() {
 		super();
@@ -70,7 +52,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		this.observe(this._collectionContext.data, (nodes) => {
+		this.observe(this._collectionContext.items, (nodes) => {
 			this._mediaItems = nodes;
 			this._createTableItems(this._mediaItems);
 		});
@@ -130,6 +112,24 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				@ordered="${this._handleOrdering}"></umb-table>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				box-sizing: border-box;
+				height: 100%;
+				width: 100%;
+				padding: var(--uui-size-space-3) var(--uui-size-space-6);
+			}
+
+			/* TODO: Should we have embedded padding in the table component? */
+			umb-table {
+				padding: 0; /* To fix the embedded padding in the table component. */
+			}
+		`,
+	];
 }
 
 export default UmbMediaTableCollectionViewElement;

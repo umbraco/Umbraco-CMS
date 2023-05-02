@@ -23,54 +23,7 @@ import './health-check-action.element';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-
-			uui-box + uui-box {
-				margin-top: var(--uui-size-space-5);
-			}
-
-			p {
-				margin: 0;
-			}
-
-			.header {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
-
-			.check-results-wrapper .check-result {
-				padding-top: var(--uui-size-space-5);
-			}
-
-			.check-results-wrapper .check-result:not(:last-child) {
-				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				padding-bottom: var(--uui-size-space-5);
-			}
-
-			.check-results-wrapper uui-button {
-				margin-block-start: 1em;
-			}
-
-			.check-result-description {
-				display: flex;
-			}
-
-			.check-result-description span {
-				width: 36px;
-			}
-
-			uui-icon {
-				vertical-align: sub;
-			}
-		`,
-	];
+	
 
 	@property()
 	groupName!: string;
@@ -214,6 +167,55 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			</div>`;
 		else return nothing;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
+			uui-box + uui-box {
+				margin-top: var(--uui-size-space-5);
+			}
+
+			p {
+				margin: 0;
+			}
+
+			.header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.check-results-wrapper .check-result {
+				padding-top: var(--uui-size-space-5);
+			}
+
+			.check-results-wrapper .check-result:not(:last-child) {
+				border-bottom: 1px solid var(--uui-color-divider-standalone);
+				padding-bottom: var(--uui-size-space-5);
+			}
+
+			.check-results-wrapper uui-button {
+				margin-block-start: 1em;
+			}
+
+			.check-result-description {
+				display: flex;
+			}
+
+			.check-result-description span {
+				width: 36px;
+			}
+
+			uui-icon {
+				vertical-align: sub;
+			}
+		`,
+	];
 }
 
 export default UmbDashboardHealthCheckGroupElement;

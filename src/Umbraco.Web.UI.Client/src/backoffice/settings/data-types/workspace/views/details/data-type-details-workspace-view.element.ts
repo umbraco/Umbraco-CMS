@@ -14,19 +14,13 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 import '../../../../../shared/property-editors/shared/property-editor-config/property-editor-config.element';
 import '../../../../../shared/components/ref-property-editor-ui/ref-property-editor-ui.element';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-data-type-details-workspace-view')
-export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
-
+export class UmbDataTypeDetailsWorkspaceViewEditElement
+	extends UmbLitElement
+	implements UmbWorkspaceEditorViewExtensionElement
+{
 	@state()
 	_dataType?: DataTypeResponseModel;
 
@@ -170,6 +164,16 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDataTypeDetailsWorkspaceViewEditElement;

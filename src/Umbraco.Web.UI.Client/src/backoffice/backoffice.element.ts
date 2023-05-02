@@ -1,43 +1,53 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './users/current-user/current-user.store';
-import {
-	UmbCurrentUserHistoryStore,
-	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
-} from './users/current-user/current-user-history.store';
-
+import { UmbStoreExtensionInitializer } from '../core/store-extension-initializer';
 import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './shared/components/backoffice-frame/backoffice.context';
-import { UmbThemeContext } from './themes/theme.context';
-import {
-	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
-	UmbAppLanguageContext,
-} from './settings/languages/app-language-select/app-language.context';
-import { UmbServerExtensionController } from './packages/repository/server-extension.controller';
+import { UmbExtensionInitializer } from './packages/repository/server-extension.controller';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-// Domains
-import './settings';
-import './documents';
-import './media';
-import './members';
-import './translation';
-import './users';
-import './packages';
-import './search';
-import './templating';
-import './shared';
+const CORE_PACKAGES = [
+	import('./shared/umbraco-package'),
+	import('./settings/umbraco-package'),
+	import('./documents/umbraco-package'),
+	import('./media/umbraco-package'),
+	import('./members/umbraco-package'),
+	import('./translation/umbraco-package'),
+	import('./users/umbraco-package'),
+	import('./packages/umbraco-package'),
+	import('./search/umbraco-package'),
+	import('./templating/umbraco-package'),
+	import('./umbraco-news/umbraco-package'),
+];
 
 @defineElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
+	constructor() {
+		super();
+		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
+		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
+		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
+		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+		new UmbStoreExtensionInitializer(this);
+		new UmbExtensionInitializer(this, umbExtensionsRegistry, CORE_PACKAGES);
+	}
+
+	render() {
+		return html`
+			<umb-backoffice-header></umb-backoffice-header>
+			<umb-backoffice-main></umb-backoffice-main>
+			<umb-backoffice-notification-container></umb-backoffice-notification-container>
+			<umb-backoffice-modal-container></umb-backoffice-modal-container>
+		`;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -55,36 +65,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 			}
 		`,
 	];
-
-	constructor() {
-		super();
-
-		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-
-		this.provideContext(UMB_MODAL_CONTEXT_TOKEN, new UmbModalContext(this));
-		this.provideContext(UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
-		this.provideContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
-		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(this));
-		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
-		new UmbThemeContext(this);
-		new UmbServerExtensionController(this, umbExtensionsRegistry);
-		this.provideContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, new UmbCurrentUserHistoryStore());
-
-		// Register All Stores
-		// TODO: can we use kinds here so we don't have to hardcode the types?
-		this.observe(umbExtensionsRegistry.extensionsOfTypes(['store', 'treeStore', 'itemStore']), (stores) => {
-			stores.forEach((store) => createExtensionClass(store, [this]));
-		});
-	}
-
-	render() {
-		return html`
-			<umb-backoffice-header></umb-backoffice-header>
-			<umb-backoffice-main></umb-backoffice-main>
-			<umb-backoffice-notification-container></umb-backoffice-notification-container>
-			<umb-backoffice-modal-container></umb-backoffice-modal-container>
-		`;
-	}
 }
 
 export default UmbBackofficeElement;

@@ -3,27 +3,15 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbLitElement {
-	static styles = [
-		css`
-			a {
-				color: var(--uui-color-text);
-				background: transparent;
-				border: none;
-				text-decoration: underline;
-				cursor: pointer;
-				display: inline-block;
-			}
-		`,
-	];
 	@state()
-	private _routes: IRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
 			path: `/index/:indexerName`,
 			component: () => import('./views/section-view-examine-indexers'),
@@ -65,6 +53,19 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 					this._activePath = event.target.localActiveViewPath || '';
 				}}></umb-router-slot>`;
 	}
+
+	static styles = [
+		css`
+			a {
+				color: var(--uui-color-text);
+				background: transparent;
+				border: none;
+				text-decoration: underline;
+				cursor: pointer;
+				display: inline-block;
+			}
+		`,
+	];
 }
 
 export default UmbDashboardExamineManagementElement;

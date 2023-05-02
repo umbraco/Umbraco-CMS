@@ -18,69 +18,7 @@ interface GroupedPropertyEditorUIs {
 }
 @customElement('umb-property-editor-ui-picker-modal')
 export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#filter {
-				width: 100%;
-				margin-bottom: var(--uui-size-space-4);
-			}
 
-			#filter-icon {
-				padding-left: var(--uui-size-space-2);
-			}
-
-			#item-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-				margin: 0;
-				padding: 0;
-				grid-gap: var(--uui-size-space-4);
-			}
-
-			#item-grid .item {
-				display: flex;
-				align-items: flex-start;
-				justify-content: center;
-				list-style: none;
-				height: 100%;
-				border: 1px solid transparent;
-				border-radius: var(--uui-border-radius);
-			}
-
-			#item-grid .item:hover {
-				background: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-				cursor: pointer;
-			}
-
-			#item-grid .item[selected] button {
-				background: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-			}
-
-			#item-grid .item button {
-				background: none;
-				border: none;
-				cursor: pointer;
-				padding: var(--uui-size-space-3);
-				display: flex;
-				align-items: center;
-				flex-direction: column;
-				justify-content: center;
-				font-size: 0.8rem;
-				height: 100%;
-				width: 100%;
-				color: var(--uui-color-interactive);
-				border-radius: var(--uui-border-radius);
-			}
-
-			#item-grid .item .icon {
-				font-size: 2em;
-				margin-bottom: var(--uui-size-space-2);
-			}
-		`,
-	];
 
 	@property({ type: Object })
 	data?: UmbPropertyEditorUIPickerModalData;
@@ -151,13 +89,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select Property Editor UI">
+			<umb-workspace-editor headline="Select Property Editor UI">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="${this._submitLabel}" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -193,6 +131,70 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 			)}
 		</ul>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#filter {
+				width: 100%;
+				margin-bottom: var(--uui-size-space-4);
+			}
+
+			#filter-icon {
+				padding-left: var(--uui-size-space-2);
+			}
+
+			#item-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+				margin: 0;
+				padding: 0;
+				grid-gap: var(--uui-size-space-4);
+			}
+
+			#item-grid .item {
+				display: flex;
+				align-items: flex-start;
+				justify-content: center;
+				list-style: none;
+				height: 100%;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+			}
+
+			#item-grid .item:hover {
+				background: var(--uui-color-surface-emphasis);
+				color: var(--uui-color-interactive-emphasis);
+				cursor: pointer;
+			}
+
+			#item-grid .item[selected] button {
+				background: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
+			}
+
+			#item-grid .item button {
+				background: none;
+				border: none;
+				cursor: pointer;
+				padding: var(--uui-size-space-3);
+				display: flex;
+				align-items: center;
+				flex-direction: column;
+				justify-content: center;
+				font-size: 0.8rem;
+				height: 100%;
+				width: 100%;
+				color: var(--uui-color-interactive);
+				border-radius: var(--uui-border-radius);
+			}
+
+			#item-grid .item .icon {
+				font-size: 2em;
+				margin-bottom: var(--uui-size-space-2);
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUIPickerModalElement;

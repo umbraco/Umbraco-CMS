@@ -42,7 +42,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 			{
 				extensions: [
 					{
-						type: 'entrypoint',
+						type: 'entryPoint',
 						name: 'My Custom Entry Point',
 						alias: 'My.Entrypoint.Custom',
 						js: '/App_Plugins/custom-entrypoint.js',
@@ -58,7 +58,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 						name: 'My Custom Package View',
 						js: '/App_Plugins/package-view.js',
 						meta: {
-							packageName: 'my.package',
+							packageName: 'Package with a view',
 						},
 					},
 				],

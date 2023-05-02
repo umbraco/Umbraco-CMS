@@ -9,6 +9,20 @@ import { customElement } from 'lit/decorators.js';
  */
 @customElement('umb-code-block')
 export class UmbCodeBlockElement extends LitElement {
+	
+
+	render() {
+		return html`<div id="container">
+			<uui-scroll-container>
+				<pre>
+					<code>
+						<slot></slot>
+					</code>
+				</pre>
+			</uui-scroll-container>
+		</div> `;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -38,18 +52,6 @@ export class UmbCodeBlockElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html`<div id="container">
-			<uui-scroll-container>
-				<pre>
-					<code>
-						<slot></slot>
-					</code>
-				</pre>
-			</uui-scroll-container>
-		</div> `;
-	}
 }
 
 declare global {

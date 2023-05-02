@@ -25,33 +25,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#editor {
-				position: relative;
-				min-height: 100px;
-			}
-
-			.tox-tinymce-aux {
-				z-index: 9000;
-			}
-
-			.tox-tinymce-inline {
-				z-index: 900;
-			}
-
-			.tox-tinymce-fullscreen {
-				position: absolute;
-			}
-
-			/* FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed */
-			.tox .tox-collection__item-label {
-				line-height: 1 !important;
-			}
-		`,
-	];
-
 	@property()
 	configuration: Array<DataTypePropertyPresentationModel> = [];
 
@@ -474,6 +447,33 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		return html``;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#editor {
+				position: relative;
+				min-height: 100px;
+			}
+
+			.tox-tinymce-aux {
+				z-index: 9000;
+			}
+
+			.tox-tinymce-inline {
+				z-index: 900;
+			}
+
+			.tox-tinymce-fullscreen {
+				position: absolute;
+			}
+
+			/* FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed */
+			.tox .tox-collection__item-label {
+				line-height: 1 !important;
+			}
+		`,
+	];
 }
 
 export default UmbInputTinyMceElement;

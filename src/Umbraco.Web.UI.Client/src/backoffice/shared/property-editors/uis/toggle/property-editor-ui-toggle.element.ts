@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -10,8 +10,8 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
  * @element umb-property-editor-ui-toggle
  */
 @customElement('umb-property-editor-ui-toggle')
-export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property()
 	value = false;
@@ -53,6 +53,8 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 			?showLabels="${this._showLabels}"
 			@change="${this._onChange}"></umb-input-toggle>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIToggleElement;

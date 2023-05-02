@@ -2,7 +2,7 @@ import type {
 	ManifestModal,
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspaceAlias = 'Umb.Workspace.LogviewerRoot';
@@ -17,9 +17,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Logviewer.Overview',
 		name: 'LogViewer Root Workspace Overview View',
 		loader: () => import('../views/overview/index'),
@@ -34,7 +34,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 	},
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Logviewer.Search',
 		name: 'LogViewer Root Workspace Search View',
 		loader: () => import('../views/search/index'),

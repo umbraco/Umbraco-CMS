@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 
@@ -10,8 +10,6 @@ import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-
  */
 @customElement('umb-property-editor-ui-block-grid-inner-test')
 export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement {
-	static styles = [UUITextStyles];
-
 	@property({ type: String })
 	public name = '';
 
@@ -22,14 +20,13 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 	private _activePath: string | undefined;
 
 	@state()
-	private _routes: IRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
 			path: 'inner-1',
 			component: () => {
 				return import('./property-editor-ui-block-grid-inner-test.element');
 			},
-			setup: (component, info) => {
-				console.log('block route inner', info);
+			setup: (component) => {
 				if (component instanceof HTMLElement) {
 					(component as any).name = 'inner-1';
 				}
@@ -37,12 +34,10 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 		},
 		{
 			path: 'inner-2',
-			//pathMatch: 'full',
 			component: () => {
 				return import('./property-editor-ui-block-grid-inner-test.element');
 			},
-			setup: (component, info) => {
-				console.log('block route inner', info);
+			setup: (component) => {
 				if (component instanceof HTMLElement) {
 					(component as any).name = 'inner-2';
 				}
@@ -76,6 +71,8 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 				}}></umb-router-slot>
 		</div>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridInnerTestElement;

@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import '../../../components/input-radio-button-list/input-radio-button-list.element';
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -11,8 +11,8 @@ import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/
  * @element umb-property-editor-ui-radio-button-list
  */
 @customElement('umb-property-editor-ui-radio-button-list')
-export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	#value = '';
 	@property({ type: String })
@@ -59,6 +59,8 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 			.selectedKey="${this.#value}"
 			.list="${this._list}"></umb-input-radio-button-list>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIRadioButtonListElement;

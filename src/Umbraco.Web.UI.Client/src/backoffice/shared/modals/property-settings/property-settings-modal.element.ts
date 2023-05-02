@@ -14,102 +14,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object, UmbPropertySettingsModalResult> {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				color: var(--uui-color-text);
-			}
-			#content {
-				padding: var(--uui-size-layout-1);
-			}
-			#appearances {
-				display: flex;
-				gap: var(--uui-size-layout-1);
-				max-width: 350px;
-				margin: 0 auto;
-			}
-			.appearance {
-				position: relative;
-				display: flex;
-				border: 2px solid var(--uui-color-border-standalone);
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				align-items: center;
-				border-radius: 6px;
-				opacity: 0.8;
-				flex-direction: column;
-				justify-content: space-between;
-				gap: var(--uui-size-space-3);
-			}
-			.appearance-label {
-				font-size: 0.8rem;
-				line-height: 1;
-			}
-			.appearance.selected .appearance-label {
-				font-weight: bold;
-			}
-			.appearance:not(.selected):hover {
-				border-color: var(--uui-color-border-emphasis);
-				cursor: pointer;
-				opacity: 1;
-			}
-			.appearance.selected {
-				border-color: var(--uui-color-selected);
-				opacity: 1;
-			}
-			.appearance.selected::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				border-radius: 6px;
-				opacity: 0.1;
-				background-color: var(--uui-color-selected);
-			}
-			.appearance.left {
-				flex-grow: 1;
-			}
-			.appearance.top {
-				flex-shrink: 1;
-			}
-			.appearance svg {
-				display: flex;
-				width: 100%;
-				color: var(--uui-color-text);
-			}
-			hr {
-				border: none;
-				border-top: 1px solid var(--uui-color-divider);
-				margin-top: var(--uui-size-space-6);
-				margin-bottom: var(--uui-size-space-5);
-			}
-			uui-input {
-				width: 100%;
-			}
-			#alias-lock {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-			}
-			#alias-lock uui-icon {
-				margin-bottom: 2px;
-			}
-			#property-editor-ui-picker {
-				width: 100%;
-				--uui-button-padding-top-factor: 4;
-				--uui-button-padding-bottom-factor: 4;
-			}
-			.container {
-				display: flex;
-				flex-direction: column;
-			}
-			uui-form,
-			form {
-				display: block;
-				height: 100%;
-			}
-		`,
-	];
+
 
 	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
 	@state() private _selectedPropertyEditorUIAlias = '';
@@ -295,7 +200,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object,
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-layout headline="Property settings">
+					<umb-workspace-editor headline="Property settings">
 						<div id="content">
 							<uui-box>
 								<div class="container">
@@ -336,7 +241,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object,
 							<uui-button label="Close" @click=${this.#onClose}></uui-button>
 							<uui-button label="Submit" look="primary" color="positive" type="submit"></uui-button>
 						</div>
-					</umb-workspace-layout>
+					</umb-workspace-editor>
 				</form>
 			</uui-form>
 		`;
@@ -428,6 +333,103 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object,
 				  `
 				: nothing} `;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				color: var(--uui-color-text);
+			}
+			#content {
+				padding: var(--uui-size-layout-1);
+			}
+			#appearances {
+				display: flex;
+				gap: var(--uui-size-layout-1);
+				max-width: 350px;
+				margin: 0 auto;
+			}
+			.appearance {
+				position: relative;
+				display: flex;
+				border: 2px solid var(--uui-color-border-standalone);
+				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				align-items: center;
+				border-radius: 6px;
+				opacity: 0.8;
+				flex-direction: column;
+				justify-content: space-between;
+				gap: var(--uui-size-space-3);
+			}
+			.appearance-label {
+				font-size: 0.8rem;
+				line-height: 1;
+			}
+			.appearance.selected .appearance-label {
+				font-weight: bold;
+			}
+			.appearance:not(.selected):hover {
+				border-color: var(--uui-color-border-emphasis);
+				cursor: pointer;
+				opacity: 1;
+			}
+			.appearance.selected {
+				border-color: var(--uui-color-selected);
+				opacity: 1;
+			}
+			.appearance.selected::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				border-radius: 6px;
+				opacity: 0.1;
+				background-color: var(--uui-color-selected);
+			}
+			.appearance.left {
+				flex-grow: 1;
+			}
+			.appearance.top {
+				flex-shrink: 1;
+			}
+			.appearance svg {
+				display: flex;
+				width: 100%;
+				color: var(--uui-color-text);
+			}
+			hr {
+				border: none;
+				border-top: 1px solid var(--uui-color-divider);
+				margin-top: var(--uui-size-space-6);
+				margin-bottom: var(--uui-size-space-5);
+			}
+			uui-input {
+				width: 100%;
+			}
+			#alias-lock {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			}
+			#alias-lock uui-icon {
+				margin-bottom: 2px;
+			}
+			#property-editor-ui-picker {
+				width: 100%;
+				--uui-button-padding-top-factor: 4;
+				--uui-button-padding-bottom-factor: 4;
+			}
+			.container {
+				display: flex;
+				flex-direction: column;
+			}
+			uui-form,
+			form {
+				display: block;
+				height: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbPropertySettingsModalElement;

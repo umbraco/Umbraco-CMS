@@ -1,15 +1,15 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-block-list
  */
 @customElement('umb-property-editor-ui-block-list')
-export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property()
 	value = '';
@@ -20,6 +20,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	render() {
 		return html`<div>umb-property-editor-ui-block-list</div>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIBlockListElement;

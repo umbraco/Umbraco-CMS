@@ -7,29 +7,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#action-menu-popover {
-				display: block;
-			}
-			#action-menu-dropdown {
-				overflow: hidden;
-				z-index: -1;
-				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-				width: 250px;
-				position: absolute;
-				right: 5px;
-				height: auto;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _actionMenuIsOpen = false;
@@ -90,6 +68,30 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			</div>`
 			: '';
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#action-menu-popover {
+				display: block;
+			}
+			#action-menu-dropdown {
+				overflow: hidden;
+				z-index: -1;
+				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+				width: 250px;
+				position: absolute;
+				right: 5px;
+				height: auto;
+			}
+		`,
+	];
 }
 
 declare global {

@@ -23,6 +23,15 @@ export class UmbDictionaryStore extends UmbStoreBase {
 		this._data.append([dictionary]);
 	}
 
+	/**
+	 * Retrieve a dictionary item from the store
+	 * @param {string} id
+	 * @memberof UmbDictionaryStore
+	 */
+	byId(id: DictionaryItemResponseModel['id']) {
+		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
+	}
+
 	remove(uniques: string[]) {
 		this._data.remove(uniques);
 	}

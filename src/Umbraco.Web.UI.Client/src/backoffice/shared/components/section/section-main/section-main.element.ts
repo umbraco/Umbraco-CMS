@@ -4,6 +4,16 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-section-main')
 export class UmbSectionMainElement extends LitElement {
+	
+
+	render() {
+		return html`
+			<main>
+				<slot></slot>
+			</main>
+		`;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -20,14 +30,6 @@ export class UmbSectionMainElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html`
-			<main>
-				<slot></slot>
-			</main>
-		`;
-	}
 }
 
 declare global {

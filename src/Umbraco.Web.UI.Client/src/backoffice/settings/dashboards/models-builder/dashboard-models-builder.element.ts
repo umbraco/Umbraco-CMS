@@ -13,41 +13,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-
-			.headline {
-				display: flex;
-				justify-content: space-between;
-				align-items: flex-start;
-			}
-
-			.models-description ul {
-				list-style-type: square;
-				margin: 0;
-				padding-left: var(--uui-size-layout-1);
-			}
-
-			span.out-of-date {
-				display: block;
-				padding-block-end: var(--uui-size-space-4);
-			}
-
-			.error {
-				font-weight: bold;
-				color: var(--uui-color-danger);
-			}
-
-			p.models-actions {
-				margin-bottom: 0;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _modelsBuilder?: ModelsBuilderResponseModel;
@@ -169,6 +135,42 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 				return;
 		}
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
+			.headline {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+			}
+
+			.models-description ul {
+				list-style-type: square;
+				margin: 0;
+				padding-left: var(--uui-size-layout-1);
+			}
+
+			span.out-of-date {
+				display: block;
+				padding-block-end: var(--uui-size-space-4);
+			}
+
+			.error {
+				font-weight: bold;
+				color: var(--uui-color-danger);
+			}
+
+			p.models-actions {
+				margin-bottom: 0;
+			}
+		`,
+	];
 }
 
 declare global {

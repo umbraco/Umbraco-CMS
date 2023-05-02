@@ -3,26 +3,27 @@ import { hasInitExport, loadExtension, UmbExtensionRegistry } from '@umbraco-cms
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbEntryPointExtensionInitializer {
-	#rootHost;
+	#host;
 	#extensionRegistry;
+	#entryPointMap = new Map();
 
-	constructor(rootHost: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry) {
-		this.#rootHost = rootHost;
+	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry) {
+		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
-		// TODO: change entrypoint extension to be entryPoint:
-		extensionRegistry.extensionsOfType('entrypoint').subscribe((entryPoints) => {
+		extensionRegistry.extensionsOfType('entryPoint').subscribe((entryPoints) => {
 			entryPoints.forEach((entryPoint) => {
+				if (this.#entryPointMap.has(entryPoint.alias)) return;
+				this.#entryPointMap.set(entryPoint.alias, entryPoint);
 				this.instantiateEntryPoint(entryPoint);
 			});
 		});
 	}
 
-	instantiateEntryPoint(manifest: ManifestEntrypoint) {
-		loadExtension(manifest).then((js) => {
-			// If the extension has an onInit export, be sure to run that or else let the module handle itself
-			if (hasInitExport(js)) {
-				js.onInit(this.#rootHost, this.#extensionRegistry);
-			}
-		});
+	async instantiateEntryPoint(manifest: ManifestEntrypoint) {
+		const js = await loadExtension(manifest);
+		// If the extension has an onInit export, be sure to run that or else let the module handle itself
+		if (hasInitExport(js)) {
+			js.onInit(this.#host, this.#extensionRegistry);
+		}
 	}
 }

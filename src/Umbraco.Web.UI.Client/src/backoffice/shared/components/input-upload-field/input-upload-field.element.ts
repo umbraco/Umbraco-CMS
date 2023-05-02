@@ -9,27 +9,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-icon {
-				vertical-align: sub;
-				margin-right: var(--uui-size-space-4);
-			}
-
-			uui-symbol-file-thumbnail {
-				box-sizing: border-box;
-				min-height: 150px;
-				padding: var(--uui-size-space-4);
-				border: 1px solid var(--uui-color-border);
-			}
-
-			#wrapper {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, auto));
-			}
-		`,
-	];
+	
 
 	private _keys: Array<string> = [];
 	/**
@@ -177,6 +157,28 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		// Remove via endpoint?
 		this._currentFiles = [];
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-icon {
+				vertical-align: sub;
+				margin-right: var(--uui-size-space-4);
+			}
+
+			uui-symbol-file-thumbnail {
+				box-sizing: border-box;
+				min-height: 150px;
+				padding: var(--uui-size-space-4);
+				border: 1px solid var(--uui-color-border);
+			}
+
+			#wrapper {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+			}
+		`,
+	];
 }
 
 export default UmbInputUploadFieldElement;

@@ -9,6 +9,10 @@ export const plugins: PluginOption[] = [
 				src: 'public-assets/icons/*.js',
 				dest: 'icons',
 			},
+			{
+				src: 'public-assets/App_Plugins/*.js',
+				dest: 'App_Plugins',
+			},
 		],
 	}),
 	viteTSConfigPaths(),

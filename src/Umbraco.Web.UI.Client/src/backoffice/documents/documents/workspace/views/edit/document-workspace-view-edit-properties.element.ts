@@ -2,25 +2,14 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbWorkspacePropertyStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-property-structure-helper.class';
-import { PropertyContainerTypes } from '../../../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
+import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
+import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTypePropertyTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			.property {
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-			.property:last-child {
-				border-bottom: 0;
-			}
-		`,
-	];
-
 	@property({ type: String, attribute: 'container-name', reflect: false })
 	public get containerName(): string | undefined {
 		return this._propertyStructureHelper.getContainerName();
@@ -37,14 +26,17 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbWorkspacePropertyStructureHelper(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
 
 	@state()
-	_propertyStructure: Array<DocumentTypePropertyTypeResponseModel> = [];
+	_propertyStructure: Array<PropertyTypeResponseModelBaseModel> = [];
 
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._propertyStructureHelper.setStructureManager((workspaceContext as UmbDocumentWorkspaceContext).structure);
+		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
 		});
@@ -57,6 +49,18 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 			(property) => html`<umb-variantable-property class="property" .property=${property}></umb-variantable-property> `
 		);
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			.property {
+				border-bottom: 1px solid var(--uui-color-divider);
+			}
+			.property:last-child {
+				border-bottom: 0;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceViewEditPropertiesElement;

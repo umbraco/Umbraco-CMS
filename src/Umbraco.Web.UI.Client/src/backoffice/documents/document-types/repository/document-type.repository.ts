@@ -3,13 +3,9 @@ import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.
 import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store';
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store';
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import {
-	ProblemDetailsModel,
-	DocumentTypeResponseModel,
-	FolderTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeResponseModel, FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemType = DocumentTypeResponseModel;
@@ -68,8 +64,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		await this.#init;
 
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
+			throw new Error('Parent id is missing');
 		}
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
@@ -85,8 +80,7 @@ export class UmbDocumentTypeRepository implements UmbTreeRepository<ItemType>, U
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);

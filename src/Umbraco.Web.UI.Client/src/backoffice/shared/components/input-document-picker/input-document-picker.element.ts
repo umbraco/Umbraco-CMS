@@ -17,14 +17,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#add-button {
-				width: 100%;
-			}
-		`,
-	];
+	
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -174,6 +167,15 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			</uui-ref-node>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#add-button {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbInputDocumentPickerElement;

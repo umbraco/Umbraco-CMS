@@ -2,7 +2,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
+	ManifestWorkspaceEditorView,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
@@ -15,9 +15,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.DocumentType.Design',
 		name: 'Document Type Workspace Design View',
 		loader: () => import('./views/design/document-type-workspace-view-edit.element'),
@@ -32,7 +32,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 	},
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.DocumentType.Structure',
 		name: 'Document Type Workspace Structure View',
 		loader: () => import('./views/structure/document-type-workspace-view-structure.element'),
@@ -47,7 +47,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 	},
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.DocumentType.Permissions',
 		name: 'Document Type Workspace Permissions View',
 		loader: () => import('./views/details/document-type-workspace-view-details.element'),
@@ -62,7 +62,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 	},
 	{
-		type: 'workspaceView',
+		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.DocumentType.Templates',
 		name: 'Document Type Workspace Templates View',
 		loader: () => import('./views/templates/document-type-workspace-view-templates.element'),
@@ -95,4 +95,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceEditorViews, ...workspaceActions];

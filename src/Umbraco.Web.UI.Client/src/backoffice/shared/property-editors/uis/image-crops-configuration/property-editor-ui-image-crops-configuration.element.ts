@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -10,9 +10,9 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-property-editor-ui-image-crops-configuration')
 export class UmbPropertyEditorUIImageCropsConfigurationElement
 	extends UmbLitElement
-	implements UmbPropertyEditorElement
+	implements UmbPropertyEditorExtensionElement
 {
-	static styles = [UUITextStyles];
+
 
 	@property()
 	value = '';
@@ -23,6 +23,8 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 	render() {
 		return html`<div>umb-property-editor-ui-image-crops-configuration</div>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIImageCropsConfigurationElement;

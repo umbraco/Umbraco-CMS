@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler<UmbConfirmModalData, UmbConfirmModalResult>;
@@ -38,6 +38,8 @@ export class UmbConfirmModalElement extends UmbLitElement {
 			</uui-dialog-layout>
 		`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbConfirmModalElement;

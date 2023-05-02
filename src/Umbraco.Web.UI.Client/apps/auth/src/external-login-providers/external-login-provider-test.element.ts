@@ -4,6 +4,16 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-external-login-provider-test')
 export class UmbExternalLoginProviderTestElement extends LitElement {
+	
+
+	render() {
+		return html`
+			<b>Custom External Login Provider</b>
+			<p>This is an example of a custom external login provider using the external login provider extension point</p>
+			<uui-button label="My custom login provider" look="primary"></uui-button>
+		`;
+	}
+	
 	static styles = [
 		UUITextStyles,
 		css`
@@ -21,14 +31,6 @@ export class UmbExternalLoginProviderTestElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html`
-			<b>Custom External Login Provider</b>
-			<p>This is an example of a custom external login provider using the external login provider extension point</p>
-			<uui-button label="My custom login provider" look="primary"></uui-button>
-		`;
-	}
 }
 
 export default UmbExternalLoginProviderTestElement;

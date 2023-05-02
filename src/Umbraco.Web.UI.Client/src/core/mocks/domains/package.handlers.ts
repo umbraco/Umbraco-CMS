@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
@@ -54,7 +54,7 @@ export const handlers = [
 	rest.post(umbracoPath('/package/created'), async (_req, res, ctx) => {
 		//save
 		const data: PackageMigrationStatusResponseModel = await _req.json();
-		const newPackage: PackageDefinitionResponseModel = { ...data, id: uuidv4() };
+		const newPackage: PackageDefinitionResponseModel = { ...data, id: UmbId.new() };
 		packageArray.push(newPackage);
 		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(newPackage));
 	}),

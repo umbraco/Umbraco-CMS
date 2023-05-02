@@ -1,15 +1,15 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-tags
  */
 @customElement('umb-property-editor-ui-tags')
-export class UmbPropertyEditorUITagsElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUITagsElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property()
 	value = '';
@@ -20,6 +20,8 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	render() {
 		return html`<div>umb-property-editor-ui-tags</div>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUITagsElement;

@@ -12,8 +12,6 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	UmbAllowedDocumentTypesModalData,
 	UmbAllowedDocumentTypesModalResult
 > {
-	static styles = [UUITextStyles];
-
 	#documentTypeRepository = new UmbDocumentTypeRepository(this);
 
 	@state()
@@ -60,6 +58,8 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbAllowedDocumentTypesModalElement;

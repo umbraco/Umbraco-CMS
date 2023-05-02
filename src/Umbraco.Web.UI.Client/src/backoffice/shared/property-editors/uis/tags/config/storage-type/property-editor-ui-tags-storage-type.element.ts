@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tags-storage-type')
 export class UmbPropertyEditorUITagsStorageTypeElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -19,6 +19,8 @@ export class UmbPropertyEditorUITagsStorageTypeElement extends UmbLitElement {
 	render() {
 		return html`<div>umb-property-editor-ui-tags-storage-type</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUITagsStorageTypeElement;

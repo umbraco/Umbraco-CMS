@@ -9,7 +9,7 @@ import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@state()
 	private _buttonState?: UUIButtonState;
@@ -52,6 +52,8 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 				.state="${this._buttonState}"></uui-button>
 		`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbWorkspaceActionElement;

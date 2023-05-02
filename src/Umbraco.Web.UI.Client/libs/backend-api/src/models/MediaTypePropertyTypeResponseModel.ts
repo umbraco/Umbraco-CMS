@@ -5,4 +5,3 @@
 import type { PropertyTypeResponseModelBaseModel } from './PropertyTypeResponseModelBaseModel';
 
 export type MediaTypePropertyTypeResponseModel = PropertyTypeResponseModelBaseModel;
-

@@ -15,43 +15,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-embedded-media-modal')
 export class UmbEmbeddedMediaModalElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			h3 {
-				margin-left: var(--uui-size-space-5);
-				margin-right: var(--uui-size-space-5);
-			}
 
-			uui-input {
-				width: 100%;
-				--uui-button-border-radius: 0;
-			}
-
-			.sr-only {
-				clip: rect(0, 0, 0, 0);
-				border: 0;
-				height: 1px;
-				margin: -1px;
-				overflow: hidden;
-				padding: 0;
-				position: absolute;
-				width: 1px;
-			}
-
-			umb-workspace-property-layout:first-child {
-				padding-top: 0;
-			}
-
-			umb-workspace-property-layout:last-child {
-				padding-bottom: 0;
-			}
-
-			p {
-				margin-bottom: 0;
-			}
-		`,
-	];
 
 	#info?: string;
 	#a11yInfo?: string;
@@ -193,7 +157,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Embed">
+			<umb-workspace-editor headline="Embed">
 				<uui-box>
 					<umb-workspace-property-layout label="URL" orientation="vertical">
 						<div slot="editor">
@@ -256,9 +220,47 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 					look="primary"
 					label="Submit"
 					@click=${this.#handleConfirm}></uui-button>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			h3 {
+				margin-left: var(--uui-size-space-5);
+				margin-right: var(--uui-size-space-5);
+			}
+
+			uui-input {
+				width: 100%;
+				--uui-button-border-radius: 0;
+			}
+
+			.sr-only {
+				clip: rect(0, 0, 0, 0);
+				border: 0;
+				height: 1px;
+				margin: -1px;
+				overflow: hidden;
+				padding: 0;
+				position: absolute;
+				width: 1px;
+			}
+
+			umb-workspace-property-layout:first-child {
+				padding-top: 0;
+			}
+
+			umb-workspace-property-layout:last-child {
+				padding-bottom: 0;
+			}
+
+			p {
+				margin-bottom: 0;
+			}
+		`,
+	];
 }
 
 export default UmbEmbeddedMediaModalElement;

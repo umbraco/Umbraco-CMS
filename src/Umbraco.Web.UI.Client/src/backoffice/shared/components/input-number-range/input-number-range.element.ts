@@ -11,7 +11,7 @@ function getNumberOrUndefined(value: string) {
 
 @customElement('umb-input-number-range')
 export class UmbInputNumberRangeElement extends FormControlMixin(UmbLitElement) {
-	static styles = [UUITextStyles, css``];
+	
 
 	@property({ type: String, attribute: 'min-label' })
 	minLabel = 'Low value';
@@ -84,6 +84,8 @@ export class UmbInputNumberRangeElement extends FormControlMixin(UmbLitElement) 
 			–
 			<uui-input type="number" .value=${this._maxValue} @input=${this._onMaxInput} label=${this.maxLabel}></uui-input>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbInputNumberRangeElement;

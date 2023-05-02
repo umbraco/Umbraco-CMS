@@ -10,34 +10,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-language-workspace-edit')
 export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-space-6);
-				gap: var(--uui-size-space-4);
-				width: 100%;
-			}
 
-			uui-input {
-				width: 100%;
-			}
-
-			strong {
-				display: flex;
-				align-items: center;
-			}
-
-			#footer {
-				padding: 0 var(--uui-size-layout-1);
-			}
-
-			uui-input:not(:focus) {
-				border: 1px solid transparent;
-			}
-		`,
-	];
 
 	#workspaceContext?: UmbLanguageWorkspaceContext;
 
@@ -77,7 +50,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-layout alias="Umb.Workspace.Language">
+		return html`<umb-workspace-editor alias="Umb.Workspace.Language">
 			<div id="header" slot="header">
 				<uui-button label="Navigate back" href="section/settings/workspace/language-root" compact>
 					<uui-icon name="umb:arrow-left"></uui-icon>
@@ -93,8 +66,37 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 				<a href="section/settings/workspace/language-root">Languages</a> /
 				${this._isNew ? 'Create' : this._language?.name}
 			</div>
-		</umb-workspace-layout>`;
+		</umb-workspace-editor>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				display: flex;
+				padding: 0 var(--uui-size-space-6);
+				gap: var(--uui-size-space-4);
+				width: 100%;
+			}
+
+			uui-input {
+				width: 100%;
+			}
+
+			strong {
+				display: flex;
+				align-items: center;
+			}
+
+			#footer {
+				padding: 0 var(--uui-size-layout-1);
+			}
+
+			uui-input:not(:focus) {
+				border: 1px solid transparent;
+			}
+		`,
+	];
 }
 
 export default UmbLanguageWorkspaceEditElement;

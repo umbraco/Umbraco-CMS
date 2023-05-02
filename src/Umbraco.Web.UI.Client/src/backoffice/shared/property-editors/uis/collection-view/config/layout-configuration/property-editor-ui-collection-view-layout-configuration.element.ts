@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-collection-view-layout-configuration')
 export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property()
 	value = '';
@@ -19,6 +19,8 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement extends
 	render() {
 		return html`<div>umb-property-editor-ui-collection-view-layout-configuration</div>`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUICollectionViewLayoutConfigurationElement;

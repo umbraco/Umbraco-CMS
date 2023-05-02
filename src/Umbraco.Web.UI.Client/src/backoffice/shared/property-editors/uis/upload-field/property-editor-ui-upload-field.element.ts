@@ -3,15 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbInputUploadFieldElement } from '../../../../shared/components/input-upload-field/input-upload-field.element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-upload-field
  */
 @customElement('umb-property-editor-ui-upload-field')
-export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property()
 	value = '';
@@ -42,6 +42,8 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 			?multiple="${this._multiple}"
 			.fileExtensions="${this._fileExtensions}"></umb-input-upload-field>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIUploadFieldElement;

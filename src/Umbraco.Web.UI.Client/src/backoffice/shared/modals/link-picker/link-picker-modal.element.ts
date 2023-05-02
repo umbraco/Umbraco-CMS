@@ -14,39 +14,7 @@ import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
-	static styles = [
-		UUITextStyles,
-		css`
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				margin-bottom: var(--uui-size-space-3);
-			}
 
-			uui-input,
-			uui-toggle,
-			uui-label {
-				width: 100%;
-			}
-
-			uui-input,
-			uui-label {
-				margin-bottom: var(--uui-size-space-6);
-			}
-
-			.url-link {
-				display: flex;
-				gap: var(--uui-size-space-6);
-			}
-			.url-link span {
-				flex: 1 1 0px;
-			}
-
-			#select-media {
-				display: block;
-			}
-		`,
-	];
 
 	@state()
 	_selectedKey?: string;
@@ -123,7 +91,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select Link">
+			<umb-workspace-editor headline="Select Link">
 				<uui-box>
 					<div class="url-link">${this._renderLinkUrlInput()} ${this._renderAnchorInput()}</div>
 
@@ -153,7 +121,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					<uui-button label="Close" @click=${this._close}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -202,6 +170,40 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				.selection=${[this._selectedKey ?? '']}
 				selectable></umb-tree>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-color-divider);
+				margin-bottom: var(--uui-size-space-3);
+			}
+
+			uui-input,
+			uui-toggle,
+			uui-label {
+				width: 100%;
+			}
+
+			uui-input,
+			uui-label {
+				margin-bottom: var(--uui-size-space-6);
+			}
+
+			.url-link {
+				display: flex;
+				gap: var(--uui-size-space-6);
+			}
+			.url-link span {
+				flex: 1 1 0px;
+			}
+
+			#select-media {
+				display: block;
+			}
+		`,
+	];
 }
 
 export default UmbLinkPickerModalElement;

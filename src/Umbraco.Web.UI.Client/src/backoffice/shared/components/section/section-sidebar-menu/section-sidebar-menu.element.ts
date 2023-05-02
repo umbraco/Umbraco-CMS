@@ -26,14 +26,7 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			h3 {
-				padding: var(--uui-size-4) var(--uui-size-8);
-			}
-		`,
-	];
+	
 
 	@property()
 	manifest?: ManifestSectionSidebarAppMenuKind;
@@ -46,6 +39,15 @@ export class UmbSectionSidebarMenuElement extends UmbLitElement {
 				.filter=${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}
 				default-element="umb-menu"></umb-extension-slot>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			h3 {
+				padding: var(--uui-size-4) var(--uui-size-8);
+			}
+		`,
+	];
 }
 
 export default UmbSectionSidebarMenuElement;

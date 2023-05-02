@@ -13,29 +13,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				height: 100%;
-			}
 
-			.header {
-				margin: 0 var(--uui-size-layout-1);
-				display: flex;
-				gap: var(--uui-size-space-4);
-			}
-
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-
-			uui-checkbox {
-				margin-top: var(--uui-size-space-4);
-			}
-		`,
-	];
 
 	@property()
 	entityId?: string;
@@ -107,11 +85,11 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.PackageBuilder">
+			<umb-workspace-editor alias="Umb.Workspace.PackageBuilder">
 				${this.#renderHeader()}
 				<uui-box class="wrapper" headline="Package Content"> ${this.#renderEditors()} </uui-box>
 				${this.#renderActions()}
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -286,6 +264,30 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-input-checkbox-list></umb-input-checkbox-list>
 		</div>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				height: 100%;
+			}
+
+			.header {
+				margin: 0 var(--uui-size-layout-1);
+				display: flex;
+				gap: var(--uui-size-space-4);
+			}
+
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+
+			uui-checkbox {
+				margin-top: var(--uui-size-space-4);
+			}
+		`,
+	];
 }
 
 export default UmbWorkspacePackageBuilderElement;

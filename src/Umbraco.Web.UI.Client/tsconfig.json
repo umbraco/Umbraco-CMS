@@ -19,6 +19,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@umbraco-cms/backoffice/backend-api": ["libs/backend-api"],
+			"@umbraco-cms/backoffice/content-type": ["libs/content-type"],
 			"@umbraco-cms/backoffice/context-api": ["libs/context-api"],
 			"@umbraco-cms/backoffice/controller": ["libs/controller"],
 			"@umbraco-cms/backoffice/css": ["libs/css/custom-properties.css"],
@@ -42,6 +43,8 @@
 			"@umbraco-cms/backoffice/utils": ["libs/utils"],
 			"@umbraco-cms/backoffice/workspace": ["libs/workspace"],
 			"@umbraco-cms/backoffice/picker-input": ["libs/picker-input"],
+			"@umbraco-cms/backoffice/id": ["libs/id"],
+			"@umbraco-cms/backoffice/collection": ["libs/collection"],
 			"@umbraco-cms/internal/lit-element": ["src/core/lit-element"],
 			"@umbraco-cms/internal/modal": ["src/core/modal"],
 			"@umbraco-cms/internal/router": ["src/core/router"],

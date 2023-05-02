@@ -1,12 +1,8 @@
 import { manifests as searchManifests } from '../search/manifests';
-
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
 export const manifests = [...searchManifests];
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+	extensionRegistry.registerMany(manifests);
 };
-
-registerExtensions(manifests);

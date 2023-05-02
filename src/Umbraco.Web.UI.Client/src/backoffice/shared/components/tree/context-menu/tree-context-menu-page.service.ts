@@ -8,7 +8,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 // TODO: Refactor this, its not a service and the data should be handled by a context api.
 @customElement('umb-tree-context-menu-page-service')
 export class UmbTreeContextMenuPageServiceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@property({ type: Object })
 	public actionEntity: any = { key: '', name: '' };
@@ -62,6 +62,8 @@ export class UmbTreeContextMenuPageServiceElement extends UmbLitElement {
 	render() {
 		return this._renderTopPage();
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 export const UMB_TREE_CONTEXT_MENU_PAGE_SERVICE_CONTEXT_TOKEN =

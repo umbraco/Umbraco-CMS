@@ -36,8 +36,8 @@ export class UmbDataTypeStore extends UmbStoreBase {
 	}
 
 	/**
-	 * Append a data-type to the store
-	 * @param {id} DataTypeModel id.
+	 * Retrieve a data-type from the store
+	 * @param {id} string id.
 	 * @memberof UmbDataTypeStore
 	 */
 	byId(id: DataTypeResponseModel['id']) {

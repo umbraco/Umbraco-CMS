@@ -12,6 +12,9 @@ import './backoffice-frame/backoffice-modal-container.element';
 import './backoffice-frame/backoffice-notification-container.element';
 import './button-with-dropdown/button-with-dropdown.element';
 import './code-block/code-block.element';
+import './collection/collection.element';
+import './collection/collection-toolbar.element';
+import './collection/collection-selection-actions.element';
 import './debug/debug.element';
 import './donut-chart';
 import './dropdown/dropdown.element';
@@ -43,10 +46,11 @@ import './tree/tree.element';
 import './tree/entity-tree-item/entity-tree-item.element';
 import './tree/tree-menu-item/tree-menu-item.element';
 
+import './entity-bulk-action/entity-bulk-action.element';
+
 import './menu/menu-item-base/menu-item-base.element';
 
 import './variantable-property/variantable-property.element';
-import './workspace/workspace-action-menu/workspace-action-menu.element';
 
 import './header-app/header-app-button.element';
 
@@ -54,10 +58,15 @@ import './history/history-list.element';
 import './history/history-item.element';
 
 import './workspace/workspace-action/workspace-action.element';
-import './workspace/workspace-layout/workspace-layout.element';
-import './workspace/workspace-footer-layout/workspace-footer-layout.element';
+import './workspace/workspace-editor/workspace-editor.element';
+import './workspace/workspace-footer/workspace-footer.element';
+import './workspace/workspace-action-menu/workspace-action-menu.element';
+
+import './variant-selector/variant-selector.element.ts';
 
 import './template-card/template-card.element';
 import './code-editor';
+
+import './tooltip-menu/tooltip-menu.element';
 
 export const manifests = [...debugManifests];

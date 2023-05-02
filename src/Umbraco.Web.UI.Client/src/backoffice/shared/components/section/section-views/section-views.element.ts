@@ -3,9 +3,14 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map, of } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import type { ManifestDashboard, ManifestSectionView } from '@umbraco-cms/backoffice/extensions-registry';
+import type {
+	ManifestDashboard,
+	ManifestSectionView,
+	UmbDashboardExtensionElement,
+	UmbSectionViewExtensionElement,
+} from '@umbraco-cms/backoffice/extensions-registry';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -13,30 +18,6 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 // TODO: this might need a new name, since it's both view and dashboard now
 @customElement('umb-section-views')
 export class UmbSectionViewsElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				background-color: var(--uui-color-surface);
-				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				height: var(--umb-header-layout-height);
-				box-sizing: border-box;
-			}
-
-			#views {
-				justify-content: flex-end;
-				--uui-tab-divider: var(--uui-color-divider-standalone);
-			}
-
-			#views uui-tab:first-child {
-				border-left: 1px solid var(--uui-color-divider-standalone);
-			}
-		`,
-	];
-
 	@property({ type: String, attribute: 'section-alias' })
 	public sectionAlias?: string;
 
@@ -53,7 +34,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	private _activePath?: string;
 
 	@state()
-	private _routes: Array<IRoute> = [];
+	private _routes: Array<UmbRoute> = [];
 
 	private _sectionContext?: UmbSectionContext;
 	private _extensionsObserver?: UmbObserverController<ManifestSectionView[]>;
@@ -74,14 +55,20 @@ export class UmbSectionViewsElement extends UmbLitElement {
 			return {
 				path: 'dashboard/' + manifest.meta.pathname,
 				component: () => createExtensionElement(manifest),
-			};
+				setup: (component: UmbDashboardExtensionElement) => {
+					component.manifest = manifest;
+				},
+			} as UmbRoute;
 		});
 
 		const viewRoutes = this._views?.map((manifest) => {
 			return {
 				path: 'view/' + manifest.meta.pathname,
 				component: () => createExtensionElement(manifest),
-			};
+				setup: (component: UmbSectionViewExtensionElement) => {
+					component.manifest = manifest;
+				},
+			} as UmbRoute;
 		});
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
@@ -185,6 +172,30 @@ export class UmbSectionViewsElement extends UmbLitElement {
 			</uui-tab-group>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				background-color: var(--uui-color-surface);
+				border-bottom: 1px solid var(--uui-color-divider-standalone);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				height: var(--umb-header-layout-height);
+				box-sizing: border-box;
+			}
+
+			#views {
+				justify-content: flex-end;
+				--uui-tab-divider: var(--uui-color-divider-standalone);
+			}
+
+			#views uui-tab:first-child {
+				border-left: 1px solid var(--uui-color-divider-standalone);
+			}
+		`,
+	];
 }
 
 export default UmbSectionViewsElement;

@@ -282,14 +282,7 @@ export class UmbDataTypeRepository
 	async requestFolder(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this.#init;
-
-		const { data, error } = await this.#folderSource.get(id);
-
-		if (data) {
-			this.#treeStore?.appendItems([data]);
-		}
-
-		return { data, error };
+		return await this.#folderSource.get(id);
 	}
 
 	// Actions

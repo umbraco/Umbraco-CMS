@@ -6,7 +6,6 @@ import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
-	ProblemDetailsModel,
 	DocumentResponseModel,
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
@@ -69,8 +68,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		await this.#init;
 
 		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
+			throw new Error('Parent id is missing');
 		}
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
@@ -86,8 +84,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -124,9 +121,9 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
+
 		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {
@@ -134,6 +131,12 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		}
 
 		return { data, error };
+	}
+
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#store!.byId(id);
 	}
 
 	// Could potentially be general methods:

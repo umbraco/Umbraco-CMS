@@ -8,20 +8,7 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-media-type-workspace-edit')
 export class UmbMediaTypeWorkspaceEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-layout-1);
-				gap: var(--uui-size-space-4);
-				width: 100%;
-			}
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
+
 
 	@state()
 	private _mediaTypeName?: string | null = '';
@@ -55,10 +42,25 @@ export class UmbMediaTypeWorkspaceEditElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-layout alias="Umb.Workspace.MediaType">
+		return html`<umb-workspace-editor alias="Umb.Workspace.MediaType">
 			<uui-input id="header" slot="header" .value=${this._mediaTypeName} @input="${this.#handleInput}"></uui-input>
-		</umb-workspace-layout>`;
+		</umb-workspace-editor>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#header {
+				display: flex;
+				padding: 0 var(--uui-size-layout-1);
+				gap: var(--uui-size-space-4);
+				width: 100%;
+			}
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbMediaTypeWorkspaceEditElement;

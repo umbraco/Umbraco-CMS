@@ -8,49 +8,7 @@ import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backoffice
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-			#message-list-header {
-				display: flex;
-				font-weight: 600;
-			}
-
-			#message-list-header > div {
-				box-sizing: border-box;
-				padding: 10px 20px;
-				display: flex;
-				align-items: center;
-			}
-
-			#timestamp {
-				flex: 1 0 14ch;
-			}
-
-			#level,
-			#machine {
-				flex: 1 0 14ch;
-			}
-
-			#message {
-				flex: 6 0 14ch;
-			}
-
-			#empty {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				gap: var(--uui-size-space-3);
-			}
-
-			#pagination {
-				margin: var(--uui-size-space-5, 18px) 0;
-			}
-		`,
-	];
+	
 
 	@query('#logs-scroll-container')
 	private _logsScrollContainer!: UUIScrollContainerElement;
@@ -150,6 +108,50 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			${this._renderPagination()}
 		</uui-box>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+			#message-list-header {
+				display: flex;
+				font-weight: 600;
+			}
+
+			#message-list-header > div {
+				box-sizing: border-box;
+				padding: 10px 20px;
+				display: flex;
+				align-items: center;
+			}
+
+			#timestamp {
+				flex: 1 0 14ch;
+			}
+
+			#level,
+			#machine {
+				flex: 1 0 14ch;
+			}
+
+			#message {
+				flex: 6 0 14ch;
+			}
+
+			#empty {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: var(--uui-size-space-3);
+			}
+
+			#pagination {
+				margin: var(--uui-size-space-5, 18px) 0;
+			}
+		`,
+	];
 }
 
 declare global {

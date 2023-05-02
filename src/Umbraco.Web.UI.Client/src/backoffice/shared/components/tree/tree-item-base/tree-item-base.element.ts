@@ -10,7 +10,7 @@ import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@state()
 	private _item?: TreeItemPresentationModel;
@@ -86,7 +86,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		const { asObservable } = await this.#treeItemContext.requestChildren();
 		if (!asObservable) return;
 
-		this.observe(asObservable(), (childItems: any) => {
+		this.observe(asObservable(), (childItems) => {
 			this._childItems = childItems;
 		});
 	}
@@ -159,6 +159,8 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				: ''}
 		`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

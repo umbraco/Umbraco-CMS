@@ -4,18 +4,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbVariantId } from '../../../../shared/variants/variant-id.class';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../../shared/components/workspace/workspace-variant/workspace-variant.context';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../../shared/components/workspace-property/workspace-property.context';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
-export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
-
+export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
 	private _variantContext?: typeof UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN.TYPE;
 
 	@property()
@@ -25,7 +23,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	public config = [];
 
 	@state()
-	private _routes: IRoute[] = [];
+	private _routes: UmbRoute[] = [];
 
 	@state()
 	private _routerPath: string | undefined;
@@ -56,8 +54,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component, info) => {
-						console.log('block route', info);
+					setup: (component) => {
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-1';
 						}
@@ -65,12 +62,10 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 				},
 				{
 					path: 'modal-2',
-					//pathMatch: 'full',
 					component: () => {
 						return import('./property-editor-ui-block-grid-inner-test.element');
 					},
-					setup: (component, info) => {
-						console.log('block route', info);
+					setup: (component) => {
 						if (component instanceof HTMLElement) {
 							(component as any).name = 'block-grid-2';
 						}
@@ -110,6 +105,8 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 			  </div>`
 			: 'loading...';
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridElement;

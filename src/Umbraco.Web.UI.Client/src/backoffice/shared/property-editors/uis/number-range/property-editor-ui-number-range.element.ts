@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbInputNumberRangeElement } from '../../../../shared/components/input-number-range/input-number-range.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../../shared/components/input-number-range/input-number-range.element';
 
@@ -15,8 +15,8 @@ type ValueType = {
  * @element umb-property-editor-ui-number-range
  */
 @customElement('umb-property-editor-ui-number-range')
-export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property({ type: Object })
 	private _value: ValueType = { min: undefined, max: undefined };
@@ -51,6 +51,8 @@ export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement impleme
 			.maxValue=${this._maxValue}
 			@change=${this._onChange}></umb-input-number-range>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUINumberRangeElement;

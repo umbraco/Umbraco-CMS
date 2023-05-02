@@ -2,11 +2,10 @@ import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } fr
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store';
 import { UmbMemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
 // TODO => Update type when backend updated
@@ -55,16 +54,14 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
-		const error: ProblemDetailsModel = { title: 'Not implemented' };
-		return { data: undefined, error };
+		return { data: undefined, error: { title: 'Not implemented', message: 'Not implemented' } };
 	}
 
 	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -100,8 +97,7 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Id is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 		const { data, error } = await this.#detailSource.get(id);
 
@@ -111,12 +107,17 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		return { data, error };
 	}
 
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#store!.byId(id);
+	}
+
 	async create(detail: MemberGroupDetails) {
 		await this.#init;
 
 		if (!detail.name) {
-			const error: ProblemDetailsModel = { title: 'Name is missing' };
-			return { error };
+			throw new Error('Name is missing');
 		}
 
 		const { data, error } = await this.#detailSource.insert(detail);

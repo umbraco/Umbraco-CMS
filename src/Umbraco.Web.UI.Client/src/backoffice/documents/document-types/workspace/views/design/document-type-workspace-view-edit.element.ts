@@ -3,41 +3,25 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
-import { UmbWorkspaceContainerStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-container-structure-helper.class';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element';
+import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-document-type-workspace-view-edit')
-export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				--uui-tab-background: var(--uui-color-surface);
-			}
-
-			/* TODO: This should be replaced with a general workspace bar — naming is hard */
-			#workspace-tab-bar {
-				padding: 0 var(--uui-size-layout-1);
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				background-color: var(--uui-color-surface);
-				flex-wrap: nowrap;
-			}
-		`,
-	];
-
+export class UmbDocumentTypeWorkspaceViewEditElement
+	extends UmbLitElement
+	implements UmbWorkspaceEditorViewExtensionElement
+{
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
 
 	@state()
-	private _routes: IRoute[] = [];
+	private _routes: UmbRoute[] = [];
 
 	@state()
 	_tabs: Array<PropertyTypeContainerResponseModelBaseModel> = [];
@@ -50,7 +34,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 
 	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
-	private _tabsStructureHelper = new UmbWorkspaceContainerStructureHelper(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	constructor() {
 		super();
@@ -66,6 +50,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext as UmbDocumentTypeWorkspaceContext;
+			this._tabsStructureHelper.setStructureManager((workspaceContext as UmbDocumentTypeWorkspaceContext).structure);
 			this._observeRootGroups();
 		});
 	}
@@ -84,7 +69,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 	}
 
 	private _createRoutes() {
-		const routes: IRoute[] = [];
+		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
@@ -215,6 +200,26 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement {
 			</umb-router-slot>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				--uui-tab-background: var(--uui-color-surface);
+			}
+
+			/* TODO: This should be replaced with a general workspace bar — naming is hard */
+			#workspace-tab-bar {
+				padding: 0 var(--uui-size-layout-1);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background-color: var(--uui-color-surface);
+				flex-wrap: nowrap;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTypeWorkspaceViewEditElement;

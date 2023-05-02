@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import UmbInputSliderElement from '../../../../shared/components/input-slider/input-slider.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -10,8 +10,8 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
  * @element umb-property-editor-ui-slider
  */
 @customElement('umb-property-editor-ui-slider')
-export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property()
 	value: {
@@ -81,6 +81,8 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 			?enable-range=${this._enableRange}
 			@change="${this._onChange}"></umb-input-slider>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUISliderElement;

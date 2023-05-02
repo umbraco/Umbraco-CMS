@@ -2,30 +2,18 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
-import { UmbSectionElement } from '../section/section.element';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section/section.context';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extensions-api';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				background-color: var(--uui-color-background);
-				display: block;
-				height: calc(100% - 60px); // 60 => top header height
-			}
-		`,
-	];
-
 	@state()
-	private _routes: Array<IRoute> = [];
+	private _routes: Array<UmbRoute> = [];
 
 	@state()
 	private _sections: Array<ManifestSection> = [];
@@ -46,7 +34,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private async _observeBackoffice() {
 		if (this._backofficeContext) {
 			this.observe(
-				this._backofficeContext.getAllowedSections(),
+				this._backofficeContext.allowedSections,
 				(sections) => {
 					this._sections = sections;
 					this._createRoutes();
@@ -63,9 +51,9 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		this._routes = this._sections.map((section) => {
 			return {
 				path: this._routePrefix + section.meta.pathname,
-				component: () => createExtensionElementOrFallback(section, 'umb-section'),
+				component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
 				setup: (component) => {
-					(component as UmbSectionElement).manifest = section;
+					(component as UmbSectionExtensionElement).manifest = section;
 				},
 			};
 		});
@@ -96,6 +84,17 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	render() {
 		return html` <umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				background-color: var(--uui-color-background);
+				display: block;
+				height: calc(100% - 60px); // 60 => top header height
+			}
+		`,
+	];
 }
 
 declare global {

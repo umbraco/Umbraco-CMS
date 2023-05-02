@@ -22,96 +22,7 @@ type HistoryLogType = 'Publish' | 'Save' | 'Unpublish' | 'ContentVersionEnableCl
 
 @customElement('umb-document-info-workspace-view')
 export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: grid;
-				gap: var(--uui-size-layout-1);
-				margin: var(--uui-size-layout-1);
-				grid-template-columns: 1fr 350px;
-			}
-
-			div.container {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-layout-1);
-			}
-
-			//General section
-
-			#general-section {
-				display: flex;
-				flex-direction: column;
-			}
-
-			.general-item {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-1);
-			}
-
-			.general-item:not(:last-child) {
-				margin-bottom: var(--uui-size-space-6);
-			}
-
-			// Link section
-
-			#link-section {
-				display: flex;
-				flex-direction: column;
-				text-align: left;
-			}
-
-			.link-item {
-				padding: var(--uui-size-space-4) var(--uui-size-space-6);
-				display: grid;
-				grid-template-columns: 75px 1fr;
-				color: inherit;
-				text-decoration: none;
-			}
-
-			.link-language {
-				color: var(--uui-color-divider-emphasis);
-			}
-
-			.link-content.italic {
-				font-style: italic;
-			}
-
-			.link-item uui-icon {
-				margin-right: var(--uui-size-space-2);
-				vertical-align: middle;
-			}
-
-			.link-item.with-href {
-				cursor: pointer;
-			}
-
-			.link-item.with-href:hover {
-				background: var(--uui-color-divider);
-			}
-
-			//History section
-
-			uui-tag uui-icon {
-				margin-right: var(--uui-size-space-1);
-			}
-
-			.log-type {
-				display: flex;
-				gap: var(--uui-size-space-2);
-			}
-			uui-pagination {
-				display: inline-block;
-			}
-			.pagination {
-				display: flex;
-				justify-content: center;
-				margin-top: var(--uui-size-space-4);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _historyList: HistoryNode[] = [
@@ -325,6 +236,97 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 				return 'Could not detech log type';
 		}
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: grid;
+				gap: var(--uui-size-layout-1);
+				margin: var(--uui-size-layout-1);
+				grid-template-columns: 1fr 350px;
+			}
+
+			div.container {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-layout-1);
+			}
+
+			//General section
+
+			#general-section {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.general-item {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-1);
+			}
+
+			.general-item:not(:last-child) {
+				margin-bottom: var(--uui-size-space-6);
+			}
+
+			// Link section
+
+			#link-section {
+				display: flex;
+				flex-direction: column;
+				text-align: left;
+			}
+
+			.link-item {
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				display: grid;
+				grid-template-columns: 75px 1fr;
+				color: inherit;
+				text-decoration: none;
+			}
+
+			.link-language {
+				color: var(--uui-color-divider-emphasis);
+			}
+
+			.link-content.italic {
+				font-style: italic;
+			}
+
+			.link-item uui-icon {
+				margin-right: var(--uui-size-space-2);
+				vertical-align: middle;
+			}
+
+			.link-item.with-href {
+				cursor: pointer;
+			}
+
+			.link-item.with-href:hover {
+				background: var(--uui-color-divider);
+			}
+
+			//History section
+
+			uui-tag uui-icon {
+				margin-right: var(--uui-size-space-1);
+			}
+
+			.log-type {
+				display: flex;
+				gap: var(--uui-size-space-2);
+			}
+			uui-pagination {
+				display: inline-block;
+			}
+			.pagination {
+				display: flex;
+				justify-content: center;
+				margin-top: var(--uui-size-space-4);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentInfoWorkspaceViewElement;

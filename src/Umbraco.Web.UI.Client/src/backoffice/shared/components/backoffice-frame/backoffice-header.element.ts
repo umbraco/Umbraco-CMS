@@ -8,6 +8,21 @@ import './backoffice-header-apps.element';
 
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeaderElement extends LitElement {
+	
+
+	render() {
+		return html`
+			<div id="appHeader">
+				<uui-button id="logo" look="primary" label="Umbraco" compact>
+					<img src="${logoImg}" alt="Umbraco" />
+				</uui-button>
+
+				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>
+				<umb-backoffice-header-apps></umb-backoffice-header-apps>
+			</div>
+		`;
+	}
+	
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -40,19 +55,6 @@ export class UmbBackofficeHeaderElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html`
-			<div id="appHeader">
-				<uui-button id="logo" look="primary" label="Umbraco" compact>
-					<img src="${logoImg}" alt="Umbraco" />
-				</uui-button>
-
-				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>
-				<umb-backoffice-header-apps></umb-backoffice-header-apps>
-			</div>
-		`;
-	}
 }
 
 declare global {

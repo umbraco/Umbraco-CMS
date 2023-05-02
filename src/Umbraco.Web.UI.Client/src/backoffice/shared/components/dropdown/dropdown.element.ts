@@ -6,26 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
 export class UmbDropdownElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#container {
-				display: inline-block;
-			}
-
-			#dropdown {
-				overflow: hidden;
-				z-index: -1;
-				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-			}
-		`,
-	];
+	
 
 	@property({ type: Boolean, reflect: true })
 	open = false;
@@ -46,6 +27,27 @@ export class UmbDropdownElement extends UmbLitElement {
 			</div>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#container {
+				display: inline-block;
+			}
+
+			#dropdown {
+				overflow: hidden;
+				z-index: -1;
+				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+			}
+		`,
+	];
 }
 
 declare global {

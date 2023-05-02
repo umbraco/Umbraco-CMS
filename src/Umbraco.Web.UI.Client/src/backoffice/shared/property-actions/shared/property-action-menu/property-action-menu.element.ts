@@ -12,37 +12,6 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			#popover {
-				width: auto;
-			}
-
-			#more-symbol {
-				font-size: 0.6em;
-			}
-
-			#popover-trigger {
-				--uui-button-padding-top-factor: 0.5;
-				--uui-button-padding-bottom-factor: 0.1;
-				--uui-button-height: 18px;
-				--uui-button-border-radius: 6px;
-			}
-
-			#dropdown {
-				background-color: var(--uui-color-surface);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-				min-width: 200px;
-				color: var(--uui-color-text);
-			}
-		`,
-	];
-
 	// TODO: we need to investigate context api vs values props and events
 	@property()
 	public value?: string;
@@ -77,6 +46,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	private _observeActions(alias: string) {
 		this._actionsObserver?.destroy();
+		// TODO: Align property actions with entity actions.
 		this._actionsObserver = this.observe(
 			umbExtensionsRegistry.extensionsOfType('propertyAction').pipe(
 				map((propertyActions) => {
@@ -123,4 +93,35 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			  `
 			: '';
 	}
+
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			#popover {
+				width: auto;
+			}
+
+			#more-symbol {
+				font-size: 0.6em;
+			}
+
+			#popover-trigger {
+				--uui-button-padding-top-factor: 0.5;
+				--uui-button-padding-bottom-factor: 0.1;
+				--uui-button-height: 18px;
+				--uui-button-border-radius: 6px;
+			}
+
+			#dropdown {
+				background-color: var(--uui-color-surface);
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+				min-width: 200px;
+				color: var(--uui-color-text);
+			}
+		`,
+	];
 }

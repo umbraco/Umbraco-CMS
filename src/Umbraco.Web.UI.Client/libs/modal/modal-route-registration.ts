@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
 import { UmbModalHandler } from './modal-handler';
 import { UmbModalConfig, UmbModalContext } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Params } from '@umbraco-cms/backoffice/router';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) => string;
@@ -26,7 +26,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		path: string,
 		modalConfig?: UmbModalConfig
 	) {
-		this.#key = modalConfig?.key || uuidv4();
+		this.#key = modalConfig?.key || UmbId.new();
 		this.#modalAlias = modalAlias;
 		this.#path = path;
 		this.#modalConfig = { ...modalConfig, key: this.#key };

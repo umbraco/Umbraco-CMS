@@ -13,129 +13,6 @@ import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/ba
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#name-input {
-				width: 100%;
-				height: 100%; /** I really don't know why this fixes the border colliding with variant-selector-toggle, but lets this solution for now */
-			}
-
-			#variant-selector-toggle {
-				white-space: nowrap;
-			}
-
-			#variant-selector-popover {
-				display: block;
-			}
-
-			#variant-selector-dropdown {
-				overflow: hidden;
-				z-index: -1;
-				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-			}
-
-			#variant-close {
-				white-space: nowrap;
-			}
-
-			ul {
-				list-style-type: none;
-				padding: 0;
-				margin: 0;
-			}
-
-			li {
-				position: relative;
-				margin-bottom: 1px;
-			}
-
-			li:nth-last-of-type(1) {
-				margin-bottom: 0;
-			}
-
-			li.selected:before {
-				background-color: var(--uui-color-current);
-				border-radius: 0 4px 4px 0;
-				bottom: 8px;
-				content: '';
-				left: 0;
-				pointer-events: none;
-				position: absolute;
-				top: 8px;
-				width: 4px;
-				z-index: 1;
-			}
-
-			.variant-selector-switch-button {
-				display: flex;
-				align-items: center;
-				border: none;
-				background: transparent;
-				color: var(--uui-color-current-contrast);
-				padding: 6px 20px;
-				font-weight: bold;
-				width: 100%;
-				text-align: left;
-				font-size: 14px;
-				cursor: pointer;
-				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
-			}
-
-			.variant-selector-switch-button:hover {
-				background: var(--uui-palette-sand);
-				color: var(--uui-palette-space-cadet-light);
-			}
-
-			.variant-selector-switch-button i {
-				font-weight: normal;
-			}
-
-			.variant-selector-switch-button.add-mode {
-				position: relative;
-				color: var(--uui-palette-dusty-grey-dark);
-			}
-
-			.variant-selector-switch-button.add-mode:after {
-				border: 2px dashed var(--uui-color-divider-standalone);
-				bottom: 0;
-				content: '';
-				left: 0;
-				margin: 2px;
-				pointer-events: none;
-				position: absolute;
-				right: 0;
-				top: 0;
-				z-index: 1;
-			}
-
-			.add-icon {
-				font-size: 12px;
-				margin-right: 12px;
-			}
-
-			.variant-selector-split-view {
-				position: absolute;
-				top: 0;
-				right: 0;
-				bottom: 1px;
-			}
-
-			.variant-selector-state {
-				color: var(--uui-palette-malibu-dimmed);
-				font-size: 12px;
-				font-weight: normal;
-			}
-		`,
-	];
-
 	// TODO: not jet used:
 	@property()
 	alias!: string;
@@ -368,6 +245,129 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		</div>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#name-input {
+				width: 100%;
+				height: 100%; /** I really don't know why this fixes the border colliding with variant-selector-toggle, but lets this solution for now */
+			}
+
+			#variant-selector-toggle {
+				white-space: nowrap;
+			}
+
+			#variant-selector-popover {
+				display: block;
+			}
+
+			#variant-selector-dropdown {
+				overflow: hidden;
+				z-index: -1;
+				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+			}
+
+			#variant-close {
+				white-space: nowrap;
+			}
+
+			ul {
+				list-style-type: none;
+				padding: 0;
+				margin: 0;
+			}
+
+			li {
+				position: relative;
+				margin-bottom: 1px;
+			}
+
+			li:nth-last-of-type(1) {
+				margin-bottom: 0;
+			}
+
+			li.selected:before {
+				background-color: var(--uui-color-current);
+				border-radius: 0 4px 4px 0;
+				bottom: 8px;
+				content: '';
+				left: 0;
+				pointer-events: none;
+				position: absolute;
+				top: 8px;
+				width: 4px;
+				z-index: 1;
+			}
+
+			.variant-selector-switch-button {
+				display: flex;
+				align-items: center;
+				border: none;
+				background: transparent;
+				color: var(--uui-color-current-contrast);
+				padding: 6px 20px;
+				font-weight: bold;
+				width: 100%;
+				text-align: left;
+				font-size: 14px;
+				cursor: pointer;
+				border-bottom: 1px solid var(--uui-color-divider-standalone);
+				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+			}
+
+			.variant-selector-switch-button:hover {
+				background: var(--uui-palette-sand);
+				color: var(--uui-palette-space-cadet-light);
+			}
+
+			.variant-selector-switch-button i {
+				font-weight: normal;
+			}
+
+			.variant-selector-switch-button.add-mode {
+				position: relative;
+				color: var(--uui-palette-dusty-grey-dark);
+			}
+
+			.variant-selector-switch-button.add-mode:after {
+				border: 2px dashed var(--uui-color-divider-standalone);
+				bottom: 0;
+				content: '';
+				left: 0;
+				margin: 2px;
+				pointer-events: none;
+				position: absolute;
+				right: 0;
+				top: 0;
+				z-index: 1;
+			}
+
+			.add-icon {
+				font-size: 12px;
+				margin-right: 12px;
+			}
+
+			.variant-selector-split-view {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 1px;
+			}
+
+			.variant-selector-state {
+				color: var(--uui-palette-malibu-dimmed);
+				font-size: 12px;
+				font-weight: normal;
+			}
+		`,
+	];
 }
 
 export default UmbVariantSelectorElement;

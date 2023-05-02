@@ -5,7 +5,7 @@ import { UmbVariantId } from '../../../shared/variants/variant-id.class';
 import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
@@ -21,7 +21,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	_unique?: string;
 
 	@state()
-	_routes?: Array<IRoute>;
+	_routes?: Array<UmbRoute>;
 
 	@state()
 	_availableVariants: Array<VariantModelBaseModel> = [];
@@ -67,7 +67,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		if (!this._availableVariants || this._availableVariants.length === 0) return;
 
 		// Generate split view routes for all available routes
-		const routes: Array<IRoute> = [];
+		const routes: Array<UmbRoute> = [];
 
 		// Split view routes:
 		this._availableVariants.forEach((variantA) => {

@@ -5,6 +5,24 @@ import loginImg from '/login.jpeg';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
+	
+
+	render() {
+		return html`
+			<div id="background"></div>
+
+			<div id="logo">
+				<img src="${logoImg}" alt="Umbraco" />
+			</div>
+
+			<div id="container">
+				<uui-box id="box">
+					<slot></slot>
+				</uui-box>
+			</div>
+		`;
+	}
+	
 	static styles: CSSResultGroup = [
 		css`
 			#background {
@@ -49,22 +67,6 @@ export class UmbAuthLayoutElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html`
-			<div id="background"></div>
-
-			<div id="logo">
-				<img src="${logoImg}" alt="Umbraco" />
-			</div>
-
-			<div id="container">
-				<uui-box id="box">
-					<slot></slot>
-				</uui-box>
-			</div>
-		`;
-	}
 }
 
 declare global {

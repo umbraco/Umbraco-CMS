@@ -4,40 +4,29 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
-import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extensions-registry';
+import type {
+	ManifestSection,
+	ManifestSectionSidebarApp,
+	UmbSectionExtensionElement,
+} from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './section-sidebar-menu/section-sidebar-menu.element';
 
 /**
  * @export
- * @class UmbSectionElement
+ * @class UmbBaseSectionElement
  * @description - Element hosting sections and section navigation.
  */
-@customElement('umb-section')
-export class UmbSectionElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				flex: 1 1 auto;
-				height: 100%;
-				display: flex;
-			}
-
-			h3 {
-				padding: var(--uui-size-4) var(--uui-size-8);
-			}
-		`,
-	];
-
+@customElement('umb-section-default')
+export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectionExtensionElement {
 	@property()
 	public manifest?: ManifestSection;
 
 	@state()
-	private _routes?: Array<IRoute>;
+	private _routes?: Array<UmbRoute>;
 
 	@state()
 	private _menus?: Array<Omit<ManifestSectionSidebarApp, 'kind'>>;
@@ -49,8 +38,6 @@ export class UmbSectionElement extends UmbLitElement {
 	}
 
 	#createRoutes() {
-		this._routes = [];
-
 		this._routes = [
 			{
 				path: 'workspace/:entityType',
@@ -106,10 +93,25 @@ export class UmbSectionElement extends UmbLitElement {
 			</umb-section-main>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				flex: 1 1 auto;
+				height: 100%;
+				display: flex;
+			}
+
+			h3 {
+				padding: var(--uui-size-4) var(--uui-size-8);
+			}
+		`,
+	];
 }
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-section': UmbSectionElement;
+		'umb-section-default': UmbSectionDefaultElement;
 	}
 }

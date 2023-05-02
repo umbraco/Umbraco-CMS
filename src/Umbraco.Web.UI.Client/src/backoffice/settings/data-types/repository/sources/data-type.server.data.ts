@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DataTypeResource,
@@ -17,7 +17,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDataTypeServerDataSource
-	implements UmbDataSource<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>
+	implements UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>
 {
 	#host: UmbControllerHostElement;
 
@@ -54,8 +54,12 @@ export class UmbDataTypeServerDataSource
 	 */
 	async createScaffold(parentId?: string | null) {
 		const data: CreateDataTypeRequestModel = {
-			id: uuidv4(),
+			id: UmbId.new(),
 			parentId,
+			name: '',
+			propertyEditorAlias: undefined,
+			propertyEditorUiAlias: null,
+			values: [],
 		};
 
 		return { data };

@@ -7,6 +7,45 @@ import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registr
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalElementPickerBase<ManifestSection> {
+
+
+	@state()
+	private _sections: Array<ManifestSection> = [];
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections: Array<ManifestSection>) => {
+			this._sections = sections;
+		});
+	}
+
+	render() {
+		return html`
+			<umb-workspace-editor headline="Select sections">
+				<uui-box>
+					<uui-input label="search"></uui-input>
+					<hr />
+					<div id="item-list">
+						${this._sections.map(
+							(item) => html`
+								<div
+									@click=${() => this.handleSelection(item.alias)}
+									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.alias)}
+									class=${this.isSelected(item.alias) ? 'item selected' : 'item'}>
+									<span>${item.meta.label}</span>
+								</div>
+							`
+						)}
+					</div>
+				</uui-box>
+				<div slot="actions">
+					<uui-button label="Close" @click=${this.close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
+				</div>
+			</umb-workspace-editor>
+		`;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -52,43 +91,6 @@ export class UmbSectionPickerModalElement extends UmbModalElementPickerBase<Mani
 			}
 		`,
 	];
-
-	@state()
-	private _sections: Array<ManifestSection> = [];
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		umbExtensionsRegistry.extensionsOfType('section').subscribe((sections: Array<ManifestSection>) => {
-			this._sections = sections;
-		});
-	}
-
-	render() {
-		return html`
-			<umb-workspace-layout headline="Select sections">
-				<uui-box>
-					<uui-input label="search"></uui-input>
-					<hr />
-					<div id="item-list">
-						${this._sections.map(
-							(item) => html`
-								<div
-									@click=${() => this.handleSelection(item.alias)}
-									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.alias)}
-									class=${this.isSelected(item.alias) ? 'item selected' : 'item'}>
-									<span>${item.meta.label}</span>
-								</div>
-							`
-						)}
-					</div>
-				</uui-box>
-				<div slot="actions">
-					<uui-button label="Close" @click=${this.close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
-				</div>
-			</umb-workspace-layout>
-		`;
-	}
 }
 
 export default UmbSectionPickerModalElement;

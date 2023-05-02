@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 import './relation-type-workspace-edit.element';
 
@@ -14,8 +14,6 @@ import './relation-type-workspace-edit.element';
  */
 @customElement('umb-relation-type-workspace')
 export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
-
 	#workspaceContext = new UmbRelationTypeWorkspaceContext(this);
 
 	#routerPath? = '';
@@ -24,7 +22,7 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 	#key = '';
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
 			component: () => this.#element,
@@ -50,6 +48,8 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 				this.#routerPath = event.target.absoluteRouterPath;
 			}}></umb-router-slot>`;
 	}
+
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbRelationTypeWorkspaceElement;

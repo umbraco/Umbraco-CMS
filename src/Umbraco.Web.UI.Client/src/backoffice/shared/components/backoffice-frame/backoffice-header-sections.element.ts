@@ -9,31 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			#tabs {
-				color: var(--uui-color-header-contrast);
-				height: 60px;
-				font-size: 16px;
-				--uui-tab-text: var(--uui-color-header-contrast);
-				--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
-				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
-				--uui-tab-background: var(--uui-color-header-background);
-			}
-
-			#dropdown {
-				background-color: white;
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-				min-width: 200px;
-				color: black; /* Change to variable */
-			}
-		`,
-	];
+	
 
 	@state()
 	private _open = false;
@@ -81,7 +57,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _observeSections() {
 		if (!this._backofficeContext) return;
 
-		this.observe(this._backofficeContext.getAllowedSections(), (allowedSections) => {
+		this.observe(this._backofficeContext.allowedSections, (allowedSections) => {
 			this._sections = allowedSections;
 			this._visibleSections = this._sections;
 		});
@@ -141,6 +117,32 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	render() {
 		return html` ${this._renderSections()} `;
 	}
+	
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			#tabs {
+				color: var(--uui-color-header-contrast);
+				height: 60px;
+				font-size: 16px;
+				--uui-tab-text: var(--uui-color-header-contrast);
+				--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
+				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
+				--uui-tab-background: var(--uui-color-header-background);
+			}
+
+			#dropdown {
+				background-color: white;
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+				min-width: 200px;
+				color: black; /* Change to variable */
+			}
+		`,
+	];
 }
 
 declare global {

@@ -7,6 +7,54 @@ import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<UserGroupDetails> {
+
+
+	@state()
+	private _userGroups: Array<UserGroupDetails> = [];
+
+	private _userGroupStore?: UmbUserGroupStore;
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
+			this._userGroupStore = userGroupStore;
+			this._observeUserGroups();
+		});
+	}
+
+	private _observeUserGroups() {
+		if (!this._userGroupStore) return;
+		this.observe(this._userGroupStore.getAll(), (userGroups) => (this._userGroups = userGroups));
+	}
+
+	render() {
+		return html`
+			<umb-workspace-editor headline="Select user groups">
+				<uui-box>
+					<uui-input label="search"></uui-input>
+					<hr />
+					<div id="item-list">
+						${this._userGroups.map(
+							(item) => html`
+								<div
+									@click=${() => this.handleSelection(item.id)}
+									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
+									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
+									<uui-icon .name=${item.icon}></uui-icon>
+									<span>${item.name}</span>
+								</div>
+							`
+						)}
+					</div>
+				</uui-box>
+				<div slot="actions">
+					<uui-button label="Close" @click=${this.close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
+				</div>
+			</umb-workspace-editor>
+		`;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -52,52 +100,6 @@ export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<Us
 			}
 		`,
 	];
-
-	@state()
-	private _userGroups: Array<UserGroupDetails> = [];
-
-	private _userGroupStore?: UmbUserGroupStore;
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
-			this._userGroupStore = userGroupStore;
-			this._observeUserGroups();
-		});
-	}
-
-	private _observeUserGroups() {
-		if (!this._userGroupStore) return;
-		this.observe(this._userGroupStore.getAll(), (userGroups) => (this._userGroups = userGroups));
-	}
-
-	render() {
-		return html`
-			<umb-workspace-layout headline="Select user groups">
-				<uui-box>
-					<uui-input label="search"></uui-input>
-					<hr />
-					<div id="item-list">
-						${this._userGroups.map(
-							(item) => html`
-								<div
-									@click=${() => this.handleSelection(item.id)}
-									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
-									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
-									<uui-icon .name=${item.icon}></uui-icon>
-									<span>${item.name}</span>
-								</div>
-							`
-						)}
-					</div>
-				</uui-box>
-				<div slot="actions">
-					<uui-button label="Close" @click=${this.close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
-				</div>
-			</umb-workspace-layout>
-		`;
-	}
 }
 
 export default UmbUserGroupPickerModalElement;

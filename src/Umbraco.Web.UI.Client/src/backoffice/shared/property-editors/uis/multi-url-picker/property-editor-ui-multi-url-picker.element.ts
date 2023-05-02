@@ -5,7 +5,7 @@ import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { UmbInputMultiUrlPickerElement } from '../../../../shared/components/input-multi-url-picker/input-multi-url-picker.element';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../../shared/components/workspace-property/workspace-property.context';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -13,8 +13,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-property-editor-ui-multi-url-picker
  */
 @customElement('umb-property-editor-ui-multi-url-picker')
-export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	@property({ type: Array })
 	value: UmbLinkPickerLink[] = [];
@@ -87,6 +87,8 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 			.min=${this._minNumber}
 			.urls="${this.value}"></umb-input-multi-url-picker>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUIMultiUrlPickerElement;

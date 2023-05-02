@@ -7,51 +7,23 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestWorkspaceView, ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
+import {
+	ManifestWorkspaceEditorView,
+	ManifestWorkspaceViewCollection,
+} from '@umbraco-cms/backoffice/extensions-registry';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-
-				--umb-log-viewer-debug-color: var(--uui-color-default-emphasis);
-				--umb-log-viewer-information-color: var(--uui-color-positive);
-				--umb-log-viewer-warning-color: var(--uui-color-warning);
-				--umb-log-viewer-error-color: var(--uui-color-danger);
-				--umb-log-viewer-fatal-color: var(--uui-palette-black);
-				--umb-log-viewer-verbose-color: var(--uui-color-current);
-			}
-
-			#header {
-				display: flex;
-				padding: 0 var(--uui-size-space-6);
-				gap: var(--uui-size-space-4);
-				align-items: center;
-			}
-
-			uui-tab-group {
-				--uui-tab-divider: var(--uui-color-border);
-				border-left: 1px solid var(--uui-color-border);
-				border-right: 1px solid var(--uui-color-border);
-			}
-		`,
-	];
-
 	private _alias = 'Umb.Workspace.LogviewerRoot';
 
 	@state()
-	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
+	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
-	private _routes: IRoute[] = [];
+	private _routes: UmbRoute[] = [];
 
 	@state()
 	private _activePath?: string;
@@ -91,7 +63,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	private _observeWorkspaceViews() {
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfTypes<ManifestWorkspaceView>(['workspaceView'])
+				.extensionsOfTypes<ManifestWorkspaceEditorView>(['workspaceEditorView'])
 				.pipe(
 					map((extensions) => extensions.filter((extension) => extension.conditions.workspaces.includes(this._alias)))
 				),
@@ -182,6 +154,37 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+
+				--umb-log-viewer-debug-color: var(--uui-color-default-emphasis);
+				--umb-log-viewer-information-color: var(--uui-color-positive);
+				--umb-log-viewer-warning-color: var(--uui-color-warning);
+				--umb-log-viewer-error-color: var(--uui-color-danger);
+				--umb-log-viewer-fatal-color: var(--uui-palette-black);
+				--umb-log-viewer-verbose-color: var(--uui-color-current);
+			}
+
+			#header {
+				display: flex;
+				padding: 0 var(--uui-size-space-6);
+				gap: var(--uui-size-space-4);
+				align-items: center;
+			}
+
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
+		`,
+	];
 }
 
 export default UmbLogViewerWorkspaceElement;

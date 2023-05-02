@@ -13,45 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-health-check-group-box-overview')
 export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			.group-box {
-				position: relative;
-			}
-
-			.group-box:hover::after {
-				content: '';
-				width: 100%;
-				height: 100%;
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				border-radius: var(--uui-border-radius);
-				transition: opacity 100ms ease-out 0s;
-				opacity: 0.33;
-				outline-color: var(--uui-color-selected);
-				outline-width: 4px;
-				outline-style: solid;
-			}
-
-			a {
-				text-align: center;
-				font-weight: bold;
-				cursor: pointer;
-				text-decoration: none;
-				color: var(--uui-color-text);
-				margin-bottom: var(--uui-size-space-3);
-				display: block;
-			}
-
-			uui-icon {
-				padding-right: var(--uui-size-space-2);
-			}
-		`,
-	];
+	
 
 	@property({ type: Object })
 	manifest?: ManifestHealthCheck;
@@ -152,6 +114,46 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 		});
 		return tags;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			.group-box {
+				position: relative;
+			}
+
+			.group-box:hover::after {
+				content: '';
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: var(--uui-border-radius);
+				transition: opacity 100ms ease-out 0s;
+				opacity: 0.33;
+				outline-color: var(--uui-color-selected);
+				outline-width: 4px;
+				outline-style: solid;
+			}
+
+			a {
+				text-align: center;
+				font-weight: bold;
+				cursor: pointer;
+				text-decoration: none;
+				color: var(--uui-color-text);
+				margin-bottom: var(--uui-size-space-3);
+				display: block;
+			}
+
+			uui-icon {
+				padding-right: var(--uui-size-space-2);
+			}
+		`,
+	];
 }
 
 export default UmbHealthCheckGroupBoxOverviewElement;

@@ -11,33 +11,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-				margin: var(--uui-size-layout-1);
-			}
-
-			#dictionary-top-bar {
-				margin-bottom: var(--uui-size-space-5);
-				display: flex;
-				justify-content: space-between;
-			}
-
-			umb-table {
-				display: inline;
-				padding: 0;
-			}
-
-			umb-empty-state {
-				margin: auto;
-				font-size: var(--uui-size-6);
-			}
-		`,
-	];
+	
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -192,6 +166,34 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 				() => html`<umb-empty-state>There were no dictionary items found.</umb-empty-state>`
 			)}`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				margin: var(--uui-size-layout-1);
+			}
+
+			#dictionary-top-bar {
+				margin-bottom: var(--uui-size-space-5);
+				display: flex;
+				justify-content: space-between;
+			}
+
+			umb-table {
+				display: inline;
+				padding: 0;
+			}
+
+			umb-empty-state {
+				margin: auto;
+				font-size: var(--uui-size-6);
+			}
+		`,
+	];
 }
 
 export default UmbDashboardTranslationDictionaryElement;

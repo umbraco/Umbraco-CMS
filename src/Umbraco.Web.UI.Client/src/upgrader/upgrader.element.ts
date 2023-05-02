@@ -3,7 +3,7 @@ import './upgrader-view.element';
 
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UpgradeResource, UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UpgradeResource, UpgradeSettingsResponseModel, ApiError } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -48,7 +48,7 @@ export class UmbUpgraderElement extends UmbLitElement {
 		if (data) {
 			this.upgradeSettings = data;
 		} else if (error) {
-			this.errorMessage = error.detail;
+			this.errorMessage = error instanceof ApiError ? error.body.detail : error.message;
 		}
 
 		this.fetching = false;
@@ -62,7 +62,8 @@ export class UmbUpgraderElement extends UmbLitElement {
 		const { error } = await tryExecute(UpgradeResource.postUpgradeAuthorize());
 
 		if (error) {
-			this.errorMessage = error.detail || 'Unknown error, please try again';
+			this.errorMessage =
+				error instanceof ApiError ? error.body.detail : error.message ?? 'Unknown error, please try again';
 		} else {
 			history.pushState(null, '', 'section/content');
 		}

@@ -12,7 +12,7 @@ import type { SwatchDetails } from '@umbraco-cms/backoffice/models';
  */
 @customElement('umb-input-color-picker')
 export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) {
-	static styles = [UUITextStyles];
+	
 
 	@property({ type: Boolean })
 	showLabels = false;
@@ -48,6 +48,8 @@ export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) 
 				.showLabel=${this.showLabels}></uui-color-swatch>`;
 		})}`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbInputColorPickerElement;

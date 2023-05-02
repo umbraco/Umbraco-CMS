@@ -2,21 +2,19 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './data-type-workspace-edit.element';
 
 @customElement('umb-data-type-workspace')
 export class UmbDataTypeWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
-
 	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
 
 	#element = document.createElement('umb-data-type-workspace-edit-element');
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
 			component: () => this.#element,
@@ -38,6 +36,8 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
+
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbDataTypeWorkspaceElement;

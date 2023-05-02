@@ -1,108 +1,101 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbUserStore, UMB_USER_STORE_CONTEXT_TOKEN } from '../../repository/user.store';
-import { UmbModalElementPickerBase } from '@umbraco-cms/internal/modal';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { customElement, property, state } from 'lit/decorators.js';
+import { UmbUserRepository } from '../../repository/user.repository';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalHandler, UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-picker-modal')
-export class UmbUserPickerModalElement extends UmbModalElementPickerBase<UserDetails> {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-input {
-				width: 100%;
-			}
+export class UmbUserPickerModalElement extends UmbLitElement {
+	@property({ attribute: false })
+	modalHandler?: UmbModalHandler<UmbUserPickerModalData, UmbUserPickerModalResult>;
 
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				margin: 16px 0;
-			}
-			#item-list {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-1);
-				font-size: 1rem;
-			}
-			.item {
-				color: var(--uui-color-interactive);
-				display: flex;
-				align-items: center;
-				padding: var(--uui-size-2);
-				gap: var(--uui-size-space-5);
-				cursor: pointer;
-				position: relative;
-				border-radius: var(--uui-border-radius);
-			}
-			.item.selected {
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-			}
-			.item:not(.selected):hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-			}
-			.item.selected:hover {
-				background-color: var(--uui-color-selected-emphasis);
-			}
-			.item:hover uui-avatar {
-				border-color: var(--uui-color-surface-emphasis);
-			}
-			.item.selected uui-avatar {
-				border-color: var(--uui-color-selected-contrast);
-			}
-			uui-avatar {
-				border: 2px solid var(--uui-color-surface);
-			}
-		`,
-	];
+	@property({ type: Object, attribute: false })
+	data?: UmbUserPickerModalData;
 
 	@state()
-	private _users: Array<UserDetails> = [];
+	_selection: Array<string> = [];
 
-	private _userStore?: UmbUserStore;
+	@state()
+	_multiple = false;
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.consumeContext(UMB_USER_STORE_CONTEXT_TOKEN, (userStore) => {
-			this._userStore = userStore;
-			this._observeUsers();
-		});
+	@state()
+	private _users: Array<UserResponseModel> = [];
+
+	#userRepository?: UmbUserRepository;
+
+	constructor() {
+		super();
+
+		// TODO: this code is reused in multiple places, so it should be extracted to a function
+		new UmbObserverController(
+			this,
+			umbExtensionsRegistry.getByTypeAndAlias('repository', 'Umb.Repository.User'),
+			async (repositoryManifest) => {
+				if (!repositoryManifest) return;
+
+				try {
+					const result = await createExtensionClass<UmbUserRepository>(repositoryManifest, [this]);
+					this.#userRepository = result;
+					this.#observeUsers();
+				} catch (error) {
+					throw new Error('Could not create repository with alias: Umb.Repository.User');
+				}
+			}
+		);
 	}
 
-	private _observeUsers() {
-		if (!this._userStore) return;
-		this.observe(this._userStore.getAll(), (users) => (this._users = users));
+	async #observeUsers() {
+		if (!this.#userRepository) return;
+		// TODO is this the correct end point?
+		const { data } = await this.#userRepository.requestCollection();
+
+		if (data) {
+			this._users = data.items;
+		}
+	}
+
+	#submit() {
+		this.modalHandler?.submit({ selection: this._selection });
+	}
+
+	#close() {
+		this.modalHandler?.reject();
 	}
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Select users">
+			<umb-body-layout headline="Select Users">
 				<uui-box>
-					<uui-input label="search"></uui-input>
-					<hr />
-					<div id="item-list">
-						${this._users.map(
-							(item) => html`
-								<div
-									@click=${() => this.handleSelection(item.id)}
-									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
-									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
-									<uui-avatar .name=${item.name}></uui-avatar>
-									<span>${item.name}</span>
-								</div>
-							`
-						)}
-					</div>
+					${this._users.map(
+						(user) => html`
+							<uui-menu-item label=${user.name} selectable>
+								<uui-avatar slot="icon" name=${user.name}></uui-avatar>
+								Hello</uui-menu-item
+							>
+						`
+					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
+					<uui-button label="Close" @click=${this.#close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-avatar {
+				border: 2px solid var(--uui-color-surface);
+				font-size: 12px;
+			}
+		`,
+	];
 }
 
 export default UmbUserPickerModalElement;

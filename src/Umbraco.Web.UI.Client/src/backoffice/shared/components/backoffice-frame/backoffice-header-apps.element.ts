@@ -4,6 +4,12 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-backoffice-header-apps')
 export class UmbBackofficeHeaderAppsElement extends LitElement {
+	
+
+	render() {
+		return html` <umb-extension-slot id="apps" type="headerApp"></umb-extension-slot> `;
+	}
+	
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
@@ -14,10 +20,6 @@ export class UmbBackofficeHeaderAppsElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html` <umb-extension-slot id="apps" type="headerApp"></umb-extension-slot> `;
-	}
 }
 
 declare global {

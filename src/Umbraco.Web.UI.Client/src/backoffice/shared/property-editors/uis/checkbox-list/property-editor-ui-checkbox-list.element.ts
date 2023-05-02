@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element';
-import { UmbPropertyEditorElement } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -10,8 +10,8 @@ import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/
  * @element umb-property-editor-ui-checkbox-list
  */
 @customElement('umb-property-editor-ui-checkbox-list')
-export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorElement {
-	static styles = [UUITextStyles];
+export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+
 
 	#value: Array<string> = [];
 	@property({ type: Array })
@@ -57,6 +57,8 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 			.selectedIds="${this.#value}"
 			.list="${this._list}"></umb-input-checkbox-list>`;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbPropertyEditorUICheckboxListElement;

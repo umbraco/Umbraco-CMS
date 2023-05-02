@@ -12,49 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#polling-interval-menu {
-				margin: 0;
-				padding: 0;
-				width: 20ch;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				display: flex;
-				flex-direction: column;
-				transform: translateX(calc((100% - 33px) * -1));
-			}
-
-			#polling-enabled-icon {
-				margin-right: var(--uui-size-space-3);
-				margin-bottom: 1px;
-				-webkit-animation: rotate-center 0.8s ease-in-out infinite both;
-				animation: rotate-center 0.8s ease-in-out infinite both;
-			}
-
-			@-webkit-keyframes rotate-center {
-				0% {
-					-webkit-transform: rotate(0);
-					transform: rotate(0);
-				}
-				100% {
-					-webkit-transform: rotate(360deg);
-					transform: rotate(360deg);
-				}
-			}
-			@keyframes rotate-center {
-				0% {
-					-webkit-transform: rotate(0);
-					transform: rotate(0);
-				}
-				100% {
-					-webkit-transform: rotate(360deg);
-					transform: rotate(360deg);
-				}
-			}
-		`,
-	];
+	
 
 	@query('#polling-popover')
 	private _pollingPopover!: UUIPopoverElement;
@@ -131,6 +89,50 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 			</uui-popover>
 		</uui-button-group>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#polling-interval-menu {
+				margin: 0;
+				padding: 0;
+				width: 20ch;
+				background-color: var(--uui-color-surface);
+				box-shadow: var(--uui-shadow-depth-3);
+				display: flex;
+				flex-direction: column;
+				transform: translateX(calc((100% - 33px) * -1));
+			}
+
+			#polling-enabled-icon {
+				margin-right: var(--uui-size-space-3);
+				margin-bottom: 1px;
+				-webkit-animation: rotate-center 0.8s ease-in-out infinite both;
+				animation: rotate-center 0.8s ease-in-out infinite both;
+			}
+
+			@-webkit-keyframes rotate-center {
+				0% {
+					-webkit-transform: rotate(0);
+					transform: rotate(0);
+				}
+				100% {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+			@keyframes rotate-center {
+				0% {
+					-webkit-transform: rotate(0);
+					transform: rotate(0);
+				}
+				100% {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg);
+				}
+			}
+		`,
+	];
 }
 
 declare global {

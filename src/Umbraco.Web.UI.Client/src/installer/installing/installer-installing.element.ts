@@ -3,13 +3,7 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-installer-installing')
 export class UmbInstallerInstallingElement extends LitElement {
-	static styles: CSSResultGroup = [
-		css`
-			h1 {
-				text-align: center;
-			}
-		`,
-	];
+	
 
 	render() {
 		return html` <div class="uui-text" data-test="installer-installing">
@@ -17,6 +11,14 @@ export class UmbInstallerInstallingElement extends LitElement {
 			<uui-loader-bar></uui-loader-bar>
 		</div>`;
 	}
+	
+	static styles: CSSResultGroup = [
+		css`
+			h1 {
+				text-align: center;
+			}
+		`,
+	];
 }
 
 declare global {
