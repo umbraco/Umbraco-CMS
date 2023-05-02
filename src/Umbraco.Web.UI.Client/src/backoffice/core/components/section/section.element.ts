@@ -48,7 +48,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 			},
 			{
 				path: '**',
-				component: () => import('../section/section-views/section-views.element'),
+				component: () => import('./section-views/section-views.element'),
 				setup: (element) => {
 					(element as UmbSectionViewsElement).sectionAlias = this.manifest?.alias;
 				},

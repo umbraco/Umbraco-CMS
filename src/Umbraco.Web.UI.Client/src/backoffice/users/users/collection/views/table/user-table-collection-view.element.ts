@@ -9,7 +9,7 @@ import {
 	UmbTableSelectedEvent,
 	UmbTableConfig,
 	UmbTableOrderedEvent,
-} from '../../../../../shared/components/table/table.element';
+} from '../../../../../core/components/table/table.element';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,

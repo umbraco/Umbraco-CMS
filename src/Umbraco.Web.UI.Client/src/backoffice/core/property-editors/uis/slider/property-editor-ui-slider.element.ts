@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import UmbInputSliderElement from '../../../../shared/components/input-slider/input-slider.element';
+import UmbInputSliderElement from '../../../components/input-slider/input-slider.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,8 +11,6 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
  */
 @customElement('umb-property-editor-ui-slider')
 export class UmbPropertyEditorUISliderElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	@property()
 	value: {
 		to?: number;

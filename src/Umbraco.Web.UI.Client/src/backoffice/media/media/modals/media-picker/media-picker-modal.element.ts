@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
+import { UmbTreeElement } from '../../../../core/components/tree/tree.element';
 import { UmbMediaPickerModalData, UmbMediaPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
