@@ -21,6 +21,8 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 	public modalContext?: UmbModalContext;
 
+	public pickableFilter?: (item: ItemType) => boolean = () => true;
+
 	#selection = new UmbArrayState<string>([]);
 	selection = this.#selection.asObservable();
 
@@ -76,12 +78,13 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	}
 
 	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
-	openPicker(pickerData?: UmbPickerModalData<ItemType>) {
+	openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
 		if (!this.modalContext) throw new Error('Modal context is not initialized');
 
 		const modalHandler = this.modalContext.open(this.modalAlias, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this.getSelection()],
+			pickableFilter: this.pickableFilter,
 			...pickerData,
 		});
 
