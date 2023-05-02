@@ -1,6 +1,5 @@
-import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
 import { UmbMemberGroupRepository } from '../repository/member-group.repository';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

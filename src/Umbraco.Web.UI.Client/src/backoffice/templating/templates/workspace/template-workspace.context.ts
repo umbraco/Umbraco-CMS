@@ -1,5 +1,5 @@
 import { UmbTemplateRepository } from '../repository/template.repository';
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
+import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';

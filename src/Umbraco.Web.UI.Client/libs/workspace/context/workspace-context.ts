@@ -1,4 +1,4 @@
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface';
 import { UmbContextProviderController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
