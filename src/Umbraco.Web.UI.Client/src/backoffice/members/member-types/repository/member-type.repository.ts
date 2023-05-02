@@ -1,3 +1,4 @@
+import type { MemberTypeDetails } from '../types';
 import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
 import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store';
@@ -6,7 +7,6 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO => use correct type when available

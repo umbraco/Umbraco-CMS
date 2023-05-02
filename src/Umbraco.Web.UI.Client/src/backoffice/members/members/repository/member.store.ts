@@ -1,8 +1,8 @@
+import type { MemberDetails } from '../types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { MemberDetails } from '@umbraco-cms/backoffice/models';
 
 /**
  * @export

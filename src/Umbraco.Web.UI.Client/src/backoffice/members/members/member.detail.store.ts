@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { umbMemberData } from '../../../core/mocks/data/member.data';
-import type { MemberDetails, MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import type { MemberDetails } from './types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -27,7 +27,7 @@ export class UmbMemberStore extends UmbStoreBase implements UmbEntityDetailStore
 	 * @return {*}  {(Observable<MemberDetails>)}
 	 * @memberof UmbMemberStore
 	 */
-	getByKey(id: string): Observable<MemberGroupDetails> {
+	getByKey(id: string): Observable<MemberDetails> {
 		// tryExecuteAndNotify(this.host, MemberResource.getMemberByKey({ id })).then(({ data }) => {
 		// 	if (data) {}
 		// 		this.#data.appendOne(data);

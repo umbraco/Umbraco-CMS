@@ -1,3 +1,4 @@
+import type { MemberGroupDetails } from '../types';
 import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } from './member-group.tree.store';
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store';
@@ -5,7 +6,6 @@ import { UmbMemberGroupTreeServerDataSource } from './sources/member-group.tree.
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

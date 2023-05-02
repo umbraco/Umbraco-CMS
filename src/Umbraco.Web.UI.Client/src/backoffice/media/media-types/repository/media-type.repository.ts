@@ -1,10 +1,10 @@
+import type { MediaTypeDetails } from '../types';
 import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store';
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
 import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

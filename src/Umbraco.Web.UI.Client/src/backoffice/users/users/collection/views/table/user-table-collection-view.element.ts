@@ -15,13 +15,13 @@ import {
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
 } from '../../../../user-groups/repository/user-group.store';
 import { UmbUserCollectionContext } from '../../user-collection.context';
+import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
-import type { UserGroupEntity } from '@umbraco-cms/backoffice/models';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './column-layouts/name/user-table-name-column-layout.element';
 import './column-layouts/status/user-table-status-column-layout.element';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-table-collection-view')
 export class UmbUserTableCollectionViewElement extends UmbLitElement {

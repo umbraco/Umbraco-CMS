@@ -6,7 +6,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/models';
+import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
 
 export class UmbStylesheetRepository
 	implements UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbTreeRootFileSystemModel>

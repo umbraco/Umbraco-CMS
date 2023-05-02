@@ -4,8 +4,8 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbUserStore } from '../../users/repository/user.store';
+import type { UserGroupDetails } from '../types';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
-import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import '../../users/components/user-input/user-input.element';

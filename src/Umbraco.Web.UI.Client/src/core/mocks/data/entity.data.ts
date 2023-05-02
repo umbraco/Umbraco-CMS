@@ -1,9 +1,8 @@
 import { UmbData } from './data';
-import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { Entity } from '@umbraco-cms/backoffice/models';
+import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
-export class UmbEntityData<T extends Entity> extends UmbData<T> {
+export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 	constructor(data: Array<T>) {
 		super(data);
 	}
@@ -17,7 +16,10 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	}
 
 	getByIds(ids: Array<string>) {
-		return this.data.filter((item) => ids.includes(item.id));
+		return this.data.filter((item) => {
+			if (!item.id) throw new Error('Item has no id');
+			ids.includes(item.id);
+		});
 	}
 
 	insert(item: T) {
@@ -44,50 +46,6 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return saveItem;
 	}
 
-	move(ids: Array<string>, destinationId: string | null) {
-		if (destinationId === undefined) throw new Error('Destination Id is missing');
-
-		if (destinationId !== null) {
-			const destinationItem = this.getById(destinationId);
-			if (!destinationItem) throw new Error(`Destination item with key ${destinationId} not found`);
-		}
-
-		const items = this.getByIds(ids);
-		const movedItems = items.map((item) => {
-			return {
-				...item,
-				parentId: destinationId,
-			};
-		});
-
-		movedItems.forEach((movedItem) => this.updateData(movedItem));
-	}
-
-	copy(ids: Array<string>, destinationId: string | null) {
-		if (destinationId === undefined) throw new Error('Destination Id is missing');
-
-		if (destinationId !== null) {
-			const destinationItem = this.getById(destinationId);
-			if (!destinationItem) throw new Error(`Destination item with key ${destinationId} not found`);
-		}
-
-		// TODO: Notice we don't add numbers to the 'copy' name.
-		const items = this.getByIds(ids);
-		const copyItems = items.map((item) => {
-			return {
-				...item,
-				name: item.name + ' Copy',
-				id: UmbId.new(),
-				parentId: destinationId,
-			};
-		});
-
-		copyItems.forEach((copyItem) => this.insert(copyItem));
-		const newIds = copyItems.map((item) => item.id);
-
-		return newIds;
-	}
-
 	trash(ids: Array<string>) {
 		const trashedItems: Array<T> = [];
 
@@ -108,12 +66,22 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 	}
 
 	delete(ids: Array<string>) {
-		const deletedKeys = this.data.filter((item) => ids.includes(item.id)).map((item) => item.id);
-		this.data = this.data.filter((item) => ids.indexOf(item.id) === -1);
+		const deletedKeys = this.data
+			.filter((item) => {
+				if (!item.id) throw new Error('Item has no id');
+				ids.includes(item.id);
+			})
+			.map((item) => item.id);
+
+		this.data = this.data.filter((item) => {
+			if (!item.id) throw new Error('Item has no id');
+			ids.indexOf(item.id) === -1;
+		});
+
 		return deletedKeys;
 	}
 
-	protected updateData(updateItem: T) {
+	updateData(updateItem: T) {
 		const itemIndex = this.data.findIndex((item) => item.id === updateItem.id);
 		const item = this.data[itemIndex];
 		if (!item) return;
