@@ -53,6 +53,7 @@ export class UmbDataTypePickerModalElement extends UmbLitElement {
 						@selected=${this.#onSelectionChange}
 						.selection=${this._selection}
 						selectable
+						.selectableFilter=${this.data?.pickableFilter}
 						?multiple=${this._multiple}></umb-tree>
 				</uui-box>
 				<div slot="actions">
