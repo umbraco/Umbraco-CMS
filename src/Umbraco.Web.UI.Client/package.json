@@ -95,7 +95,7 @@
 		"@web/dev-server-esbuild": "^0.3.3",
 		"@web/dev-server-import-maps": "^0.0.7",
 		"@web/dev-server-rollup": "^0.3.21",
-		"@web/test-runner": "^0.15.0",
+		"@web/test-runner": "^0.16.1",
 		"@web/test-runner-playwright": "^0.10.0",
 		"babel-loader": "^9.1.2",
 		"eslint": "^8.32.0",
