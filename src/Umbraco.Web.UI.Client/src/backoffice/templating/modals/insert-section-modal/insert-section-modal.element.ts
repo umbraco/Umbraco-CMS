@@ -1,20 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS } from './manifests';
+import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import {
-	UMB_MODAL_CONTEXT_TOKEN,
-	UmbModalContext,
-	UmbModalToken,
-	UMB_PARTIAL_VIEW_PICKER_MODAL,
-	UmbModalHandler,
-	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UmbDictionaryItemPickerModalResult,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export const UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL = new UmbModalToken(
-	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS,
+import './insert-section-input.element';
+
+export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
+	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
 	{
 		type: 'sidebar',
 		size: 'small',
@@ -30,7 +24,7 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 	object,
 	InsertSectionModalModalResult
 > {
-	#addSection() {
+	#chooseSection() {
 		this.modalHandler?.submit({ value: 'test' });
 	}
 
@@ -40,54 +34,48 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 
 	render() {
 		return html`
-			<umb-workspace-layout headline="Insert">
+			<umb-body-layout headline="Insert">
 				<div id="main">
 					<uui-box>
-						<uui-button @click=${this.#addSection} look="placeholder" label="Insert value"
-							><h3>Render child template</h3>
-							<p>
-								Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.
-							</p></uui-button
-						>
-						<uui-button @click=${this.#addSection} look="placeholder" label="Insert value"
-							><h3>Render a named section</h3>
+						<umb-insert-section-checkbox label="Render child template">
+							<p>Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.</p>
+						</umb-insert-section-checkbox>
+
+						<umb-insert-section-checkbox label="Render a named section">
 							<p>
 								Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.
 								This renders an area of a child template which is wrapped in a corresponding
 								<code>@section [name]{ ... }</code> definition.
 							</p>
-
-							<p>
-								<uui-form-layout>
-									<uui-label slot="label">Section name</uui-label>
-									<uui-input placeholder="Enter section name"></uui-input>
-								</uui-form-layout>
-
-								<uui-checkbox>Section is mandatory</uui-checkbox>
+							<uui-form-layout-item slot="if-checked">
+								<uui-label slot="label">Section name</uui-label>
+								<uui-input placeholder="Enter section name"></uui-input>
+							</uui-form-layout-item>
+							<p slot="if-checked">
+								<uui-checkbox>Section is mandatory </uui-checkbox><br />
 								<small
 									>If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error
 									is shown.</small
 								>
-							</p></uui-button
-						>
+							</p>
+						</umb-insert-section-checkbox>
 
-						<uui-button @click=${this.#addSection} look="placeholder" label="Insert Macro"
-							><h3>Define a named section</h3>
+						<umb-insert-section-checkbox label="Define a named section">
 							<p>
 								Defines a part of your template as a named section by wrapping it in <code>@section { ... }</code>. This
 								can be rendered in a specific area of the parent of this template, by using <code>@RenderSection</code>.
 							</p>
-							<uui-form-layout>
+							<uui-form-layout-item slot="if-checked">
 								<uui-label slot="label">Section name</uui-label>
 								<uui-input placeholder="Enter section name"></uui-input>
-							</uui-form-layout>
-						</uui-button>
+							</uui-form-layout-item>
+						</umb-insert-section-checkbox>
 					</uui-box>
 				</div>
 				<div slot="actions">
 					<uui-button @click=${this.#close} look="secondary">Close</uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
 
@@ -105,8 +93,7 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 				height: calc(100vh - 124px);
 			}
 
-			#main uui-button:not(:last-of-type) {
-				display: block;
+			#main umb-insert-section-checkbox:not(:last-of-type) {
 				margin-bottom: var(--uui-size-space-5);
 			}
 
