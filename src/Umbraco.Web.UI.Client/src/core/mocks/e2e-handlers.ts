@@ -14,6 +14,7 @@ import { handlers as healthCheckHandlers } from './domains/health-check.handlers
 import { handlers as languageHandlers } from './domains/language.handlers';
 import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
 import { handlers as packageHandlers } from './domains/package.handlers';
+import { handlers as configHandlers } from './domains/config.handlers';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
@@ -33,4 +34,5 @@ export const handlers = [
 	...languageHandlers,
 	...redirectManagementHandlers,
 	...packageHandlers,
+	...configHandlers,
 ];

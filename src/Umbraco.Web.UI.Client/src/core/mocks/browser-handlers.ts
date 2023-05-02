@@ -29,6 +29,7 @@ import { handlers as logViewerHandlers } from './domains/log-viewer.handlers';
 import { handlers as packageHandlers } from './domains/package.handlers';
 import { handlers as rteEmbedHandlers } from './domains/rte-embed.handlers';
 import { handlers as stylesheetHandlers } from './domains/stylesheet.handlers';
+import { handlers as configHandlers } from './domains/config.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -61,6 +62,7 @@ const handlers = [
 	...packageHandlers,
 	...rteEmbedHandlers,
 	...stylesheetHandlers,
+	...configHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {
