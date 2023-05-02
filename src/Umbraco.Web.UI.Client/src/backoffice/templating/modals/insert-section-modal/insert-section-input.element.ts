@@ -7,7 +7,7 @@ import { UUIBooleanInputElement } from '@umbraco-ui/uui';
 export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	renderCheckbox() {
 		return html`
-			<h3>${this.label}</h3>
+			<h3>${this.checked ? html`<uui-icon name="umb:check"></uui-icon>` : ''}${this.label}</h3>
 			<slot><p>here goes some description</p></slot>
 			${this.checked ? html`<slot name="if-checked"></slot>` : ''}
 		`;
@@ -37,6 +37,15 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 			label {
 				padding: 6px 18px;
 				display: block;
+			}
+
+			uui-icon {
+				background-color: var(--uui-color-positive-emphasis);
+				border-radius: 50%;
+				padding: 0.2em;
+				margin-right: 1ch;
+				color: var(--uui-color-positive-contrast);
+				font-size: 0.7em;
 			}
 
 			::slotted(*) {

@@ -1,11 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, queryAll } from 'lit/decorators.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 import './insert-section-input.element';
+import UmbInsertSectionCheckboxElement from './insert-section-input.element';
 
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
@@ -24,8 +25,21 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 	object,
 	InsertSectionModalModalResult
 > {
-	#chooseSection() {
-		this.modalHandler?.submit({ value: 'test' });
+
+	@queryAll('umb-insert-section-checkbox')
+	checkboxes!: NodeListOf<UmbInsertSectionCheckboxElement>;
+
+	#chooseSection(event: Event) {
+		const target = event.target as UmbInsertSectionCheckboxElement;
+		const checkboxes = Array.from(this.checkboxes);
+		if (target.checked) {
+			checkboxes.forEach((checkbox) => {
+				if (checkbox !== target) {
+					checkbox.checked = false;
+				}
+			});
+		}
+		//this.modalHandler?.submit({ value: 'test' });
 	}
 
 	#close() {
@@ -36,7 +50,7 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 		return html`
 			<umb-body-layout headline="Insert">
 				<div id="main">
-					<uui-box>
+					<uui-box @change=${this.#chooseSection}>
 						<umb-insert-section-checkbox label="Render child template">
 							<p>Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.</p>
 						</umb-insert-section-checkbox>
@@ -100,6 +114,10 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 			h3,
 			p {
 				text-align: left;
+			}
+
+			uui-input {
+				width: 100%;
 			}
 		`,
 	];
