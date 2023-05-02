@@ -91,11 +91,13 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this._showImportView = true;
 	}
 
+	/*
 	#handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
 		this._selection = element.selection;
 	}
+	*/
 
 	#renderUploadView() {
 		return html`<p>

@@ -44,7 +44,8 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 		console.log('change', e);
 		// save new allowed ids
 		const input = e.target as UmbInputTemplateElement;
-		this.#workspaceContext?.setAllowedTemplateIds(input.selectedIds);
+		const idsWithoutRoot = input.selectedIds.filter((id) => id !== null) as Array<string>;
+		this.#workspaceContext?.setAllowedTemplateIds(idsWithoutRoot);
 		this.#workspaceContext?.setDefaultTemplateId(input.defaultId);
 	}
 

@@ -10,8 +10,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
-	
-
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 
 	@state()
@@ -21,7 +19,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 	private _entityType?: string;
 
 	@state()
-	private _unique?: string;
+	private _unique?: string | null;
 
 	@state()
 	private _headline?: string;
@@ -76,7 +74,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			  </div>`
 			: nothing;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

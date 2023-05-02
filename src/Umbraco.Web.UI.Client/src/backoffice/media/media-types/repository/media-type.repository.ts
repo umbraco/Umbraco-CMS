@@ -7,8 +7,9 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbMediaTypeRepository implements UmbTreeRepository {
+export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemResponseModel> {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -43,6 +44,21 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		]);
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'media-type-root',
+			name: 'Media Types',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -57,10 +73,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 

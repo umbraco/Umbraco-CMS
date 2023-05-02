@@ -7,9 +7,12 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO => Update type when backend updated
-export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRepository<any, any, any> {
+export class UmbMemberGroupRepository
+	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any, any, any, any>
+{
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -39,6 +42,21 @@ export class UmbMemberGroupRepository implements UmbTreeRepository, UmbDetailRep
 		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 			this.#notificationContext = instance;
 		});
+	}
+
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'member-group-root',
+			name: 'Member Groups',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
 	}
 
 	async requestRootTreeItems() {

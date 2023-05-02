@@ -18,7 +18,7 @@ const treeItem: ManifestTreeItem = {
 	name: 'Document Tree Item',
 	loader: () => import('./tree-item/document-tree-item.element'),
 	conditions: {
-		entityType: 'document',
+		entityTypes: ['document-root', 'document'],
 	},
 };
 

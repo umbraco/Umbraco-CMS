@@ -44,26 +44,32 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 		return saveItem;
 	}
 
-	move(ids: Array<string>, destinationKey: string) {
-		const destinationItem = this.getById(destinationKey);
-		if (!destinationItem) throw new Error(`Destination item with key ${destinationKey} not found`);
+	move(ids: Array<string>, destinationId: string | null) {
+		if (destinationId === undefined) throw new Error('Destination Id is missing');
+
+		if (destinationId !== null) {
+			const destinationItem = this.getById(destinationId);
+			if (!destinationItem) throw new Error(`Destination item with key ${destinationId} not found`);
+		}
 
 		const items = this.getByIds(ids);
 		const movedItems = items.map((item) => {
 			return {
 				...item,
-				parentId: destinationKey,
+				parentId: destinationId,
 			};
 		});
 
 		movedItems.forEach((movedItem) => this.updateData(movedItem));
-		destinationItem.hasChildren = true;
-		this.updateData(destinationItem);
 	}
 
-	copy(ids: Array<string>, destinationKey: string) {
-		const destinationItem = this.getById(destinationKey);
-		if (!destinationItem) throw new Error(`Destination item with key ${destinationKey} not found`);
+	copy(ids: Array<string>, destinationId: string | null) {
+		if (destinationId === undefined) throw new Error('Destination Id is missing');
+
+		if (destinationId !== null) {
+			const destinationItem = this.getById(destinationId);
+			if (!destinationItem) throw new Error(`Destination item with key ${destinationId} not found`);
+		}
 
 		// TODO: Notice we don't add numbers to the 'copy' name.
 		const items = this.getByIds(ids);
@@ -72,15 +78,12 @@ export class UmbEntityData<T extends Entity> extends UmbData<T> {
 				...item,
 				name: item.name + ' Copy',
 				id: UmbId.new(),
-				parentId: destinationKey,
+				parentId: destinationId,
 			};
 		});
 
 		copyItems.forEach((copyItem) => this.insert(copyItem));
 		const newIds = copyItems.map((item) => item.id);
-
-		destinationItem.hasChildren = true;
-		this.updateData(destinationItem);
 
 		return newIds;
 	}

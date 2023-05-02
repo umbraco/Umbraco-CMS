@@ -19,7 +19,7 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.MemberGroup',
 	name: 'Member Group Tree Item',
 	conditions: {
-		entityType: 'member-group',
+		entityTypes: ['member-group-root', 'member-group'],
 	},
 };
 

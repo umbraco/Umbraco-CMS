@@ -51,12 +51,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	_selectedIds: Array<string> = [];
-	@property({ type: Array<string> })
+	_selectedIds: Array<string | null> = [];
+	@property({ type: Array<string | null> })
 	public get selectedIds() {
 		return this._selectedIds;
 	}
-	public set selectedIds(newKeys: Array<string>) {
+	public set selectedIds(newKeys: Array<string | null>) {
 		this._selectedIds = newKeys;
 		this.#observePickedTemplates();
 	}

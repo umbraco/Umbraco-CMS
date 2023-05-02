@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-dictionary-menu-item')
 export class UmbDictionaryMenuItemElement extends UmbLitElement {
 	render() {
-		return html`<umb-tree alias="Umb.Tree.Dictionary"></umb-tree>`;
+		return html`<umb-tree alias="Umb.Tree.Dictionary" hide-tree-root></umb-tree>`;
 	}
 }
 

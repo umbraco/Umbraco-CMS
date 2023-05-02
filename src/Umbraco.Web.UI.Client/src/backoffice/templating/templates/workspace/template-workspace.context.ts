@@ -50,7 +50,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.next(data as any);
 	}
 
 	public destroy() {
