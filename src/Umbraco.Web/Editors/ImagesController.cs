@@ -96,7 +96,8 @@ namespace Umbraco.Web.Editors
 
         private bool IsAllowed(string imagePath)
         {
-            if(Uri.IsWellFormedUriString(imagePath, UriKind.Relative))
+
+            if(Uri.IsWellFormedUriString(WebUtility.UrlEncode(imagePath), UriKind.Relative))
             {
                 return true;
             }
