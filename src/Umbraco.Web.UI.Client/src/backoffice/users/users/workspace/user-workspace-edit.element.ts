@@ -143,7 +143,7 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Email">
 					<uui-input slot="editor" name="email" label="email" readonly value=${this._user.email}></uui-input>
 				</umb-workspace-property-layout>
-				<umb-workspace-property-layout label="Language">
+				<umb-workspace-property-layout label="Language" description="The language of the UI in the Backoffice">
 					<uui-select slot="editor" name="language" label="language" .options=${this.#languages}> </uui-select>
 				</umb-workspace-property-layout>
 			</uui-box>
