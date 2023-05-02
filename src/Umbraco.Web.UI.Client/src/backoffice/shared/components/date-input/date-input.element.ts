@@ -102,7 +102,16 @@ export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
 
 	#valueToServerOffset(d: string, utc = false) {
 		if (this.type === 'time') {
-			return '';
+			const newDate = new Date(`${new Date().toJSON().slice(0, 10)} ${d}`);
+			const dateOffset = new Date(
+				newDate.setTime(newDate.getTime() + (utc ? this._offsetValue * -1 : this._offsetValue) * 60 * 1000)
+			);
+			const time = dateOffset
+				.toLocaleTimeString(undefined, {
+					hourCycle: 'h23',
+				})
+				.slice(0, 5);
+			return time;
 		} else {
 			const newDate = new Date(d.replace('Z', ''));
 			const dateOffset = new Date(
