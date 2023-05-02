@@ -8,6 +8,7 @@ import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbr
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryOverviewResponseModel,
+	EntityTreeItemResponseModel,
 	ImportDictionaryRequestModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -15,7 +16,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 export class UmbDictionaryRepository
 	implements
-		UmbTreeRepository,
+		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<
 			CreateDictionaryItemRequestModel,
 			any,
@@ -57,6 +58,21 @@ export class UmbDictionaryRepository
 		]);
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'dictionary-root',
+			name: 'Dictionary',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -70,11 +86,8 @@ export class UmbDictionaryRepository
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 

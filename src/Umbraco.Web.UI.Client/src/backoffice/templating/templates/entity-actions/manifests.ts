@@ -15,7 +15,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityType: 'template',
+			entityTypes: ['template'],
 		},
 	},
 	{
@@ -29,7 +29,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityType: 'template',
+			entityTypes: ['template'],
 		},
 	},
 ];

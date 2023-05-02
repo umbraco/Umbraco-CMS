@@ -1,6 +1,6 @@
+import type { MemberDetails } from '../../../backoffice/members/members/types';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import type { MemberDetails } from '@umbraco-cms/backoffice/models';
 import type {
 	EntityTreeItemResponseModel,
 	PagedEntityTreeItemResponseModel,

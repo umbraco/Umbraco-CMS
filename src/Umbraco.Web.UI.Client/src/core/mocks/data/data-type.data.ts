@@ -1,3 +1,4 @@
+import { UmbEntityTreeData } from './entity-tree.data';
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
 import type {
@@ -611,11 +612,9 @@ const createDataTypeItem = (item: DataTypeResponseModel | FolderTreeItemResponse
 	};
 };
 
-// Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeItemResponseModel> {
+	#tree = new UmbEntityTreeData<FolderTreeItemResponseModel>(this);
+
 	constructor() {
 		super(data);
 	}
@@ -654,6 +653,14 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeIt
 		if (!item) throw new Error(`Item with id ${id} not found`);
 		if (!item.isFolder) throw new Error(`Item with id ${id} is not a folder`);
 		this.data = this.data.filter((item) => item.id !== id);
+	}
+
+	copy(ids: Array<string>, destinationKey: string) {
+		return this.#tree.copy(ids, destinationKey);
+	}
+
+	move(ids: Array<string>, destinationKey: string) {
+		return this.#tree.move(ids, destinationKey);
 	}
 }
 

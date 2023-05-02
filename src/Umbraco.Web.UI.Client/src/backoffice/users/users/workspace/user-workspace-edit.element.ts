@@ -11,7 +11,6 @@ import { UmbUserRepository } from '../repository/user.repository';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
@@ -22,7 +21,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 @customElement('umb-user-workspace-edit')
 export class UmbUserWorkspaceEditElement extends UmbLitElement {
 	@state()
-	private _currentUser?: UserDetails;
+	private _currentUser?: any;
 
 	@state()
 	private _user?: UserResponseModel;

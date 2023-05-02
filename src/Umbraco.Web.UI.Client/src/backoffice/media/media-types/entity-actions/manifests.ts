@@ -20,7 +20,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCreateMediaTypeEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -35,7 +35,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbMoveEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -50,7 +50,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCopyEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -65,7 +65,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDeleteEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -80,7 +80,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbReloadMediaTypeEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 ];

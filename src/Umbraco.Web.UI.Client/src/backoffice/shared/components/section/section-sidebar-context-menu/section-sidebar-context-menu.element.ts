@@ -2,16 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import {
-	UmbSectionSidebarContext,
-	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
-} from '../section-sidebar/section-sidebar.context';
+import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-sidebar-context-menu')
 export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
-	
-
 	#sectionSidebarContext?: UmbSectionSidebarContext;
 
 	@state()
@@ -21,7 +16,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 	private _entityType?: string;
 
 	@state()
-	private _unique?: string;
+	private _unique?: string | null;
 
 	@state()
 	private _headline?: string;
@@ -76,7 +71,7 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			  </div>`
 			: nothing;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

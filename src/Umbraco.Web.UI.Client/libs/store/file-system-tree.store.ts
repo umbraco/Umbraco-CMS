@@ -30,7 +30,9 @@ export class UmbFileSystemTreeStore
 	 * @memberof UmbFileSystemTreeStore
 	 */
 	childrenOf(parentPath: string | null) {
-		return this._data.getObservablePart((items) => items.filter((item) => item.path?.startsWith(parentPath + '/')));
+		return this._data.getObservablePart((items) =>
+			items.filter((item) => item.path?.startsWith(parentPath + '/') || parentPath === null)
+		);
 	}
 
 	/**

@@ -1,9 +1,6 @@
 import { map } from 'rxjs';
-import {
-	UmbSectionSidebarContext,
-	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
-} from '../../section/section-sidebar/section-sidebar.context';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
+import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
+import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { UmbTreeContextBase } from '../tree.context';
 import { UmbTreeItemContext } from '../tree-item.context.interface';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
@@ -23,16 +20,18 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 // add type for unique function
-export type UmbTreeItemUniqueFunction<T extends TreeItemPresentationModel> = (x: T) => string | null | undefined;
+export type UmbTreeItemUniqueFunction<TreeItemType extends TreeItemPresentationModel> = (
+	x: TreeItemType
+) => string | null | undefined;
 
-export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeItemPresentationModel>
-	implements UmbTreeItemContext<T>
+export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationModel>
+	implements UmbTreeItemContext<TreeItemType>
 {
 	public host: UmbControllerHostElement;
-	public unique?: string;
+	public unique?: string | null;
 	public type?: string;
 
-	#treeItem = new UmbDeepState<T | undefined>(undefined);
+	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
 
 	#hasChildren = new UmbBooleanState(false);
@@ -56,27 +55,28 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	#path = new UmbStringState('');
 	path = this.#path.asObservable();
 
-	treeContext?: UmbTreeContextBase;
+	treeContext?: UmbTreeContextBase<TreeItemType>;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
-	#getUniqueFunction: UmbTreeItemUniqueFunction<T>;
+	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 	#actionObserver?: UmbObserverController<ManifestEntityAction[]>;
 
-	constructor(host: UmbControllerHostElement, getUniqueFunction: UmbTreeItemUniqueFunction<T>) {
+	constructor(host: UmbControllerHostElement, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
 		this.host = host;
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
 		new UmbContextProviderController(host, UMB_TREE_ITEM_CONTEXT_TOKEN, this);
 	}
 
-	public setTreeItem(treeItem: T | undefined) {
+	public setTreeItem(treeItem: TreeItemType | undefined) {
 		if (!treeItem) {
 			this.#treeItem.next(undefined);
 			return;
 		}
 
 		const unique = this.#getUniqueFunction(treeItem);
-		if (!unique) throw new Error('Could not create tree item context, unique key is missing');
+		// Only check for undefined. The tree root has null as unique
+		if (unique === undefined) throw new Error('Could not create tree item context, unique key is missing');
 		this.unique = unique;
 
 		if (!treeItem.type) throw new Error('Could not create tree item context, tree item type is missing');
@@ -88,7 +88,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	}
 
 	public async requestChildren() {
-		if (!this.unique) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 
 		// TODO: wait for tree context to be ready
 		this.#isLoading.next(true);
@@ -106,12 +106,12 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	}
 
 	public select() {
-		if (!this.unique) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		this.treeContext?.select(this.unique);
 	}
 
 	public deselect() {
-		if (!this.unique) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		this.treeContext?.deselect(this.unique);
 	}
 
@@ -125,7 +125,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 			this.#sectionSidebarContext = instance;
 		});
 
-		new UmbContextConsumerController(this.host, 'umbTreeContext', (treeContext: UmbTreeContextBase) => {
+		new UmbContextConsumerController(this.host, 'umbTreeContext', (treeContext: UmbTreeContextBase<TreeItemType>) => {
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
@@ -143,7 +143,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 
 	#observeIsSelected() {
 		if (!this.treeContext) throw new Error('Could not request children, tree context is missing');
-		if (!this.unique) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 
 		new UmbObserverController(
 			this.host,
@@ -160,8 +160,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 		new UmbObserverController(this.host, this.#sectionContext.pathname, (pathname) => {
 			if (!pathname) return;
 			if (!this.type) throw new Error('Cant construct path, entity type is missing');
-			if (!this.unique) throw new Error('Cant construct path, unique is missing');
-
+			if (this.unique === undefined) throw new Error('Cant construct path, unique is missing');
 			const path = this.constructPath(pathname, this.type, this.unique);
 			this.#path.next(path);
 		});
@@ -174,7 +173,7 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 			this.host,
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.conditions.entityType === this.type))),
+				.pipe(map((actions) => actions.filter((action) => action.conditions.entityTypes.includes(this.type!)))),
 			(actions) => {
 				this.#hasActions.next(actions.length > 0);
 			}
@@ -182,9 +181,9 @@ export class UmbTreeItemContextBase<T extends TreeItemPresentationModel = TreeIt
 	}
 
 	// TODO: use router context
-	constructPath(pathname: string, entityType: string, unique: string) {
+	constructPath(pathname: string, entityType: string, unique: string | null) {
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
 }
 
-export const UMB_TREE_ITEM_CONTEXT_TOKEN = new UmbContextToken<UmbTreeItemContext>('UmbTreeItemContext');
+export const UMB_TREE_ITEM_CONTEXT_TOKEN = new UmbContextToken<UmbTreeItemContext<any>>('UmbTreeItemContext');

@@ -1,4 +1,4 @@
-import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
+import type { UserGroupDetails } from '../types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -59,17 +59,6 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 			});
 
 		return this.#groups.getObservablePart((userGroups) => userGroups.find((userGroup) => userGroup.id === id));
-	}
-
-	getByKeys(ids: Array<string>) {
-		const params = ids.map((id) => `id=${id}`).join('&');
-		fetch(`/umbraco/backoffice/user-groups/getByKeys?${params}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this.#groups.append(data);
-			});
-
-		return this.#groups.getObservablePart((items) => items.filter((node) => ids.includes(node.id)));
 	}
 
 	async save(userGroups: Array<UserGroupDetails>) {

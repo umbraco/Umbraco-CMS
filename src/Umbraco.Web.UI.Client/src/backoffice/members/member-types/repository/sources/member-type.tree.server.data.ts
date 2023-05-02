@@ -37,10 +37,7 @@ export class UmbMemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
-
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		return { error: new ApiError({} as any, {} as any, 'Not implemented for Member Type') };
 	}
 

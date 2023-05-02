@@ -10,8 +10,6 @@ import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
-	
-
 	@state()
 	private _item?: TreeItemPresentationModel;
 
@@ -39,7 +37,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
 	private _iconSlotHasChildren = false;
 
-	#treeItemContext?: UmbTreeItemContext;
+	#treeItemContext?: UmbTreeItemContext<TreeItemPresentationModel>;
 
 	constructor() {
 		super();
@@ -159,7 +157,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				: ''}
 		`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

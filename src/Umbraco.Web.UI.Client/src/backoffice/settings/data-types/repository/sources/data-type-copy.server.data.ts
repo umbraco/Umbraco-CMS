@@ -26,9 +26,9 @@ export class UmbDataTypeCopyServerDataSource implements UmbCopyDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeCopyServerDataSource
 	 */
-	async copy(id: string, targetId: string) {
+	async copy(id: string, targetId: string | null) {
 		if (!id) throw new Error('Id is missing');
-		if (!targetId) throw new Error('Target Id is missing');
+		if (targetId === undefined) throw new Error('Target Id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,

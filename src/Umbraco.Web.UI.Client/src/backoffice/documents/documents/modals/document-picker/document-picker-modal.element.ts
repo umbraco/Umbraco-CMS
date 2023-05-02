@@ -11,10 +11,8 @@ export class UmbDocumentPickerModalElement extends UmbModalBaseElement<
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalResult
 > {
-
-
 	@state()
-	_selection: Array<string> = [];
+	_selection: Array<string | null> = [];
 
 	@state()
 	_multiple = true;

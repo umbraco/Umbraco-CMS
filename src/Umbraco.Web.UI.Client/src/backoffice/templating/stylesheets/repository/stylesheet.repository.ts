@@ -5,13 +5,11 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import {
-	FileSystemTreeItemPresentationModel,
-	PagedFileSystemTreeItemPresentationModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
 
 export class UmbStylesheetRepository
-	implements UmbTreeRepository<FileSystemTreeItemPresentationModel, PagedFileSystemTreeItemPresentationModel>
+	implements UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbTreeRootFileSystemModel>
 {
 	#host;
 	#dataSource;
@@ -50,6 +48,21 @@ export class UmbStylesheetRepository
 		}
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			path: null,
+			type: 'stylesheet-root',
+			name: 'Stylesheets',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -63,7 +76,7 @@ export class UmbStylesheetRepository
 	}
 
 	async requestTreeItemsOf(path: string | null) {
-		if (!path) throw new Error('Cannot request tree item with missing path');
+		if (path === undefined) throw new Error('Cannot request tree item with missing path');
 
 		await this.#init;
 

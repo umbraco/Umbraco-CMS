@@ -1,5 +1,5 @@
+import type { DocumentBlueprintDetails } from '../../../backoffice/documents/document-blueprints/types';
 import { UmbEntityData } from './entity.data';
-import type { DocumentBlueprintDetails } from '@umbraco-cms/backoffice/models';
 
 export const data: Array<DocumentBlueprintDetails> = [
 	{

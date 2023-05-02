@@ -1,6 +1,6 @@
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
 import { StylesheetDetails } from '..';
+import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 

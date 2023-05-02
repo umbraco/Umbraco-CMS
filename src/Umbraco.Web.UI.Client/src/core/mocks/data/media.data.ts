@@ -1,4 +1,5 @@
 import type { MediaDetails } from '../../../backoffice/media/media';
+import { UmbEntityTreeData } from './entity-tree.data';
 import { UmbEntityData } from './entity.data';
 import { createContentTreeItem } from './utils';
 import { ContentTreeItemResponseModel, PagedContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -203,6 +204,8 @@ export const data: Array<MediaDetails> = [
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 class UmbMediaData extends UmbEntityData<MediaDetails> {
+	#tree = new UmbEntityTreeData<ContentTreeItemResponseModel>(this);
+
 	constructor() {
 		super(data);
 	}
@@ -224,6 +227,10 @@ class UmbMediaData extends UmbEntityData<MediaDetails> {
 	getTreeItem(ids: Array<string>): Array<ContentTreeItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id));
 		return items.map((item) => createContentTreeItem(item));
+	}
+
+	move(ids: Array<string>, destinationKey: string) {
+		return this.#tree.move(ids, destinationKey);
 	}
 }
 

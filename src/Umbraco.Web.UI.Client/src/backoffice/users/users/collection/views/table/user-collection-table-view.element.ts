@@ -1,6 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
+import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import {
 	UmbTableElement,
 	UmbTableColumn,
@@ -16,8 +17,6 @@ import {
 } from '../../../../user-groups/repository/user-group.store';
 import { UmbUserCollectionContext } from '../../user-collection.context';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
-import type { UserGroupEntity } from '@umbraco-cms/backoffice/models';
-
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

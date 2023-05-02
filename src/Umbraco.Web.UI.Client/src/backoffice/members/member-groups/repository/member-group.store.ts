@@ -1,4 +1,4 @@
-import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import type { MemberGroupDetails } from '../types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';

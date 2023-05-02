@@ -1,8 +1,8 @@
 import { ReplaySubject } from 'rxjs';
+import type { UmbPackage } from '../types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import type { UmbPackage } from '@umbraco-cms/backoffice/models';
 import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
