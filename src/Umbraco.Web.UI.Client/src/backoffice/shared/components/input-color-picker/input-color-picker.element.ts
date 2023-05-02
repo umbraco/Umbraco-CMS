@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { SwatchDetails } from '@umbraco-cms/backoffice/models';
+import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 
 /*
  * This wraps the UUI library uui-color-swatches component
@@ -12,13 +12,11 @@ import type { SwatchDetails } from '@umbraco-cms/backoffice/models';
  */
 @customElement('umb-input-color-picker')
 export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) {
-	
-
 	@property({ type: Boolean })
 	showLabels = false;
 
 	@property()
-	swatches?: SwatchDetails[];
+	swatches?: UmbSwatchDetails[];
 
 	constructor() {
 		super();
@@ -48,7 +46,7 @@ export class UmbInputColorPickerElement extends FormControlMixin(UmbLitElement) 
 				.showLabel=${this.showLabels}></uui-color-swatch>`;
 		})}`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

@@ -3,11 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { map } from 'rxjs';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../../section/section.context';
 import {
 	UmbSectionSidebarContext,
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
-} from '../../section/section-sidebar/section-sidebar.context';
+	UmbSectionContext,
+	UMB_SECTION_CONTEXT_TOKEN,
+} from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
@@ -15,8 +16,6 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-menu-item-base')
 export class UmbMenuItemBaseElement extends UmbLitElement {
-	
-
 	private _entityType?: string;
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType() {
@@ -65,7 +64,7 @@ export class UmbMenuItemBaseElement extends UmbLitElement {
 		this.#actionObserver = this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.conditions.entityType === this.entityType))),
+				.pipe(map((actions) => actions.filter((action) => action.conditions.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this._hasActions = actions.length > 0;
 			},
@@ -116,7 +115,7 @@ export class UmbMenuItemBaseElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

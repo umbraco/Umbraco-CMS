@@ -1,3 +1,4 @@
+import { DATA_TYPE_ROOT_ENTITY_TYPE } from '..';
 import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data';
 import { UmbDataTypeMoveServerDataSource } from './sources/data-type-move.server.data';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store';
@@ -14,6 +15,12 @@ import type {
 	UmbFolderRepository,
 	UmbMoveRepository,
 	UmbCopyRepository,
+	UmbTreeDataSource,
+	UmbDataSource,
+	UmbFolderDataSource,
+	UmbItemDataSource,
+	UmbMoveDataSource,
+	UmbCopyDataSource,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -31,7 +38,7 @@ export class UmbDataTypeRepository
 	implements
 		UmbItemRepository<DataTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
-		UmbDetailRepository<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>,
+		UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>,
 		UmbFolderRepository,
 		UmbMoveRepository,
 		UmbCopyRepository
@@ -40,12 +47,12 @@ export class UmbDataTypeRepository
 
 	#host: UmbControllerHostElement;
 
-	#treeSource: UmbDataTypeTreeServerDataSource;
-	#detailSource: UmbDataTypeServerDataSource;
-	#folderSource: UmbDataTypeFolderServerDataSource;
-	#itemSource: UmbDataTypeItemServerDataSource;
-	#moveSource: UmbDataTypeMoveServerDataSource;
-	#copySource: UmbDataTypeCopyServerDataSource;
+	#treeSource: UmbTreeDataSource<FolderTreeItemResponseModel>;
+	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>;
+	#folderSource: UmbFolderDataSource;
+	#itemSource: UmbItemDataSource<DataTypeItemResponseModel>;
+	#moveSource: UmbMoveDataSource;
+	#copySource: UmbCopyDataSource;
 
 	#detailStore?: UmbDataTypeStore;
 	#treeStore?: UmbDataTypeTreeStore;
@@ -84,6 +91,20 @@ export class UmbDataTypeRepository
 	}
 
 	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: DATA_TYPE_ROOT_ENTITY_TYPE,
+			name: 'Data Types',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -97,8 +118,8 @@ export class UmbDataTypeRepository
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
-		if (!parentId) throw new Error('Parent id is missing');
 		await this.#init;
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -286,14 +307,17 @@ export class UmbDataTypeRepository
 	}
 
 	// Actions
-	async move(id: string, targetId: string) {
+	async move(id: string, targetId: string | null) {
 		await this.#init;
 		const { error } = await this.#moveSource.move(id, targetId);
 
 		if (!error) {
 			// TODO: Be aware about this responsibility.
 			this.#treeStore?.updateItem(id, { parentId: targetId });
-			this.#treeStore?.updateItem(targetId, { hasChildren: true });
+			// only update the target if its not the root
+			if (targetId) {
+				this.#treeStore?.updateItem(targetId, { hasChildren: true });
+			}
 
 			const notification = { data: { message: `Data type moved` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -302,7 +326,7 @@ export class UmbDataTypeRepository
 		return { error };
 	}
 
-	async copy(id: string, targetId: string) {
+	async copy(id: string, targetId: string | null) {
 		await this.#init;
 		const { data: dataTypeCopyId, error } = await this.#copySource.copy(id, targetId);
 		if (error) return { error };
@@ -310,8 +334,13 @@ export class UmbDataTypeRepository
 		if (dataTypeCopyId) {
 			const { data: dataTypeCopy } = await this.requestById(dataTypeCopyId);
 			if (!dataTypeCopy) throw new Error('Could not find copied data type');
+
+			// TODO: Be aware about this responsibility.
 			this.#treeStore?.appendItems([dataTypeCopy]);
-			this.#treeStore?.updateItem(targetId, { hasChildren: true });
+			// only update the target if its not the root
+			if (targetId) {
+				this.#treeStore?.updateItem(targetId, { hasChildren: true });
+			}
 
 			const notification = { data: { message: `Data type copied` } };
 			this.#notificationContext?.peek('positive', notification);

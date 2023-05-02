@@ -1,12 +1,10 @@
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbTreeContextBase } from './tree.context';
-import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 import './tree-item/tree-item.element';
 import './tree-item-base/tree-item-base.element';
@@ -15,122 +13,104 @@ import './context-menu/tree-context-menu.service';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
-	private _alias = '';
 	@property({ type: String, reflect: true })
 	get alias() {
-		return this._alias;
+		return this.#treeContext.getTreeAlias();
 	}
 	set alias(newVal) {
-		const oldVal = this._alias;
-		this._alias = newVal;
-		this.requestUpdate('alias', oldVal);
-		this._observeTree();
+		this.#treeContext.setTreeAlias(newVal);
 	}
 
-	private _selectable = false;
 	@property({ type: Boolean, reflect: true })
 	get selectable() {
-		return this._selectable;
+		return this.#treeContext.getSelectable();
 	}
 	set selectable(newVal) {
-		const oldVal = this._selectable;
-		this._selectable = newVal;
-		this.requestUpdate('selectable', oldVal);
-		this._treeContext?.setSelectable(newVal);
+		this.#treeContext.setSelectable(newVal);
 	}
 
-	private _selection: Array<string> = [];
 	@property({ type: Array })
 	get selection() {
-		return this._selection;
+		return this.#treeContext.getSelection();
 	}
-	set selection(newVal: Array<string>) {
-		const oldVal = this._selection;
-		this._selection = newVal;
-		this.requestUpdate('selection', oldVal);
-		this._treeContext?.setSelection(newVal);
+	set selection(newVal) {
+		this.#treeContext?.setSelection(newVal);
 	}
 
-	private _multiple = false;
 	@property({ type: Boolean, reflect: true })
 	get multiple() {
-		return this._multiple;
+		return this.#treeContext.getMultiple();
 	}
 	set multiple(newVal) {
-		const oldVal = this._multiple;
-		this._multiple = newVal;
-		this.requestUpdate('multiple', oldVal);
-		this._treeContext?.setMultiple(newVal);
+		this.#treeContext.setMultiple(newVal);
+	}
+
+	// TODO: what is the best name for this functionatliy?
+	private _hideTreeRoot = false;
+	@property({ type: Boolean, attribute: 'hide-tree-root' })
+	get hideTreeRoot() {
+		return this._hideTreeRoot;
+	}
+	set hideTreeRoot(newVal: boolean) {
+		const oldVal = this._hideTreeRoot;
+		this._hideTreeRoot = newVal;
+		if (newVal === true) {
+			this.#observeRootItems();
+		}
+
+		this.requestUpdate('hideTreeRoot', oldVal);
 	}
 
 	@state()
-	private _tree?: ManifestTree;
+	private _items: TreeItemPresentationModel[] = [];
 
 	@state()
-	private _items: EntityTreeItemResponseModel[] = [];
+	private _treeRoot?: TreeItemPresentationModel;
 
-	private _treeContext?: UmbTreeContextBase;
+	#treeContext = new UmbTreeContextBase<TreeItemPresentationModel>(this);
 
-	protected firstUpdated(): void {
-		this._observeTree();
+	#rootItemsObserver?: UmbObserverController<Array<TreeItemPresentationModel>>;
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.#requestTreeRoot();
 	}
 
-	private _observeTree() {
-		if (!this.alias) return;
+	async #requestTreeRoot() {
+		if (!this.#treeContext?.requestTreeRoot) throw new Error('Tree does not support root');
 
-		this.observe(
-			umbExtensionsRegistry
-				.extensionsOfType('tree')
-				.pipe(map((trees) => trees.find((tree) => tree.alias === this.alias))),
-			async (tree) => {
-				if (this._tree?.alias === tree?.alias) return;
-
-				this._tree = tree;
-				this.#provideTreeContext();
-			}
-		);
+		const { data } = await this.#treeContext.requestTreeRoot();
+		this._treeRoot = data;
 	}
 
-	#provideTreeContext() {
-		if (!this._tree || this._treeContext) return;
+	async #observeRootItems() {
+		if (!this.#treeContext?.requestRootItems) throw new Error('Tree does not support root items');
+		this.#rootItemsObserver?.destroy();
 
-		// TODO: if a new tree comes around, which is different, then we should clean up and re provide.
-		this._treeContext = new UmbTreeContextBase(this, this._tree);
-		this._treeContext.setSelectable(this.selectable);
-		this._treeContext.setSelection(this.selection);
-		this._treeContext.setMultiple(this.multiple);
+		const { asObservable } = await this.#treeContext.requestRootItems();
 
-		this.#observeSelection();
-		this.#observeTreeRoot();
-
-		this.provideContext('umbTreeContext', this._treeContext);
-	}
-
-	async #observeTreeRoot() {
-		if (!this._treeContext?.requestRootItems) return;
-
-		this._treeContext.requestRootItems();
-
-		this.observe(await this._treeContext.rootItems(), (rootItems) => {
-			this._items = rootItems;
-		});
-	}
-
-	#observeSelection() {
-		if (!this._treeContext) return;
-
-		this.observe(this._treeContext.selection, (selection) => {
-			if (this._selection === selection) return;
-			this._selection = selection;
-			this.dispatchEvent(new CustomEvent('selected'));
-		});
+		if (asObservable) {
+			this.#rootItemsObserver = this.observe(asObservable(), (rootItems) => {
+				this._items = rootItems;
+				this.requestUpdate();
+			});
+		}
 	}
 
 	render() {
+		return html` ${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
+	}
+
+	#renderTreeRoot() {
+		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
+		return html` <umb-tree-item .item=${this._treeRoot}></umb-tree-item> `;
+	}
+
+	#renderRootItems() {
+		if (this._items?.length === 0) return nothing;
 		return html`
 			${repeat(
 				this._items,
-				// TODO: add getUnique to a repository interface
 				(item, index) => index,
 				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
 			)}

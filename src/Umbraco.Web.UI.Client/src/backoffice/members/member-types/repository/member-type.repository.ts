@@ -1,3 +1,4 @@
+import type { MemberTypeDetails } from '../types';
 import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
 import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store';
@@ -6,11 +7,11 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO => use correct type when available
 type ItemType = any;
-type TreeItemType = any;
+type TreeItemType = EntityTreeItemResponseModel;
 
 export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
@@ -47,6 +48,21 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		]);
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'member-type-root',
+			name: 'Member Types',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -61,10 +77,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 

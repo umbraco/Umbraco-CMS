@@ -16,7 +16,7 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.DictionaryItem',
 	name: 'Dictionary Item Tree Item',
 	conditions: {
-		entityType: 'dictionary-item',
+		entityTypes: ['dictionary-root', 'dictionary-item'],
 	},
 };
 

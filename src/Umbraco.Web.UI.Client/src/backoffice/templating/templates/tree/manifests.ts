@@ -16,7 +16,7 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.Template',
 	name: 'Template Tree Item',
 	conditions: {
-		entityType: 'template',
+		entityTypes: ['template-root', 'template'],
 	},
 };
 

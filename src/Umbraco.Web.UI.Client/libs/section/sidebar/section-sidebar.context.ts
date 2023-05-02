@@ -10,7 +10,7 @@ export class UmbSectionSidebarContext {
 	#entityType = new UmbStringState<undefined>(undefined);
 	entityType = this.#entityType.asObservable();
 
-	#unique = new UmbStringState<undefined>(undefined);
+	#unique = new UmbStringState<null | undefined>(undefined);
 	unique = this.#unique.asObservable();
 
 	#headline = new UmbStringState<undefined>(undefined);
@@ -20,14 +20,14 @@ export class UmbSectionSidebarContext {
 		this.#host = host;
 	}
 
-	toggleContextMenu(entityType: string, unique: string | undefined, headline: string) {
+	toggleContextMenu(entityType: string, unique: string | null | undefined, headline: string) {
 		console.log('open for ', entityType, unique, headline);
 		this.openContextMenu(entityType, unique, headline);
 	}
 
 	// TODO: we wont get notified about tree item name changes because we don't have a subscription
 	// we need to figure out how we best can handle this when we only know the entity and unique id
-	openContextMenu(entityType: string, unique: string | undefined, headline: string) {
+	openContextMenu(entityType: string, unique: string | null | undefined, headline: string) {
 		this.#entityType.next(entityType);
 		this.#unique.next(unique);
 		this.#headline.next(headline);

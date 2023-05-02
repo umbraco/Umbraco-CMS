@@ -16,7 +16,7 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 export class UmbRelationTypeRepository
 	implements
 		UmbTreeRepository<any>,
-		UmbDetailRepository<CreateRelationTypeRequestModel, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
+		UmbDetailRepository<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
 {
 	#init!: Promise<unknown>;
 
@@ -54,6 +54,21 @@ export class UmbRelationTypeRepository
 
 	// TODO: Trash
 	// TODO: Move
+
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'relation-type-root',
+			name: 'Relation Types',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
 
 	async requestRootTreeItems() {
 		await this.#init;
@@ -99,12 +114,8 @@ export class UmbRelationTypeRepository
 	// DETAILS:
 
 	async createScaffold(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
-
 		return this.#detailDataSource.createScaffold(parentId);
 	}
 

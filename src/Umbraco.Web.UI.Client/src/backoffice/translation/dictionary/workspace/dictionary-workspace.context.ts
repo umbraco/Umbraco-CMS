@@ -1,6 +1,5 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
-import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

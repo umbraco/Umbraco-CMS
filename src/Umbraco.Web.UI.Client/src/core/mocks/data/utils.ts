@@ -8,6 +8,7 @@ import type {
 	DocumentResponseModel,
 	FileSystemTreeItemPresentationModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { template } from 'lodash-es';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
 	return {
@@ -64,7 +65,11 @@ export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): Doc
 
 export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentationModel => {
 	return {
-		...createFolderTreeItem(item),
+		name: item.name,
+		type: item.type,
+		icon: item.icon,
+		hasChildren: item.hasChildren,
 		path: item.path,
+		isFolder: item.isFolder,
 	};
 };

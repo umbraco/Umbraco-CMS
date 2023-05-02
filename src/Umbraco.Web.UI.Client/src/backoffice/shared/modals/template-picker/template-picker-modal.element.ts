@@ -13,7 +13,7 @@ export class UmbTemplatePickerModalElement extends UmbModalBaseElement<
 	UmbTemplatePickerModalResult
 > {
 	@state()
-	_selection: Array<string> = [];
+	_selection: Array<string | null> = [];
 
 	@state()
 	_multiple = true;

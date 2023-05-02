@@ -9,12 +9,15 @@ import {
 	DocumentResponseModel,
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
+	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemType = DocumentResponseModel;
 
-export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDetailRepository<ItemType> {
+export class UmbDocumentRepository
+	implements UmbTreeRepository<DocumentTreeItemResponseModel>, UmbDetailRepository<ItemType>
+{
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -52,6 +55,21 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 	// TODO: Trash
 	// TODO: Move
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'document-root',
+			name: 'Documents',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -66,10 +84,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 

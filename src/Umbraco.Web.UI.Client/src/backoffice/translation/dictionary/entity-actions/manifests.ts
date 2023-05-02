@@ -22,7 +22,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCreateDictionaryEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -37,7 +37,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbMoveEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -52,7 +52,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbExportDictionaryEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -67,7 +67,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbImportDictionaryEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -82,7 +82,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbReloadDictionaryEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -97,7 +97,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDeleteEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 ];

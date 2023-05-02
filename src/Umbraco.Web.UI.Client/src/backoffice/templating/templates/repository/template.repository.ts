@@ -2,26 +2,32 @@ import { UmbTemplateDetailServerDataSource } from './sources/template.detail.ser
 import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data';
 import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
-import type { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSource,
+	UmbDetailRepository,
+	UmbTreeDataSource,
+	UmbTreeRepository,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateTemplateRequestModel,
+	EntityTreeItemResponseModel,
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbTemplateRepository
 	implements
-		UmbTreeRepository<any>,
-		UmbDetailRepository<CreateTemplateRequestModel, UpdateTemplateRequestModel, TemplateResponseModel>
+		UmbTreeRepository<EntityTreeItemResponseModel>,
+		UmbDetailRepository<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>
 {
 	#init;
 	#host: UmbControllerHostElement;
 
-	#treeDataSource: UmbTemplateTreeServerDataSource;
-	#detailDataSource: UmbTemplateDetailServerDataSource;
+	#treeDataSource: UmbTreeDataSource<EntityTreeItemResponseModel>;
+	#detailDataSource: UmbDataSource<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>;
 
 	#treeStore?: UmbTemplateTreeStore;
 	#store?: UmbTemplateStore;
@@ -51,6 +57,19 @@ export class UmbTemplateRepository
 	}
 
 	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'template-root',
+			name: 'Templates',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
 
 	async requestRootTreeItems() {
 		await this.#init;
@@ -65,11 +84,8 @@ export class UmbTemplateRepository
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf(parentId);
 
@@ -102,7 +118,7 @@ export class UmbTemplateRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async itemsLegacy(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string | null>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
@@ -110,14 +126,9 @@ export class UmbTemplateRepository
 	// DETAILS:
 
 	async createScaffold(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
-
-		// TODO: add parent id to create scaffold
-		return this.#detailDataSource.createScaffold();
+		return this.#detailDataSource.createScaffold(parentId);
 	}
 
 	async requestById(id: string) {
