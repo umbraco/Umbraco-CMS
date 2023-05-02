@@ -23,7 +23,7 @@ export const Date: Story = {
 	args: {
 		type: 'date',
 		value: '2023-04-01',
-		offsetTime: true,
+		offsetTime: false,
 	},
 };
 
@@ -38,7 +38,7 @@ export const DatetimelocalOffset: Story = {
 	args: {
 		type: 'datetime-local',
 		value: '2023-04-01T10:00:00',
-		offsetTime: false,
+		offsetTime: true,
 		displayValue: '',
 	},
 	render: (args) =>
