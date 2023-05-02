@@ -18,7 +18,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	// TODO: get from extension registry
 	#userRepository = new UmbUserRepository(this);
 
-	private _handleSubmit(e: Event) {
+	private async _handleSubmit(e: Event) {
 		e.preventDefault();
 
 		const form = e.target as HTMLFormElement;
@@ -34,26 +34,24 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 
 		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbInputPickerUserGroupElement;
-		const userGroupIds = userGroupPicker?.value || [];
+		const userGroupIds = userGroupPicker?.value || ['e5e7f6c8-7f9c-4b5b-8d5d-9e1e5a4f7e4d'];
 
 		const message = formData.get('message') as string;
 
-		alert('implement invite');
-
 		// TODO: figure out when to use email or username
-		/*
-		const { data } = this.#userRepository.invite({
-			name,
-			email,
-			userName: email,
-			message,
-			userGroupIds,
-		});
+		// TODO: invite request gives 500 error.
+		alert('Implement invite');
+		// const { data } = await this.#userRepository.invite({
+		// 	name,
+		// 	email,
+		// 	userName: email,
+		// 	message,
+		// 	userGroupIds,
+		// });
 
-		if (data) {
-			this._invitedUser = data;
-		}
-		*/
+		// if (data) {
+		// 	this._invitedUser = data;
+		// }
 	}
 
 	private _submitForm() {

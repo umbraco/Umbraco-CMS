@@ -95,6 +95,8 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 	async invite(inviteRequestData: InviteUserRequestModel) {
 		if (!inviteRequestData) throw new Error('Data is missing');
 		const { data, error } = await this.#detailSource.invite(inviteRequestData);
+
+		return { data, error };
 	}
 
 	async save(id: string, user: UpdateUserRequestModel) {
