@@ -11,6 +11,20 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UserGroupBaseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
+	constructor(host: UmbControllerHostElement) {
+		super(host, new UmbUserGroupRepository(host));
+	}
+
+	async load(id: string) {
+		console.log('load');
+
+		const { data } = await this.repository.requestById(id);
+		if (data) {
+			this.setIsNew(false);
+			this.#data.update(data);
+		}
+	}
+
 	getEntityId(): string | undefined {
 		throw new Error('Method not implemented.');
 	}
@@ -25,9 +39,6 @@ export class UmbUserGroupWorkspaceContext
 	}
 	destroy(): void {
 		throw new Error('Method not implemented.');
-	}
-	constructor(host: UmbControllerHostElement) {
-		super(host, new UmbUserGroupRepository(host));
 	}
 
 	updateProperty<Alias extends keyof UserGroupBaseModel>(alias: Alias, value: UserGroupBaseModel[Alias]) {
