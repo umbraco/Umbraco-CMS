@@ -62,4 +62,6 @@ import './code-editor';
 
 import './tooltip-menu/tooltip-menu.element';
 
+export * from './table';
+
 export const manifests = [...debugManifests];
