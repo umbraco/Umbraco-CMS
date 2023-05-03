@@ -6,8 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 // TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
 export class UmbDropdownElement extends UmbLitElement {
-	
-
 	@property({ type: Boolean, reflect: true })
 	open = false;
 
@@ -27,12 +25,13 @@ export class UmbDropdownElement extends UmbLitElement {
 			</div>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
 			#container {
 				display: inline-block;
+				width: unset;
 			}
 
 			#dropdown {
