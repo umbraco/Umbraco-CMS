@@ -113,8 +113,7 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
         // Mostly no-op just check that we didn't end up ReadUncommitted for real.
         private void ObtainReadLock()
         {
-            // IUmbracoDatabase? db = _parent._efCoreScopeAccessor.Value.AmbientScope?.Database;
-            var efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
+            IEfCoreScope<T>? efCoreScope = _parent._efCoreScopeAccessor.Value.AmbientScope;
 
             if (efCoreScope is null)
             {
@@ -152,10 +151,12 @@ internal class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedLockingM
 
                 var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId.ToString(CultureInfo.InvariantCulture)}";
 
-                // DbCommand command = db.Database.CreateCommand(db.Database.GetDbConnection(), CommandType.Text, query);
-
                 try
                 {
+                    // imagine there is an existing writer, whilst elapsed time is < command timeout sqlite will busy loop
+                    // Important to note that if this value == 0 then Command.DefaultTimeout (30s) is used.
+                    // Math.Ceiling such that (0 < totalseconds < 1) is rounded up to 1.
+                    database.Database.SetCommandTimeout((int)Math.Ceiling(_timeout.TotalSeconds));
                     var i = await database.Database.ExecuteScalarAsync<int>(query);
 
                     if (i == 0)
