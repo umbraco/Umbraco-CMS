@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { UmbInstallerContext } from '../installer.context';
-import '../../core/context-provider/context-provider.element';
+import '../../../storybook/utils/context-provider/context-provider.element';
 
 export const installerContextProvider = (story: any, installerContext = new UmbInstallerContext()) => html`
 	<umb-context-provider
