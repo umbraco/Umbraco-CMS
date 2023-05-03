@@ -1,14 +1,14 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UserGroupBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupBaseModel>
-	implements UmbEntityWorkspaceContextInterface<UserGroupBaseModel | undefined>
+	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupPresentationModel>
+	implements UmbEntityWorkspaceContextInterface<UserGroupPresentationModel | undefined>
 {
-	#data = new UmbObjectState<UserGroupBaseModel | undefined>(undefined);
+	#data = new UmbObjectState<UserGroupPresentationModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -31,7 +31,7 @@ export class UmbUserGroupWorkspaceContext
 	getEntityType(): string {
 		throw new Error('Method not implemented.');
 	}
-	getData(): UserGroupBaseModel | undefined {
+	getData(): UserGroupPresentationModel | undefined {
 		throw new Error('Method not implemented.');
 	}
 	save(): Promise<void> {
@@ -41,7 +41,10 @@ export class UmbUserGroupWorkspaceContext
 		throw new Error('Method not implemented.');
 	}
 
-	updateProperty<Alias extends keyof UserGroupBaseModel>(alias: Alias, value: UserGroupBaseModel[Alias]) {
+	updateProperty<Alias extends keyof UserGroupPresentationModel>(
+		alias: Alias,
+		value: UserGroupPresentationModel[Alias]
+	) {
 		this.#data.update({ [alias]: value });
 	}
 }

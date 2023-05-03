@@ -8,7 +8,7 @@ import {
 	InviteUserRequestModel,
 	EnableUserRequestModel,
 	DisableUserRequestModel,
-	UserGroupBaseModel,
+	UserGroupPresentationModel,
 	UserGroupResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -31,17 +31,17 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserGroupBaseModel>> {
+	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserGroupPresentationModel>> {
 		throw new Error('Method not implemented.');
 	}
-	get(id: string): Promise<DataSourceResponse<UserGroupBaseModel>> {
+	get(id: string): Promise<DataSourceResponse<UserGroupPresentationModel>> {
 		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroupById({ id }));
 	}
-	insert(data: UserGroupBaseModel): Promise<DataSourceResponse<void>> {
+	insert(data: UserGroupPresentationModel): Promise<DataSourceResponse<void>> {
 		throw new Error('Method not implemented.');
 	}
-	update(unique: string, data: UserGroupBaseModel): Promise<DataSourceResponse<UserGroupBaseModel>> {
+	update(unique: string, data: UserGroupPresentationModel): Promise<DataSourceResponse<UserGroupPresentationModel>> {
 		throw new Error('Method not implemented.');
 	}
 	delete(unique: string): Promise<DataSourceResponse<undefined>> {

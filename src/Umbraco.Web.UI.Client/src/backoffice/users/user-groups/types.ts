@@ -18,6 +18,12 @@ export interface UserGroupDetails extends UserGroupEntity {
 	permissions: Array<string>;
 }
 
+export interface UmbUserGroupCollectionFilterModel {
+	skip?: number;
+	take?: number;
+	filter?: string;
+}
+
 export type UmbUserGroupDetailDataSource = UmbDataSource<
 	SaveUserGroupRequestModel,
 	void,

@@ -10,18 +10,16 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../../shared/components/table';
-import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
-import type { UserGroupDetails } from '../types';
+import { UmbUserGroupCollectionContext } from './user-group-collection.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './user-group-table-name-column-layout.element';
-//import '../../user-section/views/user-groups/user-group-table-sections-column-layout.element';
+import './user-group-table-sections-column-layout.element';
 
 @customElement('umb-user-group-collection-view')
 export class UmbUserGroupCollectionViewElement extends UmbLitElement {
-	@state()
-	private _userGroups: Array<UserGroupDetails> = [];
-
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: true,
@@ -55,49 +53,47 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _userGroupStore?: UmbUserGroupStore;
+	@state()
+	private _userGroups: Array<UserGroupPresentationModel> = [];
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	#collectionContext?: UmbUserGroupCollectionContext;
 
-		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
-			this._userGroupStore = userGroupStore;
-			this._observeUserGroups();
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+			this.#collectionContext = instance as UmbUserGroupCollectionContext;
+			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
+			this.observe(this.#collectionContext.items, (items) => {
+				this._userGroups = items;
+				this._createTableItems(items);
+			});
 		});
 	}
 
-	private _observeUserGroups() {
-		if (!this._userGroupStore) return;
-
-		this.observe(this._userGroupStore.getAll(), (userGroups) => {
-			this._userGroups = userGroups;
-			this._createTableItems(this._userGroups);
-		});
-	}
-
-	private _createTableItems(userGroups: Array<UserGroupDetails>) {
+	private _createTableItems(userGroups: Array<UserGroupPresentationModel>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
-				id: userGroup.id || '',
-				icon: userGroup.icon,
+				id: userGroup.name || '',
+				icon: userGroup.icon || '',
 				data: [
 					{
 						columnAlias: 'userGroupName',
 						value: {
-							name: userGroup.name,
+							name: userGroup.name || '',
 						},
 					},
 					{
 						columnAlias: 'userGroupSections',
-						value: userGroup.sections,
+						value: userGroup.sections || [],
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.contentStartNode || 'Content root',
+						value: userGroup.documentStartNodeId || 'Content root',
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNode || 'Media root',
+						value: userGroup.mediaStartNodeId || 'Media root',
 					},
 				],
 			};

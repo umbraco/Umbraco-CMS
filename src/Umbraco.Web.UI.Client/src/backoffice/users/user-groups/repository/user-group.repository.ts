@@ -1,9 +1,11 @@
 import { Observable } from 'rxjs';
-import { UmbUserGroupDetailDataSource } from '../types';
+import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from '../types';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data';
-import { UserGroupBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data';
+import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
+	UmbCollectionDataSource,
 	UmbCollectionRepository,
 	UmbDetailRepository,
 	UmbRepositoryErrorResponse,
@@ -11,16 +13,27 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 
 // TODO: implement
-export class UmbUserGroupRepository implements UmbDetailRepository<UserGroupBaseModel>, UmbCollectionRepository {
+export class UmbUserGroupRepository
+	implements UmbDetailRepository<UserGroupPresentationModel>, UmbCollectionRepository
+{
 	#host: UmbControllerHostElement;
 
 	#detailSource: UmbUserGroupDetailDataSource;
+	#collectionSource: UmbCollectionDataSource<UserGroupPresentationModel>;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		this.#detailSource = new UmbUserGroupServerDataSource(this.#host);
+		this.#collectionSource = new UmbUserGroupCollectionServerDataSource(this.#host);
 	}
 
+	// COLLECTION
+	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {
+		//TODO: missing observable
+		return this.#collectionSource.filterCollection(filter);
+	}
+
+	// DETAIL
 	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<any>> {
 		throw new Error('Method not implemented.');
 	}
@@ -45,9 +58,6 @@ export class UmbUserGroupRepository implements UmbDetailRepository<UserGroupBase
 		throw new Error('Method not implemented.');
 	}
 	delete(id: string): Promise<UmbRepositoryErrorResponse> {
-		throw new Error('Method not implemented.');
-	}
-	requestCollection(filter?: any): Promise<any> {
 		throw new Error('Method not implemented.');
 	}
 }
