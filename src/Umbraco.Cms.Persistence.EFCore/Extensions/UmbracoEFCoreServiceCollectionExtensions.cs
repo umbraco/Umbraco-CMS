@@ -9,21 +9,12 @@ namespace Umbraco.Extensions;
 
 public static class UmbracoEFCoreServiceCollectionExtensions
 {
-    public static IServiceCollection AddUmbracoEFCore(this IServiceCollection services)
-    {
-        services.AddUnique<IAmbientEFCoreScopeContextStack, AmbientEFCoreScopeContextStack>();
-        return services;
-    }
-
     public delegate void DefaultEFCoreOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString);
 
-    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null) where T : DbContext
+    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
+        where T : DbContext
     {
-
-        if (defaultEFCoreOptionsAction is null)
-        {
-            defaultEFCoreOptionsAction = DefaultOptionsAction;
-        }
+        defaultEFCoreOptionsAction ??= DefaultOptionsAction;
 
         services.AddDbContext<T>(
             options =>

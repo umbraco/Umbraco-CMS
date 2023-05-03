@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
@@ -17,7 +18,7 @@ internal class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDbContext
     private readonly IAmbientEFCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
-    private readonly IAmbientEFCoreScopeContextStack _ambientEfCoreScopeContextStack;
+    private readonly IAmbientScopeContextStack _ambientEfCoreScopeContextStack;
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
     private readonly IEventAggregator _eventAggregator;
     private readonly FileSystems _fileSystems;
@@ -30,7 +31,7 @@ internal class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDbContext
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeStack<TDbContext>>(),
             StaticServiceProvider.Instance.GetRequiredService<ILoggerFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor<TDbContext>>(),
-            StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeContextStack>(),
+            StaticServiceProvider.Instance.GetRequiredService<IAmbientScopeContextStack>(),
             StaticServiceProvider.Instance.GetRequiredService<IDistributedLockingMechanismFactory>(),
             StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
             StaticServiceProvider.Instance.GetRequiredService<FileSystems>(),
@@ -43,7 +44,7 @@ internal class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDbContext
         IAmbientEFCoreScopeStack<TDbContext> ambientEfCoreScopeStack,
         ILoggerFactory loggerFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
-        IAmbientEFCoreScopeContextStack ambientEfCoreScopeContextStack,
+        IAmbientScopeContextStack ambientEfCoreScopeContextStack,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IEventAggregator eventAggregator,
         FileSystems fileSystems,

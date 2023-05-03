@@ -62,7 +62,6 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
         builder.Services.AddUnique<IProfiler, TestProfiler>();
-        builder.Services.AddUmbracoEFCore();
 
         builder.Services.AddDbContext<TestUmbracoDbContext>(
             (serviceProvider, options) =>
@@ -94,7 +93,7 @@ public static class UmbracoBuilderExtensions
                     options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
                 }
             });
-        
+
         builder.Services.AddUnique<IAmbientEFCoreScopeStack<TestUmbracoDbContext>, AmbientEFCoreScopeStack<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>, EFCoreScopeAccessor<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeProvider<TestUmbracoDbContext>, EFCoreScopeProvider<TestUmbracoDbContext>>();
