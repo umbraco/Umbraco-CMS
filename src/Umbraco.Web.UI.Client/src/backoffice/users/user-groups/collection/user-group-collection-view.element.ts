@@ -62,10 +62,12 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
-			this.#collectionContext = instance as UmbUserGroupCollectionContext;
+			this.#collectionContext = instance;
 			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
 			this.observe(this.#collectionContext.items, (items) => {
 				this._userGroups = items;
+				console.log('items', items);
+
 				this._createTableItems(items);
 			});
 		});

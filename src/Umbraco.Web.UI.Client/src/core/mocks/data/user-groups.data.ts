@@ -1,5 +1,5 @@
 import { UmbEntityData } from './entity.data';
-import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { PagedUserGroupPresentationModel, UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
 class UmbUserGroupsData extends UmbEntityData<UserGroupPresentationModel> {
@@ -7,8 +7,11 @@ class UmbUserGroupsData extends UmbEntityData<UserGroupPresentationModel> {
 		super(data);
 	}
 
-	getAll() {
-		return this.data;
+	getAll(): PagedUserGroupPresentationModel {
+		return {
+			total: this.data.length,
+			items: this.data,
+		};
 	}
 }
 
