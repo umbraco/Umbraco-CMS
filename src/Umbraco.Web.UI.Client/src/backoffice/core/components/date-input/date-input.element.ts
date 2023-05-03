@@ -9,8 +9,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-date-input')
 export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
-	static styles = [UUITextStyles, css``];
-
 	protected getFormElement() {
 		return undefined;
 	}
@@ -143,6 +141,8 @@ export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
 			.value="${this.displayValue?.replace('Z', '')}">
 		</uui-input>`;
 	}
+
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbDateInputElement;
