@@ -8,7 +8,6 @@ import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../core/components/workspace/workspace-variant/workspace-variant.element';
 import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 

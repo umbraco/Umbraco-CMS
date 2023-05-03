@@ -53,6 +53,7 @@ import './workspace/workspace-action/workspace-action.element';
 import './workspace/workspace-editor/workspace-editor.element';
 import './workspace/workspace-footer/workspace-footer.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
+import './workspace/workspace-variant/workspace-variant.element';
 
 import './property-creator/property-creator.element';
 

@@ -5,7 +5,6 @@ import { repeat } from 'lit/directives/repeat.js';
 import { ActiveVariant } from '../../../core/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../core/components/workspace/workspace-variant/workspace-variant.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-split-view')
