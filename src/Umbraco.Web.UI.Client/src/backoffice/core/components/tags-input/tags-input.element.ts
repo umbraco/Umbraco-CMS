@@ -10,171 +10,6 @@ import { TagResource, TagResponseModel } from '@umbraco-cms/backoffice/backend-a
 
 @customElement('umb-tags-input')
 export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
-	static styles = [
-		UUITextStyles,
-		css`
-			#wrapper {
-				box-sizing: border-box;
-				display: flex;
-				gap: var(--uui-size-space-2);
-				flex-wrap: wrap;
-				align-items: center;
-				padding: var(--uui-size-space-2);
-				border: 1px solid var(--uui-color-border);
-				background-color: var(--uui-input-background-color, var(--uui-color-surface));
-				flex: 1;
-			}
-
-			#main-tag-wrapper {
-				position: relative;
-			}
-
-			/** Tags */
-
-			uui-tag {
-				position: relative;
-				max-width: 200px;
-			}
-
-			uui-tag uui-icon {
-				cursor: pointer;
-				min-width: 12.8px !important;
-			}
-
-			uui-tag span {
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			/** Created tags */
-
-			.tag uui-icon {
-				margin-left: var(--uui-size-space-2);
-			}
-
-			.tag uui-icon:hover,
-			.tag uui-icon:active {
-				color: var(--uui-color-selected-contrast);
-			}
-
-			/** Main tag */
-
-			#main-tag {
-				padding: 3px;
-				background-color: var(--uui-color-selected-contrast);
-				min-width: 20px;
-				position: relative;
-				border-radius: var(--uui-size-5, 12px);
-			}
-
-			#main-tag uui-icon {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-			}
-
-			#main-tag:hover uui-icon,
-			#main-tag:active uui-icon {
-				color: var(--uui-color-selected);
-			}
-
-			#main-tag #tag-input:focus ~ uui-icon,
-			#main-tag #tag-input:not(:placeholder-shown) ~ uui-icon {
-				display: none;
-			}
-
-			#main-tag:has(*:hover),
-			#main-tag:has(*:active),
-			#main-tag:has(*:focus) {
-				border: 1px solid var(--uui-color-selected-emphasis);
-			}
-
-			#main-tag:has(#tag-input:not(:focus)):hover {
-				cursor: pointer;
-				border: 1px solid var(--uui-color-selected-emphasis);
-			}
-
-			#main-tag:not(:focus-within) #tag-input:placeholder-shown {
-				opacity: 0;
-			}
-
-			#main-tag:has(#tag-input:focus),
-			#main-tag:has(#tag-input:not(:placeholder-shown)) {
-				min-width: 65px;
-			}
-
-			#main-tag #tag-input {
-				box-sizing: border-box;
-				max-height: 25.8px;
-				background: none;
-				font: inherit;
-				color: var(--uui-color-selected);
-				line-height: reset;
-				padding: 0 var(--uui-size-space-2);
-				margin: 0.5px 0 -0.5px;
-				border: none;
-				outline: none;
-				width: 100%;
-			}
-
-			/** Dropdown matchlist */
-
-			#matchlist input[type='radio'] {
-				-webkit-appearance: none;
-				appearance: none;
-				/* For iOS < 15 to remove gradient background */
-				background-color: transparent;
-				/* Not removed via appearance */
-				margin: 0;
-			}
-
-			uui-tag:focus-within #matchlist {
-				display: flex;
-			}
-
-			#matchlist {
-				display: none;
-				display: flex;
-				flex-direction: column;
-				background-color: var(--uui-color-surface);
-				position: absolute;
-				width: 150px;
-				left: 0;
-				top: var(--uui-size-space-6);
-				border-radius: var(--uui-border-radius);
-				border: 1px solid var(--uui-color-border);
-			}
-
-			#matchlist label {
-				display: none;
-				cursor: pointer;
-				box-sizing: border-box;
-				display: block;
-				width: 100%;
-				background: none;
-				border: none;
-				text-align: left;
-				padding: 10px 12px;
-
-				/** Overflow */
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			#matchlist label:hover,
-			#matchlist label:focus,
-			#matchlist label:focus-within,
-			#matchlist input[type='radio']:focus + label {
-				display: block;
-				background-color: var(--uui-color-focus);
-				color: var(--uui-color-selected-contrast);
-			}
-		`,
-	];
-
 	@property({ type: String })
 	group?: string;
 
@@ -396,6 +231,171 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 			</div>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			#wrapper {
+				box-sizing: border-box;
+				display: flex;
+				gap: var(--uui-size-space-2);
+				flex-wrap: wrap;
+				align-items: center;
+				padding: var(--uui-size-space-2);
+				border: 1px solid var(--uui-color-border);
+				background-color: var(--uui-input-background-color, var(--uui-color-surface));
+				flex: 1;
+			}
+
+			#main-tag-wrapper {
+				position: relative;
+			}
+
+			/** Tags */
+
+			uui-tag {
+				position: relative;
+				max-width: 200px;
+			}
+
+			uui-tag uui-icon {
+				cursor: pointer;
+				min-width: 12.8px !important;
+			}
+
+			uui-tag span {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			/** Created tags */
+
+			.tag uui-icon {
+				margin-left: var(--uui-size-space-2);
+			}
+
+			.tag uui-icon:hover,
+			.tag uui-icon:active {
+				color: var(--uui-color-selected-contrast);
+			}
+
+			/** Main tag */
+
+			#main-tag {
+				padding: 3px;
+				background-color: var(--uui-color-selected-contrast);
+				min-width: 20px;
+				position: relative;
+				border-radius: var(--uui-size-5, 12px);
+			}
+
+			#main-tag uui-icon {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+
+			#main-tag:hover uui-icon,
+			#main-tag:active uui-icon {
+				color: var(--uui-color-selected);
+			}
+
+			#main-tag #tag-input:focus ~ uui-icon,
+			#main-tag #tag-input:not(:placeholder-shown) ~ uui-icon {
+				display: none;
+			}
+
+			#main-tag:has(*:hover),
+			#main-tag:has(*:active),
+			#main-tag:has(*:focus) {
+				border: 1px solid var(--uui-color-selected-emphasis);
+			}
+
+			#main-tag:has(#tag-input:not(:focus)):hover {
+				cursor: pointer;
+				border: 1px solid var(--uui-color-selected-emphasis);
+			}
+
+			#main-tag:not(:focus-within) #tag-input:placeholder-shown {
+				opacity: 0;
+			}
+
+			#main-tag:has(#tag-input:focus),
+			#main-tag:has(#tag-input:not(:placeholder-shown)) {
+				min-width: 65px;
+			}
+
+			#main-tag #tag-input {
+				box-sizing: border-box;
+				max-height: 25.8px;
+				background: none;
+				font: inherit;
+				color: var(--uui-color-selected);
+				line-height: reset;
+				padding: 0 var(--uui-size-space-2);
+				margin: 0.5px 0 -0.5px;
+				border: none;
+				outline: none;
+				width: 100%;
+			}
+
+			/** Dropdown matchlist */
+
+			#matchlist input[type='radio'] {
+				-webkit-appearance: none;
+				appearance: none;
+				/* For iOS < 15 to remove gradient background */
+				background-color: transparent;
+				/* Not removed via appearance */
+				margin: 0;
+			}
+
+			uui-tag:focus-within #matchlist {
+				display: flex;
+			}
+
+			#matchlist {
+				display: none;
+				display: flex;
+				flex-direction: column;
+				background-color: var(--uui-color-surface);
+				position: absolute;
+				width: 150px;
+				left: 0;
+				top: var(--uui-size-space-6);
+				border-radius: var(--uui-border-radius);
+				border: 1px solid var(--uui-color-border);
+			}
+
+			#matchlist label {
+				display: none;
+				cursor: pointer;
+				box-sizing: border-box;
+				display: block;
+				width: 100%;
+				background: none;
+				border: none;
+				text-align: left;
+				padding: 10px 12px;
+
+				/** Overflow */
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			#matchlist label:hover,
+			#matchlist label:focus,
+			#matchlist label:focus-within,
+			#matchlist input[type='radio']:focus + label {
+				display: block;
+				background-color: var(--uui-color-focus);
+				color: var(--uui-color-selected-contrast);
+			}
+		`,
+	];
 }
 
 export default UmbTagsInputElement;

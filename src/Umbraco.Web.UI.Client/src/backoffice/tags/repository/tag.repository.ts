@@ -26,16 +26,16 @@ export class UmbTagRepository {
 	}
 
 	async requestTags(
-		{ query, skip, take, tagGroup, culture } = { query: '', skip: 0, take: 1000, tagGroup: '', culture: '' }
+		{ query, skip, take, tagGroup, culture } = { query: '', skip: 0, take: 1000, tagGroup: 'default', culture: '' }
 	) {
 		await this.#init;
 
 		const { data, error } = await this.#dataSource.getCollection({ query, skip, take, tagGroup, culture });
 
 		if (data) {
-			data.items.forEach((x) => this.#tagStore?.append(x));
+			this.#tagStore?.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this.#tagStore!.data };
+		return { data, error, asObservable: () => this.#tagStore?.byGroup(tagGroup) };
 	}
 }

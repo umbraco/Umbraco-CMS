@@ -33,10 +33,10 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	}
 
 	render() {
-		return html`<umb-input-tags
+		return html`<umb-tags-input
 			group="${ifDefined(this._group)}"
 			.items="${this.value}"
-			@change="${this._onChange}"></umb-input-tags>`;
+			@change="${this._onChange}"></umb-tags-input>`;
 	}
 
 	static styles = [UUITextStyles];
