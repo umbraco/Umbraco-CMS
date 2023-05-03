@@ -46,7 +46,7 @@ test.describe('Tabs', () => {
     await openDocTypeFolder(umbracoUi, page);
   }
 
-  test.only('Click dashboard tabs', async ({umbracoUi, page}) => {
+  test('Click dashboard tabs', async ({umbracoUi, page}) => {
     await umbracoUi.goToSection('content');
     await page.locator('[data-element="tab-contentRedirectManager"] > button').click();
     expect(page.locator('.redirecturlsearch')).not.toBeNull();
