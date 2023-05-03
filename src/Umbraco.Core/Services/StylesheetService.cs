@@ -103,7 +103,7 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
         }
 
         if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false
-           && Repository.Exists(createModel.ParentPath) is false)
+            && Repository.FolderExists(createModel.ParentPath) is false)
         {
             return StylesheetOperationStatus.ParentNotFound;
         }
