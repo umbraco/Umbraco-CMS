@@ -37,8 +37,6 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
-	//TODO: UUI-INPUT needs to handle max, min, and step natively in its input field, maybe make a uui-input-number?
-
 	render() {
 		return html`<uui-input
 			.value=${this.value}
