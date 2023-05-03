@@ -4,7 +4,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
 import type { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-variantable-property')
