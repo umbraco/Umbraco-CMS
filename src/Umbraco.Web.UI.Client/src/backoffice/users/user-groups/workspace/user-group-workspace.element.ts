@@ -16,7 +16,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 		{
 			path: ':id',
 			component: () => this.#element,
-			setup: (_component, info) => {
+			setup: (component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},
