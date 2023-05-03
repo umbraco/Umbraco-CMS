@@ -9,6 +9,7 @@ import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
 } from '../../../users/current-user/current-user.store';
+import type { UmbLoggedInUser } from '../../../users/current-user/types';
 import { availableLanguages } from './input-tiny-mce.languages';
 import {
 	TinyMcePluginArguments,
@@ -17,7 +18,7 @@ import {
 } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import type { ClassConstructor, UserDetails } from '@umbraco-cms/backoffice/models';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { hasDefaultExport, loadExtension, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -93,7 +94,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#currentUserStore?: UmbCurrentUserStore;
 	modalContext!: UmbModalContext;
 	#mediaHelper = new UmbMediaHelper();
-	#currentUser?: UserDetails;
+	#currentUser?: UmbLoggedInUser;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 
 	protected getFormElement() {
@@ -116,7 +117,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	async #observeCurrentUser() {
 		if (!this.#currentUserStore) return;
 
-		this.observe(this.#currentUserStore.currentUser, (currentUser?: UserDetails) => {
+		this.observe(this.#currentUserStore.currentUser, (currentUser?: UmbLoggedInUser) => {
 			this.#currentUser = currentUser;
 		});
 	}
