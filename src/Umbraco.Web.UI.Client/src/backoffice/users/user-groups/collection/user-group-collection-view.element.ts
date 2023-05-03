@@ -5,9 +5,7 @@ import {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
-	UmbTableElement,
 	UmbTableItem,
-	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '../../../shared/components/table';
 import { UmbUserGroupCollectionContext } from './user-group-collection.context';
@@ -66,8 +64,6 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
 			this.observe(this.#collectionContext.items, (items) => {
 				this._userGroups = items;
-				console.log('items', items);
-
 				this._createTableItems(items);
 			});
 		});
@@ -112,13 +108,6 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 		console.log('HANDLE DESELECT');
 	}
 
-	private _handleOrdering(event: UmbTableOrderedEvent) {
-		const table = event.target as UmbTableElement;
-		const orderingColumn = table.orderingColumn;
-		const orderingDesc = table.orderingDesc;
-		console.log(`fetch users, order column: ${orderingColumn}, desc: ${orderingDesc}`);
-	}
-
 	render() {
 		return html`
 			<umb-table
@@ -127,8 +116,7 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 				.items=${this._tableItems}
 				.selection=${this._selection}
 				@selected="${this._handleSelected}"
-				@deselected="${this._handleDeselected}"
-				@ordered="${this._handleOrdering}"></umb-table>
+				@deselected="${this._handleDeselected}"></umb-table>
 		`;
 	}
 
