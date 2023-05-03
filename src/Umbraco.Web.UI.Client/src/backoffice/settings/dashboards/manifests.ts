@@ -18,21 +18,6 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 	{
 		type: 'dashboard',
-		alias: 'Umb.Dashboard.ExamineManagement',
-		name: 'Examine Management Dashboard',
-		elementName: 'umb-dashboard-examine-management',
-		loader: () => import('./examine-management/dashboard-examine-management.element'),
-		weight: 400,
-		meta: {
-			label: 'Examine Management',
-			pathname: 'examine-management',
-		},
-		conditions: {
-			sections: ['Umb.Section.Settings'],
-		},
-	},
-	{
-		type: 'dashboard',
 		alias: 'Umb.Dashboard.ModelsBuilder',
 		name: 'Models Builder Dashboard',
 		elementName: 'umb-dashboard-models-builder',
@@ -113,7 +98,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.ExamineFieldsSettings',
 		name: 'Examine Field Settings Modal',
-		loader: () => import('./examine-management/views/modal-views/fields-settings.element'),
+		loader: () => import('../../search/examine-management-dashboard/views/modal-views/fields-settings.element'),
 	},
 ];
 
