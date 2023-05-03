@@ -32,7 +32,6 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observePoolingConfig();
-			this.#logViewerContext.getLogs();
 		});
 	}
 
