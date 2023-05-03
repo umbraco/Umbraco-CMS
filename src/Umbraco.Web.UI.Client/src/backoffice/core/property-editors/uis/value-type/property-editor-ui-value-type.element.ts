@@ -1,24 +1,50 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { UUISelectEvent } from '@umbraco-ui/uui';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-property-editor-ui-value-type
  */
+
 @customElement('umb-property-editor-ui-value-type')
 export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	@property()
 	value = '';
 
+	@state()
+	private _options: Array<Option> = [
+		{ name: 'String', value: 'STRING' },
+		{ name: 'Decimal', value: 'DECIMAL' },
+		{ name: 'Date/Time', value: 'DATETIME' },
+		{ name: 'Time', value: 'TIME' },
+		{ name: 'Integer', value: 'INT' },
+		{ name: 'Big Integer', value: 'BIGINT' },
+		{ name: 'Long String', value: 'TEXT' },
+	];
+
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
+		const valueAlias = config.find((x) => x.alias === 'value');
+		if (!valueAlias) return;
+
+		this.value = valueAlias.value as string;
+		const index = this._options.findIndex((option) => option.value === valueAlias);
+
+		if (index < 0) return;
+		this._options[0].selected = true;
+	}
+
+	#onChange(e: UUISelectEvent) {
+		this.value = e.target.value as string;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
 
 	render() {
-		return html`<div>umb-property-editor-ui-value-type</div>`;
+		return html`<uui-select .options="${this._options}" @change="${this.#onChange}"> </uui-select>`;
 	}
 
 	static styles = [UUITextStyles];
