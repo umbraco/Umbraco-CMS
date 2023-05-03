@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -58,10 +59,14 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetResized(string imagePath, int width)
         {
+            // We have to use HttpUtility to encode the path here, for non-ASCII characters
+            // We cannot use the WebUtility, as we only want to encode the path, and not the entire string
+            var encodedImagePath = HttpUtility.UrlPathEncode(imagePath);
+
             var ext = Path.GetExtension(imagePath);
 
             // check if imagePath is local to prevent open redirect
-            if (!IsAllowed(imagePath))
+            if (!IsAllowed(encodedImagePath))
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
             }
@@ -87,23 +92,24 @@ namespace Umbraco.Web.Editors
             }
 
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
-            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(encodedImagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
 
             var response = Request.CreateResponse(HttpStatusCode.Found);
             response.Headers.Location = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
             return response;
         }
 
-        private bool IsAllowed(string imagePath)
+        private bool IsAllowed(string encodedImagePath)
         {
-            if(Uri.IsWellFormedUriString(imagePath, UriKind.Relative))
+
+            if(Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
             {
                 return true;
             }
 
             if (_contentSection is ContentElement contentElement)
             {
-                var builder = new UriBuilder(imagePath);
+                var builder = new UriBuilder(encodedImagePath);
 
                 foreach (var allowedMediaHost in contentElement.AllowedMediaHosts)
                 {
