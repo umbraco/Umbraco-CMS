@@ -73,6 +73,9 @@ export class UmbLogViewerWorkspaceContext {
 	#canShowLogs = new UmbBasicState<boolean | null>(null);
 	canShowLogs = createObservablePart(this.#canShowLogs, (data) => data);
 
+	#isLoadingLogs = new UmbBasicState<boolean | null>(null);
+	isLoadingLogs = createObservablePart(this.#isLoadingLogs, (data) => data);
+
 	#filterExpression = new UmbStringState<string>('');
 	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
 
@@ -101,18 +104,7 @@ export class UmbLogViewerWorkspaceContext {
 		this.#repository = new UmbLogViewerRepository(this.#host);
 	}
 
-	async init() {
-		this.validateLogSize();
-	}
-
-	reset() {
-		this.#logs.next({ items: [], total: 0 });
-		this.setCurrentPage(1);
-	}
-
 	onChangeState = () => {
-		this.reset();
-
 		const searchQuery = query();
 		let sanitizedQuery = '';
 		if (searchQuery.lq) {
@@ -262,9 +254,13 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	getLogs = async () => {
-		if (!this.#canShowLogs.getValue()) {
+		if (this.#canShowLogs.getValue() === false) {
 			return;
 		}
+
+		const isPollingEnabled = this.#polling.getValue().enabled;
+
+		if (!isPollingEnabled) this.#isLoadingLogs.next(true);
 
 		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
@@ -279,7 +275,7 @@ export class UmbLogViewerWorkspaceContext {
 		};
 
 		const { data } = await this.#repository.getLogs(options);
-
+		this.#isLoadingLogs.next(false);
 		if (data) {
 			this.#logs.next(data);
 		}
