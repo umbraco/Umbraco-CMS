@@ -1,3 +1,5 @@
+export * from './tree.context';
+
 export interface UmbTreeRootModel {
 	type: string;
 	name: string;

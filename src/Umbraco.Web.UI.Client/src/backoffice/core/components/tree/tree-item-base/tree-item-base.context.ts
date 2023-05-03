@@ -1,8 +1,8 @@
 import { map } from 'rxjs';
+import { UmbTreeItemContext } from '../tree-item.context.interface';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
-import { UmbTreeContextBase } from '../tree.context';
-import { UmbTreeItemContext } from '../tree-item.context.interface';
+import { UmbTreeContextBase } from '@umbraco-cms/backoffice/tree';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
 import {
 	UmbBooleanState,
