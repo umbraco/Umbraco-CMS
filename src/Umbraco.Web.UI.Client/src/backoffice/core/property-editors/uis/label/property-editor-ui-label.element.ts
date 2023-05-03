@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
@@ -12,8 +12,6 @@ type umbracoDataValueType = 'STRING' | 'DECIMAL' | 'DATE/TIME' | 'TIME' | 'INTEG
  */
 @customElement('umb-property-editor-ui-label')
 export class UmbPropertyEditorUILabelElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	@property()
 	value = '';
 
@@ -30,7 +28,7 @@ export class UmbPropertyEditorUILabelElement extends UmbLitElement implements Um
 	}
 
 	render() {
-		return nothing;
+		return html`${this.value}`;
 	}
 
 	static styles = [UUITextStyles];
