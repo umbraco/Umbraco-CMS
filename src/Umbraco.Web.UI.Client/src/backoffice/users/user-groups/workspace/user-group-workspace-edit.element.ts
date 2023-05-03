@@ -3,7 +3,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbUserStore } from '../../users/repository/user.store';
 import type { UserGroupDetails } from '../types';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -14,158 +13,28 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-user-group-workspace-edit')
 export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
-	defaultPermissions: Array<{
-		name: string;
-		permissions: Array<{ name: string; description: string; value: boolean }>;
-	}> = [
-		{
-			name: 'Administration',
-			permissions: [
-				{
-					name: 'Culture and Hostnames',
-					description: 'Allow access to assign culture and hostnames',
-					value: false,
-				},
-				{
-					name: 'Restrict Public Access',
-					description: 'Allow access to set and change access restrictions for a node',
-					value: false,
-				},
-				{
-					name: 'Rollback',
-					description: 'Allow access to roll back a node to a previous state',
-					value: false,
-				},
-			],
-		},
-		{
-			name: 'Content',
-			permissions: [
-				{
-					name: 'Browse Node',
-					description: 'Allow access to view a node',
-					value: false,
-				},
-				{
-					name: 'Create Content Template',
-					description: 'Allow access to create a Content Template',
-					value: false,
-				},
-				{
-					name: 'Delete',
-					description: 'Allow access to delete nodes',
-					value: false,
-				},
-				{
-					name: 'Create',
-					description: 'Allow access to create nodes',
-					value: false,
-				},
-				{
-					name: 'Publish',
-					description: 'Allow access to publish nodes',
-					value: false,
-				},
-				{
-					name: 'Permissions',
-					description: 'Allow access to change permissions for a node',
-					value: false,
-				},
-				{
-					name: 'Send To Publish',
-					description: 'Allow access to send a node for approval before publishing',
-					value: false,
-				},
-				{
-					name: 'Unpublish',
-					description: 'Allow access to unpublish a node',
-					value: false,
-				},
-				{
-					name: 'Update',
-					description: 'Allow access to save a node',
-					value: false,
-				},
-				{
-					name: 'Full restore',
-					description: 'Allow the user to restore items',
-					value: false,
-				},
-				{
-					name: 'Partial restore',
-					description: 'Allow the user to partial restore items',
-					value: false,
-				},
-				{
-					name: 'Queue for transfer',
-					description: 'Allow the user to queue item(s)',
-					value: false,
-				},
-			],
-		},
-		{
-			name: 'Structure',
-			permissions: [
-				{
-					name: 'Copy',
-					description: 'Allow access to copy a node',
-					value: false,
-				},
-				{
-					name: 'Move',
-					description: 'Allow access to move a node',
-					value: false,
-				},
-				{
-					name: 'Sort',
-					description: 'Allow access to change the sort order for nodes',
-					value: false,
-				},
-			],
-		},
-	];
-
-	private _userStore?: UmbUserStore;
-
-	#workspaceContext?: UmbUserGroupWorkspaceContext;
-
 	@state()
 	private _userGroup?: UserGroupDetails;
 
 	@state()
 	private _userKeys?: Array<string>;
 
+	#workspaceContext?: UmbUserGroupWorkspaceContext;
+	#defaultPermissions = tempDefaultPermissions;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbUserGroupWorkspaceContext;
-			this.observeUserGroup();
+			this.#observeUserGroup();
 		});
 	}
 
-	observeUserGroup() {
+	#observeUserGroup() {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup as any));
 	}
-
-	// private _observeUsers() {
-	// 	if (!this._userStore) return;
-
-	// 	// TODO: Create method to only get users from this userGroup
-	// 	// TODO: Find a better way to only call this once at the start
-	// 	this.observe(this._userStore.getAll(), (users) => {
-	// 		// TODO: handle if there is no users.
-	// 		if (!this._userKeys && users.length > 0) {
-	// 			const entityId = this.#workspaceContext?.getEntityId();
-	// 			if (!entityId) return;
-	// 			this._userKeys = users.filter((user) => user.userGroups.includes(entityId)).map((user) => user.id);
-	// 			//this._updateProperty('users', this._userKeys);
-	// 			// TODO: make a method on the UmbWorkspaceUserGroupContext:
-	// 			//this._workspaceContext.setUsers();
-	// 		}
-	// 	});
-	// }
 
 	private _updateUserKeys(userKeys: Array<string>) {
 		this._userKeys = userKeys;
@@ -242,7 +111,7 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 				<div slot="headline">Default Permissions</div>
 				<div id="default-permissions">
 					${repeat(
-						this.defaultPermissions,
+						this.#defaultPermissions,
 						(defaultPermission) => html`
 							<div>
 								<b>${defaultPermission.name}</b>
@@ -280,13 +149,13 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		</uui-box>`;
 	}
 
-	// TODO: find a way where we don't have to do this for all Workspaces.
-	private _handleInput(event: UUIInputEvent) {
+	// TODO. find a way where we don't have to do this for all workspaces.
+	#onNameChange(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.setName(target.value);
+				this.#workspaceContext?.updateProperty('name', target.value);
 			}
 		}
 	}
@@ -296,12 +165,23 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.UserGroup">
-				<uui-input id="name" slot="header" .value=${this._userGroup.name} @input="${this._handleInput}"></uui-input>
+				${this.#renderHeader()}
 				<div id="main">
 					<div id="left-column">${this.renderLeftColumn()}</div>
 					<div id="right-column">${this.renderRightColumn()}</div>
 				</div>
 			</umb-workspace-editor>
+		`;
+	}
+
+	#renderHeader() {
+		return html`
+			<div id="header" slot="header">
+				<a href="/section/user-groups">
+					<uui-icon name="umb:arrow-left"></uui-icon>
+				</a>
+				<uui-input id="name" .value=${this._userGroup?.name ?? ''} @input="${this.#onNameChange}"></uui-input>
+			</div>
 		`;
 	}
 
@@ -362,6 +242,126 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		`,
 	];
 }
+
+// TEMP MOCK DATA
+type TempPermissionGroup = {
+	name: string;
+	permissions: Array<TempPermission>;
+};
+
+type TempPermission = {
+	name: string;
+	description: string;
+	value: boolean;
+};
+
+const tempDefaultPermissions: Array<TempPermissionGroup> = [
+	{
+		name: 'Administration',
+		permissions: [
+			{
+				name: 'Culture and Hostnames',
+				description: 'Allow access to assign culture and hostnames',
+				value: false,
+			},
+			{
+				name: 'Restrict Public Access',
+				description: 'Allow access to set and change access restrictions for a node',
+				value: false,
+			},
+			{
+				name: 'Rollback',
+				description: 'Allow access to roll back a node to a previous state',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Content',
+		permissions: [
+			{
+				name: 'Browse Node',
+				description: 'Allow access to view a node',
+				value: false,
+			},
+			{
+				name: 'Create Content Template',
+				description: 'Allow access to create a Content Template',
+				value: false,
+			},
+			{
+				name: 'Delete',
+				description: 'Allow access to delete nodes',
+				value: false,
+			},
+			{
+				name: 'Create',
+				description: 'Allow access to create nodes',
+				value: false,
+			},
+			{
+				name: 'Publish',
+				description: 'Allow access to publish nodes',
+				value: false,
+			},
+			{
+				name: 'Permissions',
+				description: 'Allow access to change permissions for a node',
+				value: false,
+			},
+			{
+				name: 'Send To Publish',
+				description: 'Allow access to send a node for approval before publishing',
+				value: false,
+			},
+			{
+				name: 'Unpublish',
+				description: 'Allow access to unpublish a node',
+				value: false,
+			},
+			{
+				name: 'Update',
+				description: 'Allow access to save a node',
+				value: false,
+			},
+			{
+				name: 'Full restore',
+				description: 'Allow the user to restore items',
+				value: false,
+			},
+			{
+				name: 'Partial restore',
+				description: 'Allow the user to partial restore items',
+				value: false,
+			},
+			{
+				name: 'Queue for transfer',
+				description: 'Allow the user to queue item(s)',
+				value: false,
+			},
+		],
+	},
+	{
+		name: 'Structure',
+		permissions: [
+			{
+				name: 'Copy',
+				description: 'Allow access to copy a node',
+				value: false,
+			},
+			{
+				name: 'Move',
+				description: 'Allow access to move a node',
+				value: false,
+			},
+			{
+				name: 'Sort',
+				description: 'Allow access to change the sort order for nodes',
+				value: false,
+			},
+		],
+	},
+];
 
 export default UmbUserGroupWorkspaceEditElement;
 
