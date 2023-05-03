@@ -39,6 +39,7 @@ export default {
 					imports: {
 						'src/': './src/',
 						'@umbraco-cms/backoffice/backend-api': './libs/backend-api/index.ts',
+						'@umbraco-cms/backoffice/content-type': './libs/content-type/index.ts',
 						'@umbraco-cms/backoffice/context-api': './libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller': './libs/controller/index.ts',
 						'@umbraco-cms/backoffice/element': './libs/element/index.ts',
@@ -56,10 +57,19 @@ export default {
 						'@umbraco-cms/backoffice/store': './libs/store/index.ts',
 						'@umbraco-cms/backoffice/utils': './libs/utils/index.ts',
 						'@umbraco-cms/backoffice/workspace': './libs/workspace/index.ts',
+						'@umbraco-cms/backoffice/picker-input': './libs/picker-input/index.ts',
+						'@umbraco-cms/backoffice/id': './libs/id/index.ts',
+						'@umbraco-cms/backoffice/collection': './libs/collection/index.ts',
+						'@umbraco-cms/backoffice/tree': './libs/tree/index.ts',
+						'@umbraco-cms/backoffice/section': './libs/section/index.ts',
+
+						'@umbraco-cms/backoffice/user-group': './src/backoffice/users/user-groups/index.ts',
+
 						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
 						'@umbraco-cms/internal/router': './src/core/router/index.ts',
-						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts'
+						'@umbraco-cms/internal/sorter': './src/core/sorter/index.ts',
+						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
 				},
 			},

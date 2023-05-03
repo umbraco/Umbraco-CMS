@@ -1,6 +1,8 @@
-import { ManifestLoaderType } from './load-extension.function';
-import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
 
-export function isManifestLoaderType(manifest: ManifestBase): manifest is ManifestLoaderType {
-	return typeof (manifest as ManifestLoaderType).loader === 'function';
+import type { ManifestBase, ManifestWithLoader } from '@umbraco-cms/backoffice/extensions-registry';
+export type ManifestLoaderType<T> = ManifestWithLoader<T> & {
+	loader: () => Promise<T>;
+};
+export function isManifestLoaderType<T>(manifest: ManifestBase): manifest is ManifestLoaderType<T> {
+	return typeof (manifest as ManifestLoaderType<T>).loader === 'function';
 }

@@ -1,21 +1,21 @@
-import { TemplateTreeDataSource } from '.';
-import { ProblemDetailsModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { TemplateTreeDataSource } from '.';
+import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template tree that fetches data from the server
  * @export
- * @class TemplateTreeServerDataSource
+ * @class UmbTemplateTreeServerDataSource
  * @implements {TemplateTreeDataSource}
  */
-export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
+export class UmbTemplateTreeServerDataSource implements TemplateTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
-	 * Creates an instance of TemplateTreeServerDataSource.
+	 * Creates an instance of UmbTemplateTreeServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -24,7 +24,7 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
@@ -34,32 +34,34 @@ export class TemplateTreeServerDataSource implements TemplateTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { error };
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
-		return tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTreeTemplateChildren({
-				parentId,
-			})
-		);
+		/* TODO: should we make getRootItems() internal 
+		so it only is a server concern that there are two endpoints? */
+		if (parentId === null) {
+			return this.getRootItems();
+		} else {
+			return tryExecuteAndNotify(
+				this.#host,
+				TemplateResource.getTreeTemplateChildren({
+					parentId,
+				})
+			);
+		}
 	}
 
 	/**
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} id
 	 * @return {*}
-	 * @memberof TemplateTreeServerDataSource
+	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

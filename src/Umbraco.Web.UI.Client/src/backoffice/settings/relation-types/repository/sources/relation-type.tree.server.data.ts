@@ -1,23 +1,22 @@
-import { RelationTypeTreeDataSource } from '.';
-import { ProblemDetailsModel, RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbRelationTypeTreeDataSource } from '.';
+import { RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the RelationType tree that fetches data from the server
  * @export
- * @class RelationTypeTreeServerDataSource
- * @implements {RelationTypeTreeDataSource}
+ * @class UmbRelationTypeTreeServerDataSource
+ * @implements {UmbRelationTypeTreeDataSource}
  */
-export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSource {
+export class UmbRelationTypeTreeServerDataSource implements UmbRelationTypeTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
 	async trashItems(ids: Array<string>) {
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'RelationType ids is missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		// TODO: use resources when end point is ready:
@@ -47,9 +46,9 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 	}
 
 	/**
-	 * Creates an instance of RelationTypeTreeServerDataSource.
+	 * Creates an instance of UmbRelationTypeTreeServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof RelationTypeTreeServerDataSource
+	 * @memberof UmbRelationTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -58,7 +57,7 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof RelationTypeTreeServerDataSource
+	 * @memberof UmbRelationTypeTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, RelationTypeResource.getTreeRelationTypeRoot({}));
@@ -68,12 +67,11 @@ export class RelationTypeTreeServerDataSource implements RelationTypeTreeDataSou
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof RelationTypeTreeServerDataSource
+	 * @memberof UmbRelationTypeTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (ids) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

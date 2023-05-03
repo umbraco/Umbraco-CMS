@@ -1,5 +1,5 @@
 import type { MediaDetails } from '../';
-import { MediaTreeServerDataSource } from './sources/media.tree.server.data';
+import { UmbMediaTreeServerDataSource } from './sources/media.tree.server.data';
 import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
 import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
@@ -8,7 +8,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateMediaRequestModel,
-	ProblemDetailsModel,
+	EntityTreeItemResponseModel,
 	UpdateMediaRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
@@ -17,7 +17,9 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 type ItemDetailType = MediaDetails;
 
 export class UmbMediaRepository
-	implements UmbTreeRepository, UmbDetailRepository<CreateMediaRequestModel, UpdateMediaRequestModel, MediaDetails>
+	implements
+		UmbTreeRepository<EntityTreeItemResponseModel>,
+		UmbDetailRepository<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>
 {
 	#host: UmbControllerHostElement;
 
@@ -36,7 +38,7 @@ export class UmbMediaRepository
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new MediaTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbMediaTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbMediaDetailServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -67,6 +69,21 @@ export class UmbMediaRepository
 		}
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'media-root',
+			name: 'Media',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -81,11 +98,7 @@ export class UmbMediaRepository
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -96,12 +109,11 @@ export class UmbMediaRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -119,7 +131,7 @@ export class UmbMediaRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
@@ -127,7 +139,7 @@ export class UmbMediaRepository
 	// DETAILS:
 
 	async createScaffold(parentId: string | null) {
-		if (!parentId) throw new Error('Parent id is missing');
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
 		return this.#detailDataSource.createScaffold(parentId);
 	}
@@ -143,6 +155,12 @@ export class UmbMediaRepository
 		}
 
 		return { data, error };
+	}
+
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#store!.byId(id);
 	}
 
 	// Could potentially be general methods:
@@ -220,7 +238,7 @@ export class UmbMediaRepository
 		alert('implement trash');
 	}
 
-	async move(ids: Array<string>, destination: string) {
+	async move(ids: Array<string>, destination: string | null) {
 		// TODO: use backend cli when available.
 		const res = await fetch('/umbraco/management/api/v1/media/move', {
 			method: 'POST',

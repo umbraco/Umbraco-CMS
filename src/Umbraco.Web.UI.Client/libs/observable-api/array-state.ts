@@ -1,17 +1,17 @@
-import { DeepState } from './deep-state';
+import { UmbDeepState } from './deep-state';
 import { partialUpdateFrozenArray } from './partial-update-frozen-array.function';
 import { pushToUniqueArray } from './push-to-unique-array.function';
 
 /**
  * @export
- * @class ArrayState
- * @extends {DeepState<T>}
+ * @class UmbArrayState
+ * @extends {UmbDeepState<T>}
  * @description - A RxJS BehaviorSubject which deepFreezes the object-data to ensure its not manipulated from any implementations.
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  *
  * The ArrayState provides methods to append data when the data is an Object.
  */
-export class ArrayState<T> extends DeepState<T[]> {
+export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	#getUnique?: (entry: T) => unknown;
 	#sortMethod?: (a: T, b: T) => number;
 
@@ -29,7 +29,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.key);
+	 * const myState = new UmbArrayState(data, (x) => x.key);
 	 * myState.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 	 */
 	sortBy(sortMethod?: (a: T, b: T) => number) {
@@ -48,14 +48,14 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method remove
 	 * @param {unknown[]} uniques - The unique values to remove.
-	 * @return {ArrayState<T>} Reference to it self.
+	 * @return {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with id '1' and '2'</caption>
 	 * const data = [
 	 * 	{ id: 1, value: 'foo'},
 	 * 	{ id: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.id);
+	 * const myState = new UmbArrayState(data, (x) => x.id);
 	 * myState.remove([1, 2]);
 	 */
 	remove(uniques: unknown[]) {
@@ -77,14 +77,14 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method removeOne
 	 * @param {unknown} unique - The unique value to remove.
-	 * @return {ArrayState<T>} Reference to it self.
+	 * @return {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with id '1'</caption>
 	 * const data = [
 	 * 	{ id: 1, value: 'foo'},
 	 * 	{ id: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.id);
+	 * const myState = new UmbArrayState(data, (x) => x.id);
 	 * myState.removeOne(1);
 	 */
 	removeOne(unique: unknown) {
@@ -104,7 +104,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method filter
 	 * @param {unknown} filterMethod - The unique value to remove.
-	 * @return {ArrayState<T>} Reference to it self.
+	 * @return {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with key '1'</caption>
 	 * const data = [
@@ -112,7 +112,7 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * 	{ key: 2, value: 'bar'},
 	 * 	{ key: 3, value: 'poo'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.key);
+	 * const myState = new UmbArrayState(data, (x) => x.key);
 	 * myState.filter((entry) => entry.key !== 1);
 	 *
 	 * Result:
@@ -130,14 +130,14 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method appendOne
 	 * @param {T} entry - new data to be added in this Subject.
-	 * @return {ArrayState<T>} Reference to it self.
+	 * @return {UmbArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data);
+	 * const myState = new UmbArrayState(data);
 	 * myState.append({ key: 1, value: 'replaced-foo'});
 	 */
 	appendOne(entry: T) {
@@ -154,14 +154,14 @@ export class ArrayState<T> extends DeepState<T[]> {
 	/**
 	 * @method append
 	 * @param {T[]} entries - A array of new data to be added in this Subject.
-	 * @return {ArrayState<T>} Reference to it self.
+	 * @return {UmbArrayState<T>} Reference to it self.
 	 * @description - Append some new data to this Subject, if it compares to existing data it will replace it.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data);
+	 * const myState = new UmbArrayState(data);
 	 * myState.append([
 	 * 	{ key: 1, value: 'replaced-foo'},
 	 * 	{ key: 3, value: 'another-bla'}
@@ -184,14 +184,14 @@ export class ArrayState<T> extends DeepState<T[]> {
 	 * @method updateOne
 	 * @param {unknown} unique - Unique value to find entry to update.
 	 * @param {Partial<T>} entry - new data to be added in this Subject.
-	 * @return {ArrayState<T>} Reference to it self.
+	 * @return {UmbArrayState<T>} Reference to it self.
 	 * @description - Update a item with some new data, requires the ArrayState to be constructed with a getUnique method.
 	 * @example <caption>Example append some data.</caption>
 	 * const data = [
 	 * 	{ key: 1, value: 'foo'},
 	 * 	{ key: 2, value: 'bar'}
 	 * ];
-	 * const myState = new ArrayState(data, (x) => x.key);
+	 * const myState = new UmbArrayState(data, (x) => x.key);
 	 * myState.updateOne(2, {value: 'updated-bar'});
 	 */
 	updateOne(unique: unknown, entry: Partial<T>) {

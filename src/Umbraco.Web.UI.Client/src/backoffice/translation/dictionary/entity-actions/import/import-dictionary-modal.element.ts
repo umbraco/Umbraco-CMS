@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
+import { UmbTreeElement } from '../../../../core/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { DictionaryItemResponseModel, ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
@@ -91,11 +91,13 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this._showImportView = true;
 	}
 
+	/*
 	#handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
 		this._selection = element.selection;
 	}
+	*/
 
 	#renderUploadView() {
 		return html`<p>

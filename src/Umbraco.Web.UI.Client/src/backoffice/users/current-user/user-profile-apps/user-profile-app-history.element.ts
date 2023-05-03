@@ -10,48 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-profile-app-history')
 export class UmbUserProfileAppHistoryElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			#recent-history {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-3);
-			}
-			#recent-history-items {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			.history-item {
-				display: grid;
-				grid-template-columns: 32px 1fr;
-				grid-template-rows: 1fr;
-				color: var(--uui-color-interactive);
-				text-decoration: none;
-			}
-			.history-item uui-icon {
-				margin-top: var(--uui-size-space-1);
-			}
-			.history-item:hover {
-				color: var(--uui-color-interactive-emphasis);
-			}
-			.history-item > div {
-				color: inherit;
-				text-decoration: none;
-				display: flex;
-				flex-direction: column;
-				line-height: 1.4em;
-			}
-			.history-item > div > span {
-				font-size: var(--uui-size-4);
-				opacity: 0.5;
-				text-overflow: ellipsis;
-				overflow: hidden;
-				white-space: nowrap;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
@@ -107,6 +66,49 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 			</a>
 		`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			#recent-history {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-3);
+			}
+			#recent-history-items {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
+			.history-item {
+				display: grid;
+				grid-template-columns: 32px 1fr;
+				grid-template-rows: 1fr;
+				color: var(--uui-color-interactive);
+				text-decoration: none;
+			}
+			.history-item uui-icon {
+				margin-top: var(--uui-size-space-1);
+			}
+			.history-item:hover {
+				color: var(--uui-color-interactive-emphasis);
+			}
+			.history-item > div {
+				color: inherit;
+				text-decoration: none;
+				display: flex;
+				flex-direction: column;
+				line-height: 1.4em;
+			}
+			.history-item > div > span {
+				font-size: var(--uui-size-4);
+				opacity: 0.5;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+		`,
+	];
 }
 
 export default UmbUserProfileAppHistoryElement;

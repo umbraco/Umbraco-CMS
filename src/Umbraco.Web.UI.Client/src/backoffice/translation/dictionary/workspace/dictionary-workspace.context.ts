@@ -1,15 +1,14 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
-import { UmbWorkspaceContext } from '../../../../backoffice/shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbWorkspaceContext<UmbDictionaryRepository, DictionaryItemResponseModel>
 	implements UmbEntityWorkspaceContextInterface<DictionaryItemResponseModel | undefined>
 {
-	#data = new ObjectState<DictionaryItemResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	name = this.#data.getObservablePart((data) => data?.name);

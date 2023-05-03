@@ -1,15 +1,15 @@
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel, DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document tree that fetches data from the server
  * @export
- * @class DocumentTreeServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @class UmbDocumentTypeTreeServerDataSource
+ * @implements {UmbTreeDataSource}
  */
-export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	// TODO: how do we handle trashed items?
@@ -42,9 +42,9 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	}
 
 	/**
-	 * Creates an instance of DocumentTreeServerDataSource.
+	 * Creates an instance of UmbDocumentTypeTreeServerDataSource.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -53,7 +53,7 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTypeTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, DocumentTypeResource.getTreeDocumentTypeRoot({}));
@@ -63,32 +63,34 @@ export class DocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { error };
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
-		return tryExecuteAndNotify(
-			this.#host,
-			DocumentTypeResource.getTreeDocumentTypeChildren({
-				parentId,
-			})
-		);
+		/* TODO: should we make getRootItems() internal 
+		so it only is a server concern that there are two endpoints? */
+		if (parentId === null) {
+			return this.getRootItems();
+		} else {
+			return tryExecuteAndNotify(
+				this.#host,
+				DocumentTypeResource.getTreeDocumentTypeChildren({
+					parentId,
+				})
+			);
+		}
 	}
 
 	/**
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof DocumentTreeServerDataSource
+	 * @memberof UmbDocumentTypeTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

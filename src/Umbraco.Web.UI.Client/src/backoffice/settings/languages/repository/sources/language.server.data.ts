@@ -1,12 +1,11 @@
 import {
-	ProblemDetailsModel,
 	LanguageResource,
 	LanguageResponseModel,
 	CreateLanguageRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Language that fetches data from the server
@@ -15,7 +14,7 @@ import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbLanguageServerDataSource
-	implements UmbDataSource<CreateLanguageRequestModel, any, LanguageResponseModel>
+	implements UmbDataSource<CreateLanguageRequestModel, any, any, LanguageResponseModel>
 {
 	#host: UmbControllerHostElement;
 
@@ -69,8 +68,7 @@ export class UmbLanguageServerDataSource
 	 */
 	async insert(language: CreateLanguageRequestModel) {
 		if (!language.isoCode) {
-			const error: ProblemDetailsModel = { title: 'Language iso code is missing' };
-			return { error };
+			throw new Error('Language iso code is missing');
 		}
 
 		return tryExecuteAndNotify(this.#host, LanguageResource.postLanguage({ requestBody: language }));
@@ -84,8 +82,7 @@ export class UmbLanguageServerDataSource
 	 */
 	async update(iscoCode: string, language: LanguageResponseModel) {
 		if (!language.isoCode) {
-			const error: ProblemDetailsModel = { title: 'Language iso code is missing' };
-			return { error };
+			throw new Error('Language iso code is missing');
 		}
 
 		return tryExecuteAndNotify(

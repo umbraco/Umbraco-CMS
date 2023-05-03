@@ -2,22 +2,15 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbWorkspaceContainerStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-container-structure-helper.class';
+import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
+import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import './document-workspace-view-edit-properties.element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-view-edit-tab')
 export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
-
 	private _tabName?: string | undefined;
 
 	@property({ type: String })
@@ -40,7 +33,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
-	_groupStructureHelper = new UmbWorkspaceContainerStructureHelper(this);
+	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerResponseModelBaseModel> = [];
@@ -51,6 +44,9 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._groupStructureHelper.setStructureManager((workspaceContext as UmbDocumentWorkspaceContext).structure);
+		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
 		});
@@ -81,6 +77,15 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 			)}
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceViewEditTabElement;

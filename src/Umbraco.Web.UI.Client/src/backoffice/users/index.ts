@@ -3,13 +3,26 @@ import { manifests as userManifests } from './users/manifests';
 import { manifests as userSectionManifests } from './user-section/manifests';
 import { manifests as currentUserManifests } from './current-user/manifests';
 
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user/current-user.store';
+import {
+	UmbCurrentUserHistoryStore,
+	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
+} from './current-user/current-user-history.store';
+import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+
+import './users/components';
+import './user-groups/components';
 
 export const manifests = [...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests];
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
-};
+export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
+	extensionRegistry.registerMany(manifests);
 
-registerExtensions(manifests);
+	new UmbContextProviderController(host, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
+	new UmbContextProviderController(
+		host,
+		UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
+		new UmbCurrentUserHistoryStore()
+	);
+};

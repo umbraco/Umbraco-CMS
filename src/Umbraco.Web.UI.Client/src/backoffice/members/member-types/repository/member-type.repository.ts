@@ -1,17 +1,17 @@
-import { MemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
+import type { MemberTypeDetails } from '../types';
+import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
 import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store';
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO => use correct type when available
 type ItemType = any;
-type TreeItemType = any;
+type TreeItemType = EntityTreeItemResponseModel;
 
 export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
@@ -30,7 +30,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new MemberTypeTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbMemberTypeTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbMemberTypeDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -48,6 +48,21 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		]);
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'member-type-root',
+			name: 'Member Types',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -62,11 +77,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -77,12 +88,11 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -100,7 +110,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
@@ -118,8 +128,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 		const { data, error } = await this.#detailSource.requestById(id);
 
@@ -128,13 +137,17 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		}
 		return { data, error };
 	}
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#store!.byId(id);
+	}
 
 	async delete(id: string) {
 		await this.#init;
 
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		const { error } = await this.#detailSource.delete(id);
@@ -160,7 +173,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 
 		await this.#init;
 
-		const { error } = await this.#detailSource.save(id, updatedMemberType);
+		const { error } = await this.#detailSource.update(id, updatedMemberType);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.
@@ -181,11 +194,10 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		await this.#init;
 
 		if (!detail.name) {
-			const error: ProblemDetailsModel = { title: 'Name is missing' };
-			return { error };
+			throw new Error('Name is missing');
 		}
 
-		const { data, error } = await this.#detailSource.create(detail);
+		const { data, error } = await this.#detailSource.insert(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' created` } };

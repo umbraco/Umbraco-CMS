@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../shared/components/table';
+import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '../../../../core/components/table';
 import { UmbLanguageRepository } from '../../repository/language.repository';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,21 +11,6 @@ import './components/language-root-table-name-column-layout.element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			#main {
-				margin: var(--uui-size-layout-1);
-			}
-		`,
-	];
-
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
@@ -135,6 +120,21 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#main {
+				margin: var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbLanguageRootWorkspaceElement;

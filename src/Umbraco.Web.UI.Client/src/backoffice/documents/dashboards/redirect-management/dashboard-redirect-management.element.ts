@@ -13,79 +13,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagementElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-
-			.actions {
-				display: flex;
-				gap: var(--uui-size-space-1);
-				justify-content: space-between;
-				margin-bottom: var(--uui-size-space-4);
-			}
-
-			.actions uui-icon {
-				transform: translateX(50%);
-			}
-
-			uui-table {
-				table-layout: fixed;
-			}
-
-			uui-table-head-cell:nth-child(2*n) {
-				width: 10%;
-			}
-
-			uui-table-head-cell:last-child,
-			uui-table-cell:last-child {
-				text-align: right;
-			}
-
-			uui-table uui-icon {
-				vertical-align: sub;
-			}
-			uui-pagination {
-				display: inline-block;
-			}
-			.pagination {
-				display: flex;
-				justify-content: center;
-				margin-top: var(--uui-size-space-5);
-			}
-
-			.trackerDisabled {
-				position: relative;
-				-webkit-user-select: none;
-				-ms-user-select: none;
-				user-select: none;
-			}
-			.trackerDisabled::after {
-				content: '';
-				background-color: var(--uui-color-disabled);
-				position: absolute;
-				border-radius: 2px;
-				left: 0;
-				right: 0;
-				top: 0;
-				bottom: 0;
-				-webkit-user-select: none;
-				-ms-user-select: none;
-				user-select: none;
-			}
-
-			a {
-				color: var(--uui-color-interactive);
-			}
-			a:hover,
-			a:focus {
-				color: var(--uui-color-interactive-emphasis);
-			}
-		`,
-	];
+	
 
 	@property({ type: Number, attribute: 'items-per-page' })
 	itemsPerPage = 20;
@@ -337,6 +265,80 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			<uui-pagination .total=${totalPages} @change="${this._onPageChange}"></uui-pagination>
 		</div>`;
 	}
+	
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
+			.actions {
+				display: flex;
+				gap: var(--uui-size-space-1);
+				justify-content: space-between;
+				margin-bottom: var(--uui-size-space-4);
+			}
+
+			.actions uui-icon {
+				transform: translateX(50%);
+			}
+
+			uui-table {
+				table-layout: fixed;
+			}
+
+			uui-table-head-cell:nth-child(2*n) {
+				width: 10%;
+			}
+
+			uui-table-head-cell:last-child,
+			uui-table-cell:last-child {
+				text-align: right;
+			}
+
+			uui-table uui-icon {
+				vertical-align: sub;
+			}
+			uui-pagination {
+				display: inline-block;
+			}
+			.pagination {
+				display: flex;
+				justify-content: center;
+				margin-top: var(--uui-size-space-5);
+			}
+
+			.trackerDisabled {
+				position: relative;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+			.trackerDisabled::after {
+				content: '';
+				background-color: var(--uui-color-disabled);
+				position: absolute;
+				border-radius: 2px;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+
+			a {
+				color: var(--uui-color-interactive);
+			}
+			a:hover,
+			a:focus {
+				color: var(--uui-color-interactive-emphasis);
+			}
+		`,
+	];
 }
 
 export default UmbDashboardRedirectManagementElement;

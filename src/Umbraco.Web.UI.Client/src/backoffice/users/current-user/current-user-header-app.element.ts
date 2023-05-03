@@ -1,25 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import type { UmbLoggedInUser } from './types';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user.store';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CURRENT_USER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		UUITextStyles,
-		css`
-			uui-button {
-				font-size: 14px;
-				--uui-button-background-color: transparent;
-			}
-		`,
-	];
-
 	@state()
-	private _currentUser?: UserDetails;
+	private _currentUser?: UmbLoggedInUser;
 
 	private _currentUserStore?: UmbCurrentUserStore;
 	private _modalContext?: UmbModalContext;
@@ -56,6 +46,16 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 			</uui-button>
 		`;
 	}
+
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			uui-button {
+				font-size: 14px;
+				--uui-button-background-color: transparent;
+			}
+		`,
+	];
 }
 
 export default UmbCurrentUserHeaderAppElement;

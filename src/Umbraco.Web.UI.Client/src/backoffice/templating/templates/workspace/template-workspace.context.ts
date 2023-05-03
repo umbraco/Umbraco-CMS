@@ -1,11 +1,11 @@
 import { UmbTemplateRepository } from '../repository/template.repository';
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { createObservablePart, DeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel> {
-	#data = new DeepState<TemplateResponseModel | undefined>(undefined);
+	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
 	content = createObservablePart(this.#data, (data) => data?.content);
@@ -50,7 +50,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.next(data as any);
 	}
 
 	public destroy() {

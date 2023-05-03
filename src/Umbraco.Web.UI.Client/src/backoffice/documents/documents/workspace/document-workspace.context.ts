@@ -1,12 +1,16 @@
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
-import { UmbWorkspaceVariableEntityContextInterface } from '../../../shared/components/workspace/workspace-context/workspace-variable-entity-context.interface';
-import { UmbVariantId } from '../../../shared/variants/variant-id.class';
-import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
-import { UmbWorkspaceSplitViewManager } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
+import { UmbWorkspaceVariableEntityContextInterface } from '../../../core/components/workspace/workspace-context/workspace-variable-entity-context.interface';
+import { UmbVariantId } from '../../../core/variants/variant-id.class';
+import { UmbWorkspaceSplitViewManager } from '../../../core/components/workspace/workspace-context/workspace-split-view-manager.class';
+import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { partialUpdateFrozenArray, ObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import {
+	partialUpdateFrozenArray,
+	UmbObjectState,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
@@ -22,12 +26,12 @@ export class UmbDocumentWorkspaceContext
 	 * For now lets not share this publicly as it can become confusing.
 	 * TODO: Use this to compare, for variants with changes.
 	 */
-	#document = new ObjectState<EntityType | undefined>(undefined);
+	#document = new UmbObjectState<EntityType | undefined>(undefined);
 
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
-	#draft = new ObjectState<EntityType | undefined>(undefined);
+	#draft = new UmbObjectState<EntityType | undefined>(undefined);
 	readonly unique = this.#draft.getObservablePart((data) => data?.id);
 	readonly documentTypeKey = this.#draft.getObservablePart((data) => data?.contentTypeId);
 
@@ -41,7 +45,7 @@ export class UmbDocumentWorkspaceContext
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDocumentRepository(host));
 
-		this.structure = new UmbWorkspacePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
+		this.structure = new UmbContentTypePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
 		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
 
 		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));

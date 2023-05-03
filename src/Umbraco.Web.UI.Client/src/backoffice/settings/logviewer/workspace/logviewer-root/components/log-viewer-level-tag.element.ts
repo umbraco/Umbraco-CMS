@@ -13,7 +13,7 @@ interface LevelMapStyles {
 
 @customElement('umb-log-viewer-level-tag')
 export class UmbLogViewerLevelTagElement extends LitElement {
-	static styles = [UUITextStyles, css``];
+	
 
 	@property()
 	level?: LogLevelModel;
@@ -41,6 +41,8 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 			>${this.level}<slot></slot
 		></uui-tag>`;
 	}
+	
+	static styles = [UUITextStyles, css``];
 }
 
 declare global {

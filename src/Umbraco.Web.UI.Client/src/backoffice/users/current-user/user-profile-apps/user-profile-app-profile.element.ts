@@ -2,16 +2,14 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../current-user.store';
+import type { UmbLoggedInUser } from '../types';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
 import { UmbModalContext, UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
-	static styles = [UUITextStyles, css``];
-
 	@state()
-	private _currentUser?: UserDetails;
+	private _currentUser?: UmbLoggedInUser;
 
 	private _modalContext?: UmbModalContext;
 	private _currentUserStore?: UmbCurrentUserStore;
@@ -48,8 +46,9 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	private _changePassword() {
 		if (!this._modalContext) return;
 
+		// TODO: check if current user is admin
 		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL, {
-			requireOldPassword: this._currentUserStore?.isAdmin || false,
+			requireOldPassword: false,
 		});
 	}
 
@@ -62,6 +61,8 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
+
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbUserProfileAppProfileElement;

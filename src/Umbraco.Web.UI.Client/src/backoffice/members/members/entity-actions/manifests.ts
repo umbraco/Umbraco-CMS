@@ -14,7 +14,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			repositoryAlias: MEMBER_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityType: 'member',
+			entityTypes: ['member'],
 		},
 	},
 ];

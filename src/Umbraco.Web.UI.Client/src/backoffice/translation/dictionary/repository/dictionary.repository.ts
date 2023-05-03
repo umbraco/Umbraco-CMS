@@ -1,24 +1,25 @@
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictionary.store';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data';
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store';
-import { DictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data';
+import { UmbDictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryOverviewResponseModel,
+	EntityTreeItemResponseModel,
 	ImportDictionaryRequestModel,
-	ProblemDetailsModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDictionaryRepository
 	implements
-		UmbTreeRepository,
+		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<
 			CreateDictionaryItemRequestModel,
+			any,
 			UpdateDictionaryItemRequestModel,
 			DictionaryOverviewResponseModel
 		>
@@ -39,7 +40,7 @@ export class UmbDictionaryRepository
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new DictionaryTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbDictionaryTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbDictionaryDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -57,6 +58,21 @@ export class UmbDictionaryRepository
 		]);
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'dictionary-root',
+			name: 'Dictionary',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -70,12 +86,8 @@ export class UmbDictionaryRepository
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
-		}
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -86,12 +98,11 @@ export class UmbDictionaryRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -109,7 +120,7 @@ export class UmbDictionaryRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
@@ -132,6 +143,12 @@ export class UmbDictionaryRepository
 			this.#detailStore?.append(data);
 		}
 		return { data, error };
+	}
+
+	async byId(id: string) {
+		if (!id) throw new Error('Key is missing');
+		await this.#init;
+		return this.#detailStore!.byId(id);
 	}
 
 	async list(skip = 0, take = 1000) {
@@ -171,8 +188,7 @@ export class UmbDictionaryRepository
 		await this.#init;
 
 		if (!detail.name) {
-			const error: ProblemDetailsModel = { title: 'Name is missing' };
-			return { error };
+			throw new Error('Name is missing');
 		}
 
 		const { data, error } = await this.#detailSource.insert(detail);
@@ -189,8 +205,7 @@ export class UmbDictionaryRepository
 		await this.#init;
 
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		return this.#detailSource.export(id, includeChildren);
@@ -200,8 +215,7 @@ export class UmbDictionaryRepository
 		await this.#init;
 
 		if (!temporaryFileId) {
-			const error: ProblemDetailsModel = { title: 'File is missing' };
-			return { error };
+			throw new Error('Temporary file id is missing');
 		}
 
 		return this.#detailSource.import(temporaryFileId, parentId);
@@ -211,8 +225,7 @@ export class UmbDictionaryRepository
 		await this.#init;
 
 		if (!formData) {
-			const error: ProblemDetailsModel = { title: 'Form data is missing' };
-			return { error };
+			throw new Error('Form data is missing');
 		}
 
 		return this.#detailSource.upload(formData);

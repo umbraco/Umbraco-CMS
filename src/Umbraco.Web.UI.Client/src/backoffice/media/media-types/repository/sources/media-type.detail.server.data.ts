@@ -1,7 +1,6 @@
+import type { MediaTypeDetails } from '../../types';
 import { MediaTypeDetailDataSource } from './media-type.details.server.data.interface';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -50,8 +49,7 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	 */
 	async update(mediaType: MediaTypeDetails) {
 		if (!mediaType.id) {
-			const error: ProblemDetailsModel = { title: 'MediaType id is missing' };
-			return { error };
+			throw new Error('MediaType id is missing');
 		}
 
 		const payload = { id: mediaType.id, requestBody: mediaType };
@@ -99,8 +97,7 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		//return await tryExecuteAndNotify(this.#host, MediaTypeResource.deleteMediaTypeByKey({ id }));

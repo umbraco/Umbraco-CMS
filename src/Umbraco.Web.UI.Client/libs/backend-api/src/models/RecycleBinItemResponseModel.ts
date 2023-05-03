@@ -12,4 +12,3 @@ export type RecycleBinItemResponseModel = {
     isContainer?: boolean;
     parentId?: string | null;
 };
-

@@ -4,6 +4,12 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-member-workspace-edit')
 export class UmbMemberWorkspaceEditElement extends LitElement {
+
+
+	render() {
+		return html` <umb-workspace-editor alias="Umb.Workspace.Member">Member Workspace</umb-workspace-editor> `;
+	}
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -14,10 +20,6 @@ export class UmbMemberWorkspaceEditElement extends LitElement {
 			}
 		`,
 	];
-
-	render() {
-		return html` <umb-workspace-layout alias="Umb.Workspace.Member">Member Workspace</umb-workspace-layout> `;
-	}
 }
 
 export default UmbMemberWorkspaceEditElement;

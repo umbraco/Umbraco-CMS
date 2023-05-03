@@ -6,7 +6,6 @@ import type { ContentResponseModelBaseDocumentValueModelDocumentVariantResponseM
 import type { ContentUrlInfoModel } from './ContentUrlInfoModel';
 
 export type DocumentResponseModel = (ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel & {
-    urls?: Array<ContentUrlInfoModel>;
-    templateId?: string | null;
+urls?: Array<ContentUrlInfoModel>;
+templateId?: string | null;
 });
-

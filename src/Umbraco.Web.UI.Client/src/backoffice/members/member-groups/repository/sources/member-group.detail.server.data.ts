@@ -1,7 +1,6 @@
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { MemberGroupDetails } from '../../types';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -11,7 +10,7 @@ import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {MemberGroupDetailDataSource}
  */
 // TODO => Provide type when it is available
-export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, any, any> {
+export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, any, any, any> {
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {
@@ -51,8 +50,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 	 */
 	async update(id: string, memberGroup: MemberGroupDetails) {
 		if (!memberGroup.id) {
-			const error: ProblemDetailsModel = { title: 'Member Group id is missing' };
-			return { error };
+			throw new Error('Member Group id is missing');
 		}
 
 		const payload = { id: memberGroup.id, requestBody: memberGroup };
@@ -113,8 +111,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		//return await tryExecuteAndNotify(this.#host, MemberGroupResource.deleteMemberGroupByKey({ id }));

@@ -32,19 +32,25 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent id from the server
-	 * @param {(string | null)} parentId
+	 * @param {(string)} parentId
 	 * @return {*}
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		if (!parentId) throw new Error('Parent id is missing');
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
-		return tryExecuteAndNotify(
-			this.#host,
-			DataTypeResource.getTreeDataTypeChildren({
-				parentId,
-			})
-		);
+		/* TODO: should we make getRootItems() internal 
+		so it only is a server concern that there are two endpoints? */
+		if (parentId === null) {
+			return this.getRootItems();
+		} else {
+			return tryExecuteAndNotify(
+				this.#host,
+				DataTypeResource.getTreeDataTypeChildren({
+					parentId,
+				})
+			);
+		}
 	}
 
 	/**

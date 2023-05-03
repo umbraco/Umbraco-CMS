@@ -1,21 +1,23 @@
 import { UmbDocumentServerDataSource } from './sources/document.server.data';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store';
-import { DocumentTreeServerDataSource } from './sources/document.tree.server.data';
+import { UmbDocumentTreeServerDataSource } from './sources/document.tree.server.data';
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
-	ProblemDetailsModel,
 	DocumentResponseModel,
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
+	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemType = DocumentResponseModel;
 
-export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDetailRepository<ItemType> {
+export class UmbDocumentRepository
+	implements UmbTreeRepository<DocumentTreeItemResponseModel>, UmbDetailRepository<ItemType>
+{
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -32,7 +34,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new DocumentTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbDocumentTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbDocumentServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -53,6 +55,21 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 	// TODO: Trash
 	// TODO: Move
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'document-root',
+			name: 'Documents',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -67,11 +84,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -82,12 +95,11 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -105,7 +117,7 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
@@ -124,9 +136,9 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
+
 		const { data, error } = await this.#detailDataSource.get(id);
 
 		if (data) {
@@ -134,6 +146,12 @@ export class UmbDocumentRepository implements UmbTreeRepository<ItemType>, UmbDe
 		}
 
 		return { data, error };
+	}
+
+	async byId(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+		return this.#store!.byId(id);
 	}
 
 	// Could potentially be general methods:

@@ -4,9 +4,10 @@ import { manifests as contentMenuManifest } from './menu.manifests';
 import { manifests as documentBlueprintManifests } from './document-blueprints/manifests';
 import { manifests as documentTypeManifests } from './document-types/manifests';
 import { manifests as documentManifests } from './documents/manifests';
+import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import './document-types/components';
+import './documents/components';
 
 export const manifests = [
 	...dashboardManifests,
@@ -17,8 +18,6 @@ export const manifests = [
 	...documentManifests,
 ];
 
-const registerExtensions = (manifests: Array<ManifestTypes>) => {
-	manifests.forEach((manifest) => umbExtensionsRegistry.register(manifest));
+export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+	extensionRegistry.registerMany(manifests);
 };
-
-registerExtensions(manifests);

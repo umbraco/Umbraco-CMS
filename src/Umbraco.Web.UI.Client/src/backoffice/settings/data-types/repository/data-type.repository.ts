@@ -1,44 +1,62 @@
+import { DATA_TYPE_ROOT_ENTITY_TYPE } from '..';
 import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data';
+import { UmbDataTypeMoveServerDataSource } from './sources/data-type-move.server.data';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store';
 import { UmbDataTypeServerDataSource } from './sources/data-type.server.data';
 import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
 import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data';
+import { UmbDataTypeItemServerDataSource } from './sources/data-type-item.server.data';
+import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDataTypeItemStore } from './data-type-item.store';
+import { UmbDataTypeCopyServerDataSource } from './sources/data-type-copy.server.data';
 import type {
-	UmbTreeDataSource,
 	UmbTreeRepository,
 	UmbDetailRepository,
-	UmbFolderDataSource,
+	UmbItemRepository,
+	UmbFolderRepository,
+	UmbMoveRepository,
+	UmbCopyRepository,
+	UmbTreeDataSource,
 	UmbDataSource,
+	UmbFolderDataSource,
+	UmbItemDataSource,
+	UmbMoveDataSource,
+	UmbCopyDataSource,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateDataTypeRequestModel,
 	CreateFolderRequestModel,
+	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	FolderModelBaseModel,
 	FolderTreeItemResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
-
 export class UmbDataTypeRepository
 	implements
+		UmbItemRepository<DataTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
-		UmbDetailRepository<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>,
-		UmbFolderRepository
+		UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>,
+		UmbFolderRepository,
+		UmbMoveRepository,
+		UmbCopyRepository
 {
-	#init!: Promise<unknown>;
+	#init: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
 
-	#treeSource: UmbTreeDataSource;
-	#detailSource: UmbDataSource<CreateDataTypeRequestModel, UpdateDataTypeRequestModel, DataTypeResponseModel>;
+	#treeSource: UmbTreeDataSource<FolderTreeItemResponseModel>;
+	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>;
 	#folderSource: UmbFolderDataSource;
+	#itemSource: UmbItemDataSource<DataTypeItemResponseModel>;
+	#moveSource: UmbMoveDataSource;
+	#copySource: UmbCopyDataSource;
 
 	#detailStore?: UmbDataTypeStore;
 	#treeStore?: UmbDataTypeTreeStore;
+	#itemStore?: UmbDataTypeItemStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -49,20 +67,42 @@ export class UmbDataTypeRepository
 		this.#treeSource = new UmbDataTypeTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbDataTypeServerDataSource(this.#host);
 		this.#folderSource = new UmbDataTypeFolderServerDataSource(this.#host);
+		this.#itemSource = new UmbDataTypeItemServerDataSource(this.#host);
+		this.#moveSource = new UmbDataTypeMoveServerDataSource(this.#host);
+		this.#copySource = new UmbDataTypeCopyServerDataSource(this.#host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#treeStore = instance;
-			}),
-
 			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
-			}),
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#treeStore = instance;
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
-			}),
+			}).asPromise(),
 		]);
+	}
+
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: DATA_TYPE_ROOT_ENTITY_TYPE,
+			name: 'Data Types',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
 	}
 
 	async requestRootTreeItems() {
@@ -78,8 +118,8 @@ export class UmbDataTypeRepository
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
-		if (!parentId) throw new Error('Parent id is missing');
 		await this.#init;
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -88,15 +128,6 @@ export class UmbDataTypeRepository
 		}
 
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
-	}
-
-	async requestTreeItems(ids: Array<string>) {
-		if (!ids) throw new Error('Keys are missing');
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
 	async rootTreeItems() {
@@ -110,13 +141,26 @@ export class UmbDataTypeRepository
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	// ITEMS:
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Keys are missing');
 		await this.#init;
-		return this.#treeStore!.items(ids);
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(ids: Array<string>) {
+		await this.#init;
+		return this.#itemStore!.items(ids);
 	}
 
 	// DETAILS:
-
 	async createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
@@ -146,7 +190,6 @@ export class UmbDataTypeRepository
 	async create(dataType: CreateDataTypeRequestModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.id) throw new Error('Data Type id is missing');
-
 		await this.#init;
 
 		const { error } = await this.#detailSource.insert(dataType);
@@ -167,7 +210,6 @@ export class UmbDataTypeRepository
 	async save(id: string, updatedDataType: UpdateDataTypeRequestModel) {
 		if (!id) throw new Error('Data Type id is missing');
 		if (!updatedDataType) throw new Error('Data Type is missing');
-
 		await this.#init;
 
 		const { error } = await this.#detailSource.update(id, updatedDataType);
@@ -186,8 +228,6 @@ export class UmbDataTypeRepository
 
 		return { error };
 	}
-
-	// General:
 
 	async delete(id: string) {
 		if (!id) throw new Error('Data Type id is missing');
@@ -210,9 +250,10 @@ export class UmbDataTypeRepository
 		return { error };
 	}
 
-	// folder
+	// Folder:
 	async createFolderScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
+		await this.#init;
 		return this.#folderSource.createScaffold(parentId);
 	}
 
@@ -234,6 +275,7 @@ export class UmbDataTypeRepository
 
 	async deleteFolder(id: string) {
 		if (!id) throw new Error('Key is missing');
+		await this.#init;
 
 		const { error } = await this.#folderSource.delete(id);
 
@@ -247,6 +289,7 @@ export class UmbDataTypeRepository
 	async updateFolder(id: string, folder: FolderModelBaseModel) {
 		if (!id) throw new Error('Key is missing');
 		if (!folder) throw new Error('Folder data is missing');
+		await this.#init;
 
 		const { error } = await this.#folderSource.update(id, folder);
 
@@ -259,14 +302,51 @@ export class UmbDataTypeRepository
 
 	async requestFolder(id: string) {
 		if (!id) throw new Error('Key is missing');
+		await this.#init;
+		return await this.#folderSource.get(id);
+	}
 
-		const { data, error } = await this.#folderSource.get(id);
+	// Actions
+	async move(id: string, targetId: string | null) {
+		await this.#init;
+		const { error } = await this.#moveSource.move(id, targetId);
 
-		if (data) {
-			this.#treeStore?.appendItems([data]);
+		if (!error) {
+			// TODO: Be aware about this responsibility.
+			this.#treeStore?.updateItem(id, { parentId: targetId });
+			// only update the target if its not the root
+			if (targetId) {
+				this.#treeStore?.updateItem(targetId, { hasChildren: true });
+			}
+
+			const notification = { data: { message: `Data type moved` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
 
-		return { data, error };
+		return { error };
+	}
+
+	async copy(id: string, targetId: string | null) {
+		await this.#init;
+		const { data: dataTypeCopyId, error } = await this.#copySource.copy(id, targetId);
+		if (error) return { error };
+
+		if (dataTypeCopyId) {
+			const { data: dataTypeCopy } = await this.requestById(dataTypeCopyId);
+			if (!dataTypeCopy) throw new Error('Could not find copied data type');
+
+			// TODO: Be aware about this responsibility.
+			this.#treeStore?.appendItems([dataTypeCopy]);
+			// only update the target if its not the root
+			if (targetId) {
+				this.#treeStore?.updateItem(targetId, { hasChildren: true });
+			}
+
+			const notification = { data: { message: `Data type copied` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { data: dataTypeCopyId };
 	}
 }
 

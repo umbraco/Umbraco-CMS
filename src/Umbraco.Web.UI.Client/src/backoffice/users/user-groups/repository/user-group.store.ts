@@ -1,7 +1,7 @@
-import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
+import type { UserGroupDetails } from '../types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 // TODO: get rid of this type addition & { ... }:
@@ -16,11 +16,11 @@ export const UMB_USER_GROUP_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGro
  * @description - Data Store for User Groups
  */
 export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailStore<UserGroupDetails> {
-	#groups = new ArrayState<UserGroupDetails>([], (x) => x.id);
+	#groups = new UmbArrayState<UserGroupDetails>([], (x) => x.id);
 	public groups = this.#groups.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UserGroupDetails>([], (x) => x.id));
 	}
 
 	getScaffold(entityType: string, parentId: string | null) {
@@ -59,17 +59,6 @@ export class UmbUserGroupStore extends UmbStoreBase implements UmbEntityDetailSt
 			});
 
 		return this.#groups.getObservablePart((userGroups) => userGroups.find((userGroup) => userGroup.id === id));
-	}
-
-	getByKeys(ids: Array<string>) {
-		const params = ids.map((id) => `id=${id}`).join('&');
-		fetch(`/umbraco/backoffice/user-groups/getByKeys?${params}`)
-			.then((res) => res.json())
-			.then((data) => {
-				this.#groups.append(data);
-			});
-
-		return this.#groups.getObservablePart((items) => items.filter((node) => ids.includes(node.id)));
 	}
 
 	async save(userGroups: Array<UserGroupDetails>) {

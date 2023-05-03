@@ -19,7 +19,7 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuKind = {
 	kind: 'menu',
 	alias: 'Umb.SectionSidebarMenu.Settings',
 	name: 'Settings Section Sidebar Menu',
-	weight: 100,
+	weight: 200,
 	meta: {
 		label: 'Settings',
 		menu: 'Umb.Menu.Settings',

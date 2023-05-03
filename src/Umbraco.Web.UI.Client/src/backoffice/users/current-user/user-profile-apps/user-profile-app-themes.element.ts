@@ -2,29 +2,13 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UUISelectEvent } from '@umbraco-ui/uui';
-import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../themes/theme.context';
+import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-user-profile-app-themes')
 export class UmbUserProfileAppThemesElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-				padding: var(--uui-size-space-5);
-				background: var(--uui-color-surface);
-				color: var(--uui-color-text);
-				border-radius: var(--uui-border-radius);
-				box-shadow: var(--uui-shadow-depth-1);
-			}
-		`,
-	];
-
 	#themeService?: UmbThemeContext;
 
 	@state()
@@ -69,6 +53,22 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 				.options=${this.#options}></uui-select>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+				padding: var(--uui-size-space-5);
+				background: var(--uui-color-surface);
+				color: var(--uui-color-text);
+				border-radius: var(--uui-border-radius);
+				box-shadow: var(--uui-shadow-depth-1);
+			}
+		`,
+	];
 }
 
 export default UmbUserProfileAppThemesElement;

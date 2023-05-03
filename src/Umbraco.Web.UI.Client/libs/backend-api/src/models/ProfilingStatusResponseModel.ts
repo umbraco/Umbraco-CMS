@@ -5,4 +5,3 @@
 export type ProfilingStatusResponseModel = {
     enabled?: boolean;
 };
-

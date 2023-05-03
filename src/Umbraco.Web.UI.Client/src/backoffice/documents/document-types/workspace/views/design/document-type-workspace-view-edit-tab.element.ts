@@ -2,26 +2,15 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbWorkspaceContainerStructureHelper } from '../../../../../shared/components/workspace/workspace-context/workspace-container-structure-helper.class';
+import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import './document-type-workspace-view-edit-properties.element';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-
-			#add {
-				width: 100%;
-			}
-		`,
-	];
-
 	private _ownerTabId?: string | undefined;
 
 	@property({ type: String })
@@ -57,7 +46,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
-	_groupStructureHelper = new UmbWorkspaceContainerStructureHelper(this);
+	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerResponseModelBaseModel> = [];
@@ -68,6 +57,9 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (context) => {
+			this._groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
+		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
 		});
@@ -78,7 +70,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	#onAddGroup = () => {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
-		this._groupStructureHelper.addGroup(this._ownerTabId);
+		this._groupStructureHelper.addContainer(this._ownerTabId);
 	};
 
 	render() {
@@ -87,6 +79,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				? html`
 						<uui-box>
 							<umb-document-type-workspace-view-edit-properties
+								container-id=${this.ownerTabId}
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-document-type-workspace-view-edit-properties>
 						</uui-box>
@@ -97,6 +90,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				(group) => group.name,
 				(group) => html`<uui-box .headline=${group.name || ''}>
 					<umb-document-type-workspace-view-edit-properties
+						container-id=${group.id}
 						container-type="Group"
 						container-name=${group.name || ''}></umb-document-type-workspace-view-edit-properties>
 				</uui-box>`
@@ -104,6 +98,19 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			<uui-button id="add" look="placeholder" @click=${this.#onAddGroup}> Add Group </uui-button>
 		`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+
+			#add {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTypeWorkspaceViewEditTabElement;

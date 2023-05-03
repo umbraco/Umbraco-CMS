@@ -1,9 +1,7 @@
 import { assert, expect } from '@open-wc/testing';
-import { validate as uuidValidate } from 'uuid';
-
 import { UmbNotificationHandler } from './notification-handler';
-
 import type { UmbNotificationOptions } from './notification.context';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 describe('UmbNotificationHandler', () => {
 	let notificationHandler: UmbNotificationHandler;
@@ -17,7 +15,7 @@ describe('UmbNotificationHandler', () => {
 		describe('properties', () => {
 			it('has a key property', () => {
 				expect(notificationHandler).to.have.property('key');
-				expect(uuidValidate(notificationHandler.key)).to.be.true;
+				expect(UmbId.validate(notificationHandler.key)).to.be.true;
 			});
 
 			it('has an element property', () => {

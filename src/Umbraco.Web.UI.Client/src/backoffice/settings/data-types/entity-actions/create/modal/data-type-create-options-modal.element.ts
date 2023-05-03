@@ -13,7 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-data-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
-	static styles = [UUITextStyles];
+	
 
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler<UmbDataTypeCreateOptionsModalData>;
@@ -66,6 +66,8 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
+	
+	static styles = [UUITextStyles];
 }
 
 export default UmbDataTypeCreateOptionsModalElement;

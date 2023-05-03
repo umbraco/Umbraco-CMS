@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	TemplateResponseModel,
 	TemplateResource,
@@ -16,7 +16,7 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbTemplateDetailServerDataSource
-	implements UmbDataSource<CreateTemplateRequestModel, UpdateTemplateRequestModel, TemplateResponseModel>
+	implements UmbDataSource<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>
 {
 	#host: UmbControllerHostElement;
 
@@ -49,7 +49,7 @@ export class UmbTemplateDetailServerDataSource
 		const error = undefined;
 		const data: TemplateResponseModel = {
 			$type: '',
-			id: uuid(),
+			id: UmbId.new(),
 			name: '',
 			alias: '',
 			content: '',

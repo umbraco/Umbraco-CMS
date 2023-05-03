@@ -4,15 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('umb-workspace-package')
 export class UmbWorkspacePackageElement extends LitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			.header {
-				display: flex;
-				font-size: var(--uui-type-h5-size);
-			}
-		`,
-	];
+
 
 	@property()
 	entityId?: string;
@@ -48,8 +40,18 @@ export class UmbWorkspacePackageElement extends LitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-layout alias="Umb.Workspace.Package"> ${this._renderHeader()} </umb-workspace-layout> `;
+		return html`<umb-workspace-editor alias="Umb.Workspace.Package"> ${this._renderHeader()} </umb-workspace-editor> `;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			.header {
+				display: flex;
+				font-size: var(--uui-type-h5-size);
+			}
+		`,
+	];
 }
 
 export default UmbWorkspacePackageElement;

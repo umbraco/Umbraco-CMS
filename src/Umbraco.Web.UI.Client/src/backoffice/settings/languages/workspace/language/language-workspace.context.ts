@@ -1,19 +1,18 @@
 import { UmbLanguageRepository } from '../../repository/language.repository';
-import { UmbWorkspaceContext } from '../../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { ApiError, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbLanguageWorkspaceContext
 	extends UmbWorkspaceContext<UmbLanguageRepository, LanguageResponseModel>
 	implements UmbEntityWorkspaceContextInterface
 {
-	#data = new ObjectState<LanguageResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<LanguageResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	// TODO: this is a temp solution to bubble validation errors to the UI
-	#validationErrors = new ObjectState<any | undefined>(undefined);
+	#validationErrors = new UmbObjectState<any | undefined>(undefined);
 	validationErrors = this.#validationErrors.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -83,8 +82,8 @@ export class UmbLanguageWorkspaceContext
 			const { error } = await this.repository.create(data);
 			// TODO: this is temp solution to bubble validation errors to the UI
 			if (error) {
-				if (error.type === 'validation') {
-					this.setValidationErrors?.(error.errors);
+				if (error instanceof ApiError && error.body.type === 'validation') {
+					this.setValidationErrors?.(error.body.errors);
 				}
 			} else {
 				this.setValidationErrors?.(undefined);

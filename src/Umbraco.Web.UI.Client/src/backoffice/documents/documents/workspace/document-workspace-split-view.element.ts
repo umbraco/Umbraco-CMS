@@ -2,38 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
+import { ActiveVariant } from '../../../core/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
+import '../../../core/components/workspace/workspace-variant/workspace-variant.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				width: 100%;
-				height: 100%;
-
-				display: flex;
-				flex: 1;
-				flex-direction: column;
-			}
-
-			#splitViews {
-				display: flex;
-				width: 100%;
-				height: calc(100% - var(--umb-footer-layout-height));
-			}
-
-			#breadcrumbs {
-				margin: 0 var(--uui-size-layout-1);
-			}
-		`,
-	];
-
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
 	@state()
@@ -77,11 +53,35 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 						)}
 					</div>
 
-					<umb-workspace-footer-layout alias="Umb.Workspace.Document">
+					<umb-workspace-footer alias="Umb.Workspace.Document">
 						<div id="breadcrumbs">Breadcrumbs</div>
-					</umb-workspace-footer-layout>`
+					</umb-workspace-footer>`
 			: nothing;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				width: 100%;
+				height: 100%;
+
+				display: flex;
+				flex: 1;
+				flex-direction: column;
+			}
+
+			#splitViews {
+				display: flex;
+				width: 100%;
+				height: calc(100% - var(--umb-footer-layout-height));
+			}
+
+			#breadcrumbs {
+				margin: 0 var(--uui-size-layout-1);
+			}
+		`,
+	];
 }
 
 export default UmbDocumentWorkspaceSplitViewElement;

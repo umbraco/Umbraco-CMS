@@ -7,12 +7,10 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement {
-	static styles = [UUITextStyles];
-
 	#workspaceContext = new UmbUserGroupWorkspaceContext(this);
 	#element = new UmbUserGroupWorkspaceEditElement();
 
@@ -47,7 +45,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	}
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
@@ -61,6 +59,8 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbUserGroupWorkspaceElement;

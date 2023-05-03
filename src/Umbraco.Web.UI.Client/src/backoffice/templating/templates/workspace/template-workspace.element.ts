@@ -2,37 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputElement } from '@umbraco-ui/uui';
-import { UmbCodeEditorElement } from '../../../shared/components/code-editor/code-editor.element';
+import { UmbCodeEditorElement } from '../../../core/components/code-editor/code-editor.element';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-
-			umb-code-editor {
-				--editor-height: calc(100vh - 300px);
-			}
-
-			uui-box {
-				margin: 1em;
-				--uui-box-default-padding: 0;
-			}
-
-			uui-input {
-				width: 100%;
-				margin: 1em;
-			}
-		`,
-	];
-
 	public load(entityId: string) {
 		this.#templateWorkspaceContext.load(entityId);
 	}
@@ -89,7 +64,7 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 
 	render() {
 		// TODO: add correct UI elements
-		return html`<umb-workspace-layout alias="Umb.Workspace.Template">
+		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
 			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-box>
 				<uui-button color="danger" look="primary" slot="header" @click=${this.#insertCode}
@@ -102,8 +77,33 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 					.code=${this._content ?? ''}
 					@input=${this.#onCodeEditorInput}></umb-code-editor>
 			</uui-box>
-		</umb-workspace-layout>`;
+		</umb-workspace-editor>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			umb-code-editor {
+				--editor-height: calc(100vh - 300px);
+			}
+
+			uui-box {
+				margin: 1em;
+				--uui-box-default-padding: 0;
+			}
+
+			uui-input {
+				width: 100%;
+				margin: 1em;
+			}
+		`,
+	];
 }
 
 export default UmbTemplateWorkspaceElement;

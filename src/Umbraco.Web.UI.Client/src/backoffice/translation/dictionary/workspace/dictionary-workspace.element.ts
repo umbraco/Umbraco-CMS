@@ -3,18 +3,16 @@ import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context';
 import { UmbDictionaryWorkspaceEditElement } from './dictionary-workspace-edit.element';
-import type { IRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dictionary-workspace')
 export class UmbWorkspaceDictionaryElement extends UmbLitElement {
-	static styles = [UUITextStyles];
-
 	#workspaceContext = new UmbDictionaryWorkspaceContext(this);
 	#element = new UmbDictionaryWorkspaceEditElement();
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
@@ -28,6 +26,8 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
+
+	static styles = [UUITextStyles];
 }
 
 export default UmbWorkspaceDictionaryElement;

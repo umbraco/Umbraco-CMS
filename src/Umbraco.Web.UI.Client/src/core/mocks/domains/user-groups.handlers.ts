@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 import { umbUserGroupsData } from '../data/user-groups.data';
-import type { UserGroupDetails } from '@umbraco-cms/backoffice/models';
+import type { UserGroupDetails } from '../../../backoffice/users/user-groups/types';
 
 export const handlers = [
 	rest.get('/umbraco/backoffice/user-groups/list/items', (req, res, ctx) => {
@@ -21,14 +21,6 @@ export const handlers = [
 		const userGroup = umbUserGroupsData.getById(id);
 
 		return res(ctx.status(200), ctx.json(userGroup));
-	}),
-
-	rest.get('/umbraco/backoffice/user-groups/getByKeys', (req, res, ctx) => {
-		const ids = req.url.searchParams.getAll('id');
-		if (ids.length === 0) return;
-		const userGroups = umbUserGroupsData.getByIds(ids);
-
-		return res(ctx.status(200), ctx.json(userGroups));
 	}),
 
 	rest.post<Array<UserGroupDetails>>('/umbraco/backoffice/user-groups/save', async (req, res, ctx) => {

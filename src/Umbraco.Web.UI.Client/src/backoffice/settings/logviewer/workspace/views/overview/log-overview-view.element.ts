@@ -7,83 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')
 export class UmbLogViewerOverviewViewElement extends UmbLitElement {
-	static styles = [
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-
-			#logviewer-layout {
-				padding-bottom: var(--uui-size-layout-1);
-				display: grid;
-				grid-template-columns: 7fr 2fr;
-				grid-template-rows: auto auto;
-				gap: 20px 20px;
-				grid-auto-flow: row;
-				grid-template-areas:
-					'saved-searches info'
-					'common-messages info';
-			}
-
-			#info {
-				grid-area: info;
-				align-self: start;
-				display: grid;
-				grid-template-columns: repeat(2, 1fr);
-				grid-template-rows: repeat(4, 1fr);
-				gap: 20px 20px;
-			}
-
-			#time-period {
-				grid-area: 1 / 1 / 2 / 3;
-			}
-
-			#errors {
-				grid-area: 2 / 1 / 3 / 2;
-			}
-
-			#level {
-				grid-area: 2 / 2 / 3 / 3;
-			}
-
-			#log-lever {
-				color: var(--uui-color-positive);
-				text-align: center;
-			}
-
-			#types {
-				grid-area: 3 / 1 / 5 / 3;
-			}
-
-			#saved-searches-container,
-			to-many-logs-warning {
-				grid-area: saved-searches;
-			}
-
-			#common-messages-container {
-				grid-area: common-messages;
-				--uui-box-default-padding: 0 var(--uui-size-space-5, 18px) var(--uui-size-space-5, 18px)
-					var(--uui-size-space-5, 18px);
-			}
-
-			#common-messages-container > uui-box {
-				height: 100%;
-			}
-
-			uui-label:nth-of-type(2) {
-				display: block;
-				margin-top: var(--uui-size-space-5);
-			}
-
-			#error-count {
-				font-size: 4rem;
-				text-align: center;
-				color: var(--uui-color-danger);
-			}
-		`,
-	];
-
 	@state()
 	private _errorCount = 0;
 
@@ -133,12 +56,12 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
 								`@Level='Fatal' or @Level='Error' or Has(@Exception)`
 							)}`}>
-							<h1 id="error-count">${this._errorCount}</h1></uui-button
+							<h2 id="error-count">${this._errorCount}</h2></uui-button
 						>
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">
-						<h1 id="log-lever"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h1>
+						<h2 id="log-level"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h2>
 					</uui-box>
 
 					<umb-log-viewer-log-types-chart id="types"></umb-log-viewer-log-types-chart>
@@ -156,6 +79,90 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			</div>
 		`;
 	}
+
+	static styles = [
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+
+			#logviewer-layout {
+				padding-bottom: var(--uui-size-layout-1);
+				display: grid;
+				grid-template-columns: 7fr 2fr;
+				grid-template-rows: auto auto;
+				gap: 20px 20px;
+				grid-auto-flow: row;
+				grid-template-areas:
+					'saved-searches info'
+					'common-messages info';
+			}
+
+			#info {
+				grid-area: info;
+				align-self: start;
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				grid-template-rows: repeat(4, max-content);
+				gap: 20px 20px;
+			}
+
+			#time-period {
+				grid-area: 1 / 1 / 2 / 3;
+			}
+
+			#errors {
+				grid-area: 2 / 1 / 3 / 2;
+				--uui-box-default-padding: 0;
+			}
+
+			#errors > uui-button {
+				width: 100%;
+			}
+
+			#level {
+				grid-area: 2 / 2 / 3 / 3;
+			}
+
+			#log-level {
+				color: var(--uui-color-positive);
+				text-align: center;
+				margin: 0;
+			}
+
+			#types {
+				grid-area: 3 / 1 / 5 / 3;
+			}
+
+			#saved-searches-container,
+			to-many-logs-warning {
+				grid-area: saved-searches;
+			}
+
+			#common-messages-container {
+				grid-area: common-messages;
+				--uui-box-default-padding: 0 var(--uui-size-space-5, 18px) var(--uui-size-space-5, 18px)
+					var(--uui-size-space-5, 18px);
+			}
+
+			#common-messages-container > uui-box {
+				height: 100%;
+			}
+
+			uui-label:nth-of-type(2) {
+				display: block;
+				margin-top: var(--uui-size-space-5);
+			}
+
+			#error-count {
+				font-size: 3rem;
+				text-align: center;
+				color: var(--uui-color-danger);
+				margin: 0;
+			}
+		`,
+	];
 }
 
 declare global {

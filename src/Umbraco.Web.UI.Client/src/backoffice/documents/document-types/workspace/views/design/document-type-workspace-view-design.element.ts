@@ -4,79 +4,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../../../shared/property-creator/property-creator.element.ts';
+import '../../../../../core/property-creator/property-creator.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-type-workspace-view-design')
 export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-			}
-			/* TODO: This should be replaced with a general workspace bar — naming is hard */
-			#workspace-tab-bar {
-				padding: 0 var(--uui-size-layout-1);
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				background-color: var(--uui-color-surface);
-				flex-wrap: nowrap;
-			}
-			.tab-actions {
-				display: flex;
-				gap: var(--uui-size-space-4);
-			}
-			.tab-actions uui-button uui-icon {
-				padding-right: calc(-1 * var(--uui-size-space-4));
-			}
-
-			uui-tab {
-				display: flex;
-				flex-direction: row;
-				flex-wrap: nowrap;
-			}
-
-			uui-tab .trash {
-				display: flex;
-				align-items: stretch;
-			}
-
-			uui-tab uui-input {
-				flex-grow: 1;
-			}
-
-			uui-input:not(:focus) {
-				border: 1px solid transparent;
-			}
-
-			uui-input:not(:hover, :focus) .trash {
-				opacity: 0;
-			}
-
-			/** Property Group Wrapper */
-
-			#wrapper {
-				margin: var(--uui-size-layout-1);
-			}
-
-			#add-group {
-				margin-top: var(--uui-size-layout-1);
-				width: 100%;
-				--uui-button-height: var(--uui-size-layout-4);
-			}
-
-			.group-headline {
-				display: flex;
-				gap: var(--uui-size-space-4);
-			}
-			.group-headline uui-input {
-				flex-grow: 1;
-			}
-		`,
-	];
-
 	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	@state()
@@ -162,6 +94,74 @@ export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
 			</uui-button>
 		</uui-tab-group>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+			/* TODO: This should be replaced with a general workspace bar — naming is hard */
+			#workspace-tab-bar {
+				padding: 0 var(--uui-size-layout-1);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background-color: var(--uui-color-surface);
+				flex-wrap: nowrap;
+			}
+			.tab-actions {
+				display: flex;
+				gap: var(--uui-size-space-4);
+			}
+			.tab-actions uui-button uui-icon {
+				padding-right: calc(-1 * var(--uui-size-space-4));
+			}
+
+			uui-tab {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: nowrap;
+			}
+
+			uui-tab .trash {
+				display: flex;
+				align-items: stretch;
+			}
+
+			uui-tab uui-input {
+				flex-grow: 1;
+			}
+
+			uui-input:not(:focus) {
+				border: 1px solid transparent;
+			}
+
+			uui-input:not(:hover, :focus) .trash {
+				opacity: 0;
+			}
+
+			/** Property Group Wrapper */
+
+			#wrapper {
+				margin: var(--uui-size-layout-1);
+			}
+
+			#add-group {
+				margin-top: var(--uui-size-layout-1);
+				width: 100%;
+				--uui-button-height: var(--uui-size-layout-4);
+			}
+
+			.group-headline {
+				display: flex;
+				gap: var(--uui-size-space-4);
+			}
+			.group-headline uui-input {
+				flex-grow: 1;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentTypeWorkspaceViewDesignElement;

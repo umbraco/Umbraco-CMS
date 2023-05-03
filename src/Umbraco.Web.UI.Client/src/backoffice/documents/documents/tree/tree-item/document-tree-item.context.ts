@@ -1,4 +1,4 @@
-import { UmbTreeItemContextBase } from '../../../../shared/components/tree/tree-item-base/tree-item-base.context';
+import { UmbTreeItemContextBase } from '../../../../core/components/tree/tree-item-base/tree-item-base.context';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

@@ -16,7 +16,7 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.MediaType',
 	name: 'Media Type Tree Item',
 	conditions: {
-		entityType: 'media-type',
+		entityTypes: ['media-type-root', 'media-type'],
 	},
 };
 

@@ -8,4 +8,3 @@ export type PagedPackageDefinitionResponseModel = {
     total: number;
     items: Array<PackageDefinitionResponseModel>;
 };
-

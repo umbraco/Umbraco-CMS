@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import {
+	ApiError,
 	DatabaseInstallResponseModel,
 	DatabaseSettingsPresentationModel,
 	InstallResource,
@@ -14,69 +15,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		css`
-			:host,
-			#container {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
-
-			uui-form {
-				height: 100%;
-			}
-
-			form {
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-			}
-
-			uui-form-layout-item {
-				margin-top: 0;
-				margin-bottom: var(--uui-size-layout-1);
-			}
-
-			uui-input,
-			uui-input-password,
-			uui-combobox {
-				width: 100%;
-			}
-
-			hr {
-				width: 100%;
-				margin-top: var(--uui-size-space-2);
-				margin-bottom: var(--uui-size-layout-1);
-				border: none;
-				border-bottom: 1px solid var(--uui-color-border);
-			}
-
-			h1 {
-				text-align: center;
-				margin-bottom: var(--uui-size-layout-3);
-			}
-
-			h2 {
-				margin: 0;
-			}
-
-			#buttons {
-				display: flex;
-				margin-top: auto;
-			}
-
-			#button-install {
-				margin-left: auto;
-				min-width: 120px;
-			}
-
-			.error {
-				color: var(--uui-color-danger);
-				padding: var(--uui-size-space-2) 0;
-			}
-		`,
-	];
+	
 
 	@query('#button-install')
 	private _installButton!: UUIButtonElement;
@@ -215,7 +154,9 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				);
 
 				if (error) {
-					this._validationErrorMessage = `The server could not validate the database connection. Details: ${error.detail}`;
+					this._validationErrorMessage = `The server could not validate the database connection. Details: ${
+						error instanceof ApiError ? error.body.detail : error.message
+					}`;
 					this._installButton.state = 'failed';
 					return;
 				}
@@ -424,6 +365,70 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			</uui-form>
 		</div>`;
 	}
+	
+	static styles: CSSResultGroup = [
+		css`
+			:host,
+			#container {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			uui-form {
+				height: 100%;
+			}
+
+			form {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			uui-form-layout-item {
+				margin-top: 0;
+				margin-bottom: var(--uui-size-layout-1);
+			}
+
+			uui-input,
+			uui-input-password,
+			uui-combobox {
+				width: 100%;
+			}
+
+			hr {
+				width: 100%;
+				margin-top: var(--uui-size-space-2);
+				margin-bottom: var(--uui-size-layout-1);
+				border: none;
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			h1 {
+				text-align: center;
+				margin-bottom: var(--uui-size-layout-3);
+			}
+
+			h2 {
+				margin: 0;
+			}
+
+			#buttons {
+				display: flex;
+				margin-top: auto;
+			}
+
+			#button-install {
+				margin-left: auto;
+				min-width: 120px;
+			}
+
+			.error {
+				color: var(--uui-color-danger);
+				padding: var(--uui-size-space-2) 0;
+			}
+		`,
+	];
 }
 
 declare global {

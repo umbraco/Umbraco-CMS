@@ -8,4 +8,3 @@ export type HelpPageResponseModel = {
     url?: string | null;
     type?: string | null;
 };
-

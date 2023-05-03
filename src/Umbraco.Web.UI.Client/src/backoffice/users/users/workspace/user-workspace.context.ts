@@ -1,55 +1,66 @@
-import { UMB_USER_STORE_CONTEXT_TOKEN } from '../repository/user.store';
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
-import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
 import { UmbUserRepository } from '../repository/user.repository';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { UserDetails } from '@umbraco-cms/backoffice/models';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UpdateUserRequestModel, UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserRepository, UserDetails>
-	implements UmbEntityWorkspaceContextInterface<UserDetails | undefined>
+	extends UmbWorkspaceContext<UmbUserRepository, UserResponseModel>
+	implements UmbEntityWorkspaceContextInterface<UserResponseModel | undefined>
 {
-	#manager = new UmbEntityWorkspaceManager<typeof UMB_USER_STORE_CONTEXT_TOKEN.TYPE>(
-		this.host,
-		'user',
-		UMB_USER_STORE_CONTEXT_TOKEN
-	);
-
-	public readonly data = this.#manager.state.asObservable();
-	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
-
-	// TODO: remove this magic connection, instead create the necessary methods to update parts.
-	update = this.#manager.state.update;
-
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbUserRepository(host));
 	}
 
-	setName(name: string) {
-		this.#manager.state.update({ name: name });
-	}
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityId = this.#manager.getEntityKey;
-	getStore = this.#manager.getStore;
-	getData = this.#manager.getData as any; // TODO: fix type mismatch, this will mos likely be handled when switching to repositories.
-	load = this.#manager.load;
-	create = this.#manager.create;
-	save = this.#manager.save;
-	destroy = this.#manager.destroy;
+	#data = new UmbObjectState<UserResponseModel | undefined>(undefined);
+	data = this.#data.asObservable();
 
-	getName() {
-		throw new Error('getName is not implemented for UmbWorkspaceUserContext');
+	async load(id: string) {
+		console.log('load');
+
+		const { data } = await this.repository.requestById(id);
+		if (data) {
+			this.setIsNew(false);
+			this.#data.update(data);
+		}
 	}
 
-	propertyValueByAlias(alias: string) {
-		throw new Error('setPropertyValue is not implemented for UmbWorkspaceUserContext');
+	getEntityId(): string | undefined {
+		return this.getData()?.id || '';
 	}
-	getPropertyValue(alias: string) {
-		throw new Error('setPropertyValue is not implemented for UmbWorkspaceUserContext');
+
+	getEntityType(): string {
+		return 'user';
 	}
-	setPropertyValue(alias: string, value: unknown) {
-		throw new Error('setPropertyValue is not implemented for UmbWorkspaceUserContext');
+
+	getData() {
+		return this.#data.getValue();
+	}
+
+	updateProperty<PropertyName extends keyof UserResponseModel>(
+		propertyName: PropertyName,
+		value: UserResponseModel[PropertyName]
+	) {
+		this.#data.update({ [propertyName]: value });
+	}
+
+	async save() {
+		if (!this.#data.value) return;
+		if (!this.#data.value.id) return;
+
+		console.log('save', this.#data.value, this.getIsNew());
+
+		if (this.getIsNew()) {
+			await this.repository.create(this.#data.value);
+		} else {
+			//TODO: temp hack: why does the response model allow for nulls but not the request model?
+			await this.repository.save(this.#data.value.id, this.#data.value as UpdateUserRequestModel);
+		}
+		// If it went well, then its not new anymore?.
+		this.setIsNew(false);
+	}
+
+	destroy(): void {
+		this.#data.complete();
 	}
 }

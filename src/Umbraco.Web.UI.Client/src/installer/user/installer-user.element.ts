@@ -5,55 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-user')
 export class UmbInstallerUserElement extends UmbLitElement {
-	static styles: CSSResultGroup = [
-		css`
-			:host,
-			#container {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-			}
-
-			uui-form-layout-item {
-				margin-top: 0;
-				margin-bottom: var(--uui-size-layout-1);
-			}
-
-			uui-form {
-				height: 100%;
-			}
-
-			form {
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-			}
-
-			uui-input,
-			uui-input-password {
-				width: 100%;
-			}
-
-			h1 {
-				text-align: center;
-				margin-bottom: var(--uui-size-layout-3);
-			}
-
-			#news-checkbox {
-				margin-top: var(--uui-size-space-4);
-			}
-
-			#buttons {
-				display: flex;
-				margin-top: auto;
-			}
-
-			#button-install {
-				margin-left: auto;
-				min-width: 120px;
-			}
-		`,
-	];
+	
 
 	@state()
 	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
@@ -157,6 +109,56 @@ export class UmbInstallerUserElement extends UmbLitElement {
 			</uui-form>
 		</div>`;
 	}
+	
+	static styles: CSSResultGroup = [
+		css`
+			:host,
+			#container {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			uui-form-layout-item {
+				margin-top: 0;
+				margin-bottom: var(--uui-size-layout-1);
+			}
+
+			uui-form {
+				height: 100%;
+			}
+
+			form {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			uui-input,
+			uui-input-password {
+				width: 100%;
+			}
+
+			h1 {
+				text-align: center;
+				margin-bottom: var(--uui-size-layout-3);
+			}
+
+			#news-checkbox {
+				margin-top: var(--uui-size-space-4);
+			}
+
+			#buttons {
+				display: flex;
+				margin-top: auto;
+			}
+
+			#button-install {
+				margin-left: auto;
+				min-width: 120px;
+			}
+		`,
+	];
 }
 
 declare global {

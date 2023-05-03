@@ -19,6 +19,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@umbraco-cms/backoffice/backend-api": ["libs/backend-api"],
+			"@umbraco-cms/backoffice/content-type": ["libs/content-type"],
 			"@umbraco-cms/backoffice/context-api": ["libs/context-api"],
 			"@umbraco-cms/backoffice/controller": ["libs/controller"],
 			"@umbraco-cms/backoffice/css": ["libs/css/custom-properties.css"],
@@ -36,9 +37,18 @@
 			"@umbraco-cms/backoffice/repository": ["libs/repository"],
 			"@umbraco-cms/backoffice/resources": ["libs/resources"],
 			"@umbraco-cms/backoffice/router": ["libs/router"],
+			"@umbraco-cms/backoffice/sorter": ["libs/sorter"],
 			"@umbraco-cms/backoffice/store": ["libs/store"],
 			"@umbraco-cms/backoffice/utils": ["libs/utils"],
 			"@umbraco-cms/backoffice/workspace": ["libs/workspace"],
+			"@umbraco-cms/backoffice/picker-input": ["libs/picker-input"],
+			"@umbraco-cms/backoffice/id": ["libs/id"],
+			"@umbraco-cms/backoffice/collection": ["libs/collection"],
+			"@umbraco-cms/backoffice/tree": ["libs/tree"],
+			"@umbraco-cms/backoffice/section": ["libs/section"],
+
+			"@umbraco-cms/backoffice/user-group": ["src/backoffice/users/user-groups"],
+
 			"@umbraco-cms/internal/lit-element": ["src/core/lit-element"],
 			"@umbraco-cms/internal/modal": ["src/core/modal"],
 			"@umbraco-cms/internal/router": ["src/core/router"],

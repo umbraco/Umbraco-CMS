@@ -1,15 +1,15 @@
+import type { MediaTypeDetails } from '../types';
 import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store';
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
-import { MediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbMediaTypeRepository implements UmbTreeRepository {
+export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemResponseModel> {
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -26,7 +26,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		this.#host = host;
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new MediaTypeTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbMediaTypeTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbMediaTypeDetailServerDataSource(this.#host);
 
 		this.#init = Promise.all([
@@ -44,6 +44,21 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		]);
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'media-type-root',
+			name: 'Media Types',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -58,11 +73,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { data: undefined, error };
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -73,12 +84,11 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
@@ -96,7 +106,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
@@ -114,8 +124,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Id is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 		const { data, error } = await this.#detailSource.get(id);
 
@@ -136,8 +145,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		// TODO: should we show a notification if the media type is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!mediaType || !mediaType.id) {
-			const error: ProblemDetailsModel = { title: 'Media Type is missing' };
-			return { error };
+			throw new Error('Media type is missing');
 		}
 
 		const { error } = await this.#detailSource.update(mediaType);
@@ -161,8 +169,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository {
 		await this.#init;
 
 		if (!mediaType.name) {
-			const error: ProblemDetailsModel = { title: 'Name is missing' };
-			return { error };
+			throw new Error('Name is missing');
 		}
 
 		const { data, error } = await this.#detailSource.insert(mediaType);

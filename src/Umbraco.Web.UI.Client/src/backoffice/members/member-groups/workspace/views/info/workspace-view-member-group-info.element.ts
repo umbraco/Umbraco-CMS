@@ -2,36 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceMemberGroupContext } from '../../member-group-workspace.context';
-import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import type { MemberGroupDetails } from '../../../types';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-workspace-view-member-group-info')
 export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				margin: var(--uui-size-layout-1);
-				gap: var(--uui-size-layout-1);
-				justify-content: space-between;
-			}
-
-			uui-box {
-				margin-bottom: var(--ui-size-layout-1);
-			}
-
-			uui-box:first-child {
-				flex: 1 1 75%;
-			}
-
-			uui-box:last-child {
-				min-width: 320px;
-			}
-		`,
-	];
-
 	@state()
 	private _memberGroup?: MemberGroupDetails;
 
@@ -80,6 +56,30 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 	render() {
 		return html` ${this._renderMemberGroupInfo()}${this._renderGeneralInfo()} `;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				margin: var(--uui-size-layout-1);
+				gap: var(--uui-size-layout-1);
+				justify-content: space-between;
+			}
+
+			uui-box {
+				margin-bottom: var(--ui-size-layout-1);
+			}
+
+			uui-box:first-child {
+				flex: 1 1 75%;
+			}
+
+			uui-box:last-child {
+				min-width: 320px;
+			}
+		`,
+	];
 }
 
 export default UmbWorkspaceViewMemberGroupInfoElement;

@@ -1,8 +1,7 @@
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbDataTypeRepository } from '../repository/data-type.repository';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { CreateDataTypeRequestModel, DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbDataTypeWorkspaceContext
@@ -10,7 +9,7 @@ export class UmbDataTypeWorkspaceContext
 	implements UmbEntityWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	// TODO: revisit. temp solution because the create and response models are different.
-	#data = new ObjectState<DataTypeResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	name = this.#data.getObservablePart((data) => data?.name);

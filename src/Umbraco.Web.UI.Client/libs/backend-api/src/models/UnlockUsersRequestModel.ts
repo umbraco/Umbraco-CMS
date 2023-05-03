@@ -5,4 +5,3 @@
 export type UnlockUsersRequestModel = {
     userIds?: Array<string>;
 };
-

@@ -3,9 +3,10 @@ import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-u
 import { css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbInputDocumentPickerElement } from '../../../shared/components/input-document-picker/input-document-picker.element';
-import { UmbInputMediaPickerElement } from '../../../shared/components/input-media-picker/input-media-picker.element';
-import { UmbInputLanguagePickerElement } from '../../../shared/components/input-language-picker/input-language-picker.element';
+// TODO: update to module imports when ready
+import type { UmbInputDocumentPickerElement } from '../../../documents/documents/components/input-document-picker/input-document-picker.element';
+import type { UmbInputMediaPickerElement } from '../../../media/media/components/input-media-picker/input-media-picker.element';
+import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -13,30 +14,6 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 
 @customElement('umb-workspace-package-builder')
 export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: block;
-				height: 100%;
-			}
-
-			.header {
-				margin: 0 var(--uui-size-layout-1);
-				display: flex;
-				gap: var(--uui-size-space-4);
-			}
-
-			uui-box {
-				margin: var(--uui-size-layout-1);
-			}
-
-			uui-checkbox {
-				margin-top: var(--uui-size-space-4);
-			}
-		`,
-	];
-
 	@property()
 	entityId?: string;
 
@@ -107,11 +84,11 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-layout alias="Umb.Workspace.PackageBuilder">
+			<umb-workspace-editor alias="Umb.Workspace.PackageBuilder">
 				${this.#renderHeader()}
 				<uui-box class="wrapper" headline="Package Content"> ${this.#renderEditors()} </uui-box>
 				${this.#renderActions()}
-			</umb-workspace-layout>
+			</umb-workspace-editor>
 		`;
 	}
 
@@ -259,7 +236,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	#renderDataTypeSection() {
 		return html`<div slot="editor">
-			<umb-input-checkbox-list></umb-input-checkbox-list>
+			<umb-data-type-input></umb-data-type-input>
 		</div>`;
 	}
 
@@ -286,6 +263,30 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-input-checkbox-list></umb-input-checkbox-list>
 		</div>`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+				height: 100%;
+			}
+
+			.header {
+				margin: 0 var(--uui-size-layout-1);
+				display: flex;
+				gap: var(--uui-size-space-4);
+			}
+
+			uui-box {
+				margin: var(--uui-size-layout-1);
+			}
+
+			uui-checkbox {
+				margin-top: var(--uui-size-space-4);
+			}
+		`,
+	];
 }
 
 export default UmbWorkspacePackageBuilderElement;

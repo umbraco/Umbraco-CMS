@@ -6,4 +6,3 @@ export type TemplateQueryResultItemPresentationModel = {
     icon?: string;
     name?: string;
 };
-

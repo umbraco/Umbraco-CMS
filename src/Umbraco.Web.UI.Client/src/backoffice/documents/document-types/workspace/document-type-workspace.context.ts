@@ -1,8 +1,11 @@
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
-import { UmbWorkspacePropertyStructureManager } from '../../../shared/components/workspace/workspace-context/workspace-structure-manager.class';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbWorkspaceContext, UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type {
+	ContentTypeCompositionModel,
+	ContentTypeSortModel,
+	DocumentTypeResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = DocumentTypeResponseModel;
@@ -19,7 +22,6 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	// TODO: Consider if each of these should go the view it self, but only if its used in that one view, otherwise make then go here.
 	readonly allowedAsRoot;
 	readonly variesByCulture;
 	readonly variesBySegment;
@@ -37,7 +39,7 @@ export class UmbDocumentTypeWorkspaceContext
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDocumentTypeRepository(host));
 
-		this.structure = new UmbWorkspacePropertyStructureManager(this.host, this.repository);
+		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
 		// General for content types:
 		this.data = this.structure.rootDocumentType;
@@ -58,10 +60,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
 	}
 
-	public setPropertyValue(alias: string, value: unknown) {
-		throw new Error('setPropertyValue is not implemented for UmbDocumentTypeWorkspaceContext');
-	}
-
 	getData() {
 		return this.structure.getRootDocumentType() || {};
 	}
@@ -80,10 +78,40 @@ export class UmbDocumentTypeWorkspaceContext
 	setAlias(alias: string) {
 		this.structure.updateRootDocumentType({ alias });
 	}
+	setDescription(description: string) {
+		this.structure.updateRootDocumentType({ description });
+	}
 
-	// TODO => manage setting icon color
+	// TODO: manage setting icon color alias?
 	setIcon(icon: string) {
 		this.structure.updateRootDocumentType({ icon });
+	}
+
+	setAllowedAsRoot(allowedAsRoot: boolean) {
+		this.structure.updateRootDocumentType({ allowedAsRoot });
+	}
+	setVariesByCulture(variesByCulture: boolean) {
+		this.structure.updateRootDocumentType({ variesByCulture });
+	}
+	setVariesBySegment(variesBySegment: boolean) {
+		this.structure.updateRootDocumentType({ variesBySegment });
+	}
+	setIsElement(isElement: boolean) {
+		this.structure.updateRootDocumentType({ isElement });
+	}
+	setAllowedContentTypes(allowedContentTypes: Array<ContentTypeSortModel>) {
+		this.structure.updateRootDocumentType({ allowedContentTypes });
+	}
+	setCompositions(compositions: Array<ContentTypeCompositionModel>) {
+		this.structure.updateRootDocumentType({ compositions });
+	}
+
+	// Document type specific:
+	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
+		this.structure.updateRootDocumentType({ allowedTemplateIds });
+	}
+	setDefaultTemplateId(defaultTemplateId: string) {
+		this.structure.updateRootDocumentType({ defaultTemplateId });
 	}
 
 	async createScaffold(parentId: string) {

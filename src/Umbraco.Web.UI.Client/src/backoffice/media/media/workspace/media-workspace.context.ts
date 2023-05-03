@@ -1,8 +1,7 @@
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbMediaRepository } from '../repository/media.repository';
 import type { MediaDetails } from '../';
-import type { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import { appendToFrozenArray, ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 type EntityType = MediaDetails;
@@ -10,7 +9,7 @@ export class UmbMediaWorkspaceContext
 	extends UmbWorkspaceContext<UmbMediaRepository, EntityType>
 	implements UmbEntityWorkspaceContextInterface<EntityType | undefined>
 {
-	#data = new ObjectState<EntityType | undefined>(undefined);
+	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 

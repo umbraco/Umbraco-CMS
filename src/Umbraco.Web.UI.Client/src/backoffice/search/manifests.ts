@@ -13,7 +13,27 @@ const headerApps: Array<ManifestTypes> = [
 			pathname: 'search',
 		},
 	},
-
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.Search',
+		name: 'Search Modal',
+		loader: () => import('./search-modal/search-modal.element'),
+	},
+	{
+		type: 'dashboard',
+		alias: 'Umb.Dashboard.ExamineManagement',
+		name: 'Examine Management Dashboard',
+		elementName: 'umb-dashboard-examine-management',
+		loader: () => import('./examine-management-dashboard/dashboard-examine-management.element'),
+		weight: 400,
+		meta: {
+			label: 'Examine Management',
+			pathname: 'examine-management',
+		},
+		conditions: {
+			sections: ['Umb.Section.Settings'],
+		},
+	},
 	{
 		type: 'headerApp',
 		kind: 'button',

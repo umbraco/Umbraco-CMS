@@ -1,8 +1,7 @@
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { MemberTypeDetails } from '../../types';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import type { MemberTypeDetails } from '@umbraco-cms/backoffice/models';
-import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @description - A data source for the MemberType detail that fetches data from the server
@@ -10,11 +9,35 @@ import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
  * @class UmbMemberTypeDetailServerDataSource
  * @implements {MemberTypeDetailDataSource}
  */
-export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<any, any, any> {
+export class UmbMemberTypeDetailServerDataSource implements UmbDataSource<any, any, any, any> {
 	#host: UmbControllerHostElement;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
+	}
+
+	/**
+	 * Fetches a Member Type with the given id from the server
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbMediaDetailServerDataSource
+	 */
+	async get(id: string) {
+		if (!id) {
+			throw new Error('Id is missing');
+		}
+
+		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${id}`)) as any;
+
+		/*
+		return tryExecuteAndNotify(
+			this.#host,
+			// TODO: use backend cli when available.
+			fetch(`/umbraco/management/api/v1/member-group/details/${id}`)
+				.then((res) => res.json())
+				.then((res) => res[0] || undefined)
+		);
+		*/
 	}
 
 	/**
@@ -45,7 +68,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async save(id: string, memberType: any) {
+	async update(id: string, memberType: any) {
 		if (!id) throw new Error('Member Type id is missing');
 
 		const payload = { id: memberType.id, requestBody: memberType };
@@ -70,7 +93,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async create(data: MemberTypeDetails) {
+	async insert(data: MemberTypeDetails) {
 		const requestBody = {
 			name: data.name,
 		};
@@ -97,8 +120,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDetailRepository<
 	 */
 	async delete(id: string) {
 		if (!id) {
-			const error: ProblemDetailsModel = { title: 'Key is missing' };
-			return { error };
+			throw new Error('Id is missing');
 		}
 
 		//return await tryExecuteAndNotify(this.#host, MemberTypeResource.deleteMemberTypeByKey({ id }));

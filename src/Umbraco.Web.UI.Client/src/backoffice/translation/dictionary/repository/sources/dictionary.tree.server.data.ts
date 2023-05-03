@@ -1,15 +1,15 @@
-import { DictionaryResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Dictionary tree that fetches data from the server
  * @export
- * @class DictionaryTreeServerDataSource
+ * @class UmbDictionaryTreeServerDataSource
  * @implements {DictionaryTreeDataSource}
  */
-export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -24,7 +24,7 @@ export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof DictionaryTreeServerDataSource
+	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, DictionaryResource.getTreeDictionaryRoot({}));
@@ -34,32 +34,34 @@ export class DictionaryTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof DictionaryTreeServerDataSource
+	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		if (!parentId) {
-			const error: ProblemDetailsModel = { title: 'Parent id is missing' };
-			return { error };
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
-		return tryExecuteAndNotify(
-			this.#host,
-			DictionaryResource.getTreeDictionaryChildren({
-				parentId,
-			})
-		);
+		/* TODO: should we make getRootItems() internal 
+		so it only is a server concern that there are two endpoints? */
+		if (parentId === null) {
+			return this.getRootItems();
+		} else {
+			return tryExecuteAndNotify(
+				this.#host,
+				DictionaryResource.getTreeDictionaryChildren({
+					parentId,
+				})
+			);
+		}
 	}
 
 	/**
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof DictionaryTreeServerDataSource
+	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids || ids.length === 0) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

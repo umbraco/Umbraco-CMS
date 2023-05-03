@@ -1,11 +1,11 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository';
 import {
-	BasicState,
-	ArrayState,
+	UmbBasicState,
+	UmbArrayState,
 	createObservablePart,
-	DeepState,
-	ObjectState,
-	StringState,
+	UmbDeepState,
+	UmbObjectState,
+	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import {
 	DirectionModel,
@@ -58,38 +58,41 @@ export class UmbLogViewerWorkspaceContext {
 		endDate: this.today,
 	};
 
-	#savedSearches = new ObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
+	#savedSearches = new UmbObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
 	savedSearches = createObservablePart(this.#savedSearches, (data) => data?.items);
 
-	#logCount = new DeepState<LogLevelCountsReponseModel | null>(null);
+	#logCount = new UmbDeepState<LogLevelCountsReponseModel | null>(null);
 	logCount = createObservablePart(this.#logCount, (data) => data);
 
-	#dateRange = new DeepState<LogViewerDateRange>(this.defaultDateRange);
+	#dateRange = new UmbDeepState<LogViewerDateRange>(this.defaultDateRange);
 	dateRange = createObservablePart(this.#dateRange, (data) => data);
 
-	#loggers = new DeepState<PagedLoggerResponseModel | null>(null);
+	#loggers = new UmbDeepState<PagedLoggerResponseModel | null>(null);
 	loggers = createObservablePart(this.#loggers, (data) => data?.items);
 
-	#canShowLogs = new BasicState<boolean | null>(null);
+	#canShowLogs = new UmbBasicState<boolean | null>(null);
 	canShowLogs = createObservablePart(this.#canShowLogs, (data) => data);
 
-	#filterExpression = new StringState<string>('');
+	#isLoadingLogs = new UmbBasicState<boolean | null>(null);
+	isLoadingLogs = createObservablePart(this.#isLoadingLogs, (data) => data);
+
+	#filterExpression = new UmbStringState<string>('');
 	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
 
-	#messageTemplates = new DeepState<PagedLogTemplateResponseModel | null>(null);
+	#messageTemplates = new UmbDeepState<PagedLogTemplateResponseModel | null>(null);
 	messageTemplates = createObservablePart(this.#messageTemplates, (data) => data);
 
-	#logLevelsFilter = new ArrayState<LogLevelModel>([]);
+	#logLevelsFilter = new UmbArrayState<LogLevelModel>([]);
 	logLevelsFilter = createObservablePart(this.#logLevelsFilter, (data) => data);
 
-	#logs = new DeepState<PagedLogMessageResponseModel | null>(null);
+	#logs = new UmbDeepState<PagedLogMessageResponseModel | null>(null);
 	logs = createObservablePart(this.#logs, (data) => data?.items);
 	logsTotal = createObservablePart(this.#logs, (data) => data?.total);
 
-	#polling = new ObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
+	#polling = new UmbObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
 	polling = createObservablePart(this.#polling, (data) => data);
 
-	#sortingDirection = new BasicState<DirectionModel>(DirectionModel.ASCENDING);
+	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.ASCENDING);
 	sortingDirection = createObservablePart(this.#sortingDirection, (data) => data);
 
 	#intervalID: number | null = null;
@@ -101,18 +104,7 @@ export class UmbLogViewerWorkspaceContext {
 		this.#repository = new UmbLogViewerRepository(this.#host);
 	}
 
-	async init() {
-		this.validateLogSize();
-	}
-
-	reset() {
-		this.#logs.next({ items: [], total: 0 });
-		this.setCurrentPage(1);
-	}
-
 	onChangeState = () => {
-		this.reset();
-
 		const searchQuery = query();
 		let sanitizedQuery = '';
 		if (searchQuery.lq) {
@@ -262,9 +254,13 @@ export class UmbLogViewerWorkspaceContext {
 	}
 
 	getLogs = async () => {
-		if (!this.#canShowLogs.getValue()) {
+		if (this.#canShowLogs.getValue() === false) {
 			return;
 		}
+
+		const isPollingEnabled = this.#polling.getValue().enabled;
+
+		if (!isPollingEnabled) this.#isLoadingLogs.next(true);
 
 		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
@@ -279,7 +275,7 @@ export class UmbLogViewerWorkspaceContext {
 		};
 
 		const { data } = await this.#repository.getLogs(options);
-
+		this.#isLoadingLogs.next(false);
 		if (data) {
 			this.#logs.next(data);
 		}

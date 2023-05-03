@@ -10,32 +10,7 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@um
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
-	static styles = [
-		css`
-			:host {
-				display: block;
-				margin: var(--uui-size-layout-1);
-			}
-			uui-box {
-				margin: var(--uui-size-space-5) 0;
-				padding-bottom: var(--uui-size-space-1);
-			}
-
-			.no-packages {
-				display: flex;
-				justify-content: space-around;
-			}
-			uui-pagination {
-				display: inline-block;
-			}
-
-			.pagination,
-			.loading {
-				display: flex;
-				justify-content: center;
-			}
-		`,
-	];
+	
 
 	private take = 20;
 
@@ -149,6 +124,33 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		this._createdPackages.splice(index, 1);
 		this.requestUpdate();
 	}
+	
+	static styles = [
+		css`
+			:host {
+				display: block;
+				margin: var(--uui-size-layout-1);
+			}
+			uui-box {
+				margin: var(--uui-size-space-5) 0;
+				padding-bottom: var(--uui-size-space-1);
+			}
+
+			.no-packages {
+				display: flex;
+				justify-content: space-around;
+			}
+			uui-pagination {
+				display: inline-block;
+			}
+
+			.pagination,
+			.loading {
+				display: flex;
+				justify-content: center;
+			}
+		`,
+	];
 }
 
 export default UmbPackagesCreatedOverviewElement;

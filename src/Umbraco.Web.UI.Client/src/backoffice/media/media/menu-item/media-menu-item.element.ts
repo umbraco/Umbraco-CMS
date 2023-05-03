@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-media-menu-item')
 export class UmbMediaMenuItemElement extends UmbLitElement {
 	render() {
-		return html`<umb-tree alias="Umb.Tree.Media"></umb-tree>`;
+		return html`<umb-tree alias="Umb.Tree.Media" hide-tree-root></umb-tree>`;
 	}
 }
 

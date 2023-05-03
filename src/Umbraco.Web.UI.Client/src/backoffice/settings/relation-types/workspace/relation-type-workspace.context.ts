@@ -1,16 +1,14 @@
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-
-import { ObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 
 export class UmbRelationTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbRelationTypeRepository, RelationTypeResponseModel>
 	implements UmbEntityWorkspaceContextInterface<RelationTypeResponseModel | undefined>
 {
-	#data = new ObjectState<RelationTypeResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.getObservablePart((data) => data?.name);
 	id = this.#data.getObservablePart((data) => data?.id);

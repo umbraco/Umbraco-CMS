@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../../backoffice/shared/components/table';
+import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '../../../core/components/table';
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,34 +11,6 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
-	static styles = [
-		UUITextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-				margin: var(--uui-size-layout-1);
-			}
-
-			#dictionary-top-bar {
-				margin-bottom: var(--uui-size-space-5);
-				display: flex;
-				justify-content: space-between;
-			}
-
-			umb-table {
-				display: inline;
-				padding: 0;
-			}
-
-			umb-empty-state {
-				margin: auto;
-				font-size: var(--uui-size-6);
-			}
-		`,
-	];
-
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
@@ -192,6 +164,34 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 				() => html`<umb-empty-state>There were no dictionary items found.</umb-empty-state>`
 			)}`;
 	}
+
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				margin: var(--uui-size-layout-1);
+			}
+
+			#dictionary-top-bar {
+				margin-bottom: var(--uui-size-space-5);
+				display: flex;
+				justify-content: space-between;
+			}
+
+			umb-table {
+				display: inline;
+				padding: 0;
+			}
+
+			umb-empty-state {
+				margin: auto;
+				font-size: var(--uui-size-6);
+			}
+		`,
+	];
 }
 
 export default UmbDashboardTranslationDictionaryElement;

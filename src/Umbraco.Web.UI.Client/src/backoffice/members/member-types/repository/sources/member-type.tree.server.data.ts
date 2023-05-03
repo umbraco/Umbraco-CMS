@@ -1,15 +1,15 @@
-import { MemberTypeResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { ApiError, MemberTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the MemberType tree that fetches data from the server
  * @export
- * @class MemberTypeTreeServerDataSource
- * @implements {MemberTypeTreeDataSource}
+ * @class UmbMemberTypeTreeServerDataSource
+ * @implements {UmbTreeDataSource}
  */
-export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
+export class UmbMemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHostElement;
 
 	/**
@@ -24,7 +24,7 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @return {*}
-	 * @memberof MemberTypeTreeServerDataSource
+	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getRootItems() {
 		return tryExecuteAndNotify(this.#host, MemberTypeResource.getTreeMemberTypeRoot({}));
@@ -34,23 +34,22 @@ export class MemberTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * Fetches the children of a given parent id from the server
 	 * @param {(string | null)} parentId
 	 * @return {*}
-	 * @memberof MemberTypeTreeServerDataSource
+	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
-		const error: ProblemDetailsModel = { title: 'Not implemented for Member Type' };
-		return { error };
+		if (parentId === undefined) throw new Error('Parent id is missing');
+		return { error: new ApiError({} as any, {} as any, 'Not implemented for Member Type') };
 	}
 
 	/**
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
 	 * @return {*}
-	 * @memberof MemberTypeTreeServerDataSource
+	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
 		if (!ids || ids.length === 0) {
-			const error: ProblemDetailsModel = { title: 'Ids are missing' };
-			return { error };
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

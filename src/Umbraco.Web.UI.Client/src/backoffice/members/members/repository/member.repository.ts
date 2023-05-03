@@ -1,14 +1,13 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store';
-import { MemberTreeServerDataSource } from './sources/member.tree.server.data';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbMemberTreeServerDataSource } from './sources/member.tree.server.data';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbMemberRepository implements UmbTreeRepository {
+export class UmbMemberRepository implements UmbTreeRepository<any> {
 	#host: UmbControllerHostElement;
-	#dataSource: MemberTreeServerDataSource;
+	#dataSource: UmbMemberTreeServerDataSource;
 	#treeStore?: UmbMemberTreeStore;
 	#notificationContext?: UmbNotificationContext;
 	#initResolver?: () => void;
@@ -17,7 +16,7 @@ export class UmbMemberRepository implements UmbTreeRepository {
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		// TODO: figure out how spin up get the correct data source
-		this.#dataSource = new MemberTreeServerDataSource(this.#host);
+		this.#dataSource = new UmbMemberTreeServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#treeStore = instance;
@@ -41,6 +40,22 @@ export class UmbMemberRepository implements UmbTreeRepository {
 		}
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			parentId: null,
+			type: 'member-root',
+			name: 'Members',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -54,16 +69,14 @@ export class UmbMemberRepository implements UmbTreeRepository {
 	}
 
 	async requestTreeItemsOf(parentId: string | null) {
-		const error: ProblemDetailsModel = { title: 'Not implemented' };
-		return { data: undefined, error };
+		return { data: undefined, error: { title: 'Not implemented', message: 'Not implemented' } };
 	}
 
-	async requestTreeItems(ids: Array<string>) {
+	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {
-			const error: ProblemDetailsModel = { title: 'Keys are missing' };
-			return { data: undefined, error };
+			throw new Error('Ids are missing');
 		}
 
 		const { data, error } = await this.#dataSource.getItems(ids);
@@ -81,7 +94,7 @@ export class UmbMemberRepository implements UmbTreeRepository {
 		return this.#treeStore!.childrenOf(parentId);
 	}
 
-	async treeItems(ids: Array<string>) {
+	async itemsLegacy(ids: Array<string>) {
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
