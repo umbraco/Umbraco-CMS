@@ -63,6 +63,7 @@ export default {
 						'@umbraco-cms/backoffice/tree': './libs/tree/index.ts',
 						'@umbraco-cms/backoffice/section': './libs/section/index.ts',
 
+						'@umbraco-cms/backoffice/core/components': './src/backoffice/core/components/index.ts',
 						'@umbraco-cms/backoffice/user-group': './src/backoffice/users/user-groups/index.ts',
 
 						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
