@@ -16,23 +16,16 @@ import './collection/collection.element';
 import './collection/collection-toolbar.element';
 import './collection/collection-selection-actions.element';
 import './debug/debug.element';
-import './donut-chart';
 import './dropdown/dropdown.element';
 import './empty-state/empty-state.element';
 import './extension-slot/extension-slot.element';
 import './input-checkbox-list/input-checkbox-list.element';
 import './input-color-picker/input-color-picker.element';
-import './input-culture-select/input-culture-select.element';
-import './input-document-picker/input-document-picker.element';
-import './input-document-type-picker/input-document-type-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
-import './input-language-picker/input-language-picker.element';
-import './input-media-picker/input-media-picker.element';
 import './input-multi-url-picker/input-multi-url-picker.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
 import './input-upload-field/input-upload-field.element';
-import './input-template/input-template.element';
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './section/section-main/section-main.element';
@@ -63,7 +56,6 @@ import './workspace/workspace-action-menu/workspace-action-menu.element';
 
 import './variant-selector/variant-selector.element.ts';
 
-import './template-card/template-card.element';
 import './code-editor';
 
 import './tooltip-menu/tooltip-menu.element';

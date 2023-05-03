@@ -6,6 +6,7 @@ import { manifests as workspaceManifests } from './workspace/manifests';
 import { manifests as entityActionManifests } from './entity-actions/manifests';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests';
 import { manifests as modalManifests } from './modals/manifests';
+import { manifests as propertyEditorManifests } from './property-editors/manifests';
 
 export const manifests = [
 	...collectionManifests,
@@ -16,4 +17,5 @@ export const manifests = [
 	...entityActionManifests,
 	...entityBulkActionManifests,
 	...modalManifests,
+	...propertyEditorManifests,
 ];

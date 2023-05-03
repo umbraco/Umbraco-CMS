@@ -13,7 +13,6 @@ import {
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
-// TODO: implement
 export class UmbUserRepository implements UmbUserDetailRepository, UmbCollectionRepository {
 	#host: UmbControllerHostElement;
 	#init;
@@ -105,6 +104,8 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 	async invite(inviteRequestData: InviteUserRequestModel) {
 		if (!inviteRequestData) throw new Error('Data is missing');
 		const { data, error } = await this.#detailSource.invite(inviteRequestData);
+
+		return { data, error };
 	}
 
 	async save(id: string, user: UpdateUserRequestModel) {
@@ -136,5 +137,17 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 		}
 
 		return { error };
+	}
+
+	async enable(ids: Array<string>) {
+		if (ids.length === 0) throw new Error('User ids are missing');
+
+		const { data, error } = await this.#detailSource.enable({ userIds: ids });
+	}
+
+	async disable(ids: Array<string>) {
+		if (ids.length === 0) throw new Error('User ids are missing');
+
+		const { data, error } = await this.#detailSource.disable({ userIds: ids });
 	}
 }
