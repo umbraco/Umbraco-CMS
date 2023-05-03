@@ -10,4 +10,12 @@ export const handlers = [
 
 		return res(ctx.status(200), ctx.json(response));
 	}),
+
+	rest.get(umbracoPath(`${slug}/:id`), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+		const userGroup = umbUserGroupsData.getById(id);
+
+		return res(ctx.status(200), ctx.json(userGroup));
+	}),
 ];

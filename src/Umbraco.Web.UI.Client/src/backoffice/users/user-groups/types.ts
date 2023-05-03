@@ -21,7 +21,6 @@ export interface UserGroupDetails extends UserGroupEntity {
 export interface UmbUserGroupCollectionFilterModel {
 	skip?: number;
 	take?: number;
-	filter?: string;
 }
 
 export type UmbUserGroupDetailDataSource = UmbDataSource<
