@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -47,6 +48,7 @@ public class ConfigurationField
         HideLabel = attribute.HideLabel;
         Key = attribute.Key;
         View = attribute.View;
+        SortOrder = attribute.SortOrder;
     }
 
     /// <summary>
@@ -76,6 +78,12 @@ public class ConfigurationField
     /// </summary>
     [DataMember(Name = "description")]
     public string? Description { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the sort order of the field.
+    /// </summary>
+    [DataMember(Name = "sortOrder")]
+    public int SortOrder { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the label of the field.

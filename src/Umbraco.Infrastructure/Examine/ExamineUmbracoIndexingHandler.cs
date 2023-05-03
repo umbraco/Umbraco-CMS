@@ -31,6 +31,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
+    private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
 
     public ExamineUmbracoIndexingHandler(
@@ -43,7 +44,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IContentValueSetBuilder contentValueSetBuilder,
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
-        IValueSetBuilder<IMember> memberValueSetBuilder)
+        IValueSetBuilder<IMember> memberValueSetBuilder,
+        IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder)
     {
         _mainDom = mainDom;
         _logger = logger;
@@ -55,6 +57,7 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
         _mediaValueSetBuilder = mediaValueSetBuilder;
         _memberValueSetBuilder = memberValueSetBuilder;
+        _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
         _enabled = new Lazy<bool>(IsEnabled);
     }
 
@@ -302,6 +305,19 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
 
                     List<ValueSet> valueSet = builders[index.PublishedValuesOnly].Value;
                     index.IndexItems(valueSet);
+                }
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Task.CompletedTask;
+                }
+
+                if (isPublished && examineUmbracoIndexingHandler._examineManager.TryGetIndex(
+                        Core.Constants.UmbracoIndexes.DeliveryApiContentIndexName,
+                        out IIndex deliveryApiContentIndex))
+                {
+                    IEnumerable<ValueSet> valueSets = examineUmbracoIndexingHandler._deliveryApiContentIndexValueSetBuilder.GetValueSets(content);
+                    deliveryApiContentIndex.IndexItems(valueSets);
                 }
 
                 return Task.CompletedTask;

@@ -84,6 +84,12 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
     public override object? GetSourceValue(string? culture = null, string? segment = null) => _sourceValue;
 
     private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
+        => GetCacheLevels(PropertyType.CacheLevel, out cacheLevel, out referenceCacheLevel);
+
+    private void GetDeliveryApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
+        => GetCacheLevels(PropertyType.DeliveryApiCacheLevel, out cacheLevel, out referenceCacheLevel);
+
+    private void GetCacheLevels(PropertyCacheLevel propertyTypeCacheLevel, out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
     {
         // based upon the current reference cache level (ReferenceCacheLevel) and this property
         // cache level (PropertyType.CacheLevel), determines both the actual cache level for the
@@ -97,9 +103,9 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         // currently (reference) caching at published snapshot, property specifies
         // elements, ok to use element. OTOH, currently caching at elements,
         // property specifies snapshot, need to use snapshot.
-        if (PropertyType.CacheLevel > ReferenceCacheLevel || PropertyType.CacheLevel == PropertyCacheLevel.None)
+        if (propertyTypeCacheLevel > ReferenceCacheLevel || propertyTypeCacheLevel == PropertyCacheLevel.None)
         {
-            cacheLevel = PropertyType.CacheLevel;
+            cacheLevel = propertyTypeCacheLevel;
             referenceCacheLevel = cacheLevel;
         }
         else
@@ -214,11 +220,52 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
+    public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
+    {
+        GetDeliveryApiCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel);
+
+        lock (_locko)
+        {
+            CacheValues cacheValues = GetCacheValues(cacheLevel);
+
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            return expanding
+                ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
+                : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);
+        }
+    }
+
+    private object? GetDeliveryApiDefaultObject(CacheValues cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiDefaultObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiDefaultObjectValue = getValue();
+            cacheValues.DeliveryApiDefaultObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiDefaultObjectValue;
+    }
+
+    private object? GetDeliveryApiExpandedObject(CacheValues cacheValues, Func<object?> getValue)
+    {
+        if (cacheValues.DeliveryApiExpandedObjectInitialized == false)
+        {
+            cacheValues.DeliveryApiExpandedObjectValue = getValue();
+            cacheValues.DeliveryApiExpandedObjectInitialized = true;
+        }
+
+        return cacheValues.DeliveryApiExpandedObjectValue;
+    }
+
     protected class CacheValues
     {
         public bool ObjectInitialized;
         public object? ObjectValue;
         public bool XPathInitialized;
         public object? XPathValue;
+        public bool DeliveryApiDefaultObjectInitialized;
+        public object? DeliveryApiDefaultObjectValue;
+        public bool DeliveryApiExpandedObjectInitialized;
+        public object? DeliveryApiExpandedObjectValue;
     }
 }
