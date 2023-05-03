@@ -15,28 +15,32 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName) where T : DbContext
+    public delegate void DefaultEFCoreOptionsAction(DbContextOptionsBuilder options, string? providerName, string? connectionString);
+
+    public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, string connectionString, string providerName, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null) where T : DbContext
     {
+
+        if (defaultEFCoreOptionsAction is null)
+        {
+            defaultEFCoreOptionsAction = DefaultOptionsAction;
+        }
+
         services.AddDbContext<T>(
             options =>
             {
-                DefaultOptionsAction(options, providerName, connectionString);
-            },
-            optionsLifetime: ServiceLifetime.Singleton);
+                defaultEFCoreOptionsAction(options, providerName, connectionString);
+            });
 
         services.AddDbContextFactory<T>(options =>
         {
-            DefaultOptionsAction(options, providerName, connectionString);
+            defaultEFCoreOptionsAction(options, providerName, connectionString);
         });
-
 
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
         services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
         services.AddUnique<IEFCoreScopeProvider<T>, EFCoreScopeProvider<T>>();
         services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<T>>();
         services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<T>>();
-
-
 
         return services;
     }
