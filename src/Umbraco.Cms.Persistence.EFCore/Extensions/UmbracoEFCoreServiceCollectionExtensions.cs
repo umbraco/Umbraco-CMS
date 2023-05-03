@@ -29,7 +29,8 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             options =>
             {
                 defaultEFCoreOptionsAction(options, providerName, connectionString);
-            });
+            },
+            optionsLifetime: ServiceLifetime.Singleton);
 
         services.AddDbContextFactory<T>(options =>
         {
