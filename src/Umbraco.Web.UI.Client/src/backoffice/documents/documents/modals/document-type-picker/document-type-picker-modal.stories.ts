@@ -1,4 +1,4 @@
-import '../../../../shared/components/body-layout/body-layout.element';
+import '../../../../core/components/body-layout/body-layout.element';
 import './document-type-picker-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';

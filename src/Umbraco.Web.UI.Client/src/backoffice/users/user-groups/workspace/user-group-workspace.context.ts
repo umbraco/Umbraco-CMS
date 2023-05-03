@@ -1,4 +1,4 @@
-import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
+import { UmbEntityWorkspaceManager } from '../../../core/components/workspace/workspace-context/entity-manager-controller';
 import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import type { UserGroupDetails } from '../types';

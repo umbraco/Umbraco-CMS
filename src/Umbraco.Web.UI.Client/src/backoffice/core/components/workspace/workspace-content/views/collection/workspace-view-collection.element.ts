@@ -8,7 +8,7 @@ import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backen
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
-import '../../../../../../shared/components/collection/dashboards/dashboard-collection.element';
+import '../../../../collection/dashboards/dashboard-collection.element';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
