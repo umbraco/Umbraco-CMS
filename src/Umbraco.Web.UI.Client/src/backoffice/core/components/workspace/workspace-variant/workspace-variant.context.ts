@@ -1,5 +1,5 @@
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDocumentWorkspaceContext } from '../../../../documents/documents/workspace/document-workspace.context';
-import { UmbVariantId } from '../../../variants/variant-id.class';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
 import { ActiveVariant } from '../workspace-context/workspace-split-view-manager.class';
 import {

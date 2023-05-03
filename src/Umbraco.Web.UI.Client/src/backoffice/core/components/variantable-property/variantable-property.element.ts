@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbVariantId } from '../../variants/variant-id.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
 import type { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import '../workspace-property/workspace-property.element';
@@ -9,8 +9,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-variantable-property')
 export class UmbVariantablePropertyElement extends UmbLitElement {
-	
-
 	private _property?: PropertyTypeResponseModelBaseModel | undefined;
 	@property({ type: Object, attribute: false })
 	public get property(): PropertyTypeResponseModelBaseModel | undefined {
@@ -62,7 +60,7 @@ export class UmbVariantablePropertyElement extends UmbLitElement {
 			.property=${this._property}
 			.propertyVariantId=${this._propertyVariantId}></umb-property-type-based-property>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

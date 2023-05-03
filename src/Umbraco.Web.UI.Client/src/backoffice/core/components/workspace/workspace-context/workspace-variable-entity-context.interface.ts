@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import { UmbVariantId } from '../../../variants/variant-id.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceSplitViewManager } from './workspace-split-view-manager.class';
 import type { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type { ValueModelBaseModel, VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';

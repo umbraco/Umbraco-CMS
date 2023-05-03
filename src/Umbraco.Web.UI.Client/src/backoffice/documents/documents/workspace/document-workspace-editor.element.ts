@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbVariantId } from '../../../core/variants/variant-id.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { ActiveVariant } from '../../../core/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
