@@ -9,7 +9,7 @@ import {
 	UmbTableSelectedEvent,
 	UmbTableConfig,
 	UmbTableOrderedEvent,
-} from '../../../../../core/components/table/table.element';
+} from '@umbraco-cms/backoffice/core/components';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
