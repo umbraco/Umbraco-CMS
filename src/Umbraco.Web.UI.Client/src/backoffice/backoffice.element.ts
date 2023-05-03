@@ -5,7 +5,7 @@ import { UmbStoreExtensionInitializer } from '../core/store-extension-initialize
 import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
-} from './shared/components/backoffice-frame/backoffice.context';
+} from './core/components/backoffice-frame/backoffice.context';
 import { UmbExtensionInitializer } from './packages/repository/server-extension.controller';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
@@ -14,7 +14,7 @@ import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/exten
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 const CORE_PACKAGES = [
-	import('./shared/umbraco-package'),
+	import('./core/umbraco-package'),
 	import('./settings/umbraco-package'),
 	import('./documents/umbraco-package'),
 	import('./media/umbraco-package'),

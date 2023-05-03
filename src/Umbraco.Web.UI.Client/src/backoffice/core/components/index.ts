@@ -54,7 +54,7 @@ import './workspace/workspace-editor/workspace-editor.element';
 import './workspace/workspace-footer/workspace-footer.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
 
-import './variant-selector/variant-selector.element.ts';
+import './variant-selector/variant-selector.element';
 
 import './code-editor';
 
