@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
+import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
@@ -85,32 +85,36 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	}
 
 	render() {
-		// if (this._selectionLength === 0) return nothing;
+		if (this._selectionLength === 0) return nothing;
 
-		return html`<div id="selection-info">
-				<uui-button
-					@click=${this._handleClearSelection}
-					@keydown=${this._handleKeyDown}
-					label="Clear"
-					look="secondary"></uui-button>
-				${this._renderSelectionCount()}
+		return html`
+			<div id="container">
+				<div id="selection-info">
+					<uui-button
+						@click=${this._handleClearSelection}
+						@keydown=${this._handleKeyDown}
+						label="Clear"
+						look="secondary"></uui-button>
+					${this._renderSelectionCount()}
+				</div>
+
+				<div id="actions">
+					${this._entityBulkActions?.map(
+						(manifest) =>
+							html`<umb-entity-bulk-action
+								@executed=${this.#onActionExecuted}
+								.selection=${this._selection}
+								.manifest=${manifest}></umb-entity-bulk-action>`
+					)}
+				</div>
 			</div>
-
-			<div id="actions">
-				${this._entityBulkActions?.map(
-					(manifest) =>
-						html`<umb-entity-bulk-action
-							@executed=${this.#onActionExecuted}
-							.selection=${this._selection}
-							.manifest=${manifest}></umb-entity-bulk-action>`
-				)}
-			</div>`;
+		`;
 	}
 
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
+			#container {
 				display: flex;
 				gap: var(--uui-size-3);
 				width: 100%;

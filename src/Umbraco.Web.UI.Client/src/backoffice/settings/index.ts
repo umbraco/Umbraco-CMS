@@ -1,4 +1,4 @@
-import { UmbThemeContext } from '../themes/theme.context';
+import { UmbThemeContext } from './themes/theme.context';
 import { manifests as settingsSectionManifests } from './section.manifests';
 import { manifests as settingsMenuManifests } from './menu.manifests';
 import { manifests as dashboardManifests } from './dashboards/manifests';

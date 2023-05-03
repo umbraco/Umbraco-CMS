@@ -5,13 +5,13 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CreateUser',
 		name: 'Create User Modal',
-		loader: () => import('./create-user/create-user-modal.element'),
+		loader: () => import('./create/user-create-modal.element'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.InviteUser',
 		name: 'Invite User Modal',
-		loader: () => import('./invite-user/invite-user-modal.element'),
+		loader: () => import('./invite/user-invite-modal.element'),
 	},
 	{
 		type: 'modal',
