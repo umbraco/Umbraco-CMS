@@ -54,6 +54,8 @@ import './workspace/workspace-editor/workspace-editor.element';
 import './workspace/workspace-footer/workspace-footer.element';
 import './workspace/workspace-action-menu/workspace-action-menu.element';
 
+import './property-creator/property-creator.element';
+
 import './variant-selector/variant-selector.element';
 
 import './code-editor';
