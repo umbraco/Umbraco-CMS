@@ -136,8 +136,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                // FIXME: Use timeout variable
-                await dbContext.Database.ExecuteSqlAsync($"SET LOCK_TIMEOUT 60000;");
+                await dbContext.Database.ExecuteSqlRawAsync($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};");
 
                 var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SELECT value FROM dbo.umbracoLock WITH (REPEATABLEREAD) WHERE id={LockId}");
 
@@ -171,8 +170,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                // FIXME: Use variable timeout
-                await dbContext.Database.ExecuteSqlAsync($"SET LOCK_TIMEOUT 60000;");
+                await dbContext.Database.ExecuteSqlRawAsync($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};");
 
                 var rowsAffected = await dbContext.Database.ExecuteSqlAsync(@$"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
 
