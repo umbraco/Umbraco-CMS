@@ -1,4 +1,10 @@
+import {
+	SaveUserGroupRequestModel,
+	UpdateUserGroupRequestModel,
+	UserGroupBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
+import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 export interface UserGroupEntity extends UmbEntityBase {
 	type: 'user-group';
@@ -11,3 +17,10 @@ export interface UserGroupDetails extends UserGroupEntity {
 	mediaStartNode?: string;
 	permissions: Array<string>;
 }
+
+export type UmbUserGroupDetailDataSource = UmbDataSource<
+	SaveUserGroupRequestModel,
+	void,
+	UpdateUserGroupRequestModel,
+	UserGroupBaseModel
+>;
