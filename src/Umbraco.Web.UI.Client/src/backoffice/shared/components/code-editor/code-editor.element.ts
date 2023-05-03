@@ -1,7 +1,7 @@
 import { css, html, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { createRef, Ref, ref } from 'lit/directives/ref.js';
-import { UMB_THEME_CONTEXT_TOKEN } from '../../../themes/theme.context';
+import { UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context';
 import { UmbCodeEditorController } from './code-editor.controller';
 import { CodeEditorLanguage, CodeEditorTheme, UmbCodeEditorHost } from './code-editor.model';
 import { monacoEditorStyles, monacoJumpingCursorHack } from './styles';
@@ -22,8 +22,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-code-editor')
 export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditorHost {
-	
-
 	private containerRef: Ref<HTMLElement> = createRef();
 
 	get container() {
@@ -146,7 +144,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	render() {
 		return html` <div id="editor-container" ${ref(this.containerRef)}></div> `;
 	}
-	
+
 	static styles = [
 		monacoEditorStyles,
 		monacoJumpingCursorHack,
