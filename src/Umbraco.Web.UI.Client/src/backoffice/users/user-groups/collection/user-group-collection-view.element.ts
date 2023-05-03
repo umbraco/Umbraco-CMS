@@ -72,7 +72,7 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	private _createTableItems(userGroups: Array<UserGroupPresentationModel>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
-				id: userGroup.name || '',
+				id: userGroup.id || '',
 				icon: userGroup.icon || '',
 				data: [
 					{
