@@ -9,12 +9,12 @@ import {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../../../shared/components/table';
-import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../repository/user-group.store';
-import type { UserGroupDetails } from '../../types';
+} from '../../../shared/components/table';
+import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
+import type { UserGroupDetails } from '../types';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../workspace/user-group-table-name-column-layout.element';
+import './user-group-table-name-column-layout.element';
 //import '../../user-section/views/user-groups/user-group-table-sections-column-layout.element';
 
 @customElement('umb-user-group-collection-view')

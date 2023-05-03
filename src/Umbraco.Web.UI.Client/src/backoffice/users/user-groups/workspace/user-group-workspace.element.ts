@@ -47,7 +47,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'edit/:id',
+			path: ':id',
 			component: () => this.#element,
 			setup: (_component, info) => {
 				const id = info.match.params.id;
