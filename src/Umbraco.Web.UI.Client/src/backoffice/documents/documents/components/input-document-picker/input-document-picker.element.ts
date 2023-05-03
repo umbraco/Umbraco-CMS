@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../../documents/documents/repository/document.tree.store';
-import type { UmbDocumentTreeStore } from '../../../documents/documents/repository/document.tree.store';
+import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../repository/document.tree.store';
+import type { UmbDocumentTreeStore } from '../../repository/document.tree.store';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -17,7 +17,6 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 
 @customElement('umb-input-document-picker')
 export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElement) {
-	
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -167,7 +166,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			</uui-ref-node>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

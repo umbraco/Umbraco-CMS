@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbTemplateCardElement } from '../template-card/template-card.element';
-import { UmbTemplateRepository } from '../../../templating/templates/repository/template.repository';
+import { UmbTemplateRepository } from '../../repository/template.repository';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,
@@ -51,12 +51,12 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	_selectedIds: Array<string> = [];
-	@property({ type: Array<string> })
+	_selectedIds: Array<string | null> = [];
+	@property({ type: Array<string | null> })
 	public get selectedIds() {
 		return this._selectedIds;
 	}
-	public set selectedIds(newKeys: Array<string>) {
+	public set selectedIds(newKeys: Array<string | null>) {
 		this._selectedIds = newKeys;
 		this.#observePickedTemplates();
 	}

@@ -14,8 +14,6 @@ import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalResult> {
-
-
 	@state()
 	_selectedKey?: string;
 
@@ -73,6 +71,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
 		const selectedKey = element.selection[element.selection.length - 1];
+		if (!selectedKey) return;
+
 		const udi = buildUdi(entityType, selectedKey);
 
 		this._selectedKey = selectedKey;

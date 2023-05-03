@@ -6,14 +6,20 @@ import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.da
 import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateMediaRequestModel,
+	EntityTreeItemResponseModel,
+	UpdateMediaRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 type ItemDetailType = MediaDetails;
 
 export class UmbMediaRepository
-	implements UmbTreeRepository, UmbDetailRepository<CreateMediaRequestModel, UpdateMediaRequestModel, MediaDetails>
+	implements
+		UmbTreeRepository<EntityTreeItemResponseModel>,
+		UmbDetailRepository<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>
 {
 	#host: UmbControllerHostElement;
 
@@ -63,6 +69,21 @@ export class UmbMediaRepository
 		}
 	}
 
+	// TREE:
+	async requestTreeRoot() {
+		await this.#init;
+
+		const data = {
+			id: null,
+			type: 'media-root',
+			name: 'Media',
+			icon: 'umb:folder',
+			hasChildren: true,
+		};
+
+		return { data };
+	}
+
 	async requestRootTreeItems() {
 		await this.#init;
 
@@ -77,10 +98,7 @@ export class UmbMediaRepository
 
 	async requestTreeItemsOf(parentId: string | null) {
 		await this.#init;
-
-		if (!parentId) {
-			throw new Error('Parent id is missing');
-		}
+		if (parentId === undefined) throw new Error('Parent id is missing');
 
 		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
 
@@ -121,7 +139,7 @@ export class UmbMediaRepository
 	// DETAILS:
 
 	async createScaffold(parentId: string | null) {
-		if (!parentId) throw new Error('Parent id is missing');
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
 		return this.#detailDataSource.createScaffold(parentId);
 	}
@@ -220,7 +238,7 @@ export class UmbMediaRepository
 		alert('implement trash');
 	}
 
-	async move(ids: Array<string>, destination: string) {
+	async move(ids: Array<string>, destination: string | null) {
 		// TODO: use backend cli when available.
 		const res = await fetch('/umbraco/management/api/v1/media/move', {
 			method: 'POST',

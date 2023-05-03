@@ -1,12 +1,7 @@
-import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
 import { UmbUserRepository } from '../repository/user.repository';
-import { UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import {
-	UpdateUserGroupRequestModel,
-	UpdateUserRequestModel,
-	UserResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { UpdateUserRequestModel, UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserWorkspaceContext

@@ -2,14 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbWorkspaceMemberGroupContext } from '../../member-group-workspace.context';
-import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
+import type { MemberGroupDetails } from '../../../types';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-workspace-view-member-group-info')
 export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
-	
-
 	@state()
 	private _memberGroup?: MemberGroupDetails;
 
@@ -58,7 +56,7 @@ export class UmbWorkspaceViewMemberGroupInfoElement extends UmbLitElement {
 	render() {
 		return html` ${this._renderMemberGroupInfo()}${this._renderGeneralInfo()} `;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

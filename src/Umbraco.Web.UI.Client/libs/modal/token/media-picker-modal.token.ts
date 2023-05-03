@@ -6,7 +6,7 @@ export interface UmbMediaPickerModalData {
 }
 
 export interface UmbMediaPickerModalResult {
-	selection: Array<string>;
+	selection: Array<string | null>;
 }
 
 export const UMB_MEDIA_PICKER_MODAL = new UmbModalToken<UmbMediaPickerModalData, UmbMediaPickerModalResult>(

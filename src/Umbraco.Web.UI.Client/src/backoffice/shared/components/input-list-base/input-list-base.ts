@@ -45,13 +45,13 @@ export class UmbInputListBaseElement extends UmbLitElement {
 
 		modalHandler?.onSubmit().then((data: UmbPickerModalData<string>) => {
 			if (data) {
-				this.value = data.selection;
+				this.value = data.selection.filter((id) => id !== null && id !== undefined) as Array<string>;
 				this.selectionUpdated();
 			}
 		});
 	}
 
-	protected removeFromSelection(id: string) {
+	protected removeFromSelection(id?: string | null) {
 		this.value = this.value.filter((k) => k !== id);
 		this.selectionUpdated();
 	}

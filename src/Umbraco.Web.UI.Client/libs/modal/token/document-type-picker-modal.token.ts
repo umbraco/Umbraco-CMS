@@ -6,7 +6,7 @@ export interface UmbDocumentTypePickerModalData {
 }
 
 export interface UmbDocumentTypePickerModalResult {
-	selection: Array<string>;
+	selection: Array<string | null>;
 }
 
 export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<

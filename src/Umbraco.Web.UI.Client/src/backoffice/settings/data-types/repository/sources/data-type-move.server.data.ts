@@ -22,13 +22,14 @@ export class UmbDataTypeMoveServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Move an item for the given id to the target id
-	 * @param {Array<string>} id
+	 * @param {string} id
+	 * @param {(string | null)} targetId
 	 * @return {*}
 	 * @memberof UmbDataTypeMoveServerDataSource
 	 */
-	async move(id: string, targetId: string) {
+	async move(id: string, targetId: string | null) {
 		if (!id) throw new Error('Id is missing');
-		if (!targetId) throw new Error('Target Id is missing');
+		if (targetId === undefined) throw new Error('Target Id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,

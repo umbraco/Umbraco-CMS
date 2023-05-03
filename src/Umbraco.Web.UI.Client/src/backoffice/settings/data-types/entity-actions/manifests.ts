@@ -1,4 +1,4 @@
-import { DATA_TYPE_ENTITY_TYPE } from '..';
+import { DATA_TYPE_FOLDER_ENTITY_TYPE, DATA_TYPE_ENTITY_TYPE } from '..';
 import { DATA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
 import { manifests as createManifests } from './create/manifests';
 import { manifests as moveManifests } from './move/manifests';
@@ -24,7 +24,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDeleteEntityAction,
 		},
 		conditions: {
-			entityType: DATA_TYPE_ENTITY_TYPE,
+			entityTypes: [DATA_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -39,7 +39,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDeleteFolderEntityAction,
 		},
 		conditions: {
-			entityType: DATA_TYPE_ENTITY_TYPE,
+			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
@@ -54,7 +54,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbFolderUpdateEntityAction,
 		},
 		conditions: {
-			entityType: DATA_TYPE_ENTITY_TYPE,
+			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 ];

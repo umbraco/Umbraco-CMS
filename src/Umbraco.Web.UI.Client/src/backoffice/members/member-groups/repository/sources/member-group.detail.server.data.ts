@@ -1,6 +1,6 @@
+import type { MemberGroupDetails } from '../../types';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { MemberGroupDetails } from '@umbraco-cms/backoffice/models';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**

@@ -32,7 +32,7 @@ class UmbEntityActionListElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('entityAction').pipe(
 				map((extensions) => {
-					return extensions.filter((extension) => extension.conditions.entityType === this.entityType);
+					return extensions.filter((extension) => extension.conditions.entityTypes.includes(this.entityType));
 				})
 			),
 			(actions) => {

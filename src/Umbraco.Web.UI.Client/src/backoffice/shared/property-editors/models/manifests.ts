@@ -1,6 +1,5 @@
 import { manifest as colorPicker } from './Umbraco.ColorPicker';
 import { manifest as eyeDropper } from './Umbraco.ColorPicker.EyeDropper';
-import { manifest as contentPicker } from './Umbraco.ContentPicker';
 import { manifest as json } from './Umbraco.JSON';
 import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker';
@@ -35,7 +34,6 @@ import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extens
 export const manifests: Array<ManifestPropertyEditorModel> = [
 	colorPicker,
 	eyeDropper,
-	contentPicker,
 	dateTime,
 	emailAddress,
 	json,

@@ -11,10 +11,8 @@ export class UmbDocumentTypePickerModalElement extends UmbModalBaseElement<
 	UmbDocumentTypePickerModalData,
 	UmbDocumentTypePickerModalResult
 > {
-
-
 	@state()
-	_selection: Array<string> = [];
+	_selection: Array<string | null> = [];
 
 	@state()
 	_multiple = true;
@@ -28,8 +26,7 @@ export class UmbDocumentTypePickerModalElement extends UmbModalBaseElement<
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		//TODO: Should multiple property be implemented here or be passed down into umb-tree?
-		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
+		this._selection = element.selection;
 	}
 
 	private _submit() {
@@ -50,7 +47,8 @@ export class UmbDocumentTypePickerModalElement extends UmbModalBaseElement<
 						alias="Umb.Tree.DocumentTypes"
 						@selected=${this._handleSelectionChange}
 						.selection=${this._selection}
-						selectable></umb-tree>
+						selectable
+						?multiple=${this._multiple}></umb-tree>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>

@@ -30,7 +30,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCreateDocumentEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -45,7 +45,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbTrashEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -60,7 +60,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCreateDocumentBlueprintEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -75,7 +75,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbMoveEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -90,7 +90,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCopyEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -105,7 +105,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbSortChildrenOfEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -120,7 +120,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDocumentCultureAndHostnamesEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -134,7 +134,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDocumentPermissionsEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -148,7 +148,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDocumentPublicAccessEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -162,7 +162,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbPublishDocumentEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -176,7 +176,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbUnpublishDocumentEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 	{
@@ -190,7 +190,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbRollbackDocumentEntityAction,
 		},
 		conditions: {
-			entityType,
+			entityTypes: [entityType],
 		},
 	},
 ];
