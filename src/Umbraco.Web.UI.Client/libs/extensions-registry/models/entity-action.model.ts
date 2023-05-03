@@ -47,5 +47,5 @@ export interface MetaEntityAction {
 }
 
 export interface ConditionsEntityAction {
-	entityType: string;
+	entityTypes: Array<string>;
 }

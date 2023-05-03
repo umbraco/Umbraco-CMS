@@ -1,4 +1,4 @@
-import { UmbThemeContext } from '../themes/theme.context';
+import { UmbThemeContext } from './themes/theme.context';
 import { manifests as settingsSectionManifests } from './section.manifests';
 import { manifests as settingsMenuManifests } from './menu.manifests';
 import { manifests as dashboardManifests } from './dashboards/manifests';
@@ -14,6 +14,9 @@ import {
 } from './languages/app-language-select/app-language.context';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+
+import './cultures/components';
+import './languages/components';
 
 export const manifests = [
 	...settingsSectionManifests,

@@ -6,6 +6,7 @@ import { manifests as modalManifests } from './modals/manifests';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
 import './components';
+import './templates/components';
 
 export const manifests = [
 	...menuManifests,

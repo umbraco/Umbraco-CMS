@@ -39,7 +39,7 @@ export class UmbEntityTreeStore
 	 * @return {*}
 	 * @memberof UmbEntityTreeStore
 	 */
-	items(ids: Array<string>) {
+	items(ids: Array<string | null>) {
 		return this._data.getObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
 	}
 }

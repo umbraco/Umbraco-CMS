@@ -1,7 +1,7 @@
+import type { MediaTypeDetails } from '../../../backoffice/media/media-types/types';
 import { UmbEntityData } from './entity.data';
 import { createFolderTreeItem } from './utils';
 import { FolderTreeItemResponseModel, PagedFolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { MediaTypeDetails } from '@umbraco-cms/backoffice/models';
 
 export const data: Array<MediaTypeDetails> = [
 	{

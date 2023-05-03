@@ -7,5 +7,5 @@ export interface ManifestTreeItem extends ManifestElement<UmbTreeItemExtensionEl
 }
 
 export interface ConditionsTreeItem {
-	entityType: string;
+	entityTypes: Array<string>;
 }

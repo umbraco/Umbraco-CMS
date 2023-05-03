@@ -5,8 +5,8 @@ import {
 	EntityTreeItemResponseModel,
 	PagedEntityTreeItemResponseModel,
 	TemplateResponseModel,
-	TemplateModelBaseModel,
 	TemplateScaffoldResponseModel,
+	CreateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
@@ -98,7 +98,7 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		};
 	}
 
-	create(templateData: TemplateModelBaseModel) {
+	create(templateData: CreateTemplateRequestModel) {
 		const template = {
 			$type: '',
 			id: UmbId.new(),

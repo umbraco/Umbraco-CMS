@@ -1,14 +1,12 @@
 import { css, html, LitElement, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { UmbTableColumn, UmbTableItem } from '../../../../../../shared/components/table';
+import type { UmbTableColumn, UmbTableItem } from '../../../../../../core/components/table';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
 // TODO: this could be done more generic, but for now we just need it for the document table
 @customElement('umb-document-table-actions-column-layout')
 export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
-	
-
 	@property({ type: Object, attribute: false })
 	column!: UmbTableColumn;
 
@@ -56,7 +54,7 @@ export class UmbDocumentTableActionColumnLayoutElement extends LitElement {
 			</div>
 		`;
 	}
-	
+
 	static styles = [
 		css`
 			#action-menu-popover {

@@ -14,7 +14,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityType: 'media',
+			entityTypes: ['media'],
 		},
 	},
 ];

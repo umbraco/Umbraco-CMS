@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import type { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
+import type { UmbTreeElement } from '../../../../core/components/tree/tree.element';
 import { UmbDocumentPickerModalData, UmbDocumentPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
@@ -11,10 +11,8 @@ export class UmbDocumentPickerModalElement extends UmbModalBaseElement<
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalResult
 > {
-
-
 	@state()
-	_selection: Array<string> = [];
+	_selection: Array<string | null> = [];
 
 	@state()
 	_multiple = true;

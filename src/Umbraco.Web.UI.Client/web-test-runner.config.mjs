@@ -60,6 +60,11 @@ export default {
 						'@umbraco-cms/backoffice/picker-input': './libs/picker-input/index.ts',
 						'@umbraco-cms/backoffice/id': './libs/id/index.ts',
 						'@umbraco-cms/backoffice/collection': './libs/collection/index.ts',
+						'@umbraco-cms/backoffice/tree': './libs/tree/index.ts',
+						'@umbraco-cms/backoffice/section': './libs/section/index.ts',
+
+						'@umbraco-cms/backoffice/user-group': './src/backoffice/users/user-groups/index.ts',
+
 						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
 						'@umbraco-cms/internal/router': './src/core/router/index.ts',

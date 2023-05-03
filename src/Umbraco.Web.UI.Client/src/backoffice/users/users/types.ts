@@ -2,12 +2,15 @@ import type {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	DirectionModel,
+	DisableUserRequestModel,
+	EnableUserRequestModel,
 	InviteUserRequestModel,
 	UpdateUserRequestModel,
 	UserOrderModel,
 	UserResponseModel,
 	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
+
 import { UmbDataSource, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbCreateUserResponseModel {
@@ -28,6 +31,8 @@ export interface UmbUserCollectionFilterModel {
 export interface UmbUserDetailDataSource
 	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UserResponseModel> {
 	invite(data: InviteUserRequestModel): Promise<any>;
+	enable(data: EnableUserRequestModel): Promise<any>;
+	disable(data: DisableUserRequestModel): Promise<any>;
 }
 
 export interface UmbUserDetailRepository

@@ -7,8 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')
 export class UmbLogViewerOverviewViewElement extends UmbLitElement {
-	
-
 	@state()
 	private _errorCount = 0;
 
@@ -58,12 +56,12 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
 								`@Level='Fatal' or @Level='Error' or Has(@Exception)`
 							)}`}>
-							<h1 id="error-count">${this._errorCount}</h1></uui-button
+							<h2 id="error-count">${this._errorCount}</h2></uui-button
 						>
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">
-						<h1 id="log-lever"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h1>
+						<h2 id="log-level"><umb-log-viewer-log-level-overview></umb-log-viewer-log-level-overview></h2>
 					</uui-box>
 
 					<umb-log-viewer-log-types-chart id="types"></umb-log-viewer-log-types-chart>
@@ -81,7 +79,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			</div>
 		`;
 	}
-	
+
 	static styles = [
 		css`
 			:host {
@@ -106,7 +104,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				align-self: start;
 				display: grid;
 				grid-template-columns: repeat(2, 1fr);
-				grid-template-rows: repeat(4, 1fr);
+				grid-template-rows: repeat(4, max-content);
 				gap: 20px 20px;
 			}
 
@@ -116,15 +114,21 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 			#errors {
 				grid-area: 2 / 1 / 3 / 2;
+				--uui-box-default-padding: 0;
+			}
+
+			#errors > uui-button {
+				width: 100%;
 			}
 
 			#level {
 				grid-area: 2 / 2 / 3 / 3;
 			}
 
-			#log-lever {
+			#log-level {
 				color: var(--uui-color-positive);
 				text-align: center;
+				margin: 0;
 			}
 
 			#types {
@@ -152,9 +156,10 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 			}
 
 			#error-count {
-				font-size: 4rem;
+				font-size: 3rem;
 				text-align: center;
 				color: var(--uui-color-danger);
+				margin: 0;
 			}
 		`,
 	];

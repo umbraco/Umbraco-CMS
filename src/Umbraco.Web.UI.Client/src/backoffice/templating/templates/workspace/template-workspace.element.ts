@@ -1,13 +1,12 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import type { IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
-
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './template-workspace-edit.element';
-import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {

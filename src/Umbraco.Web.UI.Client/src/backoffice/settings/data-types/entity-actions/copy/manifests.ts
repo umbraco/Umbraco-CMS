@@ -16,7 +16,7 @@ const entityActions: Array<ManifestTypes> = [
 			api: UmbCopyDataTypeEntityAction,
 		},
 		conditions: {
-			entityType: DATA_TYPE_ENTITY_TYPE,
+			entityTypes: [DATA_TYPE_ENTITY_TYPE],
 		},
 	},
 ];
