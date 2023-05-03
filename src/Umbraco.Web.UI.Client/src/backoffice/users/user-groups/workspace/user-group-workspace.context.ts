@@ -1,41 +1,36 @@
-import { UmbEntityWorkspaceManager } from '../../../shared/components/workspace/workspace-context/entity-manager-controller';
-import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
-import type { UserGroupDetails } from '../types';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UserGroupBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupDetails>
-	implements UmbEntityWorkspaceContextInterface<UserGroupDetails | undefined>
+	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupBaseModel>
+	implements UmbEntityWorkspaceContextInterface<UserGroupBaseModel | undefined>
 {
-	#manager = new UmbEntityWorkspaceManager<typeof UMB_USER_GROUP_STORE_CONTEXT_TOKEN.TYPE>(
-		this.host,
-		'user-group',
-		UMB_USER_GROUP_STORE_CONTEXT_TOKEN
-	);
+	#data = new UmbObjectState<UserGroupBaseModel | undefined>(undefined);
+	data = this.#data.asObservable();
 
-	public readonly data = this.#manager.state.asObservable();
-	public readonly name = this.#manager.state.getObservablePart((state) => state?.name);
-
+	getEntityId(): string | undefined {
+		throw new Error('Method not implemented.');
+	}
+	getEntityType(): string {
+		throw new Error('Method not implemented.');
+	}
+	getData(): UserGroupBaseModel | undefined {
+		throw new Error('Method not implemented.');
+	}
+	save(): Promise<void> {
+		throw new Error('Method not implemented.');
+	}
+	destroy(): void {
+		throw new Error('Method not implemented.');
+	}
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbUserGroupRepository(host));
 	}
 
-	setName(name: string) {
-		this.#manager.state.update({ name: name });
-	}
-	getEntityType = this.#manager.getEntityType;
-	getUnique = this.#manager.getEntityKey;
-	getEntityId = this.#manager.getEntityKey;
-	getStore = this.#manager.getStore;
-	getData = this.#manager.getData as any; // TODO: fix type mismatch, but this will be done when we move to repositories.
-	load = this.#manager.load;
-	create = this.#manager.create;
-	save = this.#manager.save;
-	destroy = this.#manager.destroy;
-
-	public setPropertyValue(alias: string, value: unknown) {
-		throw new Error('setPropertyValue is not implemented for UmbWorkspaceUserGroupContext');
+	updateProperty<Alias extends keyof UserGroupBaseModel>(alias: Alias, value: UserGroupBaseModel[Alias]) {
+		this.#data.update({ [alias]: value });
 	}
 }
