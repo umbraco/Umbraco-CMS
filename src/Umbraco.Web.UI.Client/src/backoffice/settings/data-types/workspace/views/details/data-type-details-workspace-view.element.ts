@@ -13,8 +13,6 @@ import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api'
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
-import '../../../../../core/components/ref-property-editor-ui/ref-property-editor-ui.element';
-
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement
 	extends UmbLitElement
