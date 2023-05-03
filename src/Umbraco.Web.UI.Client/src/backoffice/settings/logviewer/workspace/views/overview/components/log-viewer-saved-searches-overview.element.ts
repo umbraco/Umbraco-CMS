@@ -8,8 +8,6 @@ import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api
 //TODO: implement the saved searches pagination when the API total bug is fixed
 @customElement('umb-log-viewer-saved-searches-overview')
 export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
-	
-
 	@state()
 	private _savedSearches: SavedLogSearchResponseModel[] = [];
 
@@ -33,12 +31,12 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 
 	#renderSearchItem = (searchListItem: SavedLogSearchResponseModel) => {
 		return html` <li>
-			<uui-button
+			<uui-menu-item
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
 				href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(searchListItem.query ?? '')}`}>
-				<uui-icon name="umb:search"></uui-icon>${searchListItem.name}
-			</uui-button>
+				<uui-icon slot="icon" name="umb:search"></uui-icon>${searchListItem.name}
+			</uui-menu-item>
 		</li>`;
 	};
 
@@ -49,7 +47,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 			</ul>
 		</uui-box>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -74,6 +72,10 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 
 			li uui-icon {
 				margin-right: 1em;
+			}
+
+			uui-menu-item {
+				width: 100%;
 			}
 		`,
 	];
