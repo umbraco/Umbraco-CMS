@@ -4,6 +4,7 @@ import { manifests as stylesheetManifests } from './stylesheets/manifests';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
 import './components';
+import './templates/components';
 
 export const manifests = [...menuManifests, ...templateManifests, ...stylesheetManifests];
 

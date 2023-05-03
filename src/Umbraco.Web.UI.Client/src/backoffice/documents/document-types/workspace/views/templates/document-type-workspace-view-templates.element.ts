@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
-import type { UmbInputTemplateElement } from '../../../../../../backoffice/shared/components/input-template/input-template.element';
+import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';

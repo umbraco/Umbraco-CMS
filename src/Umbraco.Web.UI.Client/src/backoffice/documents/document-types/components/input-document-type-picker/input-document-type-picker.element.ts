@@ -6,7 +6,7 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import {
 	UmbDocumentTypeTreeStore,
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
-} from '../../../documents/document-types/repository/document-type.tree.store';
+} from '../../repository/document-type.tree.store';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -19,8 +19,6 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-type-picker')
 export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitElement) {
-	
-
 	// TODO: do we need both selectedIds and value? If we just use value we follow the same pattern as native form controls.
 	private _selectedIds: Array<string> = [];
 	@property({ type: Array })
@@ -124,7 +122,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 			</uui-ref-node>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -15,6 +15,9 @@ import {
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
+import './cultures/components';
+import './languages/components';
+
 export const manifests = [
 	...settingsSectionManifests,
 	...settingsMenuManifests,
