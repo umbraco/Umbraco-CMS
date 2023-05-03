@@ -124,8 +124,13 @@ export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
 	#onChange(e: UUIInputEvent) {
 		e.stopPropagation();
 		const picked = e.target.value as string;
-		this.value = picked ? this.#localToUTC(picked) : '';
-		this.displayValue = picked ? picked : '';
+		if (!picked) {
+			this.value = '';
+			this.displayValue = '';
+			return;
+		}
+		this.value = this.offsetTime ? this.#valueToServerOffset(picked) : this.#localToUTC(picked);
+		this.displayValue = picked;
 		this.dispatchEvent(new CustomEvent('change'));
 	}
 

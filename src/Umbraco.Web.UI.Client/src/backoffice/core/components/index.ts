@@ -19,6 +19,8 @@ import './debug/debug.element';
 import './dropdown/dropdown.element';
 import './empty-state/empty-state.element';
 import './extension-slot/extension-slot.element';
+
+import './date-input/date-input.element';
 import './input-checkbox-list/input-checkbox-list.element';
 import './input-color-picker/input-color-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
@@ -26,6 +28,7 @@ import './input-multi-url-picker/input-multi-url-picker.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
 import './input-upload-field/input-upload-field.element';
+
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './section/section-main/section-main.element';
