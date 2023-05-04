@@ -44,7 +44,10 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 	}
 
 	render() {
-		return html`<uui-select .options="${this._options}" @change="${this.#onChange}"></uui-select>`;
+		return html`<uui-select
+			label="Select a value type"
+			.options="${this._options}"
+			@change="${this.#onChange}"></uui-select>`;
 	}
 
 	static styles = [UUITextStyles];
