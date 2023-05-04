@@ -4822,6 +4822,26 @@
       }
     },
     "/umbraco/management/api/v1/partial-view/folder": {
+      "get": {
+        "tags": [
+          "Partial View"
+        ],
+        "operationId": "GetPartialViewFolder",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
       "post": {
         "tags": [
           "Partial View"
@@ -4851,26 +4871,6 @@
           "Partial View"
         ],
         "operationId": "DeletePartialViewFolder",
-        "parameters": [
-          {
-            "name": "path",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "Partial View"
-        ],
-        "operationId": "GetPartialViewFolder",
         "parameters": [
           {
             "name": "path",
@@ -7860,7 +7860,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/SaveUserGroupRequestModel"
+                    "$ref": "#/components/schemas/CreateUserGroupRequestModel"
                   }
                 ]
               }
@@ -7924,7 +7924,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedUserGroupPresentationModel"
+                  "$ref": "#/components/schemas/PagedUserGroupResponseModel"
                 }
               }
             }
@@ -7957,7 +7957,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/UserGroupPresentationModel"
+                      "$ref": "#/components/schemas/UserGroupResponseModel"
                     }
                   ]
                 }
@@ -9352,6 +9352,15 @@
             "nullable": true
           }
         },
+        "additionalProperties": false
+      },
+      "CreateUserGroupRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
         "additionalProperties": false
       },
       "CreateUserRequestModel": {
@@ -12001,7 +12010,7 @@
         },
         "additionalProperties": false
       },
-      "PagedUserGroupPresentationModel": {
+      "PagedUserGroupResponseModel": {
         "required": [
           "items",
           "total"
@@ -12017,7 +12026,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/UserGroupPresentationModel"
+                  "$ref": "#/components/schemas/UserGroupResponseModel"
                 }
               ]
             }
@@ -12539,15 +12548,6 @@
         ],
         "type": "integer",
         "format": "int32"
-      },
-      "SaveUserGroupRequestModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/UserGroupBaseModel"
-          }
-        ],
-        "additionalProperties": false
       },
       "SavedLogSearchPresenationBaseModel": {
         "type": "object",
@@ -13471,7 +13471,7 @@
         },
         "additionalProperties": false
       },
-      "UserGroupPresentationModel": {
+      "UserGroupResponseModel": {
         "required": [
           "$type"
         ],
@@ -13494,7 +13494,7 @@
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "UserGroupPresentationModel": "#/components/schemas/UserGroupPresentationModel"
+            "UserGroupResponseModel": "#/components/schemas/UserGroupResponseModel"
           }
         }
       },
