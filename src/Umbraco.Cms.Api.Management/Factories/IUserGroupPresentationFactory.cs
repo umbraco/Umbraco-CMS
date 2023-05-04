@@ -25,11 +25,11 @@ public interface IUserGroupPresentationFactory
     Task<IEnumerable<UserGroupResponseModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups);
 
     /// <summary>
-    /// Creates an <see cref="IUserGroup"/> based on a <see cref="SaveUserGroupRequestModel"/>
+    /// Creates an <see cref="IUserGroup"/> based on a <see cref="CreateUserGroupRequestModel"/>
     /// </summary>
     /// <param name="requestModel"></param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(SaveUserGroupRequestModel requestModel);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(CreateUserGroupRequestModel requestModel);
 
     /// <summary>
     /// Converts the values of an update model to fit with the existing backoffice implementations, and maps it to an existing user group.

@@ -67,7 +67,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(SaveUserGroupRequestModel requestModel)
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> CreateAsync(CreateUserGroupRequestModel requestModel)
     {
         var cleanedName = requestModel.Name.CleanForXss('[', ']', '(', ')', ':');
 
