@@ -4,7 +4,6 @@ import { UUISelectEvent } from '@umbraco-ui/uui';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-property-editor-ui-value-type
@@ -26,17 +25,18 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 		{ name: 'Long String', value: 'TEXT' },
 	];
 
-	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		const valueAlias = config.find((x) => x.alias === 'value');
-		if (!valueAlias) return;
-
-		this.value = valueAlias.value as string;
-		const index = this._options.findIndex((option) => option.value === valueAlias);
-
-		if (index < 0) return;
-		this._options[0].selected = true;
+	constructor() {
+		super();
 	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		const index = this._options.findIndex((option) => option.value === this.value);
+		index > 0 ? (this._options[index].selected = true) : (this._options[0].selected = true);
+	}
+
+	@property({ type: Array, attribute: false })
+	public config = [];
 
 	#onChange(e: UUISelectEvent) {
 		this.value = e.target.value as string;
@@ -44,7 +44,7 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 	}
 
 	render() {
-		return html`<uui-select .options="${this._options}" @change="${this.#onChange}"> </uui-select>`;
+		return html`<uui-select .options="${this._options}" @change="${this.#onChange}"></uui-select>`;
 	}
 
 	static styles = [UUITextStyles];
