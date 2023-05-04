@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management;
+using Umbraco.Cms.Api.Management.Controllers.Install;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -21,10 +23,10 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
         builder.AddMvcAndRazor(mvcBuilder =>
         {
             // Adds Umbraco.Cms.Api.Management
-            mvcBuilder.AddApplicationPart(typeof(Api.Management.Controllers.Install.InstallControllerBase).Assembly);
+            mvcBuilder.AddApplicationPart(typeof(InstallControllerBase).Assembly);
         });
 
-        new Api.Management.ManagementApiComposer().Compose(builder);
+        new ManagementApiComposer().Compose(builder);
     }
 
     [Test]

@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Cms.Core;

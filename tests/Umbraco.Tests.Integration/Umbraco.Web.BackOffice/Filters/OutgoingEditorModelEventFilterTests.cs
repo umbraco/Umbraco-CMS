@@ -1,4 +1,5 @@
-﻿using System.Net;
+using System.Linq;
+using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;

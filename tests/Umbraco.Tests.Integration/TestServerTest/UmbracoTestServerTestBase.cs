@@ -16,8 +16,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Api.Management;
-using Umbraco.Cms.Api.Management.Controllers.Install;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;

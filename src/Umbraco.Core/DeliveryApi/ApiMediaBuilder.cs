@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiMediaBuilder : IApiMediaBuilder
+public sealed class ApiMediaBuilder : IApiMediaBuilder
 {
     private readonly IApiContentNameProvider _apiContentNameProvider;
     private readonly IApiMediaUrlProvider _apiMediaUrlProvider;

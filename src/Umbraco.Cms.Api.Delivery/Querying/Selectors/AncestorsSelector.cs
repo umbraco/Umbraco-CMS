@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -5,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Selectors;
 
-internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
+public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 {
     private const string AncestorsSpecifier = "ancestors:";
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -33,7 +34,7 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             // it means that CanHandle() returned true, meaning that this Selector should be able to handle the selector value
             return new SelectorOption
             {
-                FieldName = "id",
+                FieldName = AncestorsSelectorIndexer.FieldName,
                 Value = string.Empty
             };
         }
@@ -44,7 +45,7 @@ internal sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
 
         return new SelectorOption
         {
-            FieldName = "id",
+            FieldName = AncestorsSelectorIndexer.FieldName,
             Value = string.Join(" ", ancestorKeys)
         };
     }

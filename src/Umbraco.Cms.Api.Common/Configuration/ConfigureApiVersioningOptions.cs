@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
 
-public class ConfigureApiVersioningOptions : IConfigureOptions<ApiVersioningOptions>
+public sealed class ConfigureApiVersioningOptions : IConfigureOptions<ApiVersioningOptions>
 {
     public void Configure(ApiVersioningOptions options)
     {

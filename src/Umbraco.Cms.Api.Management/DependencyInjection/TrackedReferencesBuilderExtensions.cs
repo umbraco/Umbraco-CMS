@@ -4,7 +4,7 @@ using Umbraco.Cms.Api.Management.Mapping.Relation;
 using Umbraco.Cms.Api.Management.Mapping.TrackedReferences;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.New.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Mapping;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 

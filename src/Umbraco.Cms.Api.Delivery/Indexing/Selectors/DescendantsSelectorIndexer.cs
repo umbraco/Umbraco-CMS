@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 
-internal sealed class DescendantsSelectorIndexer : IContentIndexHandler
+public sealed class DescendantsSelectorIndexer : IContentIndexHandler
 {
     internal const string FieldName = "ancestorIds";
 

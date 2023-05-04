@@ -1,7 +1,10 @@
+using System.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
@@ -26,7 +29,35 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     private readonly ILogger<AutoModelsNotificationHandler> _logger;
     private readonly IMainDom _mainDom;
     private readonly ModelsGenerationError _mbErrors;
-    private readonly ModelsGenerator _modelGenerator;
+    private readonly IModelsGenerator _modelGenerator;
+
+    // TODO: Remove in v13
+    private readonly ModelsGenerator? _concreteModelGenerator;
+
+    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with IModelsGenerator instead.")]
+    [Browsable(false)]
+    public AutoModelsNotificationHandler(
+        ILogger<AutoModelsNotificationHandler> logger,
+        IOptionsMonitor<ModelsBuilderSettings> config,
+        ModelsGenerator modelGenerator,
+        ModelsGenerationError mbErrors,
+        IMainDom mainDom)
+        : this(logger, config, StaticServiceProvider.Instance.GetRequiredService<IModelsGenerator>(), mbErrors, mainDom)
+    {
+    }
+
+    [Obsolete("This constructor is obsolete and will be removed in v13. Use the constructor with only IModelsGenerator instead.")]
+    [Browsable(false)]
+    public AutoModelsNotificationHandler(
+        ILogger<AutoModelsNotificationHandler> logger,
+        IOptionsMonitor<ModelsBuilderSettings> config,
+        ModelsGenerator concreteModelGenerator,
+        IModelsGenerator modelGenerator,
+        ModelsGenerationError mbErrors,
+        IMainDom mainDom)
+        : this(logger, config, modelGenerator, mbErrors, mainDom)
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AutoModelsNotificationHandler" /> class.
@@ -34,7 +65,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     public AutoModelsNotificationHandler(
         ILogger<AutoModelsNotificationHandler> logger,
         IOptionsMonitor<ModelsBuilderSettings> config,
-        ModelsGenerator modelGenerator,
+        IModelsGenerator modelGenerator,
         ModelsGenerationError mbErrors,
         IMainDom mainDom)
     {

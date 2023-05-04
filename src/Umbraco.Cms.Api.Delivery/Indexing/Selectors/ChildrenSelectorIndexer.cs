@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 
-internal sealed class ChildrenSelectorIndexer : IContentIndexHandler
+public sealed class ChildrenSelectorIndexer : IContentIndexHandler
 {
     private readonly IEntityService _entityService;
 

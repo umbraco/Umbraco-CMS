@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiContentBuilder : ApiContentBuilderBase<IApiContent>, IApiContentBuilder
+public sealed class ApiContentBuilder : ApiContentBuilderBase<IApiContent>, IApiContentBuilder
 {
     public ApiContentBuilder(IApiContentNameProvider apiContentNameProvider, IApiContentRouteBuilder apiContentRouteBuilder, IOutputExpansionStrategyAccessor outputExpansionStrategyAccessor)
         : base(apiContentNameProvider, apiContentRouteBuilder, outputExpansionStrategyAccessor)
