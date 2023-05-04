@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public class ApiContentResponse : ApiContent, IApiContentResponse
+public sealed class ApiContentResponse : ApiContent, IApiContentResponse
 {
     public ApiContentResponse(Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties, IDictionary<string, IApiContentRoute> cultures)
         : base(id, name, contentType, route, properties)
