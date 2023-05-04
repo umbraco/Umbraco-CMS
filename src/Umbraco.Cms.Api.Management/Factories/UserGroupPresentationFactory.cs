@@ -28,7 +28,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     }
 
     /// <inheritdoc />
-    public async Task<UserGroupPresentationModel> CreateAsync(IUserGroup userGroup)
+    public async Task<UserGroupResponseModel> CreateAsync(IUserGroup userGroup)
     {
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
@@ -40,7 +40,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             throw new InvalidOperationException($"Unknown language ID in User Group: {userGroup.Name}");
         }
 
-        return new UserGroupPresentationModel
+        return new UserGroupResponseModel
         {
             Name = userGroup.Name ?? string.Empty,
             Id = userGroup.Key,
@@ -55,9 +55,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<UserGroupPresentationModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups)
+    public async Task<IEnumerable<UserGroupResponseModel>> CreateMultipleAsync(IEnumerable<IUserGroup> userGroups)
     {
-        var userGroupViewModels = new List<UserGroupPresentationModel>();
+        var userGroupViewModels = new List<UserGroupResponseModel>();
         foreach (IUserGroup userGroup in userGroups)
         {
             userGroupViewModels.Add(await CreateAsync(userGroup));

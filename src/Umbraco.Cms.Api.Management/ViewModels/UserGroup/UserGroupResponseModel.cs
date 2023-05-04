@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
-public class UserGroupPresentationModel : UserGroupBase, INamedEntityPresentationModel
+public class UserGroupResponseModel : UserGroupBase, INamedEntityPresentationModel
 {
     /// <summary>
     /// The key identifier for the user group.
