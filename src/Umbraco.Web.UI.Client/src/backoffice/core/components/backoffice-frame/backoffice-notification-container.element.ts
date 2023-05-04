@@ -11,8 +11,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-notification-container')
 export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
-	
-
 	@state()
 	private _notifications?: UmbNotificationHandler[];
 
@@ -48,7 +46,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			</uui-toast-notification-container>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
