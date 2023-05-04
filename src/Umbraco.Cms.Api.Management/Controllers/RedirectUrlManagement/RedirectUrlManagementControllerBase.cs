@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
@@ -6,8 +7,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 [ApiController]
 [VersionedApiBackOfficeRoute("redirect-management")]
 [ApiExplorerSettings(GroupName = "Redirect Management")]
-[ApiVersion("1.0")]
-public class RedirectUrlManagementBaseController : ManagementApiControllerBase
+public class RedirectUrlManagementControllerBase : ManagementApiControllerBase
 {
 
 }

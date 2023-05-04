@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
@@ -6,7 +7,6 @@ using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree;
 
-[ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Stylesheet}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Stylesheet))]

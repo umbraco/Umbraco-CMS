@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Text;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
@@ -12,6 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Query;
 
+[ApiVersion("1.0")]
 public class ExecuteTemplateQueryController : TemplateQueryControllerBase
 {
     private readonly IPublishedContentQuery _publishedContentQuery;

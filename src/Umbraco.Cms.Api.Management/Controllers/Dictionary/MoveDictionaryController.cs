@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
+[ApiVersion("1.0")]
 public class MoveDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;

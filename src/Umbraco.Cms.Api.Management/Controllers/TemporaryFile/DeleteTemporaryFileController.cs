@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.TemporaryFile;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
+[ApiVersion("1.0")]
 public class DeleteTemporaryFileController : TemporaryFileControllerBase
 {
     private readonly ITemporaryFileService _temporaryFileService;

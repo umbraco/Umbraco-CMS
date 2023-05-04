@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -9,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 [ApiController]
 [VersionedApiBackOfficeRoute("log-viewer")]
 [ApiExplorerSettings(GroupName = "Log Viewer")]
-[ApiVersion("1.0")]
 public abstract class LogViewerControllerBase : ManagementApiControllerBase
 {
     protected IActionResult LogViewerOperationStatusResult(LogViewerOperationStatus status) =>

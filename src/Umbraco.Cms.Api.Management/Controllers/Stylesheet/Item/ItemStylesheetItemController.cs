@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Script.Item;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Item;
 
+[ApiVersion("1.0")]
 public class ItemStylesheetItemController : StylesheetItemControllerBase
 {
     private readonly IFileItemPresentationModelFactory _fileItemPresentationModelFactory;

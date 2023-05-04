@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Item;
 
+[ApiVersion("1.0")]
 public class ItemTemplateItemController : TemplateItemControllerBase
 {
     private readonly IEntityService _entityService;

@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -12,6 +13,7 @@ using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
+[ApiVersion("1.0")]
 public class AllLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
 using Umbraco.Cms.Core.Manifest;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+[ApiVersion("1.0")]
 public class AllPackageManifestController : PackageControllerBase
 {
     private readonly IPackageManifestService _packageManifestService;

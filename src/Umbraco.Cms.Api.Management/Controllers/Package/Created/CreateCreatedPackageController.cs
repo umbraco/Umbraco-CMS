@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+[ApiVersion("1.0")]
 public class CreateCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;

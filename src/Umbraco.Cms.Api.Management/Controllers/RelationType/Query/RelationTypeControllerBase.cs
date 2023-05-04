@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
@@ -9,7 +10,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}")]
 [ApiExplorerSettings(GroupName = "Relation Type")]
-[ApiVersion("1.0")]
 public class RelationTypeControllerBase : ManagementApiControllerBase
 {
         protected IActionResult RelationTypeOperationStatusResult(RelationTypeOperationStatus status) =>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
+[ApiVersion("1.0")]
 public class BuildModelsBuilderController : ModelsBuilderControllerBase
 {
     private ModelsBuilderSettings _modelsBuilderSettings;

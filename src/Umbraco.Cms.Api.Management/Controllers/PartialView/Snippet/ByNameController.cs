@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView.Snippets;
 using Umbraco.Cms.Core.Mapping;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Snippets;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Snippet;
 
+[ApiVersion("1.0")]
 public class ByNameController : PartialViewControllerBase
 {
     private readonly IPartialViewService _partialViewService;

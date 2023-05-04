@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +10,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TrackedReference;
 
+[ApiVersion("1.0")]
 public class ByIdTrackedReferenceController : TrackedReferenceControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
