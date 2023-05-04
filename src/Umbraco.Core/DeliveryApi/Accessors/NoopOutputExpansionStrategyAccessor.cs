@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.DeliveryApi.Accessors;
 
-public class NoopOutputExpansionStrategyAccessor : IOutputExpansionStrategyAccessor
+public sealed class NoopOutputExpansionStrategyAccessor : IOutputExpansionStrategyAccessor
 {
     public bool TryGetValue([NotNullWhen(true)] out IOutputExpansionStrategy? outputExpansionStrategy)
     {
