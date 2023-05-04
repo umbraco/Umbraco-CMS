@@ -1,7 +1,6 @@
 using Examine;
 using Examine.Search;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
-using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -12,13 +11,13 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 
 internal sealed class ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
 {
+    private const string ItemIdFieldName = "itemId";
     private readonly IExamineManager _examineManager;
     private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
     private readonly SelectorHandlerCollection _selectorHandlers;
     private readonly FilterHandlerCollection _filterHandlers;
     private readonly SortHandlerCollection _sortHandlers;
     private readonly string _fallbackGuidValue;
-    private readonly ISet<string> _itemIdOnlyFieldSet = new HashSet<string> { "itemId" };
 
     public ApiContentQueryService(
         IExamineManager examineManager,
@@ -63,10 +62,10 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         HandleFiltering(filters, queryOperation);
 
         // Handle Sorting
-        IOrdering sortQuery = HandleSorting(sorts, queryOperation).SelectFields(_itemIdOnlyFieldSet);
+        IOrdering sortQuery = HandleSorting(sorts, queryOperation);
 
         ISearchResults? results = sortQuery
-            .SelectFields(_itemIdOnlyFieldSet)
+            .SelectField(ItemIdFieldName)
             .Execute(QueryOptions.SkipTake(skip, take));
 
         if (results is null)
@@ -75,8 +74,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         }
 
         Guid[] items = results
-            .Where(r => r.Values.ContainsKey("itemId"))
-            .Select(r => Guid.Parse(r.Values["itemId"]))
+            .Where(r => r.Values.ContainsKey(ItemIdFieldName))
+            .Select(r => Guid.Parse(r.Values[ItemIdFieldName]))
             .ToArray();
         return new PagedModel<Guid>(results.TotalItemCount, items);
     }
@@ -190,7 +189,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
             };
         }
 
-        return orderingQuery ?? // Apply default sorting (left-aligning the content tree) if no valid sort query params
-               queryCriteria.OrderBy(new SortableField(PathSortIndexer.FieldName, SortType.String));
+        // Keep the index sorting as default
+        return orderingQuery ?? queryCriteria.OrderBy();
     }
 }
