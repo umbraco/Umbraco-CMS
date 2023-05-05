@@ -1,7 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UUIPopoverElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUICheckboxElement, UUIRadioGroupElement, UUIRadioGroupEvent } from '@umbraco-ui/uui';
+import { UmbDropdownElement } from '../../../core/components/dropdown/dropdown.element';
 import { UmbUserCollectionContext } from './user-collection.context';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import {
@@ -11,11 +12,24 @@ import {
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
-	private isCloud = true; //NOTE: Used to show either invite or create user buttons and views.
+	private _isCloud = true; //NOTE: Used to show either invite or create user buttons and views.
+
+	@state()
+	private _stateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);
+
+	@state()
+	private _stateFilterSelection: Array<UserStateModel> = [];
+
+	@state()
+	private _orderByOptions: Array<UserOrderModel> = Object.values(UserOrderModel);
+
+	@state()
+	private _orderBy?: UserOrderModel;
 
 	#modalContext?: UmbModalContext;
 	#collectionContext?: UmbUserCollectionContext;
@@ -30,24 +44,27 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
-			this.#collectionContext = instance;
+			this.#collectionContext = instance as UmbUserCollectionContext;
 		});
 	}
 
+	// TODO: we need to render collection view extension
 	private _toggleViewType() {
+		/*
 		const isList = window.location.pathname.split('/').pop() === 'list';
 
 		isList
 			? history.pushState(null, '', 'section/users/view/users/overview/grid')
 			: history.pushState(null, '', 'section/users/view/users/overview/list');
+			*/
 	}
 
-	private _handleTogglePopover(event: PointerEvent) {
+	#onDropdownClick(event: PointerEvent) {
 		const composedPath = event.composedPath();
 
-		const popover = composedPath.find((el) => el instanceof UUIPopoverElement) as UUIPopoverElement;
-		if (popover) {
-			popover.open = !popover.open;
+		const dropdown = composedPath.find((el) => el instanceof UmbDropdownElement) as UmbDropdownElement;
+		if (dropdown) {
+			dropdown.open = !dropdown.open;
 		}
 	}
 
@@ -61,7 +78,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	private _showInviteOrCreate() {
 		let token = undefined;
 		// TODO: we need to find a better way to determine if we should create or invite
-		if (this.isCloud) {
+		if (this._isCloud) {
 			token = UMB_INVITE_USER_MODAL;
 		} else {
 			token = UMB_CREATE_USER_MODAL;
@@ -70,50 +87,79 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.#modalContext?.open(token);
 	}
 
+	#onStateFilterChange(event: UUIBooleanInputEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUICheckboxElement;
+		const value = target.value as UserStateModel;
+		const isChecked = target.checked;
+
+		this._stateFilterSelection = isChecked
+			? [...this._stateFilterSelection, value]
+			: this._stateFilterSelection.filter((v) => v !== value);
+
+		this.#collectionContext?.setStateFilter(this._stateFilterSelection);
+	}
+
+	#onOrderByChange(event: UUIRadioGroupEvent) {
+		event.stopPropagation();
+		const target = event.currentTarget as UUIRadioGroupElement | null;
+
+		if (target) {
+			this._orderBy = target.value as UserOrderModel;
+			this.#collectionContext?.setOrderByFilter(this._orderBy);
+		}
+	}
+
 	render() {
 		return html`
 			<div id="sticky-top">
 				<div id="user-list-top-bar">
 					<uui-button
 						@click=${this._showInviteOrCreate}
-						label=${this.isCloud ? 'Invite' : 'Create' + ' user'}
+						label=${this._isCloud ? 'Invite' : 'Create' + ' user'}
 						look="outline"></uui-button>
 					<uui-input @input=${this._updateSearch} label="search" id="input-search"></uui-input>
 					<div>
-						<!-- TODO: consider making this a shared component, as we need similar for other locations, example media library, members. -->
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="status">
-								Status: <b>All</b>
+						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
+						<umb-dropdown margin="8">
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
+								State: ${this._stateFilterSelection}
 							</uui-button>
-							<div slot="popover" class="filter-dropdown">
+							<div slot="dropdown" class="filter-dropdown">
+								${this._stateFilterOptions.map(
+									(option) =>
+										html`<uui-checkbox
+											label=${option}
+											@change=${this.#onStateFilterChange}
+											name="state"
+											value=${option}></uui-checkbox>`
+								)}
+							</div>
+						</umb-dropdown>
+
+						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
+						<umb-dropdown margin="8">
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="order by"> Group: </uui-button>
+							<div slot="dropdown" class="filter-dropdown">
 								<uui-checkbox label="Active"></uui-checkbox>
 								<uui-checkbox label="Inactive"></uui-checkbox>
 								<uui-checkbox label="Invited"></uui-checkbox>
 								<uui-checkbox label="Disabled"></uui-checkbox>
 							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="groups">
-								Groups: <b>All</b>
+						</umb-dropdown>
+
+						<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
+						<umb-dropdown margin="8">
+							<uui-button @click=${this.#onDropdownClick} slot="trigger" label="Order By">
+								Order By: <b>${this._orderBy}</b>
 							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
+							<div slot="dropdown" class="filter-dropdown" name="orderBy">
+								<uui-radio-group name="radioGroup" @change=${this.#onOrderByChange}>
+									${this._orderByOptions.map((option) => html`<uui-radio label=${option} value=${option}></uui-radio>`)}
+								</uui-radio-group>
 							</div>
-						</uui-popover>
-						<uui-popover margin="8">
-							<uui-button @click=${this._handleTogglePopover} slot="trigger" label="order by">
-								Order by: <b>Name (A-Z)</b>
-							</uui-button>
-							<div slot="popover" class="filter-dropdown">
-								<uui-checkbox label="Active"></uui-checkbox>
-								<uui-checkbox label="Inactive"></uui-checkbox>
-								<uui-checkbox label="Invited"></uui-checkbox>
-								<uui-checkbox label="Disabled"></uui-checkbox>
-							</div>
-						</uui-popover>
+						</umb-dropdown>
+
 						<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
 							<uui-icon name="settings"></uui-icon>
 						</uui-button>
@@ -146,31 +192,21 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				gap: var(--uui-size-space-5);
 				align-items: center;
 			}
+
 			#user-list {
 				padding: var(--uui-size-layout-1);
 				padding-top: var(--uui-size-space-2);
 			}
+
 			#input-search {
 				width: 100%;
-			}
-
-			uui-popover {
-				width: unset;
 			}
 
 			.filter-dropdown {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
-				background-color: var(--uui-color-surface);
-				padding: var(--uui-size-space-4);
-				border-radius: var(--uui-size-border-radius);
-				box-shadow: var(--uui-shadow-depth-2);
 				width: fit-content;
-			}
-			a {
-				color: inherit;
-				text-decoration: none;
 			}
 		`,
 	];

@@ -3,11 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserCollectionContext } from './user-collection.context';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-import './views/table/user-table-collection-view.element';
-import './views/grid/user-grid-collection-view.element';
 import './user-collection-header.element';
 
 export type UsersViewType = 'list' | 'grid';
@@ -19,11 +17,11 @@ export class UmbUserCollectionElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: 'grid',
-			component: () => import('./views/grid/user-grid-collection-view.element'),
+			component: () => import('./views/grid/user-collection-grid-view.element'),
 		},
 		{
 			path: 'list',
-			component: () => import('./views/table/user-table-collection-view.element'),
+			component: () => import('./views/table/user-collection-table-view.element'),
 		},
 		{
 			path: '**',

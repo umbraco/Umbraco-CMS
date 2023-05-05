@@ -9,8 +9,6 @@ import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router
 //TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
 export class UmbLogViewerMessageElement extends UmbLitElement {
-	
-
 	@query('details')
 	details!: HTMLDetailsElement;
 
@@ -141,7 +139,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 						<umb-log-viewer-level-tag .level=${this.level ? this.level : 'Information'}></umb-log-viewer-level-tag>
 					</div>
 					<div id="machine">${this.properties.find((property) => property.name === 'MachineName')?.value}</div>
-					<div id="message">${this.renderedMessage}</div>
+					<div id="message"><uui-scroll-container>${this.renderedMessage}</uui-scroll-container></div>
 				</summary>
 				${this.exception ? html`<pre id="exception">${this.exception}</pre>` : ''}
 				<ul id="properties-list">
@@ -195,7 +193,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			</details>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -251,6 +249,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			#message {
 				flex: 6 0 14ch;
+				word-break: break-all;
 			}
 
 			.property-name,

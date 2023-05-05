@@ -1,4 +1,4 @@
-import { UmbTreeItemContextBase } from '../../../shared/components/tree/tree-item-base/tree-item-base.context';
+import { UmbTreeItemContextBase } from '../../../core/components/tree/tree-item-base/tree-item-base.context';
 import { urlFriendlyPathFromServerFilePath } from '../../utils';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';

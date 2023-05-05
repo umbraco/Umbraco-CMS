@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { UmbEmbeddedMediaModalElement as ModalElement } from '../../../backoffice/shared/modals/embedded-media/embedded-media-modal.element';
+import { UmbEmbeddedMediaModalElement as ModalElement } from '../../../backoffice/core/modals/embedded-media/embedded-media-modal.element';
 import { OEmbedResult, OEmbedStatus } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
