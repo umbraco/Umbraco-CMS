@@ -5,6 +5,7 @@ import { InputType } from '@umbraco-ui/uui';
 import { UmbPropertyValueChangeEvent } from '../..';
 import { UmbPropertyEditorExtensionElement , PropertyEditorConfigDefaultData } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-date-picker
@@ -48,7 +49,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	private _offsetTime?: boolean;
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<PropertyEditorConfigDefaultData>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const oldVal = this._inputType;
 
 		// Format string prevalue/config

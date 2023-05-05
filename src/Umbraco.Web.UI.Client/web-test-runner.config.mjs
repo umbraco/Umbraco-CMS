@@ -42,6 +42,7 @@ export default {
 						'@umbraco-cms/backoffice/content-type': './libs/content-type/index.ts',
 						'@umbraco-cms/backoffice/context-api': './libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller': './libs/controller/index.ts',
+						'@umbraco-cms/backoffice/data-type': './libs/data-type/index.ts',
 						'@umbraco-cms/backoffice/element': './libs/element/index.ts',
 						'@umbraco-cms/backoffice/entity-action': './libs/entity-action/index.ts',
 						'@umbraco-cms/backoffice/events': './libs/umb-events/index.ts',

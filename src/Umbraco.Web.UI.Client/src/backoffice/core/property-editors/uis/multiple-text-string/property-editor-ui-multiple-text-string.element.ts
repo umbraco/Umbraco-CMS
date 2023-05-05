@@ -8,6 +8,7 @@ import UmbInputMultipleTextStringElement, {
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 export type MultipleTextStringConfigData = Array<{
 	alias: 'minNumber' | 'maxNumber';
@@ -26,7 +27,7 @@ export class UmbPropertyEditorUIMultipleTextStringElement
 	public value: MultipleTextStringValue = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: MultipleTextStringConfigData) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		this._limitMin = config.find((x) => x.alias === 'minNumber')?.value;
 		this._limitMax = config.find((x) => x.alias === 'maxNumber')?.value;
 	}

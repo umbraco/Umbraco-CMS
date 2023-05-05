@@ -5,6 +5,7 @@ import { UmbInputToggleElement } from '../../../components/input-toggle/input-to
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-toggle
@@ -26,7 +27,7 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	_showLabels?: boolean;
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const defaultValue = config.find((x) => x.alias === 'default');
 		if (defaultValue) this.value = defaultValue.value as boolean;
 

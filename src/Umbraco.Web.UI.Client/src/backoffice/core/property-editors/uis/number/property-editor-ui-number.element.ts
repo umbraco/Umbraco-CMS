@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
@@ -12,7 +13,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public config = new UmbDataTypePropertyCollection();
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;

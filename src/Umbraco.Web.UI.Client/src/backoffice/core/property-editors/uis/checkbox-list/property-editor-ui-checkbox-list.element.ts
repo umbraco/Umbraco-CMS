@@ -5,6 +5,7 @@ import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-checkbox-list
@@ -23,7 +24,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const listData = config.find((x) => x.alias === 'items');
 
 		if (!listData) return;

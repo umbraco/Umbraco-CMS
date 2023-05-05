@@ -1,6 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbVariantId } from '../../../variants/variant-id.class';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../components/workspace/workspace-variant/workspace-variant.context';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
@@ -20,7 +21,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public config = new UmbDataTypePropertyCollection();
 
 	@state()
 	private _routes: UmbRoute[] = [];

@@ -6,6 +6,7 @@ import type { UmbInputRadioButtonListElement } from '../../../components/input-r
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-radio-button-list
@@ -24,7 +25,7 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const listData = config.find((x) => x.alias === 'items');
 
 		if (!listData) return;

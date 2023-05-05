@@ -6,6 +6,7 @@ import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/exten
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -22,7 +23,7 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	private _swatches: UmbSwatchDetails[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const useLabel = config.find((x) => x.alias === 'useLabel');
 		if (useLabel) this._showLabels = useLabel.value;
 

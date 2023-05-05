@@ -2,12 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
 import type {
-	DataTypeResponseModel,
-	DataTypePropertyPresentationModel,
+	DataTypeResponseModel,	
 	PropertyTypeResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import '../workspace-property/workspace-property.element';
@@ -16,8 +16,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-property-type-based-property')
-export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
-	
+export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {	
 
 	@property({ type: Object, attribute: false })
 	public get property(): PropertyTypeResponseModelBaseModel | undefined {
@@ -37,7 +36,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _dataTypeData: DataTypePropertyPresentationModel[] = [];
+	private _dataTypeData = new UmbDataTypePropertyCollection();
 
 	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
 	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
@@ -96,7 +95,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._dataTypeObserver = this.observe(
 				await this._dataTypeRepository.byId(dataTypeId),
 				(dataType) => {
-					this._dataTypeData = dataType?.values || [];
+					this._dataTypeData = new UmbDataTypePropertyCollection(dataType?.values || []);
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
 				},
 				'observeDataType'

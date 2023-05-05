@@ -5,6 +5,7 @@ import { UmbInputUploadFieldElement } from '../../../components/input-upload-fie
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-upload-field
@@ -15,7 +16,7 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const fileExtensions = config.find((x) => x.alias === 'fileExtensions');
 		if (fileExtensions) this._fileExtensions = fileExtensions.value;
 

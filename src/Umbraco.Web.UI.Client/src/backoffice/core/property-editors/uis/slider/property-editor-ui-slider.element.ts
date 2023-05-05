@@ -5,6 +5,7 @@ import UmbInputSliderElement from '../../../components/input-slider/input-slider
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-slider
@@ -36,7 +37,7 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	_max?: number;
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const enableRange = config.find((x) => x.alias === 'enableRange');
 		if (enableRange) this._enableRange = enableRange.value as boolean;
 

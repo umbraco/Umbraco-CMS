@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
@@ -90,7 +91,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: Object, attribute: false })
-	public set config(value: DataTypePropertyPresentationModel[]) {
+	public set config(value: UmbDataTypePropertyCollection) {
 		this._propertyContext.setConfig(value);
 	}
 
@@ -201,7 +202,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 						this._propertyContext.config,
 						(config) => {
 							if (this._element && config) {
-								this._element.config = config;
+								this._element.config = new UmbDataTypePropertyCollection(config);
 							}
 						},
 						'_observePropertyConfig'

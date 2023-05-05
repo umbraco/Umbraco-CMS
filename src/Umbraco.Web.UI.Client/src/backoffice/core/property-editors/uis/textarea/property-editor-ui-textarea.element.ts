@@ -8,6 +8,7 @@ import {
 } from '../../../components/workspace-property/workspace-property.context';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
@@ -15,7 +16,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	config = [];
+	config = new UmbDataTypePropertyCollection();
 
 	private propertyContext?: UmbWorkspacePropertyContext<string>;
 
