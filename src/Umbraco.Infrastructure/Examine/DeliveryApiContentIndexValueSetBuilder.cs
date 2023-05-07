@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -13,25 +12,22 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexValueSetBuilder
 {
     private readonly ContentIndexHandlerCollection _contentIndexHandlerCollection;
-    private readonly IScopeProvider _scopeProvider;
+    private readonly IContentService _contentService;
     private readonly IPublicAccessService _publicAccessService;
-    private readonly ILocalizationService _localizationService;
     private readonly ILogger<DeliveryApiContentIndexValueSetBuilder> _logger;
     private DeliveryApiSettings _deliveryApiSettings;
 
     public DeliveryApiContentIndexValueSetBuilder(
         ContentIndexHandlerCollection contentIndexHandlerCollection,
-        IScopeProvider scopeProvider,
+        IContentService contentService,
         IPublicAccessService publicAccessService,
-        ILocalizationService localizationService,
         ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
     {
         _contentIndexHandlerCollection = contentIndexHandlerCollection;
-        _scopeProvider = scopeProvider;
         _publicAccessService = publicAccessService;
-        _localizationService = localizationService;
         _logger = logger;
+        _contentService = contentService;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
@@ -39,84 +35,71 @@ public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexVa
     /// <inheritdoc />
     public IEnumerable<ValueSet> GetValueSets(params IContent[] contents)
     {
-        var allCultures = _localizationService.GetAllLanguages().Select(l => l.IsoCode).ToArray();
         foreach (IContent content in contents.Where(CanIndex))
         {
-            var contentVariesByCulture = content.ContentType.VariesByCulture();
+            var cultures = IndexableCultures(content);
 
-            // which cultures should we add to the index?
-            // - if the content type is culture variant, only add the published cultures of the content
-            // - otherwise "fake" all available cultures (thus indexing the same values for all cultures)
-            var indexableCultures = contentVariesByCulture
-                ? content.PublishedCultures.ToArray()
-                : allCultures;
-
-            var availableCulturesIndexValue = indexableCultures.Select(culture => culture.ToLowerInvariant()).ToArray();
-
-            // required index values go here
-            var indexValues = new Dictionary<string, IEnumerable<object>>(StringComparer.InvariantCultureIgnoreCase)
+            foreach (var culture in cultures)
             {
-                ["id"] = new object[] { content.Id }, // required for unpublishing/deletion handling
-                ["cultures"] = availableCulturesIndexValue, // required for culture variant querying
-                [UmbracoExamineFieldNames.IndexPathFieldName] = new object[] { content.Path }, // required for unpublishing/deletion handling
-                [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.PublishName ?? string.Empty }, // primarily needed for backoffice index browsing
-            };
+                var indexCulture = culture ?? "none";
 
-            AddContentIndexHandlerFields(content, indexableCultures, indexValues);
+                // required index values go here
+                var indexValues = new Dictionary<string, IEnumerable<object>>(StringComparer.InvariantCultureIgnoreCase)
+                {
+                    ["id"] = new object[] { content.Id }, // required for correct publishing handling and also needed for backoffice index browsing
+                    ["contentTypeId"] = new object[] { content.ContentTypeId }, // required for correct content type change handling
+                    ["culture"] = new object[] { indexCulture }, // required for culture variant querying
+                    [UmbracoExamineFieldNames.IndexPathFieldName] = new object[] { content.Path }, // required for unpublishing/deletion handling
+                    [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
+                };
 
-            yield return new ValueSet(content.Id.ToString(), IndexTypes.Content, content.ContentType.Alias, indexValues);
+                AddContentIndexHandlerFields(content, culture, indexValues);
+
+                yield return new ValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
+            }
         }
     }
 
-    private void AddContentIndexHandlerFields(IContent content, string[] cultures, Dictionary<string, IEnumerable<object>> indexValues)
+    private string?[] IndexableCultures(IContent content)
     {
-        var contentVariesByCulture = content.ContentType.VariesByCulture();
+        var variesByCulture = content.ContentType.VariesByCulture();
 
+        // if the content varies by culture, the indexable cultures are the published
+        // cultures - otherwise "null" represents "no culture"
+        var cultures = variesByCulture
+            ? content.PublishedCultures.ToArray()
+            : new string?[] { null };
+
+        // now iterate all ancestors and make sure all cultures are published all the way up the tree
+        foreach (var ancestorId in content.GetAncestorIds() ?? Array.Empty<int>())
+        {
+            IContent? ancestor = _contentService.GetById(ancestorId);
+            if (ancestor is null || ancestor.Published is false)
+            {
+                // no published ancestor => don't index anything
+                cultures = Array.Empty<string?>();
+            }
+            else if (variesByCulture && ancestor.ContentType.VariesByCulture())
+            {
+                // both the content and the ancestor are culture variant => only index the published cultures they have in common
+                cultures = cultures.Intersect(ancestor.PublishedCultures).ToArray();
+            }
+
+            // if we've already run out of cultures to index, there is no reason to iterate the ancestors any further
+            if (cultures.Any() == false)
+            {
+                break;
+            }
+        }
+
+        return cultures;
+    }
+
+    private void AddContentIndexHandlerFields(IContent content, string? culture, Dictionary<string, IEnumerable<object>> indexValues)
+    {
         foreach (IContentIndexHandler handler in _contentIndexHandlerCollection)
         {
-            var cultureVariantFields = handler
-                .GetFields()
-                .Where(f => f.VariesByCulture)
-                .Select(f => f.FieldName)
-                .ToArray();
-
-            IndexFieldValue[] fieldValues;
-            if (contentVariesByCulture is false)
-            {
-                // for culture invariant content we'll get the field values once and "expand" the culture variant fields
-                // with one field per culture (see also the field definition builder)
-                fieldValues = handler.GetFieldValues(content, null)
-                    .SelectMany(fieldValue =>
-                        // if the field is culture variant, create a dedicated field per culture - otherwise just use the field as is
-                        cultureVariantFields.Contains(fieldValue.FieldName)
-                            ? cultures.Select(culture => new IndexFieldValue
-                            {
-                                FieldName = DeliveryApiContentIndexFieldDefinitionBuilder.CultureVariantIndexFieldName(fieldValue.FieldName, culture),
-                                Values = fieldValue.Values
-                            })
-                            : new[] { fieldValue })
-                    .ToArray();
-            }
-            else
-            {
-                // for culture variant culture we'll get the field values for each culture one at a time
-                fieldValues = cultures.SelectMany(culture =>
-                        handler
-                            .GetFieldValues(content, culture)
-                            .Select(fieldValue =>
-                                // if the field is culture variant, create a new field specifically for this culture - otherwise just use the field as is
-                                cultureVariantFields.Contains(fieldValue.FieldName)
-                                    ? new IndexFieldValue
-                                    {
-                                        FieldName = DeliveryApiContentIndexFieldDefinitionBuilder.CultureVariantIndexFieldName(fieldValue.FieldName, culture),
-                                        Values = fieldValue.Values
-                                    }
-                                    : fieldValue))
-                    // for culture invariant fields we expect duplicates (one per culture) - let's remove those
-                    .DistinctBy(fieldValue => fieldValue.FieldName)
-                    .ToArray();
-            }
-
+            IndexFieldValue[] fieldValues = handler.GetFieldValues(content, culture).ToArray();
             foreach (IndexFieldValue fieldValue in fieldValues)
             {
                 if (indexValues.ContainsKey(fieldValue.FieldName))
@@ -145,12 +128,9 @@ public class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiContentIndexVa
         }
 
         // is the content protected?
-        using (_scopeProvider.CreateScope(autoComplete: true))
+        if (_publicAccessService.IsProtected(content.Path).Success)
         {
-            if (_publicAccessService.IsProtected(content.Path).Success)
-            {
-                return false;
-            }
+            return false;
         }
 
         return true;

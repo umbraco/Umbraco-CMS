@@ -23,7 +23,6 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
     private readonly ILogger<ApiContentQueryService> _logger;
     private readonly string _fallbackGuidValue;
     private readonly ISet<string> _itemIdOnlyFieldSet = new HashSet<string> { "itemId" };
-    private readonly string[] _cultureVariantFieldNames;
     private readonly Dictionary<string, FieldType> _fieldTypes;
 
     public ApiContentQueryService(
@@ -47,13 +46,6 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         // A fallback value is needed for Examine queries in case we don't have a value - we can't pass null or empty string
         // It is set to a random guid since this would be highly unlikely to yield any results
         _fallbackGuidValue = Guid.NewGuid().ToString("D");
-
-        // create an array of known culture variant fields
-        _cultureVariantFieldNames = indexHandlers
-            .SelectMany(handler => handler.GetFields())
-            .Where(field => field.VariesByCulture)
-            .Select(field => field.FieldName)
-            .ToArray();
 
         // build a look-up dictionary of field types by field name
         _fieldTypes = indexHandlers
@@ -83,8 +75,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
             return emptyResult;
         }
 
+        // Item culture must be either the requested culture or "none"
         var culture = CurrentCulture();
-        queryOperation = queryOperation.And().Field("cultures", culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue));
+        queryOperation.And().GroupedOr(new[] { "culture" }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
 
         // Handle Filtering
         HandleFiltering(filters, queryOperation);
@@ -145,7 +138,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         fieldName ??= UmbracoExamineFieldNames.CategoryFieldName;
         fieldValue ??= "content";
 
-        return baseQuery.Field(IndexFieldName(fieldName), fieldValue);
+        return baseQuery.Field(fieldName, fieldValue);
     }
 
     private void HandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
@@ -161,17 +154,15 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
                     ? filter.Value
                     : _fallbackGuidValue;
 
-                var fieldName = IndexFieldName(filter.FieldName);
-
                 switch (filter.Operator)
                 {
                     case FilterOperation.Is:
-                        queryOperation.And().Field(fieldName,
+                        queryOperation.And().Field(filter.FieldName,
                             (IExamineValue)new ExamineValue(Examineness.Explicit,
                                 value)); // TODO: doesn't work for explicit word(s) match
                         break;
                     case FilterOperation.IsNot:
-                        queryOperation.Not().Field(fieldName,
+                        queryOperation.Not().Field(filter.FieldName,
                             (IExamineValue)new ExamineValue(Examineness.Explicit,
                                 value)); // TODO: doesn't work for explicit word(s) match
                         break;
@@ -218,12 +209,10 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
                 _ => throw new ArgumentOutOfRangeException(nameof(fieldType))
             };
 
-            var fieldName = IndexFieldName(sort.FieldName);
-
             orderingQuery = sort.Direction switch
             {
-                Direction.Ascending => queryCriteria.OrderBy(new SortableField(fieldName, sortType)),
-                Direction.Descending => queryCriteria.OrderByDescending(new SortableField(fieldName, sortType)),
+                Direction.Ascending => queryCriteria.OrderBy(new SortableField(sort.FieldName, sortType)),
+                Direction.Descending => queryCriteria.OrderByDescending(new SortableField(sort.FieldName, sortType)),
                 _ => orderingQuery
             };
         }
@@ -236,9 +225,4 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
 
     private string CurrentCulture()
         => _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
-
-    private string IndexFieldName(string fieldName)
-        => _cultureVariantFieldNames.InvariantContains(fieldName)
-            ? DeliveryApiContentIndexFieldDefinitionBuilder.CultureVariantIndexFieldName(fieldName, CurrentCulture())
-            : fieldName;
 }
