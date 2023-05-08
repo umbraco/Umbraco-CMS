@@ -1,6 +1,6 @@
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
-const headerApps: Array<ManifestTypes> = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.Search',
@@ -46,6 +46,10 @@ const headerApps: Array<ManifestTypes> = [
 			href: '/section/content/workspace/document/edit/c05da24d-7740-447b-9cdc-bd8ce2172e38/en-us/view/content/tab/Local%20blog%20tab',
 		},
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.ExamineFieldsSettings',
+		name: 'Examine Field Settings Modal',
+		loader: () => import('./examine-management-dashboard/views/modal-views/fields-settings.element'),
+	},
 ];
-
-export const manifests = [...headerApps];

@@ -1,4 +1,4 @@
-import { UmbVariantId } from '../../../variants/variant-id.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
