@@ -21,7 +21,6 @@ export class UmbTagStore extends UmbStoreBase {
 	 */
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_TAG_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<TagResponseModel>([], (x) => x.id));
-		console.log('Store is open');
 	}
 
 	/**
@@ -48,7 +47,11 @@ export class UmbTagStore extends UmbStoreBase {
 		);
 	}
 
-	//TODO Skriv god kommentar til filter/exclude
+	// TODO
+	// There isnt really any way to exclude certain tags when searching for suggestions.
+	// This is important for the skip/take in the endpoint. We do not want to get the tags from database that we already have picked.
+	// Forexample: we have 10 different tags that includes "berry" (and searched for "berry") and we have a skip of 0 and take of 5.
+	// If we already has picked lets say 4 of them, the list will only show 1 more, even though there is more remaining in the database.
 
 	byQuery(group: TagResponseModel['group'], culture: string, query: string) {
 		return this._data.getObservablePart((items) =>

@@ -19,7 +19,8 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	_items: string[] = [];
 	@property({ type: Array })
 	public set items(newTags: string[]) {
-		this._items = newTags;
+		const newItems = newTags.filter((x) => x !== '');
+		this._items = newItems;
 		super.value = this._items.join(',');
 	}
 	public get items(): string[] {
@@ -55,7 +56,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #getExistingTags(query: string) {
-		if (!this.group || this.culture === undefined) return;
+		if (!this.group || this.culture === undefined || !query) return;
 		const { data } = await this.#repository.queryTags(this.group, this.culture, query);
 		if (!data) return;
 		this._matches = data.items;
@@ -83,8 +84,11 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 
 	#onInput(e: UUIInputEvent) {
 		this._currentInput = e.target.value as string;
-		if (!this._currentInput.length) this._matches = [];
-		else this.#getExistingTags(this._currentInput);
+		if (!this._currentInput || !this._currentInput.length) {
+			this._matches = [];
+		} else {
+			this.#getExistingTags(this._currentInput);
+		}
 	}
 
 	protected updated(): void {
@@ -96,10 +100,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 		else this.#createTag();
 	}
 
-	#createTag(text?: string) {
-		if (text) {
-			this._tagInput.value = text;
-		}
+	#createTag() {
 		this.#inputError(false);
 		const newTag = (this._tagInput.value as string).trim();
 		if (!newTag) return;
@@ -125,11 +126,10 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#delete(tag: string) {
-		this.items.splice(
-			this.items.findIndex((x) => x === tag),
-			1
-		);
-		this.items = [...this.items];
+		const currentItems = [...this.items];
+		const index = currentItems.findIndex((x) => x === tag);
+		currentItems.splice(index, 1);
+		currentItems.length ? (this.items = [...currentItems]) : (this.items = []);
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
@@ -216,7 +216,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 		return html`
 			<div id="matchlist">
 				${repeat(
-					matchfilter,
+					matchfilter.slice(0, 5),
 					(tag: TagResponseModel) => tag.id,
 					(tag: TagResponseModel, index: number) => {
 						return html` <input
