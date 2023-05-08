@@ -109,6 +109,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			innerElement.data = data;
 			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
+			innerElement.manifest = manifest;
 		}
 
 		return innerElement;
