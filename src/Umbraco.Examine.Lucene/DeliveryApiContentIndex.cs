@@ -49,13 +49,11 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
             var (contentId, culture) = ParseItemId(itemId);
             if (contentId == null || removedContentIds.Contains(contentId))
             {
+                _logger.LogWarning("Could not parse item ID; expected integer or composite ID, got: {itemId}", itemId);
                 continue;
             }
 
             // find descendants-or-self based on path and optional culture
-            // var descendantPath = $@"\-1\,*{contentId}\,*";
-            // var selfPath = $@"\-1\,{contentId}";
-            // var rawQuery = $"({UmbracoExamineFieldNames.IndexPathFieldName}:{selfPath} OR {UmbracoExamineFieldNames.IndexPathFieldName}:{descendantPath})";
             var rawQuery = $"({UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId} OR {UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId},*)";
             if (culture != null)
             {

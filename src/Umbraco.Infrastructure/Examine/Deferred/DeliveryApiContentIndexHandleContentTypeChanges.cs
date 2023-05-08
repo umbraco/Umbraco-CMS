@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
 
-internal class DeliveryApiContentIndexHandleContentTypeChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
+internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {
     private const int PageSize = 500;
 

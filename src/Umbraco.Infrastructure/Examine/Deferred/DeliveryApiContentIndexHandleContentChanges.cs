@@ -7,7 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.Deferred;
 
-internal class DeliveryApiContentIndexHandleContentChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
+internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiContentIndexDeferredBase, IDeferredAction
 {
     private readonly IList<KeyValuePair<int, TreeChangeTypes>> _changes;
     private readonly IContentService _contentService;
@@ -41,8 +41,7 @@ internal class DeliveryApiContentIndexHandleContentChanges : DeliveryApiContentI
         foreach ((int contentId, TreeChangeTypes changeTypes) in _changes)
         {
             var remove = changeTypes.HasType(TreeChangeTypes.Remove);
-            var reindex = changeTypes.HasType(TreeChangeTypes.RefreshNode) ||
-                          changeTypes.HasType(TreeChangeTypes.RefreshBranch);
+            var reindex = changeTypes.HasType(TreeChangeTypes.RefreshNode) || changeTypes.HasType(TreeChangeTypes.RefreshBranch);
 
             if (remove)
             {
