@@ -34,6 +34,7 @@ export class UmbTreeElement extends UmbLitElement {
 		return this.#treeContext.getSelection();
 	}
 	set selection(newVal) {
+		if (!Array.isArray(newVal)) return;
 		this.#treeContext?.setSelection(newVal);
 	}
 
