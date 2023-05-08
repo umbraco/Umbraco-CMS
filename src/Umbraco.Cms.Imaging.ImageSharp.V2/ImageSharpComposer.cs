@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Imaging.ImageSharp;
+namespace Umbraco.Cms.Imaging.ImageSharp.V2;
 
 /// <summary>
 /// Adds imaging support using ImageSharp/ImageSharp.Web.
