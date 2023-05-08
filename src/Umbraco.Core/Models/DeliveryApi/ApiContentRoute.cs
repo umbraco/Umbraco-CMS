@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public class ApiContentRoute : IApiContentRoute
+public sealed class ApiContentRoute : IApiContentRoute
 {
     public ApiContentRoute(string path, ApiContentStartItem startItem)
     {

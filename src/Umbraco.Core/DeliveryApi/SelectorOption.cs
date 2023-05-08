@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class SelectorOption
+public sealed class SelectorOption
 {
     public required string FieldName { get; set; }
 

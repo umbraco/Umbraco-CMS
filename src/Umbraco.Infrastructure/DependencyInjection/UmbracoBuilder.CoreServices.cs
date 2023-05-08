@@ -58,7 +58,6 @@ using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
-using ApiRichTextParser = Umbraco.Cms.Infrastructure.DeliveryApi.ApiRichTextParser;
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
