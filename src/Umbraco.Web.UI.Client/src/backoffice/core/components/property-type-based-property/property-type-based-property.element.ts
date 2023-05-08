@@ -2,23 +2,20 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
-import { UmbVariantId } from '../../variants/variant-id.class';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
 import type {
 	DataTypeResponseModel,
 	DataTypePropertyPresentationModel,
 	PropertyTypeResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import '../workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
-	
-
 	@property({ type: Object, attribute: false })
 	public get property(): PropertyTypeResponseModelBaseModel | undefined {
 		return this._property;
@@ -114,7 +111,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			.propertyVariantId=${this.propertyVariantId}
 			.config=${this._dataTypeData}></umb-workspace-property>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
