@@ -5,8 +5,6 @@ import 'element-internals-polyfill';
 
 import './core/router/router-slot.element';
 import './core/router/variant-router-slot.element';
-import './core/notification/layouts/default';
-import './core/modal/modal-element.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';

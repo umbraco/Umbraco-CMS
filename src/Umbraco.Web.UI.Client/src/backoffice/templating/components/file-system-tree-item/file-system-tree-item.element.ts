@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbTreeItemElement } from '../../../../backoffice/shared/components/tree/tree-item/tree-item.element';
+import { UmbTreeItemElement } from '../../../core/components/tree/tree-item/tree-item.element';
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestKind } from '@umbraco-cms/backoffice/extensions-registry';
@@ -23,8 +23,6 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-file-system-tree-item')
 export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
-	
-
 	private _item?: FileSystemTreeItemPresentationModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
@@ -41,7 +39,7 @@ export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTr
 		if (!this.item) return nothing;
 		return html`<umb-tree-item-base></umb-tree-item-base>`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

@@ -1,6 +1,7 @@
 {
 	"cssVariables.lookupFiles": ["node_modules/@umbraco-ui/uui-css/dist/custom-properties.css"],
 	"cSpell.words": [
+		"Backoffice",
 		"combobox",
 		"Elementable",
 		"pickable",

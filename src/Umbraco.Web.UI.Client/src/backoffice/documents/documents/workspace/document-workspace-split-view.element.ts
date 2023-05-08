@@ -2,10 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { ActiveVariant } from '../../../shared/components/workspace/workspace-context/workspace-split-view-manager.class';
+import { ActiveVariant } from '../../../core/components/workspace/workspace-context/workspace-split-view-manager.class';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../shared/components/workspace/workspace-variant/workspace-variant.element';
+import '../../../core/components/workspace/workspace-variant/workspace-variant.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-workspace-split-view')
