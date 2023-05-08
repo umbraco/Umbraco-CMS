@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
@@ -55,13 +56,13 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
     }
 
     /// <inheritdoc/>
-    public PagedModel<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
+    public Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
     {
         var emptyResult = new PagedModel<Guid>();
 
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? apiIndex))
         {
-            return emptyResult;
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.IndexNotFound, emptyResult);
         }
 
         IQuery baseQuery = apiIndex.Searcher.CreateQuery();
@@ -72,7 +73,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         // If no Selector could be found, we return no results
         if (queryOperation is null)
         {
-            return emptyResult;
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.SelectorOptionNotFound, emptyResult);
         }
 
         // Item culture must be either the requested culture or "none"
@@ -80,10 +81,22 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         queryOperation.And().GroupedOr(new[] { "culture" }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
 
         // Handle Filtering
-        HandleFiltering(filters, queryOperation);
+        var canApplyFiltering = CanHandleFiltering(filters, queryOperation);
+
+        // If there is an invalid Filter option, we return no results
+        if (canApplyFiltering is false)
+        {
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.FilterOptionNotFound, emptyResult);
+        }
 
         // Handle Sorting
-        IOrdering sortQuery = HandleSorting(sorts, queryOperation).SelectFields(_itemIdOnlyFieldSet);
+        IOrdering? sortQuery = HandleSorting(sorts, queryOperation)?.SelectFields(_itemIdOnlyFieldSet);
+
+        // If there is an invalid Sort option, we return no results
+        if (sortQuery is null)
+        {
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.SortOptionNotFound, emptyResult);
+        }
 
         ISearchResults? results = sortQuery
             .SelectFields(_itemIdOnlyFieldSet)
@@ -91,14 +104,16 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
 
         if (results is null)
         {
-            return emptyResult;
+            // The query yield no results
+            return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, emptyResult);
         }
 
         Guid[] items = results
             .Where(r => r.Values.ContainsKey("itemId"))
             .Select(r => Guid.Parse(r.Values["itemId"]))
             .ToArray();
-        return new PagedModel<Guid>(results.TotalItemCount, items);
+
+        return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, new PagedModel<Guid>(results.TotalItemCount, items));
     }
 
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
@@ -141,45 +156,50 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         return baseQuery.Field(fieldName, fieldValue);
     }
 
-    private void HandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
+    private bool CanHandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
     {
         foreach (var filterValue in filters)
         {
             IFilterHandler? filterHandler = _filterHandlers.FirstOrDefault(h => h.CanHandle(filterValue));
             FilterOption? filter = filterHandler?.BuildFilterOption(filterValue);
 
-            if (filter is not null)
+            if (filter is null)
             {
-                var value = string.IsNullOrWhiteSpace(filter.Value) == false
-                    ? filter.Value
-                    : _fallbackGuidValue;
+                return false;
+            }
 
-                switch (filter.Operator)
-                {
-                    case FilterOperation.Is:
-                        queryOperation.And().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit,
-                                value)); // TODO: doesn't work for explicit word(s) match
-                        break;
-                    case FilterOperation.IsNot:
-                        queryOperation.Not().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit,
-                                value)); // TODO: doesn't work for explicit word(s) match
-                        break;
-                    // TODO: Fix
-                    case FilterOperation.Contains:
-                        break;
-                    // TODO: Fix
-                    case FilterOperation.DoesNotContain:
-                        break;
-                    default:
-                        continue;
-                }
+            var value = string.IsNullOrWhiteSpace(filter.Value) == false
+                ? filter.Value
+                : _fallbackGuidValue;
+
+            switch (filter.Operator)
+            {
+                case FilterOperation.Is:
+                    queryOperation.And().Field(filter.FieldName,
+                        (IExamineValue)new ExamineValue(Examineness.Explicit,
+                            value)); // TODO: doesn't work for explicit word(s) match
+                    break;
+                case FilterOperation.IsNot:
+                    queryOperation.Not().Field(filter.FieldName,
+                        (IExamineValue)new ExamineValue(Examineness.Explicit,
+                            value)); // TODO: doesn't work for explicit word(s) match
+                    break;
+                // TODO: Fix
+                case FilterOperation.Contains:
+                    break;
+                // TODO: Fix
+                case FilterOperation.DoesNotContain:
+                    break;
+                default:
+                    continue;
             }
         }
+
+        return true;
     }
 
-    private IOrdering HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
+
+    private IOrdering? HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
     {
         IOrdering? orderingQuery = null;
 
@@ -190,7 +210,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
 
             if (sort is null)
             {
-                continue;
+                return null;
             }
 
             if (_fieldTypes.TryGetValue(sort.FieldName, out FieldType fieldType) is false)
