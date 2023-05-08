@@ -31,7 +31,8 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
-		this.#selectionManager.setMultiple(false);
+		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
+		this.#selectionManager.setSelection(this.data?.selection ?? []);
 
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('section'),

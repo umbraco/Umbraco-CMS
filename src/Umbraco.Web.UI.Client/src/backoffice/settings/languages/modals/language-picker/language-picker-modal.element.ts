@@ -19,6 +19,12 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	#languageRepository = new UmbLanguageRepository(this);
 	#selectionManager = new UmbSelectionManagerBase();
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
+		this.#selectionManager.setSelection(this.data?.selection ?? []);
+	}
+
 	async firstUpdated() {
 		const { data } = await this.#languageRepository.requestLanguages();
 		this._languages = data?.items ?? [];
