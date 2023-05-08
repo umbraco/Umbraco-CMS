@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Options;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
 
-public class ConfigureApiExplorerOptions : IConfigureOptions<ApiExplorerOptions>
+public sealed class ConfigureApiExplorerOptions : IConfigureOptions<ApiExplorerOptions>
 {
     private readonly IOptions<ApiVersioningOptions> _apiVersioningOptions;
 
