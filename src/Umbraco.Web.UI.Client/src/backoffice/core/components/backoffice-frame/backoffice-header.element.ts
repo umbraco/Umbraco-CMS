@@ -1,32 +1,19 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UMB_APP } from '../../../../app.context';
+import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import logoImg from '/umbraco_logomark_white.svg';
 
 import './backoffice-header-sections.element';
 import './backoffice-header-apps.element';
 
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeaderElement extends UmbLitElement {
-	@state()
-	_backofficePath = '';
-
-	constructor() {
-		super();
-
-		new UmbContextConsumerController(this, UMB_APP, (appContext) => {
-			this._backofficePath = appContext.getBackofficePath();
-		});
-	}
-
 	render() {
 		return html`
 			<div id="appHeader">
 				<uui-button id="logo" look="primary" label="Umbraco" compact>
-					<!-- TODO: add some asset manager to easily get the path of a asset -->
-					<img src="${this._backofficePath}/umbraco_logomark_white.svg" alt="Umbraco" />
+					<img src=${logoImg} alt="Umbraco" />
 				</uui-button>
 
 				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>
