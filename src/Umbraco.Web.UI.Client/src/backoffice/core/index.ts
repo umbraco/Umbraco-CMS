@@ -14,8 +14,6 @@ import { ManifestKind, ManifestTypes } from '@umbraco-cms/backoffice/extensions-
 
 import './notification';
 
-import './components/tree-picker-modal/tree-picker-modal.element';
-
 export const manifests: Array<ManifestTypes | ManifestKind> = [
 	...componentManifests,
 	...propertyActionManifests,
