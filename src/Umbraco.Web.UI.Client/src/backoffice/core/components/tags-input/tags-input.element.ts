@@ -4,14 +4,17 @@ import { customElement, property, query, queryAll, state } from 'lit/decorators.
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-ui/uui';
+import { UmbTagRepository } from '../../../tags/repository/tag.repository';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { TagResource, TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tags-input')
 export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String })
 	group?: string;
+
+	@property({ type: String })
+	culture?: string | null;
 
 	_items: string[] = [];
 	@property({ type: Array })
@@ -41,6 +44,8 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	@queryAll('.options')
 	private _optionCollection?: HTMLCollectionOf<HTMLInputElement>;
 
+	#repository = new UmbTagRepository(this);
+
 	public focus() {
 		this._tagInput.focus();
 	}
@@ -50,11 +55,8 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #getExistingTags(query: string) {
-		//TODO: Culture
-		const { data } = await tryExecuteAndNotify(
-			this,
-			TagResource.getTag({ query, skip: 0, take: 5, tagGroup: this.group })
-		);
+		if (!this.group || this.culture === undefined) return;
+		const { data } = await this.#repository.queryTags(this.group, this.culture, query);
 		if (!data) return;
 		this._matches = data.items;
 	}

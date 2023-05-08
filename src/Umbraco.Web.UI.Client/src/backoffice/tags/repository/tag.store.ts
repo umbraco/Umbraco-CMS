@@ -12,6 +12,8 @@ export const UMB_TAG_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTagStore>('Umb
  * @description - Data Store for Template Details
  */
 export class UmbTagStore extends UmbStoreBase {
+	public readonly data = this._data.asObservable();
+
 	/**
 	 * Creates an instance of UmbTagStore.
 	 * @param {UmbControllerHostElement} host
@@ -19,6 +21,7 @@ export class UmbTagStore extends UmbStoreBase {
 	 */
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_TAG_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<TagResponseModel>([], (x) => x.id));
+		console.log('Store is open');
 	}
 
 	/**
@@ -39,15 +42,22 @@ export class UmbTagStore extends UmbStoreBase {
 		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
-	// TODO
-	byGroup(group: TagResponseModel['group']) {
-		return this._data.getObservablePart((x) => x.filter((y) => y.group === group));
+	items(group: TagResponseModel['group'], culture: string) {
+		return this._data.getObservablePart((items) =>
+			items.filter((item) => item.group === group && item.culture === culture)
+		);
 	}
 
-	// TODO
-	byText(text: string) {
+	//TODO Skriv god kommentar til filter/exclude
+
+	byQuery(group: TagResponseModel['group'], culture: string, query: string) {
 		return this._data.getObservablePart((items) =>
-			items.filter((item) => item.text?.toLocaleLowerCase().includes(text.toLocaleLowerCase()))
+			items.filter(
+				(item) =>
+					item.group === group &&
+					item.culture === culture &&
+					item.query?.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+			)
 		);
 	}
 

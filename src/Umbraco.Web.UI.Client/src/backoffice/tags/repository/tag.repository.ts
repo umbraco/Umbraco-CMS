@@ -2,8 +2,6 @@ import { UmbTagServerDataSource } from './sources/tag.server.data';
 import { UmbTagStore, UMB_TAG_STORE_CONTEXT_TOKEN } from './tag.store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { TagResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbTagRepository {
 	#init!: Promise<unknown>;
@@ -26,16 +24,36 @@ export class UmbTagRepository {
 	}
 
 	async requestTags(
-		{ query, skip, take, tagGroup, culture } = { query: '', skip: 0, take: 1000, tagGroup: 'default', culture: '' }
+		tagGroupName: string,
+		culture: string | null,
+		{ skip, take, query } = { skip: 0, take: 1000, query: '' }
 	) {
 		await this.#init;
 
-		const { data, error } = await this.#dataSource.getCollection({ query, skip, take, tagGroup, culture });
+		const requestCulture = culture || '';
+
+		const { data, error } = await this.#dataSource.getCollection({
+			skip,
+			take,
+			tagGroup: tagGroupName,
+			culture: requestCulture,
+			query,
+		});
 
 		if (data) {
-			this.#tagStore?.appendItems(data.items);
+			// TODO: allow to append an array of items to the store
+			data.items.forEach((x) => this.#tagStore?.append(x));
 		}
 
-		return { data, error, asObservable: () => this.#tagStore?.byGroup(tagGroup) };
+		return { data, error, asObservable: () => this.#tagStore!.byQuery(tagGroupName, requestCulture, query) };
+	}
+
+	async queryTags(
+		tagGroupName: string,
+		culture: string | null,
+		query: string,
+		{ skip, take } = { skip: 0, take: 1000 }
+	) {
+		return this.requestTags(tagGroupName, culture, { skip, take, query });
 	}
 }
