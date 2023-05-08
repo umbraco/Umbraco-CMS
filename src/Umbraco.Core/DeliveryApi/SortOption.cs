@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class SortOption
+public sealed class SortOption
 {
     public required string FieldName { get; set; }
 

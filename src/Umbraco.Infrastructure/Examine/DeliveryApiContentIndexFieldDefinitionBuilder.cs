@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContentIndexFieldDefinitionBuilder
+internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryApiContentIndexFieldDefinitionBuilder
 {
     private readonly ContentIndexHandlerCollection _indexHandlers;
     private readonly ILogger<DeliveryApiContentIndexFieldDefinitionBuilder> _logger;

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiElementBuilder : IApiElementBuilder
+public sealed class ApiElementBuilder : IApiElementBuilder
 {
     private readonly IOutputExpansionStrategyAccessor _outputExpansionStrategyAccessor;
 

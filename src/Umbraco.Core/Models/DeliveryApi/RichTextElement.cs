@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public class RichTextElement
+public sealed class RichTextElement
 {
     public RichTextElement(string tag, string text, Dictionary<string, object> attributes, IEnumerable<RichTextElement> elements)
     {
