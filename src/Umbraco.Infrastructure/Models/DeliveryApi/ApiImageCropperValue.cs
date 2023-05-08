@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public sealed class ApiImageCropperValue
+internal sealed class ApiImageCropperValue
 {
     public ApiImageCropperValue(string url, ImageCropperValue.ImageCropperFocalPoint? focalPoint, IEnumerable<ImageCropperValue.ImageCropperCrop>? crops)
     {
