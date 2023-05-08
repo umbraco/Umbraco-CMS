@@ -11,12 +11,6 @@ const modals: Array<ManifestModal> = [
 			treeAlias: DOCUMENT_TREE_ALIAS,
 		},
 	},
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.DocumentTypePicker',
-		name: 'Document Type Picker Modal',
-		loader: () => import('./document-type-picker/document-type-picker-modal.element'),
-	},
 ];
 
 export const manifests = [...modals];
