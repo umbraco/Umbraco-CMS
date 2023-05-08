@@ -13,22 +13,32 @@ public class DeliveryApiJsonTypeResolver : DefaultJsonTypeInfoResolver
     {
         JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);
 
-         if (jsonTypeInfo.Type == typeof(IApiContent))
-         {
-             ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(ApiContent));
-         }
-         else if (jsonTypeInfo.Type == typeof(IApiContentResponse))
-         {
-             ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(ApiContentResponse));
+        if (jsonTypeInfo.Type == typeof(IApiContent))
+        {
+            ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(ApiContent));
+        }
+        else if (jsonTypeInfo.Type == typeof(IApiContentResponse))
+        {
+            ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(ApiContentResponse));
+        }
+        else if (jsonTypeInfo.Type == typeof(IRichTextElement))
+        {
+            ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(RichTextGenericElement), typeof(RichTextTextElement));
         }
 
         return jsonTypeInfo;
     }
 
-    private void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, Type derivedType)
-        => jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+    private void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, params Type[] derivedTypes)
+    {
+        // var jsonDerivedTypes = derivedTypes.Select(type => new JsonDerivedType(type)).ToList();
+        jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
         {
             UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
-            DerivedTypes = { new JsonDerivedType(derivedType) }
         };
+        foreach (Type derivedType in derivedTypes)
+        {
+            jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType));
+        }
+    }
 }
