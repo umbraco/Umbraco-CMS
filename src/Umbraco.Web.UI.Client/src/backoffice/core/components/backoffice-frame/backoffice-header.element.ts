@@ -25,6 +25,7 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 		return html`
 			<div id="appHeader">
 				<uui-button id="logo" look="primary" label="Umbraco" compact>
+					<!-- TODO: add some asset manager to easily get the path of a asset -->
 					<img src="${this._backofficePath}/umbraco_logomark_white.svg" alt="Umbraco" />
 				</uui-button>
 
