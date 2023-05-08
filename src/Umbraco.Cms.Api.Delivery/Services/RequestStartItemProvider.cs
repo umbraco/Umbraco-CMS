@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -32,7 +33,8 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
             return null;
         }
 
-        var headerValue = GetHeaderValue("Start-Item");
+        // We make sure there is a value with the above check
+        var headerValue = GetHeaderValue("Start-Item")!.Trim(Constants.CharArrays.ForwardSlash);
 
         if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) == false || publishedSnapshot?.Content == null)
         {
@@ -43,7 +45,7 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
 
         _requestedStartContent = Guid.TryParse(headerValue, out Guid key)
             ? rootContent.FirstOrDefault(c => c.Key == key)
-            : rootContent.FirstOrDefault(c => c.UrlSegment == headerValue);
+            : rootContent.FirstOrDefault(c => c.UrlSegment.InvariantEquals(headerValue));
 
         return _requestedStartContent;
     }
