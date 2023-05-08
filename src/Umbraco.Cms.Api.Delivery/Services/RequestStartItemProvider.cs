@@ -27,11 +27,12 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
             return _requestedStartContent;
         }
 
-        var headerValue = GetHeaderValue("Start-Item");
-        if (headerValue.IsNullOrWhiteSpace())
+        if (StartItemHeaderHasValue() == false)
         {
             return null;
         }
+
+        var headerValue = GetHeaderValue("Start-Item");
 
         if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) == false || publishedSnapshot?.Content == null)
         {
@@ -46,4 +47,7 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
 
         return _requestedStartContent;
     }
+
+    /// <inheritdoc/>
+    public bool StartItemHeaderHasValue() => !GetHeaderValue("Start-Item").IsNullOrWhiteSpace();
 }
