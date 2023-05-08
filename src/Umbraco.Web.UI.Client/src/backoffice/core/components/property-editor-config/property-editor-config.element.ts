@@ -8,7 +8,6 @@ import type {
 } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
-import '../../../components/workspace-property/workspace-property.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -17,8 +16,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-config')
 export class UmbPropertyEditorConfigElement extends UmbLitElement {
-	
-
 	/**
 	 * Property Editor UI Alias. The element will render configuration for a Property Editor UI with this alias.
 	 * @type {string}
@@ -122,7 +119,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 				: html`<div>No configuration</div>`}
 		`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

@@ -11,9 +11,6 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-
-import '../../../../../core/property-editors/shared/property-editor-config/property-editor-config.element';
-import '../../../../../core/components/ref-property-editor-ui/ref-property-editor-ui.element';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-data-type-details-workspace-view')
