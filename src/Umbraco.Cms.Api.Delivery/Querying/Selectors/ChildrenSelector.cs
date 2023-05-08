@@ -1,6 +1,7 @@
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Selectors;
 
@@ -20,13 +21,15 @@ public sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
     /// <inheritdoc/>
     public SelectorOption BuildSelectorOption(string selector)
     {
-        var fieldValue = selector.Substring(ChildrenSpecifier.Length);
-        Guid? id = GetGuidFromQuery(fieldValue);
+        var fieldValue = selector[ChildrenSpecifier.Length..];
+        var id = GetGuidFromQuery(fieldValue)?.ToString("D");
 
         return new SelectorOption
         {
             FieldName = ChildrenSelectorIndexer.FieldName,
-            Value = id.ToString() ?? string.Empty
+            Values = id.IsNullOrWhiteSpace() == false
+                ? new[] { id }
+                : Array.Empty<string>()
         };
     }
 }

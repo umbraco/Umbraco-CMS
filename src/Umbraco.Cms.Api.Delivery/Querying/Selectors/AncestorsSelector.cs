@@ -22,7 +22,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
     /// <inheritdoc/>
     public SelectorOption BuildSelectorOption(string selector)
     {
-        var fieldValue = selector.Substring(AncestorsSpecifier.Length);
+        var fieldValue = selector[AncestorsSpecifier.Length..];
         Guid? id = GetGuidFromQuery(fieldValue);
 
         if (id is null ||
@@ -35,18 +35,18 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             return new SelectorOption
             {
                 FieldName = AncestorsSelectorIndexer.FieldName,
-                Value = string.Empty
+                Values = Array.Empty<string>()
             };
         }
 
         // With the previous check we made sure that if we reach this, we already made sure that there is a valid content item
         IPublishedContent contentItem = publishedSnapshot.Content.GetById((Guid)id)!; // so it can't be null
-        IEnumerable<Guid> ancestorKeys = contentItem.Ancestors().Select(a => a.Key);
+        var ancestorKeys = contentItem.Ancestors().Select(a => a.Key.ToString("D")).ToArray();
 
         return new SelectorOption
         {
             FieldName = AncestorsSelectorIndexer.FieldName,
-            Value = string.Join(" ", ancestorKeys)
+            Values = ancestorKeys
         };
     }
 }

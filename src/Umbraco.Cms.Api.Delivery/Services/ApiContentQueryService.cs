@@ -118,7 +118,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
     {
         string? fieldName = null;
-        string? fieldValue = null;
+        string[] fieldValues = Array.Empty<string>();
 
         if (fetch is not null)
         {
@@ -131,9 +131,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
             }
 
             fieldName = selector.FieldName;
-            fieldValue = string.IsNullOrWhiteSpace(selector.Value) == false
-                ? selector.Value
-                : _fallbackGuidValue;
+            fieldValues = selector.Values.Any()
+                ? selector.Values
+                : new[] { _fallbackGuidValue };
         }
 
         // Take into account the "start-item" header if present, as it defines a starting root node to query from
@@ -144,19 +144,33 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
             {
                 // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
                 fieldName = DescendantsSelectorIndexer.FieldName;
-                fieldValue = startItem.Key.ToString();
+                fieldValues = new [] { startItem.Key.ToString() };
             }
         }
 
         // If no params or no fetch value, get everything from the index - this is a way to do that with Examine
         fieldName ??= UmbracoExamineFieldNames.CategoryFieldName;
-        fieldValue ??= "content";
+        fieldValues = fieldValues.Any() ? fieldValues : new [] { "content" };
 
-        return baseQuery.Field(fieldName, fieldValue);
+        return fieldValues.Length == 1
+            ? baseQuery.Field(fieldName, fieldValues.First())
+            : baseQuery.GroupedOr(new[] { fieldName }, fieldValues);
     }
 
     private bool CanHandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
     {
+        void HandleExact(IQuery query, string fieldName, string[] values)
+        {
+            if (values.Length == 1)
+            {
+                query.Field(fieldName, values[0]);
+            }
+            else
+            {
+                query.GroupedOr(new[] { fieldName }, values);
+            }
+        }
+
         foreach (var filterValue in filters)
         {
             IFilterHandler? filterHandler = _filterHandlers.FirstOrDefault(h => h.CanHandle(filterValue));
@@ -167,21 +181,19 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
                 return false;
             }
 
-            var value = string.IsNullOrWhiteSpace(filter.Value) == false
-                ? filter.Value
-                : _fallbackGuidValue;
+            var values = filter.Values.Any()
+                ? filter.Values
+                : new[] { _fallbackGuidValue };
 
             switch (filter.Operator)
             {
                 case FilterOperation.Is:
-                    queryOperation.And().Field(filter.FieldName,
-                        (IExamineValue)new ExamineValue(Examineness.Explicit,
-                            value)); // TODO: doesn't work for explicit word(s) match
+                    // TODO: test this for explicit word matching
+                    HandleExact(queryOperation.And(), filter.FieldName, values);
                     break;
                 case FilterOperation.IsNot:
-                    queryOperation.Not().Field(filter.FieldName,
-                        (IExamineValue)new ExamineValue(Examineness.Explicit,
-                            value)); // TODO: doesn't work for explicit word(s) match
+                    // TODO: test this for explicit word matching
+                    HandleExact(queryOperation.Not(), filter.FieldName, values);
                     break;
                 // TODO: Fix
                 case FilterOperation.Contains:
