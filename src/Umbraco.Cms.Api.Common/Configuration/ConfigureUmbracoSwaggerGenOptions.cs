@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Extensions;
 using OperationIdRegexes = Umbraco.Cms.Api.Common.OpenApi.OperationIdRegexes;
 
@@ -55,8 +56,15 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.SupportNonNullableReferenceTypes();
         swaggerGenOptions.UseOneOfForPolymorphism();
         swaggerGenOptions.UseAllOfForInheritance();
+        var cachedApiElementNamespace = typeof(ApiElement).Namespace ?? string.Empty;
         swaggerGenOptions.SelectDiscriminatorNameUsing(type =>
         {
+            if (type.Namespace != null && type.Namespace.StartsWith(cachedApiElementNamespace))
+            {
+                // We do not show type on delivery, as it is read only.
+                return null;
+            }
+
             if (type.GetInterfaces().Any())
             {
                 return "$type";
