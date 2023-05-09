@@ -40,8 +40,10 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	public readonly multiple = this.#selectionManager.multiple;
 	public readonly selection = this.#selectionManager.selection;
 
+	public repository?: UmbTreeRepository<TreeItemType>;
+	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
+
 	#treeAlias?: string;
-	repository?: UmbTreeRepository<TreeItemType>;
 	#treeManifestObserver?: UmbObserverController<any>;
 
 	#initResolver?: () => void;

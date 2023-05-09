@@ -6,7 +6,7 @@ import {
 	UmbModalToken,
 	UmbModalType,
 	UMB_MODAL_CONTEXT_TOKEN,
-	UmbPickerModalData,
+	UmbPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -43,7 +43,7 @@ export class UmbInputListBaseElement extends UmbLitElement {
 			selection: this.value,
 		});
 
-		modalHandler?.onSubmit().then((data: UmbPickerModalData<string>) => {
+		modalHandler?.onSubmit().then((data: UmbPickerModalResult) => {
 			if (data) {
 				this.value = data.selection?.filter((id) => id !== null && id !== undefined) as Array<string>;
 				this.selectionUpdated();

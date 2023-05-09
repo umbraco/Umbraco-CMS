@@ -1,6 +1,7 @@
-import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
+import { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalToken, UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 
-export type UmbDataTypePickerModalData = UmbTreePickerModalData<any>;
+export type UmbDataTypePickerModalData = UmbTreePickerModalData<FolderTreeItemResponseModel>;
 export type UmbDataTypePickerModalResult = UmbPickerModalResult;
 
 export const UMB_DATA_TYPE_PICKER_MODAL = new UmbModalToken<UmbDataTypePickerModalData, UmbDataTypePickerModalResult>(
