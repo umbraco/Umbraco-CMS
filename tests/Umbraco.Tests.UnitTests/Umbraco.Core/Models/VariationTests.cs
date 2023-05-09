@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;

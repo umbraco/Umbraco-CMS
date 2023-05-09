@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public class ApiLink
+public sealed class ApiLink
 {
     public static ApiLink Content(string title, string? target, Guid destinationId, string destinationType, IApiContentRoute route)
         => new(LinkType.Content, null, title, target, destinationId, destinationType, route);
