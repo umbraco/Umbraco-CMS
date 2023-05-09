@@ -25,8 +25,16 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
         EnableDefaultEventHandler = false;
 
         _logger = loggerFactory.CreateLogger<DeliveryApiContentIndex>();
-    }
 
+        // so... Examine lazily resolves the field value types, and incidentally this currently only happens at indexing time.
+        // however, we really must have the correct value types at boot time, so we'll forcefully resolve the value types here.
+        // this is, in other words, a workaround.
+        if (FieldValueTypeCollection.ValueTypes.Any() is false)
+        {
+            // we should never ever get here
+            _logger.LogError("No value types defined for the delivery API content index");
+        }
+    }
 
     /// <inheritdoc />
     /// <summary>
