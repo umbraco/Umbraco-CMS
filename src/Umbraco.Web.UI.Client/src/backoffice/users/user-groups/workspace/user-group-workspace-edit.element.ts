@@ -192,7 +192,12 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 				display: block;
 				height: 100%;
 			}
-
+			#header {
+				width: 100%;
+				display: grid;
+				grid-template-columns: var(--uui-size-layout-1) 1fr;
+				padding: var(--uui-size-layout-1);
+			}
 			#main {
 				display: grid;
 				grid-template-columns: 1fr 350px;
