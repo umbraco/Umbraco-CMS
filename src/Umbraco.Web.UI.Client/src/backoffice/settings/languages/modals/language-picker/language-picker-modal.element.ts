@@ -2,32 +2,32 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UUIMenuItemElement, UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLanguageRepository } from '../../repository/language.repository';
-import { UmbModalElementPickerBase } from '@umbraco-cms/internal/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbLanguagePickerModalResult, UmbLanguagePickerModalData } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-language-picker-modal')
-export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<LanguageResponseModel> {
-	
-
+export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
+	UmbLanguagePickerModalData,
+	UmbLanguagePickerModalResult
+> {
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
 
-	private _languageRepository = new UmbLanguageRepository(this);
+	#languageRepository = new UmbLanguageRepository(this);
+	#selectionManager = new UmbSelectionManagerBase();
 
-	async firstUpdated() {
-		const { data } = await this._languageRepository.requestLanguages();
-		this._languages = data?.items ?? [];
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
+		this.#selectionManager.setSelection(this.data?.selection ?? []);
 	}
 
-	#onSelection(event: UUIMenuItemEvent) {
-		event?.stopPropagation();
-		const language = event?.target as UUIMenuItemElement;
-		const isoCode = language.dataset.isoCode;
-		if (!isoCode) return;
-		this.handleSelection(isoCode);
+	async firstUpdated() {
+		const { data } = await this.#languageRepository.requestLanguages();
+		this._languages = data?.items ?? [];
 	}
 
 	get #filteredLanguages() {
@@ -36,6 +36,14 @@ export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<Lan
 		} else {
 			return this._languages;
 		}
+	}
+
+	#submit() {
+		this.modalHandler?.submit({ selection: this.#selectionManager.getSelection() });
+	}
+
+	#close() {
+		this.modalHandler?.reject();
 	}
 
 	render() {
@@ -47,23 +55,22 @@ export class UmbLanguagePickerModalElement extends UmbModalElementPickerBase<Lan
 					(item) => html`
 						<uui-menu-item
 							label=${item.name ?? ''}
-							selectable="true"
-							@selected=${this.#onSelection}
-							@unselected=${this.#onSelection}
-							?selected=${this.isSelected(item.isoCode!)}
-							data-iso-code="${ifDefined(item.isoCode)}">
+							selectable
+							@selected=${() => this.#selectionManager.select(item.isoCode!)}
+							@unselected=${() => this.#selectionManager.deselect(item.isoCode!)}
+							?selected=${this.#selectionManager.isSelected(item.isoCode!)}>
 							<uui-icon slot="icon" name="umb:globe"></uui-icon>
 						</uui-menu-item>
 					`
 				)}
 			</uui-box>
 			<div slot="actions">
-				<uui-button label="Close" @click=${this.close}></uui-button>
-				<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
+				<uui-button label="Close" @click=${this.#close}></uui-button>
+				<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 
