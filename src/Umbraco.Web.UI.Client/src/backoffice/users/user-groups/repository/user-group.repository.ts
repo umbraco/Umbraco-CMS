@@ -51,12 +51,28 @@ export class UmbUserGroupRepository
 	byId(id: string): Promise<Observable<any>> {
 		throw new Error('Method not implemented.');
 	}
-	create(data: any): Promise<UmbRepositoryResponse<any>> {
-		throw new Error('Method not implemented.');
+
+	async create(userGroupRequestData: any): Promise<UmbRepositoryResponse<any>> {
+		if (!userGroupRequestData) throw new Error('Data is missing');
+
+		const { data, error } = await this.#detailSource.insert(userGroupRequestData);
+
+		//TODO Put it in the store
+
+		return { error };
 	}
-	save(id: string, data: any): Promise<UmbRepositoryErrorResponse> {
-		throw new Error('Method not implemented.');
+
+	async save(id: string, userGroup: UserGroupPresentationModel) {
+		if (!id) throw new Error('UserGroup id is missing');
+		if (!userGroup) throw new Error('UserGroup update data is missing');
+
+		const { data, error } = await this.#detailSource.update(id, userGroup);
+
+		//TODO Put it in the store
+
+		return { data, error };
 	}
+
 	delete(id: string): Promise<UmbRepositoryErrorResponse> {
 		throw new Error('Method not implemented.');
 	}

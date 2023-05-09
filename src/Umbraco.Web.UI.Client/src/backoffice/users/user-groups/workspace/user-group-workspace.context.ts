@@ -34,8 +34,17 @@ export class UmbUserGroupWorkspaceContext
 	getData(): UserGroupPresentationModel | undefined {
 		throw new Error('Method not implemented.');
 	}
-	save(): Promise<void> {
-		throw new Error('Method not implemented.');
+	async save() {
+		if (!this.#data.value) return;
+		if (!this.#data.value.id) return;
+
+		if (this.getIsNew()) {
+			await this.repository.create(this.#data.value);
+		} else {
+			await this.repository.save(this.#data.value.id, this.#data.value);
+		}
+		// If it went well, then its not new anymore?.
+		this.setIsNew(false);
 	}
 	destroy(): void {
 		throw new Error('Method not implemented.');

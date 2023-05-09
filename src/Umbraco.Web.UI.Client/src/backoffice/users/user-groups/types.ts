@@ -2,6 +2,7 @@ import {
 	SaveUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
 	UserGroupBaseModel,
+	UserGroupPresentationModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
@@ -23,9 +24,10 @@ export interface UmbUserGroupCollectionFilterModel {
 	take?: number;
 }
 
+//TODO Which model should we use instead of "any"?
 export type UmbUserGroupDetailDataSource = UmbDataSource<
 	SaveUserGroupRequestModel,
-	void,
+	any,
 	UpdateUserGroupRequestModel,
-	UserGroupBaseModel
+	UserGroupPresentationModel
 >;

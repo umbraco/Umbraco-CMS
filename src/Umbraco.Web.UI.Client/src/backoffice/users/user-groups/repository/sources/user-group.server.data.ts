@@ -1,15 +1,10 @@
 import { UmbUserGroupDetailDataSource } from '../../types';
 import { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import {
-	CreateUserRequestModel,
-	UpdateUserRequestModel,
-	UserPresentationBaseModel,
-	UserResource,
-	InviteUserRequestModel,
-	EnableUserRequestModel,
-	DisableUserRequestModel,
 	UserGroupPresentationModel,
 	UserGroupResource,
+	UpdateUserGroupRequestModel,
+	SaveUserGroupRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -38,13 +33,22 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroupById({ id }));
 	}
-	insert(data: UserGroupPresentationModel): Promise<DataSourceResponse<void>> {
-		throw new Error('Method not implemented.');
+	insert(data: SaveUserGroupRequestModel) {
+		return tryExecuteAndNotify(this.#host, UserGroupResource.postUserGroup({ requestBody: data }));
 	}
-	update(unique: string, data: UserGroupPresentationModel): Promise<DataSourceResponse<UserGroupPresentationModel>> {
-		throw new Error('Method not implemented.');
+	update(id: string, data: UpdateUserGroupRequestModel) {
+		if (!id) throw new Error('Id is missing');
+
+		return tryExecuteAndNotify(
+			this.#host,
+			UserGroupResource.putUserGroupById({
+				id,
+				requestBody: data,
+			})
+		);
 	}
-	delete(unique: string): Promise<DataSourceResponse<undefined>> {
-		throw new Error('Method not implemented.');
+	delete(id: string): Promise<DataSourceResponse<undefined>> {
+		if (!id) throw new Error('Id is missing');
+		return tryExecuteAndNotify(this.#host, UserGroupResource.deleteUserGroupById({ id }));
 	}
 }
