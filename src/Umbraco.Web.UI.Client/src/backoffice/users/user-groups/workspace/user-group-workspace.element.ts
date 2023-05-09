@@ -14,7 +14,14 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: ':id',
+			path: 'create',
+			component: () => this.#element,
+			setup: (component, info) => {
+				this.#workspaceContext.createScaffold();
+			},
+		},
+		{
+			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (component, info) => {
 				const id = info.match.params.id;

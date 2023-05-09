@@ -1,7 +1,6 @@
 import {
 	SaveUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
-	UserGroupBaseModel,
 	UserGroupPresentationModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';

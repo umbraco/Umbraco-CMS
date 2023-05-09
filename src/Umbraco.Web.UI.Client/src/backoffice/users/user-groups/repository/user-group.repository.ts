@@ -2,7 +2,12 @@ import { Observable } from 'rxjs';
 import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from '../types';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data';
 import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data';
-import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	SaveUserGroupRequestModel,
+	UpdateUserGroupRequestModel,
+	UserGroupBaseModel,
+	UserGroupPresentationModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbCollectionDataSource,
@@ -14,7 +19,9 @@ import {
 
 // TODO: implement
 export class UmbUserGroupRepository
-	implements UmbDetailRepository<UserGroupPresentationModel>, UmbCollectionRepository
+	implements
+		UmbDetailRepository<SaveUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupPresentationModel>,
+		UmbCollectionRepository
 {
 	#host: UmbControllerHostElement;
 
@@ -26,6 +33,9 @@ export class UmbUserGroupRepository
 		this.#detailSource = new UmbUserGroupServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserGroupCollectionServerDataSource(this.#host);
 	}
+	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<UserGroupBaseModel>> {
+		return this.#detailSource.createScaffold(parentId);
+	}
 
 	// COLLECTION
 	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {
@@ -34,10 +44,6 @@ export class UmbUserGroupRepository
 	}
 
 	// DETAIL
-	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<any>> {
-		throw new Error('Method not implemented.');
-	}
-
 	async requestById(id: string) {
 		if (!id) throw new Error('Id is missing');
 

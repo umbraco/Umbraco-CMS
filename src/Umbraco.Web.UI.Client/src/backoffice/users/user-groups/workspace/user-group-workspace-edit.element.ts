@@ -177,7 +177,7 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	#renderHeader() {
 		return html`
 			<div id="header" slot="header">
-				<a href="/section/users/view/user-groups/">
+				<a href="/section/users/view/user-groups">
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</a>
 				<uui-input id="name" .value=${this._userGroup?.name ?? ''} @input="${this.#onNameChange}"></uui-input>

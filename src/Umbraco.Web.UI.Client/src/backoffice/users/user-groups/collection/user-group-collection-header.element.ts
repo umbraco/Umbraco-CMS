@@ -21,7 +21,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 	#onCreate() {
 		//TODO Navigate to create workspace
 
-		history.pushState(null, '', 'section/users/view/user-groups/create/');
+		history.pushState(null, '', 'section/users/view/user-groups/user-group/create/');
 	}
 
 	#onSearch(event: UUIInputEvent) {

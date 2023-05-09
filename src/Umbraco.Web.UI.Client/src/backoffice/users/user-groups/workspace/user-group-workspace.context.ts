@@ -15,6 +15,14 @@ export class UmbUserGroupWorkspaceContext
 		super(host, new UmbUserGroupRepository(host));
 	}
 
+	async createScaffold() {
+		const { data } = await this.repository.createScaffold(null);
+		this.setIsNew(true);
+		// TODO: Should the data be the base model or the presentation model?
+		this.#data.next(data as unknown as UserGroupPresentationModel);
+		return { data };
+	}
+
 	async load(id: string) {
 		console.log('load');
 

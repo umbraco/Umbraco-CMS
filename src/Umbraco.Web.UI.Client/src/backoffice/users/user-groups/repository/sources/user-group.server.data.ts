@@ -5,6 +5,7 @@ import {
 	UserGroupResource,
 	UpdateUserGroupRequestModel,
 	SaveUserGroupRequestModel,
+	UserGroupBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -26,9 +27,12 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 	}
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserGroupPresentationModel>> {
-		throw new Error('Method not implemented.');
+
+	async createScaffold(parentId: string | null) {
+		const data: UserGroupBaseModel = {};
+		return { data };
 	}
+
 	get(id: string): Promise<DataSourceResponse<UserGroupPresentationModel>> {
 		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroupById({ id }));
