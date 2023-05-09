@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -8,7 +7,6 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
-[ValidateStartItem]
 public class ByRouteContentApiController : ContentApiItemControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
