@@ -1,19 +1,23 @@
 import { Observable, map } from 'rxjs';
 import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbBooleanState, UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 
 // TODO: update interface
 export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> {
 	readonly selectable: Observable<boolean>;
 	readonly selection: Observable<Array<string | null>>;
 	setSelectable(value: boolean): void;
+	getSelectable(): boolean;
 	setMultiple(value: boolean): void;
+	getMultiple(): boolean;
 	setSelection(value: Array<string | null>): void;
+	getSelection(): Array<string | null>;
 	select(unique: string | null): void;
 	deselect(unique: string | null): void;
 	requestChildrenOf: (parentUnique: string | null) => Promise<{
@@ -28,18 +32,16 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 {
 	public host: UmbControllerHostElement;
 
+	#selectionManager = new UmbSelectionManagerBase();
+
 	#selectable = new UmbBooleanState(false);
 	public readonly selectable = this.#selectable.asObservable();
 
-	#multiple = new UmbBooleanState(false);
-	public readonly multiple = this.#multiple.asObservable();
-
-	#selection = new UmbArrayState(<Array<string | null>>[]);
-	public readonly selection = this.#selection.asObservable();
+	public readonly multiple = this.#selectionManager.multiple;
+	public readonly selection = this.#selectionManager.selection;
 
 	#treeAlias?: string;
 	repository?: UmbTreeRepository<TreeItemType>;
-
 	#treeManifestObserver?: UmbObserverController<any>;
 
 	#initResolver?: () => void;
@@ -84,32 +86,29 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	}
 
 	public setMultiple(value: boolean) {
-		this.#multiple.next(value);
+		this.#selectionManager.setMultiple(value);
 	}
 
 	public getMultiple() {
-		return this.#multiple.getValue();
+		return this.#selectionManager.getMultiple();
 	}
 
 	public setSelection(value: Array<string | null>) {
-		if (!value) return;
-		this.#selection.next(value);
+		this.#selectionManager.setSelection(value);
 	}
 
 	public getSelection() {
-		return this.#selection.getValue();
+		return this.#selectionManager.getSelection();
 	}
 
 	public select(unique: string | null) {
 		if (!this.getSelectable()) return;
-		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
-		this.#selection.next(newSelection);
+		this.#selectionManager.select(unique);
 		this.host.dispatchEvent(new CustomEvent('selected'));
 	}
 
 	public deselect(unique: string | null) {
-		const newSelection = this.getSelection().filter((x) => x !== unique);
-		this.#selection.next(newSelection);
+		this.#selectionManager.deselect(unique);
 		this.host.dispatchEvent(new CustomEvent('selected'));
 	}
 
