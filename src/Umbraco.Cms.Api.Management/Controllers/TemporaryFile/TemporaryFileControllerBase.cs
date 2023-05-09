@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
@@ -10,7 +9,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 [ApiController]
 [VersionedApiBackOfficeRoute("temporaryfile")]
 [ApiExplorerSettings(GroupName = "Temporary File")]
-[ApiVersion("1.0")]
 public abstract class TemporaryFileControllerBase : ManagementApiControllerBase
 {
     protected IActionResult TemporaryFileStatusResult(TemporaryFileOperationStatus operationStatus) =>

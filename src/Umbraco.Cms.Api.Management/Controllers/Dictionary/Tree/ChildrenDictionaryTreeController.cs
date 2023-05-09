@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
+[ApiVersion("1.0")]
 public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
 {
     public ChildrenDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)

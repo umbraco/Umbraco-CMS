@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PublishedCache;
 
+[ApiVersion("1.0")]
 public class StatusPublishedCacheController : PublishedCacheControllerBase
 {
     private readonly IPublishedSnapshotStatus _publishedSnapshotStatus;

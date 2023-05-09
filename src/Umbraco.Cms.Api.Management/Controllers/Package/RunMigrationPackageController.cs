@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Infrastructure.Install;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+[ApiVersion("1.0")]
 public class RunMigrationPackageController : PackageControllerBase
 {
     private readonly PackageMigrationRunner _packageMigrationRunner;

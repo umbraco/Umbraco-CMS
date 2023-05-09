@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
@@ -10,7 +11,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.User;
 [ApiController]
 [VersionedApiBackOfficeRoute("user")]
 [ApiExplorerSettings(GroupName = "User")]
-[ApiVersion("1.0")]
 public abstract class UserControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserOperationStatusResult(UserOperationStatus status, ErrorMessageResult? errorMessageResult = null) =>

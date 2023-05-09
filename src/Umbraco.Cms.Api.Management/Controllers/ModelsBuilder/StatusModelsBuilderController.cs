@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
@@ -7,6 +8,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
+[ApiVersion("1.0")]
 public class StatusModelsBuilderController : ModelsBuilderControllerBase
 {
     private readonly OutOfDateModelsStatus _outOfDateModelsStatus;

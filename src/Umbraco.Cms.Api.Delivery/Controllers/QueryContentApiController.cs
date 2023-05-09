@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -8,6 +9,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[ApiVersion("1.0")]
 public class QueryContentApiController : ContentApiControllerBase
 {
     private readonly IApiContentQueryService _apiContentQueryService;

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Mime;
 using System.Text;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package.Created;
 
+[ApiVersion("1.0")]
 public class DownloadCreatedPackageController : CreatedPackageControllerBase
 {
     private readonly IPackagingService _packagingService;

@@ -1,6 +1,7 @@
 ﻿using System.Net.Mime;
 using System.Text;
 using System.Xml.Linq;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
+[ApiVersion("1.0")]
 public class ExportDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;

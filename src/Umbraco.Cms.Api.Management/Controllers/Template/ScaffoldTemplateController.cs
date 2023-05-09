@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Template;
 using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
+[ApiVersion("1.0")]
 public class ScaffoldTemplateController : TemplateControllerBase
 {
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
@@ -9,7 +10,8 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
-public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseController
+[ApiVersion("1.0")]
+public class GetAllRedirectUrlManagementController : RedirectUrlManagementControllerBase
 {
     private readonly IRedirectUrlService _redirectUrlService;
     private readonly IRedirectUrlPresentationFactory _redirectUrlPresentationFactory;
@@ -22,6 +24,7 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementBaseCo
         _redirectUrlPresentationFactory = redirectUrlPresentationFactory;
     }
 
+    [MapToApiVersion("1.0")]
     [HttpGet]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]

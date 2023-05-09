@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script;
 
+[ApiVersion("1.0")]
 public class UpdateScriptController : ScriptControllerBase
 {
     private readonly IScriptService _scriptService;

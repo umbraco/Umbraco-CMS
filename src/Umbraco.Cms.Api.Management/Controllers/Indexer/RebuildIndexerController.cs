@@ -1,4 +1,5 @@
-﻿using Examine;
+﻿using Asp.Versioning;
+using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

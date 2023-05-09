@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
@@ -10,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 
-
+[ApiVersion("1.0")]
 public class ItemMediaItemController : MediaItemControllerBase
 {
     private readonly IEntityService _entityService;

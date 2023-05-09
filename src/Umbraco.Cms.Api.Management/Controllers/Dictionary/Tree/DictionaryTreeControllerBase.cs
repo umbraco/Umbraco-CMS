@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -8,7 +9,6 @@ using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
-[ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]

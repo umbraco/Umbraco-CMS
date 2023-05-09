@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -8,7 +9,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 [ApiController]
 [VersionedApiBackOfficeRoute("relation")]
 [ApiExplorerSettings(GroupName = "Relation")]
-[ApiVersion("1.0")]
 // TODO: Implement Authentication
 public abstract class RelationControllerBase : ManagementApiControllerBase
 {

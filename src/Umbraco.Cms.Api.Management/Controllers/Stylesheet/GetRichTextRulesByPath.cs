@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.RichTextStylesheet;
 using Umbraco.Cms.Core;
@@ -9,6 +10,7 @@ using StylesheetRule = Umbraco.Cms.Core.Strings.Css.StylesheetRule;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
+[ApiVersion("1.0")]
 public class GetRichTextRulesByPath : StylesheetControllerBase
 {
     private readonly IRichTextStylesheetService _richTextStylesheetService;

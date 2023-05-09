@@ -4,7 +4,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Item;
 
-[ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
