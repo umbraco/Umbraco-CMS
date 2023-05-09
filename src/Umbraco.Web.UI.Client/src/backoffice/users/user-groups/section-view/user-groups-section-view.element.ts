@@ -13,7 +13,7 @@ export class UmbUserGroupsSectionViewElement extends UmbLitElement {
 			component: () => import('../collection/user-group-collection.element'),
 		},
 		{
-			path: 'user-group',
+			path: 'edit',
 			component: () => import('../workspace/user-group-workspace.element'),
 		},
 		{
