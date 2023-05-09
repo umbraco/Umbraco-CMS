@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbTreeElement } from '../../../shared/components/tree/tree.element';
+import { UmbTreeElement } from '../../../core/components/tree/tree.element';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbDictionaryItemPickerModalData, UmbDictionaryItemPickerModalResult } from '@umbraco-cms/backoffice/modal';
 
@@ -11,7 +11,7 @@ export default class UmbDictionaryItemPickerModalElement extends UmbModalBaseEle
 	UmbDictionaryItemPickerModalResult
 > {
 	@state()
-	_selection: Array<string> = [];
+	_selection: Array<string | null> = [];
 
 	@state()
 	_multiple = false;

@@ -77,8 +77,8 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 									>Add default value</uui-button
 							  >`}
 						<uui-form-layout-item>
-							<uui-label slot="label" for="default-value">Recursive</uui-label>
-							<uui-checkbox @change=${() => (this.recursive = !this.recursive)}>Yes, make it recursive</uui-checkbox>
+							<uui-label slot="label" for="default-value">Fallback</uui-label>
+							<uui-checkbox @change=${() => (this.recursive = !this.recursive)}>From ancestors</uui-checkbox>
 						</uui-form-layout-item>
 						<uui-form-layout-item>
 							<uui-label slot="label">Output sample</uui-label>

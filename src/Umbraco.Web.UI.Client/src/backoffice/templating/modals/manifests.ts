@@ -27,7 +27,7 @@ const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
-		name: 'Partial View Picker Modal',
+		name: 'Partial Insert Section Picker Modal',
 		loader: () => import('./insert-section-modal/insert-section-modal.element'),
 	},
 ];

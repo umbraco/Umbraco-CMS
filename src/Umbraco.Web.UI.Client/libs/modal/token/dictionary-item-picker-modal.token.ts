@@ -6,7 +6,7 @@ export interface UmbDictionaryItemPickerModalData {
 }
 
 export interface UmbDictionaryItemPickerModalResult {
-	selection: string[];
+	selection: Array<string | null>;
 }
 
 export const UMB_DICTIONARY_ITEM_PICKER_MODAL_ALIAS = 'Umb.Modal.DictionaryItemPicker';

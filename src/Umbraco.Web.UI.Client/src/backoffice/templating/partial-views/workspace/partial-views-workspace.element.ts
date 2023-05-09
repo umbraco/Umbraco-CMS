@@ -6,7 +6,7 @@ import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './partial-views-workspace-edit.element';
-import { IRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-partial-views-workspace')
 export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
@@ -18,7 +18,7 @@ export class UmbPartialViewsWorkspaceElement extends UmbLitElement {
 	#key = '';
 
 	@state()
-	_routes: IRoute[] = [
+	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentKey',
 			component: () => this.#element,

@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputElement } from '@umbraco-ui/uui';
-import { UmbCodeEditorElement } from '../../../shared/components/code-editor/code-editor.element';
+import { UmbCodeEditorElement } from '../../../core/components/code-editor';
 import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -33,10 +33,10 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 				this._content = content;
 			});
 
-			this.observe(this.#partialViewsWorkspaceContext.isNew, (isNew) => {
-				this.#isNew = !!isNew;
-				console.log(this.#isNew);
-			});
+			// this.observe(this.#partialViewsWorkspaceContext.isNew, (isNew) => {
+			// 	this.#isNew = !!isNew;
+			// 	console.log(this.#isNew);
+			// });
 		});
 	}
 

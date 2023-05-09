@@ -70,7 +70,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#getDictionaryItemSnippet = async (modalResult: UmbDictionaryItemPickerModalResult) => {
-		const { data } = await this.#dictionaryRepository.requestById(modalResult.selection[0]);
+		const id = modalResult.selection[0];
+		if (id === null) return;
+		const { data } = await this.#dictionaryRepository.requestById(id);
 		this.value = getInsertDictionarySnippet(data?.name ?? '');
 	};
 
