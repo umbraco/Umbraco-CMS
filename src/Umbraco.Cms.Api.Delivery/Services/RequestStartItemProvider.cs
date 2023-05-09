@@ -10,15 +10,23 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestStartItemProvider
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IRequestCultureService _requestCultureService;
 
     // this provider lifetime is Scope, so we can cache this as a field
     private IPublishedContent? _requestedStartContent;
 
     public RequestStartItemProvider(
         IHttpContextAccessor httpContextAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        : base(httpContextAccessor) =>
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IVariationContextAccessor variationContextAccessor,
+        IRequestCultureService requestCultureService)
+        : base(httpContextAccessor)
+    {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _variationContextAccessor = variationContextAccessor;
+        _requestCultureService = requestCultureService;
+    }
 
     /// <inheritdoc/>
     public IPublishedContent? GetStartItem()
@@ -34,16 +42,24 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
             return null;
         }
 
-        if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) == false || publishedSnapshot?.Content == null)
+        if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) == false ||
+            publishedSnapshot?.Content == null)
         {
             return null;
         }
 
         IEnumerable<IPublishedContent> rootContent = publishedSnapshot.Content.GetAtRoot();
 
-        _requestedStartContent = Guid.TryParse(headerValue, out Guid key)
-            ? rootContent.FirstOrDefault(c => c.Key == key)
-            : rootContent.FirstOrDefault(c => c.UrlSegment.InvariantEquals(headerValue));
+        if (Guid.TryParse(headerValue, out Guid key))
+        {
+            _requestedStartContent = rootContent.FirstOrDefault(c => c.Key == key);
+        }
+        else
+        {
+            var culture = _requestCultureService.GetRequestedCulture();
+            _requestedStartContent = rootContent.FirstOrDefault(c =>
+                c.UrlSegment(_variationContextAccessor, culture).InvariantEquals(headerValue));
+        }
 
         return _requestedStartContent;
     }
