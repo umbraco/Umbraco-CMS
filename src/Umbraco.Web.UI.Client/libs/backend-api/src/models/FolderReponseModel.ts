@@ -5,7 +5,8 @@
 import type { FolderModelBaseModel } from './FolderModelBaseModel';
 
 export type FolderReponseModel = (FolderModelBaseModel & {
-$type: string;
-id?: string;
-parentId?: string | null;
+    $type: string;
+    id?: string;
+    parentId?: string | null;
 });
+

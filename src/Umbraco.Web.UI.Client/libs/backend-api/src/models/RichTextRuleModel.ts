@@ -7,3 +7,4 @@ export type RichTextRuleModel = {
     selector?: string;
     styles?: string;
 };
+

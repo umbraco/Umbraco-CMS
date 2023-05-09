@@ -1,5 +1,5 @@
 import { customElement, property } from 'lit/decorators.js';
-import { UmbVariantId } from '../../backoffice/core/variants/variant-id.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbRouterSlotElement } from './router-slot.element';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
 
