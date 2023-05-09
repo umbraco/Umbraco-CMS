@@ -26,8 +26,7 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	checkbox?: HTMLFormElement;
 
 	validate() {
-
-		if(!this.form) return true;
+		if (!this.form) return true;
 
 		this.form.requestSubmit();
 		return this.form.checkValidity();
@@ -45,7 +44,7 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 		return this.checkbox?.checked;
 	}
 
-
+	/* eslint-disable lit-a11y/click-events-have-key-events */
 	render() {
 		return html`
 			${super.render()}
@@ -76,6 +75,7 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 				: ''}
 		`;
 	}
+	/* eslint-enable lit-a11y/click-events-have-key-events */
 
 	static styles = [
 		...UUIBooleanInputElement.styles,
