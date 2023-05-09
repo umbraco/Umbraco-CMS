@@ -9,3 +9,4 @@ export type UpdateContentRequestModelBaseDocumentValueModelDocumentVariantReques
     values?: Array<DocumentValueModel>;
     variants?: Array<DocumentVariantRequestModel>;
 };
+

@@ -6,3 +6,4 @@ export type LogMessagePropertyPresentationModel = {
     name?: string;
     value?: string | null;
 };
+

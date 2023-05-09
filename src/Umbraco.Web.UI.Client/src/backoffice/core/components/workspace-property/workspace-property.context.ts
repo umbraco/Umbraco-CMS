@@ -1,4 +1,4 @@
-import { UmbVariantId } from '../../variants/variant-id.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace/workspace-context/workspace-variable-entity-context.interface';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace/workspace-variant/workspace-variant.context';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';

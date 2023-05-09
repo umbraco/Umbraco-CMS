@@ -14,18 +14,18 @@ export class TagResource {
      * @throws ApiError
      */
     public static getTag({
-query,
-tagGroup,
-culture,
-skip,
-take = 100,
-}: {
-query?: string,
-tagGroup?: string,
-culture?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedTagResponseModel> {
+        query,
+        tagGroup,
+        culture,
+        skip,
+        take = 100,
+    }: {
+        query?: string,
+        tagGroup?: string,
+        culture?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedTagResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tag',
