@@ -1,18 +1,15 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDataTypePickerModalData {
-	selection?: Array<string | null>;
-	multiple?: boolean;
-}
-
-export interface UmbDataTypePickerModalResult {
-	selection: Array<string | null>;
-}
+export type UmbDataTypePickerModalData = UmbTreePickerModalData<any>;
+export type UmbDataTypePickerModalResult = UmbPickerModalResult;
 
 export const UMB_DATA_TYPE_PICKER_MODAL = new UmbModalToken<UmbDataTypePickerModalData, UmbDataTypePickerModalResult>(
-	'Umb.Modal.DataTypePicker',
+	'Umb.Modal.TreePicker',
 	{
 		type: 'sidebar',
 		size: 'small',
+	},
+	{
+		treeAlias: 'Umb.Tree.DataTypes',
 	}
 );
