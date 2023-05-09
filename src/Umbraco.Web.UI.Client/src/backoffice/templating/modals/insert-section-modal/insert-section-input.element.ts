@@ -2,7 +2,6 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-ui/uui';
-import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
 
 @customElement('umb-insert-section-checkbox')
 export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
