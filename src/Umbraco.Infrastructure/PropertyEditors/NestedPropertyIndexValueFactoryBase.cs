@@ -38,7 +38,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
 
             var propertyTypeDictionary =
                 contentType
-                    .PropertyGroups
+                    .CompositionPropertyGroups
                     .SelectMany(x => x.PropertyTypes!)
                     .Select(propertyType =>
                     {
