@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,7 @@ using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
+[ApiVersion("1.0")]
 [ApiController]
 [VersionedApiBackOfficeRoute(Paths.BackOfficeApiEndpointTemplate)]
 [ApiExplorerSettings(GroupName = "Security")]

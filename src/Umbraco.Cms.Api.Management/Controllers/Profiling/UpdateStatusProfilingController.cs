@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Profiling;
 using Umbraco.Cms.Core;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Profiling;
 
+[ApiVersion("1.0")]
 public class UpdateStatusProfilingController : ProfilingControllerBase
 {
     private readonly IWebProfilerService _webProfilerService;

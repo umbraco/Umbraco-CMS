@@ -1,4 +1,5 @@
-﻿using Examine;
+﻿using Asp.Versioning;
+using Examine;
 using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +18,7 @@ public class QuerySearcherController : SearcherControllerBase
 
     public QuerySearcherController(IExamineManagerService examineManagerService) => _examineManagerService = examineManagerService;
 
-    [HttpGet("{searcherName}/query")]
+    [Microsoft.AspNetCore.Mvc.HttpGet("{searcherName}/query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SearchResultResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

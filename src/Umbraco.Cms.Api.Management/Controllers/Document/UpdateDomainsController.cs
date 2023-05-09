@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
@@ -11,6 +12,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+[ApiVersion("1.0")]
 public class UpdateDomainsController : DocumentControllerBase
 {
     private readonly IDomainService _domainService;
@@ -22,6 +24,7 @@ public class UpdateDomainsController : DocumentControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
+    [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/domains")]
     public async Task<IActionResult> UpdateDomainsAsync(Guid id, UpdateDomainsRequestModel updateModel)
     {

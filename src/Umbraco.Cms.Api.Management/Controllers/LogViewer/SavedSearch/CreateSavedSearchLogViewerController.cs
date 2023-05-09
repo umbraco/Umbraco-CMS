@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.LogViewer;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
+[ApiVersion("1.0")]
 public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;

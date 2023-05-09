@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
+[ApiVersion("1.0")]
 public class AllHealthCheckGroupController : HealthCheckGroupControllerBase
 {
     private readonly IHealthCheckGroupPresentationFactory _healthCheckGroupPresentationFactory;

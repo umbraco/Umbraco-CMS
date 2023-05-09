@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck;
 
+[ApiVersion("1.0")]
 public class ExecuteActionHealthCheckController : HealthCheckControllerBase
 {
     private readonly HealthCheckCollection _healthChecks;

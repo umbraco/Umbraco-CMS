@@ -1,5 +1,5 @@
 using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Configuration;
 

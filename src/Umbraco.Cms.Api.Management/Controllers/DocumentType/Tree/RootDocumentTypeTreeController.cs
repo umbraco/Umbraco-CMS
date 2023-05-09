@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 
+[ApiVersion("1.0")]
 public class RootDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
     public RootDocumentTypeTreeController(IEntityService entityService, IContentTypeService contentTypeService)

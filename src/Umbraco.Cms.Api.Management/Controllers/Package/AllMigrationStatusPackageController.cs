@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -9,6 +10,7 @@ using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+[ApiVersion("1.0")]
 public class AllMigrationStatusPackageController : PackageControllerBase
 {
     private readonly IPackagingService _packagingService;

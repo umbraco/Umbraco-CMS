@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Language;
 using Umbraco.Cms.Api.Management.ViewModels.TemporaryFile;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.TemporaryFile;
@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
+[ApiVersion("1.0")]
 public class ByKeyTemporaryFileController : TemporaryFileControllerBase
 {
     private readonly ITemporaryFileService _temporaryFileService;
@@ -20,6 +21,8 @@ public class ByKeyTemporaryFileController : TemporaryFileControllerBase
     }
 
     [HttpGet($"{{{nameof(id)}}}")]
+
+
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Culture;
 
+[ApiVersion("1.0")]
 public class AllCultureController : CultureControllerBase
 {
     private readonly IUmbracoMapper _umbracoMapper;
