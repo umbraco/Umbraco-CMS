@@ -1,19 +1,10 @@
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class FilterOption
+public sealed class FilterOption
 {
     public required string FieldName { get; set; }
 
     public required string Value { get; set; }
 
     public FilterOperation Operator { get; set; }
-}
-
-public enum FilterOperation
-{
-    Is,
-    IsNot,
-    // TODO: how to handle these in Examine?
-    Contains,
-    DoesNotContain
 }

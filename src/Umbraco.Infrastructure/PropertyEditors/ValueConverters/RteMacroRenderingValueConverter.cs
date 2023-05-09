@@ -14,9 +14,9 @@ using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.DeliveryApi;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Infrastructure.Macros;
-using Umbraco.Cms.Infrastructure.Models.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;

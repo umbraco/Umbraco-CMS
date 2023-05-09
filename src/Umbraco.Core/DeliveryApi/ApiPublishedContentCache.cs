@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiPublishedContentCache : IApiPublishedContentCache
+public sealed class ApiPublishedContentCache : IApiPublishedContentCache
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRequestPreviewService _requestPreviewService;
@@ -70,5 +70,5 @@ public class ApiPublishedContentCache : IApiPublishedContentCache
             : null;
 
     private bool IsAllowedContentType(IPublishedContent content)
-        => _deliveryApiSettings.DisallowedContentTypeAliases.InvariantContains(content.ContentType.Alias) is false;
+        => _deliveryApiSettings.IsAllowedContentType(content);
 }

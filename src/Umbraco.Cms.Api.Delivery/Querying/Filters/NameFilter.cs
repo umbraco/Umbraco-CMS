@@ -1,8 +1,9 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Filters;
 
-internal sealed class NameFilter : IFilterHandler
+public sealed class NameFilter : IFilterHandler
 {
     private const string NameSpecifier = "name:";
 
@@ -17,7 +18,7 @@ internal sealed class NameFilter : IFilterHandler
 
         var filterOption = new FilterOption
         {
-            FieldName = "name",
+            FieldName = NameSortIndexer.FieldName,
             Value = string.Empty
         };
 

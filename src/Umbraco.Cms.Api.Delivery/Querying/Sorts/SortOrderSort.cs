@@ -1,9 +1,10 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Sorts;
 
-internal sealed class SortOrderSort : ISortHandler
+public sealed class SortOrderSort : ISortHandler
 {
     private const string SortOptionSpecifier = "sortOrder:";
 
@@ -18,7 +19,7 @@ internal sealed class SortOrderSort : ISortHandler
 
         return new SortOption
         {
-            FieldName = "sortOrder",
+            FieldName = SortOrderSortIndexer.FieldName,
             Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending,
             FieldType = FieldType.Number
         };

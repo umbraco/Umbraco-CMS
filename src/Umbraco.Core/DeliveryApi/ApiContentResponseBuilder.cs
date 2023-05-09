@@ -4,7 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiContentResponseBuilder : ApiContentBuilderBase<IApiContentResponse>, IApiContentResponseBuilder
+public sealed class ApiContentResponseBuilder : ApiContentBuilderBase<IApiContentResponse>, IApiContentResponseBuilder
 {
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
 

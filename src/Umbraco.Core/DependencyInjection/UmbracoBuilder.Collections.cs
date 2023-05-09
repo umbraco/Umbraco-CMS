@@ -127,6 +127,7 @@ public static partial class UmbracoBuilderExtensions
         builder.SelectorHandlers().Add(() => builder.TypeLoader.GetTypes<ISelectorHandler>());
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
+        builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
     }
 
     /// <summary>
@@ -320,4 +321,10 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     public static SortHandlerCollectionBuilder SortHandlers(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<SortHandlerCollectionBuilder>();
+
+    /// <summary>
+    /// Gets the Delivery API content index handler collection builder
+    /// </summary>
+    public static ContentIndexHandlerCollectionBuilder ContentIndexHandlers(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<ContentIndexHandlerCollectionBuilder>();
 }

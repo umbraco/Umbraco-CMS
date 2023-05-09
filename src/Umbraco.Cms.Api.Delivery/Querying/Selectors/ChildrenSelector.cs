@@ -1,9 +1,10 @@
+using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Selectors;
 
-internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
+public sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
 {
     private const string ChildrenSpecifier = "children:";
 
@@ -24,7 +25,7 @@ internal sealed class ChildrenSelector : QueryOptionBase, ISelectorHandler
 
         return new SelectorOption
         {
-            FieldName = "parentKey",
+            FieldName = ChildrenSelectorIndexer.FieldName,
             Value = id.ToString() ?? string.Empty
         };
     }
