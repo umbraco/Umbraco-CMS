@@ -1,17 +1,18 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
-using Umbraco.Cms.Imaging.ImageSharp.ImageProcessors;
-using Umbraco.Cms.Imaging.ImageSharp.Media;
+using Umbraco.Cms.Imaging.ImageSharp.V2.ImageProcessors;
+using Umbraco.Cms.Imaging.ImageSharp.V2.Media;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Imaging.ImageSharp;
+namespace Umbraco.Cms.Imaging.ImageSharp.V2;
 
 public static class UmbracoBuilderExtensions
 {
