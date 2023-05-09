@@ -29,7 +29,14 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 	}
 
 	async createScaffold(parentId: string | null) {
-		const data: UserGroupBaseModel = {};
+		const data: SaveUserGroupRequestModel = {
+			name: '',
+			icon: '',
+			sections: [],
+			languages: [],
+			hasAccessToAllLanguages: false,
+			permissions: [],
+		};
 		return { data };
 	}
 
