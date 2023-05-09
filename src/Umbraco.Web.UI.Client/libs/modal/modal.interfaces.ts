@@ -9,5 +9,5 @@ export interface UmbPickerModalResult {
 }
 
 export interface UmbTreePickerModalData<TreeItemType> extends UmbPickerModalData<TreeItemType> {
-	treeAlias: string;
+	treeAlias?: string;
 }
