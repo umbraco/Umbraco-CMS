@@ -42,10 +42,15 @@ export class UmbTagRepository {
 
 		if (data) {
 			// TODO: allow to append an array of items to the store
+			// TODO: append culture? "Invariant" if null.
 			data.items.forEach((x) => this.#tagStore?.append(x));
 		}
 
-		return { data, error, asObservable: () => this.#tagStore!.byQuery(tagGroupName, requestCulture, query) };
+		return {
+			data,
+			error,
+			asObservable: () => this.#tagStore!.byQuery(tagGroupName, requestCulture, query),
+		};
 	}
 
 	async queryTags(
