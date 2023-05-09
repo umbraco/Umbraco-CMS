@@ -3,17 +3,24 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../repository/user-group.store';
 import type { UserGroupDetails } from '../../types';
-import { UmbModalElementPickerBase } from '@umbraco-cms/internal/modal';
+import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-user-group-picker-modal')
-export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<UserGroupDetails> {
+export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {
 	@state()
 	private _userGroups: Array<UserGroupDetails> = [];
 
 	private _userGroupStore?: UmbUserGroupStore;
+	#selectionManager = new UmbSelectionManagerBase();
 
 	connectedCallback(): void {
 		super.connectedCallback();
+
+		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
+		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
+		this.#selectionManager.setSelection(this.data?.selection ?? []);
+
 		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
 			this._userGroupStore = userGroupStore;
 			this._observeUserGroups();
@@ -25,79 +32,42 @@ export class UmbUserGroupPickerModalElement extends UmbModalElementPickerBase<Us
 		this.observe(this._userGroupStore.getAll(), (userGroups) => (this._userGroups = userGroups));
 	}
 
+	#submit() {
+		this.modalHandler?.submit({
+			selection: this.#selectionManager.getSelection(),
+		});
+	}
+
+	#close() {
+		this.modalHandler?.reject();
+	}
+
 	render() {
 		return html`
 			<umb-workspace-editor headline="Select user groups">
 				<uui-box>
-					<uui-input label="search"></uui-input>
-					<hr />
-					<div id="item-list">
-						${this._userGroups.map(
-							(item) => html`
-								<div
-									@click=${() => this.handleSelection(item.id)}
-									@keydown=${(e: KeyboardEvent) => this._handleKeydown(e, item.id)}
-									class=${this.isSelected(item.id) ? 'item selected' : 'item'}>
-									<uui-icon .name=${item.icon}></uui-icon>
-									<span>${item.name}</span>
-								</div>
-							`
-						)}
-					</div>
+					${this._userGroups.map(
+						(item) => html`
+							<uui-menu-item
+								label=${item.name}
+								selectable
+								@selected=${() => this.#selectionManager.select(item.id!)}
+								@unselected=${() => this.#selectionManager.deselect(item.id!)}
+								?selected=${this.#selectionManager.isSelected(item.id!)}>
+								<uui-icon .name=${item.icon} slot="icon"></uui-icon>
+							</uui-menu-item>
+						`
+					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.submit}></uui-button>
+					<uui-button label="Close" @click=${this.#close}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
 			</umb-workspace-editor>
 		`;
 	}
 
-	static styles = [
-		UUITextStyles,
-		css`
-			uui-input {
-				width: 100%;
-			}
-			hr {
-				border: none;
-				border-bottom: 1px solid var(--uui-color-divider);
-				margin: 16px 0;
-			}
-			#item-list {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-1);
-			}
-			.item {
-				color: var(--uui-color-interactive);
-				display: grid;
-				grid-template-columns: var(--uui-size-8) 1fr;
-				padding: var(--uui-size-4) var(--uui-size-2);
-				gap: var(--uui-size-space-5);
-				align-items: center;
-				border-radius: var(--uui-border-radius);
-				cursor: pointer;
-			}
-			.item.selected {
-				background-color: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-			}
-			.item:not(.selected):hover {
-				background-color: var(--uui-color-surface-emphasis);
-				color: var(--uui-color-interactive-emphasis);
-			}
-			.item.selected:hover {
-				background-color: var(--uui-color-selected-emphasis);
-			}
-			.item uui-icon {
-				width: 100%;
-				box-sizing: border-box;
-				display: flex;
-				height: fit-content;
-			}
-		`,
-	];
+	static styles = [UUITextStyles, css``];
 }
 
 export default UmbUserGroupPickerModalElement;

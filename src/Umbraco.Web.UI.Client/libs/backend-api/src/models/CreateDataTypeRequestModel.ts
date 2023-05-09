@@ -5,6 +5,7 @@
 import type { DataTypeModelBaseModel } from './DataTypeModelBaseModel';
 
 export type CreateDataTypeRequestModel = (DataTypeModelBaseModel & {
-id?: string | null;
-parentId?: string | null;
+    id?: string | null;
+    parentId?: string | null;
 });
+
