@@ -48,8 +48,6 @@ export class UmbUserWorkspaceContext
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
 
-		console.log('save', this.#data.value, this.getIsNew());
-
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
 		} else {
