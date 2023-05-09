@@ -3,10 +3,10 @@ using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;

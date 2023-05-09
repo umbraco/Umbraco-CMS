@@ -31,11 +31,11 @@ internal sealed class DeliveryApiJsonTypeResolver : DefaultJsonTypeInfoResolver
 
     private void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, params Type[] derivedTypes)
     {
-        // var jsonDerivedTypes = derivedTypes.Select(type => new JsonDerivedType(type)).ToList();
         jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
         {
             UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
         };
+
         foreach (Type derivedType in derivedTypes)
         {
             jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType));
