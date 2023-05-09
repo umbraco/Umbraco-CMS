@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Imaging.ImageSharp;
+namespace Umbraco.Cms.Imaging.ImageSharp.V2;
 
 /// <summary>
 ///     Configures the ImageSharp middleware options.

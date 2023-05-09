@@ -1,9 +1,9 @@
-using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using Umbraco.Cms.Core.Media;
 using Size = System.Drawing.Size;
 
-namespace Umbraco.Cms.Imaging.ImageSharp.Media;
+namespace Umbraco.Cms.Imaging.ImageSharp.V2.Media;
 
 public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
 {
@@ -28,35 +28,31 @@ public sealed class ImageSharpDimensionExtractor : IImageDimensionExtractor
     {
         Size? size = null;
 
-        if (stream is not null)
+        IImageInfo imageInfo = Image.Identify(_configuration, stream);
+        if (imageInfo != null)
         {
-            DecoderOptions options = new()
-            {
-                Configuration = _configuration,
-            };
-
-            ImageInfo imageInfo = Image.Identify(options, stream);
-            if (imageInfo != null)
-            {
-                size = IsExifOrientationRotated(imageInfo)
-                    ? new Size(imageInfo.Height, imageInfo.Width)
-                    : new Size(imageInfo.Width, imageInfo.Height);
-            }
+            size = IsExifOrientationRotated(imageInfo)
+                ? new Size(imageInfo.Height, imageInfo.Width)
+                : new Size(imageInfo.Width, imageInfo.Height);
         }
 
         return size;
     }
 
-    private static bool IsExifOrientationRotated(ImageInfo imageInfo)
+    private static bool IsExifOrientationRotated(IImageInfo imageInfo)
         => GetExifOrientation(imageInfo) switch
         {
-            ExifOrientationMode.LeftTop or ExifOrientationMode.RightTop or ExifOrientationMode.RightBottom or ExifOrientationMode.LeftBottom => true,
+            ExifOrientationMode.LeftTop
+                or ExifOrientationMode.RightTop
+                or ExifOrientationMode.RightBottom
+                or ExifOrientationMode.LeftBottom => true,
             _ => false,
         };
 
-    private static ushort GetExifOrientation(ImageInfo imageInfo)
+    private static ushort GetExifOrientation(IImageInfo imageInfo)
     {
-        if (imageInfo.Metadata.ExifProfile?.TryGetValue(ExifTag.Orientation, out IExifValue<ushort>? orientation) == true)
+        IExifValue<ushort>? orientation = imageInfo.Metadata.ExifProfile?.GetValue(ExifTag.Orientation);
+        if (orientation is not null)
         {
             if (orientation.DataType == ExifDataType.Short)
             {
