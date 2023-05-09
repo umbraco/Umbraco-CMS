@@ -149,7 +149,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Delivery", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Common", "src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj", "{D48B5D6B-82FF-4235-986C-CDE646F41DEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Imaging.ImageSharp3", "src\Umbraco.Cms.Imaging.ImageSharp3\Umbraco.Cms.Imaging.ImageSharp3.csproj", "{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
