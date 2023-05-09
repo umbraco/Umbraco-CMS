@@ -39,12 +39,6 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.TemplatePicker',
-		name: 'Template Picker Modal',
-		loader: () => import('./template-picker/template-picker-modal.element'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.Template',
 		name: 'Template Modal',
 		loader: () => import('./template/template-modal.element'),
