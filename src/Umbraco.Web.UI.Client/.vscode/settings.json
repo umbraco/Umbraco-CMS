@@ -5,6 +5,7 @@
 		"Backoffice",
 		"combobox",
 		"Elementable",
+		"pickable",
 		"templating",
 		"variantable"
 	],

@@ -7,6 +7,7 @@ import {
 	UMB_MODAL_CONTEXT_TOKEN,
 	UmbModalContext,
 	UmbModalToken,
+	UmbPickerModalData,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -19,6 +20,8 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	#getUnique: (entry: ItemType) => string | undefined;
 
 	public modalContext?: UmbModalContext;
+
+	public pickableFilter?: (item: ItemType) => boolean = () => true;
 
 	#selection = new UmbArrayState<string>([]);
 	selection = this.#selection.asObservable();
@@ -74,14 +77,14 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		this.#selection.next(selection);
 	}
 
-	// TODO: revisit this method. How do we best pass picker data?
-	// If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
-	openPicker(pickerData?: any) {
+	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
+	openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
 		if (!this.modalContext) throw new Error('Modal context is not initialized');
 
 		const modalHandler = this.modalContext.open(this.modalAlias, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this.getSelection()],
+			pickableFilter: this.pickableFilter,
 			...pickerData,
 		});
 
