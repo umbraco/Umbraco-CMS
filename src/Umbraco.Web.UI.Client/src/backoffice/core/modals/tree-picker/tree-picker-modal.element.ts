@@ -5,10 +5,11 @@ import type { UmbTreeElement } from '../../components/tree/tree.element';
 import { ManifestModalTreePickerKind } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tree-picker-modal')
-export class UmbTreePickerModalElement<T = unknown> extends UmbModalBaseElement<
-	UmbTreePickerModalData<T>,
+export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentationModel> extends UmbModalBaseElement<
+	UmbTreePickerModalData<TreeItemType>,
 	UmbPickerModalResult,
 	ManifestModalTreePickerKind
 > {
@@ -66,6 +67,6 @@ export default UmbTreePickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-picker-modal': UmbTreePickerModalElement;
+		'umb-tree-picker-modal': UmbTreePickerModalElement<TreeItemPresentationModel>;
 	}
 }
