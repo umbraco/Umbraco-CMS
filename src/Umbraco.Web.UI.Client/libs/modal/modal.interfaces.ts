@@ -1,9 +1,13 @@
-export interface UmbPickerModalData<T> {
+export interface UmbPickerModalData<ItemType> {
 	multiple?: boolean;
 	selection?: Array<string | null>;
-	filter?: (item: T) => boolean;
+	filter?: (item: ItemType) => boolean;
 }
 
 export interface UmbPickerModalResult {
 	selection: Array<string | null>;
+}
+
+export interface UmbTreePickerModalData<TreeItemType> extends UmbPickerModalData<TreeItemType> {
+	treeAlias: string;
 }
