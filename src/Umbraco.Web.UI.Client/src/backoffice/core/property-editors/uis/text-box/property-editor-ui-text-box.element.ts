@@ -1,18 +1,30 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	@property()
 	value = '';
 
+	@state()
+	private _type = 'text';
+
+	@state()
+	private _maxChars?: number;
+
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
+		const inputType = config.find((x) => x.alias === 'inputType');
+		if (inputType) this._type = inputType.value;
+
+		const maxChars = config.find((x) => x.alias === 'maxChars');
+		if (maxChars) this._maxChars = maxChars.value;
+	}
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
@@ -20,7 +32,11 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 	}
 
 	render() {
-		return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
+		return html`<uui-input
+			.value=${this.value}
+			type="${this._type}"
+			maxlength="${ifDefined(this._maxChars)}"
+			@input=${this.onInput}></uui-input>`;
 	}
 
 	static styles = [

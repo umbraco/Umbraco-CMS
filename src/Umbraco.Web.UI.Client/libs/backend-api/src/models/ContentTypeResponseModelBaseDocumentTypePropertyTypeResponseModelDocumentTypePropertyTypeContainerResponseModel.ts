@@ -22,3 +22,4 @@ export type ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDoc
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;
 };
+

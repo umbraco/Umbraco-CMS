@@ -6,3 +6,4 @@ export type TextFileViewModelBaseModel = {
     name?: string;
     content?: string;
 };
+

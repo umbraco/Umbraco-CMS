@@ -5,3 +5,4 @@
 import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
 
 export type CreateUserRequestModel = UserPresentationBaseModel;
+

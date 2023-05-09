@@ -9,3 +9,4 @@ export type LogLevelCountsReponseModel = {
     error?: number;
     fatal?: number;
 };
+

@@ -4,4 +4,5 @@
 
 import type { UserGroupBaseModel } from './UserGroupBaseModel';
 
-export type SaveUserGroupRequestModel = UserGroupBaseModel;
+export type CreateUserGroupRequestModel = UserGroupBaseModel;
+
