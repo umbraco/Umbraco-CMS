@@ -7,6 +7,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 import './insert-section-input.element';
 import UmbInsertSectionCheckboxElement from './insert-section-input.element';
+import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
 
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
@@ -31,6 +32,9 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 	@state()
 	selectedCheckbox?: UmbInsertSectionCheckboxElement | null = null;
 
+	@state()
+	snippet = '';
+
 	#chooseSection(event: Event) {
 		event.stopPropagation();
 		const target = event.target as UmbInsertSectionCheckboxElement;
@@ -41,6 +45,7 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 		}
 		if (target.checked) {
 			this.selectedCheckbox = target;
+			this.snippet = this.snippetMethods[checkboxes.indexOf(target)](target?.inputValue as string, target?.isMandatory);
 			checkboxes.forEach((checkbox) => {
 				if (checkbox !== target) {
 					checkbox.checked = false;
@@ -53,13 +58,14 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 		this.selectedCheckbox = this.checkboxes[0];
 	}
 
+	snippetMethods = [getRenderBodySnippet, getRenderSectionSnippet, getAddSectionSnippet];
+
 	#close() {
 		this.modalHandler?.reject();
 	}
 
 	#submit() {
-		if(this.selectedCheckbox?.validate())
-		this.modalHandler?.submit({ value: (this.selectedCheckbox?.inputValue as string) ?? '' });
+		if (this.selectedCheckbox?.validate()) this.modalHandler?.submit({ value: this.snippet ?? '' });
 	}
 
 	render() {

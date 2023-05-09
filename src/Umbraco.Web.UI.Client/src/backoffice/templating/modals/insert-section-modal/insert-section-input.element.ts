@@ -2,6 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-ui/uui';
+import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
 
 @customElement('umb-insert-section-checkbox')
 export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
@@ -16,15 +17,18 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	showInput = false;
 
 	@query('uui-input')
-	input!: UUIInputElement;
+	input?: UUIInputElement;
 
 	@query('form')
-	form!: HTMLFormElement;
+	form?: HTMLFormElement;
 
 	@query('uui-checkbox')
-	checkbox!: HTMLFormElement;
+	checkbox?: HTMLFormElement;
 
 	validate() {
+
+		if(!this.form) return true;
+
 		this.form.requestSubmit();
 		return this.form.checkValidity();
 	}
@@ -34,12 +38,13 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	}
 
 	get inputValue() {
-		return this.input.value;
+		return this.input?.value;
 	}
 
 	get isMandatory() {
-		return this.checkbox.checked;
+		return this.checkbox?.checked;
 	}
+
 
 	render() {
 		return html`
