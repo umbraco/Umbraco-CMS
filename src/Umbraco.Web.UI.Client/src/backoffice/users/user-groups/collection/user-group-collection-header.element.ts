@@ -1,18 +1,10 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import {
-	UUIBooleanInputEvent,
-	UUICheckboxElement,
-	UUIInputEvent,
-	UUIRadioGroupElement,
-	UUIRadioGroupEvent,
-} from '@umbraco-ui/uui';
-
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
-
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { customElement } from 'lit/decorators.js';
+import { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbUserGroupCollectionContext } from './user-group-collection.context';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-group-collection-header')
 export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
@@ -31,7 +23,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 	}
 
 	#onSearch(event: UUIInputEvent) {
-		//TODO Search
+		//TODO How do we handle search when theres no endpoint (we have to do it locally)
 	}
 
 	render() {

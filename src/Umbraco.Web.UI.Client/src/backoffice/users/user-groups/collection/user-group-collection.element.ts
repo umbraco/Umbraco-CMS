@@ -6,6 +6,7 @@ import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './user-group-collection-view.element';
+import './user-group-collection-header.element';
 
 @customElement('umb-user-group-collection')
 export class UmbUserCollectionElement extends UmbLitElement {
@@ -17,7 +18,13 @@ export class UmbUserCollectionElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-user-group-collection-view></umb-user-group-collection-view>`;
+		return html`
+			<uui-scroll-container>
+				<umb-user-group-collection-header></umb-user-group-collection-header>
+				<umb-user-group-collection-view></umb-user-group-collection-view>
+			</uui-scroll-container>
+			<umb-collection-selection-actions></umb-collection-selection-actions>
+		`;
 	}
 
 	static styles = [
