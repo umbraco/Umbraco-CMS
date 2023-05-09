@@ -55,6 +55,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Embedded Media Modal',
 		loader: () => import('./embedded-media/embedded-media-modal.element'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.TreePicker',
+		name: 'Tree Picker Modal',
+		loader: () => import('./tree-picker/tree-picker-modal.element'),
+	},
 ];
 
 export const manifests = [...modals];
