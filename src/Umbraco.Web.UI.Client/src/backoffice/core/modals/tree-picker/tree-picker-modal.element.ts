@@ -3,12 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbTreeElement } from '../../components/tree/tree.element';
 import { ManifestModalTreePickerKind } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbPickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<T = unknown> extends UmbModalBaseElement<
-	UmbPickerModalData<T>,
+	UmbTreePickerModalData<T>,
 	UmbPickerModalResult,
 	ManifestModalTreePickerKind
 > {
@@ -44,7 +44,7 @@ export class UmbTreePickerModalElement<T = unknown> extends UmbModalBaseElement<
 			<umb-body-layout headline="Select">
 				<uui-box>
 					<umb-tree
-						alias=${this.manifest?.meta.treeAlias}
+						alias=${this.data?.treeAlias}
 						@selected=${this.#onSelectionChange}
 						.selection=${this._selection}
 						selectable
