@@ -34,6 +34,7 @@ export class UmbTreeElement extends UmbLitElement {
 		return this.#treeContext.getSelection();
 	}
 	set selection(newVal) {
+		if (!Array.isArray(newVal)) return;
 		this.#treeContext?.setSelection(newVal);
 	}
 
@@ -59,6 +60,14 @@ export class UmbTreeElement extends UmbLitElement {
 		}
 
 		this.requestUpdate('hideTreeRoot', oldVal);
+	}
+
+	@property()
+	get selectableFilter() {
+		return this.#treeContext.selectableFilter;
+	}
+	set selectableFilter(newVal) {
+		this.#treeContext.selectableFilter = newVal;
 	}
 
 	@state()

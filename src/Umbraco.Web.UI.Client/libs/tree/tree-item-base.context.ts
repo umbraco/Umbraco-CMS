@@ -138,7 +138,13 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 
 	#observeIsSelectable() {
 		if (!this.treeContext) return;
-		new UmbObserverController(this.host, this.treeContext.selectable, (value) => this.#isSelectable.next(value));
+		new UmbObserverController(this.host, this.treeContext.selectable, (value) => {
+			// If the tree is selectable, check if this item is selectable
+			if (value === true) {
+				const isSelectable = this.treeContext?.selectableFilter?.(this.getTreeItem()!) ?? true;
+				this.#isSelectable.next(isSelectable);
+			}
+		});
 	}
 
 	#observeIsSelected() {

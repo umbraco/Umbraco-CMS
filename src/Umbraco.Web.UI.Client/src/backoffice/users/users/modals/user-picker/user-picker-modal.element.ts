@@ -1,30 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { UmbUserRepository } from '../../repository/user.repository';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalHandler, UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-user-picker-modal')
-export class UmbUserPickerModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbUserPickerModalData, UmbUserPickerModalResult>;
-
-	@property({ type: Object, attribute: false })
-	data?: UmbUserPickerModalData;
-
-	@state()
-	_selection: Array<string> = [];
-
-	@state()
-	_multiple = false;
-
+export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPickerModalData, UmbUserPickerModalResult> {
 	@state()
 	private _users: Array<UserResponseModel> = [];
 
+	#selectionManager = new UmbSelectionManagerBase();
 	#userRepository?: UmbUserRepository;
 
 	constructor() {
@@ -59,7 +49,7 @@ export class UmbUserPickerModalElement extends UmbLitElement {
 	}
 
 	#submit() {
-		this.modalHandler?.submit({ selection: this._selection });
+		this.modalHandler?.submit({ selection: this.#selectionManager.getSelection() });
 	}
 
 	#close() {
@@ -72,10 +62,14 @@ export class UmbUserPickerModalElement extends UmbLitElement {
 				<uui-box>
 					${this._users.map(
 						(user) => html`
-							<uui-menu-item label=${user.name} selectable>
+							<uui-menu-item
+								label=${user.name}
+								selectable
+								@selected=${() => this.#selectionManager.select(user.id!)}
+								@unselected=${() => this.#selectionManager.deselect(user.id!)}
+								?selected=${this.#selectionManager.isSelected(user.id!)}>
 								<uui-avatar slot="icon" name=${user.name}></uui-avatar>
-								Hello</uui-menu-item
-							>
+							</uui-menu-item>
 						`
 					)}
 				</uui-box>
