@@ -1,18 +1,19 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
+import { ContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbMediaPickerModalData {
-	multiple?: boolean;
-	selection: Array<string>;
-}
+export type UmbMediaTreePickerModalData = UmbTreePickerModalData<ContentTreeItemResponseModel>;
+export type UmbMediaTreePickerModalResult = UmbPickerModalResult;
 
-export interface UmbMediaPickerModalResult {
-	selection: Array<string | null>;
-}
-
-export const UMB_MEDIA_PICKER_MODAL = new UmbModalToken<UmbMediaPickerModalData, UmbMediaPickerModalResult>(
-	'Umb.Modal.MediaPicker',
+export const UMB_MEDIA_TREE_PICKER_MODAL = new UmbModalToken<
+	UmbMediaTreePickerModalData,
+	UmbMediaTreePickerModalResult
+>(
+	'Umb.Modal.TreePicker',
 	{
 		type: 'sidebar',
 		size: 'small',
+	},
+	{
+		treeAlias: 'Umb.Tree.Media',
 	}
 );
