@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiPublishedContentCache : IApiPublishedContentCache
+public sealed class ApiPublishedContentCache : IApiPublishedContentCache
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IRequestPreviewService _requestPreviewService;

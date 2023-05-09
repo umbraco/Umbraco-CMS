@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public class ApiMedia : IApiMedia
+public sealed class ApiMedia : IApiMedia
 {
     public ApiMedia(Guid id, string name, string mediaType, string url, IDictionary<string, object?> properties)
     {

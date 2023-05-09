@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
-public class DeliveryApiContentIndexPopulator : IndexPopulator
+internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
 {
     private readonly IContentService _contentService;
     private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiMediaUrlProvider : IApiMediaUrlProvider
+public sealed class ApiMediaUrlProvider : IApiMediaUrlProvider
 {
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
