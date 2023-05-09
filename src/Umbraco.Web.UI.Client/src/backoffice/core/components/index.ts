@@ -50,7 +50,6 @@ import './section/section.element';
 import './tree/tree.element';
 import './tree/entity-tree-item/entity-tree-item.element';
 import './tree/tree-menu-item/tree-menu-item.element';
-import '../modals/tree-picker/tree-picker-modal.element';
 
 import './menu/menu-item-base/menu-item-base.element';
 
