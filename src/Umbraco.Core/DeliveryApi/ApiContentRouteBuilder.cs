@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class ApiContentRouteBuilder : IApiContentRouteBuilder
+public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 {
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly GlobalSettings _globalSettings;

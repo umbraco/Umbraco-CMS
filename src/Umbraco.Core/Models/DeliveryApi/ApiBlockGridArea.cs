@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public class ApiBlockGridArea
+public sealed class ApiBlockGridArea
 {
     public ApiBlockGridArea(string alias, int rowSpan, int columnSpan, IEnumerable<ApiBlockGridItem> items)
     {

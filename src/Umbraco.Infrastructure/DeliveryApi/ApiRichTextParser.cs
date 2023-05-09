@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
-public partial class ApiRichTextParser : IApiRichTextParser
+internal sealed partial class ApiRichTextParser : IApiRichTextParser
 {
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
