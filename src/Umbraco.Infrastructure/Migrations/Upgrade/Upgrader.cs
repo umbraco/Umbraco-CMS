@@ -65,7 +65,7 @@ public class Upgrader
         // Otherwise it just means that our migration failed on the first step, which is fine,
         // or there were no pending transitions so nothing changed.
         // We will skip saving the state since we it's still the same
-        if (result.Successful && result.FinalState == result.InitialState)
+        if (result.FinalState == result.InitialState)
         {
             return result;
         }
