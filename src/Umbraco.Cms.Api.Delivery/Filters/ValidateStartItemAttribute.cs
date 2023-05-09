@@ -21,7 +21,7 @@ internal sealed class ValidateStartItemAttribute : TypeFilterAttribute
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (_requestStartItemProvider.StartItemHeaderHasValue() == false)
+            if (_requestStartItemProvider.RequestedStartItem() is null)
             {
                 return;
             }

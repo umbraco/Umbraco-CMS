@@ -8,5 +8,5 @@ internal sealed class NoopRequestStartItemProvider : IRequestStartItemProvider
     public IPublishedContent? GetStartItem() => null;
 
     /// <inheritdoc />
-    public bool StartItemHeaderHasValue() => false;
+    public string? RequestedStartItem() => null;
 }

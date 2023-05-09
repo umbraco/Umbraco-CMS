@@ -28,13 +28,11 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
             return _requestedStartContent;
         }
 
-        if (StartItemHeaderHasValue() == false)
+        var headerValue = RequestedStartItem()?.Trim(Constants.CharArrays.ForwardSlash);
+        if (headerValue.IsNullOrWhiteSpace())
         {
             return null;
         }
-
-        // We make sure there is a value with the above check
-        var headerValue = GetHeaderValue("Start-Item")!.Trim(Constants.CharArrays.ForwardSlash);
 
         if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) == false || publishedSnapshot?.Content == null)
         {
@@ -51,5 +49,5 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
     }
 
     /// <inheritdoc/>
-    public bool StartItemHeaderHasValue() => !GetHeaderValue("Start-Item").IsNullOrWhiteSpace();
+    public string? RequestedStartItem() => GetHeaderValue("Start-Item");
 }

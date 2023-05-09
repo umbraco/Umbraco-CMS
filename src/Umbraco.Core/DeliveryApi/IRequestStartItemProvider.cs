@@ -5,12 +5,12 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 public interface IRequestStartItemProvider
 {
     /// <summary>
-    ///     Gets the requested start item from the "Start-Item" header, if present.
+    ///     Gets the requested start item, if present.
     /// </summary>
     IPublishedContent? GetStartItem();
 
     /// <summary>
-    ///     Checks whether the "Start-Item" header has value.
+    ///     Gets the value of the requested start item, if present.
     /// </summary>
-    bool StartItemHeaderHasValue();
+    string? RequestedStartItem();
 }
