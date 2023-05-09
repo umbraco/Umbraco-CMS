@@ -20,9 +20,14 @@ import {
 	UmbPartialViewPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL } from '../../modals/modal-tokens';
 
-
+export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
+	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);
 
 @customElement('umb-templating-insert-menu')
 export class UmbTemplatingInsertMenuElement extends UmbLitElement {

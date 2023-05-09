@@ -1,18 +1,25 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL } from './modal-tokens';
+import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS } from './manifests';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UMB_MODAL_CONTEXT_TOKEN,
 	UmbModalContext,
+	UmbModalToken,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalHandler,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UmbDictionaryItemPickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
 
-
+export const UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL = new UmbModalToken(
+	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS,
+	{
+		type: 'sidebar',
+		size: 'small',
+	}
+);
 
 export interface ChooseInsertTypeModalData {
 	hidePartialViews?: boolean;
