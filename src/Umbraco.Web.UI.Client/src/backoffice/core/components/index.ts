@@ -36,7 +36,6 @@ import './input-eye-dropper/input-eye-dropper.element';
 import './input-multi-url-picker/input-multi-url-picker.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
-import './tags-input/tags-input.element';
 import './input-upload-field/input-upload-field.element';
 
 import './property-type-based-property/property-type-based-property.element';

@@ -4,7 +4,7 @@ import { customElement, property, query, queryAll, state } from 'lit/decorators.
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-ui/uui';
-import { UmbTagRepository } from '../../../tags/repository/tag.repository';
+import { UmbTagRepository } from '../../repository/tag.repository';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -46,6 +46,11 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 	private _optionCollection?: HTMLCollectionOf<HTMLInputElement>;
 
 	#repository = new UmbTagRepository(this);
+
+	constructor() {
+		super();
+		console.log('tags-input');
+	}
 
 	public focus() {
 		this._tagInput.focus();

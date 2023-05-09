@@ -2,8 +2,8 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbTagsInputElement } from '../../../components/tags-input/tags-input.element';
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
+import { UmbTagsInputElement } from '../../components/tags-input/tags-input.element';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../core/components/workspace-property/workspace-property.context';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -34,6 +34,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 
 	constructor() {
 		super();
+		console.log('ui tags');
 		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (context) => {
 			this.observe(context.variantId, (id) => {
 				if (id && id.culture !== undefined) {
