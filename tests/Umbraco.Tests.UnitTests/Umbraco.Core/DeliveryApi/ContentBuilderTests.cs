@@ -21,6 +21,7 @@ public class ContentBuilderTests : DeliveryApiTests
 
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
+        contentType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
 
         var key = Guid.NewGuid();
         var urlSegment = "url-segment";
