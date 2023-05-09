@@ -7,3 +7,4 @@ export type CopyDocumentRequestModel = {
     relateToOriginal?: boolean;
     includeDescendants?: boolean;
 };
+

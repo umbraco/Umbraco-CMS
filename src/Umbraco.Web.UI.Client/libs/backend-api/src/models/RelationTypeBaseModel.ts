@@ -9,3 +9,4 @@ export type RelationTypeBaseModel = {
     childObjectType?: string | null;
     isDependency?: boolean;
 };
+

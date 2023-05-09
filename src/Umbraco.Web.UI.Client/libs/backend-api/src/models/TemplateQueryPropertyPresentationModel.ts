@@ -8,3 +8,4 @@ export type TemplateQueryPropertyPresentationModel = {
     alias?: string;
     type?: TemplateQueryPropertyTypeModel;
 };
+

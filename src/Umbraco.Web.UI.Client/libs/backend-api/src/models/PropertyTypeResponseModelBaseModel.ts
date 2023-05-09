@@ -17,3 +17,4 @@ export type PropertyTypeResponseModelBaseModel = {
     validation?: PropertyTypeValidationModel;
     appearance?: PropertyTypeAppearanceModel;
 };
+
