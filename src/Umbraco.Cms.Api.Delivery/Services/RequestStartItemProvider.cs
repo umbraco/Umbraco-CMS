@@ -11,7 +11,6 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly IRequestCultureService _requestCultureService;
 
     // this provider lifetime is Scope, so we can cache this as a field
     private IPublishedContent? _requestedStartContent;
@@ -19,13 +18,11 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
     public RequestStartItemProvider(
         IHttpContextAccessor httpContextAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IVariationContextAccessor variationContextAccessor,
-        IRequestCultureService requestCultureService)
+        IVariationContextAccessor variationContextAccessor)
         : base(httpContextAccessor)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _variationContextAccessor = variationContextAccessor;
-        _requestCultureService = requestCultureService;
     }
 
     /// <inheritdoc/>
@@ -50,16 +47,9 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
 
         IEnumerable<IPublishedContent> rootContent = publishedSnapshot.Content.GetAtRoot();
 
-        if (Guid.TryParse(headerValue, out Guid key))
-        {
-            _requestedStartContent = rootContent.FirstOrDefault(c => c.Key == key);
-        }
-        else
-        {
-            var culture = _requestCultureService.GetRequestedCulture();
-            _requestedStartContent = rootContent.FirstOrDefault(c =>
-                c.UrlSegment(_variationContextAccessor, culture).InvariantEquals(headerValue));
-        }
+        _requestedStartContent = Guid.TryParse(headerValue, out Guid key)
+            ? rootContent.FirstOrDefault(c => c.Key == key)
+            : rootContent.FirstOrDefault(c => c.UrlSegment(_variationContextAccessor).InvariantEquals(headerValue));
 
         return _requestedStartContent;
     }
