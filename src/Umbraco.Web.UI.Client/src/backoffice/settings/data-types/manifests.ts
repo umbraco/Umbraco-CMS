@@ -3,7 +3,6 @@ import { manifests as repositoryManifests } from './repository/manifests';
 import { manifests as menuItemManifests } from './menu-item/manifests';
 import { manifests as treeManifests } from './tree/manifests';
 import { manifests as workspaceManifests } from './workspace/manifests';
-import { manifests as modalManifests } from './modal/manifests';
 
 export const manifests = [
 	...entityActions,
@@ -11,5 +10,4 @@ export const manifests = [
 	...menuItemManifests,
 	...treeManifests,
 	...workspaceManifests,
-	...modalManifests,
 ];
