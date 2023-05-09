@@ -148,4 +148,24 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
         Assert.IsFalse(updateResult.Success);
         Assert.AreEqual(UserGroupOperationStatus.DuplicateAlias, updateResult.Status);
     }
+
+    [Test]
+    public async Task Can_Update_UserGroup_To_New_Name()
+    {
+        var userGroup = new UserGroup(ShortStringHelper)
+        {
+            Name = "Some Name",
+            Alias = "someAlias"
+        };
+        var setupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserId);
+        Assert.IsTrue(setupResult.Success);
+
+
+        var updateName = "New Name";
+        userGroup.Name = updateName;
+        var updateResult = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserId);
+        Assert.IsTrue(updateResult.Success);
+        var updatedGroup = updateResult.Result;
+        Assert.AreEqual(updateName, updatedGroup.Name);
+    }
 }

@@ -271,6 +271,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(commonValidationStatus, userGroup);
         }
 
+        if (_userGroupRepository.Get(userGroup.Alias) is not null)
+        {
+            return Attempt.FailWithStatus(UserGroupOperationStatus.DuplicateAlias, userGroup);
+        }
+
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
@@ -327,6 +332,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.NotFound;
         }
 
+        IUserGroup? existing = _userGroupRepository.Get(userGroup.Alias);
+        if (existing is not null && existing.Key != userGroup.Key)
+        {
+            return UserGroupOperationStatus.DuplicateAlias;
+        }
+
         return UserGroupOperationStatus.Success;
     }
 
@@ -348,11 +359,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         if (userGroup.Alias.Length > MaxUserGroupAliasLength)
         {
             return UserGroupOperationStatus.AliasTooLong;
-        }
-
-        if (UserGroupHasUniqueAlias(userGroup) is false)
-        {
-            return UserGroupOperationStatus.DuplicateAlias;
         }
 
         UserGroupOperationStatus startNodesValidationStatus = ValidateStartNodesExists(userGroup);
@@ -390,8 +396,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         return UserGroupOperationStatus.Success;
     }
-
-    private bool UserGroupHasUniqueAlias(IUserGroup userGroup) => _userGroupRepository.Get(userGroup.Alias) is null;
 
     /// <summary>
     /// Ensures that the user creating the user group is either an admin, or in the group itself.
