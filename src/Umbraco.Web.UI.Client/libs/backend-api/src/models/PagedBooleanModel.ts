@@ -6,3 +6,4 @@ export type PagedBooleanModel = {
     total: number;
     items: Array<boolean>;
 };
+
