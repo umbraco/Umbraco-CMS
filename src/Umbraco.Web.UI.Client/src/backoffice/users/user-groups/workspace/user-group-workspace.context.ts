@@ -44,13 +44,14 @@ export class UmbUserGroupWorkspaceContext
 	}
 	async save() {
 		if (!this.#data.value) return;
-		if (!this.#data.value.id) return;
 
+		//TODO: Could we clean this code up?
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
-		} else {
+		} else if (this.#data.value.id) {
 			await this.repository.save(this.#data.value.id, this.#data.value);
-		}
+		} else return;
+
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 	}
