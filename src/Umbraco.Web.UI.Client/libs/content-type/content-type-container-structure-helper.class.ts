@@ -159,10 +159,10 @@ export class UmbContentTypeContainerStructureHelper {
 	/**
 	 * Returns true if the container is an owner container.
 	 */
-	isOwnerContainer(groupId?: string) {
-		if (!this.#structure || !groupId) return;
+	isOwnerContainer(containerId?: string) {
+		if (!this.#structure || !containerId) return;
 
-		return this._ownerContainers.find((x) => x.id === groupId) !== undefined;
+		return this._ownerContainers.find((x) => x.id === containerId) !== undefined;
 	}
 
 	/** Manipulate methods: */
@@ -173,10 +173,13 @@ export class UmbContentTypeContainerStructureHelper {
 		await this.#structure.createContainer(null, ownerId, this._childType, sortOrder);
 	}
 
-	async partialUpdateContainer(groupId?: string, partialUpdate?: Partial<PropertyTypeContainerResponseModelBaseModel>) {
+	async partialUpdateContainer(
+		containerId?: string,
+		partialUpdate?: Partial<PropertyTypeContainerResponseModelBaseModel>
+	) {
 		await this.#init;
-		if (!this.#structure || !groupId || !partialUpdate) return;
+		if (!this.#structure || !containerId || !partialUpdate) return;
 
-		return await this.#structure.updateContainer(null, groupId, partialUpdate);
+		return await this.#structure.updateContainer(null, containerId, partialUpdate);
 	}
 }
