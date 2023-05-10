@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Routing;
@@ -18,6 +20,12 @@ namespace Umbraco.Cms.Web.Common.Mvc;
 public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
 {
     private readonly GlobalSettings _globalSettings;
+
+    [Obsolete("Use the constructor that accepts GlobalSettings options. Will be removed in V14.")]
+    public UmbracoMvcConfigureOptions()
+        : this(StaticServiceProvider.Instance.GetRequiredService<IOptions<GlobalSettings>>())
+    {
+    }
 
     public UmbracoMvcConfigureOptions(IOptions<GlobalSettings> globalSettings)
         => _globalSettings = globalSettings.Value;
