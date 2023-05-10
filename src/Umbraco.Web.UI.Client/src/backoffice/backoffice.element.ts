@@ -23,6 +23,7 @@ const CORE_PACKAGES = [
 	import('./search/umbraco-package'),
 	import('./templating/umbraco-package'),
 	import('./umbraco-news/umbraco-package'),
+	import('./tags/umbraco-package'),
 ];
 
 @defineElement('umb-backoffice')

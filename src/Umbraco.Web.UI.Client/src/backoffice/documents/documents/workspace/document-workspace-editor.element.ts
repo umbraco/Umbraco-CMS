@@ -1,14 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbVariantId } from '../../../core/variants/variant-id.class';
-import { ActiveVariant } from '../../../core/components/workspace/workspace-context/workspace-split-view-manager.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
+import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../core/components/workspace/workspace-variant/workspace-variant.element';
 import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 

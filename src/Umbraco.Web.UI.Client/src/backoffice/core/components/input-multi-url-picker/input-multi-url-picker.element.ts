@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
-import type { UmbVariantId } from '../../variants/variant-id.class';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbLinkPickerLink,
 	UMB_LINK_PICKER_MODAL,
@@ -20,8 +20,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-input-multi-url-picker')
 export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElement) {
-	
-
 	protected getFormElement() {
 		return undefined;
 	}
@@ -222,7 +220,7 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			</uui-action-bar>
 		</uui-ref-node>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

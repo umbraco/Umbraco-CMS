@@ -8,3 +8,4 @@ export type ConsentLevelPresentationModel = {
     level?: TelemetryLevelModel;
     description?: string;
 };
+

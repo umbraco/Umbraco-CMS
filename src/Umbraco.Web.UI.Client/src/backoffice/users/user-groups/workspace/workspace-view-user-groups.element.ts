@@ -9,7 +9,7 @@ import {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../../core/components/table';
+} from '@umbraco-cms/backoffice/core/components';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
 import type { UserGroupDetails } from '../types';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

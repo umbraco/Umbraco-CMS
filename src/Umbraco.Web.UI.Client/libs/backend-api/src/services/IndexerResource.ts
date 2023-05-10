@@ -16,12 +16,12 @@ export class IndexerResource {
      * @throws ApiError
      */
     public static getIndexer({
-skip,
-take,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedIndexResponseModel> {
+        skip,
+        take,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedIndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer',
@@ -37,10 +37,10 @@ take?: number,
      * @throws ApiError
      */
     public static getIndexerByIndexName({
-indexName,
-}: {
-indexName: string,
-}): CancelablePromise<IndexResponseModel> {
+        indexName,
+    }: {
+        indexName: string,
+    }): CancelablePromise<IndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer/{indexName}',
@@ -58,10 +58,10 @@ indexName: string,
      * @throws ApiError
      */
     public static postIndexerByIndexNameRebuild({
-indexName,
-}: {
-indexName: string,
-}): CancelablePromise<OkResultModel> {
+        indexName,
+    }: {
+        indexName: string,
+    }): CancelablePromise<OkResultModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/indexer/{indexName}/rebuild',

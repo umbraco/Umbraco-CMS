@@ -16,10 +16,10 @@ export class MediaTypeResource {
      * @throws ApiError
      */
     public static getMediaTypeById({
-id,
-}: {
-id: string,
-}): CancelablePromise<MediaTypeResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<MediaTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media-type/{id}',
@@ -37,10 +37,10 @@ id: string,
      * @throws ApiError
      */
     public static getMediaTypeItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<MediaTypeItemResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MediaTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media-type/item',
@@ -55,16 +55,16 @@ id?: Array<string>,
      * @throws ApiError
      */
     public static getTreeMediaTypeChildren({
-parentId,
-skip,
-take = 100,
-foldersOnly = false,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-foldersOnly?: boolean,
-}): CancelablePromise<PagedFolderTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+        foldersOnly = false,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+        foldersOnly?: boolean,
+    }): CancelablePromise<PagedFolderTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/children',
@@ -82,14 +82,14 @@ foldersOnly?: boolean,
      * @throws ApiError
      */
     public static getTreeMediaTypeRoot({
-skip,
-take = 100,
-foldersOnly = false,
-}: {
-skip?: number,
-take?: number,
-foldersOnly?: boolean,
-}): CancelablePromise<PagedFolderTreeItemResponseModel> {
+        skip,
+        take = 100,
+        foldersOnly = false,
+    }: {
+        skip?: number,
+        take?: number,
+        foldersOnly?: boolean,
+    }): CancelablePromise<PagedFolderTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/root',

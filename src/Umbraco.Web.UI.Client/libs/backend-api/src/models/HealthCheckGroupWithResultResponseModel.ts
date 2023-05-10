@@ -7,3 +7,4 @@ import type { HealthCheckWithResultPresentationModel } from './HealthCheckWithRe
 export type HealthCheckGroupWithResultResponseModel = {
     checks?: Array<HealthCheckWithResultPresentationModel>;
 };
+
