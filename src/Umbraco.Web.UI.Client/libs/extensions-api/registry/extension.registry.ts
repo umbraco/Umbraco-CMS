@@ -70,7 +70,7 @@ export class UmbExtensionRegistry {
 		this._extensions.next([...extensionsValues, manifest as ManifestTypes]);
 	}
 
-	registerMany(manifests: Array<ManifestTypes>): void {
+	registerMany(manifests: Array<ManifestTypes | ManifestKind>): void {
 		manifests.forEach((manifest) => this.register(manifest));
 	}
 

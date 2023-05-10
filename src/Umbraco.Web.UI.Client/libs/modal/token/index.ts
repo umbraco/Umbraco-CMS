@@ -16,7 +16,7 @@ export * from './import-dictionary-modal.token';
 export * from './invite-user-modal.token';
 export * from './language-picker-modal.token';
 export * from './link-picker-modal.token';
-export * from './media-picker-modal.token';
+export * from './media-tree-picker-modal.token';
 export * from './property-editor-ui-picker-modal.token';
 export * from './property-settings-modal.token';
 export * from './search-modal.token';

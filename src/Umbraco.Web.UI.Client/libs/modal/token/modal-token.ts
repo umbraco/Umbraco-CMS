@@ -1,36 +1,38 @@
 import { UmbModalConfig } from '../modal.context';
 
-export class UmbModalToken<Data extends object = object, Result = unknown> {
+export class UmbModalToken<ModalDataType extends object = object, ModalResultType = unknown> {
 	/**
 	 * Get the data type of the token's data.
 	 *
 	 * @public
-	 * @type      {Data}
+	 * @type      {ModalDataType}
 	 * @memberOf  UmbModalToken
 	 * @example   `typeof MyModal.TYPE`
 	 * @returns   undefined
 	 */
-	readonly DATA: Data = undefined as never;
+	readonly DATA: ModalDataType = undefined as never;
 
 	/**
 	 * Get the result type of the token
 	 *
 	 * @public
-	 * @type      {Result}
+	 * @type      {ModalResultType}
 	 * @memberOf  UmbModalToken
 	 * @example   `typeof MyModal.RESULT`
 	 * @returns   undefined
 	 */
-	readonly RESULT: Result = undefined as never;
+	readonly RESULT: ModalResultType = undefined as never;
 
 	/**
 	 * @param alias   Unique identifier for the token,
 	 * @param defaultConfig  Default configuration for the modal,
-	 * @param _desc   Description for the token,
-	 *                used only for debugging purposes,
-	 *                it should but does not need to be unique
+	 * @param defaultData  Default data for the modal,
 	 */
-	constructor(protected alias: string, protected defaultConfig?: UmbModalConfig, protected _desc?: string) {}
+	constructor(
+		protected alias: string,
+		protected defaultConfig?: UmbModalConfig,
+		protected defaultData?: ModalDataType
+	) {}
 
 	/**
 	 * This method must always return the unique alias of the token since that
@@ -44,5 +46,9 @@ export class UmbModalToken<Data extends object = object, Result = unknown> {
 
 	public getDefaultConfig(): UmbModalConfig | undefined {
 		return this.defaultConfig;
+	}
+
+	public getDefaultData(): ModalDataType | undefined {
+		return this.defaultData;
 	}
 }
