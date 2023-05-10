@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbTableItem } from '../../../core/components/table';
+import type { UmbTableItem } from '@umbraco-cms/backoffice/core/components';
 
 @customElement('umb-user-group-table-name-column-layout')
 export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {

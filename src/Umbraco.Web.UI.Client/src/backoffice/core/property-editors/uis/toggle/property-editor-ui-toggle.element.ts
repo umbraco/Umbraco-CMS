@@ -1,11 +1,10 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-toggle
@@ -28,17 +27,10 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 
 	@property({ type: Array, attribute: false })
 	public set config(config: UmbDataTypePropertyCollection) {
-		const defaultValue = config.find((x) => x.alias === 'default');
-		if (defaultValue) this.value = defaultValue.value as boolean;
-
-		const labelOff = config.find((x) => x.alias === 'labelOff');
-		if (labelOff) this._labelOff = labelOff.value as string;
-
-		const labelOn = config.find((x) => x.alias === 'labelOn');
-		if (labelOn) this._labelOn = labelOn.value as string;
-
-		const showLabels = config.find((x) => x.alias === 'showLabels');
-		if (showLabels) this._showLabels = showLabels.value as boolean;
+		this.value = config.getValueByAlias('default') ?? false;
+		this._labelOff = config.getValueByAlias('labelOff');
+		this._labelOn = config.getValueByAlias('labelOn');
+		this._showLabels = config.getValueByAlias('showLabels');
 	}
 
 	private _onChange(event: CustomEvent) {

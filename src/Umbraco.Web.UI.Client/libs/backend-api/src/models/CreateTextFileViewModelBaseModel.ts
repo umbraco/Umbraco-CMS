@@ -5,5 +5,6 @@
 import type { TextFileViewModelBaseModel } from './TextFileViewModelBaseModel';
 
 export type CreateTextFileViewModelBaseModel = (TextFileViewModelBaseModel & {
-parentPath?: string | null;
+    parentPath?: string | null;
 });
+

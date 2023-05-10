@@ -1,19 +1,31 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	@property()
 	value = '';
 
+	@state()
+	private _max?: number;
+
+	@state()
+	private _min?: number;
+
+	@state()
+	private _step?: number;
+
 	@property({ type: Array, attribute: false })
-	public config = new UmbDataTypePropertyCollection();
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._min = config.getValueByAlias('min');
+		this._max = config.getValueByAlias('max');
+		this._step = config.getValueByAlias('step');
+	}
 
 	private onInput(e: InputEvent) {
 		this.value = (e.target as HTMLInputElement).value;
@@ -21,7 +33,13 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	}
 
 	render() {
-		return html`<uui-input .value=${this.value} type="number" @input=${this.onInput}></uui-input>`;
+		return html`<uui-input
+			.value=${this.value}
+			type="number"
+			max="${ifDefined(this._max)}"
+			min="${ifDefined(this._min)}"
+			step="${ifDefined(this._step)}"
+			@input=${this.onInput}></uui-input>`;
 	}
 
 	static styles = [

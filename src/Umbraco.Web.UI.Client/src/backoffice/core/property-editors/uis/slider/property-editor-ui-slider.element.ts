@@ -1,11 +1,10 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import UmbInputSliderElement from '../../../components/input-slider/input-slider.element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbInputSliderElement } from '../../../components/input-slider/input-slider.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-slider
@@ -38,23 +37,12 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 
 	@property({ type: Array, attribute: false })
 	public set config(config: UmbDataTypePropertyCollection) {
-		const enableRange = config.find((x) => x.alias === 'enableRange');
-		if (enableRange) this._enableRange = enableRange.value as boolean;
-
-		const initVal1 = config.find((x) => x.alias === 'initVal1');
-		if (initVal1) this._initVal1 = initVal1.value as number;
-
-		const initVal2 = config.find((x) => x.alias === 'initVal2');
-		if (initVal2) this._initVal2 = initVal2.value as number;
-
-		const step = config.find((x) => x.alias === 'step');
-		if (step) this._step = step.value as number;
-
-		const min = config.find((x) => x.alias === 'minVal');
-		if (min) this._min = min.value as number;
-
-		const max = config.find((x) => x.alias === 'maxVal');
-		if (max) this._max = max.value as number;
+		this._enableRange = config.getValueByAlias('enableRange');
+		this._initVal1 = config.getValueByAlias('initVal1');
+		this._initVal2 = config.getValueByAlias('initVal2');
+		this._step = config.getValueByAlias('step');
+		this._min = config.getValueByAlias('minVal');
+		this._max = config.getValueByAlias('maxVal');	
 	}
 
 	#getValueObject(val: string) {

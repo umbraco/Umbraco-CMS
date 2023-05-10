@@ -2,17 +2,16 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { InputType } from '@umbraco-ui/uui';
-import { UmbPropertyValueChangeEvent } from '../..';
-import { UmbPropertyEditorExtensionElement , PropertyEditorConfigDefaultData } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbPropertyValueChangeEvent } from '../..';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-date-picker
  */
 @customElement('umb-property-editor-ui-date-picker')
 export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
 
 	private _value?: Date;
 	private _valueString?: string;
@@ -53,7 +52,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		const oldVal = this._inputType;
 
 		// Format string prevalue/config
-		this._format = config.find((x) => x.alias === 'format')?.value;
+		this._format = config.getValueByAlias('format');
 		const pickTime = this._format?.includes('H') || this._format?.includes('m');
 		if (pickTime) {
 			this._inputType = 'datetime-local';
@@ -69,7 +68,7 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 		// TODO: Warren - Need to deal with offSetTime prevalue/config
 		// Currently the date picker in uui-iinput does not change based on this config
-		this._offsetTime = config.find((x) => x.alias === 'offsetTime')?.value;
+		this._offsetTime = config.getValueByAlias('offsetTime');
 
 		this.requestUpdate('_inputType', oldVal);
 	}

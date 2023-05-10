@@ -1,8 +1,8 @@
 import { map } from 'rxjs';
+import { UmbTreeItemContext } from './tree-item.context.interface';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
-import { UmbTreeContextBase } from '../tree.context';
-import { UmbTreeItemContext } from '../tree-item.context.interface';
+import { UmbTreeContextBase } from '@umbraco-cms/backoffice/tree';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
 import {
 	UmbBooleanState,
@@ -138,7 +138,13 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 
 	#observeIsSelectable() {
 		if (!this.treeContext) return;
-		new UmbObserverController(this.host, this.treeContext.selectable, (value) => this.#isSelectable.next(value));
+		new UmbObserverController(this.host, this.treeContext.selectable, (value) => {
+			// If the tree is selectable, check if this item is selectable
+			if (value === true) {
+				const isSelectable = this.treeContext?.selectableFilter?.(this.getTreeItem()!) ?? true;
+				this.#isSelectable.next(isSelectable);
+			}
+		});
 	}
 
 	#observeIsSelected() {

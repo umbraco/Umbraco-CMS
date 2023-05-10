@@ -2,11 +2,10 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -24,11 +23,8 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 
 	@property({ type: Array, attribute: false })
 	public set config(config: UmbDataTypePropertyCollection) {
-		const useLabel = config.find((x) => x.alias === 'useLabel');
-		if (useLabel) this._showLabels = useLabel.value;
-
-		const colorSwatches = config.find((x) => x.alias === 'items');
-		if (colorSwatches) this._swatches = colorSwatches.value as any[];
+		this._showLabels = config.getValueByAlias('useLabel') ?? false;
+		this._swatches = config.getValueByAlias('items') ?? [];
 	}
 
 	private _onChange(event: UUIColorSwatchesEvent) {

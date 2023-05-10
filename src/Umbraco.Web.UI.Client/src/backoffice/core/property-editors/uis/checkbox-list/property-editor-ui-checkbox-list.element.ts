@@ -25,14 +25,14 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 
 	@property({ type: Array, attribute: false })
 	public set config(config: UmbDataTypePropertyCollection) {
-		const listData = config.find((x) => x.alias === 'items');
+		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');
 
 		if (!listData) return;
 
 		// formatting the items in the dictionary into an array
 		const sortedItems = [];
-		const values = Object.values<{ value: string; sortOrder: number }>(listData.value);
-		const keys = Object.keys(listData.value);
+		const values = Object.values<{ value: string; sortOrder: number }>(listData);
+		const keys = Object.keys(listData);
 		for (let i = 0; i < values.length; i++) {
 			sortedItems.push({ key: keys[i], sortOrder: values[i].sortOrder, value: values[i].value });
 		}

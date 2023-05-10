@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
-import { UmbVariantId } from '../../variants/variant-id.class';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';

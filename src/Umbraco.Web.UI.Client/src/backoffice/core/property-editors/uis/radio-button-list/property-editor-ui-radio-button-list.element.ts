@@ -2,11 +2,10 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import '../../../components/input-radio-button-list/input-radio-button-list.element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-radio-button-list
@@ -26,14 +25,14 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 
 	@property({ type: Array, attribute: false })
 	public set config(config: UmbDataTypePropertyCollection) {
-		const listData = config.find((x) => x.alias === 'items');
+		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');
 
 		if (!listData) return;
 
 		// formatting the items in the dictionary into an array
 		const sortedItems = [];
-		const values = Object.values<{ value: string; sortOrder: number }>(listData.value);
-		const keys = Object.keys(listData.value);
+		const values = Object.values<{ value: string; sortOrder: number }>(listData);
+		const keys = Object.keys(listData);
 		for (let i = 0; i < values.length; i++) {
 			sortedItems.push({ key: keys[i], sortOrder: values[i].sortOrder, value: values[i].value });
 		}

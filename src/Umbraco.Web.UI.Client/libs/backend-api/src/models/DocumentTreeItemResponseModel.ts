@@ -5,8 +5,9 @@
 import type { ContentTreeItemResponseModel } from './ContentTreeItemResponseModel';
 
 export type DocumentTreeItemResponseModel = (ContentTreeItemResponseModel & {
-$type: string;
-isProtected?: boolean;
-isPublished?: boolean;
-isEdited?: boolean;
+    $type: string;
+    isProtected?: boolean;
+    isPublished?: boolean;
+    isEdited?: boolean;
 });
+

@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeContextBase } from './tree.context';
+import { UmbTreeContextBase } from '@umbraco-cms/backoffice/tree';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -34,6 +34,7 @@ export class UmbTreeElement extends UmbLitElement {
 		return this.#treeContext.getSelection();
 	}
 	set selection(newVal) {
+		if (!Array.isArray(newVal)) return;
 		this.#treeContext?.setSelection(newVal);
 	}
 
@@ -59,6 +60,14 @@ export class UmbTreeElement extends UmbLitElement {
 		}
 
 		this.requestUpdate('hideTreeRoot', oldVal);
+	}
+
+	@property()
+	get selectableFilter() {
+		return this.#treeContext.selectableFilter;
+	}
+	set selectableFilter(newVal) {
+		this.#treeContext.selectableFilter = newVal;
 	}
 
 	@state()
