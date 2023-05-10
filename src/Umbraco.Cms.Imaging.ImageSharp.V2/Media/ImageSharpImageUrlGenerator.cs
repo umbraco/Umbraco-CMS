@@ -1,13 +1,14 @@
 using System.Globalization;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Imaging.ImageSharp.ImageProcessors;
+using Umbraco.Cms.Imaging.ImageSharp.V2.ImageProcessors;
 using static Umbraco.Cms.Core.Models.ImageUrlGenerationOptions;
 
-namespace Umbraco.Cms.Imaging.ImageSharp.Media;
+namespace Umbraco.Cms.Imaging.ImageSharp.V2.Media;
 
 /// <summary>
 ///     Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.

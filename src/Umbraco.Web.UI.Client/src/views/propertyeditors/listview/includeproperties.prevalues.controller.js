@@ -10,42 +10,26 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
     $scope.propertyAliases = [];
     $scope.selectedField = null;
     $scope.systemFields = [
-        { value: "sortOrder" },
-        { value: "updateDate" },
-        { value: "updater" },
-        { value: "createDate" },
-        { value: "owner" },
-        { value: "published"},
-        { value: "contentTypeAlias" },
-        { value: "email" },
-        { value: "username" }
+        { value: "sortOrder", localizedKey: "general_sort" },
+        { value: "updateDate", localizedKey: "content_updateDate" },
+        { value: "updater", localizedKey: "content_updatedBy" },
+        { value: "createDate", localizedKey: "content_createDate" },
+        { value: "owner", localizedKey: "content_createBy" },
+        { value: "published", localizedKey: "content_isPublished" },
+        { value: "contentTypeAlias", localizedKey: "content_documentType" },
+        { value: "email", localizedKey: "general_email" },
+        { value: "username", localizedKey: "general_username" },
+        { value: "failedPasswordAttempts", localizedKey: "user_failedPasswordAttempts" },
+        { value: "approved", localizedKey: "user_stateApproved" },
+        { value: "lockedOut", localizedKey: "user_stateLockedOut" },
+        { value: "lastLockoutDate", localizedKey: "user_lastLockoutDate" },
+        { value: "lastLoginDate", localizedKey: "user_lastLogin" },
+        { value: "lastPasswordChangeDate", localizedKey: "user_lastPasswordChangeDate" }
     ];
 
-    $scope.getLocalizedKey = function(alias) {
-        switch (alias) {
-            case "name":
-                return "general_name";
-            case "sortOrder":
-                return "general_sort";
-            case "updateDate":
-                return "content_updateDate";
-            case "updater":
-                return "content_updatedBy";
-            case "createDate":
-                return "content_createDate";
-            case "owner":
-                return "content_createBy";
-            case "published":
-                return "content_isPublished";
-            case "contentTypeAlias":
-                //NOTE: This will just be 'Document' type even if it's for media/members since this is just a pre-val editor and we don't have a key for 'Content Type Alias'
-                return "content_documentType";
-            case "email":
-                return "general_email";
-            case "username":
-                return "general_username";
-        }
-        return alias;
+    $scope.getLocalizedKey = function (alias) {
+        const translationKey = $scope.systemFields.find(x => x.value === alias)?.localizedKey;
+        return translationKey !== undefined ? translationKey : alias;
     }
 
     $scope.changeField = function () {
@@ -65,16 +49,18 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
             e.name = v;
 
             switch (e.value) {
+                case "published":
                 case "updater":
                     e.name += " (Content only)";
                     break;
-                case "published":
-                    e.name += " (Content only)";
-                    break;
-                case "email":
-                    e.name += " (Members only)";
-                    break;
                 case "username":
+                case "email":
+                case "failedPasswordAttempts":
+                case "approved":
+                case "lockedOut":
+                case "lastLockoutDate":
+                case "lastLoginDate":
+                case "lastPasswordChangeDate":
                     e.name += " (Members only)";
                     break;
             }

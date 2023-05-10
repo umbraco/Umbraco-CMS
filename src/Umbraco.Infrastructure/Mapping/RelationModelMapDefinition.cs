@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-namespace Umbraco.New.Cms.Infrastructure.Persistence.Mappers;
+namespace Umbraco.Cms.Infrastructure.Mapping;
 
 public class RelationModelMapDefinition : IMapDefinition
 {

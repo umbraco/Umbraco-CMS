@@ -3,10 +3,10 @@ using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
@@ -17,6 +17,8 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly ILogger<ApiRichTextParser> _logger;
+
+    private const string TextNodeName = "#text";
 
     public ApiRichTextParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
@@ -30,7 +32,7 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
         _logger = logger;
     }
 
-    public RichTextElement? Parse(string html)
+    public IRichTextElement? Parse(string html)
     {
         try
         {
@@ -46,22 +48,35 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
         }
     }
 
-    private RichTextElement ParseRecursively(HtmlNode current, IPublishedSnapshot publishedSnapshot)
+    private IRichTextElement ParseRecursively(HtmlNode current, IPublishedSnapshot publishedSnapshot)
+        => current.Name == TextNodeName
+            ? ParseTextElement(current)
+            : ParseElement(current, publishedSnapshot);
+
+    private RichTextTextElement ParseTextElement(HtmlNode element)
     {
-        // if a HtmlNode contains only #text elements, the entire node contents will be contained
-        // within the innerText declaration later in this method; otherwise accept all non-#text
-        // nodes + all non-empty #text nodes as valid node children
-        HtmlNode[]? childNodes = current.ChildNodes.All(c => c.Name == "#text")
-            ? null
-            : current.ChildNodes
-                .Where(c => c.Name != "#text" || string.IsNullOrWhiteSpace(c.InnerText) is false)
-                .ToArray();
+        if (element.Name != TextNodeName)
+        {
+            throw new ArgumentException($"Only {TextNodeName} elements are supported, got: {element.Name}");
+        }
 
-        // the resulting element can only have an inner text value if the node has no (valid) children
-        var innerText = childNodes is null ? current.InnerText : string.Empty;
+        return new RichTextTextElement(element.InnerText);
+    }
 
-        var tag = TagName(current);
-        var attributes = current.Attributes.ToDictionary(a => a.Name, a => a.Value as object);
+    private RichTextGenericElement ParseElement(HtmlNode element, IPublishedSnapshot publishedSnapshot)
+    {
+        if (element.Name == TextNodeName)
+        {
+            throw new ArgumentException($"{TextNodeName} elements should be handled by {nameof(ParseTextElement)}");
+        }
+
+        // grab all non-#text nodes + all non-empty #text nodes as valid node children
+        HtmlNode[] childNodes = element.ChildNodes
+            .Where(c => c.Name != TextNodeName || string.IsNullOrWhiteSpace(c.InnerText) is false)
+            .ToArray();
+
+        var tag = TagName(element);
+        var attributes = element.Attributes.ToDictionary(a => a.Name, a => a.Value as object);
 
         ReplaceLocalLinks(publishedSnapshot, attributes);
 
@@ -69,11 +84,11 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
 
         SanitizeAttributes(attributes);
 
-        RichTextElement[] childElements = childNodes?.Any() is true
+        IRichTextElement[] childElements = childNodes.Any()
             ? childNodes.Select(child => ParseRecursively(child, publishedSnapshot)).ToArray()
-            : Array.Empty<RichTextElement>();
+            : Array.Empty<IRichTextElement>();
 
-        return new RichTextElement(tag, innerText, attributes, childElements);
+        return new RichTextGenericElement(tag, attributes, childElements);
     }
 
     private string TagName(HtmlNode htmlNode) => htmlNode.Name == "#document" ? "#root" : htmlNode.Name;
@@ -157,10 +172,7 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
         foreach (KeyValuePair<string, object> dataAttribute in dataAttributes)
         {
             var actualKey = dataAttribute.Key.TrimStart("data-");
-            if (attributes.ContainsKey(actualKey) is false)
-            {
-                attributes[actualKey] = dataAttribute.Value;
-            }
+            attributes.TryAdd(actualKey, dataAttribute.Value);
 
             attributes.Remove(dataAttribute.Key);
         }
