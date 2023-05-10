@@ -105,5 +105,8 @@ public class PropertyValueConverterTests : DeliveryApiTests
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(media.Key))
             .Returns(media);
+        PublishedMediaCacheMock
+            .Setup(pcc => pcc.GetById(It.IsAny<bool>(), media.Key))
+            .Returns(media);
     }
 }
