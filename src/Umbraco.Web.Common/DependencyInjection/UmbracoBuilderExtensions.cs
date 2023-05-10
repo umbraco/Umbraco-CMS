@@ -293,9 +293,8 @@ public static partial class UmbracoBuilderExtensions
         });
 
         builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
-        builder.Services.AddApiVersioning();
         builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
-        builder.Services.AddVersionedApiExplorer();
+        builder.Services.AddApiVersioning().AddApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
