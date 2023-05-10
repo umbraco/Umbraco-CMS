@@ -35,7 +35,8 @@ There are two ways to use this:
 "Umbraco": {
 	"CMS": {
 		"NewBackOffice":{
-			"BackOfficeHost": "http://localhost:5173"
+			"BackOfficeHost": "http://localhost:5173",
+			"AuthorizeCallbackPathName": "/"
 		},
 	},
 	[...]
