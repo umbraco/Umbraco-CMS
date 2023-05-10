@@ -34,7 +34,6 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 
 	constructor() {
 		super();
-		console.log('ui tags');
 		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (context) => {
 			this.observe(context.variantId, (id) => {
 				if (id && id.culture !== undefined) {
