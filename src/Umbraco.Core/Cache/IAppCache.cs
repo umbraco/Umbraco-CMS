@@ -18,6 +18,7 @@ public interface IAppCache
     /// <param name="key">The key of the item.</param>
     /// <param name="factory">A factory function that can create the item.</param>
     /// <returns>The item.</returns>
+    /// <remarks>Null values returned from the factory function are never cached.</remarks>
     object? Get(string key, Func<object?> factory);
 
     /// <summary>

@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-public class ApiMediaWithCrops : IApiMedia
+internal sealed class ApiMediaWithCrops : IApiMedia
 {
     private readonly IApiMedia _inner;
 
@@ -23,6 +23,14 @@ public class ApiMediaWithCrops : IApiMedia
     public string MediaType => _inner.MediaType;
 
     public string Url => _inner.Url;
+
+    public string? Extension => _inner.Extension;
+
+    public int? Width => _inner.Width;
+
+    public int? Height => _inner.Height;
+
+    public int? Bytes => _inner.Bytes;
 
     public IDictionary<string, object?> Properties => _inner.Properties;
 

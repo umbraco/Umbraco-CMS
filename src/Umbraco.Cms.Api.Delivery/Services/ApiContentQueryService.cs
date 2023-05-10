@@ -1,10 +1,10 @@
 using Examine;
 using Examine.Search;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
-using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.New.Cms.Core.Models;
 
@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Api.Delivery.Services;
 
 internal sealed class ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
 {
+    private const string ItemIdFieldName = "itemId";
     private readonly IExamineManager _examineManager;
     private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
     private readonly SelectorHandlerCollection _selectorHandlers;
     private readonly FilterHandlerCollection _filterHandlers;
     private readonly SortHandlerCollection _sortHandlers;
     private readonly string _fallbackGuidValue;
-    private readonly ISet<string> _itemIdOnlyFieldSet = new HashSet<string> { "itemId" };
 
     public ApiContentQueryService(
         IExamineManager examineManager,
@@ -39,13 +39,13 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
     }
 
     /// <inheritdoc/>
-    public PagedModel<Guid> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
+    public Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
     {
         var emptyResult = new PagedModel<Guid>();
 
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? apiIndex))
         {
-            return emptyResult;
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.IndexNotFound, emptyResult);
         }
 
         IQuery baseQuery = apiIndex.Searcher.CreateQuery();
@@ -56,29 +56,43 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         // If no Selector could be found, we return no results
         if (queryOperation is null)
         {
-            return emptyResult;
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.SelectorOptionNotFound, emptyResult);
         }
 
         // Handle Filtering
-        HandleFiltering(filters, queryOperation);
+        var canApplyFiltering = CanHandleFiltering(filters, queryOperation);
+
+        // If there is an invalid Filter option, we return no results
+        if (canApplyFiltering is false)
+        {
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.FilterOptionNotFound, emptyResult);
+        }
 
         // Handle Sorting
-        IOrdering sortQuery = HandleSorting(sorts, queryOperation).SelectFields(_itemIdOnlyFieldSet);
+        IOrdering? sortQuery = HandleSorting(sorts, queryOperation);
+
+        // If there is an invalid Sort option, we return no results
+        if (sortQuery is null)
+        {
+            return Attempt.FailWithStatus(ApiContentQueryOperationStatus.SortOptionNotFound, emptyResult);
+        }
 
         ISearchResults? results = sortQuery
-            .SelectFields(_itemIdOnlyFieldSet)
+            .SelectField(ItemIdFieldName)
             .Execute(QueryOptions.SkipTake(skip, take));
 
         if (results is null)
         {
-            return emptyResult;
+            // The query yield no results
+            return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, emptyResult);
         }
 
         Guid[] items = results
-            .Where(r => r.Values.ContainsKey("itemId"))
-            .Select(r => Guid.Parse(r.Values["itemId"]))
+            .Where(r => r.Values.ContainsKey(ItemIdFieldName))
+            .Select(r => Guid.Parse(r.Values[ItemIdFieldName]))
             .ToArray();
-        return new PagedModel<Guid>(results.TotalItemCount, items);
+
+        return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, new PagedModel<Guid>(results.TotalItemCount, items));
     }
 
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
@@ -121,45 +135,49 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         return baseQuery.Field(fieldName, fieldValue);
     }
 
-    private void HandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
+    private bool CanHandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
     {
         foreach (var filterValue in filters)
         {
             IFilterHandler? filterHandler = _filterHandlers.FirstOrDefault(h => h.CanHandle(filterValue));
             FilterOption? filter = filterHandler?.BuildFilterOption(filterValue);
 
-            if (filter is not null)
+            if (filter is null)
             {
-                var value = string.IsNullOrWhiteSpace(filter.Value) == false
-                    ? filter.Value
-                    : _fallbackGuidValue;
+                return false;
+            }
 
-                switch (filter.Operator)
-                {
-                    case FilterOperation.Is:
-                        queryOperation.And().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit,
-                                value)); // TODO: doesn't work for explicit word(s) match
-                        break;
-                    case FilterOperation.IsNot:
-                        queryOperation.Not().Field(filter.FieldName,
-                            (IExamineValue)new ExamineValue(Examineness.Explicit,
-                                value)); // TODO: doesn't work for explicit word(s) match
-                        break;
-                    // TODO: Fix
-                    case FilterOperation.Contains:
-                        break;
-                    // TODO: Fix
-                    case FilterOperation.DoesNotContain:
-                        break;
-                    default:
-                        continue;
-                }
+            var value = string.IsNullOrWhiteSpace(filter.Value) == false
+                ? filter.Value
+                : _fallbackGuidValue;
+
+            switch (filter.Operator)
+            {
+                case FilterOperation.Is:
+                    queryOperation.And().Field(filter.FieldName,
+                        (IExamineValue)new ExamineValue(Examineness.Explicit,
+                            value)); // TODO: doesn't work for explicit word(s) match
+                    break;
+                case FilterOperation.IsNot:
+                    queryOperation.Not().Field(filter.FieldName,
+                        (IExamineValue)new ExamineValue(Examineness.Explicit,
+                            value)); // TODO: doesn't work for explicit word(s) match
+                    break;
+                // TODO: Fix
+                case FilterOperation.Contains:
+                    break;
+                // TODO: Fix
+                case FilterOperation.DoesNotContain:
+                    break;
+                default:
+                    continue;
             }
         }
+
+        return true;
     }
 
-    private IOrdering HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
+    private IOrdering? HandleSorting(IEnumerable<string> sorts, IBooleanOperation queryCriteria)
     {
         IOrdering? orderingQuery = null;
 
@@ -170,7 +188,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
 
             if (sort is null)
             {
-                continue;
+                return null;
             }
 
             SortType sortType = sort.FieldType switch
@@ -190,9 +208,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
             };
         }
 
-        return orderingQuery ?? // Apply default sorting (left-aligning the content tree) if no valid sort query params
-               queryCriteria
-                   .OrderBy(new SortableField(PathSortIndexer.FieldName, SortType.String))
-                   .OrderBy(new SortableField(SortOrderSortIndexer.FieldName, SortType.Int));
+        // Keep the index sorting as default
+        return orderingQuery ?? queryCriteria.OrderBy();
     }
 }

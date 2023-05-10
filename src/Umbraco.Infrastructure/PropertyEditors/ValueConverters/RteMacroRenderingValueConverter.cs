@@ -81,7 +81,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson
-            ? typeof(RichTextElement)
+            ? typeof(IRichTextElement)
             : typeof(string);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)

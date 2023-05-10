@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -19,6 +20,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
 {
     private IPublishedContentType _contentType;
     private IPublishedContentType _elementType;
+    private IPublishedContentType _mediaType;
 
     [SetUp]
     public void SetUp()
@@ -31,6 +33,10 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         elementType.SetupGet(c => c.Alias).Returns("theElementType");
         elementType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Element);
         _elementType = elementType.Object;
+        var mediaType = new Mock<IPublishedContentType>();
+        mediaType.SetupGet(c => c.Alias).Returns("theMediaType");
+        mediaType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Media);
+        _mediaType = mediaType.Object;
     }
 
     [Test]
@@ -89,6 +95,47 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         Assert.AreEqual(2, contentPickerTwoOutput.Properties.Count);
         Assert.AreEqual(56, contentPickerTwoOutput.Properties["numberOne"]);
         Assert.AreEqual(78, contentPickerTwoOutput.Properties["numberTwo"]);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void OutputExpansionStrategy_CanExpandSpecificMedia(bool mediaPicker3)
+    {
+        var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { "mediaPickerTwo" });
+        var apiMediaBuilder = new ApiMediaBuilder(
+            new ApiContentNameProvider(),
+            new ApiMediaUrlProvider(PublishedUrlProvider),
+            Mock.Of<IPublishedValueFallback>(),
+            accessor);
+
+        var media = new Mock<IPublishedContent>();
+
+        var mediaPickerOneContent = CreateSimplePickedMedia(12, 34);
+        var mediaPickerOneProperty = mediaPicker3
+            ? CreateMediaPicker3Property(media.Object, mediaPickerOneContent.Key, "mediaPickerOne", apiMediaBuilder)
+            : CreateMediaPickerProperty(media.Object, mediaPickerOneContent.Key, "mediaPickerOne", apiMediaBuilder);
+        var mediaPickerTwoContent = CreateSimplePickedMedia(56, 78);
+        var mediaPickerTwoProperty = mediaPicker3
+            ? CreateMediaPicker3Property(media.Object, mediaPickerTwoContent.Key, "mediaPickerTwo", apiMediaBuilder)
+            : CreateMediaPickerProperty(media.Object, mediaPickerTwoContent.Key, "mediaPickerTwo", apiMediaBuilder);
+
+        SetupMediaMock(media, mediaPickerOneProperty, mediaPickerTwoProperty);
+
+        var result = apiMediaBuilder.Build(media.Object);
+
+        Assert.AreEqual(2, result.Properties.Count);
+
+        var mediaPickerOneOutput = (result.Properties["mediaPickerOne"] as IEnumerable<IApiMedia>)?.FirstOrDefault();
+        Assert.IsNotNull(mediaPickerOneOutput);
+        Assert.AreEqual(mediaPickerOneContent.Key, mediaPickerOneOutput.Id);
+        Assert.IsEmpty(mediaPickerOneOutput.Properties);
+
+        var mediaPickerTwoOutput = (result.Properties["mediaPickerTwo"] as IEnumerable<IApiMedia>)?.FirstOrDefault();
+        Assert.IsNotNull(mediaPickerTwoOutput);
+        Assert.AreEqual(mediaPickerTwoContent.Key, mediaPickerTwoOutput.Id);
+        Assert.AreEqual(2, mediaPickerTwoOutput.Properties.Count);
+        Assert.AreEqual(56, mediaPickerTwoOutput.Properties["numberOne"]);
+        Assert.AreEqual(78, mediaPickerTwoOutput.Properties["numberTwo"]);
     }
 
     [Test]
@@ -339,6 +386,30 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         Assert.AreEqual(0, nestedContentPickerOutput.Properties.Count);
     }
 
+    [Test]
+    public void OutputExpansionStrategy_MappingContent_ThrowsOnInvalidItemType()
+    {
+        var accessor = CreateOutputExpansionStrategyAccessor();
+        if (accessor.TryGetValue(out IOutputExpansionStrategy outputExpansionStrategy) is false)
+        {
+            Assert.Fail("Could not obtain the output expansion strategy");
+        }
+
+        Assert.Throws<ArgumentException>(() => outputExpansionStrategy.MapContentProperties(PublishedMedia));
+    }
+
+    [Test]
+    public void OutputExpansionStrategy_MappingMedia_ThrowsOnInvalidItemType()
+    {
+        var accessor = CreateOutputExpansionStrategyAccessor();
+        if (accessor.TryGetValue(out IOutputExpansionStrategy outputExpansionStrategy) is false)
+        {
+            Assert.Fail("Could not obtain the output expansion strategy");
+        }
+
+        Assert.Throws<ArgumentException>(() => outputExpansionStrategy.MapMediaProperties(PublishedContent));
+    }
+
     private IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor(bool expandAll = false, string[]? expandPropertyAliases = null)
     {
         var httpContextMock = new Mock<HttpContext>();
@@ -370,6 +441,16 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         RegisterContentWithProviders(content.Object);
     }
 
+    private void SetupMediaMock(Mock<IPublishedContent> media, params IPublishedProperty[] properties)
+    {
+        var key = Guid.NewGuid();
+        var name = "The media";
+        var urlSegment = "media-url-segment";
+        ConfigurePublishedContentMock(media, key, name, urlSegment, _mediaType, properties);
+
+        RegisterMediaWithProviders(media.Object);
+    }
+
     private IPublishedContent CreateSimplePickedContent(int numberOneValue, int numberTwoValue)
     {
         var content = new Mock<IPublishedContent>();
@@ -379,6 +460,17 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
             CreateNumberProperty(content.Object, numberTwoValue, "numberTwo"));
 
         return content.Object;
+    }
+
+    private IPublishedContent CreateSimplePickedMedia(int numberOneValue, int numberTwoValue)
+    {
+        var media = new Mock<IPublishedContent>();
+        SetupMediaMock(
+            media,
+            CreateNumberProperty(media.Object, numberOneValue, "numberOne"),
+            CreateNumberProperty(media.Object, numberTwoValue, "numberTwo"));
+
+        return media.Object;
     }
 
     private IPublishedContent CreateMultiLevelPickedContent(int numberValue, IPublishedContent nestedContentPickerValue, string nestedContentPickerPropertyTypeAlias, ApiContentBuilder apiContentBuilder)
@@ -398,6 +490,31 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         var contentPickerPropertyType = SetupPublishedPropertyType(contentPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.ContentPicker);
 
         return new PublishedElementPropertyBase(contentPickerPropertyType, parent, false, PropertyCacheLevel.None, new GuidUdi(Constants.UdiEntityType.Document, pickedContentKey).ToString());
+    }
+
+    private PublishedElementPropertyBase CreateMediaPickerProperty(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
+    {
+        MediaPickerValueConverter mediaPickerValueConverter = new MediaPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IPublishedModelFactory>(), mediaBuilder);
+        var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker, new MediaPickerConfiguration());
+
+        return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString());
+    }
+
+    private PublishedElementPropertyBase CreateMediaPicker3Property(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
+    {
+        var serializer = new JsonNetSerializer();
+        var value = serializer.Serialize(new[]
+        {
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                MediaKey = pickedMediaKey
+            }
+        });
+
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, Mock.Of<IPublishedValueFallback>(), new JsonNetSerializer(), mediaBuilder);
+        var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
+
+        return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, value);
     }
 
     private PublishedElementPropertyBase CreateNumberProperty(IPublishedElement parent, int propertyValue, string propertyTypeAlias)

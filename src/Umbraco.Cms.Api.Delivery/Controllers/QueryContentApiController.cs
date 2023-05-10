@@ -1,13 +1,17 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[ApiVersion("1.0")]
 public class QueryContentApiController : ContentApiControllerBase
 {
     private readonly IApiContentQueryService _apiContentQueryService;
@@ -31,15 +35,23 @@ public class QueryContentApiController : ContentApiControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<IApiContentResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<PagedViewModel<IApiContentResponse>>> Query(
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Query(
         string? fetch,
         [FromQuery] string[] filter,
         [FromQuery] string[] sort,
         int skip = 0,
         int take = 10)
     {
-        PagedModel<Guid> pagedResult = _apiContentQueryService.ExecuteQuery(fetch, filter, sort, skip, take);
+        Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> queryAttempt = _apiContentQueryService.ExecuteQuery(fetch, filter, sort, skip, take);
+
+        if (queryAttempt.Success is false)
+        {
+            return ApiContentQueryOperationStatusResult(queryAttempt.Status);
+        }
+
+        PagedModel<Guid> pagedResult = queryAttempt.Result;
         IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(pagedResult.Items);
         IApiContentResponse[] apiContentItems = contentItems.Select(ApiContentResponseBuilder.Build).ToArray();
 
