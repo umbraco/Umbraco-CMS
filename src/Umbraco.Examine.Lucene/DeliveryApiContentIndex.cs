@@ -48,22 +48,35 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
     /// <param name="onComplete"></param>
     protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs>? onComplete)
     {
+        var removedIndexIds = new List<string>();
         var removedContentIds = new List<string>();
         foreach (var itemId in itemIds)
         {
+            // if this item was already removed as a descendant of a previously removed item, skip it
+            if (removedIndexIds.Contains(itemId))
+            {
+                continue;
+            }
+
             // an item ID passed to this method can be a composite of content ID and culture (like "1234|da-DK") or simply a content ID
             // - when it's a composite ID, only the supplied culture of the given item should be deleted from the index
             // - when it's an content ID, all cultures of the of the given item should be deleted from the index
             var (contentId, culture) = ParseItemId(itemId);
-            if (contentId == null || removedContentIds.Contains(contentId))
+            if (contentId is null)
             {
                 _logger.LogWarning("Could not parse item ID; expected integer or composite ID, got: {itemId}", itemId);
                 continue;
             }
 
+            // if this item was already removed as a descendant of a previously removed item (for all cultures), skip it
+            if (culture is null && removedContentIds.Contains(contentId))
+            {
+                continue;
+            }
+
             // find descendants-or-self based on path and optional culture
             var rawQuery = $"({UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId} OR {UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId},*)";
-            if (culture != null)
+            if (culture is not null)
             {
                 rawQuery = $"{rawQuery} AND culture:{culture}";
             }
@@ -82,7 +95,11 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
             var indexIds = results.Select(x => x.Id).ToList();
 
             // remember which items we removed, so we can skip those later
-            removedContentIds.AddRange(indexIds.Select(indexId => ParseItemId(indexId).ContentId).WhereNotNull());
+            removedIndexIds.AddRange(indexIds);
+            if (culture is null)
+            {
+                removedContentIds.AddRange(indexIds.Select(indexId => ParseItemId(indexId).ContentId).WhereNotNull());
+            }
 
             // delete the resulting items from the index
             base.PerformDeleteFromIndex(indexIds, null);
