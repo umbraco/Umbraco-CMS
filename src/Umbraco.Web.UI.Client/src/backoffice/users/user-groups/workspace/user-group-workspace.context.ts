@@ -24,8 +24,6 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	async load(id: string) {
-		console.log('load');
-
 		const { data } = await this.repository.requestById(id);
 		if (data) {
 			this.setIsNew(false);
@@ -55,8 +53,13 @@ export class UmbUserGroupWorkspaceContext
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 	}
+
 	destroy(): void {
-		throw new Error('Method not implemented.');
+		this.#data.complete();
+	}
+
+	async delete(id: string) {
+		await this.repository.delete(id);
 	}
 
 	updateProperty<Alias extends keyof UserGroupPresentationModel>(

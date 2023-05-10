@@ -79,7 +79,13 @@ export class UmbUserGroupRepository
 		return { data, error };
 	}
 
-	delete(id: string): Promise<UmbRepositoryErrorResponse> {
-		throw new Error('Method not implemented.');
+	async delete(id: string): Promise<UmbRepositoryErrorResponse> {
+		if (!id) throw new Error('UserGroup id is missing');
+
+		const { error } = await this.#detailSource.delete(id);
+
+		//TODO Update store
+
+		return { error };
 	}
 }

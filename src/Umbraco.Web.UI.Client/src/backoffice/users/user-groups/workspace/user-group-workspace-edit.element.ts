@@ -2,23 +2,24 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { UserGroupDetails } from '../types';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../users/components/user-input/user-input.element';
 import '../../../shared/components/input-section/input-section.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-user-group-workspace-edit')
 export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	@state()
-	private _userGroup?: UserGroupDetails;
+	private _userGroup?: UserGroupPresentationModel;
 
 	@state()
 	private _userKeys?: Array<string>;
 
 	#workspaceContext?: UmbUserGroupWorkspaceContext;
+	#modalContext?: UmbModalContext;
 
 	constructor() {
 		super();
@@ -26,6 +27,10 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbUserGroupWorkspaceContext;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup as any));
+		});
+
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
 		});
 	}
 
@@ -35,8 +40,30 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		//this._workspaceContext.setUsers();
 	}
 
-	#updateSections(value: string[]) {
+	#onSectionsChange(value: string[]) {
+		console.log('va', value);
+
 		this.#workspaceContext?.updateProperty('sections', value);
+	}
+
+	async #onDelete() {
+		if (!this.#modalContext || !this.#workspaceContext) return;
+
+		const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
+			color: 'danger',
+			headline: `Delete user group ${this._userGroup?.name}?`,
+			content: html`Are you sure you want to delete <b>${this._userGroup?.name}</b> user group?`,
+			confirmLabel: 'Delete',
+		});
+
+		await modalHandler.onSubmit();
+
+		if (!this._userGroup || !this._userGroup.id) return;
+
+		await this.#workspaceContext.delete(this._userGroup?.id);
+		//TODO: should we check if it actually succeeded in deleting the user group?
+
+		history.pushState(null, '', 'section/users/view/user-groups');
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -86,8 +113,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 				<umb-workspace-property-layout label="Sections" description="Add sections to give users access">
 					<umb-input-section
 						slot="editor"
-						.value=${this._userGroup.sections}
-						@change=${(e: any) => this.#updateSections(e.target.value)}></umb-input-section>
+						.value=${this._userGroup.sections ?? []}
+						@change=${(e: any) => this.#onSectionsChange(e.target.value)}></umb-input-section>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
 					label="Content start node"
@@ -122,11 +149,18 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 
 	#renderRightColumn() {
 		return html`<uui-box>
-			<div slot="headline">Users</div>
-			<umb-input-user
-				@change=${(e: Event) => this.#onUsersChange((e.target as any).value)}
-				.value=${this._userKeys || []}></umb-input-user>
-		</uui-box>`;
+				<div slot="headline">Users</div>
+				<umb-user-input @change=${(e: Event) => this.#onUsersChange((e.target as any).value)}></umb-user-input>
+			</uui-box>
+			<uui-box>
+				<div slot="headline">Delete user group</div>
+				<uui-button
+					@click=${this.#onDelete}
+					style="width: 100%"
+					color="danger"
+					look="secondary"
+					label="Delete"></uui-button>
+			</uui-box>`;
 	}
 
 	static styles = [
@@ -148,7 +182,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 			}
-			#left-column {
+			#left-column,
+			#right-column {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-4);
