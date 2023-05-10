@@ -1,10 +1,9 @@
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDocumentRepository } from '../repository/document.repository';
 import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
 import { UmbWorkspaceVariableEntityContextInterface } from '../../../core/components/workspace/workspace-context/workspace-variable-entity-context.interface';
-import { UmbVariantId } from '../../../core/variants/variant-id.class';
-import { UmbWorkspaceSplitViewManager } from '../../../core/components/workspace/workspace-context/workspace-split-view-manager.class';
-import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbWorkspaceContext, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	partialUpdateFrozenArray,

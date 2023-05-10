@@ -15,7 +15,19 @@ export const manifest: ManifestPropertyEditorUI = {
 				{
 					alias: 'rows',
 					label: 'Number of rows',
-					description: 'If empty - 10 rows would be set as the default value',
+					description: 'If empty the textarea is set to autoheight',
+					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+				},
+				{
+					alias: 'minHeight',
+					label: 'Min height (pixels)',
+					description: 'Sets the minimum height of the textarea',
+					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+				},
+				{
+					alias: 'maxHeight',
+					label: 'Max height (pixels)',
+					description: 'Sets the maximum height of the textarea',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
 				},
 			],

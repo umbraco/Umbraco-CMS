@@ -15,10 +15,10 @@ export class DocumentBlueprintResource {
      * @throws ApiError
      */
     public static getDocumentBlueprintItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<DocumentBlueprintResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DocumentBlueprintResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document-blueprint/item',
@@ -33,12 +33,12 @@ id?: Array<string>,
      * @throws ApiError
      */
     public static getTreeDocumentBlueprintRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedDocumentBlueprintTreeItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedDocumentBlueprintTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document-blueprint/root',

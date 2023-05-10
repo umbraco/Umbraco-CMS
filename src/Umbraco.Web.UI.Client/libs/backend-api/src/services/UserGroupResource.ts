@@ -1,11 +1,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PagedUserGroupPresentationModel } from '../models/PagedUserGroupPresentationModel';
-import type { SaveUserGroupRequestModel } from '../models/SaveUserGroupRequestModel';
+import type { CreateUserGroupRequestModel } from '../models/CreateUserGroupRequestModel';
+import type { PagedUserGroupResponseModel } from '../models/PagedUserGroupResponseModel';
 import type { UpdateUserGroupRequestModel } from '../models/UpdateUserGroupRequestModel';
 import type { UserGroupItemResponseModel } from '../models/UserGroupItemResponseModel';
-import type { UserGroupPresentationModel } from '../models/UserGroupPresentationModel';
+import type { UserGroupResponseModel } from '../models/UserGroupResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -18,10 +18,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static postUserGroup({
-requestBody,
-}: {
-requestBody?: SaveUserGroupRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateUserGroupRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user-group',
@@ -35,16 +35,16 @@ requestBody?: SaveUserGroupRequestModel,
     }
 
     /**
-     * @returns PagedUserGroupPresentationModel Success
+     * @returns PagedUserGroupResponseModel Success
      * @throws ApiError
      */
     public static getUserGroup({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedUserGroupPresentationModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedUserGroupResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group',
@@ -60,10 +60,10 @@ take?: number,
      * @throws ApiError
      */
     public static getUserGroupById({
-id,
-}: {
-id: string,
-}): CancelablePromise<UserGroupPresentationModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<UserGroupResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -81,10 +81,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteUserGroupById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -102,12 +102,12 @@ id: string,
      * @throws ApiError
      */
     public static putUserGroupById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateUserGroupRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateUserGroupRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -127,10 +127,10 @@ requestBody?: UpdateUserGroupRequestModel,
      * @throws ApiError
      */
     public static getUserGroupItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<UserGroupItemResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserGroupItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group/item',

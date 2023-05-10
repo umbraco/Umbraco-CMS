@@ -1,30 +1,51 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextareaElement } from '@umbraco-ui/uui';
-import {
-	UmbWorkspacePropertyContext,
-	UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN,
-} from '../../../components/workspace-property/workspace-property.context';
+import { ifDefined } from 'lit/directives/if-defined.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
 	@property()
 	value = '';
 
+	@state()
+	private _maxChars?: number;
+
+	@state()
+	private _rows?: number;
+
+	@state()
+	private _maxheight?: number;
+
+	@state()
+	private _minheight?: number;
+
+	@state()
+	private _css?: any;
+
 	@property({ type: Array, attribute: false })
-	config = [];
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
+		const maxChars = config.find((x) => x.alias === 'maxChars');
+		if (maxChars) this._maxChars = maxChars.value;
 
-	private propertyContext?: UmbWorkspacePropertyContext<string>;
+		const rows = config.find((x) => x.alias === 'rows');
+		if (rows) this._rows = rows.value;
 
-	constructor() {
-		super();
+		const minheight = config.find((x) => x.alias === 'minHeight');
+		if (minheight) this._minheight = minheight.value;
 
-		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (instance: UmbWorkspacePropertyContext<string>) => {
-			this.propertyContext = instance;
-		});
+		const maxheight = config.find((x) => x.alias === 'maxHeight');
+		if (maxheight) this._maxheight = maxheight.value;
+
+		this._css = {
+			'--uui-textarea-min-height': `${this._minheight ? `${this._minheight}px` : 'reset'}`,
+			'--uui-textarea-max-height': `${this._maxheight ? `${this._maxheight}px` : 'reset'}`,
+		};
 	}
 
 	private onInput(e: InputEvent) {
@@ -32,8 +53,17 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
+	//TODO: uui-textarea needs a rows property
+
 	render() {
-		return html` <uui-textarea .value=${this.value} @input=${this.onInput}></uui-textarea>`;
+		return html` <uui-textarea
+			label="Textarea"
+			.value=${this.value}
+			maxlength="${ifDefined(this._maxChars)}"
+			rows="${ifDefined(this._rows)}"
+			@input=${this.onInput}
+			style="${styleMap(this._css)}"
+			autoheight="${this._rows ? false : true}"></uui-textarea>`;
 	}
 
 	static styles = [
