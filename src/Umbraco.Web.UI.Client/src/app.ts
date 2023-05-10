@@ -40,7 +40,7 @@ export class UmbAppElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	// TODO: get from server config
-	private backofficePath = import.meta.env.DEV ? '' : '/umbraco';
+	private backofficePath = import.meta.env.DEV ? '/' : '/umbraco';
 
 	private _routes: UmbRoute[] = [
 		{
