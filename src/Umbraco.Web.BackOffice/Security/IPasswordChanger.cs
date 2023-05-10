@@ -15,5 +15,5 @@ public interface IPasswordChanger<TUser> where TUser : UmbracoIdentityUser
     public Task<Attempt<PasswordChangedModel?>> ChangePasswordWithIdentityAsync(
         ChangingPasswordModel passwordModel,
         IUmbracoUserManager<TUser> userMgr,
-        IUser? currentUser);
+        IUser? currentUser) => ChangePasswordWithIdentityAsync(passwordModel, userMgr);
 }
