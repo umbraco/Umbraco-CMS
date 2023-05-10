@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Api.Common.Json;
 
-public class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
+internal class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
 {
     private readonly string _jsonOptionsName;
 
@@ -14,4 +14,18 @@ public class NamedSystemTextJsonInputFormatter : SystemTextJsonInputFormatter
 
     public override bool CanRead(InputFormatterContext context)
         => context.HttpContext.CurrentJsonOptionsName() == _jsonOptionsName && base.CanRead(context);
+
+    public override async Task<InputFormatterResult> ReadAsync(InputFormatterContext context)
+    {
+        try
+        {
+            return await base.ReadAsync(context);
+        }
+        catch (NotSupportedException exception)
+        {
+            // This happens when trying to deserialize to an interface, without sending the $type as part of the request
+            context.ModelState.TryAddModelException(string.Empty, new InputFormatterException(exception.Message, exception));
+            return await InputFormatterResult.FailureAsync();
+        }
+    }
 }

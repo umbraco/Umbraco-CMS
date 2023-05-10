@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[ApiVersion("1.0")]
 public class ByIdContentApiController : ContentApiItemControllerBase
 {
     public ByIdContentApiController(
