@@ -215,7 +215,7 @@
                             scope.sortableRequestedTabTimeout = $timeout(() => {
                                 scope.openTabAlias = scope.sortableRequestedTabAlias;
                                 scope.sortableRequestedTabTimeout = null;
-                                /* hack to update sortable positions when switching from one tab to another. 
+                                /* hack to update sortable positions when switching from one tab to another.
                                 without this sorting direct properties doesn't work correctly */
                                 scope.$apply();
                                 $('.umb-group-builder__ungrouped-properties .umb-group-builder__properties').sortable('refresh');
@@ -238,7 +238,7 @@
                 if (items && items.length <= 1) {
                     return;
                 }
-                
+
                 // update the moved item sort order to fit into where it is dragged
                 const movedItem = items[movedIndex];
 
@@ -250,8 +250,8 @@
                     movedItem.sortOrder = prevItem.sortOrder + 1;
                 }
 
-                /* After the above two items next to each other might have the same sort order 
-                 to prevent this we run through the rest of the 
+                /* After the above two items next to each other might have the same sort order
+                 to prevent this we run through the rest of the
                  items and update the sort order if they are next to each other.
                  This will make it possible to make gaps without the number being updated */
                 for (let i = movedIndex; i < items.length; i++) {
@@ -289,7 +289,7 @@
                 });
 
                 //use a different resource lookup depending on the content type type
-                var resourceLookup = mediaTypeResource.getAvailableCompositeContentTypes;;
+                var resourceLookup = mediaTypeResource.getAvailableCompositeContentTypes;
                 if (scope.contentType === "documentType") {
                     resourceLookup = contentTypeResource.getAvailableCompositeContentTypes;
                 } else if (scope.contentType === "memberType") {
@@ -411,7 +411,7 @@
                             //merge composition with content type
 
                             //use a different resource lookup depending on the content type type
-                            var resourceLookup = mediaTypeResource.getById;;
+                            var resourceLookup = mediaTypeResource.getById;
                             if (scope.contentType === "documentType") {
                                 resourceLookup = contentTypeResource.getById;
                             } else if (scope.contentType === "memberType") {
@@ -567,7 +567,7 @@
 
                 const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteTabNotice']);
                 const localize =  localizationService.localize('contentTypeEditor_confirmDeleteTabMessage',  [tabName]);
-                
+
                 $q.all([localizeMany, localize]).then(values => {
                     const translations = values[0];
                     const message = values[1];
@@ -771,7 +771,7 @@
 
                 const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteGroupNotice']);
                 const localize =  localizationService.localize('contentTypeEditor_confirmDeleteGroupMessage',  [groupName]);
-                
+
                 $q.all([localizeMany, localize]).then(values => {
                     const translations = values[0];
                     const message = values[1];

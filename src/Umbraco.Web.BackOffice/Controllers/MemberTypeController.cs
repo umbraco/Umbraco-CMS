@@ -152,16 +152,17 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     ///     be looked up via the db, they need to be passed in.
     /// </param>
     /// <returns></returns>
-    [HttpPost]
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-    public IActionResult GetAvailableCompositeMemberTypes(GetAvailableCompositionsFilter filter)
+    public IActionResult GetAvailableCompositeMemberTypes(
+        int contentTypeId,
+        [FromQuery] string[] filterContentTypes,
+        [FromQuery] string[] filterPropertyTypes)
     {
         ActionResult<IEnumerable<Tuple<EntityBasic?, bool>>> actionResult = PerformGetAvailableCompositeContentTypes(
-            filter.ContentTypeId,
+            contentTypeId,
             UmbracoObjectTypes.MemberType,
-            filter.FilterContentTypes,
-            filter.FilterPropertyTypes,
-            filter.IsElement);
+            filterContentTypes,
+            filterPropertyTypes,
+            false);
 
         if (!(actionResult.Result is null))
         {
@@ -180,9 +181,7 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     /// </summary>
     /// <param name="filter"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-    public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
+    public IActionResult GetWhereCompositionIsUsedInMemberTypes(GetAvailableCompositionsFilter filter)
     {
         var result =
             PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MemberType).Value?
