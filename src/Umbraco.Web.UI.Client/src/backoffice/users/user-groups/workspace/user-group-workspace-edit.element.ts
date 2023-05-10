@@ -2,7 +2,6 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
 import type { UserGroupDetails } from '../types';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -20,63 +19,62 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	private _userKeys?: Array<string>;
 
 	#workspaceContext?: UmbUserGroupWorkspaceContext;
-	#defaultPermissions = tempDefaultPermissions;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbUserGroupWorkspaceContext;
-			this.#observeUserGroup();
+			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup as any));
 		});
 	}
 
-	#observeUserGroup() {
-		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup as any));
-	}
-
-	private _updateUserKeys(userKeys: Array<string>) {
+	#onUsersChange(userKeys: Array<string>) {
 		this._userKeys = userKeys;
 		// TODO: make a method on the UmbWorkspaceUserGroupContext:
 		//this._workspaceContext.setUsers();
 	}
 
-	private _updatePermission(permission: { name: string; description: string; value: boolean }) {
-		if (!this.#workspaceContext) return;
+	#updateSections(value: string[]) {
+		this.#workspaceContext?.updateProperty('sections', value);
+	}
 
-		const checkValue = this._checkPermission(permission);
-		//const selectedPermissions = this._workspaceContext.getData().permissions;
-		// TODO: make a method on the UmbWorkspaceUserGroupContext:
-		//const selectedPermissions = this._workspaceContext.getPermissions();
+	#onNameChange(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
 
-		/*
-		let newPermissions = [];
-		if (checkValue === false) {
-			newPermissions = [...selectedPermissions, permission.name];
-		} else {
-			newPermissions = selectedPermissions.filter((p) => p !== permission.name);
+			if (typeof target?.value === 'string') {
+				this.#workspaceContext?.updateProperty('name', target.value);
+			}
 		}
-		*/
-
-		//this._updateProperty('permissions', newPermissions);
-		// TODO: make a method on the UmbWorkspaceUserGroupContext:
-		//this._workspaceContext.setPermissions();
 	}
 
-	private _checkPermission(permission: { name: string; description: string; value: boolean }) {
-		if (!this.#workspaceContext) return false;
+	render() {
+		if (!this._userGroup) return nothing;
 
-		//return this._workspaceContext.getPermissions().includes(permission.name);
-		return false;
+		return html`
+			<umb-workspace-editor alias="Umb.Workspace.UserGroup">
+				${this.#renderHeader()}
+				<div id="main">
+					<div id="left-column">${this.#renderLeftColumn()}</div>
+					<div id="right-column">${this.#renderRightColumn()}</div>
+				</div>
+			</umb-workspace-editor>
+		`;
 	}
 
-	private _updateSections(value: string[]) {
-		console.log('To be done');
-		//this._workspaceContext.setSections(value);
+	#renderHeader() {
+		return html`
+			<div id="header" slot="header">
+				<a href="/section/users/view/user-groups">
+					<uui-icon name="umb:arrow-left"></uui-icon>
+				</a>
+				<uui-input id="name" .value=${this._userGroup?.name ?? ''} @input="${this.#onNameChange}"></uui-input>
+			</div>
+		`;
 	}
 
-	private renderLeftColumn() {
+	#renderLeftColumn() {
 		if (!this._userGroup) return nothing;
 
 		return html` <uui-box>
@@ -85,7 +83,7 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections}
-						@change=${(e: any) => this._updateSections(e.target.value)}></umb-input-section>
+						@change=${(e: any) => this.#updateSections(e.target.value)}></umb-input-section>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
 					label="Content start node"
@@ -109,80 +107,22 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 
 			<uui-box>
 				<div slot="headline">Default Permissions</div>
-				<div id="default-permissions">
-					${repeat(
-						this.#defaultPermissions,
-						(defaultPermission) => html`
-							<div>
-								<b>${defaultPermission.name}</b>
-								${repeat(
-									defaultPermission.permissions,
-									(permission) => html`
-										<div class="default-permission">
-											<uui-toggle
-												.checked=${this._checkPermission(permission)}
-												@change=${() => this._updatePermission(permission)}></uui-toggle>
-											<div class="permission-info">
-												<b>${permission.name}</b>
-												<span class="faded-text">${permission.description}</span>
-											</div>
-										</div>
-									`
-								)}
-							</div>
-						`
-					)}
-				</div>
+				<b>PERMISSIONS NOT IMPLEMENTED YET</b>
 			</uui-box>
 
 			<uui-box>
 				<div slot="headline">Granular permissions</div>
+				<b>PERMISSIONS NOT IMPLEMENTED YET</b>
 			</uui-box>`;
 	}
 
-	private renderRightColumn() {
+	#renderRightColumn() {
 		return html`<uui-box>
 			<div slot="headline">Users</div>
 			<umb-input-user
-				@change=${(e: Event) => this._updateUserKeys((e.target as any).value)}
+				@change=${(e: Event) => this.#onUsersChange((e.target as any).value)}
 				.value=${this._userKeys || []}></umb-input-user>
 		</uui-box>`;
-	}
-
-	// TODO. find a way where we don't have to do this for all workspaces.
-	#onNameChange(event: UUIInputEvent) {
-		if (event instanceof UUIInputEvent) {
-			const target = event.composedPath()[0] as UUIInputElement;
-
-			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.updateProperty('name', target.value);
-			}
-		}
-	}
-
-	render() {
-		if (!this._userGroup) return nothing;
-
-		return html`
-			<umb-workspace-editor alias="Umb.Workspace.UserGroup">
-				${this.#renderHeader()}
-				<div id="main">
-					<div id="left-column">${this.renderLeftColumn()}</div>
-					<div id="right-column">${this.renderRightColumn()}</div>
-				</div>
-			</umb-workspace-editor>
-		`;
-	}
-
-	#renderHeader() {
-		return html`
-			<div id="header" slot="header">
-				<a href="/section/users/view/user-groups">
-					<uui-icon name="umb:arrow-left"></uui-icon>
-				</a>
-				<uui-input id="name" .value=${this._userGroup?.name ?? ''} @input="${this.#onNameChange}"></uui-input>
-			</div>
-		`;
 	}
 
 	static styles = [
@@ -222,151 +162,9 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 			uui-input {
 				width: 100%;
 			}
-			.faded-text {
-				color: var(--uui-color-text-alt);
-				font-size: 0.8rem;
-			}
-			#default-permissions {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-4);
-			}
-			.default-permission {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-4);
-				padding: var(--uui-size-space-2);
-			}
-			.default-permission:not(:last-child) {
-				border-bottom: 1px solid var(--uui-color-divider);
-			}
-			.permission-info {
-				display: flex;
-				flex-direction: column;
-			}
 		`,
 	];
 }
-
-// TEMP MOCK DATA
-type TempPermissionGroup = {
-	name: string;
-	permissions: Array<TempPermission>;
-};
-
-type TempPermission = {
-	name: string;
-	description: string;
-	value: boolean;
-};
-
-const tempDefaultPermissions: Array<TempPermissionGroup> = [
-	{
-		name: 'Administration',
-		permissions: [
-			{
-				name: 'Culture and Hostnames',
-				description: 'Allow access to assign culture and hostnames',
-				value: false,
-			},
-			{
-				name: 'Restrict Public Access',
-				description: 'Allow access to set and change access restrictions for a node',
-				value: false,
-			},
-			{
-				name: 'Rollback',
-				description: 'Allow access to roll back a node to a previous state',
-				value: false,
-			},
-		],
-	},
-	{
-		name: 'Content',
-		permissions: [
-			{
-				name: 'Browse Node',
-				description: 'Allow access to view a node',
-				value: false,
-			},
-			{
-				name: 'Create Content Template',
-				description: 'Allow access to create a Content Template',
-				value: false,
-			},
-			{
-				name: 'Delete',
-				description: 'Allow access to delete nodes',
-				value: false,
-			},
-			{
-				name: 'Create',
-				description: 'Allow access to create nodes',
-				value: false,
-			},
-			{
-				name: 'Publish',
-				description: 'Allow access to publish nodes',
-				value: false,
-			},
-			{
-				name: 'Permissions',
-				description: 'Allow access to change permissions for a node',
-				value: false,
-			},
-			{
-				name: 'Send To Publish',
-				description: 'Allow access to send a node for approval before publishing',
-				value: false,
-			},
-			{
-				name: 'Unpublish',
-				description: 'Allow access to unpublish a node',
-				value: false,
-			},
-			{
-				name: 'Update',
-				description: 'Allow access to save a node',
-				value: false,
-			},
-			{
-				name: 'Full restore',
-				description: 'Allow the user to restore items',
-				value: false,
-			},
-			{
-				name: 'Partial restore',
-				description: 'Allow the user to partial restore items',
-				value: false,
-			},
-			{
-				name: 'Queue for transfer',
-				description: 'Allow the user to queue item(s)',
-				value: false,
-			},
-		],
-	},
-	{
-		name: 'Structure',
-		permissions: [
-			{
-				name: 'Copy',
-				description: 'Allow access to copy a node',
-				value: false,
-			},
-			{
-				name: 'Move',
-				description: 'Allow access to move a node',
-				value: false,
-			},
-			{
-				name: 'Sort',
-				description: 'Allow access to change the sort order for nodes',
-				value: false,
-			},
-		],
-	},
-];
 
 export default UmbUserGroupWorkspaceEditElement;
 
