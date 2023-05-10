@@ -4,7 +4,5 @@ public sealed class SortOption
 {
     public required string FieldName { get; set; }
 
-    public Direction Direction { get; set; }
-
-    public FieldType FieldType { get; set; }
+    public required Direction Direction { get; set; }
 }

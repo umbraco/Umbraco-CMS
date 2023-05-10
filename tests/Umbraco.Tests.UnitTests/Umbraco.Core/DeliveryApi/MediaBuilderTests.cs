@@ -21,19 +21,21 @@ public class MediaBuilderTests : DeliveryApiTests
             {
                 { Constants.Conventions.Media.Width, 111 },
                 { Constants.Conventions.Media.Height, 222 },
-                { Constants.Conventions.Media.Extension, ".my-ext" }
+                { Constants.Conventions.Media.Extension, ".my-ext" },
+                { Constants.Conventions.Media.Bytes, 333 }
             });
 
-        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
         Assert.NotNull(result);
         Assert.AreEqual("The media", result.Name);
         Assert.AreEqual("theMediaType", result.MediaType);
         Assert.AreEqual("media-url:media-url-segment", result.Url);
-        Assert.AreEqual(3, result.Properties.Count);
-        Assert.AreEqual(111, result.Properties[Constants.Conventions.Media.Width]);
-        Assert.AreEqual(222, result.Properties[Constants.Conventions.Media.Height]);
-        Assert.AreEqual(".my-ext", result.Properties[Constants.Conventions.Media.Extension]);
+        Assert.AreEqual(key, result.Id);
+        Assert.AreEqual(111, result.Width);
+        Assert.AreEqual(222, result.Height);
+        Assert.AreEqual(".my-ext", result.Extension);
+        Assert.AreEqual(333, result.Bytes);
     }
 
     [Test]
@@ -46,7 +48,7 @@ public class MediaBuilderTests : DeliveryApiTests
             new Dictionary<string, object>()
         );
 
-        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
         Assert.NotNull(result);
         Assert.IsEmpty(result.Properties);
@@ -61,7 +63,7 @@ public class MediaBuilderTests : DeliveryApiTests
             "media-url-segment",
             new Dictionary<string, object> { { "myProperty", 123 }, { "anotherProperty", "A value goes here" } });
 
-        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), CreateOutputExpansionStrategyAccessor());
+        var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(media);
         Assert.NotNull(result);
         Assert.AreEqual(2, result.Properties.Count);
@@ -76,7 +78,7 @@ public class MediaBuilderTests : DeliveryApiTests
         var mediaType = new Mock<IPublishedContentType>();
         mediaType.SetupGet(c => c.Alias).Returns("theMediaType");
 
-        var mediaProperties = properties.Select(kvp => SetupProperty(kvp.Key, kvp.Value, media.Object)).ToArray();
+        var mediaProperties = properties.Select(kvp => SetupProperty(kvp.Key, kvp.Value)).ToArray();
 
         media.SetupGet(c => c.Properties).Returns(mediaProperties);
         media.SetupGet(c => c.UrlSegment).Returns(urlSegment);
@@ -89,7 +91,7 @@ public class MediaBuilderTests : DeliveryApiTests
         return media.Object;
     }
 
-    private IPublishedProperty SetupProperty<T>(string alias, T value, IPublishedContent media)
+    private IPublishedProperty SetupProperty<T>(string alias, T value)
     {
         var propertyMock = new Mock<IPublishedProperty>();
         propertyMock.SetupGet(p => p.Alias).Returns(alias);

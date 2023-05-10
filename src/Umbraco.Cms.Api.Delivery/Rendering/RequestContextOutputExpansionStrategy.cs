@@ -22,14 +22,33 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
     }
 
     public IDictionary<string, object?> MapElementProperties(IPublishedElement element)
-        => MapProperties(element.Properties);
-
-    public IDictionary<string, object?> MapProperties(IEnumerable<IPublishedProperty> properties)
-        => properties.ToDictionary(
+        => element.Properties.ToDictionary(
             p => p.Alias,
             p => p.GetDeliveryApiValue(_state == ExpansionState.Expanding));
 
     public IDictionary<string, object?> MapContentProperties(IPublishedContent content)
+        => content.ItemType == PublishedItemType.Content
+            ? MapProperties(content.Properties)
+            : throw new ArgumentException($"Invalid item type. This method can only be used with item type {nameof(PublishedItemType.Content)}, got: {content.ItemType}");
+
+    public IDictionary<string, object?> MapMediaProperties(IPublishedContent media, bool skipUmbracoProperties = true)
+    {
+        if (media.ItemType != PublishedItemType.Media)
+        {
+            throw new ArgumentException($"Invalid item type. This method can only be used with item type {PublishedItemType.Media}, got: {media.ItemType}");
+        }
+
+        IPublishedProperty[] properties = media
+            .Properties
+            .Where(p => skipUmbracoProperties is false || p.Alias.StartsWith("umbraco") is false)
+            .ToArray();
+
+        return properties.Any()
+            ? MapProperties(properties)
+            : new Dictionary<string, object?>();
+    }
+
+    private IDictionary<string, object?> MapProperties(IEnumerable<IPublishedProperty> properties)
     {
         // in the initial state, content properties should always be rendered (expanded if the requests dictates it).
         // this corresponds to the root level of a content item, i.e. when the initial content rendering starts.
@@ -37,7 +56,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
         {
             // update state to pending so we don't end up here the next time around
             _state = ExpansionState.Pending;
-            var rendered = content.Properties.ToDictionary(
+            var rendered = properties.ToDictionary(
                 property => property.Alias,
                 property =>
                 {
@@ -63,7 +82,7 @@ internal sealed class RequestContextOutputExpansionStrategy : IOutputExpansionSt
         if (_state == ExpansionState.Expanding)
         {
             _state = ExpansionState.Expanded;
-            var rendered = content.Properties.ToDictionary(
+            var rendered = properties.ToDictionary(
                 property => property.Alias,
                 property => property.GetDeliveryApiValue(false));
             _state = ExpansionState.Expanding;

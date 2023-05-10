@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
+using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Api.Delivery.Json;
 using Umbraco.Cms.Api.Delivery.Rendering;
 using Umbraco.Cms.Api.Delivery.Services;
@@ -27,6 +28,9 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestStartItemProviderAccessor, RequestContextRequestStartItemProviderAccessor>();
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, ApiContentQueryService>();
+
+        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
+        builder.AddUmbracoApiOpenApiUI();
 
         builder
             .Services

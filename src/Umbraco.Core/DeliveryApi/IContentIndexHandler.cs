@@ -12,8 +12,9 @@ public interface IContentIndexHandler : IDiscoverable
     ///     Calculates the field values for a given content item.
     /// </summary>
     /// <param name="content">The content item.</param>
+    /// <param name="culture">The culture to retrieve the field values for (null if the content does not vary by culture).</param>
     /// <returns>The values to add to the index.</returns>
-    IEnumerable<IndexFieldValue> GetFieldValues(IContent content);
+    IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture);
 
     /// <summary>
     ///     Returns the field definitions required to support the field values in the index.

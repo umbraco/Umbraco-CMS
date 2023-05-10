@@ -56,11 +56,11 @@ public class DeliveryApiTests
         DefaultPropertyType = SetupPublishedPropertyType(defaultPropertyValueConverter.Object, "default", "Default.Editor");
     }
 
-    protected IPublishedPropertyType SetupPublishedPropertyType(IPropertyValueConverter valueConverter, string propertyTypeAlias, string editorAlias)
+    protected IPublishedPropertyType SetupPublishedPropertyType(IPropertyValueConverter valueConverter, string propertyTypeAlias, string editorAlias, object? dataTypeConfiguration = null)
     {
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(It.IsAny<int>()))
-            .Returns(new PublishedDataType(123, editorAlias, new Lazy<object>()));
+            .Returns(new PublishedDataType(123, editorAlias, new Lazy<object>(() => dataTypeConfiguration)));
 
         var publishedPropType = new PublishedPropertyType(
             propertyTypeAlias,
@@ -100,7 +100,7 @@ public class DeliveryApiTests
             });
         content.SetupGet(c => c.ContentType).Returns(contentType);
         content.SetupGet(c => c.Properties).Returns(properties);
-        content.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
+        content.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
     }
 
     protected string DefaultUrlSegment(string name, string? culture = null)
