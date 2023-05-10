@@ -16,8 +16,6 @@ export class UmbUserWorkspaceContext
 	data = this.#data.asObservable();
 
 	async load(id: string) {
-		console.log('load');
-
 		const { data } = await this.repository.requestById(id);
 		if (data) {
 			this.setIsNew(false);

@@ -5,7 +5,6 @@ import {
 	UserGroupResource,
 	UpdateUserGroupRequestModel,
 	SaveUserGroupRequestModel,
-	UserGroupBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -28,6 +27,7 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 		this.#host = host;
 	}
 
+	//TODO should parentId be optional in the generic interface?
 	async createScaffold(parentId: string | null) {
 		const data: SaveUserGroupRequestModel = {
 			name: '',
