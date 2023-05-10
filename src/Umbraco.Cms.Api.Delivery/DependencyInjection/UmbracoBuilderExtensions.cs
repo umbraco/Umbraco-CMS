@@ -28,14 +28,8 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, ApiContentQueryService>();
 
-        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
-        builder.Services.AddApiVersioning();
-        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
-        builder.Services.AddVersionedApiExplorer();
-
         builder
             .Services
-            .ConfigureOptions<ConfigureMvcOptions>()
             .AddControllers()
             .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
             {
