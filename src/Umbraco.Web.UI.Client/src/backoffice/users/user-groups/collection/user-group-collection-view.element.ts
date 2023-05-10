@@ -5,6 +5,7 @@ import {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
+	UmbTableElement,
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '../../../shared/components/table';
@@ -100,12 +101,16 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 
 	private _handleSelected(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
-		console.log('HANDLE SELECT');
+		const table = event.target as UmbTableElement;
+		const selection = table.selection;
+		this.#collectionContext?.setSelection(selection);
 	}
 
 	private _handleDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
-		console.log('HANDLE DESELECT');
+		const table = event.target as UmbTableElement;
+		const selection = table.selection;
+		this.#collectionContext?.setSelection(selection);
 	}
 
 	render() {
