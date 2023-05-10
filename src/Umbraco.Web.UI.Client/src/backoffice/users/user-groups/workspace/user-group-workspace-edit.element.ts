@@ -69,7 +69,11 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 				<a href="/section/users/view/user-groups">
 					<uui-icon name="umb:arrow-left"></uui-icon>
 				</a>
-				<uui-input id="name" .value=${this._userGroup?.name ?? ''} @input="${this.#onNameChange}"></uui-input>
+				<uui-input
+					id="name"
+					label="name"
+					.value=${this._userGroup?.name ?? ''}
+					@input="${this.#onNameChange}"></uui-input>
 			</div>
 		`;
 	}
