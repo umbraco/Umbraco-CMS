@@ -9,7 +9,6 @@ import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 @customElement('umb-button-with-dropdown')
 export class UmbButtonWithDropdownElement extends LitElement {
 	
-
 	@property()
 	label = '';
 
@@ -24,6 +23,9 @@ export class UmbButtonWithDropdownElement extends LitElement {
 
 	@property()
 	placement: PopoverPlacement = 'bottom-start';
+
+	@property({ type: Boolean })
+	compact = false;
 
 	@query('#symbol-expand')
 	symbolExpand!: UUISymbolExpandElement;
@@ -55,6 +57,7 @@ export class UmbButtonWithDropdownElement extends LitElement {
 					.look=${this.look}
 					.color=${this.color}
 					.label=${this.label}
+					.compact=${this.compact}
 					id="myPopoverBtn"
 					@click=${this.#togglePopover}>
 					<slot></slot>
