@@ -4,7 +4,7 @@ import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repos
 
 //TODO Pass proper models
 export class UmbPartialViewDetailServerDataSource
-	implements UmbDataSource<PartialViewDetails, PartialViewDetails, PartialViewDetails>
+	implements UmbDataSource<PartialViewDetails, PartialViewDetails, PartialViewDetails, PartialViewDetails>
 {
 	#host: UmbControllerHostElement;
 

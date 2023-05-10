@@ -1,9 +1,5 @@
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspace,
-	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestWorkspace, ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
@@ -14,8 +10,6 @@ const workspace: ManifestWorkspace = {
 		entityType: 'partial-view',
 	},
 };
-
-const workspaceViews: Array<ManifestWorkspaceView> = [];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
@@ -35,4 +29,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceActions];

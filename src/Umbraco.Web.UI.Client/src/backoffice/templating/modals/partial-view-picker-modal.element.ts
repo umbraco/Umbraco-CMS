@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbTreeElement } from '../../shared/components/tree/tree.element';
 import { UmbPartialViewPickerModalData, UmbPartialViewPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbTreeElement } from '@umbraco-cms/backoffice/core/components';
 
 @customElement('umb-partial-view-picker-modal')
 export default class UmbPartialViewPickerModalElement extends UmbModalBaseElement<
@@ -11,7 +11,7 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 	UmbPartialViewPickerModalResult
 > {
 	@state()
-	_selection: Array<string> = [];
+	_selection: Array<string | null> = [];
 
 	@state()
 	_multiple = false;

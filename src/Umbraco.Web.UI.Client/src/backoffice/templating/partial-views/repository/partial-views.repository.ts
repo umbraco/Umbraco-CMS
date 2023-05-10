@@ -7,6 +7,8 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRootEntityModel } from '@umbraco-cms/backoffice/tree';
+import { Observable } from 'rxjs';
 
 export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<any> {
 	#init;
@@ -40,7 +42,27 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 			}),
 		]);
 	}
-	
+
+	requestTreeRoot(): Promise<{ data?: UmbTreeRootEntityModel | undefined; error?: ProblemDetailsModel | undefined }> {
+		throw new Error('Method not implemented.');
+	}
+
+	requestItemsLegacy?:
+		| ((
+				uniques: string[]
+		  ) => Promise<{
+				data?: any[] | undefined;
+				error?: ProblemDetailsModel | undefined;
+				asObservable?: (() => Observable<any[]>) | undefined;
+		  }>)
+		| undefined;
+
+	itemsLegacy?: ((uniques: string[]) => Promise<Observable<any[]>>) | undefined;
+
+	byId(id: string): Promise<Observable<any>> {
+		throw new Error('Method not implemented.');
+	}
+
 	requestById(id: string): Promise<{ data?: any; error?: ProblemDetailsModel | undefined }> {
 		throw new Error('Method not implemented.');
 	}

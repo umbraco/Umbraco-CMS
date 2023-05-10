@@ -19,7 +19,7 @@ const partialViewActions: Array<ManifestEntityAction> = [
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityType: PARTIAL_VIEW_ENTITY_TYPE,
+			entityTypes: [PARTIAL_VIEW_ENTITY_TYPE],
 		},
 	},
 ];
@@ -38,7 +38,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityType: PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
@@ -52,7 +52,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityType: PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		},
 	},
 ];

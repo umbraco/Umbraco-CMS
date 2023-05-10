@@ -25,7 +25,7 @@ export class UmbPartialViewsTreeServerDataSource implements PartialViewsTreeData
 	}) {
 		if (!path) {
 			const error: ProblemDetailsModel = { title: 'Path is missing' };
-			return { error };
+			return  error ;
 		}
 
 		return tryExecuteAndNotify(
@@ -41,7 +41,7 @@ export class UmbPartialViewsTreeServerDataSource implements PartialViewsTreeData
 	async getItem(id: Array<string>) {
 		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Paths are missing' };
-			return { error };
+			return  error ;
 		}
 
 		return tryExecuteAndNotify(
