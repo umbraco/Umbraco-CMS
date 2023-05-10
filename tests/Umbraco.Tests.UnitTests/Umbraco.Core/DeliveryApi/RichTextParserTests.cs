@@ -29,18 +29,19 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void SimpleParagraphHasNoChildElements()
+    public void SimpleParagraphHasSingleTextElement()
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse("<p>Some text paragraph</p>");
+        var element = parser.Parse("<p>Some text paragraph</p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        Assert.IsEmpty(element.Text);
         Assert.AreEqual(1, element.Elements.Count());
-        var paragraph = element.Elements.First();
+        var paragraph = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(paragraph);
         Assert.AreEqual("p", paragraph.Tag);
-        Assert.AreEqual("Some text paragraph", paragraph.Text);
-        Assert.IsEmpty(paragraph.Elements);
+        var textElement = paragraph.Elements.First() as RichTextTextElement;
+        Assert.IsNotNull(textElement);
+        Assert.AreEqual("Some text paragraph", textElement.Text);
     }
 
     [Test]
@@ -48,37 +49,44 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse("<p>Some text<br/>More text<br/>Even more text</p>");
+        var element = parser.Parse("<p>Some text<br/>More text<br/>Even more text</p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        Assert.IsEmpty(element.Text);
         Assert.AreEqual(1, element.Elements.Count());
-        var paragraph = element.Elements.First();
+        var paragraph = element.Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(paragraph);
         Assert.AreEqual("p", paragraph.Tag);
-        Assert.IsEmpty(paragraph.Text);
         var paragraphElements = paragraph.Elements.ToArray();
         Assert.AreEqual(5, paragraphElements.Length);
         for (var i = 0; i < paragraphElements.Length; i++)
         {
-            var paragraphElement = paragraphElements[i];
-            Assert.IsEmpty(paragraphElement.Elements);
+            var paragraphElement = paragraphElements[i] as RichTextGenericElement;
+            var textElement = paragraphElements[i] as RichTextTextElement;
             switch (i)
             {
                 case 0:
-                    Assert.AreEqual("#text", paragraphElement.Tag);
-                    Assert.AreEqual("Some text", paragraphElement.Text);
+                    Assert.IsNull(paragraphElement);
+                    Assert.IsNotNull(textElement);
+                    Assert.AreEqual("#text", textElement.Tag);
+                    Assert.AreEqual("Some text", textElement.Text);
                     break;
                 case 2:
-                    Assert.AreEqual("#text", paragraphElement.Tag);
-                    Assert.AreEqual("More text", paragraphElement.Text);
+                    Assert.IsNull(paragraphElement);
+                    Assert.IsNotNull(textElement);
+                    Assert.AreEqual("#text", textElement.Tag);
+                    Assert.AreEqual("More text", textElement.Text);
                     break;
                 case 4:
-                    Assert.AreEqual("#text", paragraphElement.Tag);
-                    Assert.AreEqual("Even more text", paragraphElement.Text);
+                    Assert.IsNull(paragraphElement);
+                    Assert.IsNotNull(textElement);
+                    Assert.AreEqual("#text", textElement.Tag);
+                    Assert.AreEqual("Even more text", textElement.Text);
                     break;
                 case 1:
                 case 3:
+                    Assert.IsNull(textElement);
+                    Assert.IsNotNull(paragraphElement);
+                    Assert.IsEmpty(paragraphElement.Elements);
                     Assert.AreEqual("br", paragraphElement.Tag);
-                    Assert.IsEmpty(paragraphElement.Text);
                     break;
             }
         }
@@ -89,15 +97,17 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse("<p><span data-something=\"the data-something value\">Text in a data-something SPAN</span></p>");
+        var element = parser.Parse("<p><span data-something=\"the data-something value\">Text in a data-something SPAN</span></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var span = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var span = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(span);
         Assert.AreEqual("span", span.Tag);
-        Assert.AreEqual("Text in a data-something SPAN", span.Text);
         Assert.AreEqual(1, span.Attributes.Count);
         Assert.AreEqual("something", span.Attributes.First().Key);
         Assert.AreEqual("the data-something value", span.Attributes.First().Value);
+        var textElement = span.Elements.Single() as RichTextTextElement;
+        Assert.IsNotNull(textElement);
+        Assert.AreEqual("Text in a data-something SPAN", textElement.Text);
     }
 
     [Test]
@@ -105,9 +115,9 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse("<p><span something=\"the original something\" data-something=\"the data something\">Text in a data-something SPAN</span></p>");
+        var element = parser.Parse("<p><span something=\"the original something\" data-something=\"the data something\">Text in a data-something SPAN</span></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var span = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var span = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(span);
         Assert.AreEqual("span", span.Tag);
         Assert.AreEqual(1, span.Attributes.Count);
@@ -120,9 +130,9 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
+        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var link = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("a", link.Tag);
         Assert.AreEqual(1, link.Attributes.Count);
@@ -139,9 +149,9 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>");
+        var element = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var link = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("a", link.Tag);
         Assert.AreEqual(1, link.Attributes.Count);
@@ -154,14 +164,29 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse($"<p><a href=\"https://some.where/else/\"></a></p>");
+        var element = parser.Parse($"<p><a href=\"https://some.where/else/\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var link = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("a", link.Tag);
         Assert.AreEqual(1, link.Attributes.Count);
         Assert.AreEqual("href", link.Attributes.First().Key);
         Assert.AreEqual("https://some.where/else/", link.Attributes.First().Value);
+    }
+
+    [Test]
+    public void LinkTextIsWrappedInTextElement()
+    {
+        var parser = CreateRichTextParser();
+
+        var element = parser.Parse($"<p><a href=\"https://some.where/else/\">This is the link text</a></p>") as RichTextGenericElement;
+        Assert.IsNotNull(element);
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(link);
+        Assert.AreEqual("a", link.Tag);
+        var textElement = link.Elements.Single() as RichTextTextElement;
+        Assert.IsNotNull(textElement);
+        Assert.AreEqual("This is the link text", textElement.Text);
     }
 
     [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
@@ -170,9 +195,9 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse($"<p><a href=\"/{href}\"></a></p>");
+        var element = parser.Parse($"<p><a href=\"/{href}\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var link = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("a", link.Tag);
         Assert.IsEmpty(link.Attributes);
@@ -183,9 +208,9 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></a></p>");
+        var element = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var link = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("img", link.Tag);
         Assert.AreEqual(1, link.Attributes.Count);
@@ -198,9 +223,9 @@ public class RichTextParserTests
     {
         var parser = CreateRichTextParser();
 
-        var element = parser.Parse($"<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></a></p>");
+        var element = parser.Parse($"<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
-        var link = element.Elements.FirstOrDefault()?.Elements.FirstOrDefault();
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
         Assert.AreEqual("img", link.Tag);
         Assert.AreEqual(1, link.Attributes.Count);
