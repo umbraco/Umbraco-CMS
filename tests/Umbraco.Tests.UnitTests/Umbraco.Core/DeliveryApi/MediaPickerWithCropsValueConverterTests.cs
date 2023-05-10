@@ -27,6 +27,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             new ApiMediaBuilder(
                 new ApiContentNameProvider(),
                 apiUrlProvider,
+                Mock.Of<IPublishedValueFallback>(),
                 CreateOutputExpansionStrategyAccessor()));
     }
 
@@ -34,7 +35,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToCollectionOfApiMedia()
     {
         var publishedPropertyType = SetupMediaPropertyType(false);
-        var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text");
+        var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800);
 
         var serializer = new JsonNetSerializer();
 
@@ -64,7 +65,15 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("My media", result.First().Name);
         Assert.AreEqual("my-media", result.First().Url);
+        Assert.AreEqual(".jpg", result.First().Extension);
+        Assert.AreEqual(200, result.First().Width);
+        Assert.AreEqual(400, result.First().Height);
+        Assert.AreEqual(800, result.First().Bytes);
         Assert.NotNull(result.First().FocalPoint);
+        Assert.AreEqual(".jpg", result.First().Extension);
+        Assert.AreEqual(200, result.First().Width);
+        Assert.AreEqual(400, result.First().Height);
+        Assert.AreEqual(800, result.First().Bytes);
         Assert.AreEqual(.2m, result.First().FocalPoint.Left);
         Assert.AreEqual(.4m, result.First().FocalPoint.Top);
         Assert.NotNull(result.First().Crops);
@@ -78,19 +87,16 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(10m, result.First().Crops.First().Coordinates.Y1);
         Assert.AreEqual(20m, result.First().Crops.First().Coordinates.Y2);
         Assert.NotNull(result.First().Properties);
-        Assert.AreEqual(4, result.First().Properties.Count);
+        Assert.AreEqual(1, result.First().Properties.Count);
         Assert.AreEqual("My alt text", result.First().Properties["altText"]);
-        Assert.AreEqual(".jpg", result.First().Properties[Constants.Conventions.Media.Extension]);
-        Assert.AreEqual(200, result.First().Properties[Constants.Conventions.Media.Width]);
-        Assert.AreEqual(400, result.First().Properties[Constants.Conventions.Media.Height]);
     }
 
     [Test]
     public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsValueToMedias()
     {
         var publishedPropertyType = SetupMediaPropertyType(true);
-        var mediaKey1 = SetupMedia("My media", ".jpg", 200, 400, "My alt text");
-        var mediaKey2 = SetupMedia("My other media", ".png", 800, 600, "My other alt text");
+        var mediaKey1 = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800);
+        var mediaKey2 = SetupMedia("My other media", ".png", 800, 600, "My other alt text", 200);
 
         var serializer = new JsonNetSerializer();
 
@@ -135,6 +141,10 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         Assert.AreEqual("My media", result.First().Name);
         Assert.AreEqual("my-media", result.First().Url);
+        Assert.AreEqual(".jpg", result.First().Extension);
+        Assert.AreEqual(200, result.First().Width);
+        Assert.AreEqual(400, result.First().Height);
+        Assert.AreEqual(800, result.First().Bytes);
         Assert.NotNull(result.First().FocalPoint);
         Assert.AreEqual(.2m, result.First().FocalPoint.Left);
         Assert.AreEqual(.4m, result.First().FocalPoint.Top);
@@ -149,14 +159,15 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(10m, result.First().Crops.First().Coordinates.Y1);
         Assert.AreEqual(20m, result.First().Crops.First().Coordinates.Y2);
         Assert.NotNull(result.First().Properties);
-        Assert.AreEqual(4, result.First().Properties.Count);
+        Assert.AreEqual(1, result.First().Properties.Count);
         Assert.AreEqual("My alt text", result.First().Properties["altText"]);
-        Assert.AreEqual(".jpg", result.First().Properties[Constants.Conventions.Media.Extension]);
-        Assert.AreEqual(200, result.First().Properties[Constants.Conventions.Media.Width]);
-        Assert.AreEqual(400, result.First().Properties[Constants.Conventions.Media.Height]);
 
         Assert.AreEqual("My other media", result.Last().Name);
         Assert.AreEqual("my-other-media", result.Last().Url);
+        Assert.AreEqual(".png", result.Last().Extension);
+        Assert.AreEqual(800, result.Last().Width);
+        Assert.AreEqual(600, result.Last().Height);
+        Assert.AreEqual(200, result.Last().Bytes);
         Assert.NotNull(result.Last().FocalPoint);
         Assert.AreEqual(.8m, result.Last().FocalPoint.Left);
         Assert.AreEqual(.6m, result.Last().FocalPoint.Top);
@@ -171,11 +182,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(2m, result.Last().Crops.Last().Coordinates.Y1);
         Assert.AreEqual(1m, result.Last().Crops.Last().Coordinates.Y2);
         Assert.NotNull(result.Last().Properties);
-        Assert.AreEqual(4, result.Last().Properties.Count);
+        Assert.AreEqual(1, result.Last().Properties.Count);
         Assert.AreEqual("My other alt text", result.Last().Properties["altText"]);
-        Assert.AreEqual(".png", result.Last().Properties[Constants.Conventions.Media.Extension]);
-        Assert.AreEqual(800, result.Last().Properties[Constants.Conventions.Media.Width]);
-        Assert.AreEqual(600, result.Last().Properties[Constants.Conventions.Media.Height]);
     }
 
     [TestCase("")]
@@ -233,7 +241,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         return publishedPropertyType.Object;
     }
 
-    private Guid SetupMedia(string name, string extension, int width, int height, string altText)
+    private Guid SetupMedia(string name, string extension, int width, int height, string altText, int bytes)
     {
         var publishedMediaType = new Mock<IPublishedContentType>();
         publishedMediaType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Media);
@@ -257,6 +265,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         AddProperty(Constants.Conventions.Media.Extension, extension);
         AddProperty(Constants.Conventions.Media.Width, width);
         AddProperty(Constants.Conventions.Media.Height, height);
+        AddProperty(Constants.Conventions.Media.Bytes, bytes);
         AddProperty("altText", altText);
 
         PublishedMediaCacheMock

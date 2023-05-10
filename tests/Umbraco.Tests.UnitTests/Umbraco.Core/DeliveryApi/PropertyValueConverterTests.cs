@@ -1,4 +1,3 @@
-using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -105,6 +104,9 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Returns(media.UrlSegment);
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(media.Key))
+            .Returns(media);
+        PublishedMediaCacheMock
+            .Setup(pcc => pcc.GetById(It.IsAny<bool>(), media.Key))
             .Returns(media);
     }
 }

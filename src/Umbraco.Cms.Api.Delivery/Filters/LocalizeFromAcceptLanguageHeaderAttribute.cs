@@ -5,7 +5,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
-public class LocalizeFromAcceptLanguageHeaderAttribute : TypeFilterAttribute
+internal sealed class LocalizeFromAcceptLanguageHeaderAttribute : TypeFilterAttribute
 {
     public LocalizeFromAcceptLanguageHeaderAttribute()
         : base(typeof(LocalizeFromAcceptLanguageHeaderAttributeFilter))

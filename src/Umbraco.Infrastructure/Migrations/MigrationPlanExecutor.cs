@@ -175,11 +175,24 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
         _logger.LogInformation("Done");
 
+        // final state is set to either the transition target state
+        // or the final completed transition target state if transition is null
+        // or the original migration state, if no transitions completed
+        string finalState = fromState;
+        if (transition is not null)
+        {
+            finalState = transition.TargetState;
+        }
+        else if (completedTransitions.Any())
+        {
+            finalState = completedTransitions.Last().TargetState;
+        }
+
         return new ExecutedMigrationPlan
         {
             Successful = true,
             InitialState = fromState,
-            FinalState = transition?.TargetState ?? completedTransitions.Last().TargetState,
+            FinalState = finalState,
             CompletedTransitions = completedTransitions,
             Plan = plan,
         };

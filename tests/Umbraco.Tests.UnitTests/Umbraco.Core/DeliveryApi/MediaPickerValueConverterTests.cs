@@ -98,5 +98,6 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         new ApiMediaBuilder(
             new ApiContentNameProvider(),
             new ApiMediaUrlProvider(PublishedUrlProvider),
+            Mock.Of<IPublishedValueFallback>(),
             CreateOutputExpansionStrategyAccessor()));
 }
