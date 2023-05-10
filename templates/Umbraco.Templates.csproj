@@ -8,10 +8,12 @@
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
+    <NoWarn>NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
+    <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">
       <Link>UmbracoProject\Program.cs</Link>
@@ -42,4 +44,25 @@
       <PackagePath>UmbracoProject\wwwroot</PackagePath>
     </Content>
   </ItemGroup>
+
+  <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
+  <ItemGroup>
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" />
+  </ItemGroup>
+  <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetBuildVersion;GetUmbracoBuildVersion">
+    <ItemGroup>
+      <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
+      <_TemplateJsonFiles>
+        <DestinationFile>$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension)</DestinationFile>
+      </_TemplateJsonFiles>
+    </ItemGroup>
+    <Copy SourceFiles="@(_TemplateJsonFiles)" DestinationFiles="%(DestinationFile)" />
+    <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
+    <ItemGroup>
+      <_PackageFiles Remove="@(_TemplateJsonFiles)" />
+      <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
+        <PackagePath>%(RelativeDir)</PackagePath>
+      </_PackageFiles>
+    </ItemGroup>
+  </Target>
 </Project>

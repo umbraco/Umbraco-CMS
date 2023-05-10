@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -225,7 +224,7 @@ public class LogviewerTests
         // Assert.That(searches, Contains.Item(savedSearch));
 
         // Remove the search from above & ensure it no longer exists
-        _logViewer.DeleteSavedSearch("Unit Test Example", "Has(UnitTest)");
+        _logViewer.DeleteSavedSearch("Unit Test Example");
 
         searches = _logViewer.GetSavedSearches();
         findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");

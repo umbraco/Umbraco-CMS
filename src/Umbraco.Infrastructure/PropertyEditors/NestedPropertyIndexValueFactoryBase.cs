@@ -38,8 +38,25 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
 
             var propertyTypeDictionary =
                 contentType
-                    .PropertyGroups
+                    .CompositionPropertyGroups
                     .SelectMany(x => x.PropertyTypes!)
+                    .Select(propertyType =>
+                    {
+                        // We want to ensure that the nested properties are set vary by culture if the parent is
+                        // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
+                        // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
+                        if (culture is not null)
+                        {
+                            propertyType.Variations |= ContentVariation.Culture;
+                        }
+
+                        if (segment is not null)
+                        {
+                            propertyType.Variations |= ContentVariation.Segment;
+                        }
+
+                        return propertyType;
+                    })
                     .ToDictionary(x => x.Alias);
 
             result.AddRange(GetNestedResults(
