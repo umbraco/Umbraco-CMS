@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Umbraco.Cms.Infrastructure.Migrations;
 
 public class ExecutedMigrationPlan
@@ -9,6 +11,7 @@ public class ExecutedMigrationPlan
         FinalState = finalState ?? throw new ArgumentNullException(nameof(finalState));
     }
 
+    [SetsRequiredMembers]
     public ExecutedMigrationPlan(
         MigrationPlan plan,
         string initialState,
