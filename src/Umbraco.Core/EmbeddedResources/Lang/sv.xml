@@ -97,6 +97,9 @@
     <key alias="smallSort">Sortera</key>
     <key alias="historyIncludingVariants">Historik (alla varianter)</key>
   </area>
+  <area alias="blockEditor">
+    <key alias="blockHasChanges">Du har gjort ändringar i detta innehåll. Är du säker på att du vill ångra dem?</key>
+  </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Tom</key>
@@ -140,6 +143,7 @@
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
+    <key alias="submitChanges">Skicka</key>
   </area>
   <area alias="colorpicker">
     <key alias="noColors">Du har inte konfigurerat några giltiga färger</key>
@@ -389,6 +393,7 @@
     <key alias="deleting">Tar bort...</key>
     <key alias="design">Design</key>
     <key alias="dimensions">Dimensioner</key>
+    <key alias="discard">Ignorera</key>
     <key alias="down">Ner</key>
     <key alias="download">Ladda ned</key>
     <key alias="edit">Redigera</key>
