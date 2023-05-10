@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Microsoft.Extensions.Options;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
@@ -19,6 +19,6 @@ public sealed class ConfigureApiExplorerOptions : IConfigureOptions<ApiExplorerO
         options.GroupNameFormat = "'v'VVV";
         options.SubstituteApiVersionInUrl = true;
         options.AddApiVersionParametersWhenVersionNeutral = true;
-        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.AssumeDefaultVersionWhenUnspecified = false;
     }
 }

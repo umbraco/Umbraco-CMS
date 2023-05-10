@@ -7,7 +7,6 @@ public class ProblemDetailsBuilder
 {
     private string? _title;
     private string? _detail;
-    private int _status = StatusCodes.Status400BadRequest;
     private string? _type;
 
     public ProblemDetailsBuilder WithTitle(string title)
@@ -22,12 +21,6 @@ public class ProblemDetailsBuilder
         return this;
     }
 
-    public ProblemDetailsBuilder WithStatus(int status)
-    {
-        _status = status;
-        return this;
-    }
-
     public ProblemDetailsBuilder WithType(string type)
     {
         _type = type;
@@ -39,7 +32,6 @@ public class ProblemDetailsBuilder
         {
             Title = _title,
             Detail = _detail,
-            Status = _status,
             Type = _type ?? "Error",
         };
 }
