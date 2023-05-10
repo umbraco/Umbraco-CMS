@@ -22,7 +22,7 @@ public sealed class NameFilter : IFilterHandler
             Value = string.Empty
         };
 
-        // TODO: do we support negation?
+        // Support negation
         if (value.StartsWith('!'))
         {
             filterOption.Value = value.Substring(1);

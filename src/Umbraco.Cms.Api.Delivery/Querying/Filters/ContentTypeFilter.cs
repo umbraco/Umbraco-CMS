@@ -22,7 +22,7 @@ public sealed class ContentTypeFilter : IFilterHandler
             Value = string.Empty
         };
 
-        // TODO: do we support negation?
+        // Support negation
         if (alias.StartsWith('!'))
         {
             filterOption.Value = alias.Substring(1);
