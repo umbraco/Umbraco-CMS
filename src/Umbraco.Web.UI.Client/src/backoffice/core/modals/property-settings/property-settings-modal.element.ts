@@ -7,15 +7,18 @@ import {
 	UMB_MODAL_CONTEXT_TOKEN,
 	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
 	UmbPropertySettingsModalResult,
+	UmbPropertySettingsModalData,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-property-settings-modal')
-export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object, UmbPropertySettingsModalResult> {
-
-
+// TODO: Could base take a token to get its types?.
+export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
+	UmbPropertySettingsModalData,
+	UmbPropertySettingsModalResult
+> {
 	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
 	@state() private _selectedPropertyEditorUIAlias = '';
 
