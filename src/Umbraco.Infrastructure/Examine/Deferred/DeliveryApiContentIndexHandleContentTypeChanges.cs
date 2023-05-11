@@ -128,7 +128,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         {
             ISearchResults? results = index.Searcher
                 .CreateQuery()
-                .Field("contentTypeId", contentTypeId)
+                .Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.ContentTypeId, contentTypeId.ToString())
                 // NOTE: we need to be explicit about fetching ItemIdFieldName here, otherwise Examine will try to be
                 // clever and use the "id" field of the document (which we can't use for deletion)
                 .SelectField(UmbracoExamineFieldNames.ItemIdFieldName)

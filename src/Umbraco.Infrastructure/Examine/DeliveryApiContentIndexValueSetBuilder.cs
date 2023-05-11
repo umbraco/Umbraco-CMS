@@ -46,9 +46,9 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                 // required index values go here
                 var indexValues = new Dictionary<string, IEnumerable<object>>(StringComparer.InvariantCultureIgnoreCase)
                 {
-                    ["id"] = new object[] { content.Id }, // required for correct publishing handling and also needed for backoffice index browsing
-                    ["contentTypeId"] = new object[] { content.ContentTypeId }, // required for correct content type change handling
-                    ["culture"] = new object[] { indexCulture }, // required for culture variant querying
+                    [UmbracoExamineFieldNames.DeliveryApiContentIndex.Id] = new object[] { content.Id.ToString() }, // required for correct publishing handling and also needed for backoffice index browsing
+                    [UmbracoExamineFieldNames.DeliveryApiContentIndex.ContentTypeId] = new object[] { content.ContentTypeId.ToString() }, // required for correct content type change handling
+                    [UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture] = new object[] { indexCulture }, // required for culture variant querying
                     [UmbracoExamineFieldNames.IndexPathFieldName] = new object[] { content.Path }, // required for unpublishing/deletion handling
                     [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
                 };

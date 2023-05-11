@@ -32,9 +32,9 @@ internal sealed class DeliveryApiContentIndexFieldDefinitionBuilder : IDeliveryA
     // see also the field definitions in the Delivery API content index value set builder
     private void AddRequiredFieldDefinitions(ICollection<FieldDefinition> fieldDefinitions)
     {
-        fieldDefinitions.Add(new("id", FieldDefinitionTypes.Integer));
-        fieldDefinitions.Add(new("contentTypeId", FieldDefinitionTypes.Integer));
-        fieldDefinitions.Add(new("culture", FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoExamineFieldNames.DeliveryApiContentIndex.Id, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoExamineFieldNames.DeliveryApiContentIndex.ContentTypeId, FieldDefinitionTypes.Raw));
+        fieldDefinitions.Add(new(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture, FieldDefinitionTypes.Raw));
         fieldDefinitions.Add(new(UmbracoExamineFieldNames.IndexPathFieldName, FieldDefinitionTypes.Raw));
         fieldDefinitions.Add(new(UmbracoExamineFieldNames.NodeNameFieldName, FieldDefinitionTypes.Raw));
     }

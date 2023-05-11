@@ -74,10 +74,10 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         var existingIndexCultures = index
             .Searcher
             .CreateQuery()
-            .Field("id", content.Id)
-            .SelectField("culture")
+            .Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Id, content.Id.ToString())
+            .SelectField(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture)
             .Execute()
-            .SelectMany(f => f.GetValues("culture"))
+            .SelectMany(f => f.GetValues(UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture))
             .ToArray();
 
         // index the content

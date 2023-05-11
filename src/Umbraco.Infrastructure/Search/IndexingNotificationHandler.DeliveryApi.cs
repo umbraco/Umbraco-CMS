@@ -8,7 +8,9 @@ using Umbraco.Cms.Core.Sync;
 namespace Umbraco.Cms.Infrastructure.Search;
 
 internal sealed class DeliveryApiContentIndexingNotificationHandler :
-    INotificationHandler<ContentCacheRefresherNotification>, INotificationHandler<ContentTypeCacheRefresherNotification>
+    INotificationHandler<ContentCacheRefresherNotification>,
+    INotificationHandler<ContentTypeCacheRefresherNotification>,
+    INotificationHandler<PublicAccessCacheRefresherNotification>
 {
     private readonly IDeliveryApiIndexingHandler _deliveryApiIndexingHandler;
 
@@ -46,6 +48,9 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
             .ToList();
         _deliveryApiIndexingHandler.HandleContentTypeChanges(contentTypeChangesById);
     }
+
+    public void Handle(PublicAccessCacheRefresherNotification notification)
+        => _deliveryApiIndexingHandler.HandlePublicAccessChanges();
 
     private bool NotificationHandlingIsDisabled()
     {
