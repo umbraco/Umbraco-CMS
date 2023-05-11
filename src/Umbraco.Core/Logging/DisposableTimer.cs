@@ -59,7 +59,7 @@ public class DisposableTimer : DisposableObjectSlim
                     {
                         var args = new object[startMessageArgs.Length + 1];
                         startMessageArgs.CopyTo(args, 0);
-                        args[startMessageArgs.Length] = _timingId;
+                        args[^1] = _timingId;
                         logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
                     }
 
@@ -73,7 +73,7 @@ public class DisposableTimer : DisposableObjectSlim
                     {
                         var args = new object[startMessageArgs.Length + 1];
                         startMessageArgs.CopyTo(args, 0);
-                        args[startMessageArgs.Length] = _timingId;
+                        args[^1] = _timingId;
                         logger.LogInformation(startMessage + " [Timing {TimingId}]", args);
                     }
 
@@ -127,8 +127,8 @@ public class DisposableTimer : DisposableObjectSlim
                 {
                     var args = new object[_failMessageArgs.Length + 2];
                     _failMessageArgs.CopyTo(args, 0);
-                    args[_failMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
-                    args[_failMessageArgs.Length] = _timingId;
+                    args[^2] = Stopwatch.ElapsedMilliseconds;
+                    args[^1] = _timingId;
                     _logger.LogError(_failException, _failMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                 }
             }
@@ -149,8 +149,8 @@ public class DisposableTimer : DisposableObjectSlim
                         {
                             var args = new object[_endMessageArgs.Length + 2];
                             _endMessageArgs.CopyTo(args, 0);
-                            args[^1] = Stopwatch.ElapsedMilliseconds;
-                            args[args.Length] = _timingId;
+                            args[^2] = Stopwatch.ElapsedMilliseconds;
+                            args[^1] = _timingId;
                             _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                         }
 
@@ -168,8 +168,8 @@ public class DisposableTimer : DisposableObjectSlim
                         {
                             var args = new object[_endMessageArgs.Length + 2];
                             _endMessageArgs.CopyTo(args, 0);
-                            args[_endMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
-                            args[_endMessageArgs.Length] = _timingId;
+                            args[^2] = Stopwatch.ElapsedMilliseconds;
+                            args[^1] = _timingId;
                             _logger.LogInformation(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                         }
 
