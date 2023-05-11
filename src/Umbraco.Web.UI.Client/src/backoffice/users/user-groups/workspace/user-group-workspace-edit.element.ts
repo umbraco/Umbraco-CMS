@@ -5,7 +5,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../../shared/components/input-section/input-section.element';
+import '../../../core/components/input-section/input-section.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -26,7 +26,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbUserGroupWorkspaceContext;
-			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup as any));
+			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
+			this.observe(this.#workspaceContext.userKeys, (userKeys) => (this._userKeys = userKeys));
 		});
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
@@ -35,14 +36,10 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	}
 
 	#onUsersChange(userKeys: Array<string>) {
-		this._userKeys = userKeys;
-		// TODO: make a method on the UmbWorkspaceUserGroupContext:
-		//this._workspaceContext.setUsers();
+		this.#workspaceContext?.updateUserKeys(userKeys);
 	}
 
 	#onSectionsChange(value: string[]) {
-		console.log('va', value);
-
 		this.#workspaceContext?.updateProperty('sections', value);
 	}
 
@@ -119,20 +116,12 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 				<umb-workspace-property-layout
 					label="Content start node"
 					description="Limit the content tree to a specific start node">
-					<uui-ref-node slot="editor" name="Content Root" border>
-						<uui-icon slot="icon" name="folder"></uui-icon>
-						<uui-button slot="actions" label="change"></uui-button>
-						<uui-button slot="actions" label="remove" color="danger"></uui-button>
-					</uui-ref-node>
+					<b slot="editor">CONTENT START NODE PICKER NOT IMPLEMENTED YET</b>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout
 					label="Media start node"
 					description="Limit the media library to a specific start node">
-					<uui-ref-node slot="editor" name="Media Root" border>
-						<uui-icon slot="icon" name="folder"></uui-icon>
-						<uui-button slot="actions" label="change"></uui-button>
-						<uui-button slot="actions" label="remove" color="danger"></uui-button>
-					</uui-ref-node>
+					<b slot="editor">MEDIA START NODE PICKER NOT IMPLEMENTED YET</b>
 				</umb-workspace-property-layout>
 			</uui-box>
 
@@ -150,7 +139,9 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	#renderRightColumn() {
 		return html`<uui-box>
 				<div slot="headline">Users</div>
-				<umb-user-input @change=${(e: Event) => this.#onUsersChange((e.target as any).value)}></umb-user-input>
+				<umb-user-input
+					@change=${(e: Event) => this.#onUsersChange((e.target as any).value)}
+					.value=${this._userKeys?.toString() ?? ''}></umb-user-input>
 			</uui-box>
 			<uui-box>
 				<div slot="headline">Delete user group</div>
