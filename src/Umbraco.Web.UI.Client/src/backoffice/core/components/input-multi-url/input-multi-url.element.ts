@@ -13,13 +13,13 @@ import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
- * @element umb-input-multi-url-picker
+ * @element umb-input-multi-url
  * @fires change - when the value of the input changes
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-@customElement('umb-input-multi-url-picker')
-export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-multi-url')
+export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -227,6 +227,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-multi-url-picker': UmbInputMultiUrlPickerElement;
+		'umb-input-multi-url': UmbInputMultiUrlElement;
 	}
 }
