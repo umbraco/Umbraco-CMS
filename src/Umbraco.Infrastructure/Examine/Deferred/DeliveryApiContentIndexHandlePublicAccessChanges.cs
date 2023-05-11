@@ -44,7 +44,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         IIndex index = _deliveryApiIndexingHandler.GetIndex() ??
                        throw new InvalidOperationException("Could not obtain the delivery API content index");
 
-        List<string> indexIds = FindIdsForContentIds(protectedContentIds, index);
+        List<string> indexIds = FindIndexIdsForContentIds(protectedContentIds, index);
         if (indexIds.Any() is false)
         {
             return Task.CompletedTask;
@@ -54,7 +54,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         return Task.CompletedTask;
     });
 
-    private List<string> FindIdsForContentIds(int[] contentIds, IIndex index)
+    private List<string> FindIndexIdsForContentIds(int[] contentIds, IIndex index)
     {
         const int pageSize = 500;
         const int batchSize = 50;
