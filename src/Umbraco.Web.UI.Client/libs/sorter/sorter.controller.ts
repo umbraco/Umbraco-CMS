@@ -195,8 +195,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			return this;
 		};
 
-		console.log('containerEl', this.#containerElement.shadowRoot ?? this.#containerElement);
-
 		// TODO: Clean up??
 		this.#observer.disconnect();
 
