@@ -1,18 +1,16 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDocumentPickerModalData {
-	multiple?: boolean;
-	selection?: Array<string | null>;
-}
-
-export interface UmbDocumentPickerModalResult {
-	selection: Array<string | null>;
-}
+export type UmbDocumentPickerModalData = UmbTreePickerModalData<DocumentTreeItemResponseModel>;
+export type UmbDocumentPickerModalResult = UmbPickerModalResult;
 
 export const UMB_DOCUMENT_PICKER_MODAL = new UmbModalToken<UmbDocumentPickerModalData, UmbDocumentPickerModalResult>(
-	'Umb.Modal.DocumentPicker',
+	'Umb.Modal.TreePicker',
 	{
 		type: 'sidebar',
 		size: 'small',
+	},
+	{
+		treeAlias: 'Umb.Tree.Documents',
 	}
 );

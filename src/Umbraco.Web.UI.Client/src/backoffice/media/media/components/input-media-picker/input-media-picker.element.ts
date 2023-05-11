@@ -8,7 +8,7 @@ import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
-	UMB_MEDIA_PICKER_MODAL,
+	UMB_MEDIA_TREE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -120,7 +120,7 @@ export class UmbInputMediaPickerElement extends FormControlMixin(UmbLitElement) 
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_MEDIA_PICKER_MODAL, {
+		const modalHandler = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this._selectedIds],
 		});

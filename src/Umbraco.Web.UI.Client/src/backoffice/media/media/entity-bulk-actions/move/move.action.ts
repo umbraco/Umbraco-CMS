@@ -2,7 +2,7 @@ import type { UmbMediaRepository } from '../../repository/media.repository';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_MEDIA_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
 	#modalContext?: UmbModalContext;
@@ -17,7 +17,7 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 
 	async execute() {
 		// TODO: the picker should be single picker by default
-		const modalHandler = this.#modalContext?.open(UMB_MEDIA_PICKER_MODAL, {
+		const modalHandler = this.#modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
 			selection: [],
 			multiple: false,
 		});

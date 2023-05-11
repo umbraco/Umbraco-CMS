@@ -1,4 +1,3 @@
-import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,

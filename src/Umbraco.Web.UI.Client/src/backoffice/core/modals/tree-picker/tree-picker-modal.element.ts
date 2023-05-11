@@ -1,23 +1,18 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import type { UmbTreeElement } from '../../../../core/components/tree/tree.element';
-import {
-	UmbDataTypePickerModalData,
-	UmbDataTypePickerModalResult,
-	UmbModalHandler,
-} from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { customElement, state } from 'lit/decorators.js';
+import type { UmbTreeElement } from '../../components/tree/tree.element';
+import { ManifestModalTreePickerKind } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
-// TODO: make use of UmbPickerLayoutBase
-@customElement('umb-data-type-picker-modal')
-export class UmbDataTypePickerModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbDataTypePickerModalData, UmbDataTypePickerModalResult>;
-
-	@property({ type: Object, attribute: false })
-	data?: UmbDataTypePickerModalData;
-
+@customElement('umb-tree-picker-modal')
+export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentationModel> extends UmbModalBaseElement<
+	UmbTreePickerModalData<TreeItemType>,
+	UmbPickerModalResult,
+	ManifestModalTreePickerKind
+> {
 	@state()
 	_selection: Array<string | null> = [];
 
@@ -26,6 +21,7 @@ export class UmbDataTypePickerModalElement extends UmbLitElement {
 
 	connectedCallback() {
 		super.connectedCallback();
+
 		this._selection = this.data?.selection ?? [];
 		this._multiple = this.data?.multiple ?? false;
 	}
@@ -49,7 +45,7 @@ export class UmbDataTypePickerModalElement extends UmbLitElement {
 			<umb-body-layout headline="Select">
 				<uui-box>
 					<umb-tree
-						alias="Umb.Tree.DataTypes"
+						alias=${this.data?.treeAlias}
 						@selected=${this.#onSelectionChange}
 						.selection=${this._selection}
 						selectable
@@ -67,10 +63,10 @@ export class UmbDataTypePickerModalElement extends UmbLitElement {
 	static styles = [UUITextStyles, css``];
 }
 
-export default UmbDataTypePickerModalElement;
+export default UmbTreePickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-data-type-picker-modal': UmbDataTypePickerModalElement;
+		'umb-tree-picker-modal': UmbTreePickerModalElement<TreeItemPresentationModel>;
 	}
 }
