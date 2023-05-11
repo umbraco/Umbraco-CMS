@@ -26,12 +26,12 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 	@property()
 	public set alias(value: string | undefined) {
-		this.myModalRegistration.setUniqueIdentifier('propertyAlias', value);
+		this.myModalRegistration.setUniquePathValue('propertyAlias', value);
 	}
 
 	@property()
 	public set variantId(value: string | UmbVariantId | undefined) {
-		this.myModalRegistration.setUniqueIdentifier('variantId', value?.toString());
+		this.myModalRegistration.setUniquePathValue('variantId', value?.toString());
 	}
 
 	/**
@@ -122,15 +122,10 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		this.myModalRegistration = new UmbModalRouteRegistrationController(
-			this,
-			UMB_LINK_PICKER_MODAL,
-			`:index`,
-			new Map([
-				['propertyAlias', undefined],
-				['variantId', undefined],
-			])
-		)
+		this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL, `:index`, [
+			'propertyAlias',
+			'variantId',
+		])
 			.onSetup((params) => {
 				// Get index:
 				const indexParam = params.index;

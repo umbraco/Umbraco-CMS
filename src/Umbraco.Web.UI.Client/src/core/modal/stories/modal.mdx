@@ -89,12 +89,12 @@ descripe the addional features of the route Registration:
 
 	@property()
 	public set alias(value: string | undefined) {
-		this.myModalRegistration.setUniqueIdentifier('propertyAlias', value);
+		this.myModalRegistration.setUniquePathValue('propertyAlias', value);
 	}
 
 	@property()
 	public set variantId(value: string | UmbVariantId | undefined) {
-		this.myModalRegistration.setUniqueIdentifier('variantId', value?.toString());
+		this.myModalRegistration.setUniquePathValue('variantId', value?.toString());
 	}
 
 	private _items = [
@@ -111,10 +111,7 @@ descripe the addional features of the route Registration:
 			this,
 			MY_MODAL_TOKEN,
 			`:index`,
-			new Map([
-				['propertyAlias', undefined],
-				['variantId', undefined],
-			])
+			['propertyAlias', 'variantId']
 		)
 		.onSetup((params) => {
 			// Get item index:

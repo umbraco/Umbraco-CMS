@@ -12,7 +12,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	//#host: UmbControllerHostInterface;
 
 	#additionalPath: string | null;
-	#uniqueParts: Map<string, string | undefined>;
+	#uniquePaths: Map<string, string | undefined> = new Map();
 
 	#routeContext?: typeof UMB_ROUTE_CONTEXT_TOKEN.TYPE;
 	#modalRegistration?: UmbModalRouteRegistration;
@@ -25,13 +25,17 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		host: UmbControllerHostElement,
 		alias: UmbModalToken<D, R> | string,
 		additionalPath: string | null = null,
-		uniqueParts?: Map<string, string | undefined> | null,
+		uniquePaths?: Array<string> | null,
 		modalConfig?: UmbModalConfig
 	) {
 		super(alias, null, modalConfig);
 		//this.#host = host;
 		this.#additionalPath = additionalPath;
-		this.#uniqueParts = uniqueParts || new Map();
+		if (uniquePaths) {
+			uniquePaths.forEach((name) => {
+				this.#uniquePaths.set(name, undefined);
+			});
+		}
 
 		new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
 			this.#routeContext = _routeContext;
@@ -39,13 +43,13 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		});
 	}
 
-	setUniqueIdentifier(identifier: string, value: string | undefined) {
-		if (!this.#uniqueParts.has(identifier)) {
+	setUniquePathValue(identifier: string, value: string | undefined) {
+		if (!this.#uniquePaths.has(identifier)) {
 			throw new Error(
 				`Identifier ${identifier} was not registered at the construction of the modal registration controller, it has to be.`
 			);
 		}
-		this.#uniqueParts.set(identifier, value);
+		this.#uniquePaths.set(identifier, value);
 		this._registererModal();
 	}
 
@@ -56,7 +60,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 			this.#modalRegistration = undefined;
 		}
 
-		const pathParts = Array.from(this.#uniqueParts.values());
+		const pathParts = Array.from(this.#uniquePaths.values());
 
 		// Check if there is any undefined values of unique map:
 		if (pathParts.some((value) => value === undefined)) return;

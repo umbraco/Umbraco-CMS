@@ -108,6 +108,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		// Take id and parse to modal:
 		console.log('property id:', property.id!);
 
+		// TODO: route modal..
 		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
 		modalHandler?.onSubmit().then((result) => {
