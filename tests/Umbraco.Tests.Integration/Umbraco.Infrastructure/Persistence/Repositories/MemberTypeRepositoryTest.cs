@@ -226,6 +226,31 @@ public class MemberTypeRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    // See: https://github.com/umbraco/Umbraco-CMS/issues/4963#issuecomment-483516698
+    [Test]
+    public void Bug_Changing_Built_In_Member_Type_Property_Type_Aliases_Results_In_Exception()
+    {
+        // This test was initially deleted but that broke the build as it was marked as a breaking change
+        // https://github.com/umbraco/Umbraco-CMS/pull/14060
+        // Easiest fix for now is to leave the test and just don't do anything
+    }
+
+    [Test]
+    public void Built_In_Member_Type_Properties_Are_Automatically_Added_When_Creating()
+    {
+        // This test was initially deleted but that broke the build as it was marked as a breaking change
+        // https://github.com/umbraco/Umbraco-CMS/pull/14060
+        // Easiest fix for now is to leave the test and just don't do anything
+    }
+
+    [Test]
+    public void Built_In_Member_Type_Properties_Missing_Are_Automatically_Added_When_Creating()
+    {
+        // This test was initially deleted but that broke the build as it was marked as a breaking change
+        // https://github.com/umbraco/Umbraco-CMS/pull/14060
+        // Easiest fix for now is to leave the test and just don't do anything
+    }
+
     // This is to show that new properties are created for each member type - there was a bug before
     // that was reusing the same properties with the same Ids between member types
     [Test]
