@@ -2,7 +2,7 @@ import type { UmbUserGroupCollectionFilterModel } from '../../types';
 import { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UserGroupPresentationModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResponseModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for the UserGroup that fetches data from the server
@@ -10,7 +10,7 @@ import { UserGroupPresentationModel, UserGroupResource } from '@umbraco-cms/back
  * @class UmbUserGroupCollectionServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UserGroupPresentationModel> {
+export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UserGroupResponseModel> {
 	#host: UmbControllerHostElement;
 
 	/**

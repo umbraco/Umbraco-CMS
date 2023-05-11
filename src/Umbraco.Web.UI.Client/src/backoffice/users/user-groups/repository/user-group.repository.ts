@@ -3,10 +3,10 @@ import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from 
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data';
 import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data';
 import {
-	SaveUserGroupRequestModel,
+	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
 	UserGroupBaseModel,
-	UserGroupPresentationModel,
+	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
@@ -20,13 +20,13 @@ import {
 // TODO: implement
 export class UmbUserGroupRepository
 	implements
-		UmbDetailRepository<SaveUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupPresentationModel>,
+		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
 		UmbCollectionRepository
 {
 	#host: UmbControllerHostElement;
 
 	#detailSource: UmbUserGroupDetailDataSource;
-	#collectionSource: UmbCollectionDataSource<UserGroupPresentationModel>;
+	#collectionSource: UmbCollectionDataSource<UserGroupResponseModel>;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
@@ -68,7 +68,7 @@ export class UmbUserGroupRepository
 		return { error };
 	}
 
-	async save(id: string, userGroup: UserGroupPresentationModel) {
+	async save(id: string, userGroup: UserGroupResponseModel) {
 		if (!id) throw new Error('UserGroup id is missing');
 		if (!userGroup) throw new Error('UserGroup update data is missing');
 

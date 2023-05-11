@@ -1,13 +1,13 @@
 import { UmbEntityData } from './entity.data';
-import { PagedUserGroupPresentationModel, UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { PagedUserGroupResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
-class UmbUserGroupsData extends UmbEntityData<UserGroupPresentationModel> {
-	constructor(data: Array<UserGroupPresentationModel>) {
+class UmbUserGroupsData extends UmbEntityData<UserGroupResponseModel> {
+	constructor(data: Array<UserGroupResponseModel>) {
 		super(data);
 	}
 
-	getAll(): PagedUserGroupPresentationModel {
+	getAll(): PagedUserGroupResponseModel {
 		return {
 			total: this.data.length,
 			items: this.data,
@@ -15,9 +15,9 @@ class UmbUserGroupsData extends UmbEntityData<UserGroupPresentationModel> {
 	}
 }
 
-export const data: Array<UserGroupPresentationModel> = [
+export const data: Array<UserGroupResponseModel> = [
 	{
-		$type: 'UserGroupPresentationModel',
+		$type: 'UserGroupResponseModel',
 		id: 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		name: 'Administrators',
 		icon: 'umb:medal',

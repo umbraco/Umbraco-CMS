@@ -1,10 +1,10 @@
 import { UmbUserGroupDetailDataSource } from '../../types';
 import { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import {
-	UserGroupPresentationModel,
+	UserGroupResponseModel,
 	UserGroupResource,
 	UpdateUserGroupRequestModel,
-	SaveUserGroupRequestModel,
+	CreateUserGroupRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -29,7 +29,7 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 
 	//TODO should parentId be optional in the generic interface?
 	async createScaffold(parentId: string | null) {
-		const data: SaveUserGroupRequestModel = {
+		const data: CreateUserGroupRequestModel = {
 			name: '',
 			icon: '',
 			sections: [],
@@ -40,11 +40,11 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 		return { data };
 	}
 
-	get(id: string): Promise<DataSourceResponse<UserGroupPresentationModel>> {
+	get(id: string): Promise<DataSourceResponse<UserGroupResponseModel>> {
 		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroupById({ id }));
 	}
-	insert(data: SaveUserGroupRequestModel) {
+	insert(data: CreateUserGroupRequestModel) {
 		return tryExecuteAndNotify(this.#host, UserGroupResource.postUserGroup({ requestBody: data }));
 	}
 	update(id: string, data: UpdateUserGroupRequestModel) {

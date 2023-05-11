@@ -1,6 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbUserGroupCollectionContext } from './user-group-collection.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+
+import './user-group-table-name-column-layout.element';
+import './user-group-table-sections-column-layout.element';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -8,14 +15,7 @@ import {
 	UmbTableElement,
 	UmbTableItem,
 	UmbTableSelectedEvent,
-} from '../../../shared/components/table';
-import { UmbUserGroupCollectionContext } from './user-group-collection.context';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
-import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-
-import './user-group-table-name-column-layout.element';
-import './user-group-table-sections-column-layout.element';
+} from '@umbraco-cms/backoffice/core/components';
 
 @customElement('umb-user-group-collection-view')
 export class UmbUserGroupCollectionViewElement extends UmbLitElement {
@@ -53,7 +53,7 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	private _selection: Array<string> = [];
 
 	@state()
-	private _userGroups: Array<UserGroupPresentationModel> = [];
+	private _userGroups: Array<UserGroupResponseModel> = [];
 
 	#collectionContext?: UmbUserGroupCollectionContext;
 
@@ -70,7 +70,7 @@ export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(userGroups: Array<UserGroupPresentationModel>) {
+	private _createTableItems(userGroups: Array<UserGroupResponseModel>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
 				id: userGroup.id || '',

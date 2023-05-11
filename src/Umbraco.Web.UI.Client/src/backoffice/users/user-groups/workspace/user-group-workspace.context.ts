@@ -1,14 +1,14 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupPresentationModel>
-	implements UmbEntityWorkspaceContextInterface<UserGroupPresentationModel | undefined>
+	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupResponseModel>
+	implements UmbEntityWorkspaceContextInterface<UserGroupResponseModel | undefined>
 {
-	#data = new UmbObjectState<UserGroupPresentationModel | undefined>(undefined);
+	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -19,7 +19,7 @@ export class UmbUserGroupWorkspaceContext
 		const { data } = await this.repository.createScaffold(null);
 		this.setIsNew(true);
 		// TODO: Should the data be the base model or the presentation model?
-		this.#data.next(data as unknown as UserGroupPresentationModel);
+		this.#data.next(data as unknown as UserGroupResponseModel);
 		return { data };
 	}
 
@@ -37,7 +37,7 @@ export class UmbUserGroupWorkspaceContext
 	getEntityType(): string {
 		throw new Error('Method not implemented.');
 	}
-	getData(): UserGroupPresentationModel | undefined {
+	getData(): UserGroupResponseModel | undefined {
 		throw new Error('Method not implemented.');
 	}
 	async save() {
@@ -62,10 +62,7 @@ export class UmbUserGroupWorkspaceContext
 		await this.repository.delete(id);
 	}
 
-	updateProperty<Alias extends keyof UserGroupPresentationModel>(
-		alias: Alias,
-		value: UserGroupPresentationModel[Alias]
-	) {
+	updateProperty<Alias extends keyof UserGroupResponseModel>(alias: Alias, value: UserGroupResponseModel[Alias]) {
 		this.#data.update({ [alias]: value });
 	}
 }

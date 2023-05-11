@@ -7,13 +7,13 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import '../../../shared/components/input-section/input-section.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { UserGroupPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-user-group-workspace-edit')
 export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	@state()
-	private _userGroup?: UserGroupPresentationModel;
+	private _userGroup?: UserGroupResponseModel;
 
 	@state()
 	private _userKeys?: Array<string>;
