@@ -82,33 +82,15 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#onUpload(e: CustomEvent) {
-		// UUIFileDropzoneEvent doesnt exist?
+		// TODO: UUIFileDropzoneEvent is not exported yet
+		const files: File[] = e.detail.files;
 
-		this._currentFilesTemp = e.detail.files;
+		if (!files?.length) return;
 
-		if (!this.fileExtensions?.length && this._currentFilesTemp?.length) {
-			this.#setFiles(this._currentFilesTemp);
-			return;
-		}
-		const validated = this.#validateExtensions();
-		this.#setFiles(validated);
+		// TODO: Should we validate the mimetype some how?
+		this.#setFiles(files);
 	}
 
-	#validateExtensions(): File[] {
-		// TODO: Should property editor be able to handle allowed extensions like image/* ?
-
-		const filesValidated: File[] = [];
-		this._currentFilesTemp?.forEach((temp) => {
-			const type = temp.type.slice(temp.type.lastIndexOf('/') + 1);
-			if (this.fileExtensions?.find((x) => x === type)) filesValidated.push(temp);
-			else
-				this._notificationContext?.peek('danger', {
-					data: { headline: 'File upload', message: `Chosen file type "${type}" is not allowed` },
-				});
-		});
-
-		return filesValidated;
-	}
 	#setFiles(files: File[]) {
 		this._currentFiles = [...this._currentFiles, ...files];
 
