@@ -4,7 +4,7 @@ import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Params } from '@umbraco-cms/backoffice/router';
 
-export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) => string;
+export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
 export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenResult = any> {
 	#key: string;
