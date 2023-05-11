@@ -16,24 +16,13 @@ public sealed class ContentTypeFilter : IFilterHandler
     {
         var alias = filter.Substring(ContentTypeSpecifier.Length);
 
-        var filterOption = new FilterOption
+        return new FilterOption
         {
             FieldName = ContentTypeFilterIndexer.FieldName,
-            Value = string.Empty
+            Values = new[] { alias.TrimStart('!') },
+            Operator = alias.StartsWith('!')
+                ? FilterOperation.IsNot
+                : FilterOperation.Is
         };
-
-        // TODO: do we support negation?
-        if (alias.StartsWith('!'))
-        {
-            filterOption.Value = alias.Substring(1);
-            filterOption.Operator = FilterOperation.IsNot;
-        }
-        else
-        {
-            filterOption.Value = alias;
-            filterOption.Operator = FilterOperation.Is;
-        }
-
-        return filterOption;
     }
 }

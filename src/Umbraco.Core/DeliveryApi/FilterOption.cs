@@ -1,10 +1,10 @@
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public class FilterOption
+public sealed class FilterOption
 {
     public required string FieldName { get; set; }
 
-    public required string Value { get; set; }
+    public required string[] Values { get; set; }
 
-    public FilterOperation Operator { get; set; }
+    public required FilterOperation Operator { get; set; }
 }

@@ -6,7 +6,7 @@ public interface IOutputExpansionStrategy
 {
     IDictionary<string, object?> MapElementProperties(IPublishedElement element);
 
-    IDictionary<string, object?> MapProperties(IEnumerable<IPublishedProperty> properties);
-
     IDictionary<string, object?> MapContentProperties(IPublishedContent content);
+
+    IDictionary<string, object?> MapMediaProperties(IPublishedContent media, bool skipUmbracoProperties = true);
 }
