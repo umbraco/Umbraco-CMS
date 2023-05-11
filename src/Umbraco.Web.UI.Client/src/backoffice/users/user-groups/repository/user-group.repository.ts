@@ -16,6 +16,8 @@ import {
 	UmbRepositoryErrorResponse,
 	UmbRepositoryResponse,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
 // TODO: implement
 export class UmbUserGroupRepository
@@ -28,10 +30,16 @@ export class UmbUserGroupRepository
 	#detailSource: UmbUserGroupDetailDataSource;
 	#collectionSource: UmbCollectionDataSource<UserGroupResponseModel>;
 
+	#notificationContext?: UmbNotificationContext;
+
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		this.#detailSource = new UmbUserGroupServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserGroupCollectionServerDataSource(this.#host);
+
+		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.#notificationContext = instance;
+		});
 	}
 	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<UserGroupBaseModel>> {
 		return this.#detailSource.createScaffold(parentId);
@@ -63,7 +71,12 @@ export class UmbUserGroupRepository
 
 		const { data, error } = await this.#detailSource.insert(userGroupRequestData);
 
-		//TODO Put it in the store
+		//TODO Update store
+
+		if (!error) {
+			const notification = { data: { message: `User group created` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
 
 		return { error };
 	}
@@ -74,7 +87,12 @@ export class UmbUserGroupRepository
 
 		const { data, error } = await this.#detailSource.update(id, userGroup);
 
-		//TODO Put it in the store
+		//TODO Update store
+
+		if (!error) {
+			const notification = { data: { message: `User group saved` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
 
 		return { data, error };
 	}
@@ -85,6 +103,11 @@ export class UmbUserGroupRepository
 		const { error } = await this.#detailSource.delete(id);
 
 		//TODO Update store
+
+		if (!error) {
+			const notification = { data: { message: `User group deleted` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
 
 		return { error };
 	}
