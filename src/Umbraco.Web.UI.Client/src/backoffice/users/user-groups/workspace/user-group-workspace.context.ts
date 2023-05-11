@@ -2,7 +2,7 @@ import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupResponseModel>
@@ -10,6 +10,9 @@ export class UmbUserGroupWorkspaceContext
 {
 	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
+
+	#userKeys = new UmbArrayState<string>([]);
+	userKeys = this.#userKeys.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbUserGroupRepository(host));
@@ -64,5 +67,9 @@ export class UmbUserGroupWorkspaceContext
 
 	updateProperty<Alias extends keyof UserGroupResponseModel>(alias: Alias, value: UserGroupResponseModel[Alias]) {
 		this.#data.update({ [alias]: value });
+	}
+
+	updateUserKeys(keys: Array<string>) {
+		this.#userKeys.next(keys);
 	}
 }
