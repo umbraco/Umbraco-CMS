@@ -88,9 +88,14 @@ export class UmbContentTypeContainerStructureHelper {
 			// We cannot have root properties currently, therefor we set it to false:
 			this.#hasProperties.next(false);
 			this._observeRootContainers();
-			new UmbObserverController(this.#host, this.#structure.ownerContainersOf(this._ownerType), (ownerContainers) => {
-				this._ownerContainers = ownerContainers || [];
-			});
+			new UmbObserverController(
+				this.#host,
+				this.#structure.ownerContainersOf(this._ownerType),
+				(ownerContainers) => {
+					this._ownerContainers = ownerContainers || [];
+				},
+				'_observeOwnerContainers'
+			);
 		} else if (this._ownerName) {
 			new UmbObserverController(
 				this.#host,
