@@ -1,4 +1,7 @@
-﻿using Umbraco.Cms.Core.Cache;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -13,9 +16,19 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
     INotificationHandler<PublicAccessCacheRefresherNotification>
 {
     private readonly IDeliveryApiIndexingHandler _deliveryApiIndexingHandler;
+    private readonly ILogger<DeliveryApiContentIndexingNotificationHandler> _logger;
+    private DeliveryApiSettings _deliveryApiSettings;
 
-    public DeliveryApiContentIndexingNotificationHandler(IDeliveryApiIndexingHandler deliveryApiIndexingHandler)
-        => _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
+    public DeliveryApiContentIndexingNotificationHandler(
+        IDeliveryApiIndexingHandler deliveryApiIndexingHandler,
+        ILogger<DeliveryApiContentIndexingNotificationHandler> logger,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
+    {
+        _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
+        _logger = logger;
+        _deliveryApiSettings = deliveryApiSettings.CurrentValue;
+        deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
+    }
 
     public void Handle(ContentCacheRefresherNotification notification)
     {
@@ -54,6 +67,13 @@ internal sealed class DeliveryApiContentIndexingNotificationHandler :
 
     private bool NotificationHandlingIsDisabled()
     {
+        if (_deliveryApiSettings.Enabled is false)
+        {
+            // using debug logging here since this happens on every content cache refresh and we don't want to flood the log
+            _logger.LogDebug("Delivery API index notification handling is suspended while the Delivery API is disabled.");
+            return true;
+        }
+
         if (_deliveryApiIndexingHandler.Enabled == false)
         {
             return true;
