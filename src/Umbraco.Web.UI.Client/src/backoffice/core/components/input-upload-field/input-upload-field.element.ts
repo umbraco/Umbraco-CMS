@@ -96,7 +96,8 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 		//TODO: set keys when possible, not names
 		this.keys = this._currentFiles.map((file) => file.name);
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
+		this.value = this.keys.join(',');
 	}
 
 	#handleBrowse() {
