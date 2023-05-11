@@ -3,14 +3,14 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { map } from 'lit/directives/map.js';
 import { UUIFileDropzoneElement } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+
+import './input-upload-field-file.element';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
-	
-
 	private _keys: Array<string> = [];
 	/**
 	 * @description Keys to the files that belong to this upload field.
@@ -47,25 +47,13 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	_currentFiles: File[] = [];
 
 	@state()
-	_currentFilesTemp?: File[];
-
-	@state()
 	extensions?: string[];
 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
 
-	private _notificationContext?: UmbNotificationContext;
-
 	protected getFormElement() {
 		return undefined;
-	}
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-			this._notificationContext = instance;
-		});
 	}
 
 	connectedCallback(): void {
@@ -124,23 +112,23 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderFiles() {
-		if (!this._currentFiles?.length) return nothing;
 		return html` <div id="wrapper">
-				${this._currentFiles.map((file) => {
-					return html` <uui-symbol-file-thumbnail src="${ifDefined(file.name)}" alt="${ifDefined(file.name)}">
-					</uui-symbol-file-thumbnail>`;
+				${map(this._currentFiles, (file) => {
+					return html`<umb-input-upload-field-file .file=${file}></umb-input-upload-field-file>`;
 				})}
 			</div>
-			<uui-button compact @click="${this.#handleRemove}" label="Remove files">
-				<uui-icon name="umb:trash"></uui-icon> Remove file(s)
-			</uui-button>`;
+			${this._currentFiles.length
+				? html` <uui-button compact @click=${this.#handleRemove} label="Remove files">
+						<uui-icon name="umb:trash"></uui-icon> Remove file(s)
+				  </uui-button>`
+				: nothing}`;
 	}
 
 	#handleRemove() {
 		// Remove via endpoint?
 		this._currentFiles = [];
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -149,16 +137,21 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				margin-right: var(--uui-size-space-4);
 			}
 
-			uui-symbol-file-thumbnail {
+			umb-input-upload-field-file {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 200px;
+				height: 200px;
 				box-sizing: border-box;
-				min-height: 150px;
 				padding: var(--uui-size-space-4);
 				border: 1px solid var(--uui-color-border);
 			}
 
 			#wrapper {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+				grid-template-columns: repeat(auto-fit, 200px);
+				gap: var(--uui-size-space-4);
 			}
 		`,
 	];
