@@ -179,12 +179,12 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     ///     This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request
     ///     body
     /// </summary>
-    /// <param name="filter"></param>
+    /// <param name="contentTypeId"></param>
     /// <returns></returns>
-    public IActionResult GetWhereCompositionIsUsedInMemberTypes(GetAvailableCompositionsFilter filter)
+    public IActionResult GetWhereCompositionIsUsedInMemberTypes(int contentTypeId)
     {
         var result =
-            PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MemberType).Value?
+            PerformGetWhereCompositionIsUsedInContentTypes(contentTypeId, UmbracoObjectTypes.MemberType).Value?
                 .Select(x => new { contentType = x });
         return Ok(result);
     }

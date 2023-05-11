@@ -47,13 +47,15 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
         getWhereCompositionIsUsedInContentTypes: function (contentTypeId) {
-          return umbRequestHelper.resourcePromise(
-            $http.get(
-              umbRequestHelper.getApiUrl(
-                "memberTypeApiBaseUrl",
-                "GetWhereCompositionIsUsedInMemberTypes"),
-                { contentTypeId: contentTypeId }),
-            "Failed to retrieve data for content type id " + contentTypeId);
+            var query = "contentTypeId=" + contentTypeId;
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberTypeApiBaseUrl",
+                        "GetWhereCompositionIsUsedInMemberTypes",
+                        query)),
+                "Failed to retrieve data for content type id " + contentTypeId);
         },
         //return all member types
         getTypes: function () {
