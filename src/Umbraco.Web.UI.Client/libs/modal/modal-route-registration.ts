@@ -8,7 +8,7 @@ export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) 
 
 export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenResult = any> {
 	#key: string;
-	#path: string;
+	#path: string | null;
 	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string;
 	#modalConfig?: UmbModalConfig;
 
@@ -23,7 +23,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	// Notice i removed the key in the transferring to this class.
 	constructor(
 		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string,
-		path: string,
+		path: string | null = null,
 		modalConfig?: UmbModalConfig
 	) {
 		this.#key = modalConfig?.key || UmbId.new();
@@ -44,7 +44,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		return this.#path;
 	}
 
-	protected _setPath(path: string) {
+	protected _setPath(path: string | null) {
 		this.#path = path;
 	}
 

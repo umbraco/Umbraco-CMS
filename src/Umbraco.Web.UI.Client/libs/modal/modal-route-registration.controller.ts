@@ -11,7 +11,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 {
 	//#host: UmbControllerHostInterface;
 
-	#configuredPath: string;
+	#additionalPath: string | null;
 	#uniqueParts: Map<string, string | undefined>;
 
 	#routeContext?: typeof UMB_ROUTE_CONTEXT_TOKEN.TYPE;
@@ -24,13 +24,13 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	constructor(
 		host: UmbControllerHostElement,
 		alias: UmbModalToken<D, R> | string,
-		path: string,
+		additionalPath: string | null = null,
 		uniqueParts?: Map<string, string | undefined> | null,
 		modalConfig?: UmbModalConfig
 	) {
-		super(alias, path, modalConfig);
+		super(alias, null, modalConfig);
 		//this.#host = host;
-		this.#configuredPath = path;
+		this.#additionalPath = additionalPath;
 		this.#uniqueParts = uniqueParts || new Map();
 
 		new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
@@ -61,8 +61,10 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		// Check if there is any undefined values of unique map:
 		if (pathParts.some((value) => value === undefined)) return;
 
-		// Add the configured part of the path:
-		pathParts.push(this.#configuredPath);
+		if (this.#additionalPath) {
+			// Add the configured part of the path:
+			pathParts.push(this.#additionalPath);
+		}
 
 		// Make this the path of the modal registration:
 		this._setPath(pathParts.join('/'));
