@@ -236,9 +236,8 @@ angular.module('umbraco')
                 if (property.value && property.value.src) {
 
                     if (thumbnail === true) {
-                        return property.value.src + "?width=500";
-                    }
-                    else {
+                        return mediaHelper.getThumbnailFromPath(property.value.src);
+                    } else {
                         return property.value.src;
                     }
 
