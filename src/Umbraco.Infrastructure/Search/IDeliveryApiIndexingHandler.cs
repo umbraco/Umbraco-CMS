@@ -24,4 +24,13 @@ internal interface IDeliveryApiIndexingHandler
     /// </summary>
     /// <param name="changes">The list of changes by content type ID</param>
     void HandleContentTypeChanges(IList<KeyValuePair<int, ContentTypeChangeTypes>> changes);
+
+    /// <summary>
+    ///     Handles index updates for public access changes
+    /// </summary>
+    /// <remarks>
+    ///     Given the current limitations to the distributed public access notifications, this
+    ///     will remove any protected content from the index without being clever about it.
+    /// </remarks>
+    void HandlePublicAccessChanges();
 }

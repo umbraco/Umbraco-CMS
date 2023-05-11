@@ -21,6 +21,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
 
     // these dependencies are for the deferred handling (we don't want those handlers registered in the DI)
     private readonly IContentService _contentService;
+    private readonly IPublicAccessService _publicAccessService;
     private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
     private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
@@ -31,6 +32,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         ICoreScopeProvider scopeProvider,
         ILogger<DeliveryApiIndexingHandler> logger,
         IContentService contentService,
+        IPublicAccessService publicAccessService,
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
         IBackgroundTaskQueue backgroundTaskQueue)
@@ -40,6 +42,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         _scopeProvider = scopeProvider;
         _logger = logger;
         _contentService = contentService;
+        _publicAccessService = publicAccessService;
         _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _backgroundTaskQueue = backgroundTaskQueue;
@@ -70,6 +73,16 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
             this,
             _deliveryApiContentIndexValueSetBuilder,
             _contentService,
+            _backgroundTaskQueue);
+        Execute(deferred);
+    }
+
+    /// <inheritdoc />
+    public void HandlePublicAccessChanges()
+    {
+        var deferred = new DeliveryApiContentIndexHandlePublicAccessChanges(
+            _publicAccessService,
+            this,
             _backgroundTaskQueue);
         Execute(deferred);
     }

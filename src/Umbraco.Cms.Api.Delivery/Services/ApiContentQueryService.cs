@@ -77,7 +77,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
 
         // Item culture must be either the requested culture or "none"
         var culture = CurrentCulture();
-        queryOperation.And().GroupedOr(new[] { "culture" }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
+        queryOperation.And().GroupedOr(new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
 
         // Handle Filtering
         var canApplyFiltering = CanHandleFiltering(filters, queryOperation);

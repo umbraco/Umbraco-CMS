@@ -75,7 +75,7 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
             }
 
             // find descendants-or-self based on path and optional culture
-            var rawQuery = $"({UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId} OR {UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId},*)";
+            var rawQuery = $"({UmbracoExamineFieldNames.DeliveryApiContentIndex.Id}:{contentId} OR {UmbracoExamineFieldNames.IndexPathFieldName}:\\-1*,{contentId},*)";
             if (culture is not null)
             {
                 rawQuery = $"{rawQuery} AND culture:{culture}";
