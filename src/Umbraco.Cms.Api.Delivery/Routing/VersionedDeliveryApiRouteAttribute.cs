@@ -1,4 +1,4 @@
-using Umbraco.Cms.Api.Common.Routing;
+using Umbraco.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.Api.Delivery.Routing;
 
