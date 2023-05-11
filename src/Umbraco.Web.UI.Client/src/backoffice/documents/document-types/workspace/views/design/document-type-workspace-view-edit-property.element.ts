@@ -1,7 +1,9 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  *  @element document-type-workspace-view-edit-property
@@ -9,7 +11,7 @@ import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/back
  *  @slot editor - Slot for rendering the Property Editor
  */
 @customElement('document-type-workspace-view-edit-property')
-export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
+export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	/**
 	 * Property, the data object for the property.
 	 * @type {PropertyTypeResponseModelBaseModel}
@@ -28,6 +30,17 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 	 */
 	@property({ type: Boolean })
 	public inherited?: boolean;
+
+	#modalRegistration;
+
+	constructor() {
+		super();
+
+		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+		.addUniquePaths(
+			['propertyId']
+		);
+	}
 
 	_firePartialUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
 		const partialObject = {} as any;

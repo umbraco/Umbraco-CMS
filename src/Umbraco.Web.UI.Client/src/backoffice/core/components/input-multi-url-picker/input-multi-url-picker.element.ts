@@ -122,10 +122,9 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL, `:index`, [
-			'propertyAlias',
-			'variantId',
-		])
+		this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL)
+			.addAdditionalPath(`:index`)
+			.addUniquePaths(['propertyAlias', 'variantId'])
 			.onSetup((params) => {
 				// Get index:
 				const indexParam = params.index;

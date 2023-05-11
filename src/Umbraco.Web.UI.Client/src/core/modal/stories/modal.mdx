@@ -109,10 +109,10 @@ descripe the addional features of the route Registration:
 
 		this.myModalRegistration = new UmbModalRouteRegistrationController(
 			this,
-			MY_MODAL_TOKEN,
-			`:index`,
-			['propertyAlias', 'variantId']
+			MY_MODAL_TOKEN
 		)
+		.addAdditionalPath(`:index`)
+		.addUniquePaths(['propertyAlias', 'variantId'])
 		.onSetup((params) => {
 			// Get item index:
 			const indexParam = params.index;

@@ -10,8 +10,9 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	implements UmbControllerInterface
 {
 	//#host: UmbControllerHostInterface;
+	#init;
 
-	#additionalPath: string | null;
+	#additionalPath?: string;
 	#uniquePaths: Map<string, string | undefined> = new Map();
 
 	#routeContext?: typeof UMB_ROUTE_CONTEXT_TOKEN.TYPE;
@@ -21,26 +22,27 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		return undefined;
 	}
 
-	constructor(
-		host: UmbControllerHostElement,
-		alias: UmbModalToken<D, R> | string,
-		additionalPath: string | null = null,
-		uniquePaths?: Array<string> | null,
-		modalConfig?: UmbModalConfig
-	) {
+	constructor(host: UmbControllerHostElement, alias: UmbModalToken<D, R> | string, modalConfig?: UmbModalConfig) {
 		super(alias, null, modalConfig);
-		//this.#host = host;
+
+		this.#init = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
+			this.#routeContext = _routeContext;
+			this._registererModal();
+		}).asPromise();
+	}
+
+	public addAdditionalPath(additionalPath: string) {
 		this.#additionalPath = additionalPath;
-		if (uniquePaths) {
-			uniquePaths.forEach((name) => {
+		return this;
+	}
+
+	public addUniquePaths(uniquePathNames: Array<string>) {
+		if (uniquePathNames) {
+			uniquePathNames.forEach((name) => {
 				this.#uniquePaths.set(name, undefined);
 			});
 		}
-
-		new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
-			this.#routeContext = _routeContext;
-			this._registererModal();
-		});
+		return this;
 	}
 
 	setUniquePathValue(identifier: string, value: string | undefined) {
@@ -53,7 +55,8 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		this._registererModal();
 	}
 
-	private _registererModal() {
+	private async _registererModal() {
+		await this.#init;
 		if (!this.#routeContext) return;
 		if (this.#modalRegistration) {
 			this.#routeContext.unregisterModal(this.#modalRegistration);
@@ -63,7 +66,9 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		const pathParts = Array.from(this.#uniquePaths.values());
 
 		// Check if there is any undefined values of unique map:
-		if (pathParts.some((value) => value === undefined)) return;
+		if (pathParts.some((value) => value === undefined)) {
+			return;
+		}
 
 		if (this.#additionalPath) {
 			// Add the configured part of the path:
