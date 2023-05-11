@@ -88,7 +88,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1205)
+            catch (SqlException ex) when (ex.Number == 1222)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
