@@ -1,5 +1,4 @@
 import { USER_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbUserDeleteEntityBulkAction } from './delete/delete.action';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action';
