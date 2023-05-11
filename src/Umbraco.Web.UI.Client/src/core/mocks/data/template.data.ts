@@ -29,7 +29,7 @@ export const data: Array<TemplateDBItem> = [
 		parentId: null,
 		name: 'Doc 1',
 		type: 'template',
-		icon: 'icon-layout',
+		icon: 'umb:layout',
 		hasChildren: false,
 		alias: 'Doc1',
 		content: `@using Umbraco.Extensions
@@ -53,7 +53,7 @@ export const data: Array<TemplateDBItem> = [
 		parentId: null,
 		name: 'Test',
 		type: 'template',
-		icon: 'icon-layout',
+		icon: 'umb:layout',
 		hasChildren: true,
 		alias: 'Test',
 		content:
@@ -66,7 +66,7 @@ export const data: Array<TemplateDBItem> = [
 		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
 		type: 'template',
-		icon: 'icon-layout',
+		icon: 'umb:layout',
 		hasChildren: false,
 		alias: 'Test',
 		content:

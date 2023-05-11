@@ -9,7 +9,7 @@ import type {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '../../../shared/components/table';
+} from '@umbraco-cms/backoffice/core/components';
 import type { MediaDetails } from '../';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

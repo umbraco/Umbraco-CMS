@@ -5,8 +5,7 @@ import 'element-internals-polyfill';
 
 import './core/router/router-slot.element';
 import './core/router/variant-router-slot.element';
-import './core/notification/layouts/default';
-import './core/modal/modal-element.element';
+import './core/context-provider/context-provider.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
@@ -15,6 +14,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbAuthFlow } from './core/auth/auth-flow';
 import { UmbIconStore } from './core/stores/icon/icon.store';
 import type { UmbErrorElement } from './error/error.element';
+import { UMB_APP, UmbAppContext } from './app.context';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -39,7 +39,8 @@ export class UmbAppElement extends UmbLitElement {
 	 * @attr
 	 */
 	@property({ type: String })
-	private backofficePath = '/umbraco';
+	// TODO: get from server config
+	private backofficePath = import.meta.env.DEV ? '/' : '/umbraco';
 
 	private _routes: UmbRoute[] = [
 		{
@@ -75,6 +76,8 @@ export class UmbAppElement extends UmbLitElement {
 			`${window.location.origin}${this.backofficePath}`
 		);
 
+		// TODO: Make a combined App Context
+		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath }));
 		this.provideContext(UMB_SERVER_URL, OpenAPI.BASE);
 
 		this._setup();

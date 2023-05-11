@@ -2,11 +2,9 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeElement } from '../../../../shared/components/tree/tree.element';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
 import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
-import { DictionaryItemResponseModel, ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-import-dictionary-modal')

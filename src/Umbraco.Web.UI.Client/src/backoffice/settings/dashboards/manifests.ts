@@ -1,4 +1,4 @@
-import type { ManifestDashboard, ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestDashboard } from '@umbraco-cms/backoffice/extensions-registry';
 
 const dashboards: Array<ManifestDashboard> = [
 	{
@@ -93,13 +93,4 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 ];
 
-const modals: Array<ManifestModal> = [
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.ExamineFieldsSettings',
-		name: 'Examine Field Settings Modal',
-		loader: () => import('../../search/examine-management-dashboard/views/modal-views/fields-settings.element'),
-	},
-];
-
-export const manifests = [...dashboards, ...modals];
+export const manifests = [...dashboards];

@@ -17,7 +17,6 @@ export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<
 	}
 
 	async execute() {
-		//TODO: we need bulk actions on the server
 		if (!this.#modalContext || this.selection.length === 0) return;
 
 		const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
@@ -29,6 +28,7 @@ export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<
 
 		await modalHandler.onSubmit();
 
+		//TODO: How should we handle bulk actions? right now we send a request per item we want to change.
 		//TODO: For now we have to reload the page to see the update
 		for (let index = 0; index < this.selection.length; index++) {
 			const element = this.selection[index];

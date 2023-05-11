@@ -1,18 +1,16 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbTemplatePickerModalData {
-	multiple: boolean;
-	selection: Array<string | null>;
-}
-
-export interface UmbTemplatePickerModalResult {
-	selection: Array<string | null>;
-}
+export type UmbTemplatePickerModalData = UmbTreePickerModalData<EntityTreeItemResponseModel>;
+export type UmbTemplatePickerModalResult = UmbPickerModalResult;
 
 export const UMB_TEMPLATE_PICKER_MODAL = new UmbModalToken<UmbTemplatePickerModalData, UmbTemplatePickerModalResult>(
-	'Umb.Modal.TemplatePicker',
+	'Umb.Modal.TreePicker',
 	{
 		type: 'sidebar',
 		size: 'small',
+	},
+	{
+		treeAlias: 'Umb.Tree.Templates',
 	}
 );

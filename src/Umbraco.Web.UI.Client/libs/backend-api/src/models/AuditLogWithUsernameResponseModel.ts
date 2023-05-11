@@ -5,6 +5,7 @@
 import type { AuditLogBaseModel } from './AuditLogBaseModel';
 
 export type AuditLogWithUsernameResponseModel = (AuditLogBaseModel & {
-userName?: string | null;
-userAvatars?: Array<string> | null;
+    userName?: string | null;
+    userAvatars?: Array<string> | null;
 });
+

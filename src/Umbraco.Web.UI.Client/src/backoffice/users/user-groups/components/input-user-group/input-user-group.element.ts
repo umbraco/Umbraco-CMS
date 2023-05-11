@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInputListBaseElement } from '../../../../shared/components/input-list-base/input-list-base';
+import { UmbInputListBaseElement } from '../../../../core/components/input-list-base/input-list-base';
 import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../repository/user-group.store';
 import type { UserGroupEntity } from '../../types';
 import { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';

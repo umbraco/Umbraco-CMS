@@ -4,13 +4,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../../../shared/property-creator/property-creator.element.ts';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-document-type-workspace-view-design')
 export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
-	
-
 	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	@state()
@@ -96,7 +93,7 @@ export class UmbDocumentTypeWorkspaceViewDesignElement extends UmbLitElement {
 			</uui-button>
 		</uui-tab-group>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

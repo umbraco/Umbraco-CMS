@@ -5,5 +5,6 @@
 import type { ValueModelBaseModel } from './ValueModelBaseModel';
 
 export type MediaValueModel = (ValueModelBaseModel & {
-$type: string;
+    $type: string;
 });
+

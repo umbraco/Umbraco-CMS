@@ -378,7 +378,16 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.Tags',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Tags',
-		values: [],
+		values: [
+			{
+				alias: 'group',
+				value: 'Fruits',
+			},
+			{
+				alias: 'items',
+				value: [],
+			},
+		],
 	},
 	{
 		$type: '',
@@ -571,7 +580,12 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.Decimal',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Decimal',
-		values: [],
+		values: [
+			{
+				alias: 'step',
+				value: '0.01',
+			},
+		],
 	},
 	{
 		$type: '',
