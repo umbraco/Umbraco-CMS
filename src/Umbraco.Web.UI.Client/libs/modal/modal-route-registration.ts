@@ -104,6 +104,9 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	};
 
 	routeSetup(modalContext: UmbModalContext, params: Params) {
+		// If already open, don't do anything:
+		if (this.active) return;
+
 		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
 			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig);
