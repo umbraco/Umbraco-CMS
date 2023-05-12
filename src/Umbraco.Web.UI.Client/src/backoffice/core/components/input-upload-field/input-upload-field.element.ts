@@ -112,16 +112,15 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderFiles() {
+		if (!this._currentFiles.length) return nothing;
 		return html` <div id="wrapper">
 				${map(this._currentFiles, (file) => {
 					return html`<umb-input-upload-field-file .file=${file}></umb-input-upload-field-file>`;
 				})}
 			</div>
-			${this._currentFiles.length
-				? html` <uui-button compact @click=${this.#handleRemove} label="Remove files">
-						<uui-icon name="umb:trash"></uui-icon> Remove file(s)
-				  </uui-button>`
-				: nothing}`;
+			<uui-button compact @click=${this.#handleRemove} label="Remove files">
+				<uui-icon name="umb:trash"></uui-icon> Remove file(s)
+			</uui-button>`;
 	}
 
 	#handleRemove() {
