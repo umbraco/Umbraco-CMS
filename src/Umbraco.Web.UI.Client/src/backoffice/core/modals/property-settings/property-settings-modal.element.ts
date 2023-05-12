@@ -1,6 +1,6 @@
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
+import { PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import {
 	UmbModalContext,
@@ -12,6 +12,7 @@ import {
 import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { generateAlias } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-settings-modal')
 // TODO: Could base take a token to get its types?.
@@ -20,45 +21,39 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalResult
 > {
 	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
-	@state() private _selectedPropertyEditorUIAlias = '';
-
-	@state() private _appearanceIsTop = false;
-	@state() private _mandatory = false;
+	@state() private _selectedPropertyEditorId = '';
 
 	//TODO: Should these options come from the server?
 	@state() private _customValidationOptions = [
 		{
 			name: 'No validation',
-			value: 'no-validation',
+			value: '',
 			selected: true,
 		},
 		{
 			name: 'Validate as an email address',
-			value: 'email',
-			validation: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+',
+			value: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+',
 		},
 		{
 			name: 'Validate as a number',
-			value: 'number',
-			validation: '^[0-9]*$',
+			value: '^[0-9]*$',
 		},
 		{
 			name: 'Validate as an URL',
-			value: 'url',
-			validation: 'https?://[a-zA-Z0-9-.]+\\.[a-zA-Z]{2,}',
+			value: 'https?://[a-zA-Z0-9-.]+\\.[a-zA-Z]{2,}',
 		},
 		{
 			name: '...or enter a custom validation',
-			value: 'custom',
+			value: '',
 		},
 	];
-	@state() private _customValidation = this._customValidationOptions[0];
 
 	@state() private _aliasLocked = true;
-	@state() private _name = '';
-	@state() private _alias = '';
 
 	#modalContext?: UmbModalContext;
+
+	@state()
+	protected _returnData!: UmbPropertySettingsModalResult;
 
 	constructor() {
 		super();
@@ -70,11 +65,34 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.#observePropertyEditorUI();
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._returnData = JSON.parse(JSON.stringify(this.data));
+
+		const regEx = this._returnData.validation?.regEx ?? '';
+		const newlySelected = this._customValidationOptions.find((option) => {
+			option.selected = option.value === regEx;
+			return option.selected;
+		});
+		if (newlySelected === undefined) {
+			this._customValidationOptions[4].selected = true;
+		}
+	}
+
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.)
+		requestAnimationFrame(() => {
+			(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
+		});
+	}
+
 	#observePropertyEditorUI() {
-		if (!this._selectedPropertyEditorUIAlias) return;
+		if (!this._selectedPropertyEditorId) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._selectedPropertyEditorUIAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._selectedPropertyEditorId),
 			(propertyEditorUI) => {
 				if (!propertyEditorUI) return;
 
@@ -84,15 +102,16 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#onCustomValidationChange(event: UUISelectEvent) {
-		const value = event.target.value;
-
-		this._customValidation =
-			this._customValidationOptions.find((option) => option.value === value) ?? this._customValidationOptions[0];
+		console.log('event.target.value', event.target.value);
+		const regEx = event.target.value.toString();
+		this._returnData.validation!.regEx = regEx;
+		this.requestUpdate('_returnData');
 	}
 
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
 		const value = event.target.checked;
-		this._mandatory = value;
+		this._returnData.validation!.mandatory = value;
+		this.requestUpdate('_returnData');
 	}
 
 	#onClose() {
@@ -110,65 +129,50 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		const formData = new FormData(form);
 
-		const label = this._name || '';
-		const alias = this._alias || '';
-		const description = formData.get('description')?.toString() || '';
-		const propertyEditorUI = this._selectedPropertyEditorUIAlias || undefined;
-		const labelOnTop = this._appearanceIsTop;
-		const mandatory = this._mandatory;
-		const mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
-		const pattern = formData.get('pattern')?.toString() || '';
-		const patternMessage = formData.get('pattern-message')?.toString() || '';
+		this._returnData.dataTypeId = this._selectedPropertyEditorId || undefined;
+		this._returnData.validation!.mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
 
-		this.modalHandler?.submit({
-			label,
-			alias,
-			description,
-			propertyEditorUI,
-			labelOnTop,
-			validation: {
-				mandatory,
-				mandatoryMessage,
-				pattern,
-				patternMessage,
-			},
-		});
+		this.modalHandler?.submit(this._returnData);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
 		//TODO: Generate alias
-		this._name = event.target.value.toString();
+		const oldName = this._returnData.name;
+		const oldAlias = this._returnData.alias;
+		this._returnData.name = event.target.value.toString();
 		if (this._aliasLocked) {
-			this._alias = this.#generateAlias(this._name);
+			const expectedOldAlias = generateAlias(oldName ?? '');
+			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
+			if (expectedOldAlias === oldAlias) {
+				this._returnData.alias = generateAlias(this._returnData.name);
+				this.requestUpdate('_returnData');
+			}
 		}
-	}
-
-	// TODO: move this to a helper so we can reuse it across the app
-	#generateAlias(text: string) {
-		//replace all spaces characters with a dash and remove all non-alphanumeric characters, except underscore. Allow a maximum of 1 dashes or underscores in a row.
-		return text
-			.replace(/\s+/g, '-')
-			.replace(/[^a-zA-Z0-9_-]+/g, '')
-			.replace(/[-_]{2,}/g, (match) => match[0])
-			.toLowerCase();
 	}
 
 	#onAliasChange(event: UUIInputEvent) {
-		const alias = this.#generateAlias(event.target.value.toString());
+		const alias = generateAlias(event.target.value.toString());
 		if (!this._aliasLocked) {
-			this._alias = alias;
+			this._returnData.alias = alias;
 		} else {
-			event.target.value = this._alias;
+			this._returnData.alias = this.data?.alias;
 		}
+		this.requestUpdate('_returnData');
 	}
 
-	#onAppearanceChange(event: MouseEvent) {
-		const target = event.target as HTMLElement;
-		const alreadySelected = target.classList.contains(this._appearanceIsTop ? 'top' : 'left');
+	#setAppearanceNormal() {
+		const currentValue = this._returnData.appearance?.labelOnTop;
+		if (currentValue !== true) return;
 
-		if (alreadySelected) return;
+		this._returnData.appearance!.labelOnTop = false;
+		this.requestUpdate('_returnData');
+	}
+	#setAppearanceTop() {
+		const currentValue = this._returnData.appearance?.labelOnTop;
+		if (currentValue === true) return;
 
-		this._appearanceIsTop = !this._appearanceIsTop;
+		this._returnData.appearance!.labelOnTop = true;
+		this.requestUpdate('_returnData');
 	}
 
 	#onOpenPropertyEditorUIPicker() {
@@ -181,7 +185,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		modalHandler?.onSubmit().then(({ selection }) => {
 			if (selection.length === 0) return;
 			// TODO: we might should set the alias to null or empty string, if no selection.
-			this._selectedPropertyEditorUIAlias = selection[0];
+			this._selectedPropertyEditorId = selection[0];
 			this.#observePropertyEditorUI();
 		});
 	}
@@ -195,8 +199,26 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this._aliasLocked = !this._aliasLocked;
 
 		if (this._aliasLocked) {
-			this._alias = this.#generateAlias(this._name);
+			this._returnData.alias = generateAlias(this._returnData.alias ?? '');
+			this.requestUpdate('_returnData');
 		}
+	}
+
+	#onValidationRegExChange(event: UUIInputEvent) {
+		const regEx = event.target.value.toString();
+		const newlySelected = this._customValidationOptions.find((option) => {
+			option.selected = option.value === regEx;
+			return option.selected;
+		});
+		if (newlySelected === undefined) {
+			this._customValidationOptions[4].selected = true;
+		}
+		this._returnData.validation!.regEx = regEx;
+		this.requestUpdate('_returnData');
+	}
+	#onValidationMessageChange(event: UUIInputEvent) {
+		this._returnData.validation!.regExMessage = event.target.value.toString();
+		this.requestUpdate('_returnData');
 	}
 
 	render() {
@@ -208,22 +230,28 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							<uui-box>
 								<div class="container">
 									<uui-input
+										id="nameInput"
 										name="name"
 										@input=${this.#onNameChange}
-										.value=${this._name}
+										.value=${this._returnData.name}
 										placeholder="Enter a name...">
+										<!-- TODO: validation for bad characters -->
 									</uui-input>
 									<uui-input
 										name="alias"
 										@input=${this.#onAliasChange}
-										.value=${this._alias}
+										.value=${this._returnData.alias}
 										placeholder="Enter alias..."
 										?disabled=${this._aliasLocked}>
+										<!-- TODO: validation for bad characters -->
 										<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
 											<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
 										</div>
 									</uui-input>
-									<uui-textarea name="description" placeholder="Enter description..."></uui-textarea>
+									<uui-textarea
+										name="description"
+										placeholder="Enter description..."
+										.value=${this._returnData.description}></uui-textarea>
 								</div>
 								${this.#renderPropertyUIPicker()}
 								<hr />
@@ -252,9 +280,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	#renderAlignLeftIcon() {
 		return html`<div
-			@click=${this.#onAppearanceChange}
+			@click=${this.#setAppearanceNormal}
 			@keydown=${() => ''}
-			class="appearance left ${this._appearanceIsTop ? '' : 'selected'}">
+			class="appearance left ${this._returnData.appearance?.labelOnTop ? '' : 'selected'}">
 			<svg width="260" height="32" viewBox="0 0 260 60" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<rect width="89" height="14" rx="7" fill="currentColor" />
 				<rect x="121" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
@@ -268,9 +296,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	#renderAlignTopIcon() {
 		return html`
 			<div
-				@click=${this.#onAppearanceChange}
+				@click=${this.#setAppearanceTop}
 				@keydown=${() => ''}
-				class="appearance top ${this._appearanceIsTop ? 'selected' : ''}">
+				class="appearance top ${this._returnData.appearance?.labelOnTop ? 'selected' : ''}">
 				<svg width="139" height="48" viewBox="0 0 139 90" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<rect width="89" height="14" rx="7" fill="currentColor" />
 					<rect y="30" width="139" height="10" rx="5" fill="currentColor" fill-opacity="0.4" />
@@ -287,7 +315,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				<label for="mandatory">Field is mandatory</label>
 				<uui-toggle @change=${this.#onMandatoryChange} id="mandatory" slot="editor"></uui-toggle>
 			</div>
-			${this._mandatory
+			${this._returnData.validation?.mandatory
 				? html`<uui-input
 						name="mandatory-message"
 						style="margin-top: var(--uui-size-space-1)"
@@ -326,13 +354,17 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				@change=${this.#onCustomValidationChange}
 				.options=${this._customValidationOptions}></uui-select>
 
-			${this._customValidation.value !== 'no-validation'
+			${this._returnData.validation?.regEx !== ''
 				? html`
 						<uui-input
 							name="pattern"
 							style="margin-bottom: var(--uui-size-space-1); margin-top: var(--uui-size-space-5);"
-							value=${this._customValidation.validation ?? ''}></uui-input>
-						<uui-textarea name="pattern-message"></uui-textarea>
+							@change=${this.#onValidationRegExChange}
+							.value=${this._returnData.validation?.regEx ?? ''}></uui-input>
+						<uui-textarea
+							name="pattern-message"
+							@change=${this.#onValidationMessageChange}
+							.value=${this._returnData.validation?.regExMessage ?? ''}></uui-textarea>
 				  `
 				: nothing} `;
 	}

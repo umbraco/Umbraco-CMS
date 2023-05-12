@@ -51,9 +51,11 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
+				console.log(this.property);
 				return this.property ?? false;
 			})
 			.onSubmit((result) => {
+				console.log(result);
 				this._partialUpdate(result);
 			})
 			.observeRouteBuilder((routeBuilder) => {
