@@ -5,7 +5,6 @@ import 'element-internals-polyfill';
 
 import './core/router/router-slot.element';
 import './core/router/variant-router-slot.element';
-import '../libs/context-api/provide/context-provider.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
