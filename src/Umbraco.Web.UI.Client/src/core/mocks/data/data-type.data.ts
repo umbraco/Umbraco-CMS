@@ -378,7 +378,16 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.Tags',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUI.Tags',
-		values: [],
+		values: [
+			{
+				alias: 'group',
+				value: 'Fruits',
+			},
+			{
+				alias: 'items',
+				value: [],
+			},
+		],
 	},
 	{
 		$type: '',

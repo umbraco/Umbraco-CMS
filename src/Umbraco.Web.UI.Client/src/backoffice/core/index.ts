@@ -11,15 +11,28 @@ import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestKind, ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 import './notification';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes | ManifestKind> = [
 	...componentManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...tinyMcePluginManifests,
 	...modalManifests,
+	// TODO: where should these live?
+	{
+		type: 'kind',
+		alias: 'Umb.Kind.TreePickerModal',
+		matchKind: 'treePicker',
+		matchType: 'modal',
+		manifest: {
+			type: 'modal',
+			kind: 'treePicker',
+			elementName: 'umb-tree-picker-modal',
+		},
+	},
 ];
 
 export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
