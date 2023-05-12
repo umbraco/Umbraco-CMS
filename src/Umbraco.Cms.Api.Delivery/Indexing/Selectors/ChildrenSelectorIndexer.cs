@@ -14,7 +14,7 @@ public sealed class ChildrenSelectorIndexer : IContentIndexHandler
 
     internal const string FieldName = "parentId";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
     {
         Guid parentKey = Guid.Empty;
         if (content.ParentId > 0)
@@ -26,10 +26,10 @@ public sealed class ChildrenSelectorIndexer : IContentIndexHandler
         yield return new IndexFieldValue
         {
             FieldName = FieldName,
-            Value = parentKey
+            Values = new object[] { parentKey }
         };
     }
 
     public IEnumerable<IndexField> GetFields()
-        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.String } };
+        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.StringRaw, VariesByCulture = false } };
 }

@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace Umbraco.Cms.Api.Common.Routing;
+namespace Umbraco.Cms.Web.Common.Routing;
 
 /// <summary>
 /// Adds a custom template token for specifying backoffice route with attribute routing

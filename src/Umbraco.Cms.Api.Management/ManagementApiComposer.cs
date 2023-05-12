@@ -54,7 +54,6 @@ public class ManagementApiComposer : IComposer
             .AddBackOfficeAuthentication();
 
         services
-            .ConfigureOptions<ConfigureMvcOptions>()
             .ConfigureOptions<ConfigureApiBehaviorOptions>()
             .AddControllers()
             .AddJsonOptions(_ =>

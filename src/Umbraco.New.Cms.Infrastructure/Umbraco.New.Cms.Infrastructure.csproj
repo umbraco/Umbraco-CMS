@@ -13,5 +13,6 @@
 
   <ItemGroup>
     <PackageReference Include="OpenIddict.Abstractions" Version="4.0.0" />
+    <PackageReference Include="OpenIddict.Abstractions" Version="4.3.0" />
   </ItemGroup>
 </Project>

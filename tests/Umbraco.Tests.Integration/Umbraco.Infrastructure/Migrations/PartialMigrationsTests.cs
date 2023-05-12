@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
@@ -88,6 +89,26 @@ public class PartialMigrationsTests : UmbracoIntegrationTest
             Assert.AreEqual("c", KeyValueService.GetValue(upgrader.StateValueKey));
             Assert.IsTrue(scope.Database.HasTable(TableName));
             Assert.IsTrue(ColumnExists(TableName, ColumnName, scope));
+        });
+    }
+
+    [Test]
+    public void CanRunMigrationTwice()
+    {
+        Upgrader? upgrader = new(new SimpleMigrationPlan());
+        Upgrader? upgrader2 = new(new SimpleMigrationPlan());
+        var result = upgrader.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+        var result2 = upgrader2.Execute(MigrationPlanExecutor, ScopeProvider, KeyValueService);
+
+        Assert.Multiple(() =>
+        {
+            Assert.True(result.Successful);
+            Assert.AreEqual("SimpleMigrationPlan_InitialState", result.InitialState);
+            Assert.AreEqual("SimpleMigrationStep", result.FinalState);
+            Assert.AreEqual(1, result.CompletedTransitions.Count);
+            Assert.IsNull(result.Exception);
+            Assert.True(result2.Successful);
+            Assert.IsNull(result2.Exception);
         });
     }
 
@@ -307,4 +328,30 @@ internal class TestUmbracoPlan : UmbracoPlan
         To<ErrorMigration>("b");
         To<AddColumnMigration>("c");
     }
+}
+
+internal class SimpleMigrationPlan : MigrationPlan
+{
+    public SimpleMigrationPlan()
+        : base("SimpleMigrationPlan") => DefinePlan();
+
+    public override string InitialState => "SimpleMigrationPlan_InitialState";
+
+    private void DefinePlan()
+    {
+        MigrationPlan plan = From(InitialState)
+            .To<SimpleMigrationStep>(nameof(SimpleMigrationStep));
+    }
+}
+
+internal class SimpleMigrationStep : MigrationBase
+{
+    private readonly ILogger<SimpleMigrationStep> _logger;
+
+    public SimpleMigrationStep(
+        IMigrationContext context,
+        ILogger<SimpleMigrationStep> logger)
+        : base(context) => _logger = logger;
+
+    protected override void Migrate() => _logger.LogDebug("Here be migration");
 }

@@ -1,16 +1,18 @@
 using Examine;
 using Examine.Search;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
-internal sealed class ApiContentQueryService : IApiContentQueryService // Examine-specific implementation - can be swapped out
+internal sealed class ApiContentQueryService : IApiContentQueryService
 {
     private const string ItemIdFieldName = "itemId";
     private readonly IExamineManager _examineManager;
@@ -18,24 +20,38 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
     private readonly SelectorHandlerCollection _selectorHandlers;
     private readonly FilterHandlerCollection _filterHandlers;
     private readonly SortHandlerCollection _sortHandlers;
+    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly ILogger<ApiContentQueryService> _logger;
     private readonly string _fallbackGuidValue;
+    private readonly Dictionary<string, FieldType> _fieldTypes;
 
     public ApiContentQueryService(
         IExamineManager examineManager,
         IRequestStartItemProviderAccessor requestStartItemProviderAccessor,
         SelectorHandlerCollection selectorHandlers,
         FilterHandlerCollection filterHandlers,
-        SortHandlerCollection sortHandlers)
+        SortHandlerCollection sortHandlers,
+        ContentIndexHandlerCollection indexHandlers,
+        ILogger<ApiContentQueryService> logger,
+        IVariationContextAccessor variationContextAccessor)
     {
         _examineManager = examineManager;
         _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
         _selectorHandlers = selectorHandlers;
         _filterHandlers = filterHandlers;
         _sortHandlers = sortHandlers;
+        _variationContextAccessor = variationContextAccessor;
+        _logger = logger;
 
         // A fallback value is needed for Examine queries in case we don't have a value - we can't pass null or empty string
         // It is set to a random guid since this would be highly unlikely to yield any results
         _fallbackGuidValue = Guid.NewGuid().ToString("D");
+
+        // build a look-up dictionary of field types by field name
+        _fieldTypes = indexHandlers
+            .SelectMany(handler => handler.GetFields())
+            .DistinctBy(field => field.FieldName)
+            .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
     }
 
     /// <inheritdoc/>
@@ -58,6 +74,10 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         {
             return Attempt.FailWithStatus(ApiContentQueryOperationStatus.SelectorOptionNotFound, emptyResult);
         }
+
+        // Item culture must be either the requested culture or "none"
+        var culture = CurrentCulture();
+        queryOperation.And().GroupedOr(new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
 
         // Handle Filtering
         var canApplyFiltering = CanHandleFiltering(filters, queryOperation);
@@ -98,7 +118,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
     private IBooleanOperation? HandleSelector(string? fetch, IQuery baseQuery)
     {
         string? fieldName = null;
-        string? fieldValue = null;
+        string[] fieldValues = Array.Empty<string>();
 
         if (fetch is not null)
         {
@@ -111,9 +131,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
             }
 
             fieldName = selector.FieldName;
-            fieldValue = string.IsNullOrWhiteSpace(selector.Value) == false
-                ? selector.Value
-                : _fallbackGuidValue;
+            fieldValues = selector.Values.Any()
+                ? selector.Values
+                : new[] { _fallbackGuidValue };
         }
 
         // Take into account the "start-item" header if present, as it defines a starting root node to query from
@@ -124,19 +144,33 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
             {
                 // Reusing the boolean operation of the "Descendants" selector, as we want to get all the nodes from the given starting point
                 fieldName = DescendantsSelectorIndexer.FieldName;
-                fieldValue = startItem.Key.ToString();
+                fieldValues = new [] { startItem.Key.ToString() };
             }
         }
 
         // If no params or no fetch value, get everything from the index - this is a way to do that with Examine
         fieldName ??= UmbracoExamineFieldNames.CategoryFieldName;
-        fieldValue ??= "content";
+        fieldValues = fieldValues.Any() ? fieldValues : new [] { "content" };
 
-        return baseQuery.Field(fieldName, fieldValue);
+        return fieldValues.Length == 1
+            ? baseQuery.Field(fieldName, fieldValues.First())
+            : baseQuery.GroupedOr(new[] { fieldName }, fieldValues);
     }
 
     private bool CanHandleFiltering(IEnumerable<string> filters, IBooleanOperation queryOperation)
     {
+        void HandleExact(IQuery query, string fieldName, string[] values)
+        {
+            if (values.Length == 1)
+            {
+                query.Field(fieldName, values[0]);
+            }
+            else
+            {
+                query.GroupedOr(new[] { fieldName }, values);
+            }
+        }
+
         foreach (var filterValue in filters)
         {
             IFilterHandler? filterHandler = _filterHandlers.FirstOrDefault(h => h.CanHandle(filterValue));
@@ -147,21 +181,19 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
                 return false;
             }
 
-            var value = string.IsNullOrWhiteSpace(filter.Value) == false
-                ? filter.Value
-                : _fallbackGuidValue;
+            var values = filter.Values.Any()
+                ? filter.Values
+                : new[] { _fallbackGuidValue };
 
             switch (filter.Operator)
             {
                 case FilterOperation.Is:
-                    queryOperation.And().Field(filter.FieldName,
-                        (IExamineValue)new ExamineValue(Examineness.Explicit,
-                            value)); // TODO: doesn't work for explicit word(s) match
+                    // TODO: test this for explicit word matching
+                    HandleExact(queryOperation.And(), filter.FieldName, values);
                     break;
                 case FilterOperation.IsNot:
-                    queryOperation.Not().Field(filter.FieldName,
-                        (IExamineValue)new ExamineValue(Examineness.Explicit,
-                            value)); // TODO: doesn't work for explicit word(s) match
+                    // TODO: test this for explicit word matching
+                    HandleExact(queryOperation.Not(), filter.FieldName, values);
                     break;
                 // TODO: Fix
                 case FilterOperation.Contains:
@@ -191,13 +223,20 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
                 return null;
             }
 
-            SortType sortType = sort.FieldType switch
+            if (_fieldTypes.TryGetValue(sort.FieldName, out FieldType fieldType) is false)
+            {
+                _logger.LogWarning("Sort implementation for field name {FieldName} does not match an index handler implementation, cannot resolve field type.", sort.FieldName);
+                continue;
+            }
+
+            SortType sortType = fieldType switch
             {
                 FieldType.Number => SortType.Int,
                 FieldType.Date => SortType.Long,
-                FieldType.String => SortType.String,
+                FieldType.StringRaw => SortType.String,
+                FieldType.StringAnalyzed => SortType.String,
                 FieldType.StringSortable => SortType.String,
-                _ => throw new ArgumentOutOfRangeException(nameof(sort.FieldType))
+                _ => throw new ArgumentOutOfRangeException(nameof(fieldType))
             };
 
             orderingQuery = sort.Direction switch
@@ -211,4 +250,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService // Examin
         // Keep the index sorting as default
         return orderingQuery ?? queryCriteria.OrderBy();
     }
+
+    private string CurrentCulture()
+        => _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
 }

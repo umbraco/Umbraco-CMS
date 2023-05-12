@@ -47,6 +47,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
@@ -290,6 +291,9 @@ public static partial class UmbracoBuilderExtensions
             options.Cookie.HttpOnly = true;
         });
 
+        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
+        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
+        builder.Services.AddApiVersioning().AddApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor

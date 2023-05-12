@@ -20,8 +20,7 @@ public sealed class UpdateDateSort : ISortHandler
         return new SortOption
         {
             FieldName = UpdateDateSortIndexer.FieldName,
-            Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending,
-            FieldType = FieldType.Date
+            Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending
         };
     }
 }

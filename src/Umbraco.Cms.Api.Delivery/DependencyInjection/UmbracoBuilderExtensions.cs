@@ -34,7 +34,6 @@ public static class UmbracoBuilderExtensions
 
         builder
             .Services
-            .ConfigureOptions<ConfigureMvcOptions>()
             .AddControllers()
             .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
             {
