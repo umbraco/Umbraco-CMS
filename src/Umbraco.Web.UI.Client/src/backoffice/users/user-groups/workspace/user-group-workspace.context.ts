@@ -63,13 +63,6 @@ export class UmbUserGroupWorkspaceContext
 	async save() {
 		if (!this.#data.value) return;
 
-		if (this.#data) {
-			//TODO: Remove all the !'s
-			console.log(this.#userIds.getValue(), 'USERS');
-
-			await this.#userRepository.setUserGroups(this.#userIds.getValue(), [this.#data!.getValue()!.id!]);
-		}
-
 		//TODO: Could we clean this code up?
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
@@ -77,7 +70,12 @@ export class UmbUserGroupWorkspaceContext
 			await this.repository.save(this.#data.value.id, this.#data.value);
 		} else return;
 
-		//TODO Call user repository:
+		const userIds = this.#userIds.getValue();
+		const userGroupIds = [this.#data.getValue()?.id ?? ''];
+
+		if (userIds.length > 0 && userGroupIds.length > 0) {
+			await this.#userRepository.setUserGroups(userIds, userGroupIds);
+		}
 
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);

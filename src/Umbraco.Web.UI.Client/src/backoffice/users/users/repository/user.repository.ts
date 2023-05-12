@@ -9,6 +9,7 @@ import { UmbUserServerDataSource } from './sources/user.server.data';
 import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data';
 import { UmbUserItemServerDataSource } from './sources/user-item.server.data';
 import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store';
+import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbCollectionDataSource,
@@ -25,7 +26,6 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data';
 
 export class UmbUserRepository
 	implements UmbUserDetailRepository, UmbCollectionRepository, UmbItemRepository<UserItemResponseModel>

@@ -75,8 +75,6 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	}
 
 	render() {
-		console.log(this._userKeys, 'hallo');
-
 		if (!this._userGroup) return nothing;
 
 		return html`
