@@ -42,6 +42,12 @@ public class ByIdContentApiController : ContentApiItemControllerBase
             return Unauthorized();
         }
 
-        return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
+        IApiContentResponse? apiContentResponse = ApiContentResponseBuilder.Build(contentItem);
+        if (apiContentResponse is null)
+        {
+            return NotFound();
+        }
+
+        return await Task.FromResult(Ok(apiContentResponse));
     }
 }

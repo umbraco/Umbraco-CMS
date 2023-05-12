@@ -19,8 +19,14 @@ public abstract class ApiContentBuilderBase<T>
 
     protected abstract T Create(IPublishedContent content, Guid id, string name, string contentType, IApiContentRoute route, IDictionary<string, object?> properties);
 
-    public virtual T Build(IPublishedContent content)
+    public virtual T? Build(IPublishedContent content)
     {
+        IApiContentRoute? route = _apiContentRouteBuilder.Build(content);
+        if (route is null)
+        {
+            return default;
+        }
+
         IDictionary<string, object?> properties =
             _outputExpansionStrategyAccessor.TryGetValue(out IOutputExpansionStrategy? outputExpansionStrategy)
                 ? outputExpansionStrategy.MapContentProperties(content)
@@ -31,7 +37,7 @@ public abstract class ApiContentBuilderBase<T>
             content.Key,
             _apiContentNameProvider.GetName(content),
             content.ContentType.Alias,
-            _apiContentRouteBuilder.Build(content),
+            route,
             properties);
     }
 }
