@@ -9,6 +9,7 @@ import '../../../core/components/input-section/input-section.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import UmbUserInputElement from '../../users/components/user-input/user-input.element';
 
 @customElement('umb-user-group-workspace-edit')
 export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
@@ -27,7 +28,7 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbUserGroupWorkspaceContext;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
-			this.observe(this.#workspaceContext.userKeys, (userKeys) => (this._userKeys = userKeys));
+			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
 		});
 
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
@@ -35,8 +36,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		});
 	}
 
-	#onUsersChange(userKeys: Array<string>) {
-		this.#workspaceContext?.updateUserKeys(userKeys);
+	#onUsersChange(userIds: Array<string>) {
+		this.#workspaceContext?.updateUserKeys(userIds);
 	}
 
 	#onSectionsChange(value: string[]) {
@@ -74,6 +75,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	}
 
 	render() {
+		console.log(this._userKeys, 'hallo');
+
 		if (!this._userGroup) return nothing;
 
 		return html`
@@ -140,8 +143,8 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 		return html`<uui-box>
 				<div slot="headline">Users</div>
 				<umb-user-input
-					@change=${(e: Event) => this.#onUsersChange((e.target as any).value)}
-					.value=${this._userKeys?.toString() ?? ''}></umb-user-input>
+					@change=${(e: Event) => this.#onUsersChange((e.target as UmbUserInputElement).selectedIds)}
+					.selectedIds=${this._userKeys ?? []}></umb-user-input>
 			</uui-box>
 			<uui-box>
 				<div slot="headline">Delete user group</div>

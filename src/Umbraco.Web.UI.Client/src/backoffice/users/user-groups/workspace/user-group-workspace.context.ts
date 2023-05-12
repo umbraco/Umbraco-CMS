@@ -1,4 +1,5 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
+import { UmbUserRepository } from '../../users/repository/user.repository';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,11 +12,15 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	#userKeys = new UmbArrayState<string>([]);
-	userKeys = this.#userKeys.asObservable();
+	#userIds = new UmbArrayState<string>([]);
+	userIds = this.#userIds.asObservable();
+
+	#userRepository: UmbUserRepository;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbUserGroupRepository(host));
+
+		this.#userRepository = new UmbUserRepository(host);
 	}
 
 	async createScaffold() {
@@ -32,6 +37,18 @@ export class UmbUserGroupWorkspaceContext
 			this.setIsNew(false);
 			this.#data.update(data);
 		}
+
+		const { data: users } = await this.#userRepository.filterCollection({
+			skip: 0,
+			take: 10000000,
+			userGroupIds: [id],
+		});
+
+		if (!users) return;
+
+		const ids = users.items.map((user) => user.id ?? '');
+
+		this.#userIds.next(ids);
 	}
 
 	getEntityId(): string | undefined {
@@ -46,12 +63,21 @@ export class UmbUserGroupWorkspaceContext
 	async save() {
 		if (!this.#data.value) return;
 
+		if (this.#data) {
+			//TODO: Remove all the !'s
+			console.log(this.#userIds.getValue(), 'USERS');
+
+			await this.#userRepository.setUserGroups(this.#userIds.getValue(), [this.#data!.getValue()!.id!]);
+		}
+
 		//TODO: Could we clean this code up?
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
 		} else if (this.#data.value.id) {
 			await this.repository.save(this.#data.value.id, this.#data.value);
 		} else return;
+
+		//TODO Call user repository:
 
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
@@ -70,6 +96,6 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	updateUserKeys(keys: Array<string>) {
-		this.#userKeys.next(keys);
+		this.#userIds.next(keys);
 	}
 }

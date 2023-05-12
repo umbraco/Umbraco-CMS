@@ -1,24 +1,43 @@
-import { UmbUserCollectionFilterModel, UmbUserDetailDataSource, UmbUserDetailRepository } from '../types';
+import {
+	UmbUserCollectionFilterModel,
+	UmbUserDetailDataSource,
+	UmbUserDetailRepository,
+	UmbUserSetGroupDataSource,
+} from '../types';
 import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store';
 import { UmbUserServerDataSource } from './sources/user.server.data';
 import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data';
+import { UmbUserItemServerDataSource } from './sources/user-item.server.data';
+import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbCollectionDataSource,
+	UmbCollectionRepository,
+	UmbItemDataSource,
+	UmbItemRepository,
+} from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
 	InviteUserRequestModel,
 	UpdateUserRequestModel,
+	UserItemResponseModel,
 	UserResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data';
 
-export class UmbUserRepository implements UmbUserDetailRepository, UmbCollectionRepository {
+export class UmbUserRepository
+	implements UmbUserDetailRepository, UmbCollectionRepository, UmbItemRepository<UserItemResponseModel>
+{
 	#host: UmbControllerHostElement;
 	#init;
 
 	#detailSource: UmbUserDetailDataSource;
 	#detailStore?: UmbUserStore;
+	#itemSource: UmbItemDataSource<UserItemResponseModel>;
+	#itemStore?: UmbUserItemStore;
+	#setUserGroupsSource: UmbUserSetGroupDataSource;
 
 	#collectionSource: UmbCollectionDataSource<UserResponseModel>;
 
@@ -29,15 +48,21 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 
 		this.#detailSource = new UmbUserServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserCollectionServerDataSource(this.#host);
+		this.#itemSource = new UmbUserItemServerDataSource(this.#host);
+		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_USER_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
-			}),
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_USER_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
+			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
-			}),
+			}).asPromise(),
 		]);
 	}
 
@@ -49,6 +74,25 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 
 	async filterCollection(filter: UmbUserCollectionFilterModel) {
 		return this.#collectionSource.filterCollection(filter);
+	}
+
+	// ITEMS:
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
+		await this.#init;
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(ids: Array<string>) {
+		await this.#init;
+		return this.#itemStore!.items(ids);
 	}
 
 	// DETAILS
@@ -67,6 +111,19 @@ export class UmbUserRepository implements UmbUserDetailRepository, UmbCollection
 		}
 
 		return { data, error };
+	}
+
+	async setUserGroups(userIds: Array<string>, userGroupIds: Array<string>) {
+		if (userGroupIds.length === 0) throw new Error('User group ids are missing');
+		if (userIds.length === 0) throw new Error('User ids are missing');
+
+		const { error } = await this.#setUserGroupsSource.setGroups(userIds, userGroupIds);
+
+		if (!error) {
+			//TODO: Update relevant stores
+		}
+
+		return { error };
 	}
 
 	async byId(id: string) {
