@@ -27,7 +27,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 
 		this.#init = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
 			this.#routeContext = _routeContext;
-			this._registererModal();
+			this.#registerModal();
 		}).asPromise();
 	}
 
@@ -52,21 +52,18 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 			);
 		}
 		this.#uniquePaths.set(identifier, value);
-		this._registererModal();
+		this.#registerModal();
 	}
 
-	private async _registererModal() {
+	async #registerModal() {
 		await this.#init;
 		if (!this.#routeContext) return;
-		if (this.#modalRegistration) {
-			this.#routeContext.unregisterModal(this.#modalRegistration);
-			this.#modalRegistration = undefined;
-		}
 
 		const pathParts = Array.from(this.#uniquePaths.values());
 
 		// Check if there is any undefined values of unique map:
 		if (pathParts.some((value) => value === undefined)) {
+			this.#unregisterModal();
 			return;
 		}
 
@@ -75,15 +72,33 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 			pathParts.push(this.#additionalPath);
 		}
 
+		const newPath = pathParts.join('/');
+
+		//if no changes then break out:
+		if (this.path === newPath) {
+			return;
+		}
+
 		// Make this the path of the modal registration:
-		this._setPath(pathParts.join('/'));
+		this._setPath(newPath);
+
+		this.#unregisterModal();
 
 		this.#modalRegistration = this.#routeContext.registerModal(this);
 	}
 
+	async #unregisterModal() {
+		if (!this.#routeContext) return;
+		if (this.#modalRegistration) {
+			this.#routeContext.unregisterModal(this.#modalRegistration);
+			this.#modalRegistration = undefined;
+			console.log('-- removing modal', this.alias);
+		}
+	}
+
 	hostConnected() {
 		if (!this.#modalRegistration) {
-			this._registererModal();
+			this.#registerModal();
 		}
 	}
 	hostDisconnected(): void {
