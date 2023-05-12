@@ -345,7 +345,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
 
       // Assert
       // Checks if the element has the thumbnail
-      const updatedImagePath = imageDataPath.replaceAll('/', '%2F');
+      const updatedImagePath = encodeURIComponent(imageDataPath);
       await expect(page.locator('umb-block-card', {hasText: elementName}).locator('.__showcase')).toHaveAttribute('style', 'background-image: url("/umbraco/backoffice/umbracoapi/images/GetBigThumbnail?originalImagePath=' + updatedImagePath + '\");');
 
       // Clean
