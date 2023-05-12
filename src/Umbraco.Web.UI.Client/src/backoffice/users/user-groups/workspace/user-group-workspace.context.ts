@@ -70,6 +70,11 @@ export class UmbUserGroupWorkspaceContext
 			await this.repository.save(this.#data.value.id, this.#data.value);
 		} else return;
 
+		//TODO: This next user-group section kinda works. But it will overwrite the entire user-group list on the user.
+		//TODO: instead we need to get all the users by their id's to get their user groups.
+		//TODO: these user-groups need to be updated together with the new user-group id.
+		//TODO: or the new user-group id needs to be removed from the existing list.
+
 		const userIds = this.#userIds.getValue();
 		const userGroupIds = [this.#data.getValue()?.id ?? ''];
 
