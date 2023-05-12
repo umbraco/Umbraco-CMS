@@ -75,6 +75,9 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 	setSelection(selection: string[]) {
 		this.#selection.next(selection);
+
+		//TODO: Check if it's safe to call requestItems here.
+		this.#requestItems();
 	}
 
 	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
@@ -92,7 +95,6 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 			this.setSelection(selection);
 			this.host.dispatchEvent(new UmbChangeEvent());
 			// TODO: we only want to request items that are not already in the selectedItems array
-			this.#requestItems();
 		});
 	}
 
@@ -129,8 +131,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
-		this.setSelection(newSelection);
-
+		this.#selection.next(newSelection);
 		// remove items items from selectedItems array
 		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
 		const newSelectedItems = this.#selectedItems.value.filter((item) => this.#getUnique(item) !== unique);
