@@ -1,16 +1,21 @@
-import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
 
-@customElement('umb-controller-host-test')
-export class UmbControllerHostTestElement extends UmbLitElement {
+export class UmbControllerHostInitializerElement
+	extends UmbControllerHostMixin(HTMLElement)
+	implements UmbControllerHostElement
+{
 	/**
 	 * A way to initialize controllers.
 	 * @required
 	 */
-	@property({ type: Object, attribute: false })
 	create?: (host: UmbControllerHostElement) => void;
+
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+		const slot = document.createElement('slot');
+		this.shadowRoot?.appendChild(slot);
+	}
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -18,14 +23,12 @@ export class UmbControllerHostTestElement extends UmbLitElement {
 			this.create(this);
 		}
 	}
-
-	render() {
-		return html`<slot></slot>`;
-	}
 }
+
+customElements.define('umb-controller-host-initializer', UmbControllerHostInitializerElement);
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-controller-host-test': UmbControllerHostTestElement;
+		'umb-controller-host-initializer': UmbControllerHostInitializerElement;
 	}
 }
