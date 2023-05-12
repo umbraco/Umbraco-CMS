@@ -1,8 +1,5 @@
-import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Provides a value to the context down the DOM tree.
@@ -12,28 +9,40 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
  * @throws {Error} If the key property is not set.
  * @throws {Error} If the value property is not set.
  */
-@customElement('umb-context-provider')
-export class UmbContextProviderElement extends UmbLitElement {
+export class UmbContextProviderElement extends UmbControllerHostMixin(HTMLElement) {
 	/**
 	 * The value to provide to the context.
 	 * @optional
 	 */
-	@property({ type: Object, attribute: false })
-	create?: (host: UmbControllerHostElement) => unknown;
+	public create?: (host: UmbControllerHostElement) => unknown;
 
 	/**
 	 * The value to provide to the context.
 	 * @required
 	 */
-	@property({ type: Object })
-	value: unknown;
+	public value: unknown;
 
 	/**
 	 * The key to provide to the context.
 	 * @required
 	 */
-	@property({ type: String })
-	key!: string | UmbContextToken;
+	public key!: string | UmbContextToken;
+
+	static get observedAttributes() {
+		return ['value', 'key'];
+	}
+
+	attributeChangedCallback(name: string, _oldValue: string | UmbContextToken, newValue: string | UmbContextToken) {
+		if (name === 'key') this.key = newValue;
+		if (name === 'value') this.value = newValue;
+	}
+
+	constructor() {
+		super();
+		this.attachShadow({ mode: 'open' });
+		const slot = document.createElement('slot');
+		this.shadowRoot?.appendChild(slot);
+	}
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -45,13 +54,12 @@ export class UmbContextProviderElement extends UmbLitElement {
 		} else if (!this.value) {
 			throw new Error('The value property is required.');
 		}
-		this.provideContext(this.key, this.value);
-	}
 
-	render() {
-		return html`<slot></slot>`;
+		new UmbContextProviderController(this, this.key, this.value);
 	}
 }
+
+customElements.define('umb-context-provider', UmbContextProviderElement);
 
 declare global {
 	interface HTMLElementTagNameMap {
