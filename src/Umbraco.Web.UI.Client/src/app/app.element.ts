@@ -9,9 +9,9 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { UmbAuthFlow } from '../core/auth/auth-flow';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
 import type { UmbErrorElement } from '../error/error.element';
+import { UmbAuthFlow } from './auth/auth-flow';
 import { UMB_APP, UmbAppContext } from './app.context';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
