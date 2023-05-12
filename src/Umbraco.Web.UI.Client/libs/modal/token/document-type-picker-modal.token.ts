@@ -1,18 +1,19 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbDocumentTypePickerModalData {
-	multiple?: boolean;
-	selection?: Array<string>;
-}
-
-export interface UmbDocumentTypePickerModalResult {
-	selection: Array<string | null>;
-}
+export type UmbDocumentTypePickerModalData = UmbTreePickerModalData<EntityTreeItemResponseModel>;
+export type UmbDocumentTypePickerModalResult = UmbPickerModalResult;
 
 export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 	UmbDocumentTypePickerModalData,
 	UmbDocumentTypePickerModalResult
->('Umb.Modal.DocumentTypePicker', {
-	type: 'sidebar',
-	size: 'small',
-});
+>(
+	'Umb.Modal.TreePicker',
+	{
+		type: 'sidebar',
+		size: 'small',
+	},
+	{
+		treeAlias: 'Umb.Tree.DocumentTypes',
+	}
+);

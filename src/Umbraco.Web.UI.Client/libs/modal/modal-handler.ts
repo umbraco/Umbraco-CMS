@@ -72,6 +72,9 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		this.type = config?.type || this.type;
 		this.size = config?.size || this.size;
 
+		const defaultData = modalAlias instanceof UmbModalToken ? modalAlias.getDefaultData() : undefined;
+		const combinedData = { ...defaultData, ...data } as ModalData;
+
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this._submitPromise = new Promise((resolve, reject) => {
 			this._submitResolver = resolve;
@@ -79,7 +82,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		});
 
 		this.modalElement = this.#createContainerElement();
-		this.#observeModal(modalAlias.toString(), data);
+		this.#observeModal(modalAlias.toString(), combinedData);
 	}
 
 	#createContainerElement() {
@@ -109,6 +112,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			innerElement.data = data;
 			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
+			innerElement.manifest = manifest;
 		}
 
 		return innerElement;

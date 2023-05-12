@@ -27,10 +27,15 @@ The development environment is the default environment and is used when running 
 
 ### Run against a local Umbraco instance
 
+> **Note**
+> Make sure you have followed the [Authentication guide](../docs/authentication.md) before continuing.
+
+If you have a local Umbraco instance running, you can use the development environment to run against it by overriding the API URL and bypassing the mock-service-worker in the frontend client.
+
 Create a `.env.local` file and set the following variables:
 
 ```bash
-VITE_UMBRACO_API_URL=http://localhost:5000 # This will be the URL to your Umbraco instance
+VITE_UMBRACO_API_URL=https://localhost:44339 # This will be the URL to your Umbraco instance
 VITE_UMBRACO_USE_MSW=off # Indicate that you want all API calls to bypass MSW (mock-service-worker)
 ```
 
