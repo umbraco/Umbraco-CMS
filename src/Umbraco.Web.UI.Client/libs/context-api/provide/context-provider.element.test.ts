@@ -1,14 +1,16 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
+import { UmbContextConsumerController } from '../consume/context-consumer.controller';
 import { UmbContextProviderElement } from './context-provider.element';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
 
 @customElement('umb-context-test')
-export class UmbContextTestElement extends UmbLitElement {
+export class UmbContextTestElement extends UmbControllerHostMixin(HTMLElement) {
 	public value: string | null = null;
 	constructor() {
 		super();
-		this.consumeContext<string>('test-context', (value) => {
+
+		new UmbContextConsumerController<string>(this, 'test-context', (value) => {
 			this.value = value;
 		});
 	}
