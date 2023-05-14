@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Xml;
 /// </summary>
 public class UmbracoXPathPathSyntaxParser
 {
-    [Obsolete("This will be removed in Umbraco 13. Use ParseXpath which accepts a parentId instead")]
+    [Obsolete("This will be removed in Umbraco 13. Use ParseXPathQuery which accepts a parentId instead")]
     public static string ParseXPathQuery(
         string xpathExpression,
         int? nodeContextId,
