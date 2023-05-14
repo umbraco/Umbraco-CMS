@@ -1547,4 +1547,39 @@
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0008</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Models.ContentEditing.ContentBaseSave`1</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0008</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Models.ContentEditing.ContentItemSave</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0008</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Models.ContentEditing.IContentSave`1</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0008</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Models.ContentEditing.MediaItemSave</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0008</DiagnosticId>
+    <Target>T:Umbraco.Cms.Core.Models.ContentEditing.MemberSave</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>
