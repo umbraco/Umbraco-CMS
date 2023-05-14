@@ -22,10 +22,6 @@ public static class UmbracoBuilderApiExtensions
 {
     public static IUmbracoBuilder AddUmbracoApiOpenApiUI(this IUmbracoBuilder builder)
     {
-        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
-        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
-        builder.Services.AddApiVersioning().AddApiExplorer();
-
         builder.Services.AddSwaggerGen();
         builder.Services.ConfigureOptions<ConfigureUmbracoSwaggerGenOptions>();
         builder.Services.AddSingleton<IUmbracoJsonTypeInfoResolver, UmbracoJsonTypeInfoResolver>();

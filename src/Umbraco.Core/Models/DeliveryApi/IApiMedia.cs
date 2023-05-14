@@ -2,13 +2,21 @@
 
 public interface IApiMedia
 {
-    public Guid Id { get; }
+    Guid Id { get; }
 
-    public string Name { get; }
+    string Name { get; }
 
-    public string MediaType { get; }
+    string MediaType { get; }
 
-    public string Url { get; }
+    string Url { get; }
 
-    public IDictionary<string, object?> Properties { get; }
+    string? Extension { get; }
+
+    int? Width { get; }
+
+    int? Height { get; }
+
+    int? Bytes { get; }
+
+    IDictionary<string, object?> Properties { get; }
 }

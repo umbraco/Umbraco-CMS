@@ -16,24 +16,13 @@ public sealed class NameFilter : IFilterHandler
     {
         var value = filter.Substring(NameSpecifier.Length);
 
-        var filterOption = new FilterOption
+        return new FilterOption
         {
             FieldName = NameSortIndexer.FieldName,
-            Value = string.Empty
+            Values = new[] { value.TrimStart('!') },
+            Operator = value.StartsWith('!')
+                ? FilterOperation.IsNot
+                : FilterOperation.Is
         };
-
-        // TODO: do we support negation?
-        if (value.StartsWith('!'))
-        {
-            filterOption.Value = value.Substring(1);
-            filterOption.Operator = FilterOperation.IsNot;
-        }
-        else
-        {
-            filterOption.Value = value;
-            filterOption.Operator = FilterOperation.Is;
-        }
-
-        return filterOption;
     }
 }

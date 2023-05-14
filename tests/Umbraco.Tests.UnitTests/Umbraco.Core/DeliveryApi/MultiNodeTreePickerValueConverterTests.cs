@@ -27,7 +27,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
             Mock.Of<IUmbracoContextAccessor>(),
             Mock.Of<IMemberService>(),
             new ApiContentBuilder(contentNameProvider, routeBuilder, expansionStrategyAccessor),
-            new ApiMediaBuilder(contentNameProvider, apiUrProvider, expansionStrategyAccessor));
+            new ApiMediaBuilder(contentNameProvider, apiUrProvider, Mock.Of<IPublishedValueFallback>(), expansionStrategyAccessor));
     }
 
     private PublishedDataType MultiNodePickerPublishedDataType(bool multiSelect, string entityType) =>

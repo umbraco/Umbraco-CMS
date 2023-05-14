@@ -11,6 +11,7 @@
 <!--    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />-->
     <PackageReference Include="Asp.Versioning.Mvc" Version="7.0.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>

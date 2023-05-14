@@ -11,7 +11,6 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 [ApiController]
 [DeliveryApiAccess]
 [JsonOptionsName(Constants.JsonOptionsNames.DeliveryApi)]
-[LocalizeFromAcceptLanguageHeader]
 [MapToApi(DeliveryApiConfiguration.ApiName)]
 public abstract class DeliveryApiControllerBase : Controller
 {

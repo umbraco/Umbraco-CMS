@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -9,6 +10,8 @@ namespace Umbraco.Cms.Api.Delivery.Controllers;
 
 [VersionedDeliveryApiRoute("content")]
 [ApiExplorerSettings(GroupName = "Content")]
+[LocalizeFromAcceptLanguageHeader]
+[ValidateStartItem]
 public abstract class ContentApiControllerBase : DeliveryApiControllerBase
 {
     protected IApiPublishedContentCache ApiPublishedContentCache { get; }

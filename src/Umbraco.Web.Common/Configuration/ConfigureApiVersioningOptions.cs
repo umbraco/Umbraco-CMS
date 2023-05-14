@@ -1,8 +1,7 @@
-
 using Asp.Versioning;
 using Microsoft.Extensions.Options;
 
-namespace Umbraco.Cms.Api.Common.Configuration;
+namespace Umbraco.Cms.Web.Common.Configuration;
 
 public sealed class ConfigureApiVersioningOptions : IConfigureOptions<ApiVersioningOptions>
 {

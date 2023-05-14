@@ -21,14 +21,24 @@ internal sealed class DeliveryApiJsonTypeResolver : DefaultJsonTypeInfoResolver
         {
             ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(ApiContentResponse));
         }
+        else if (jsonTypeInfo.Type == typeof(IRichTextElement))
+        {
+            ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(RichTextGenericElement), typeof(RichTextTextElement));
+        }
 
         return jsonTypeInfo;
     }
 
-    private void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, Type derivedType)
-        => jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
+    private void ConfigureJsonPolymorphismOptions(JsonTypeInfo jsonTypeInfo, params Type[] derivedTypes)
+    {
+        jsonTypeInfo.PolymorphismOptions = new JsonPolymorphismOptions
         {
             UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
-            DerivedTypes = { new JsonDerivedType(derivedType) }
         };
+
+        foreach (Type derivedType in derivedTypes)
+        {
+            jsonTypeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType));
+        }
+    }
 }

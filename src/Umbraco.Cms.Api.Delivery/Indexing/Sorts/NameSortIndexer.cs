@@ -7,9 +7,9 @@ public sealed class NameSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "name";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
-        => new[] { new IndexFieldValue { FieldName = FieldName, Value = content.Name ?? string.Empty } };
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+        => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.GetCultureName(culture) ?? string.Empty } } };
 
     public IEnumerable<IndexField> GetFields()
-        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.StringSortable } };
+        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.StringSortable, VariesByCulture = true } };
 }

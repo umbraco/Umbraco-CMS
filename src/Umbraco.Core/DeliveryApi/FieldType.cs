@@ -2,7 +2,8 @@
 
 public enum FieldType
 {
-    String,
+    StringRaw,
+    StringAnalyzed,
     StringSortable,
     Number,
     Date

@@ -36,37 +36,37 @@ public class Upgrader
     /// <param name="migrationPlanExecutor"></param>
     /// <param name="scopeProvider">A scope provider.</param>
     /// <param name="keyValueService">A key-value service.</param>
-    /// <param name="aggregator"></param>
     public ExecutedMigrationPlan Execute(
         IMigrationPlanExecutor migrationPlanExecutor,
         ICoreScopeProvider scopeProvider,
         IKeyValueService keyValueService)
     {
-        if (scopeProvider == null)
+        if (scopeProvider is null)
         {
             throw new ArgumentNullException(nameof(scopeProvider));
         }
 
-        if (keyValueService == null)
+        if (keyValueService is null)
         {
             throw new ArgumentNullException(nameof(keyValueService));
         }
 
-        var initialState = GetInitialState(scopeProvider, keyValueService);
+        string initialState = GetInitialState(scopeProvider, keyValueService);
 
         ExecutedMigrationPlan result = migrationPlanExecutor.ExecutePlan(Plan, initialState);
 
-        if (string.IsNullOrWhiteSpace(result.FinalState) || result.FinalState == result.InitialState)
+        // This should never happen, if the final state comes back as null or equal to the initial state
+        // it means that no transitions was successful, which means it cannot be a successful migration
+        if (result.Successful && string.IsNullOrWhiteSpace(result.FinalState))
         {
-            // This should never happen, if the final state comes back as null or equal to the initial state
-            // it means that no transitions was successful, which means it cannot be a successful migration
-            if (result.Successful)
-            {
-                throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
-            }
+            throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
+        }
 
-            // Otherwise it just means that our migration failed on the first step, which is fine.
-            // We will skip saving the state since we it's still the same
+        // Otherwise it just means that our migration failed on the first step, which is fine,
+        // or there were no pending transitions so nothing changed.
+        // We will skip saving the state since we it's still the same
+        if (result.FinalState == result.InitialState)
+        {
             return result;
         }
 
