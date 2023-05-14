@@ -12,7 +12,6 @@ public class ContentItemSave : IContentSave<IContent>
 {
     public ContentItemSave()
     {
-        UploadedFiles = new List<ContentPropertyFile>();
         Variants = new List<ContentVariantSave>();
     }
 
@@ -42,9 +41,6 @@ public class ContentItemSave : IContentSave<IContent>
     [DataMember(Name = "action", IsRequired = true)]
     [Required]
     public ContentSaveAction Action { get; set; }
-
-    [IgnoreDataMember]
-    public List<ContentPropertyFile> UploadedFiles { get; }
 
     // These need explicit implementation because we are using internal models
 

@@ -149,11 +149,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// </summary>
     /// <returns>The corresponding property value editor.</returns>
     protected override IDataValueEditor CreateValueEditor()
-    {
-        FileUploadPropertyValueEditor editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
-        editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, _contentSettings));
-        return editor;
-    }
+        => DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute!);
 
     /// <summary>
     ///     Gets a value indicating whether a property is an upload field.

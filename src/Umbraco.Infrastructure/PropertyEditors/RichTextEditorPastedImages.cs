@@ -2,17 +2,22 @@
 // See LICENSE for more details.
 
 using HtmlAgilityPack;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -20,17 +25,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public sealed class RichTextEditorPastedImages
 {
     private const string TemporaryImageDataAttribute = "data-tmpimg";
-    private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-    private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly ILogger<RichTextEditorPastedImages> _logger;
-    private readonly MediaFileManager _mediaFileManager;
-    private readonly IMediaService _mediaService;
-    private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly string _tempFolderAbsolutePath;
+    private readonly ITemporaryFileService _temporaryFileService;
+    private readonly IScopeProvider _scopeProvider;
+    private readonly IMediaImportService _mediaImportService;
+    private readonly IUserService _userService;
 
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     public RichTextEditorPastedImages(
         IUmbracoContextAccessor umbracoContextAccessor,
         ILogger<RichTextEditorPastedImages> logger,
@@ -41,27 +43,71 @@ public sealed class RichTextEditorPastedImages
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IShortStringHelper shortStringHelper,
         IPublishedUrlProvider publishedUrlProvider)
+        : this(
+            umbracoContextAccessor,
+            logger,
+            hostingEnvironment,
+            mediaService,
+            contentTypeBaseServiceProvider,
+            mediaFileManager,
+            mediaUrlGenerators,
+            shortStringHelper,
+            publishedUrlProvider,
+            StaticServiceProvider.Instance.GetRequiredService<ITemporaryFileService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>(),
+            StaticServiceProvider.Instance.GetRequiredService<IMediaImportService>())
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
+    public RichTextEditorPastedImages(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        ILogger<RichTextEditorPastedImages> logger,
+        IHostingEnvironment hostingEnvironment,
+        IMediaService mediaService,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        MediaFileManager mediaFileManager,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IShortStringHelper shortStringHelper,
+        IPublishedUrlProvider publishedUrlProvider,
+        ITemporaryFileService temporaryFileService,
+        IScopeProvider scopeProvider,
+        IMediaImportService mediaImportService)
+        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService)
+    {
+    }
+
+    public RichTextEditorPastedImages(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        ITemporaryFileService temporaryFileService,
+        IScopeProvider scopeProvider,
+        IMediaImportService mediaImportService)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _hostingEnvironment = hostingEnvironment;
-        _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
-        _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ??
-                                          throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
-        _mediaFileManager = mediaFileManager;
-        _mediaUrlGenerators = mediaUrlGenerators;
-        _shortStringHelper = shortStringHelper;
         _publishedUrlProvider = publishedUrlProvider;
+        _temporaryFileService = temporaryFileService;
+        _scopeProvider = scopeProvider;
+        _mediaImportService = mediaImportService;
 
-        _tempFolderAbsolutePath = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads);
+        // this obviously is not correct. however, we only use IUserService in an obsolete method,
+        // so this is better than having even more obsolete constructors for V16
+        _userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
+    }
 
+    [Obsolete($"Please use {nameof(FindAndPersistPastedTempImagesAsync)}. Will be removed in V16.")]
+    public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
+    {
+        IUser user = _userService.GetUserById(userId)
+                     ?? throw new ArgumentException($"Could not find a user with the specified user key ({userId})", nameof(userId));
+        return FindAndPersistPastedTempImagesAsync(html, mediaParentFolder, user.Key, imageUrlGenerator).GetAwaiter().GetResult();
     }
 
     /// <summary>
     ///     Used by the RTE (and grid RTE) for drag/drop/persisting images
     /// </summary>
-    public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
+    public async Task<string> FindAndPersistPastedTempImagesAsync(string html, Guid mediaParentFolder, Guid userKey, IImageUrlGenerator imageUrlGenerator)
     {
         // Find all img's that has data-tmpimg attribute
         // Use HTML Agility Pack - https://html-agility-pack.net
@@ -76,66 +122,43 @@ public sealed class RichTextEditorPastedImages
 
         // An array to contain a list of URLs that
         // we have already processed to avoid dupes
-        var uploadedImages = new Dictionary<string, GuidUdi>();
-
+        var uploadedImages = new Dictionary<Guid, GuidUdi>();
 
         foreach (HtmlNode? img in tmpImages)
         {
-            // The data attribute contains the path to the tmp img to persist as a media item
-            var tmpImgPath = img.GetAttributeValue(TemporaryImageDataAttribute, string.Empty);
-
-            if (string.IsNullOrEmpty(tmpImgPath))
+            // The data attribute contains the key of the temporary file
+            var tmpImgKey = img.GetAttributeValue(TemporaryImageDataAttribute, string.Empty);
+            if (Guid.TryParse(tmpImgKey, out Guid temporaryFileKey) is false)
             {
                 continue;
             }
 
-
-            var absoluteTempImagePath = Path.GetFullPath(_hostingEnvironment.MapPathContentRoot(tmpImgPath));
-
-            if (IsValidPath(absoluteTempImagePath) == false)
+            TemporaryFileModel? temporaryFile = _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
+            if (temporaryFile is null)
             {
                 continue;
             }
 
-            var fileName = Path.GetFileName(absoluteTempImagePath);
-            var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
-
-            var mediaItemName = safeFileName.ToFriendlyName();
-            IMedia mediaFile;
             GuidUdi udi;
 
-            if (uploadedImages.ContainsKey(tmpImgPath) == false)
+            using (IScope scope = _scopeProvider.CreateScope())
             {
-                if (mediaParentFolder == Guid.Empty)
+                _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey, _scopeProvider);
+
+                if (uploadedImages.ContainsKey(temporaryFileKey) == false)
                 {
-                    mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
+                    using Stream fileStream = temporaryFile.OpenReadStream();
+                    Guid? parentFolderKey = mediaParentFolder == Guid.Empty ? Constants.System.RootKey : mediaParentFolder;
+                    IMedia mediaFile = await _mediaImportService.ImportAsync(temporaryFile.FileName, fileStream, parentFolderKey, Constants.Conventions.MediaTypes.Image, userKey);
+                    udi = mediaFile.GetUdi();
                 }
                 else
                 {
-                    mediaFile = _mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
+                    // Already been uploaded & we have it's UDI
+                    udi = uploadedImages[temporaryFileKey];
                 }
 
-                var fileInfo = new FileInfo(absoluteTempImagePath);
-
-                FileStream? fileStream = fileInfo.OpenReadWithRetry();
-                if (fileStream == null)
-                {
-                    throw new InvalidOperationException("Could not acquire file stream");
-                }
-
-                using (fileStream)
-                {
-                    mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
-                }
-
-                _mediaService.Save(mediaFile, userId);
-
-                udi = mediaFile.GetUdi();
-            }
-            else
-            {
-                // Already been uploaded & we have it's UDI
-                udi = uploadedImages[tmpImgPath];
+                scope.Complete();
             }
 
             // Add the UDI to the img element as new data attribute
@@ -172,33 +195,9 @@ public sealed class RichTextEditorPastedImages
             img.Attributes.Remove(TemporaryImageDataAttribute);
 
             // Add to the dictionary to avoid dupes
-            if (uploadedImages.ContainsKey(tmpImgPath) == false)
-            {
-                uploadedImages.Add(tmpImgPath, udi);
-
-                // Delete folder & image now its saved in media
-                // The folder should contain one image - as a unique guid folder created
-                // for each image uploaded from TinyMceController
-                var folderName = Path.GetDirectoryName(absoluteTempImagePath);
-                try
-                {
-                    if (folderName is not null)
-                    {
-                        Directory.Delete(folderName, true);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
-                }
-            }
+            uploadedImages.TryAdd(temporaryFileKey, udi);
         }
 
         return htmlDoc.DocumentNode.OuterHtml;
-    }
-
-    private bool IsValidPath(string imagePath)
-    {
-        return imagePath.StartsWith(_tempFolderAbsolutePath);
     }
 }

@@ -68,7 +68,7 @@ public class JsonObjectConverter : JsonConverter<object>
                 return items.ToList();
             }
 
-            if (firstType == typeof(JsonNode))
+            if (firstType.IsAssignableTo(typeof(JsonNode)))
             {
                 // if we only have JSON nodes in the items collection, return them in a JSON array
                 return new JsonArray(items.OfType<JsonNode>().ToArray());

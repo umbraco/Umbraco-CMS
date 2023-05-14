@@ -377,9 +377,7 @@ public abstract class ContentEditingServiceBase<TContent, TContentType, TContent
         var data = new ContentPropertyData(value, dataType?.ConfigurationObject)
         {
             ContentKey = content.Key,
-            PropertyTypeKey = propertyType.Key,
-            // FIXME: handle file upload and somehow communicate the uploaded files to the data value editor here
-            Files = Array.Empty<ContentPropertyFile>()
+            PropertyTypeKey = propertyType.Key
         };
 
         var currentValue = content.GetValue(propertyType.Alias, culture, segment);
