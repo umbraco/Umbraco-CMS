@@ -319,6 +319,19 @@ function entityResource($q, $http, umbRequestHelper) {
         },
 
         /**
+         * @deprecated use getByXPath instead.
+         */
+        getByQuery: function (query, nodeContextId, type) {
+            return umbRequestHelper.resourcePromise(
+            $http.get(
+                umbRequestHelper.getApiUrl(
+                    "entityApiBaseUrl",
+                    "GetByQuery",
+                    [{ query: query }, { nodeContextId: nodeContextId }, { type: type }])),
+            'Failed to retrieve entity data for query ' + query);
+        },
+
+        /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByXPath
          * @methodOf umbraco.resources.entityResource

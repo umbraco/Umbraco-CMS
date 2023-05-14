@@ -112,6 +112,28 @@ public class UmbracoXPathPathSyntaxParser
                     string.Format(rootXpath, closestPublishedAncestorId) + "/ancestor-or-self::*[@level = 1]");
             });
         }
+        else if (nodeContextId.HasValue)
+        {
+            vars.Add("$parent", q =>
+            {
+                var path = getPath(nodeContextId.Value)?.ToArray();
+                if (path?[0] == nodeContextId.ToString())
+                {
+                    path = path?.Skip(1).ToArray();
+                }
+
+                var closestPublishedAncestorId = getClosestPublishedAncestor(path);
+                return q.Replace("$parent", string.Format(rootXpath, closestPublishedAncestorId));
+            });
+
+            vars.Add("$site", q =>
+            {
+                var closestPublishedAncestorId = getClosestPublishedAncestor(getPath(nodeContextId.Value));
+                return q.Replace(
+                    "$site",
+                    string.Format(rootXpath, closestPublishedAncestorId) + "/ancestor-or-self::*[@level = 1]");
+            });
+        }
 
         // These parameters must have a node id context
         if (nodeContextId.HasValue)
