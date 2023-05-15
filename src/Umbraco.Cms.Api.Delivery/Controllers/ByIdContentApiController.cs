@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[ApiVersion("1.0")]
 public class ByIdContentApiController : ContentApiItemControllerBase
 {
     public ByIdContentApiController(
@@ -25,6 +27,7 @@ public class ByIdContentApiController : ContentApiItemControllerBase
     [HttpGet("item/{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ById(Guid id)
     {
@@ -40,6 +43,12 @@ public class ByIdContentApiController : ContentApiItemControllerBase
             return Unauthorized();
         }
 
-        return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));
+        IApiContentResponse? apiContentResponse = ApiContentResponseBuilder.Build(contentItem);
+        if (apiContentResponse is null)
+        {
+            return NotFound();
+        }
+
+        return await Task.FromResult(Ok(apiContentResponse));
     }
 }

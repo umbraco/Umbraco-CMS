@@ -50,7 +50,7 @@ public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool RequiresConnectionTest => true;
 
     /// <inheritdoc />
-    public bool ForceCreateDatabase => false;
+    public bool ForceCreateDatabase => true;
 
     /// <inheritdoc />
     public bool CanRecognizeConnectionString(string? connectionString)

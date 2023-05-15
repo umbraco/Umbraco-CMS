@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -6,10 +7,12 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[ApiVersion("1.0")]
 public class QueryContentApiController : ContentApiControllerBase
 {
     private readonly IApiContentQueryService _apiContentQueryService;
@@ -51,7 +54,7 @@ public class QueryContentApiController : ContentApiControllerBase
 
         PagedModel<Guid> pagedResult = queryAttempt.Result;
         IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(pagedResult.Items);
-        IApiContentResponse[] apiContentItems = contentItems.Select(ApiContentResponseBuilder.Build).ToArray();
+        IApiContentResponse[] apiContentItems = contentItems.Select(ApiContentResponseBuilder.Build).WhereNotNull().ToArray();
 
         var model = new PagedViewModel<IApiContentResponse>
         {

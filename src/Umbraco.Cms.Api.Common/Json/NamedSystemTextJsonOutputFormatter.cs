@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Umbraco.Cms.Api.Common.Json;
 
-public class NamedSystemTextJsonOutputFormatter : SystemTextJsonOutputFormatter
+
+internal class NamedSystemTextJsonOutputFormatter : SystemTextJsonOutputFormatter
 {
     private readonly string _jsonOptionsName;
 

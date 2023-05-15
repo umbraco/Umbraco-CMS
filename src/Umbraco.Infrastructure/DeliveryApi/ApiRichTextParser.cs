@@ -117,9 +117,12 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
         {
             case Constants.UdiEntityType.Document:
                 IPublishedContent? content = publishedSnapshot.Content?.GetById(udi);
-                if (content != null)
+                IApiContentRoute? route = content != null
+                    ? _apiContentRouteBuilder.Build(content)
+                    : null;
+                if (route != null)
                 {
-                    attributes["route"] = _apiContentRouteBuilder.Build(content);
+                    attributes["route"] = route;
                 }
 
                 break;

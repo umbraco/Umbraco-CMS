@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
@@ -21,6 +22,7 @@ public class ContentBuilderTests : DeliveryApiTests
 
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
+        contentType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Content);
 
         var key = Guid.NewGuid();
         var urlSegment = "url-segment";
@@ -60,10 +62,36 @@ public class ContentBuilderTests : DeliveryApiTests
         var customNameProvider = new Mock<IApiContentNameProvider>();
         customNameProvider.Setup(n => n.GetName(content.Object)).Returns($"Custom name for: {content.Object.Name}");
 
-        var builder = new ApiContentBuilder(customNameProvider.Object, Mock.Of<IApiContentRouteBuilder>(), CreateOutputExpansionStrategyAccessor());
+        var routeBuilder = new Mock<IApiContentRouteBuilder>();
+        routeBuilder
+            .Setup(r => r.Build(content.Object, It.IsAny<string?>()))
+            .Returns(new ApiContentRoute(content.Object.UrlSegment!, new ApiContentStartItem(Guid.NewGuid(), "/")));
+
+        var builder = new ApiContentBuilder(customNameProvider.Object, routeBuilder.Object, CreateOutputExpansionStrategyAccessor());
         var result = builder.Build(content.Object);
 
         Assert.NotNull(result);
         Assert.AreEqual("Custom name for: The page", result.Name);
+    }
+
+    [Test]
+    public void ContentBuilder_ReturnsNullForUnRoutableContent()
+    {
+        var content = new Mock<IPublishedContent>();
+
+        var contentType = new Mock<IPublishedContentType>();
+        contentType.SetupGet(c => c.Alias).Returns("thePageType");
+
+        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", "the-page", contentType.Object, Array.Empty<PublishedElementPropertyBase>());
+
+        var routeBuilder = new Mock<IApiContentRouteBuilder>();
+        routeBuilder
+            .Setup(r => r.Build(content.Object, It.IsAny<string?>()))
+            .Returns((ApiContentRoute)null);
+
+        var builder = new ApiContentBuilder(new ApiContentNameProvider(), routeBuilder.Object, CreateOutputExpansionStrategyAccessor());
+        var result = builder.Build(content.Object);
+
+        Assert.Null(result);
     }
 }
