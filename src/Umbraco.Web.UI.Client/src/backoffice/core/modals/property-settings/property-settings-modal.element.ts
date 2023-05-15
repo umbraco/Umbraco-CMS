@@ -21,7 +21,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalResult
 > {
 	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
-	@state() private _selectedPropertyEditorId = '';
 
 	//TODO: Should these options come from the server?
 	@state() private _customValidationOptions = [
@@ -61,8 +60,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
-
-		this.#observePropertyEditorUI();
 	}
 
 	connectedCallback(): void {
@@ -77,6 +74,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		if (newlySelected === undefined) {
 			this._customValidationOptions[4].selected = true;
 		}
+
+		this.#observePropertyEditorUI();
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -89,15 +88,16 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#observePropertyEditorUI() {
-		if (!this._selectedPropertyEditorId) return;
+		if (!this._returnData.dataTypeId) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._selectedPropertyEditorId),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._returnData.dataTypeId),
 			(propertyEditorUI) => {
 				if (!propertyEditorUI) return;
 
 				this._selectedPropertyEditorUI = propertyEditorUI;
-			}
+			},
+			'observePropertyEditorUI'
 		);
 	}
 
@@ -116,7 +116,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		const formData = new FormData(form);
 
-		this._returnData.dataTypeId = this._selectedPropertyEditorId || undefined;
 		this._returnData.validation!.mandatoryMessage = formData.get('mandatory-message')?.toString() || '';
 
 		this.modalHandler?.submit(this._returnData);
@@ -190,7 +189,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		modalHandler?.onSubmit().then(({ selection }) => {
 			if (selection.length === 0) return;
 			// TODO: we might should set the alias to null or empty string, if no selection.
-			this._selectedPropertyEditorId = selection[0];
+			this._returnData.dataTypeId = selection[0];
+			this.requestUpdate('_returnData');
 			this.#observePropertyEditorUI();
 		});
 	}
