@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Querying;
 
@@ -23,7 +24,8 @@ public abstract class QueryOptionBase
             return id;
         }
 
-        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) ||
+        if (queryStringValue.IsNullOrWhiteSpace() ||
+            !_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) ||
             publishedSnapshot?.Content is null)
         {
             return null;
