@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Delivery.Indexing.Sorts;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Filters;
 
@@ -19,7 +20,9 @@ public sealed class NameFilter : IFilterHandler
         return new FilterOption
         {
             FieldName = NameSortIndexer.FieldName,
-            Values = new[] { value.TrimStart('!') },
+            Values = value.IsNullOrWhiteSpace() == false
+                ? new[] { value.TrimStart('!') }
+                : Array.Empty<string>(),
             Operator = value.StartsWith('!')
                 ? FilterOperation.IsNot
                 : FilterOperation.Is

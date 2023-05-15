@@ -22,6 +22,11 @@ internal sealed class RequestRoutingService : RoutingServiceBase, IRequestRoutin
     /// <inheritdoc />
     public string GetContentRoute(string requestedPath)
     {
+        if (requestedPath.IsNullOrWhiteSpace())
+        {
+            return string.Empty;
+        }
+
         requestedPath = requestedPath.EnsureStartsWith("/");
 
         // do we have an explicit start item?
