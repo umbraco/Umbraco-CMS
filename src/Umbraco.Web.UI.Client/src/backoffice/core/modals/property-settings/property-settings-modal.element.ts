@@ -101,19 +101,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		);
 	}
 
-	#onCustomValidationChange(event: UUISelectEvent) {
-		console.log('event.target.value', event.target.value);
-		const regEx = event.target.value.toString();
-		this._returnData.validation!.regEx = regEx;
-		this.requestUpdate('_returnData');
-	}
-
-	#onMandatoryChange(event: UUIBooleanInputEvent) {
-		const value = event.target.checked;
-		this._returnData.validation!.mandatory = value;
-		this.requestUpdate('_returnData');
-	}
-
 	#onClose() {
 		this.modalHandler?.reject();
 	}
@@ -157,6 +144,24 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		} else {
 			this._returnData.alias = this.data?.alias;
 		}
+		this.requestUpdate('_returnData');
+	}
+
+	#onCustomValidationChange(event: UUISelectEvent) {
+		const regEx = event.target.value.toString();
+		this._returnData.validation!.regEx = regEx;
+		this.requestUpdate('_returnData');
+	}
+
+	#onMandatoryChange(event: UUIBooleanInputEvent) {
+		const value = event.target.checked;
+		this._returnData.validation!.mandatory = value;
+		this.requestUpdate('_returnData');
+	}
+
+	#onMandatoryMessageChange(event: UUIInputEvent) {
+		const value = event.target.value.toString();
+		this._returnData.validation!.mandatoryMessage = value;
 		this.requestUpdate('_returnData');
 	}
 
@@ -313,11 +318,17 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	#renderMandatory() {
 		return html`<div style="display: flex; justify-content: space-between">
 				<label for="mandatory">Field is mandatory</label>
-				<uui-toggle @change=${this.#onMandatoryChange} id="mandatory" slot="editor"></uui-toggle>
+				<uui-toggle
+					@change=${this.#onMandatoryChange}
+					id="mandatory"
+					value=${this._returnData.validation?.mandatory}
+					slot="editor"></uui-toggle>
 			</div>
 			${this._returnData.validation?.mandatory
 				? html`<uui-input
 						name="mandatory-message"
+						value=${this._returnData.validation?.mandatoryMessage}
+						@change=${this.#onMandatoryMessageChange}
 						style="margin-top: var(--uui-size-space-1)"
 						id="mandatory-message"
 						placeholder="Enter a custom validation error message (optional)"></uui-input>`
