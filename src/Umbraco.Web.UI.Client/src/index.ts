@@ -1,5 +1,5 @@
 import { UmbAppElement } from './app/app.element';
-import { startMockServiceWorker } from './core/mocks/browser';
+import { startMockServiceWorker } from './core/mocks';
 
 if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
 	startMockServiceWorker();
