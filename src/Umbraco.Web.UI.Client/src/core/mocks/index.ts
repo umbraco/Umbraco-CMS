@@ -1,5 +1,5 @@
 const { setupWorker } = window.MockServiceWorker;
-import type { MockedRequest } from 'msw';
+import type { MockedRequest, setupWorker as setupWorkType, rest } from 'msw';
 import { handlers } from './browser-handlers';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -18,10 +18,11 @@ export const startMockServiceWorker = () =>
 		quiet: import.meta.env.VITE_MSW_QUIET === 'on',
 	});
 
-/*
-	declare global {
+declare global {
 	interface Window {
-		MockServiceWorker: any;
+		MockServiceWorker: {
+			setupWorker: typeof setupWorkType;
+			rest: typeof rest;
+		};
 	}
 }
-*/
