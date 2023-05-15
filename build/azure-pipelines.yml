@@ -292,7 +292,7 @@ stages:
             Linux:
               vmImage: 'ubuntu-latest'
               testDb: SqlServer
-              connectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+              connectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=true'
         pool:
           vmImage: $(vmImage)
         variables:
