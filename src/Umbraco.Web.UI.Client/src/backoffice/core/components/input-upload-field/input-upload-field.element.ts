@@ -4,7 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { map } from 'lit/directives/map.js';
-import { UUIFileDropzoneElement } from '@umbraco-ui/uui';
+import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './input-upload-field-file.element';
@@ -69,8 +69,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		});
 	}
 
-	#onUpload(e: CustomEvent) {
-		// TODO: UUIFileDropzoneEvent is not exported yet
+	#onUpload(e: UUIFileDropzoneEvent) {
 		const files: File[] = e.detail.files;
 
 		if (!files?.length) return;
@@ -103,7 +102,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 			<uui-file-dropzone
 				id="dropzone"
 				label="dropzone"
-				@file-change="${this.#onUpload}"
+				@change="${this.#onUpload}"
 				accept="${ifDefined(this.extensions?.join(', '))}"
 				?multiple="${this.multiple}">
 				<uui-button label="upload" @click="${this.#handleBrowse}">Upload file here</uui-button>
