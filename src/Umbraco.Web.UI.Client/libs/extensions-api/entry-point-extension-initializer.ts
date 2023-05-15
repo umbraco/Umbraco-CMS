@@ -1,4 +1,4 @@
-import type { ManifestEntrypoint } from './models';
+import type { ManifestEntrypoint } from '../extensions-registry/models';
 import { hasInitExport, loadExtension, UmbExtensionRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 

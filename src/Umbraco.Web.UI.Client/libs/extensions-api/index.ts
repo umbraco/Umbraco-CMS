@@ -10,3 +10,4 @@ export * from './load-extension.function';
 export * from './create-extension-element-or-fallback.function';
 export * from './create-extension-class.function';
 export * from './umb-lifecycle.interface';
+export * from './entry-point-extension-initializer';
