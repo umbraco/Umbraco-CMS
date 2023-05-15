@@ -6,7 +6,6 @@ import type {
 	SpecificManifestTypeOrManifestBase,
 	ManifestKind,
 } from '@umbraco-cms/backoffice/extensions-registry';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 function extensionArrayMemoization<T extends { alias: string }>(
 	previousValue: Array<T>,
