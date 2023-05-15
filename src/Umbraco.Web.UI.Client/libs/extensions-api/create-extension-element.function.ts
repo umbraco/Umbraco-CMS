@@ -1,8 +1,7 @@
 import { hasDefaultExport } from './has-default-export.function';
 import { isManifestElementNameType } from './type-guards';
 import { loadExtension } from './load-extension.function';
-import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
-import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-registry';
+import type { HTMLElementConstructor, ManifestElement } from './types';
 
 export async function createExtensionElement<ElementType extends HTMLElement>(
 	manifest: ManifestElement<ElementType>

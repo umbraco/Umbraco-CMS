@@ -1,4 +1,8 @@
-import type { ManifestWithConditions, ManifestWithView, MetaManifestWithView } from '.';
+import type {
+	ManifestWithConditions,
+	ManifestWithView,
+	MetaManifestWithView,
+} from '@umbraco-cms/backoffice/extensions-api';
 
 export interface ManifestWorkspaceViewCollection
 	extends ManifestWithView,

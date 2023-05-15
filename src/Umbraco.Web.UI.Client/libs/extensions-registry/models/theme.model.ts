@@ -1,4 +1,4 @@
-import type { ManifestWithLoader } from '.';
+import type { ManifestWithLoader } from '@umbraco-cms/backoffice/extensions-api';
 
 // TODO: make or find type for JS Module with default export: Would be nice to support css file directly.
 

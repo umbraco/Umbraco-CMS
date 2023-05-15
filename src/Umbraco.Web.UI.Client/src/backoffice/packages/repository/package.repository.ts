@@ -2,8 +2,7 @@ import { UmbPackageStore, UMB_PACKAGE_STORE_TOKEN } from './package.store';
 import { UmbPackageServerDataSource } from './sources/package.server.data';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type { ManifestBase } from '@umbraco-cms/backoffice/extensions-registry';
-import { isManifestJSType } from '@umbraco-cms/backoffice/extensions-api';
+import { isManifestJSType, ManifestBase } from '@umbraco-cms/backoffice/extensions-api';
 import { OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: Figure out if we should base stores like this on something more generic for "collections" rather than trees.

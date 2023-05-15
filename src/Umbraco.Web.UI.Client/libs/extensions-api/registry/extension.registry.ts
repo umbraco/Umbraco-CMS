@@ -1,11 +1,6 @@
 import { BehaviorSubject, map, Observable, distinctUntilChanged, combineLatest } from 'rxjs';
-import type {
-	ManifestTypes,
-	ManifestTypeMap,
-	ManifestBase,
-	SpecificManifestTypeOrManifestBase,
-	ManifestKind,
-} from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 function extensionArrayMemoization<T extends { alias: string }>(
 	previousValue: Array<T>,

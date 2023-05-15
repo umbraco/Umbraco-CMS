@@ -2,11 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
-	ManifestKind,
 	ManifestMenu,
 	ManifestSectionSidebarAppMenuKind,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestKind } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import '../../menu/menu.element';

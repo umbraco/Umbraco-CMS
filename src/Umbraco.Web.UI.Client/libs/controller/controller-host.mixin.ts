@@ -1,5 +1,5 @@
 import { UmbControllerInterface } from './controller.interface';
-import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
+import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extensions-api';
 
 export declare class UmbControllerHostElement extends HTMLElement {
 	hasController(controller: UmbControllerInterface): boolean;

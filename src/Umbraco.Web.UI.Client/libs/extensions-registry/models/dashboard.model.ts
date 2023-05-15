@@ -1,5 +1,5 @@
 import type { UmbDashboardExtensionElement } from '../interfaces';
-import type { ManifestElement, ManifestWithConditions } from '.';
+import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extensions-api';
 
 export interface ManifestDashboard
 	extends ManifestElement<UmbDashboardExtensionElement>,

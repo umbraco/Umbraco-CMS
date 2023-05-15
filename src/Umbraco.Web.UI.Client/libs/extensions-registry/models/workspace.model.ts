@@ -1,4 +1,4 @@
-import type { ManifestElement } from '.';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-api';
 
 export interface ManifestWorkspace extends ManifestElement {
 	type: 'workspace';

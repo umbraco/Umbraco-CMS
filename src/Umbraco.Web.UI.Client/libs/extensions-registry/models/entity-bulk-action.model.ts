@@ -1,4 +1,4 @@
-import type { ManifestElement, ManifestWithConditions } from '.';
+import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extensions-api';
 
 /**
  * An action to perform on multiple entities

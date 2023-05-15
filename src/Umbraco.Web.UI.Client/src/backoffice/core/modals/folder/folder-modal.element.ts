@@ -4,10 +4,10 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { UmbFolderModalData, UmbFolderModalResult, UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionClass, ManifestBase } from '@umbraco-cms/backoffice/extensions-api';
 import { FolderReponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { ManifestBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-folder-modal')
 export class UmbFolderModalElement extends UmbLitElement {

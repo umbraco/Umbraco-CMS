@@ -1,4 +1,4 @@
-import type { ManifestBase, ManifestWithLoader } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestBase, ManifestWithLoader } from '../types';
 
 export type ManifestJSType<T> = ManifestWithLoader<T> & { js: string };
 export function isManifestJSType<T>(manifest: ManifestBase | unknown): manifest is ManifestJSType<T> {

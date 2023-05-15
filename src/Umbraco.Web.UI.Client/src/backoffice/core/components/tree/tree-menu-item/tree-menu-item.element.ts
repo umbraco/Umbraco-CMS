@@ -2,11 +2,11 @@ import { html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
-	ManifestKind,
 	ManifestMenuItemTreeKind,
 	UmbMenuItemExtensionElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestKind } from '@umbraco-cms/backoffice/extensions-api';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {

@@ -1,8 +1,7 @@
 import { hasDefaultExport } from './has-default-export.function';
 import { isManifestClassConstructorType } from './type-guards';
 import { loadExtension } from './load-extension.function';
-import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
-import type { ManifestClass } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestClass, ClassConstructor } from './types';
 
 //TODO: Write tests for this method:
 export async function createExtensionClass<T = unknown>(

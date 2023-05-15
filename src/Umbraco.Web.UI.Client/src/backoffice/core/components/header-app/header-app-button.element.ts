@@ -2,11 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import {
-	ManifestHeaderAppButtonKind,
-	ManifestKind,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestHeaderAppButtonKind, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestKind } from '@umbraco-cms/backoffice/extensions-api';
 
 const manifest: ManifestKind = {
 	type: 'kind',

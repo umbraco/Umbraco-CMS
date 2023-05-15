@@ -1,4 +1,4 @@
-import type { ManifestElement, ManifestWithConditions } from '.';
+import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extensions-api';
 
 export interface ManifestCollectionView extends ManifestElement, ManifestWithConditions<ConditionsCollectionView> {
 	type: 'collectionView';
