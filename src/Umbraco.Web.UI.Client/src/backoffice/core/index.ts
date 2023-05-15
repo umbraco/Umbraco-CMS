@@ -19,18 +19,6 @@ export const manifests: Array<ManifestTypes | ManifestKind> = [
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...modalManifests,
-	// TODO: where should these live?
-	{
-		type: 'kind',
-		alias: 'Umb.Kind.TreePickerModal',
-		matchKind: 'treePicker',
-		matchType: 'modal',
-		manifest: {
-			type: 'modal',
-			kind: 'treePicker',
-			elementName: 'umb-tree-picker-modal',
-		},
-	},
 ];
 
 export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
