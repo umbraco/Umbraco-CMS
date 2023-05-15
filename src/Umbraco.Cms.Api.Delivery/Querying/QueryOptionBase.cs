@@ -17,23 +17,23 @@ public abstract class QueryOptionBase
         _requestRoutingService = requestRoutingService;
     }
 
-    public Guid? GetGuidFromQuery(string queryStringValue)
+    protected Guid? GetGuidFromQuery(string queryStringValue)
     {
+        if (queryStringValue.IsNullOrWhiteSpace())
+        {
+            return null;
+        }
+
         if (Guid.TryParse(queryStringValue, out Guid id))
         {
             return id;
         }
 
-        if (queryStringValue.IsNullOrWhiteSpace() ||
-            !_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) ||
-            publishedSnapshot?.Content is null)
-        {
-            return null;
-        }
+        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
 
         // Check if the passed value is a path of a content item
         var contentRoute = _requestRoutingService.GetContentRoute(queryStringValue);
-        IPublishedContent? contentItem = publishedSnapshot.Content.GetByRoute(contentRoute);
+        IPublishedContent? contentItem = publishedSnapshot.Content?.GetByRoute(contentRoute);
 
         return contentItem?.Key;
     }
