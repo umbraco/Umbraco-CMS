@@ -27,7 +27,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         _globalSettings = globalSettings.Value;
     }
 
-    public IApiContentRoute Build(IPublishedContent content, string? culture = null)
+    public IApiContentRoute? Build(IPublishedContent content, string? culture = null)
     {
         if (content.ItemType != PublishedItemType.Content)
         {
@@ -42,9 +42,15 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
         // the URL provider resolves the content URL as empty string or "#". since the Delivery API handles routing explicitly,
         // we can perform fallback to the content route.
-        if (contentPath.IsNullOrWhiteSpace() || "#".Equals(contentPath))
+        if (IsInvalidContentPath(contentPath))
         {
             contentPath = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content?.GetRouteById(content.Id, culture) ?? contentPath;
+        }
+
+        // if the content path has still not been resolved as a valid path, the content is un-routable in this culture
+        if (IsInvalidContentPath(contentPath))
+        {
+            return null;
         }
 
         contentPath = contentPath.EnsureStartsWith("/");
@@ -55,4 +61,6 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
         return new ApiContentRoute(contentPath, new ApiContentStartItem(root.Key, rootPath));
     }
+
+    private static bool IsInvalidContentPath(string path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
 }

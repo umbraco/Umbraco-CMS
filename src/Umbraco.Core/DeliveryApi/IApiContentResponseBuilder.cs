@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 
 public interface IApiContentResponseBuilder
 {
-    IApiContentResponse Build(IPublishedContent content);
+    IApiContentResponse? Build(IPublishedContent content);
 }

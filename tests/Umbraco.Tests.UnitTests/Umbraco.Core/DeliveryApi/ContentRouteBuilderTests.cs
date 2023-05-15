@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -21,6 +22,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
         var result = builder.Build(root);
+        Assert.IsNotNull(result);
         Assert.AreEqual("/", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root", result.StartItem.Path);
@@ -38,6 +40,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
         var result = builder.Build(child);
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root", result.StartItem.Path);
@@ -58,6 +61,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
         var result = builder.Build(grandchild);
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child/the-grandchild", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root", result.StartItem.Path);
@@ -74,11 +78,13 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(false);
         var result = builder.Build(child, "en-us");
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child-en-us", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root-en-us", result.StartItem.Path);
 
         result = builder.Build(child, "da-dk");
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child-da-dk", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root-da-dk", result.StartItem.Path);
@@ -95,11 +101,13 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(false);
         var result = builder.Build(child, "en-us");
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root-en-us", result.StartItem.Path);
 
         result = builder.Build(child, "da-dk");
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root-da-dk", result.StartItem.Path);
@@ -116,11 +124,13 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var builder = CreateApiContentRouteBuilder(false);
         var result = builder.Build(child, "en-us");
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child-en-us", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root", result.StartItem.Path);
 
         result = builder.Build(child, "da-dk");
+        Assert.IsNotNull(result);
         Assert.AreEqual("/the-child-da-dk", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root", result.StartItem.Path);
@@ -144,36 +154,18 @@ public class ContentRouteBuilderTests : DeliveryApiTests
     [TestCase("#")]
     public void FallsBackToContentPathIfUrlProviderCannotResolveUrl(string resolvedUrl)
     {
-        var publishedUrlProviderMock = new Mock<IPublishedUrlProvider>();
-        publishedUrlProviderMock
-            .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns(resolvedUrl);
+        var result = GetUnRoutableRoute(resolvedUrl, "/the/content/route");
+        Assert.IsNotNull(result);
+        Assert.AreEqual("/the/content/route", result.Path);
+    }
 
-        var publishedContentCacheMock = new Mock<IPublishedContentCache>();
-        publishedContentCacheMock
-            .Setup(c => c.GetRouteById(It.IsAny<int>(), It.IsAny<string?>()))
-            .Returns("/the/content/route");
-
-        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
-        publishedSnapshotMock
-            .SetupGet(s => s.Content)
-            .Returns(publishedContentCacheMock.Object);
-        var publishedSnapshot = publishedSnapshotMock.Object;
-
-        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-        publishedSnapshotAccessorMock
-            .Setup(a => a.TryGetPublishedSnapshot(out publishedSnapshot))
-            .Returns(true);
-
-        var content = SetupVariantPublishedContent("The Content", Guid.NewGuid());
-
-        var builder = new ApiContentRouteBuilder(
-            publishedUrlProviderMock.Object,
-            CreateGlobalSettings(),
-            Mock.Of<IVariationContextAccessor>(),
-            publishedSnapshotAccessorMock.Object);
-
-        Assert.AreEqual("/the/content/route", builder.Build(content).Path);
+    [TestCase("")]
+    [TestCase(" ")]
+    [TestCase("#")]
+    public void YieldsNullForUnRoutableContent(string contentPath)
+    {
+        var result = GetUnRoutableRoute(contentPath, contentPath);
+        Assert.IsNull(result);
     }
 
     [TestCase(true)]
@@ -253,4 +245,38 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             CreateGlobalSettings(hideTopLevelNodeFromPath),
             Mock.Of<IVariationContextAccessor>(),
             Mock.Of<IPublishedSnapshotAccessor>());
+
+    private IApiContentRoute? GetUnRoutableRoute(string publishedUrl, string routeById)
+    {
+        var publishedUrlProviderMock = new Mock<IPublishedUrlProvider>();
+        publishedUrlProviderMock
+            .Setup(p => p.GetUrl(It.IsAny<IPublishedContent>(), It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Returns(publishedUrl);
+
+        var publishedContentCacheMock = new Mock<IPublishedContentCache>();
+        publishedContentCacheMock
+            .Setup(c => c.GetRouteById(It.IsAny<int>(), It.IsAny<string?>()))
+            .Returns(routeById);
+
+        var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
+        publishedSnapshotMock
+            .SetupGet(s => s.Content)
+            .Returns(publishedContentCacheMock.Object);
+        var publishedSnapshot = publishedSnapshotMock.Object;
+
+        var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
+        publishedSnapshotAccessorMock
+            .Setup(a => a.TryGetPublishedSnapshot(out publishedSnapshot))
+            .Returns(true);
+
+        var content = SetupVariantPublishedContent("The Content", Guid.NewGuid());
+
+        var builder = new ApiContentRouteBuilder(
+            publishedUrlProviderMock.Object,
+            CreateGlobalSettings(),
+            Mock.Of<IVariationContextAccessor>(),
+            publishedSnapshotAccessorMock.Object);
+
+        return builder.Build(content);
+    }
 }

@@ -177,14 +177,17 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
             {
                 case Constants.UdiEntityType.Document:
                     IPublishedContent? content = publishedSnapshot.Content?.GetById(item.Udi.Guid);
-                    return content == null
+                    IApiContentRoute? route = content != null
+                        ? _apiContentRouteBuilder.Build(content)
+                        : null;
+                    return content == null || route == null
                         ? null
                         : ApiLink.Content(
                             item.Name.IfNullOrWhiteSpace(_apiContentNameProvider.GetName(content)),
                             item.Target,
                             content.Key,
                             content.ContentType.Alias,
-                            _apiContentRouteBuilder.Build(content));
+                            route);
                 case Constants.UdiEntityType.Media:
                     IPublishedContent? media = publishedSnapshot.Media?.GetById(item.Udi.Guid);
                     return media == null
