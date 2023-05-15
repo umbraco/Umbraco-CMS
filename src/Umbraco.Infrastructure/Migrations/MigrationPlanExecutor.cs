@@ -80,6 +80,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
     }
 
+    public string Execute(MigrationPlan plan, string fromState) => ExecutePlan(plan, fromState).FinalState;
+
     /// <summary>
     ///     Executes the plan.
     /// </summary>

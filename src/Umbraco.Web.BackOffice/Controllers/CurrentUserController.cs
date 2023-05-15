@@ -278,7 +278,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         // all current users have access to reset/manually change their password
 
         Attempt<PasswordChangedModel?> passwordChangeResult =
-            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager);
+            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager, currentUser);
 
         if (passwordChangeResult.Success)
         {

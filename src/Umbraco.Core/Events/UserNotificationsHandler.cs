@@ -107,6 +107,7 @@ public sealed class UserNotificationsHandler :
         _notifier.Notify(_actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
     }
 
+    [Obsolete("Scheduled for removal in v13")]
     public void Handle(ContentSentToPublishNotification notification) =>
         _notifier.Notify(_actions.GetAction<ActionToPublish>(), notification.Entity);
 

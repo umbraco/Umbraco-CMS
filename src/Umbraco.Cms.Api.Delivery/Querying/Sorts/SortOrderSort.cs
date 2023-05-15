@@ -20,8 +20,7 @@ public sealed class SortOrderSort : ISortHandler
         return new SortOption
         {
             FieldName = SortOrderSortIndexer.FieldName,
-            Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending,
-            FieldType = FieldType.Number
+            Direction = sortDirection.StartsWith("asc") ? Direction.Ascending : Direction.Descending
         };
     }
 }

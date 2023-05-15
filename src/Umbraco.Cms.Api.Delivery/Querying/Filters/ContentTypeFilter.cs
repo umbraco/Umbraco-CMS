@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Delivery.Indexing.Filters;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Filters;
 
@@ -16,24 +17,15 @@ public sealed class ContentTypeFilter : IFilterHandler
     {
         var alias = filter.Substring(ContentTypeSpecifier.Length);
 
-        var filterOption = new FilterOption
+        return new FilterOption
         {
             FieldName = ContentTypeFilterIndexer.FieldName,
-            Value = string.Empty
+            Values = alias.IsNullOrWhiteSpace() == false
+                ? new[] { alias.TrimStart('!') }
+                : Array.Empty<string>(),
+            Operator = alias.StartsWith('!')
+                ? FilterOperation.IsNot
+                : FilterOperation.Is
         };
-
-        // Support negation
-        if (alias.StartsWith('!'))
-        {
-            filterOption.Value = alias.Substring(1);
-            filterOption.Operator = FilterOperation.IsNot;
-        }
-        else
-        {
-            filterOption.Value = alias;
-            filterOption.Operator = FilterOperation.Is;
-        }
-
-        return filterOption;
     }
 }

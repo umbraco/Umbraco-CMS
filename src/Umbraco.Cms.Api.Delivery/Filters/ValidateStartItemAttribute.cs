@@ -14,19 +14,20 @@ internal sealed class ValidateStartItemAttribute : TypeFilterAttribute
 
     private class ValidateStartItemFilter : IActionFilter
     {
-        private readonly IRequestStartItemProvider _requestStartItemProvider;
+        private readonly IRequestStartItemProviderAccessor _requestStartItemProviderAccessor;
 
-        public ValidateStartItemFilter(IRequestStartItemProvider requestStartItemProvider)
-            => _requestStartItemProvider = requestStartItemProvider;
+        public ValidateStartItemFilter(IRequestStartItemProviderAccessor requestStartItemProviderAccessor)
+            => _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (_requestStartItemProvider.RequestedStartItem() is null)
+            if (_requestStartItemProviderAccessor.TryGetValue(out IRequestStartItemProvider? requestStartItemProvider) is false
+               || requestStartItemProvider.RequestedStartItem() is null)
             {
                 return;
             }
 
-            IPublishedContent? startItem = _requestStartItemProvider.GetStartItem();
+            IPublishedContent? startItem = requestStartItemProvider.GetStartItem();
 
             if (startItem is null)
             {

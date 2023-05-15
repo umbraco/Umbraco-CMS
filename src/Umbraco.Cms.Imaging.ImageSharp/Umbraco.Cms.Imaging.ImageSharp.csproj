@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Imaging - ImageSharp</Title>
     <Description>Adds imaging support using ImageSharp/ImageSharp.Web to Umbraco CMS.</Description>
-    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>

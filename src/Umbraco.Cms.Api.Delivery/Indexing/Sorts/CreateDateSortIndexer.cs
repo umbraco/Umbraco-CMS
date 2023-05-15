@@ -7,9 +7,9 @@ public sealed class CreateDateSortIndexer : IContentIndexHandler
 {
     internal const string FieldName = "createDate";
 
-    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content)
-        => new[] { new IndexFieldValue { FieldName = FieldName, Value = content.CreateDate } };
+    public IEnumerable<IndexFieldValue> GetFieldValues(IContent content, string? culture)
+        => new[] { new IndexFieldValue { FieldName = FieldName, Values = new object[] { content.CreateDate } } };
 
     public IEnumerable<IndexField> GetFields()
-        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.Date } };
+        => new[] { new IndexField { FieldName = FieldName, FieldType = FieldType.Date, VariesByCulture = false } };
 }
