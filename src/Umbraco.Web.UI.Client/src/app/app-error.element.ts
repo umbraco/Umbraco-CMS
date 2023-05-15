@@ -9,8 +9,8 @@ import backgroundImg from '/umbraco_background.jpg';
 /**
  * A full page error element that can be used either solo or for instance as the error 500 page and BootFailed
  */
-@customElement('umb-error')
-export class UmbErrorElement extends UmbLitElement {
+@customElement('umb-app-error')
+export class UmbAppErrorElement extends UmbLitElement {
 	/**
 	 * The error message to display
 	 *
@@ -26,8 +26,6 @@ export class UmbErrorElement extends UmbLitElement {
 	 */
 	@property()
 	error?: unknown;
-
-	
 
 	private renderProblemDetails = (problemDetails: ProblemDetailsModel) => html`
 		<h2>${problemDetails.title}</h2>
@@ -81,7 +79,7 @@ export class UmbErrorElement extends UmbLitElement {
 			</uui-box>
 		</div>
 	`;
-	
+
 	static styles = css`
 		#background {
 			position: fixed;
@@ -131,10 +129,10 @@ export class UmbErrorElement extends UmbLitElement {
 	`;
 }
 
-export default UmbErrorElement;
+export default UmbAppErrorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-error': UmbErrorElement;
+		'umb-app-error': UmbAppErrorElement;
 	}
 }
