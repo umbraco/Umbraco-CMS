@@ -14,7 +14,7 @@
             }
         });
 
-    function BlockCardController($scope, umbRequestHelper) {
+    function BlockCardController($scope, umbRequestHelper, mediaHelper) {
 
         const vm = this;
         vm.styleBackgroundImage = "none";
@@ -49,8 +49,10 @@
 
             var path = umbRequestHelper.convertVirtualToAbsolutePath(vm.blockConfigModel.thumbnail);
             if (path.toLowerCase().endsWith(".svg") === false) {
-                path += "?width=400";
+
+              path = mediaHelper.getThumbnailFromPath(path);
             }
+
             vm.styleBackgroundImage = `url('${path}')`;
         };
 

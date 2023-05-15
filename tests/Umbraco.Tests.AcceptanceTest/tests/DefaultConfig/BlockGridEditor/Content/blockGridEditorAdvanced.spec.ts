@@ -44,7 +44,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await umbracoApi.media.ensureNameNotExists(customViewItemName);
 
       const imageData = await umbracoApi.media.createImageWithFile(imageName, umbracoFileValue, imageFileName, imagePath, imageMimeType);
-      
+
       const customViewData = await umbracoApi.media.createFileWithFile(customViewItemName, customViewFileName, customViewPath, customViewMimeType);
       const customViewMediaPath = customViewData.mediaLink;
 
@@ -101,7 +101,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await umbracoUi.navigateToContent(blockGridName);
 
       // Assert
-      // Checks if the block has the correct CustomView 
+      // Checks if the block has the correct CustomView
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[view="' + customViewMediaPath + '"]')).toBeVisible();
       // Checks if the custom view updated the block by locating a name in the customView
       await expect(page.locator('[data-content-element-type-key="' + element['key'] + '"]').locator('[view="' + customViewMediaPath + '"]').locator('[name="BlockGridCustomView"]')).toBeVisible();
@@ -137,7 +137,7 @@ test.describe('BlockGridEditorAdvancedContent', () => {
       await umbracoApi.content.createDefaultContentWithABlockGridEditor(umbracoApi, element, dataType, null);
 
       await umbracoUi.navigateToContent(blockGridName);
-      
+
       // Assert
       // Checks if the block has the correct template
       await expect(page.locator('umb-block-grid-entry', {hasText: elementName}).locator('umb-block-grid-block')).toHaveAttribute('stylesheet', stylesheetDataPath);
@@ -345,7 +345,8 @@ test.describe('BlockGridEditorAdvancedContent', () => {
 
       // Assert
       // Checks if the element has the thumbnail
-      await expect(page.locator('umb-block-card', {hasText: elementName}).locator('.__showcase')).toHaveAttribute('style', 'background-image: url("' + imageDataPath + '?width=400");');
+      const updatedImagePath = encodeURIComponent(imageDataPath);
+      await expect(page.locator('umb-block-card', {hasText: elementName}).locator('.__showcase')).toHaveAttribute('style', 'background-image: url("/umbraco/backoffice/umbracoapi/images/GetBigThumbnail?originalImagePath=' + updatedImagePath + '\");');
 
       // Clean
       await umbracoApi.documentTypes.ensureNameNotExists(elementTwoName);

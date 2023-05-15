@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;

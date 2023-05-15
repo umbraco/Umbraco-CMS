@@ -131,7 +131,7 @@ internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
         var sql1 = $@"INSERT INTO cmsTags (tag, {group}, languageId)
 SELECT tagSet.tag, tagSet.{group}, tagSet.languageId
 FROM {tagSetSql}
-LEFT OUTER JOIN cmsTags ON (tagSet.tag LIKE cmsTags.tag AND tagSet.{group} = cmsTags.{group} AND COALESCE(tagSet.languageId, -1) = COALESCE(cmsTags.languageId, -1))
+LEFT OUTER JOIN cmsTags ON (tagSet.tag = cmsTags.tag AND tagSet.{group} = cmsTags.{group} AND COALESCE(tagSet.languageId, -1) = COALESCE(cmsTags.languageId, -1))
 WHERE cmsTags.id IS NULL";
 
         Database.Execute(sql1);
@@ -321,7 +321,7 @@ WHERE r.tagId IS NULL";
         Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
         sql = sql
-            .WhereLike<TagDto>(dto => dto.Text, tag);
+            .Where<TagDto>(dto => dto.Text == tag);
 
         if (group.IsNullOrWhiteSpace() == false)
         {

@@ -35,7 +35,6 @@ test.describe('BlockGridEditorInDocument', () => {
   }
 
   async function createDefaultDocumentTypeWithBlockGridEditor(umbracoApi, BlockGridEditor?) {
-
     const rootDocType = new DocumentTypeBuilder()
       .withName(documentName)
       .withAllowAsRoot(true)

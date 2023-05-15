@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 /// </summary>
 public enum SpecialDbTypes
 {
+    [Obsolete("Use NVARCHARMAX instead")]
     NTEXT,
     NCHAR,
     NVARCHARMAX,

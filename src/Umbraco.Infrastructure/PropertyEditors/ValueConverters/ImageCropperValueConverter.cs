@@ -4,7 +4,9 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -13,7 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     Represents a value converter for the image cropper value editor.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class ImageCropperValueConverter : PropertyValueConverterBase
+public class ImageCropperValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private static readonly JsonSerializerSettings _imageCropperValueJsonSerializerSettings = new()
     {
@@ -65,4 +67,13 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
 
         return value;
     }
+
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(ApiImageCropperValue);
+
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => inter is ImageCropperValue {Src: { }} imageCropperValue
+            ? new ApiImageCropperValue(imageCropperValue.Src, imageCropperValue.FocalPoint, imageCropperValue.Crops)
+            : null;
 }

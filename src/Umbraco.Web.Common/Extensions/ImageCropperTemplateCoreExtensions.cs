@@ -558,7 +558,7 @@ public static class ImageCropperTemplateCoreExtensions
         }
 
         var cacheBusterValue =
-            cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
+            cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString("x", CultureInfo.InvariantCulture) : null;
 
         return GetCropUrl(
             mediaItemUrl,
