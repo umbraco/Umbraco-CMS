@@ -76,4 +76,6 @@ export * from './table';
 export * from './tree/tree.element';
 export * from './code-editor';
 
+export * from './store';
+
 export const manifests = [...debugManifests];

@@ -1,24 +1,21 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import './core/css/custom-properties.css';
-
 import 'element-internals-polyfill';
 
-import './core/router/router-slot.element';
-import './core/router/variant-router-slot.element';
-import './core/context-provider/context-provider.element';
+import '../core/router/router-slot.element';
+import '../core/router/variant-router-slot.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { UmbAuthFlow } from './core/auth/auth-flow';
-import { UmbIconStore } from './core/stores/icon/icon.store';
-import type { UmbErrorElement } from './error/error.element';
+import { UmbIconStore } from '../core/stores/icon/icon.store';
+import type { UmbAppErrorElement } from './app-error.element';
+import { UmbAuthFlow } from './auth/auth-flow';
 import { UMB_APP, UmbAppContext } from './app.context';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_SERVER_URL, tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 
@@ -31,7 +28,7 @@ export class UmbAppElement extends UmbLitElement {
 	 * @remarks This is the base URL of the Umbraco server, not the base URL of the backoffice.
 	 */
 	@property({ type: String })
-	private serverUrl = import.meta.env.VITE_UMBRACO_API_URL ?? '';
+	serverUrl = '';
 
 	/**
 	 * The base path of the backoffice.
@@ -40,65 +37,71 @@ export class UmbAppElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	// TODO: get from server config
-	private backofficePath = import.meta.env.DEV ? '/' : '/umbraco';
+	backofficePath = '/umbraco';
+
+	/**
+	 * Bypass authentication.
+	 * @type {boolean}
+	 */
+	// TODO: this might not be the right solution
+	@property({ type: Boolean })
+	bypassAuth = false;
 
 	private _routes: UmbRoute[] = [
 		{
 			path: 'install',
-			component: () => import('./installer/installer.element'),
+			component: () => import('../installer/installer.element'),
 		},
 		{
 			path: 'upgrade',
-			component: () => import('./upgrader/upgrader.element'),
+			component: () => import('../upgrader/upgrader.element'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
 			path: '**',
-			component: () => import('./backoffice/backoffice.element'),
+			component: () => import('../backoffice/backoffice.element'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 	];
 
-	#authFlow: UmbAuthFlow;
+	#authFlow?: UmbAuthFlow;
 	#umbIconRegistry = new UmbIconStore();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
 	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
-	#isMocking = import.meta.env.VITE_UMBRACO_USE_MSW === 'on';
 
 	constructor() {
 		super();
-
-		// TODO: get all mocking logic out of this element. The app element doesn't need to know who is serving the data.
-		OpenAPI.BASE = this.#isMocking ? '' : this.serverUrl;
-
-		this.#authFlow = new UmbAuthFlow(
-			OpenAPI.BASE !== '' ? OpenAPI.BASE : window.location.origin,
-			`${window.location.origin}${this.backofficePath}`
-		);
-
-		// TODO: Make a combined App Context
-		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath }));
-		this.provideContext(UMB_SERVER_URL, OpenAPI.BASE);
-
-		this._setup();
 
 		this.#umbIconRegistry.attach(this);
 		this.#uuiIconRegistry.attach(this);
 	}
 
-	private async _setup() {
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.#setup();
+	}
+
+	async #setup() {
+		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
+
+		OpenAPI.BASE = this.serverUrl;
+		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
+
+		this.#authFlow = new UmbAuthFlow(this.serverUrl, redirectUrl);
+
+		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }));
+
 		// Try to initialise the auth flow and get the runtime status
 		try {
 			// Get the current runtime level
 			await this.#setInitStatus();
 
-			// If we are not mocking, we need to initialise the connection to the Umbraco authentication server
-			if (!this.#isMocking) {
+			if (this.bypassAuth === false) {
 				// Get service configuration from authentication server
 				await this.#authFlow.setInitialState();
 
 				// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
-				OpenAPI.TOKEN = () => this.#authFlow.performWithFreshTokens();
+				OpenAPI.TOKEN = () => this.#authFlow!.performWithFreshTokens();
 				OpenAPI.WITH_CREDENTIALS = true;
 			}
 
@@ -125,7 +128,7 @@ export class UmbAppElement extends UmbLitElement {
 			this.#errorPage(errorMsg, error);
 		}
 
-		// TODO: wrap all debugging logic in a separate class
+		// TODO: wrap all debugging logic in a separate class. Maybe this could be part of the context-api? When we create a new root, we could attach the debugger to it?
 		// Listen for the debug event from the <umb-debug> component
 		this.addEventListener(umbDebugContextEventType, (event: any) => {
 			// Once we got to the outter most component <umb-app>
@@ -195,7 +198,8 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#isAuthorized(): boolean {
-		return this.#isMocking ? true : this.#authFlow.loggedIn();
+		if (!this.#authFlow) return false;
+		return this.bypassAuth ? true : this.#authFlow.loggedIn();
 	}
 
 	#isAuthorizedGuard(): Guard {
@@ -208,7 +212,7 @@ export class UmbAppElement extends UmbLitElement {
 			window.sessionStorage.setItem('umb:auth:redirect', location.href);
 
 			// Make a request to the auth server to start the auth flow
-			this.#authFlow.makeAuthorizationRequest();
+			this.#authFlow!.makeAuthorizationRequest();
 
 			// Return false to prevent the route from being rendered
 			return false;
@@ -220,10 +224,10 @@ export class UmbAppElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: '**',
-				component: () => import('./error/error.element'),
+				component: () => import('./app-error.element'),
 				setup: (component) => {
-					(component as UmbErrorElement).errorMessage = errorMsg;
-					(component as UmbErrorElement).error = error;
+					(component as UmbAppErrorElement).errorMessage = errorMsg;
+					(component as UmbAppErrorElement).error = error;
 				},
 			},
 		];
