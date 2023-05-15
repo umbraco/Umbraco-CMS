@@ -8,13 +8,19 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        type: number
+        description: 'Issue/PR Number to comment on'
+        required: false
 
 env:
   NODE_OPTIONS: --max_old_space_size=16384
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed' && contains(github.event.pull_request.labels.*.name, 'storybook'))
+    if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && github.event.action != 'closed' && contains(github.event.pull_request.labels.*.name, 'storybook'))
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
@@ -35,6 +41,28 @@ jobs:
           api_location: '' # Api source code path - optional
           output_location: '/storybook-static' # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+      - name: Comment on PR
+        # azure/static-web-apps-deploy doesn't support workflow_dispatch, so we need to manually comment on the PR
+        if: github.event_name == 'workflow_dispatch' && inputs.issue_number != null
+        uses: actions/github-script@v6
+        env:
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          SITE_URL: ${{ steps.builddeploy.outputs.static_web_app_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: process.env.ISSUE_NUMBER,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['storybook']
+            })
+            github.rest.issues.createComment({
+              issue_number: process.env.ISSUE_NUMBER,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Storybook is available at: ${process.env.SITE_URL}`
+            })
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, 'storybook')
