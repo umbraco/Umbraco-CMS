@@ -1,4 +1,5 @@
-import { MockedRequest, setupWorker } from 'msw';
+const { setupWorker } = window.MockServiceWorker;
+import type { MockedRequest } from 'msw';
 import { handlers } from './browser-handlers';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
