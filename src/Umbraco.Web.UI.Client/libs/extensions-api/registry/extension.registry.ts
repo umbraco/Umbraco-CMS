@@ -205,5 +205,3 @@ export class UmbExtensionRegistry {
 		) as Observable<Array<ExtensionTypes>>;
 	}
 }
-
-export const UMB_EXTENSION_REGISTRY_TOKEN = new UmbContextToken<UmbExtensionRegistry>('UmbExtensionRegistry');
