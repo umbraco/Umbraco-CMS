@@ -31,11 +31,47 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		}).asPromise();
 	}
 
+	/**
+	 * Appends an additional path to the modal route.
+	 *
+	 * This can help specify the URL for this modal, or used to add a parameter to the URL like this: "/modal/my-modal/:index/"
+	 * Where :index is the name for the parameter, the modal will open with any value in that location.
+	 * When modal is being setup the value of the parameter can be read from the route params. See the example:
+	 * @param additionalPath
+	 * @returns UmbModalRouteRegistrationController
+	 * @memberof UmbContextConsumer
+	 * @example <caption>Example of adding an additional path to the modal route</caption>
+	 * const modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+	 * modalRegistration.addAdditionalPath(':index')
+	 *
+	 * modalRegistration.onSetup((params) => {
+	 * 	const index = params.index;
+	 *  // When entering the url of: "/modal/my-modal/hello-world/"
+	 *  // Then index will be "hello-world"
+	 * }
+	 */
 	public addAdditionalPath(additionalPath: string) {
 		this.#additionalPath = additionalPath;
 		return this;
 	}
 
+	/**
+	 * Registerer one or more additional paths to the modal route, similar to addAdditionalPath. But without defining the actual path name. This enables this to be asynchronously defined and even changed later.
+	 * This can be useful if your modal has to be unique for this registration, avoiding collision with other registrations.
+	 * If you made a modal for editing one of multiple property, then you can add a unique path holding the property id.
+	 * Making the URL unique to this modal registration: /modal/my-modal/my-unique-value/
+	 *
+	 * Notice the modal will only be available when all unique paths have a value.
+	 * @param {Array<string>} uniquePathNames
+	 * @returns UmbModalRouteRegistrationController
+	 * @memberof UmbContextConsumer
+	 * @example <caption>Example of adding an additional unique path to the modal route</caption>
+	 * const modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+	 * modalRegistration.addUniquePaths(['myAliasForIdentifyingThisPartOfThePath'])
+	 *
+	 * // Later:
+	 * modalRegistration.setUniquePathValue('myAliasForIdentifyingThisPartOfThePath', 'myValue');
+	 */
 	public addUniquePaths(uniquePathNames: Array<string>) {
 		if (uniquePathNames) {
 			uniquePathNames.forEach((name) => {
@@ -45,6 +81,19 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		return this;
 	}
 
+	/**
+	 * Set or change the value of a unique path part.
+	 * @param {string} identifier
+	 * @param {value | undefined} value
+	 * @returns UmbModalRouteRegistrationController
+	 * @memberof UmbContextConsumer
+	 * @example <caption>Example of adding an additional unique path to the modal route</caption>
+	 * const modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+	 * modalRegistration.addUniquePaths(['first-one', 'another-one'])
+	 *
+	 * // Later:
+	 * modalRegistration.setUniquePathValue('first-one', 'myValue');
+	 */
 	setUniquePathValue(identifier: string, value: string | undefined) {
 		if (!this.#uniquePaths.has(identifier)) {
 			throw new Error(
