@@ -27,7 +27,7 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     private readonly BackOfficeUserManager _userManager;
 
     public BackOfficeSignInManager(
-        BackOfficeUserManager userManager,
+        IBackOfficeUserManager userManager,
         IHttpContextAccessor contextAccessor,
         IBackOfficeExternalLoginProviders externalLogins,
         IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
@@ -37,9 +37,9 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation,
         IEventAggregator eventAggregator)
-        : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
+        : base((BackOfficeUserManager)userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
     {
-        _userManager = userManager;
+        _userManager = (BackOfficeUserManager)userManager;
         _externalLogins = externalLogins;
         _eventAggregator = eventAggregator;
         _globalSettings = globalSettings.Value;
@@ -47,7 +47,7 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
 
     [Obsolete("Use ctor with all params")]
     public BackOfficeSignInManager(
-        BackOfficeUserManager userManager,
+        IBackOfficeUserManager userManager,
         IHttpContextAccessor contextAccessor,
         IBackOfficeExternalLoginProviders externalLogins,
         IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
