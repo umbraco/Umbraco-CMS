@@ -1,5 +1,5 @@
 import { UUIIconRegistry } from '@umbraco-ui/uui-icon-registry';
-import icons from '../../../../public-assets/icons/icons.json';
+import icons from '../../../public-assets/icons/icons.json';
 
 interface UmbIconDescriptor {
 	name: string;

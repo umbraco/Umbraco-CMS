@@ -8,7 +8,7 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { UmbIconRegistry } from '../core/stores/icon/icon.store';
+import { UmbIconRegistry } from '../core/icon-registry/icon.registry';
 import type { UmbAppErrorElement } from './app-error.element';
 import { UmbAuthFlow } from './auth/auth-flow';
 import { UMB_APP, UmbAppContext } from './app.context';
