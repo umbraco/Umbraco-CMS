@@ -2,10 +2,13 @@ import { Observable } from 'rxjs';
 import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from '../types';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data';
 import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data';
+import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store';
+import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from './user-group.store';
 import {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
 	UserGroupBaseModel,
+	UserGroupItemResponseModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
@@ -13,33 +16,58 @@ import {
 	UmbCollectionDataSource,
 	UmbCollectionRepository,
 	UmbDetailRepository,
+	UmbItemDataSource,
+	UmbItemRepository,
 	UmbRepositoryErrorResponse,
 	UmbRepositoryResponse,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data';
 
 // TODO: implement
 export class UmbUserGroupRepository
 	implements
 		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
-		UmbCollectionRepository
+		UmbCollectionRepository,
+		UmbItemRepository<UserGroupItemResponseModel>
 {
 	#host: UmbControllerHostElement;
+	#init;
 
 	#detailSource: UmbUserGroupDetailDataSource;
+	#detailStore?: UmbUserGroupStore;
+
 	#collectionSource: UmbCollectionDataSource<UserGroupResponseModel>;
+
+	#itemSource: UmbItemDataSource<UserGroupItemResponseModel>;
+	#itemStore?: UmbUserGroupItemStore;
 
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 		this.#detailSource = new UmbUserGroupServerDataSource(this.#host);
+		this.#itemSource = new UmbUserGroupItemServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserGroupCollectionServerDataSource(this.#host);
 
 		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 			this.#notificationContext = instance;
 		});
+
+		this.#init = Promise.all([
+			new UmbContextConsumerController(this.#host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#detailStore = instance;
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
+			}).asPromise(),
+
+			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
+			}).asPromise(),
+		]);
 	}
 	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<UserGroupBaseModel>> {
 		return this.#detailSource.createScaffold(parentId);
@@ -49,6 +77,25 @@ export class UmbUserGroupRepository
 	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {
 		//TODO: missing observable
 		return this.#collectionSource.filterCollection(filter);
+	}
+
+	// ITEMS:
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Ids are missing');
+		await this.#init;
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(ids: Array<string>) {
+		await this.#init;
+		return this.#itemStore!.items(ids);
 	}
 
 	// DETAIL
