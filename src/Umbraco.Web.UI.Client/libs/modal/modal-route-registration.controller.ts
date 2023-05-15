@@ -128,17 +128,17 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 			pathParts.push(this.#additionalPath);
 		}
 
-		const newPath = pathParts.join('/');
+		const newPath = pathParts.join('/') ?? '';
 
 		//if no changes then break out:
 		if (this.path === newPath) {
 			return;
 		}
 
+		this.#unregisterModal();
+
 		// Make this the path of the modal registration:
 		this._setPath(newPath);
-
-		this.#unregisterModal();
 
 		this.#modalRegistration = this.#routeContext.registerModal(this);
 	}
@@ -148,7 +148,6 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		if (this.#modalRegistration) {
 			this.#routeContext.unregisterModal(this.#modalRegistration);
 			this.#modalRegistration = undefined;
-			console.log('-- removing modal', this.alias);
 		}
 	}
 

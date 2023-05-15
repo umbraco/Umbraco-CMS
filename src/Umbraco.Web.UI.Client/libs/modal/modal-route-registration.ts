@@ -40,6 +40,10 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		return this.#modalAlias;
 	}
 
+	public generateModalPath() {
+		return `modal/${this.alias.toString()}${this.path && this.path !== '' ? `/${this.path}` : ''}`;
+	}
+
 	public get path() {
 		return this.#path;
 	}

@@ -29,6 +29,7 @@ export class UmbRouteContext {
 
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
+		console.log('registerModal', registration);
 		this.#generateNewUrlBuilder(registration);
 		this.#generateContextRoutes();
 		return registration;
@@ -41,13 +42,9 @@ export class UmbRouteContext {
 		this.#generateContextRoutes();
 	}
 
-	#getModalRoutePath(modalRegistration: UmbModalRouteRegistration) {
-		return `/modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
-	}
-
 	#generateRoute(modalRegistration: UmbModalRouteRegistration): UmbRoute {
 		return {
-			path: this.#getModalRoutePath(modalRegistration),
+			path: '/' + modalRegistration.generateModalPath(),
 			component: EmptyDiv,
 			setup: (component, info) => {
 				if (!this.#modalContext) return;
@@ -99,7 +96,7 @@ export class UmbRouteContext {
 		if (this.#activeModalPath) {
 			// If if there is a modal using the old path.
 			const activeModal = this.#modalRegistrations.find(
-				(registration) => this.#getModalRoutePath(registration) === this.#activeModalPath
+				(registration) => '/' + registration.generateModalPath() === this.#activeModalPath
 			);
 			if (activeModal) {
 				this.#modalContext?.close(activeModal.key);
@@ -116,7 +113,7 @@ export class UmbRouteContext {
 		if (!this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
-		const localPath = routeBasePath + `modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
+		const localPath = routeBasePath + modalRegistration.generateModalPath();
 
 		const urlBuilder = generateRoutePathBuilder(localPath);
 

@@ -2,26 +2,15 @@ import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-ui
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
-	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
-	UmbPropertySettingsModalResult,
-	UmbPropertySettingsModalData,
-} from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbPropertySettingsModalResult, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-
 @customElement('umb-property-settings-modal')
 // TODO: Could base take a token to get its types?.
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalData,
 	UmbPropertySettingsModalResult
 > {
-	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
-
 	//TODO: Should these options come from the server?
 	@state() private _customValidationOptions = [
 		{
@@ -49,17 +38,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	@state() private _aliasLocked = true;
 
-	#modalContext?: UmbModalContext;
-
 	@state()
 	protected _returnData!: UmbPropertySettingsModalResult;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
-		});
 	}
 
 	connectedCallback(): void {
@@ -74,8 +57,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		if (newlySelected === undefined) {
 			this._customValidationOptions[4].selected = true;
 		}
-
-		this.#observePropertyEditorUI();
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -85,20 +66,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		requestAnimationFrame(() => {
 			(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
 		});
-	}
-
-	#observePropertyEditorUI() {
-		if (!this._returnData.dataTypeId) return;
-
-		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._returnData.dataTypeId),
-			(propertyEditorUI) => {
-				if (!propertyEditorUI) return;
-
-				this._selectedPropertyEditorUI = propertyEditorUI;
-			},
-			'observePropertyEditorUI'
-		);
 	}
 
 	#onClose() {
@@ -146,6 +113,12 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.requestUpdate('_returnData');
 	}
 
+	#onDataTypeIdChange(event: UUIInputEvent) {
+		const dataTypeId = event.target.value.toString();
+		this._returnData.dataTypeId = dataTypeId;
+		this.requestUpdate('_returnData');
+	}
+
 	#onCustomValidationChange(event: UUISelectEvent) {
 		const regEx = event.target.value.toString();
 		this._returnData.validation!.regEx = regEx;
@@ -177,22 +150,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		this._returnData.appearance!.labelOnTop = true;
 		this.requestUpdate('_returnData');
-	}
-
-	#onOpenPropertyEditorUIPicker() {
-		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
-			selection: [],
-		});
-
-		if (!modalHandler) return;
-
-		modalHandler?.onSubmit().then(({ selection }) => {
-			if (selection.length === 0) return;
-			// TODO: we might should set the alias to null or empty string, if no selection.
-			this._returnData.dataTypeId = selection[0];
-			this.requestUpdate('_returnData');
-			this.#observePropertyEditorUI();
-		});
 	}
 
 	#onToggleAliasLock() {
@@ -253,7 +210,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										placeholder="Enter description..."
 										.value=${this._returnData.description}></uui-textarea>
 								</div>
-								${this.#renderPropertyUIPicker()}
+								<umb-input-data-type
+									.value=${this._returnData.dataTypeId}
+									@change=${this.#onDataTypeIdChange}></umb-input-data-type>
 								<hr />
 								<div class="container">
 									<b>Validation</b>
@@ -328,30 +287,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 						id="mandatory-message"
 						placeholder="Enter a custom validation error message (optional)"></uui-input>`
 				: ''}`;
-	}
-
-	#renderPropertyUIPicker() {
-		return this._selectedPropertyEditorUI
-			? html`
-					<umb-ref-property-editor-ui
-						name=${this._selectedPropertyEditorUI.meta.label}
-						alias=${this._selectedPropertyEditorUI.alias}
-						property-editor-model-alias=${this._selectedPropertyEditorUI.meta.propertyEditorModel}
-						border>
-						<uui-icon name="${this._selectedPropertyEditorUI.meta.icon}" slot="icon"></uui-icon>
-						<uui-action-bar slot="actions">
-							<uui-button label="Change" @click=${this.#onOpenPropertyEditorUIPicker}></uui-button>
-						</uui-action-bar>
-					</umb-ref-property-editor-ui>
-			  `
-			: html`
-					<uui-button
-						id="property-editor-ui-picker"
-						label="Select Property Editor"
-						look="placeholder"
-						color="default"
-						@click=${this.#onOpenPropertyEditorUIPicker}></uui-button>
-			  `;
 	}
 
 	#renderCustomValidation() {
@@ -454,11 +389,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			}
 			#alias-lock uui-icon {
 				margin-bottom: 2px;
-			}
-			#property-editor-ui-picker {
-				width: 100%;
-				--uui-button-padding-top-factor: 4;
-				--uui-button-padding-bottom-factor: 4;
 			}
 			.container {
 				display: flex;
