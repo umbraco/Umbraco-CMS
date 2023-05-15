@@ -3,7 +3,7 @@ import { manifests as menuSectionManifests } from './menu.manifests';
 import { manifests as memberGroupManifests } from './member-groups/manifests';
 import { manifests as memberTypeManifests } from './member-types/manifests';
 import { manifests as memberManifests } from './members/manifests';
-import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
 export const manifests = [
 	...memberSectionManifests,
@@ -13,6 +13,6 @@ export const manifests = [
 	...memberManifests,
 ];
 
-export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+export const onInit: UmbEntryPointOnInit = (_host, extensionRegistry) => {
 	extensionRegistry.registerMany(manifests);
 };

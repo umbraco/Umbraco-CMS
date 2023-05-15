@@ -1,4 +1,4 @@
-import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 import { ManifestDashboard } from '@umbraco-cms/backoffice/extensions-registry';
 
 const dashboard: ManifestDashboard = {
@@ -16,4 +16,4 @@ const dashboard: ManifestDashboard = {
 	},
 };
 
-export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => extensionRegistry.register(dashboard);
+export const onInit: UmbEntryPointOnInit = (_host, extensionRegistry) => extensionRegistry.register(dashboard);

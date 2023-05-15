@@ -13,7 +13,7 @@ import {
 	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
 } from './languages/app-language-select/app-language.context';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
 import './cultures/components';
 import './languages/components';
@@ -30,7 +30,7 @@ export const manifests = [
 	...relationTypeManifests,
 ];
 
-export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
+export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	extensionRegistry.registerMany(manifests);
 	new UmbContextProviderController(host, UMB_APP_LANGUAGE_CONTEXT_TOKEN, new UmbAppLanguageContext(host));
 	new UmbThemeContext(host);
