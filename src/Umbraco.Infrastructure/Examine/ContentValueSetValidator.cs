@@ -22,8 +22,8 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
     {
     }
-    
-    [Obsolete($"Use the overload accepting includeFields and excludeFields instead. This overload will be removed in Umbraco 13.")]
+
+    [Obsolete("Use the overload accepting includeFields and excludeFields instead. This overload will be removed in Umbraco 14.")]
     public ContentValueSetValidator(
         bool publishedValuesOnly,
         bool supportProtectedContent,
@@ -40,7 +40,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         _publicAccessService = publicAccessService;
         _scopeProvider = scopeProvider;
     }
-    
+
     public ContentValueSetValidator(
         bool publishedValuesOnly,
         bool supportProtectedContent,
