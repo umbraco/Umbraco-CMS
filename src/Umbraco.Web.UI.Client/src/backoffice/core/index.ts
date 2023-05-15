@@ -1,4 +1,4 @@
-import { manifests as componentManifests } from './components';
+import { manifests as componentManifests, UmbStoreExtensionInitializer } from './components';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as propertyEditorManifests } from './property-editors/manifests';
 import { manifests as modalManifests } from './modals/manifests';
@@ -34,6 +34,8 @@ export const manifests: Array<ManifestTypes | ManifestKind> = [
 ];
 
 export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
+	new UmbStoreExtensionInitializer(host);
+
 	extensionRegistry.registerMany(manifests);
 
 	const notificationContainerElement = new UmbBackofficeNotificationContainerElement();
