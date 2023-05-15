@@ -92,7 +92,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 					<uui-form-layout-item>
 						<uui-label id="userGroupsLabel" slot="label" for="userGroups" required>User group</uui-label>
 						<span slot="description">Add groups to assign access and permissions</span>
-						<umb-input-user-group id="userGroups" name="userGroups"></umb-input-user-group>
+						<umb-user-group-input id="userGroups" name="userGroups"></umb-user-group-input>
 					</uui-form-layout-item>
 					<uui-form-layout-item>
 						<uui-label id="messageLabel" slot="label" for="message" required>Message</uui-label>

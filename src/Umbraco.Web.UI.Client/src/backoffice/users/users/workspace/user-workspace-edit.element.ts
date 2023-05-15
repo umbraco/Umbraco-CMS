@@ -150,11 +150,11 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				<div slot="headline">Assign access</div>
 				<div id="assign-access">
 					<umb-workspace-property-layout label="Groups" description="Add groups to assign access and permissions">
-						<umb-input-user-group
+						<umb-user-group-input
 							slot="editor"
-							.value=${this._user.userGroupIds ?? []}
+							.selectedIds=${this._user.userGroupIds ?? []}
 							@change=${(e: any) =>
-								this.#workspaceContext?.updateProperty('userGroupIds', e.target.value)}></umb-input-user-group>
+								this.#workspaceContext?.updateProperty('userGroupIds', e.target.value)}></umb-user-group-input>
 					</umb-workspace-property-layout>
 					<umb-workspace-property-layout
 						label="Content start node"
