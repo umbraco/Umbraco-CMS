@@ -9,6 +9,7 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './current-user/current-user-history.store';
 import { UmbUserItemStore } from './users/repository/user-item.store';
+import { UmbUserGroupItemStore } from './user-groups/repository/user-group-item.store';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
 
@@ -22,6 +23,7 @@ export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
 
 	new UmbContextProviderController(host, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());
 	new UmbUserItemStore(host);
+	new UmbUserGroupItemStore(host);
 	new UmbContextProviderController(
 		host,
 		UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,

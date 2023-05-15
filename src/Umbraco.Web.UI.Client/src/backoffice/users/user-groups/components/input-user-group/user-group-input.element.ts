@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbUserGroupPickerContext } from './user-group-input.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-group-input')
 export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
@@ -70,7 +70,7 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<UserItemResponseModel>;
+	private _items?: Array<UserGroupItemResponseModel>;
 
 	#pickerContext = new UmbUserGroupPickerContext(this);
 
@@ -98,6 +98,8 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
+		console.log('render', this.#pickerContext.getSelection(), this._items);
+
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
 			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
@@ -106,7 +108,7 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderItem(item: UserItemResponseModel) {
+	private _renderItem(item: UserGroupItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node-user name=${item.name}>

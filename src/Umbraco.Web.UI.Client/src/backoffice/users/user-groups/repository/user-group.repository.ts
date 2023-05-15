@@ -4,6 +4,7 @@ import { UmbUserGroupServerDataSource } from './sources/user-group.server.data';
 import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data';
 import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store';
 import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from './user-group.store';
+import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data';
 import {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
@@ -23,7 +24,6 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data';
 
 // TODO: implement
 export class UmbUserGroupRepository
@@ -62,6 +62,7 @@ export class UmbUserGroupRepository
 
 			new UmbContextConsumerController(this.#host, UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
+				console.log('item store', instance);
 			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
