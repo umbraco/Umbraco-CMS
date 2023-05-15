@@ -1,3 +1,5 @@
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRouterSlot } from 'router-slot/model';
 // TODO: remove this import when the search hack is removed
 import '../../src/backoffice/search/search-modal/search-modal.element';
 
@@ -30,7 +32,7 @@ export class UmbModalContext {
 
 	// TODO: Remove this when the modal system is more flexible
 	public search() {
-		const modalHandler = new UmbModalHandlerClass(this.host, 'Umb.Modal.Search') as unknown as UmbModalHandler<
+		const modalHandler = new UmbModalHandlerClass(this.host, null, 'Umb.Modal.Search') as unknown as UmbModalHandler<
 			any,
 			any
 		>;
@@ -78,12 +80,16 @@ export class UmbModalContext {
 	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
-		config?: UmbModalConfig
+		config?: UmbModalConfig,
+		router: IRouterSlot | null = null
 	) {
-		const modalHandler = new UmbModalHandlerClass(this.host, modalAlias, data, config) as unknown as UmbModalHandler<
-			ModalData,
-			ModalResult
-		>;
+		const modalHandler = new UmbModalHandlerClass(
+			this.host,
+			router,
+			modalAlias,
+			data,
+			config
+		) as unknown as UmbModalHandler<ModalData, ModalResult>;
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 

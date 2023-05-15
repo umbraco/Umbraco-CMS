@@ -1,3 +1,5 @@
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRouterSlot } from 'router-slot/model';
 import type {
 	UUIDialogElement,
 	UUIModalDialogElement,
@@ -5,6 +7,7 @@ import type {
 	UUIModalSidebarSize,
 } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
+import { UmbRouterSlotElement } from '@umbraco-cms/internal/router';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -45,11 +48,10 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	#host: UmbControllerHostElement;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
+	#modalRouterElement: UmbRouterSlotElement = new UmbRouterSlotElement();
 
 	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
-
-	#modalElement?: UUIModalSidebarElement | UUIDialogElement;
 
 	public key: string;
 	public type: UmbModalType = 'dialog';
@@ -57,6 +59,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 
 	constructor(
 		host: UmbControllerHostElement,
+		router: IRouterSlot | null,
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig
@@ -79,6 +82,10 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		});
 
 		this.modalElement = this.#createContainerElement();
+		this.modalElement.appendChild(this.#modalRouterElement);
+		if (router) {
+			this.#modalRouterElement.parent = router;
+		}
 		this.#observeModal(modalAlias.toString(), data);
 	}
 
@@ -88,7 +95,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 
 	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		this.#modalElement = sidebarElement;
 		sidebarElement.size = this.size;
 		return sidebarElement;
 	}
@@ -96,7 +102,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	#createDialogElement() {
 		const modalDialogElement = document.createElement('uui-modal-dialog');
 		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
-		this.#modalElement = dialogElement;
 		modalDialogElement.appendChild(dialogElement);
 		return modalDialogElement;
 	}
@@ -151,14 +156,14 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	}
 
 	#appendInnerElement(element: HTMLElement) {
-		this.#modalElement?.appendChild(element);
+		this.#modalRouterElement.appendChild(element);
 		this.#innerElement.next(element);
 	}
 
 	#removeInnerElement() {
 		const innerElement = this.#innerElement.getValue();
 		if (innerElement) {
-			this.#modalElement?.removeChild(innerElement);
+			this.#modalRouterElement.removeChild(innerElement);
 			this.#innerElement.next(undefined);
 		}
 	}

@@ -1,5 +1,5 @@
 // eslint-disable-next-line local-rules/no-external-imports
-import type { IRoutingInfo } from 'router-slot/model';
+import type { IRoutingInfo, IRouterSlot } from 'router-slot/model';
 import type { UmbRoute } from './route.interface';
 import { generateRoutePathBuilder } from './generate-route-path-builder.function';
 import {
@@ -13,13 +13,17 @@ import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms
 const EmptyDiv = document.createElement('div');
 
 export class UmbRouteContext {
+	#mainRouter: IRouterSlot;
+	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
 	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
 	#contextRoutes: UmbRoute[] = [];
 	#routerBasePath?: string;
 	#activeModalPath?: string;
 
-	constructor(host: UmbControllerHostElement, private _onGotModals: (contextRoutes: any) => void) {
+	constructor(host: UmbControllerHostElement, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
+		this.#mainRouter = mainRouter;
+		this.#modalRouter = modalRouter;
 		new UmbContextProviderController(host, UMB_ROUTE_CONTEXT_TOKEN, this);
 		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			this.#modalContext = context;
@@ -29,7 +33,6 @@ export class UmbRouteContext {
 
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
-		console.log('registerModal', registration);
 		this.#generateNewUrlBuilder(registration);
 		this.#generateContextRoutes();
 		return registration;
@@ -48,7 +51,7 @@ export class UmbRouteContext {
 			component: EmptyDiv,
 			setup: (component, info) => {
 				if (!this.#modalContext) return;
-				const modalHandler = modalRegistration.routeSetup(this.#modalContext, info.match.params);
+				const modalHandler = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
 				if (modalHandler) {
 					modalHandler.onSubmit().then(
 						() => {
@@ -81,7 +84,8 @@ export class UmbRouteContext {
 		});
 
 		// TODO: Should we await one frame, to ensure we don't call back too much?.
-		this._onGotModals(this.#contextRoutes);
+		this.#modalRouter.routes = this.#contextRoutes;
+		this.#modalRouter.render();
 	}
 
 	public _internal_routerGotBasePath(routerBasePath: string) {

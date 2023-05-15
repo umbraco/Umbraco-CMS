@@ -1,3 +1,5 @@
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRouterSlot } from 'router-slot/model';
 import { UmbModalHandler } from './modal-handler';
 import { UmbModalConfig, UmbModalContext } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
@@ -107,13 +109,13 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#modalHandler = undefined;
 	};
 
-	routeSetup(modalContext: UmbModalContext, params: Params) {
+	routeSetup(router: IRouterSlot, modalContext: UmbModalContext, params: Params) {
 		// If already open, don't do anything:
 		if (this.active) return;
 
 		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig);
+			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
 			this.#modalHandler.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalHandler;
 		}
