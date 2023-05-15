@@ -5,11 +5,12 @@ import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
 import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import type {
+import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
