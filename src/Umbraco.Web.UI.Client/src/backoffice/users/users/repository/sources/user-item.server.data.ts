@@ -4,10 +4,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UserItemResponseModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
- * A data source for Data Type items that fetches data from the server
+ * A data source for user items that fetches data from the server
  * @export
  * @class UmbUserItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @implements {UmbItemDataSource}
  */
 export class UmbUserItemServerDataSource implements UmbItemDataSource<UserItemResponseModel> {
 	#host: UmbControllerHostElement;
