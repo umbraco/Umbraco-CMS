@@ -8,7 +8,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
  * @export
  * @class UmbUserItemStore
  * @extends {UmbStoreBase}
- * @description - Data Store for Data Type items
+ * @description - Data Store for user items
  */
 
 export class UmbUserItemStore
