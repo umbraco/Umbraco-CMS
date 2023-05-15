@@ -1,9 +1,8 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 
 @customElement('umb-entity-action-list')
 class UmbEntityActionListElement extends UmbLitElement {

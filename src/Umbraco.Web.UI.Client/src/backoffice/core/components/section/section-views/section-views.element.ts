@@ -5,13 +5,14 @@ import { map, of } from 'rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import type {
+import {
 	ManifestDashboard,
 	ManifestSectionView,
 	UmbDashboardExtensionElement,
 	UmbSectionViewExtensionElement,
+	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 

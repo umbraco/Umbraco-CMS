@@ -8,8 +8,7 @@ import {
 import { UmbHealthCheckContext } from './health-check.context';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
 

@@ -8,14 +8,11 @@ import {
 	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
 	UmbPropertySettingsModalResult,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<object, UmbPropertySettingsModalResult> {
-
-
 	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
 	@state() private _selectedPropertyEditorUIAlias = '';
 

@@ -1,12 +1,13 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type {
+import {
 	ManifestTree,
 	ManifestWorkspace,
 	UmbSectionViewExtensionElement,
+	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-created-packages-section-view')

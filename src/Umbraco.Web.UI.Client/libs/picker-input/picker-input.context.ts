@@ -1,7 +1,8 @@
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_CONTEXT_TOKEN,

@@ -4,8 +4,11 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbEntityTreeItemContext } from './entity-tree-item.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ManifestKind, UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import {
+	ManifestKind,
+	UmbTreeItemExtensionElement,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 // TODO: Move to separate file:
 const manifest: ManifestKind = {

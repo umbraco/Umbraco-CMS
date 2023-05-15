@@ -2,8 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { ManifestHeaderAppButtonKind, ManifestKind } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import {
+	ManifestHeaderAppButtonKind,
+	ManifestKind,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 const manifest: ManifestKind = {
 	type: 'kind',
@@ -20,8 +23,6 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-header-app-button')
 export class UmbHeaderAppButtonElement extends LitElement {
-	
-
 	public manifest?: ManifestHeaderAppButtonKind;
 
 	render() {
@@ -35,7 +36,7 @@ export class UmbHeaderAppButtonElement extends LitElement {
 			</uui-button>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`

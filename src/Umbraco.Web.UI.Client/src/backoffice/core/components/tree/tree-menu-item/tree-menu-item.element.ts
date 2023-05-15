@@ -1,11 +1,11 @@
 import { html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import {
 	ManifestKind,
 	ManifestMenuItemTreeKind,
 	UmbMenuItemExtensionElement,
+	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
 
 // TODO: Move to separate file:

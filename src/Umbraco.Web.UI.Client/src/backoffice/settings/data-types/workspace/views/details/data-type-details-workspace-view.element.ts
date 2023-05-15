@@ -10,8 +10,10 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import {
+	UmbWorkspaceEditorViewExtensionElement,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement

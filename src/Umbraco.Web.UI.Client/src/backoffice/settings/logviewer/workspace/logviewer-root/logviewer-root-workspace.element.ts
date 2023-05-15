@@ -6,10 +6,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry, createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
 import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
+	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';

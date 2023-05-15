@@ -4,8 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbTreeItemElement } from '../../../core/components/tree/tree-item/tree-item.element';
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestKind } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestKind, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: Move to separate file:
