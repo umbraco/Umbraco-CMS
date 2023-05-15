@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 // TODO: we need to import this from the user group module when it is ready
-import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/input-user-group.element';
+import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element';
 import { UmbUserRepository } from '../../repository/user.repository';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {

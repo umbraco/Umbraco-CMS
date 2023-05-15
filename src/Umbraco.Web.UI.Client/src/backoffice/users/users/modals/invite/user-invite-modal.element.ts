@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query, state } from 'lit/decorators.js';
-import { UmbInputPickerUserGroupElement } from '../../../user-groups/components/input-user-group/input-user-group.element';
+import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element';
 import { UmbUserRepository } from '../../repository/user.repository';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -33,7 +33,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 		const email = formData.get('email') as string;
 
 		//TODO: How should we handle pickers forms?
-		const userGroupPicker = form.querySelector('#userGroups') as UmbInputPickerUserGroupElement;
+		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
 		const userGroupIds = userGroupPicker?.value || ['e5e7f6c8-7f9c-4b5b-8d5d-9e1e5a4f7e4d'];
 
 		const message = formData.get('message') as string;
