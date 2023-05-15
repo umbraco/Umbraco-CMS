@@ -63,8 +63,6 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 
 	@property()
 	public set value(idsString: string) {
-		console.log('set value', idsString);
-
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = idsString.split(/[ ,]+/);
 	}
@@ -98,8 +96,6 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		console.log('render', this.#pickerContext.getSelection(), this._items);
-
 		return html`
 			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
 			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"

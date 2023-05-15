@@ -62,7 +62,6 @@ export class UmbUserGroupRepository
 
 			new UmbContextConsumerController(this.#host, UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
-				console.log('item store', instance);
 			}).asPromise(),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
