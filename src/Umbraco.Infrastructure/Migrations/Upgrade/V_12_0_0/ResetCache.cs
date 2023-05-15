@@ -22,6 +22,11 @@ public class ResetCache : MigrationBase
 
     private void DeleteAllFilesInFolder(string path)
     {
+        if (Directory.Exists(path) == false)
+        {
+            return;
+        }
+
         var directoryInfo = new DirectoryInfo(path);
 
         foreach (FileInfo file in directoryInfo.GetFiles())
