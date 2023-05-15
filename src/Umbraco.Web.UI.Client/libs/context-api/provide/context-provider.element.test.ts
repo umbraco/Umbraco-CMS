@@ -1,14 +1,16 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
+import { UmbContextConsumerController } from '../consume/context-consumer.controller';
 import { UmbContextProviderElement } from './context-provider.element';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
 
-@customElement('umb-context-test')
-export class UmbContextTestElement extends UmbLitElement {
+@customElement('umb-test-context')
+export class UmbTestContextElement extends UmbControllerHostMixin(HTMLElement) {
 	public value: string | null = null;
 	constructor() {
 		super();
-		this.consumeContext<string>('test-context', (value) => {
+
+		new UmbContextConsumerController<string>(this, 'test-context', (value) => {
 			this.value = value;
 		});
 	}
@@ -16,16 +18,16 @@ export class UmbContextTestElement extends UmbLitElement {
 
 describe('UmbContextProvider', () => {
 	let element: UmbContextProviderElement;
-	let consumer: UmbContextTestElement;
+	let consumer: UmbTestContextElement;
 	const contextValue = 'test-value';
 
 	beforeEach(async () => {
 		element = await fixture(
 			html` <umb-context-provider key="test-context" .value=${contextValue}>
-				<umb-context-test></umb-context-test>
+				<umb-test-context></umb-test-context>
 			</umb-context-provider>`
 		);
-		consumer = element.getElementsByTagName('umb-context-test')[0] as UmbContextTestElement;
+		consumer = element.getElementsByTagName('umb-test-context')[0] as UmbTestContextElement;
 	});
 
 	it('is defined with its own instance', () => {

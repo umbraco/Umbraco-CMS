@@ -2,7 +2,6 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbTreeElement } from '../../components/tree/tree.element';
-import { ManifestModalTreePickerKind } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -10,8 +9,7 @@ import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentationModel> extends UmbModalBaseElement<
 	UmbTreePickerModalData<TreeItemType>,
-	UmbPickerModalResult,
-	ManifestModalTreePickerKind
+	UmbPickerModalResult
 > {
 	@state()
 	_selection: Array<string | null> = [];

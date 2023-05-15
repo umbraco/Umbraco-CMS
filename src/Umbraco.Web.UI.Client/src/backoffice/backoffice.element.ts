@@ -1,7 +1,6 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { UmbStoreExtensionInitializer } from '../core/store-extension-initializer';
 import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
@@ -32,7 +31,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		super();
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbStoreExtensionInitializer(this);
 		new UmbExtensionInitializer(this, umbExtensionsRegistry, CORE_PACKAGES);
 	}
 

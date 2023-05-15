@@ -8,7 +8,7 @@ import type { ManifestHeaderApp, ManifestHeaderAppButtonKind } from './header-ap
 import type { ManifestHealthCheck } from './health-check.model';
 import type { ManifestMenu } from './menu.model';
 import type { ManifestMenuItem, ManifestMenuItemTreeKind } from './menu-item.model';
-import type { ManifestModal, ManifestModalTreePickerKind } from './modal.model';
+import type { ManifestModal } from './modal.model';
 import type { ManifestPackageView } from './package-view.model';
 import type { ManifestPropertyAction } from './property-action.model';
 import type { ManifestPropertyEditorUI, ManifestPropertyEditorModel } from './property-editor.model';
@@ -72,7 +72,6 @@ export type ManifestTypes =
 	| ManifestMenuItem
 	| ManifestMenuItemTreeKind
 	| ManifestModal
-	| ManifestModalTreePickerKind
 	| ManifestPackageView
 	| ManifestPropertyAction
 	| ManifestPropertyEditorModel

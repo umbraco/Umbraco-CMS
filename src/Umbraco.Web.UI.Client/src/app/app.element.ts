@@ -3,14 +3,13 @@ import 'element-internals-polyfill';
 
 import '../core/router/router-slot.element';
 import '../core/router/variant-router-slot.element';
-import '../core/context-provider/context-provider.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import { UmbIconStore } from '../core/stores/icon/icon.store';
-import type { UmbErrorElement } from '../error/error.element';
+import type { UmbAppErrorElement } from './app-error.element';
 import { UmbAuthFlow } from './auth/auth-flow';
 import { UMB_APP, UmbAppContext } from './app.context';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -225,10 +224,10 @@ export class UmbAppElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: '**',
-				component: () => import('../error/error.element'),
+				component: () => import('./app-error.element'),
 				setup: (component) => {
-					(component as UmbErrorElement).errorMessage = errorMsg;
-					(component as UmbErrorElement).error = error;
+					(component as UmbAppErrorElement).errorMessage = errorMsg;
+					(component as UmbAppErrorElement).error = error;
 				},
 			},
 		];
