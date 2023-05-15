@@ -4,5 +4,6 @@ export * from './consume/context-request.event';
 export * from './provide/context-provider.controller';
 export * from './provide/context-provider';
 export * from './provide/context-provide.event';
+export * from './provide/context-provider.element';
 export * from './token/';
 export * from './debug/context-data.function';
