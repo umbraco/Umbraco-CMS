@@ -8,7 +8,7 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { UmbIconStore } from '../core/stores/icon/icon.store';
+import { UmbIconRegistry } from '../core/stores/icon/icon.store';
 import type { UmbAppErrorElement } from './app-error.element';
 import { UmbAuthFlow } from './auth/auth-flow';
 import { UMB_APP, UmbAppContext } from './app.context';
@@ -65,7 +65,7 @@ export class UmbAppElement extends UmbLitElement {
 	];
 
 	#authFlow?: UmbAuthFlow;
-	#umbIconRegistry = new UmbIconStore();
+	#umbIconRegistry = new UmbIconRegistry();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
 	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
 
