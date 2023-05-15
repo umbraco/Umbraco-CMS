@@ -22,8 +22,8 @@ import { UmbLitElement } from '../src/core/lit-element';
 
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 
-import '../src/core/context-provider/context-provider.element';
-import '../src/core/controller-host/controller-host-test.element';
+import '../libs/context-api/provide/context-provider.element';
+import '../libs/controller/controller-host-initializer.element.ts';
 import '../src/backoffice/core/components';
 
 import { manifests as documentManifests } from '../src/backoffice/documents';
