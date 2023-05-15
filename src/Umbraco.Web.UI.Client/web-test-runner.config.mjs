@@ -22,13 +22,6 @@ export default {
 					return `/public${args.source}`;
 				}
 			},
-
-			// Serve Umbraco's API imports (msw does not work in web-test-runner)
-			serve(context) {
-				if (context.path.startsWith('/umbraco/management/api')) {
-					return '';
-				}
-			},
 		},
 		// Serve images from the public folder as JS modules
 		url({ include: ['public/**/*'] }),
@@ -89,6 +82,7 @@ export default {
 				<link rel="icon" type="image/svg+xml" href="public/favicon.svg" />
 				<title>Umbraco</title>
 				<base href="/" />
+				<script src="/node_modules/msw/lib/iife/index.js"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/core/css/custom-properties.css">
 			</head>
