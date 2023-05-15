@@ -54,7 +54,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 
 		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroups = userGroupPicker?.value || ['e5e7f6c8-7f9c-4b5b-8d5d-9e1e5a4f7e4d'];
+		const userGroups = userGroupPicker?.selectedIds;
 
 		// TODO: figure out when to use email or username
 		const { data } = await this.#userRepository.create({
