@@ -42,13 +42,13 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	 * Appends an additional path to the modal route.
 	 *
 	 * This can help specify the URL for this modal, or used to add a parameter to the URL like this: "/modal/my-modal/:index/"
-	 * Where :index is the name for the parameter, the modal will open with any value in that location.
+	 * A folder name starting with a colon ":" will be interpreted as a parameter. Then this modal can open with any value in that location.
 	 * When modal is being setup the value of the parameter can be read from the route params. See the example:
 	 * @param additionalPath
 	 * @returns UmbModalRouteRegistrationController
 	 * @memberof UmbContextConsumer
 	 * @example <caption>Example of adding an additional path to the modal route</caption>
-	 * const modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+	 * const modalRegistration = new UmbModalRouteRegistrationController(this, MY_MODAL_TOKEN)
 	 * modalRegistration.addAdditionalPath(':index')
 	 *
 	 * modalRegistration.onSetup((params) => {
@@ -73,7 +73,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	 * @returns UmbModalRouteRegistrationController
 	 * @memberof UmbContextConsumer
 	 * @example <caption>Example of adding an additional unique path to the modal route</caption>
-	 * const modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+	 * const modalRegistration = new UmbModalRouteRegistrationController(this, MY_MODAL_TOKEN)
 	 * modalRegistration.addUniquePaths(['myAliasForIdentifyingThisPartOfThePath'])
 	 *
 	 * // Later:
@@ -95,7 +95,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	 * @returns UmbModalRouteRegistrationController
 	 * @memberof UmbContextConsumer
 	 * @example <caption>Example of adding an additional unique path to the modal route</caption>
-	 * const modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+	 * const modalRegistration = new UmbModalRouteRegistrationController(this, MY_MODAL_TOKEN)
 	 * modalRegistration.addUniquePaths(['first-one', 'another-one'])
 	 *
 	 * // Later:
