@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbDictionaryData } from '../data/dictionary.data';
 import {
 	ImportDictionaryRequestModel,

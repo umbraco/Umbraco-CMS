@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbMediaData } from '../data/media.data';
 import type { MediaDetails } from '../../../backoffice/media/media';
 

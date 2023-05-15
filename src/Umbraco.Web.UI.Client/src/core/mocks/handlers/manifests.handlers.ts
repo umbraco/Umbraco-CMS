@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 
 import type { PackageManifestResponse } from '../../../backoffice/packages/types';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';

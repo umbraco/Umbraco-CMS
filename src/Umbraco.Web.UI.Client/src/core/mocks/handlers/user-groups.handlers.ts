@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbUserGroupsData } from '../data/user-groups.data';
 import type { UserGroupDetails } from '../../../backoffice/users/user-groups/types';
 

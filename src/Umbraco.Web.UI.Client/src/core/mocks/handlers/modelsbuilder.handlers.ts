@@ -1,7 +1,11 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { ModelsBuilderResponseModel, ModelsModeModel, OutOfDateStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	ModelsBuilderResponseModel,
+	ModelsModeModel,
+	OutOfDateStatusResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {

@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbMediaTypeData } from '../data/media-type.data';
 
 // TODO: add schema

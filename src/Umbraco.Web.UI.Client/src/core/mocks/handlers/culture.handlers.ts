@@ -1,4 +1,5 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
+
 import { umbCulturesData } from '../data/culture.data';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbRelationTypeData } from '../data/relation-type.data';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

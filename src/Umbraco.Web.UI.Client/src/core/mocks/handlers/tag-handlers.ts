@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { PagedTagResponseModel, TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

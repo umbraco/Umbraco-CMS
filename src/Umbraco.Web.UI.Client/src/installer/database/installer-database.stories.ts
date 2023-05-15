@@ -2,7 +2,7 @@ import './installer-database.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 
 import { installerContextProvider } from '../shared/utils.story-helpers';
 

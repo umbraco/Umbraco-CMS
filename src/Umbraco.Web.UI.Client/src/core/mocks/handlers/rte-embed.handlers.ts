@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { OEmbedResult, OEmbedStatus } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

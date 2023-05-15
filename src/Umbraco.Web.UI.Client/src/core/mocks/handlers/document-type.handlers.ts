@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbDocumentTypeData } from '../data/document-type.data';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';

@@ -1,8 +1,13 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/examine.data';
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { IndexResponseModel, PagedIndexResponseModel, PagedSearcherResponseModel, PagedSearchResultResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	IndexResponseModel,
+	PagedIndexResponseModel,
+	PagedSearcherResponseModel,
+	PagedSearchResultResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/indexer'), (_req, res, ctx) => {

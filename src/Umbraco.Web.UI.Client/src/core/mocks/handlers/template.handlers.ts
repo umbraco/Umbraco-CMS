@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbTemplateData } from '../data/template.data';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { CreateTemplateRequestModel, UpdateTemplateRequestModel } from '@umbraco-cms/backoffice/backend-api';

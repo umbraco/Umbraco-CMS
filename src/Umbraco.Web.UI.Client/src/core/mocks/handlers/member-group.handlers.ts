@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbMemberGroupData } from '../data/member-group.data';
 
 // TODO: add schema

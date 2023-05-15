@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbPartialViewsData } from '../data/partial-views.data';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
