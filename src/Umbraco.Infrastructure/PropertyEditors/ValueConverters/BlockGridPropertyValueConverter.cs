@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -20,9 +22,20 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApiElementBuilder _apiElementBuilder;
 
+        [Obsolete("Please use non-obsolete cconstrutor. This will be removed in Umbraco 14.")]
+        public BlockGridPropertyValueConverter(
+            IProfilingLogger proflog,
+            BlockEditorConverter blockConverter,
+            IJsonSerializer jsonSerializer)
+            : this(proflog, blockConverter, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>())
+        {
+
+        }
+
         // Niels, Change: I would love if this could be general, so we don't need a specific one for each block property editor....
         public BlockGridPropertyValueConverter(
-            IProfilingLogger proflog, BlockEditorConverter blockConverter,
+            IProfilingLogger proflog,
+            BlockEditorConverter blockConverter,
             IJsonSerializer jsonSerializer,
             IApiElementBuilder apiElementBuilder)
             : base(blockConverter)
