@@ -1,18 +1,20 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../../repository/user-group.store';
-import type { UserGroupDetails } from '../../types';
+import { UmbUserGroupRepository } from '../../repository/user-group.repository';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {
 	@state()
-	private _userGroups: Array<UserGroupDetails> = [];
+	private _userGroups: Array<UserGroupResponseModel> = [];
 
-	private _userGroupStore?: UmbUserGroupStore;
 	#selectionManager = new UmbSelectionManagerBase();
+	#userGroupRepository?: UmbUserGroupRepository;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -21,15 +23,32 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.data?.selection ?? []);
 
-		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
-			this._userGroupStore = userGroupStore;
-			this._observeUserGroups();
-		});
+		// TODO: this code is reused in multiple places, so it should be extracted to a function
+		new UmbObserverController(
+			this,
+			umbExtensionsRegistry.getByTypeAndAlias('repository', 'Umb.Repository.UserGroup'),
+			async (repositoryManifest) => {
+				if (!repositoryManifest) return;
+
+				try {
+					const result = await createExtensionClass<UmbUserGroupRepository>(repositoryManifest, [this]);
+					this.#userGroupRepository = result;
+					this.#observeUserGroups();
+				} catch (error) {
+					throw new Error('Could not create repository with alias: Umb.Repository.User');
+				}
+			}
+		);
 	}
 
-	private _observeUserGroups() {
-		if (!this._userGroupStore) return;
-		this.observe(this._userGroupStore.getAll(), (userGroups) => (this._userGroups = userGroups));
+	async #observeUserGroups() {
+		if (!this.#userGroupRepository) return;
+		// TODO is this the correct end point?
+		const { data } = await this.#userGroupRepository.requestCollection();
+
+		if (data) {
+			this._userGroups = data.items;
+		}
 	}
 
 	#submit() {
