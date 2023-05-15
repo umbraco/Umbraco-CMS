@@ -195,11 +195,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	/* TODO:
-	From Github comment: We should not re-generate the alias when it gets locked again.
-  Generally the auto generation is not determined by the lock, but wether it has been changed or saved.
-	The experience in existing backoffice is: we only generate an alias when a property is new, once it has been saved it should never change unless the user actively does so.
-	On new properties, the alias auto-generates until the user has made a change to it. */
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
 
