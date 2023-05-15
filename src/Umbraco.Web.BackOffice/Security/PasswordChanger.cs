@@ -74,7 +74,8 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             {
                 return Attempt.Fail(new PasswordChangedModel
                 {
-                    ChangeError = new ValidationResult("Cannot change the password of current user without the old password", new[] { "value" }),
+
+                    Error = new ValidationResult("Cannot change the password of current user without the old password", new[] { "value" }),
                 });
             }
 
