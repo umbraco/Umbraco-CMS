@@ -11,7 +11,7 @@ import { customElement, property } from 'lit/decorators.js';
 
 import { UmbAuthFlow } from '../core/auth/auth-flow';
 import { UmbIconStore } from '../core/stores/icon/icon.store';
-import type { UmbErrorElement } from '../error/error.element';
+import type { UmbAppErrorElement } from './app-error.element';
 import { UMB_APP, UmbAppContext } from './app.context';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
@@ -225,10 +225,10 @@ export class UmbAppElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: '**',
-				component: () => import('../error/error.element'),
+				component: () => import('./app-error.element'),
 				setup: (component) => {
-					(component as UmbErrorElement).errorMessage = errorMsg;
-					(component as UmbErrorElement).error = error;
+					(component as UmbAppErrorElement).errorMessage = errorMsg;
+					(component as UmbAppErrorElement).error = error;
 				},
 			},
 		];
