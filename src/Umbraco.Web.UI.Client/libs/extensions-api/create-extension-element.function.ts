@@ -1,5 +1,5 @@
 import { hasDefaultExport } from './has-default-export.function';
-import { isManifestElementNameType } from './is-manifest-element-name-type.function';
+import { isManifestElementNameType } from './type-guards';
 import { loadExtension } from './load-extension.function';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
 import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-registry';

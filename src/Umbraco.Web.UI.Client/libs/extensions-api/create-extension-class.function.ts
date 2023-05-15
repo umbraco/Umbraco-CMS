@@ -1,5 +1,5 @@
 import { hasDefaultExport } from './has-default-export.function';
-import { isManifestClassConstructorType } from './is-manifest-class-instance-type.function';
+import { isManifestClassConstructorType } from './type-guards';
 import { loadExtension } from './load-extension.function';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 import type { ManifestClass } from '@umbraco-cms/backoffice/extensions-registry';

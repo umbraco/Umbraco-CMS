@@ -4,5 +4,9 @@ import { isManifestClassConstructorType } from './is-manifest-class-instance-typ
 import type { ManifestBase, ManifestClass } from '@umbraco-cms/backoffice/extensions-registry';
 
 export function isManifestClassableType(manifest: ManifestBase): manifest is ManifestClass {
-	return isManifestClassConstructorType(manifest) || isManifestLoaderType<object>(manifest) || isManifestJSType<object>(manifest);
+	return (
+		isManifestClassConstructorType(manifest) ||
+		isManifestLoaderType<object>(manifest) ||
+		isManifestJSType<object>(manifest)
+	);
 }
