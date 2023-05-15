@@ -4,8 +4,8 @@ import { UmbControllerHostInitializerElement } from './controller-host-test.elem
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
 
-@customElement('umb-controller-host-test-consumer')
-export class UmbControllerHostTestConsumerElement extends UmbControllerHostMixin(HTMLElement) {
+@customElement('umb-test-controller-host-initializer-consumer')
+export class UmbTestControllerHostInitializerConsumerElement extends UmbControllerHostMixin(HTMLElement) {
 	public value: string | null = null;
 	constructor() {
 		super();
@@ -18,7 +18,7 @@ export class UmbControllerHostTestConsumerElement extends UmbControllerHostMixin
 
 describe('UmbControllerHostTestElement', () => {
 	let element: UmbControllerHostInitializerElement;
-	let consumer: UmbControllerHostTestConsumerElement;
+	let consumer: UmbTestControllerHostInitializerConsumerElement;
 	const contextValue = 'test-value';
 
 	beforeEach(async () => {
@@ -26,12 +26,12 @@ describe('UmbControllerHostTestElement', () => {
 			html` <umb-controller-host-initializer
 				.create=${(host: UmbControllerHostElement) =>
 					new UmbContextProviderController(host, 'my-test-context-alias', contextValue)}>
-				<umb-controller-host-test-consumer></umb-controller-host-test-consumer>
+				<umb-test-controller-host-initializer-consumer></umb-test-controller-host-initializer-consumer>
 			</umb-controller-host-initializer>`
 		);
 		consumer = element.getElementsByTagName(
-			'umb-controller-host-test-consumer'
-		)[0] as UmbControllerHostTestConsumerElement;
+			'umb-test-controller-host-initializer-consumer'
+		)[0] as UmbTestControllerHostInitializerConsumerElement;
 	});
 
 	it('element is defined with its own instance', () => {
