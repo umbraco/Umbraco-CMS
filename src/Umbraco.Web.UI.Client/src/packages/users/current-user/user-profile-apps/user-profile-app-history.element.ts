@@ -10,8 +10,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-profile-app-history')
 export class UmbUserProfileAppHistoryElement extends UmbLitElement {
-	
-
 	@state()
 	private _history: Array<UmbCurrentUserHistoryItem> = [];
 
@@ -66,7 +64,7 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 			</a>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

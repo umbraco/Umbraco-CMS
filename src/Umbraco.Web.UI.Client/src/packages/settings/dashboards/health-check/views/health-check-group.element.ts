@@ -23,8 +23,6 @@ import './health-check-action.element';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
-	
-
 	@property()
 	groupName!: string;
 
@@ -167,7 +165,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 			</div>`;
 		else return nothing;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

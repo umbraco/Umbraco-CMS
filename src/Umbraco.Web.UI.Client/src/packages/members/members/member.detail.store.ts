@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { umbMemberData } from '../../../core/mocks/data/member.data';
+import { umbMemberData } from '../../../shared/mocks/data/member.data';
 import type { MemberDetails } from './types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';

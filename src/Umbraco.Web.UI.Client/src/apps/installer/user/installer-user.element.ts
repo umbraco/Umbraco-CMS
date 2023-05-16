@@ -5,8 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-user')
 export class UmbInstallerUserElement extends UmbLitElement {
-	
-
 	@state()
 	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 
@@ -109,7 +107,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 			</uui-form>
 		</div>`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		css`
 			:host,

@@ -6,8 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-search-header-app')
 export class UmbSearchHeaderAppElement extends UmbLitElement {
-	
-
 	private _modalContext?: UmbModalContext;
 
 	constructor() {
@@ -29,7 +27,7 @@ export class UmbSearchHeaderAppElement extends UmbLitElement {
 			</uui-button>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`

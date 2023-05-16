@@ -6,8 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbLitElement {
-	
-
 	@property({ attribute: false })
 	modalHandler?: UmbModalHandler;
 
@@ -83,7 +81,7 @@ export class UmbChangePasswordModalElement extends UmbLitElement {
 			</uui-dialog-layout>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`

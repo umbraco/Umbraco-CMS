@@ -14,8 +14,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-examine-overview')
 export class UmbDashboardExamineOverviewElement extends UmbLitElement {
-	
-
 	@state()
 	private _indexers?: IndexResponseModel[];
 
@@ -115,13 +113,13 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 			</uui-table>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
-				display:block;
-				margin:var(--uui-size-layout-1);
+				display: block;
+				margin: var(--uui-size-layout-1);
 			}
 
 			uui-box + uui-box {

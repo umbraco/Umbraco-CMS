@@ -9,8 +9,6 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 	UmbExportDictionaryModalData,
 	UmbExportDictionaryModalResult
 > {
-	
-
 	@query('#form')
 	private _form!: HTMLFormElement;
 
@@ -47,7 +45,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 			<uui-button slot="actions" type="button" label="Export" look="primary" @click=${this.#submitForm}></uui-button>
 		</umb-body-layout>`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

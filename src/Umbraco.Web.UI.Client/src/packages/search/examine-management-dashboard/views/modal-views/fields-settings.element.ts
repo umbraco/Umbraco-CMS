@@ -9,8 +9,6 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 	UmbExamineFieldsSettingsModalData,
 	UmbCreateDocumentModalResultData
 > {
-	
-
 	@state()
 	private _fields?: UmbExamineFieldsSettingsModalData;
 
@@ -55,7 +53,7 @@ export class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
 			`;
 		} else return html``;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

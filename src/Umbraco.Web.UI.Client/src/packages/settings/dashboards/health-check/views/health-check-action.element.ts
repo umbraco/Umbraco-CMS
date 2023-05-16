@@ -10,8 +10,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-health-check-action')
 export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
-	
-
 	@property({ reflect: true })
 	action!: HealthCheckActionRequestModel;
 
@@ -98,7 +96,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 
 		return nothing;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

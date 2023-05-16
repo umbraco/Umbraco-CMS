@@ -11,8 +11,6 @@ import './section-view-examine-searchers';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {
-	
-
 	@property()
 	indexName!: string;
 
@@ -153,7 +151,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 			</uui-button>
 		</uui-box>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

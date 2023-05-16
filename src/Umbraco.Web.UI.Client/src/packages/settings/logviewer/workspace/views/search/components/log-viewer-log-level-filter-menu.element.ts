@@ -10,8 +10,6 @@ import { path, query, toQueryString } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-log-viewer-log-level-filter-menu')
 export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
-	
-
 	@queryAll('#log-level-selector > uui-checkbox')
 	private _logLevelSelectorCheckboxes!: NodeListOf<UUICheckboxElement>;
 
@@ -100,7 +98,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 			</umb-button-with-dropdown>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

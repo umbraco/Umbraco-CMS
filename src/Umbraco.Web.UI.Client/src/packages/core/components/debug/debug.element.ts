@@ -2,14 +2,17 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { contextData, DebugContextData, DebugContextItemData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
+import {
+	contextData,
+	DebugContextData,
+	DebugContextItemData,
+	UmbContextDebugRequest,
+} from '@umbraco-cms/backoffice/context-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext, UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
 export class UmbDebugElement extends UmbLitElement {
-	
-
 	@property({ reflect: true, type: Boolean })
 	visible = false;
 
@@ -42,7 +45,7 @@ export class UmbDebugElement extends UmbLitElement {
 				// to the root of <umb-app> which then uses the callback prop
 				// of the this event tha has been raised to assign the contexts
 				// back to this property of the WebComponent
-				
+
 				// Massage the data into a simplier array of objects
 				// From a function in the context-api '
 				this.contextData = contextData(contexts);
@@ -92,7 +95,7 @@ export class UmbDebugElement extends UmbLitElement {
 			</div>
 		</div>`;
 	}
-	
+
 	private _renderContextAliases() {
 		const contextsTemplates: TemplateResult[] = [];
 
@@ -113,12 +116,11 @@ export class UmbDebugElement extends UmbLitElement {
 
 	private _renderInstance(instance: DebugContextItemData) {
 		const instanceTemplates: TemplateResult[] = [];
-		
-		if(instance.type === 'function'){
+
+		if (instance.type === 'function') {
 			return instanceTemplates.push(html`<li>Callable Function</li>`);
-		}
-		else if(instance.type === 'object'){
-			if(instance.methods?.length){
+		} else if (instance.type === 'object') {
+			if (instance.methods?.length) {
 				instanceTemplates.push(
 					html`
 						<li>
@@ -133,14 +135,14 @@ export class UmbDebugElement extends UmbLitElement {
 
 			const props: TemplateResult[] = [];
 			instance.properties?.forEach((property) => {
-				switch(property.type){
+				switch (property.type) {
 					case 'string':
 					case 'number':
 					case 'boolean':
 					case 'object':
 						props.push(html`<li>${property.key} <em>(${property.type})</em> = ${property.value}</li>`);
 						break;
-					
+
 					default:
 						props.push(html`<li>${property.key} <em>(${property.type})</em></li>`);
 						break;
@@ -155,14 +157,13 @@ export class UmbDebugElement extends UmbLitElement {
 					</ul>
 				</li>
 			`);
-		}
-		else if(instance.type === 'primitive'){
+		} else if (instance.type === 'primitive') {
 			instanceTemplates.push(html`<li>Context is a primitive with value: ${instance.value}</li>`);
 		}
 
 		return instanceTemplates;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

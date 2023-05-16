@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-collection-view-order-by')
 export class UmbPropertyEditorUICollectionViewOrderByElement extends UmbLitElement {
-	
-
 	@property()
 	value = '';
 
@@ -19,7 +17,7 @@ export class UmbPropertyEditorUICollectionViewOrderByElement extends UmbLitEleme
 	render() {
 		return html`<div>umb-property-editor-ui-collection-view-order-by</div>`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

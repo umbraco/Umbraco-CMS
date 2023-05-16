@@ -13,8 +13,6 @@ import './health-check-group-box-overview.element';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
-	
-
 	@state()
 	private _buttonState: UUIButtonState;
 
@@ -52,7 +50,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -68,7 +66,7 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 			.flex {
 				display: flex;
 				justify-content: space-between;
-				align-items:center;
+				align-items: center;
 			}
 
 			.grid {

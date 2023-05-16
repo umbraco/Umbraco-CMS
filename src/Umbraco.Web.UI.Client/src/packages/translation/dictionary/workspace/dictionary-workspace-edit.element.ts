@@ -8,8 +8,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-dictionary-workspace-edit')
 export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
-
-
 	@state()
 	private _name?: string | null = '';
 

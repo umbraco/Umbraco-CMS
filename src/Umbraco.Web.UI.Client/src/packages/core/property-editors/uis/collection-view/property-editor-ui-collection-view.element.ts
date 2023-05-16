@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-collection-view')
 export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement {
-	
-
 	@property()
 	value = '';
 
@@ -19,7 +17,7 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement {
 	render() {
 		return html`<div>umb-property-editor-ui-collection-view</div>`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

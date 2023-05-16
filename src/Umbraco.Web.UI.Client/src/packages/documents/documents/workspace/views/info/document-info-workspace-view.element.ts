@@ -22,8 +22,6 @@ type HistoryLogType = 'Publish' | 'Save' | 'Unpublish' | 'ContentVersionEnableCl
 
 @customElement('umb-document-info-workspace-view')
 export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
-	
-
 	@state()
 	private _historyList: HistoryNode[] = [
 		{
@@ -236,7 +234,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 				return 'Could not detech log type';
 		}
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -13,8 +13,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
  */
 @customElement('umb-relation-type-workspace-edit-element')
 export class UmbRelationTypeWorkspaceEditElement extends UmbLitElement {
-
-
 	#workspaceContext?: UmbRelationTypeWorkspaceContext;
 
 	@state()

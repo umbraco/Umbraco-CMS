@@ -66,10 +66,10 @@ export default {
 						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
 
 						// SHARED
-						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
-						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
-						'@umbraco-cms/internal/router': './src/core/router/index.ts',
-						'@umbraco-cms/internal/sorter': './src/core/sorter/index.ts',
+						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',
+						'@umbraco-cms/internal/modal': './src/shared/modal/index.ts',
+						'@umbraco-cms/internal/router': './src/shared/router/index.ts',
+						'@umbraco-cms/internal/sorter': './src/shared/sorter/index.ts',
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
 				},

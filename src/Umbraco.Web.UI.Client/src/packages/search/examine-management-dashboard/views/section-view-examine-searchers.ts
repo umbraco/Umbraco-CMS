@@ -24,8 +24,6 @@ interface ExposedSearchResultField {
 
 @customElement('umb-dashboard-examine-searcher')
 export class UmbDashboardExamineSearcherElement extends UmbLitElement {
-	
-
 	private _modalContext?: UmbModalContext;
 
 	@property()
@@ -219,7 +217,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			});
 		})}`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

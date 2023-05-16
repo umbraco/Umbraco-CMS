@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-block-list-block-configuration')
 export class UmbPropertyEditorUIBlockListBlockConfigurationElement extends UmbLitElement {
-	
-
 	@property()
 	value = '';
 
@@ -19,7 +17,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement extends UmbLi
 	render() {
 		return html`<div>umb-property-editor-ui-block-list-block-configuration</div>`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

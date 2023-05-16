@@ -7,8 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-eye-dropper')
 export class UmbInputEyeDropperElement extends FormControlMixin(UmbLitElement) {
-	
-
 	protected getFormElement() {
 		return undefined;
 	}
@@ -34,7 +32,7 @@ export class UmbInputEyeDropperElement extends FormControlMixin(UmbLitElement) {
 			.opacity="${this.opacity}"
 			.swatches="${this.swatches}"></uui-color-picker>`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

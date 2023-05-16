@@ -77,7 +77,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	#openInsertDictionaryItemModal() {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
 		this.#openModal?.onSubmit().then((dictionaryItemPickerModalResult) => {
-			if (dictionaryItemPickerModalResult) this.modalHandler?.submit({ value: dictionaryItemPickerModalResult, type: CodeSnippetType.dictionaryItem });
+			if (dictionaryItemPickerModalResult)
+				this.modalHandler?.submit({ value: dictionaryItemPickerModalResult, type: CodeSnippetType.dictionaryItem });
 		});
 	}
 

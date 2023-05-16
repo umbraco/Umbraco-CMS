@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-block-grid-stylesheet-picker')
 export class UmbPropertyEditorUIBlockGridStylesheetPickerElement extends UmbLitElement {
-	
-
 	@property()
 	value = '';
 
@@ -19,7 +17,7 @@ export class UmbPropertyEditorUIBlockGridStylesheetPickerElement extends UmbLitE
 	render() {
 		return html`<div>umb-property-editor-ui-block-grid-stylesheet-picker</div>`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

@@ -1,14 +1,14 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 import 'element-internals-polyfill';
 
-import '../../core/router/router-slot.element';
-import '../../core/router/variant-router-slot.element';
+import '../../shared/router/router-slot.element';
+import '../../shared/router/variant-router-slot.element';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { UmbIconRegistry } from '../../core/icon-registry/icon.registry';
+import { UmbIconRegistry } from '../../shared/icon-registry/icon.registry';
 import type { UmbAppErrorElement } from './app-error.element';
 import { UmbAuthFlow } from './auth/auth-flow';
 import { UMB_APP, UmbAppContext } from './app.context';

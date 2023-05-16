@@ -7,8 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-performance-profiling')
 export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
-	
-
 	@state()
 	private _profilingStatus?: boolean;
 
@@ -85,7 +83,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -93,7 +91,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 				display: block;
 				margin: var(--uui-size-layout-1);
 			}
-			
+
 			uui-toggle {
 				font-weight: bold;
 			}

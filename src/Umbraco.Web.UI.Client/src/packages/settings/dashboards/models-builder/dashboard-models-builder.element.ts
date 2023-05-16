@@ -13,8 +13,6 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-models-builder')
 export class UmbDashboardModelsBuilderElement extends UmbLitElement {
-	
-
 	@state()
 	private _modelsBuilder?: ModelsBuilderResponseModel;
 
@@ -135,7 +133,7 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 				return;
 		}
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

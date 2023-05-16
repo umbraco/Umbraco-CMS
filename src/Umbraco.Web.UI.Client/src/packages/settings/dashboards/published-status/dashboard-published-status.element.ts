@@ -9,8 +9,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-published-status')
 export class UmbDashboardPublishedStatusElement extends UmbLitElement {
-	
-
 	@state()
 	private _publishedStatusText = '';
 
@@ -187,7 +185,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

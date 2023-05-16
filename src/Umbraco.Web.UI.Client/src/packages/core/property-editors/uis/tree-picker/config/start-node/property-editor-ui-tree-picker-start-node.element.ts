@@ -8,8 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tree-picker-start-node')
 export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement {
-	
-
 	@property()
 	value = '';
 
@@ -19,7 +17,7 @@ export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement
 	render() {
 		return html`<div>umb-property-editor-ui-tree-picker-start-node</div>`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 

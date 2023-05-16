@@ -10,8 +10,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-language-workspace-edit')
 export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
-
-
 	#workspaceContext?: UmbLanguageWorkspaceContext;
 
 	@state()

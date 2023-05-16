@@ -11,8 +11,6 @@ import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {
-	
-
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
 
@@ -111,7 +109,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			)}
 		</div>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

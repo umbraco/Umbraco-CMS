@@ -13,8 +13,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-input-multiple-text-string-item')
 export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbLitElement) {
-	
-
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -121,7 +119,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 				  </uui-button>`}
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

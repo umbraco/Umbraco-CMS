@@ -12,8 +12,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {
-	
-
 	@query('#polling-popover')
 	private _pollingPopover!: UUIPopoverElement;
 
@@ -88,7 +86,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 			</uui-popover>
 		</uui-button-group>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

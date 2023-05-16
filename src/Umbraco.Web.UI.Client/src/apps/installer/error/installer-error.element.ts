@@ -7,8 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbLitElement {
-	
-
 	@state()
 	_error?: ProblemDetailsModel;
 
@@ -75,7 +73,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 			</uui-form>
 		</div>`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		css`
 			:host,

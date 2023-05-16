@@ -15,8 +15,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {
-	
-
 	@query('#button-install')
 	private _installButton!: UUIButtonElement;
 
@@ -365,7 +363,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			</uui-form>
 		</div>`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		css`
 			:host,

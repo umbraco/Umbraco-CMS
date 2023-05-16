@@ -5,8 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-history-item')
 export class UmbHistoryItemElement extends UmbLitElement {
-	
-
 	@property({ type: String })
 	src?: string;
 
@@ -31,7 +29,7 @@ export class UmbHistoryItemElement extends UmbLitElement {
 			</div>
 		</div>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

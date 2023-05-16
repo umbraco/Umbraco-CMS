@@ -6,8 +6,6 @@ import { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/backend-api'
 
 @customElement('umb-log-viewer-log-types-chart')
 export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
-	
-
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
@@ -98,7 +96,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		css`
 			#log-types-container {

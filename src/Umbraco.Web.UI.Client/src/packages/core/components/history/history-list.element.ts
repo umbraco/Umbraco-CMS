@@ -5,14 +5,12 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-history-list')
 export class UmbHistoryListElement extends UmbLitElement {
-	
-
 	render() {
 		return html`<div>
 			<slot></slot>
 		</div>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

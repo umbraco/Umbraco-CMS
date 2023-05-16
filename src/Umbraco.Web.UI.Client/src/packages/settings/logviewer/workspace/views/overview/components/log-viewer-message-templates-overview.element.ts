@@ -8,8 +8,6 @@ import { PagedLogTemplateResponseModel, SavedLogSearchResponseModel } from '@umb
 //TODO: fix pagination bug when API is fixed
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
-	
-
 	@state()
 	private _messageTemplates: PagedLogTemplateResponseModel | null = null;
 
@@ -83,7 +81,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -5,9 +5,9 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import type { SearchResultResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-modal-element-fields-viewer')
-export class UmbModalElementFieldsViewerElement extends UmbModalBaseElement<SearchResultResponseModel & { name: string }> {
-	
-
+export class UmbModalElementFieldsViewerElement extends UmbModalBaseElement<
+	SearchResultResponseModel & { name: string }
+> {
 	private _handleClose() {
 		this.modalHandler?.reject();
 	}
@@ -39,7 +39,7 @@ export class UmbModalElementFieldsViewerElement extends UmbModalBaseElement<Sear
 			</uui-dialog-layout>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

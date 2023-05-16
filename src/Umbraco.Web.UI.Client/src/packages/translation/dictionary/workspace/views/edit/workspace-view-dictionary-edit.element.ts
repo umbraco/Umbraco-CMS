@@ -12,8 +12,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-workspace-view-dictionary-edit')
 export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
-	
-
 	@state()
 	private _dictionary?: DictionaryItemResponseModel;
 
@@ -80,7 +78,7 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

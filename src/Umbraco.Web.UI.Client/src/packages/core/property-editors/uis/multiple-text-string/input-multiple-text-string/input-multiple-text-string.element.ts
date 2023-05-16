@@ -18,8 +18,6 @@ export interface MultipleTextStringValueItem {
  */
 @customElement('umb-input-multiple-text-string')
 export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
-	
-
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -196,7 +194,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 						?disabled=${this.disabled}></uui-button>`}
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -7,8 +7,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-slider')
 export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
-	
-
 	@property({ type: Number })
 	min = 0;
 
@@ -59,7 +57,7 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 			.valueHigh="${this.initVal2}"
 			@change="${this.#onChange}"></uui-range-slider>`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

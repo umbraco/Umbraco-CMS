@@ -6,8 +6,6 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-tree-context-menu-service')
 export class UmbTreeContextMenuServiceElement extends UmbLitElement {
-	
-
 	@state()
 	private _modalOpen = false;
 
@@ -50,7 +48,7 @@ export class UmbTreeContextMenuServiceElement extends UmbLitElement {
 			</div>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -5,8 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-profile-app-external-login-providers')
 export class UmbUserProfileAppExternalLoginProvidersElement extends UmbLitElement {
-	
-
 	render() {
 		return html`
 			<uui-box>
@@ -15,7 +13,7 @@ export class UmbUserProfileAppExternalLoginProvidersElement extends UmbLitElemen
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

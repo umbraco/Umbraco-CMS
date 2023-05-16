@@ -10,8 +10,6 @@ import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@um
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
-	
-
 	private take = 20;
 
 	@state()
@@ -124,7 +122,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		this._createdPackages.splice(index, 1);
 		this.requestUpdate();
 	}
-	
+
 	static styles = [
 		css`
 			:host {

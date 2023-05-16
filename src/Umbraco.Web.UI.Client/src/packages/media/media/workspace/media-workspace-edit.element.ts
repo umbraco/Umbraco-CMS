@@ -7,8 +7,6 @@ import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-ap
 
 @customElement('umb-media-workspace-edit')
 export class UmbMediaWorkspaceEditElement extends UmbLitElement {
-
-
 	@state()
 	_id?: string;
 
