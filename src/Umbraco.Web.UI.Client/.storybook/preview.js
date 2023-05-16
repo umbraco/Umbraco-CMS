@@ -20,7 +20,7 @@ import { handlers } from '../src/core/mocks/browser-handlers';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
 import { UmbLitElement } from '../src/core/lit-element';
 
-import { umbExtensionsRegistry } from '../libs/extensions-registry';
+import { umbExtensionsRegistry } from '../libs/extension-registry';
 
 import '../libs/context-api/provide/context-provider.element';
 import '../libs/controller/controller-host-initializer.element.ts';
