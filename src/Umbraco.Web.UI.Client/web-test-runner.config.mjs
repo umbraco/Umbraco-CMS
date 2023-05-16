@@ -46,7 +46,7 @@ export default {
 						'@umbraco-cms/backoffice/entity-action': './libs/entity-action/index.ts',
 						'@umbraco-cms/backoffice/events': './libs/umb-events/index.ts',
 						'@umbraco-cms/backoffice/extension-api': './libs/extension-api/index.ts',
-						'@umbraco-cms/backoffice/extension-registry': './libs/extensions-registry/index.ts',
+						'@umbraco-cms/backoffice/extension-registry': './libs/extension-registry/index.ts',
 						'@umbraco-cms/backoffice/modal': './libs/modal/index.ts',
 						'@umbraco-cms/backoffice/models': './libs/models/index.ts',
 						'@umbraco-cms/backoffice/notification': './libs/notification/index.ts',
