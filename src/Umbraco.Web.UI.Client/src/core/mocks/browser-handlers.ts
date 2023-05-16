@@ -31,6 +31,7 @@ import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers';
 import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers';
 import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers';
 import { handlers as tagHandlers } from './handlers/tag-handlers';
+import { handlers as configHandlers } from './handlers/config.handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -65,6 +66,7 @@ const handlers = [
 	...stylesheetHandlers,
 	...partialViewsHandlers,
 	...tagHandlers,
+	...configHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

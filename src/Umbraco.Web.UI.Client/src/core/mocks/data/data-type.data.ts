@@ -223,12 +223,17 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		values: [
 			{
 				alias: 'format',
-				value: 'YYYY-MM-DD',
+				value: 'YYYY-MM-DDTHH:mm',
 			},
 			{
 				alias: 'offsetTime',
 				value: true,
 			},
+			{
+				alias: 'enableTimezones',
+				value: true,
+			},
+			{},
 		],
 	},
 	{
@@ -587,7 +592,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		values: [
 			{
 				alias: 'step',
-				value: '0.01',
+				value: 0.01,
 			},
 		],
 	},

@@ -29,8 +29,9 @@ import './backoffice-frame/backoffice-notification-container.element';
 import './collection/collection.element';
 import './collection/collection-toolbar.element';
 import './collection/collection-selection-actions.element';
-
 import './input-checkbox-list/input-checkbox-list.element';
+import './date-input/date-input.element';
+
 import './input-color-picker/input-color-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
 import './input-multi-url-picker/input-multi-url-picker.element';

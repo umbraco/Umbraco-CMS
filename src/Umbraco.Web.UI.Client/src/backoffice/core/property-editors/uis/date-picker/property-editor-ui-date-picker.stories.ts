@@ -38,6 +38,24 @@ WithFormat.args = {
 	],
 };
 
+export const Timeframe = Template.bind({});
+Timeframe.args = {
+	config: [
+		{
+			alias: 'format',
+			value: 'dd/MM/yyyy HH:mm:ss',
+		},
+		{
+			alias: 'min',
+			value: '2021-01-20 00:00',
+		},
+		{
+			alias: 'max',
+			value: '2021-01-30 00:00',
+		},
+	],
+};
+
 export const TimeOnly = Template.bind({});
 TimeOnly.args = {
 	config: [

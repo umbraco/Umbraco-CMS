@@ -46,6 +46,15 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	@state()
 	private _inputType: InputType = 'datetime-local';
 
+	@state()
+	private _min?: string;
+
+	@state()
+	private _max?: string;
+
+	@state()
+	private _step?: number;
+
 	private _offsetTime?: boolean;
 
 	@property({ type: Array, attribute: false })
@@ -67,19 +76,31 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 			this._inputType = 'time';
 		}
 
-		// TODO: Warren - Need to deal with offSetTime prevalue/config
-		// Currently the date picker in uui-iinput does not change based on this config
+		//TODO:
 		this._offsetTime = config.find((x) => x.alias === 'offsetTime')?.value;
+
+		const min = config.find((x) => x.alias === 'min');
+		if (min) this._min = min.value;
+
+		const max = config.find((x) => x.alias === 'max');
+		if (max) this._max = max.value;
+
+		const step = config.find((x) => x.alias === 'step');
+		if (step) this._step = step.value;
 
 		this.requestUpdate('_inputType', oldVal);
 	}
 
 	render() {
-		return html` <uui-input
+		return html`<umb-date-input
 			.type=${this._inputType}
 			@input=${this._onInput}
-			.value=${this._valueString}
-			label="Pick a date or time"></uui-input>`;
+			.datetime=${this._valueString}
+			.min=${this._min}
+			.max=${this._max}
+			.step=${this._step}
+			.offsetTime=${this._offsetTime}
+			label="Pick a date or time"></umb-date-input>`;
 	}
 
 	static styles = [UUITextStyles];
