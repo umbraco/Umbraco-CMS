@@ -3,7 +3,7 @@ import type {
 	ManifestDashboardCollection,
 	ManifestSection,
 	ManifestTypes,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Media';
 

@@ -1,5 +1,5 @@
 import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS, PARTIAL_VIEW_TREE_ALIAS } from '../config';
-import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
 const tree: ManifestTree = {
 	type: 'tree',

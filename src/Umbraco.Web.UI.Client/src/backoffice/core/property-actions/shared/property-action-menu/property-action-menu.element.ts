@@ -3,12 +3,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
-import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-
-import '../property-action/property-action.element';
+import { ManifestPropertyAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+
+import '../property-action/property-action.element';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {

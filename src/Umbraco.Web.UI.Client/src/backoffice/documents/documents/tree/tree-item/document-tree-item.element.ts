@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbDocumentTreeItemContext } from './document-tree-item.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {

@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';

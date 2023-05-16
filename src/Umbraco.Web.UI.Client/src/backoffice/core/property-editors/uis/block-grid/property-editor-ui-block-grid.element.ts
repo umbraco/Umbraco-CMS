@@ -6,7 +6,7 @@ import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../components/workspa
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**

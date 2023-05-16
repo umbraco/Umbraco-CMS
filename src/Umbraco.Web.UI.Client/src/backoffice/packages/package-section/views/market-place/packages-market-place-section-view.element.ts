@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-packages-market-place-section-view')
 export class UmbPackagesMarketPlaceSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {

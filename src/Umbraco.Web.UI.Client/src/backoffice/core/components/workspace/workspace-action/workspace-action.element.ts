@@ -5,12 +5,10 @@ import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement extends UmbLitElement {
-	
-
 	@state()
 	private _buttonState?: UUIButtonState;
 
@@ -52,7 +50,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 				.state="${this._buttonState}"></uui-button>
 		`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

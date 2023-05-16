@@ -1,5 +1,5 @@
-import { ManifestSectionSidebarAppMenuKind } from '@umbraco-cms/backoffice/extensions-registry';
-import type { ManifestSection } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestSectionSidebarAppMenuKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Settings';
 

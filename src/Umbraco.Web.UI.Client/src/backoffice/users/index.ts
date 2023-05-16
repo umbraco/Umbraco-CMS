@@ -9,14 +9,14 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './current-user/current-user-history.store';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './users/components';
 import './user-groups/components';
 
 export const manifests = [...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests];
 
-export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
+export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	extensionRegistry.registerMany(manifests);
 
 	new UmbContextProviderController(host, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, new UmbCurrentUserStore());

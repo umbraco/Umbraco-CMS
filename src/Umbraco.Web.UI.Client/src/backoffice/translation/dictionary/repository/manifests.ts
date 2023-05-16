@@ -1,7 +1,7 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository';
 import { UmbDictionaryTreeStore } from './dictionary.tree.store';
 import { UmbDictionaryStore } from './dictionary.store';
-import { ManifestStore, ManifestTreeStore, ManifestRepository } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestStore, ManifestTreeStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const DICTIONARY_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary';
 

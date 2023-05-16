@@ -1,4 +1,4 @@
-import { ManifestMenu, ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestMenu, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menu: ManifestMenu = {
 	type: 'menu',

@@ -1,4 +1,4 @@
-import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: ManifestPropertyEditorModel = {
 	type: 'propertyEditorModel',

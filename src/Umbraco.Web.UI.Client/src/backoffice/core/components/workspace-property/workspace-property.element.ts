@@ -2,16 +2,16 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
-
-import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import '../workspace/workspace-property-layout/workspace-property-layout.element';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+
+import '../../property-actions/shared/property-action-menu/property-action-menu.element';
+import '../workspace/workspace-property-layout/workspace-property-layout.element';
 
 /**
  *  @element umb-workspace-property

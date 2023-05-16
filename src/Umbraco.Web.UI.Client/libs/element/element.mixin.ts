@@ -1,7 +1,5 @@
 import { Observable } from 'rxjs';
-
-import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/models';
-
+import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbContextToken,

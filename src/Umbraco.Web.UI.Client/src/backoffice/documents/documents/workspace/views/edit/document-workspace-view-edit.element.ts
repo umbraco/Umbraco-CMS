@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement

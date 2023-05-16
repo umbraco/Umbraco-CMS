@@ -1,4 +1,4 @@
-import { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PARTIAL_VIEW_PICKER_MODAL_ALIAS } from '@umbraco-cms/backoffice/modal';
 
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS = 'Umb.Modal.Templating.Insert.ChooseType.Sidebar';
