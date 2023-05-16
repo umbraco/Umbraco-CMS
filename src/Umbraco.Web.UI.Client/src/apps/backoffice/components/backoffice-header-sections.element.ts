@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
-import type { UmbBackofficeContext } from './backoffice.context';
+import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
+import type { UmbBackofficeContext } from '../backoffice.context';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

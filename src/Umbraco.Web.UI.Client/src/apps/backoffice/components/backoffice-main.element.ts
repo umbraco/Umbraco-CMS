@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

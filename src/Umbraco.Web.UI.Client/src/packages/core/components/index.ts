@@ -21,10 +21,10 @@ import './entity-action/entity-action.element';
 
 import './entity-bulk-action/entity-bulk-action.element';
 
-import './backoffice-frame/backoffice-header.element';
-import './backoffice-frame/backoffice-main.element';
-import './backoffice-frame/backoffice-modal-container.element';
-import './backoffice-frame/backoffice-notification-container.element';
+import '../../../apps/backoffice/components/backoffice-header.element';
+import '../../../apps/backoffice/components/backoffice-main.element';
+import './backoffice-modal-container/backoffice-modal-container.element';
+import './backoffice-notification-container/backoffice-notification-container.element';
 
 import './collection/collection.element';
 import './collection/collection-toolbar.element';

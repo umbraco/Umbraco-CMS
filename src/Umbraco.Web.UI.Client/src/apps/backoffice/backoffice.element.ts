@@ -4,10 +4,7 @@ import { css, html } from 'lit';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	UmbBackofficeContext,
-	UMB_BACKOFFICE_CONTEXT_TOKEN,
-} from '../../packages/core/components/backoffice-frame/backoffice.context';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import { UmbExtensionInitializer } from '../../packages/packages/repository/server-extension.controller';
 
 const CORE_PACKAGES = [
