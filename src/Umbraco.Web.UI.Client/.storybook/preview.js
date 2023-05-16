@@ -15,7 +15,7 @@ import { UmbDocumentTreeStore } from '../src/backoffice/documents/documents/repo
 
 import customElementManifests from '../dist/libs/custom-elements.json';
 import { UmbIconRegistry } from '../src/core//icon-registry/icon.registry';
-import { onUnhandledRequest } from '../src/core/mocks/browser';
+import { onUnhandledRequest } from '../src/core/mocks';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
 import { UmbLitElement } from '../src/core/lit-element';
@@ -23,7 +23,7 @@ import { UmbLitElement } from '../src/core/lit-element';
 import { umbExtensionsRegistry } from '../libs/extension-registry';
 
 import '../libs/context-api/provide/context-provider.element';
-import '../libs/controller/controller-host-initializer.element.ts';
+import '../libs/controller-api/controller-host-initializer.element.ts';
 import '../src/backoffice/core/components';
 
 import { manifests as documentManifests } from '../src/backoffice/documents';
