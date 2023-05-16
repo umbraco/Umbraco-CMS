@@ -1,9 +1,9 @@
 import { css, html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UUIInputEvent } from '@umbraco-ui/uui';
+import type { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbConfigRepository } from '../../repositories/config/config.repository';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -140,8 +140,8 @@ export class UmbDateInputElement extends FormControlMixin(UmbLitElement) {
 			label="Pick a date or time"
 			.type="${this.type}"
 			@change="${this.#onChange}"
-			min="${ifDefined(this.min)}"
-			max="${ifDefined(this.max)}"
+			.min="${ifDefined(this.min)}"
+			.max="${ifDefined(this.max)}"
 			.step="${this.step}"
 			.value="${this.displayValue?.replace('Z', '')}">
 		</uui-input>`;
