@@ -1,4 +1,4 @@
-import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement, UmbControllerHostMixin } from './controller-host.mixin';
 
 export class UmbControllerHostInitializerElement
 	extends UmbControllerHostMixin(HTMLElement)
