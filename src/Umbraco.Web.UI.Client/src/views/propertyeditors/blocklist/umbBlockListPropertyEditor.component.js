@@ -49,7 +49,7 @@
         $attrs.$observe('readonly', (value) => {
             vm.readonly = value !== undefined;
 
-            vm.sortableOptions.disabled = vm.readonly;
+            vm.sortableOptions.disabled = vm.readonly || vm.validationLimit.max === 1;
             vm.blockEditorApi.readonly = vm.readonly;
 
             if (deleteAllBlocksAction) {
@@ -107,11 +107,13 @@
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
             liveEditing = vm.model.config.useLiveEditing;
+
             vm.singleBlockMode =
                 vm.model.config.validationLimit.min == 1 &&
                 vm.model.config.validationLimit.max == 1 &&
                 vm.model.config.blocks.length == 1 &&
                 vm.model.config.useSingleBlockMode;
+            
             vm.blockEditorApi.singleBlockMode = vm.singleBlockMode;
 
             vm.validationLimit = vm.model.config.validationLimit;
@@ -123,16 +125,32 @@
             }
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
-            if(typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
+            if (typeof vm.model.value !== 'object' || vm.model.value === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = {};
             }
 
             var scopeOfExistence = $scope;
-            if(vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
+            if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
                 scopeOfExistence = vm.umbVariantContentEditors.getScope();
             } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
+
+            vm.sortableOptions = {
+                axis: "y",
+                containment: "parent",
+                cursor: "grabbing",
+                handle: ".blockelement__draggable-element",
+                cancel: "input,textarea,select,option",
+                classes: ".blockelement--dragging",
+                distance: 5,
+                tolerance: "pointer",
+                scroll: true,
+                disabled: vm.readonly || vm.validationLimit.max === 1,
+                update: function (ev, ui) {
+                    setDirty();
+                }
+            };
             
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -167,9 +185,9 @@
 
             if (vm.umbProperty) {
                 if (vm.singleBlockMode) {
-                vm.umbProperty.setPropertyActions(propertyActionsForSingleBlockMode);
+                  vm.umbProperty.setPropertyActions(propertyActionsForSingleBlockMode);
                 } else {
-                vm.umbProperty.setPropertyActions(propertyActions);
+                  vm.umbProperty.setPropertyActions(propertyActions);
                 }
             }
 
@@ -519,6 +537,7 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
+        
         function requestShowCreate(createIndex, mouseEvent) {
 
             if (vm.blockTypePicker) {
@@ -539,12 +558,15 @@
             }
 
         }
+        
         vm.requestShowClipboard = requestShowClipboard;
+        
         function requestShowClipboard(createIndex) {
             showCreateDialog(createIndex, true);
         }
 
         vm.showCreateDialog = showCreateDialog;
+        
         function showCreateDialog(createIndex, openClipboard) {
 
             if (vm.blockTypePicker) {
@@ -616,6 +638,7 @@
             editorService.open(blockPickerModel);
 
         };
+
         function userFlowWhenBlockWasCreated(createIndex) {
             if (vm.layout.length > createIndex) {
                 var blockObject = vm.layout[createIndex].$block;
@@ -676,7 +699,7 @@
                 return b.date - a.date
             });
 
-            if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
+            if (firstTime !== true && vm.clipboardItems.length > oldAmount) {
                 jumpClipboard();
             }
 
@@ -686,7 +709,7 @@
         var jumpClipboardTimeout;
         function jumpClipboard() {
 
-            if(jumpClipboardTimeout) {
+            if (jumpClipboardTimeout) {
                 return;
             }
 
@@ -745,8 +768,8 @@
 
             if (vm.singleBlockMode) {
                 if (vm.layout.length > 0) {
-                deleteBlock(vm.layout[0].$block);
-                index = 1;
+                  deleteBlock(vm.layout[0].$block);
+                  index = 1;
                 }
             }
 
@@ -835,28 +858,13 @@
             singleBlockMode: vm.singleBlockMode
         };
 
-        vm.sortableOptions = {
-            axis: "y",
-            containment: "parent",
-            cursor: "grabbing",
-            handle: ".blockelement__draggable-element",
-            cancel: "input,textarea,select,option",
-            classes: ".blockelement--dragging",
-            distance: 5,
-            tolerance: "pointer",
-            scroll: true,
-            disabled: vm.readonly,
-            update: function (ev, ui) {
-                setDirty();
-            }
-        };
-
         function onAmountOfBlocksChanged() {
 
             // enable/disable property actions
             if (copyAllBlocksAction) {
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
+            
             if (deleteAllBlocksAction) {
                 deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }
