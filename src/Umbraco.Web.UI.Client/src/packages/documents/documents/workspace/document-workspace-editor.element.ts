@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';

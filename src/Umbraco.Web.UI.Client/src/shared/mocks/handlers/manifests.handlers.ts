@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 
-import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type { PackageManifestResponse } from '../../../packages/packages/types';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifest'), (_req, res, ctx) => {
 	return res(

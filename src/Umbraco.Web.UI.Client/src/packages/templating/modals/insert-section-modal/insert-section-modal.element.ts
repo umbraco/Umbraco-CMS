@@ -2,12 +2,11 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, queryAll, state } from 'lit/decorators.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests';
+import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
+import UmbInsertSectionCheckboxElement from './insert-section-input.element';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-import './insert-section-input.element';
-import UmbInsertSectionCheckboxElement from './insert-section-input.element';
-import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
 
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,

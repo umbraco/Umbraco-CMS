@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data';
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data';
 import { UmbPartialViewsStore, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN } from './partial-views.store';
@@ -8,7 +9,6 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbTreeRootEntityModel } from '@umbraco-cms/backoffice/tree';
-import { Observable } from 'rxjs';
 
 export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailRepository<any> {
 	#init;

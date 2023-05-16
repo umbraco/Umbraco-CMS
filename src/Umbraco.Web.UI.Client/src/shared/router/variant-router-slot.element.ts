@@ -1,6 +1,6 @@
 import { customElement, property } from 'lit/decorators.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbRouterSlotElement } from './router-slot.element';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 function variantIdsToString(variantIds: UmbVariantId[]): string {

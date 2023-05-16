@@ -1,9 +1,9 @@
+import { UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS } from '../config';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS } from '../config';
 
 /**
  * @export

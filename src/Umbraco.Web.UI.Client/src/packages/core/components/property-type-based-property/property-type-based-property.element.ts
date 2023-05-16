@@ -2,9 +2,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type {
 	DataTypeResponseModel,
 	DataTypePropertyPresentationModel,

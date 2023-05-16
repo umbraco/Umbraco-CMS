@@ -1,3 +1,4 @@
+import { template } from 'lodash-es';
 import type {
 	ContentTreeItemResponseModel,
 	DocumentTreeItemResponseModel,
@@ -8,7 +9,6 @@ import type {
 	DocumentResponseModel,
 	FileSystemTreeItemPresentationModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { template } from 'lodash-es';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
 	return {

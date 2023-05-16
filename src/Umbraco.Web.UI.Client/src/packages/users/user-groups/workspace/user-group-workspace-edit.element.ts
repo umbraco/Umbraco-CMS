@@ -2,6 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import UmbUserInputElement from '../../users/components/user-input/user-input.element';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -9,7 +10,6 @@ import '../../../core/components/input-section/input-section.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import UmbUserInputElement from '../../users/components/user-input/user-input.element';
 
 @customElement('umb-user-group-workspace-edit')
 export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
