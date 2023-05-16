@@ -1,6 +1,6 @@
 import { urlFriendlyPathFromServerFilePath } from '../../utils';
 import { UmbTreeItemContextBase } from '@umbraco-cms/backoffice/tree';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbFileSystemTreeItemContext extends UmbTreeItemContextBase<FileSystemTreeItemPresentationModel> {

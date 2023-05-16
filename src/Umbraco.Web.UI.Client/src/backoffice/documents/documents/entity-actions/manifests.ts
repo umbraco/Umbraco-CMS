@@ -13,7 +13,7 @@ import {
 	UmbTrashEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'document';
 

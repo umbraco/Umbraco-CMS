@@ -106,6 +106,7 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		updateDate: '2/10/2022',
 		createDate: '3/13/2022',
 		failedLoginAttempts: 946,
+		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 	{
 		id: '82e11d3d-b91d-43c9-9071-34d28e62e81d',
@@ -123,6 +124,7 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		updateDate: '4/12/2023',
 		createDate: '4/12/2023',
 		failedLoginAttempts: 0,
+		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 	{
 		id: 'aa1d83a9-bc7f-47d2-b288-58d8a31f5017',
@@ -140,6 +142,7 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		updateDate: '4/11/2023',
 		createDate: '4/11/2023',
 		failedLoginAttempts: 0,
+		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 	{
 		id: 'ff2f4a50-d3d4-4bc4-869d-c7948c160e54',
@@ -157,6 +160,7 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		updateDate: '4/10/2023',
 		createDate: '4/10/2023',
 		failedLoginAttempts: 0,
+		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 	{
 		id: 'c290c6d9-9f12-4838-8567-621b52a178de',
@@ -174,6 +178,7 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		updateDate: '4/9/2023',
 		createDate: '4/9/2023',
 		failedLoginAttempts: 0,
+		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 ];
 

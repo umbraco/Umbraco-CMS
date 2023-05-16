@@ -1,7 +1,7 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbDocumentMoveEntityBulkAction } from './move/move.action';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action';
-import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'document';
 

@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbTableColumn, UmbTableConfig } from '@umbraco-cms/backoffice/core/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-workspace-view-relation-type-relation')
 export class UmbWorkspaceViewRelationTypeRelationElement

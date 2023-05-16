@@ -12,7 +12,6 @@ import {
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbCollectionDataSource,
 	UmbCollectionRepository,
@@ -24,6 +23,7 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: implement
 export class UmbUserGroupRepository

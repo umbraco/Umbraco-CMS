@@ -1,5 +1,5 @@
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

@@ -1,4 +1,4 @@
-import type { ManifestSection, ManifestSectionView } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestSection, ManifestSectionView } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Packages';
 

@@ -1,6 +1,6 @@
 import { StylesheetDetails } from '../..';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Stylesheet that fetches data from the server

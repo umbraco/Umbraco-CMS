@@ -4,11 +4,8 @@ import type { TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import {
-	createExtensionElement,
-	isManifestElementableType,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement, isManifestElementableType } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 export type InitializedExtension = { alias: string; weight: number; component: HTMLElement | null };
@@ -23,8 +20,6 @@ export type InitializedExtension = { alias: string; weight: number; component: H
  */
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
-	
-
 	@state()
 	private _extensions: InitializedExtension[] = [];
 
@@ -127,7 +122,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 			(ext) => this.renderMethod(ext) || nothing
 		);
 	}
-	
+
 	static styles = css`
 		:host {
 			display: contents;

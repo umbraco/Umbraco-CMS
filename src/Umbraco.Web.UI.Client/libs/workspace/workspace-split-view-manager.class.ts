@@ -1,5 +1,5 @@
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export type ActiveVariant = {

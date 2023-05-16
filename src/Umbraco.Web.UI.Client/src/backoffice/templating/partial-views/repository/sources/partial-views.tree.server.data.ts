@@ -1,6 +1,6 @@
 import { PartialViewsTreeDataSource } from '.';
 import { PartialViewResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbPartialViewsTreeServerDataSource implements PartialViewsTreeDataSource {
@@ -25,7 +25,7 @@ export class UmbPartialViewsTreeServerDataSource implements PartialViewsTreeData
 	}) {
 		if (!path) {
 			const error: ProblemDetailsModel = { title: 'Path is missing' };
-			return  error ;
+			return error;
 		}
 
 		return tryExecuteAndNotify(
@@ -41,7 +41,7 @@ export class UmbPartialViewsTreeServerDataSource implements PartialViewsTreeData
 	async getItem(id: Array<string>) {
 		if (!id) {
 			const error: ProblemDetailsModel = { title: 'Paths are missing' };
-			return  error ;
+			return error;
 		}
 
 		return tryExecuteAndNotify(

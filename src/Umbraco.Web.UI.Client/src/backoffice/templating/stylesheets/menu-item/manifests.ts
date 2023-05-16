@@ -1,5 +1,5 @@
 import { STYLESHEET_TREE_ALIAS } from '../tree/manifests';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
 	type: 'menuItem',

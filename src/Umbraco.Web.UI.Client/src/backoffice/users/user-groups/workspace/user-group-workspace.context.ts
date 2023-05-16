@@ -1,9 +1,9 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
-import { UmbUserRepository } from '../../users/repository/user.repository';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbUserRepository } from '../../users/repository/user.repository';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupResponseModel>

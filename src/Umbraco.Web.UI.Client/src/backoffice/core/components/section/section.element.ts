@@ -4,12 +4,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element';
 import type { UmbSectionViewsElement } from './section-views/section-views.element';
-import type {
+import {
 	ManifestSection,
 	ManifestSectionSidebarApp,
 	UmbSectionExtensionElement,
-} from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

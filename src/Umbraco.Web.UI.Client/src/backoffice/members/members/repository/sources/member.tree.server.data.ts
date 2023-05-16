@@ -1,5 +1,5 @@
 import { MemberTreeDataSource } from '.';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * A data source for the Member tree that fetches data from the server

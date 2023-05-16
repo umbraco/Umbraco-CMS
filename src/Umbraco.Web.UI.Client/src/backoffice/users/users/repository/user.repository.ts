@@ -10,13 +10,13 @@ import { UmbUserCollectionServerDataSource } from './sources/user-collection.ser
 import { UmbUserItemServerDataSource } from './sources/user-item.server.data';
 import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store';
 import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import {
 	UmbCollectionDataSource,
 	UmbCollectionRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
 } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateUserRequestModel,
 	InviteUserRequestModel,

@@ -1,36 +1,35 @@
-import { handlers as dataTypeHandlers } from './domains/data-type';
-import { handlers as relationTypeHandlers } from './domains/relation-type.handlers';
-import { handlers as documentTypeHandlers } from './domains/document-type.handlers';
-import { handlers as installHandlers } from './domains/install.handlers';
-import * as manifestsHandlers from './domains/manifests.handlers';
-import { handlers as publishedStatusHandlers } from './domains/published-status.handlers';
-import * as serverHandlers from './domains/server.handlers';
-import { handlers as upgradeHandlers } from './domains/upgrade.handlers';
-import { handlers as userHandlers } from './domains/user.handlers';
-import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
-import { handlers as usersHandlers } from './domains/users.handlers';
-import { handlers as userGroupsHandlers } from './domains/user-groups.handlers';
-import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
-import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
-import { handlers as healthCheckHandlers } from './domains/health-check.handlers';
-import { handlers as profilingHandlers } from './domains/performance-profiling.handlers';
-import { handlers as documentHandlers } from './domains/document.handlers';
-import { handlers as mediaHandlers } from './domains/media.handlers';
-import { handlers as dictionaryHandlers } from './domains/dictionary.handlers';
-import { handlers as mediaTypeHandlers } from './domains/media-type.handlers';
-import { handlers as memberGroupHandlers } from './domains/member-group.handlers';
-import { handlers as memberHandlers } from './domains/member.handlers';
-import { handlers as memberTypeHandlers } from './domains/member-type.handlers';
-import { handlers as templateHandlers } from './domains/template.handlers';
-import { handlers as languageHandlers } from './domains/language.handlers';
-import { handlers as cultureHandlers } from './domains/culture.handlers';
-import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
-import { handlers as logViewerHandlers } from './domains/log-viewer.handlers';
-import { handlers as packageHandlers } from './domains/package.handlers';
-import { handlers as rteEmbedHandlers } from './domains/rte-embed.handlers';
-import { handlers as stylesheetHandlers } from './domains/stylesheet.handlers';
-import { handlers as partialViewsHandlers } from './domains/partial-views.handlers';
-import { handlers as tagHandlers } from './domains/tag-handlers';
+import { handlers as dataTypeHandlers } from './handlers/data-type';
+import { handlers as relationTypeHandlers } from './handlers/relation-type.handlers';
+import { handlers as documentTypeHandlers } from './handlers/document-type.handlers';
+import { handlers as installHandlers } from './handlers/install.handlers';
+import * as manifestsHandlers from './handlers/manifests.handlers';
+import { handlers as publishedStatusHandlers } from './handlers/published-status.handlers';
+import * as serverHandlers from './handlers/server.handlers';
+import { handlers as upgradeHandlers } from './handlers/upgrade.handlers';
+import { handlers as userHandlers } from './handlers/user.handlers';
+import { handlers as telemetryHandlers } from './handlers/telemetry.handlers';
+import { handlers as userGroupsHandlers } from './handlers/user-group.handlers';
+import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers';
+import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers';
+import { handlers as healthCheckHandlers } from './handlers/health-check.handlers';
+import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers';
+import { handlers as documentHandlers } from './handlers/document.handlers';
+import { handlers as mediaHandlers } from './handlers/media.handlers';
+import { handlers as dictionaryHandlers } from './handlers/dictionary.handlers';
+import { handlers as mediaTypeHandlers } from './handlers/media-type.handlers';
+import { handlers as memberGroupHandlers } from './handlers/member-group.handlers';
+import { handlers as memberHandlers } from './handlers/member.handlers';
+import { handlers as memberTypeHandlers } from './handlers/member-type.handlers';
+import { handlers as templateHandlers } from './handlers/template.handlers';
+import { handlers as languageHandlers } from './handlers/language.handlers';
+import { handlers as cultureHandlers } from './handlers/culture.handlers';
+import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers';
+import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers';
+import { handlers as packageHandlers } from './handlers/package.handlers';
+import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers';
+import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers';
+import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers';
+import { handlers as tagHandlers } from './handlers/tag-handlers';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
@@ -44,7 +43,6 @@ const handlers = [
 	...documentTypeHandlers,
 	...telemetryHandlers,
 	...publishedStatusHandlers,
-	...usersHandlers,
 	...userGroupsHandlers,
 	...mediaTypeHandlers,
 	...memberGroupHandlers,

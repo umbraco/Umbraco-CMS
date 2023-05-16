@@ -3,7 +3,7 @@ import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store';
 import { UmbRelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
 import { UmbRelationTypeTreeDataSource } from './sources';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateRelationTypeRequestModel,
