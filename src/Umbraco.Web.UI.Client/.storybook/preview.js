@@ -8,13 +8,13 @@ import { html } from 'lit';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 import { setCustomElements } from '@storybook/web-components';
 
-import { UmbDataTypeStore } from '../src/backoffice/settings/data-types/repository/data-type.store.ts';
-import { UmbDocumentTypeStore } from '../src/backoffice/documents/document-types/repository/document-type.store.ts';
-import { UmbDocumentStore } from '../src/backoffice/documents/documents/repository/document.store.ts';
-import { UmbDocumentTreeStore } from '../src/backoffice/documents/documents/repository/document.tree.store.ts';
+import { UmbDataTypeStore } from '../src/packages/settings/data-types/repository/data-type.store.ts';
+import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/repository/document-type.store.ts';
+import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store.ts';
+import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store.ts';
 
 import customElementManifests from '../dist/libs/custom-elements.json';
-import { UmbIconRegistry } from '../src/core//icon-registry/icon.registry';
+import { UmbIconRegistry } from '../src/core/icon-registry/icon.registry';
 import { onUnhandledRequest } from '../src/core/mocks';
 import { handlers } from '../src/core/mocks/browser-handlers';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
@@ -24,9 +24,9 @@ import { umbExtensionsRegistry } from '../libs/extension-registry';
 
 import '../libs/context-api/provide/context-provider.element';
 import '../libs/controller-api/controller-host-initializer.element.ts';
-import '../src/backoffice/core/components';
+import '../src/packages/core/components';
 
-import { manifests as documentManifests } from '../src/backoffice/documents';
+import { manifests as documentManifests } from '../src/packages/documents';
 
 class UmbStoryBookElement extends UmbLitElement {
 	_umbIconRegistry = new UmbIconRegistry();
