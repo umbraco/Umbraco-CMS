@@ -22,8 +22,8 @@ import { UmbLitElement } from '../src/core/lit-element';
 
 import { umbExtensionsRegistry } from '../libs/extensions-api';
 
-import '../src/core/context-provider/context-provider.element';
-import '../src/core/controller-host/controller-host-test.element';
+import '../libs/context-api/provide/context-provider.element';
+import '../libs/controller/controller-host-initializer.element.ts';
 import '../src/backoffice/core/components';
 
 import { manifests as documentManifests } from '../src/backoffice/documents';
@@ -56,19 +56,27 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const dataTypeStoreProvider = (story) => html`
-	<umb-controller-host-test .create=${(host) => new UmbDataTypeStore(host)}>${story()}</umb-controller-host-test>
+	<umb-controller-host-initializer .create=${(host) => new UmbDataTypeStore(host)}
+		>${story()}</umb-controller-host-initializer
+	>
 `;
 
 const documentTypeStoreProvider = (story) => html`
-	<umb-controller-host-test .create=${(host) => new UmbDocumentTypeStore(host)}>${story()}</umb-controller-host-test>
+	<umb-controller-host-initializer .create=${(host) => new UmbDocumentTypeStore(host)}
+		>${story()}</umb-controller-host-initializer
+	>
 `;
 
 const documentStoreProvider = (story) => html`
-	<umb-controller-host-test .create=${(host) => new UmbDocumentStore(host)}>${story()}</umb-controller-host-test>
+	<umb-controller-host-initializer .create=${(host) => new UmbDocumentStore(host)}
+		>${story()}</umb-controller-host-initializer
+	>
 `;
 
 const documentTreeStoreProvider = (story) => html`
-	<umb-controller-host-test .create=${(host) => new UmbDocumentTreeStore(host)}>${story()}</umb-controller-host-test>
+	<umb-controller-host-initializer .create=${(host) => new UmbDocumentTreeStore(host)}
+		>${story()}</umb-controller-host-initializer
+	>
 `;
 
 // Initialize MSW
