@@ -46,6 +46,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL)
 			.onSetup(() => {
+				console.log('registration setup.');
 				return {
 					selection: [this._value.toString()],
 					submitLabel: 'Submit',

@@ -13,7 +13,7 @@ import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import type { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
 
 /**
@@ -40,12 +40,13 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 			submit: (arg: T) => void;
 	  };
 
-//TODO consider splitting this into two separate handlers
-export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> {
+// TODO: consider splitting this into two separate handlers
+// TODO: Rename to become a controller.
+export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> extends UmbController {
 	private _submitPromise: Promise<ModalResult>;
 	private _submitResolver?: (value: ModalResult) => void;
 	private _submitRejecter?: () => void;
-	#host: UmbControllerHostElement;
+	private _parentRouter: IRouterSlot | null;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 	#modalRouterElement: UmbRouterSlotElement = new UmbRouterSlotElement();
@@ -57,6 +58,8 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	public type: UmbModalType = 'dialog';
 	public size: UUIModalSidebarSize = 'small';
 
+	private modalAlias: string; //TEMP... TODO: Remove this.
+
 	constructor(
 		host: UmbControllerHostElement,
 		router: IRouterSlot | null,
@@ -64,8 +67,10 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		data?: ModalData,
 		config?: UmbModalConfig
 	) {
-		this.#host = host;
+		super(host);
+		this._parentRouter = router;
 		this.key = config?.key || UmbId.new();
+		this.modalAlias = modalAlias.toString();
 
 		if (modalAlias instanceof UmbModalToken) {
 			this.type = modalAlias.getDefaultConfig()?.type || this.type;
@@ -82,11 +87,23 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		});
 
 		this.modalElement = this.#createContainerElement();
-		this.modalElement.appendChild(this.#modalRouterElement);
+		/**
+		 *
+		 * Maybe we could just get a Modal Router Slot. But it needs to have the ability to actually inject via slot. so the modal inner element can be within.
+		 *
+		 */
 		if (router) {
 			this.#modalRouterElement.parent = router;
 		}
+		this.modalElement.appendChild(this.#modalRouterElement);
 		this.#observeModal(modalAlias.toString(), data);
+	}
+
+	public hostConnected() {
+		// Not much to do now..?
+	}
+	public hostDisconnected() {
+		// Not much to do now..?
 	}
 
 	#createContainerElement() {
@@ -139,24 +156,33 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
 	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
 	#observeModal(modalAlias: string, data?: ModalData) {
-		new UmbObserverController(
-			this.#host,
-			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
-			async (manifest) => {
-				if (manifest) {
-					const innerElement = await this.#createInnerElement(manifest, data);
-					if (innerElement) {
-						this.#appendInnerElement(innerElement);
-						return;
+		if (this.host) {
+			new UmbObserverController(
+				this.host,
+				umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
+				async (manifest) => {
+					if (manifest) {
+						const innerElement = await this.#createInnerElement(manifest, data);
+						if (innerElement) {
+							this.#appendInnerElement(innerElement);
+							return;
+						}
 					}
+					this.#removeInnerElement();
 				}
-				this.#removeInnerElement();
-			}
-		);
+			);
+		}
 	}
 
 	#appendInnerElement(element: HTMLElement) {
 		this.#modalRouterElement.appendChild(element);
+		/*this.#modalRouterElement.routes = [
+			{
+				path: '',
+				component: element,
+			},
+		];
+		this.#modalRouterElement.render();*/
 		this.#innerElement.next(element);
 	}
 
@@ -166,5 +192,10 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			this.#modalRouterElement.removeChild(innerElement);
 			this.#innerElement.next(undefined);
 		}
+	}
+
+	public destroy() {
+		super.destroy();
+		// TODO: Make sure to clean up..
 	}
 }

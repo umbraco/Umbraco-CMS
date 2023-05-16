@@ -115,6 +115,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
+			console.log('routeSetup has router:', router);
 			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
 			this.#modalHandler.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalHandler;
