@@ -1,6 +1,5 @@
 import { BehaviorSubject, map, Observable, distinctUntilChanged, combineLatest } from 'rxjs';
 import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 function extensionArrayMemoization<T extends { alias: string }>(
 	previousValue: Array<T>,
@@ -29,27 +28,34 @@ function extensionSingleMemoization<T extends { alias: string }>(
 
 const sortExtensions = (a: ManifestBase, b: ManifestBase) => (b.weight || 0) - (a.weight || 0);
 
-export class UmbExtensionRegistry {
+export class UmbExtensionRegistry<
+	IncomingManifestTypes extends ManifestBase,
+	ManifestTypes extends ManifestBase = IncomingManifestTypes | ManifestBase
+> {
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();
 
-	private _kinds = new BehaviorSubject<Array<ManifestKind>>([]);
+	private _kinds = new BehaviorSubject<Array<ManifestKind<ManifestTypes>>>([]);
 	public readonly kinds = this._kinds.asObservable();
 
-	defineKind(kind: ManifestKind) {
+	defineKind(kind: ManifestKind<ManifestTypes>) {
 		const nextData = this._kinds
 			.getValue()
 			.filter(
-				(k) => !(k.matchType === (kind as ManifestKind).matchType && k.matchKind === (kind as ManifestKind).matchKind)
+				(k) =>
+					!(
+						k.matchType === (kind as ManifestKind<ManifestTypes>).matchType &&
+						k.matchKind === (kind as ManifestKind<ManifestTypes>).matchKind
+					)
 			);
-		nextData.push(kind as ManifestKind);
+		nextData.push(kind as ManifestKind<ManifestTypes>);
 		this._kinds.next(nextData);
 	}
 
-	register(manifest: ManifestTypes | ManifestKind): void {
+	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
 		if (manifest.type === 'kind') {
-			this.defineKind(manifest as ManifestKind);
+			this.defineKind(manifest as ManifestKind<ManifestTypes>);
 			return;
 		}
 
@@ -64,7 +70,7 @@ export class UmbExtensionRegistry {
 		this._extensions.next([...extensionsValues, manifest as ManifestTypes]);
 	}
 
-	registerMany(manifests: Array<ManifestTypes | ManifestKind>): void {
+	registerMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
 		manifests.forEach((manifest) => this.register(manifest));
 	}
 
@@ -93,13 +99,13 @@ export class UmbExtensionRegistry {
 	}
 	*/
 
-	private _kindsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
+	private _kindsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => kind.matchType === type)),
 			distinctUntilChanged(extensionArrayMemoization)
 		);
 	}
-	private _extensionsOfType<Key extends keyof ManifestTypeMap | string>(type: Key) {
+	private _extensionsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type)),
 			distinctUntilChanged(extensionArrayMemoization)
@@ -111,16 +117,20 @@ export class UmbExtensionRegistry {
 			distinctUntilChanged(extensionArrayMemoization)
 		);
 	}
-	private _extensionsOfTypes<ExtensionType = ManifestBase>(types: string[]): Observable<Array<ExtensionType>> {
+
+	// TODO: can we get rid of as unknown here
+	private _extensionsOfTypes<ExtensionType extends ManifestBase = ManifestBase>(
+		types: Array<ExtensionType['type']>
+	): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1)),
 			distinctUntilChanged(extensionArrayMemoization)
-		) as Observable<Array<ExtensionType>>;
+		) as unknown as Observable<Array<ExtensionType>>;
 	}
 
 	getByTypeAndAlias<
-		Key extends keyof ManifestTypeMap | string,
-		T extends ManifestBase = SpecificManifestTypeOrManifestBase<Key>
+		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>
 	>(type: Key, alias: string) {
 		return combineLatest([
 			this.extensions.pipe(
@@ -149,8 +159,8 @@ export class UmbExtensionRegistry {
 	}
 
 	extensionsOfType<
-		Key extends keyof ManifestTypeMap | string,
-		T extends ManifestBase = SpecificManifestTypeOrManifestBase<Key>
+		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>
 	>(type: Key) {
 		return combineLatest([this._extensionsOfType(type), this._kindsOfType(type)]).pipe(
 			map(([exts, kinds]) =>

@@ -2,10 +2,13 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { ManifestHeaderAppButtonKind, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
-import { ManifestKind } from '@umbraco-cms/backoffice/extensions-api';
+import {
+	ManifestHeaderAppButtonKind,
+	UmbBackofficeManifestKind,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extensions-registry';
 
-const manifest: ManifestKind = {
+const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.Button',
 	matchKind: 'button',

@@ -1,17 +1,19 @@
-import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ClassConstructor<T> = new (...args: any[]) => T;
 
-export type ManifestTypeMap = {
+export type ManifestTypeMap<ManifestTypes extends ManifestBase> = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
+} & {
+	[key: string]: ManifestBase;
 };
 
-export type SpecificManifestTypeOrManifestBase<T extends keyof ManifestTypeMap | string> =
-	T extends keyof ManifestTypeMap ? ManifestTypeMap[T] : ManifestBase;
+export type SpecificManifestTypeOrManifestBase<
+	ManifestTypes extends ManifestBase,
+	T extends keyof ManifestTypeMap<ManifestTypes> | string
+> = T extends keyof ManifestTypeMap<ManifestTypes> ? ManifestTypeMap<ManifestTypes>[T] : ManifestBase;
 
 export interface ManifestBase {
 	/**
@@ -42,7 +44,7 @@ export interface ManifestBase {
 	weight?: number;
 }
 
-export interface ManifestKind {
+export interface ManifestKind<ManifestTypes> {
 	type: 'kind';
 	alias: string;
 	matchType: string;

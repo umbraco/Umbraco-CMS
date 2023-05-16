@@ -4,15 +4,15 @@ import { customElement, property } from 'lit/decorators.js';
 import {
 	ManifestMenu,
 	ManifestSectionSidebarAppMenuKind,
+	UmbBackofficeManifestKind,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
-import { ManifestKind } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import '../../menu/menu.element';
 
 // TODO: Move to separate file:
-const manifest: ManifestKind = {
+const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.Menu',
 	matchKind: 'menu',
