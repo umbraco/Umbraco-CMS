@@ -90,7 +90,7 @@ export default {
 				<base href="/" />
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
-				<link rel="stylesheet" href="src/core/css/custom-properties.css">
+				<link rel="stylesheet" href="src/shared/css/custom-properties.css">
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
