@@ -61,14 +61,15 @@ export default {
 						'@umbraco-cms/backoffice/tree': './libs/tree/index.ts',
 						'@umbraco-cms/backoffice/section': './libs/section/index.ts',
 						'@umbraco-cms/backoffice/variant': './libs/variant/index.ts',
-						'@umbraco-cms/backoffice/core/components': './src/backoffice/core/components/index.ts',
-						'@umbraco-cms/backoffice/user-group': './src/backoffice/users/user-groups/index.ts',
+
+						'@umbraco-cms/backoffice/core/components': './src/packages/core/components/index.ts',
+						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
 
 						// SHARED
-						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
-						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
-						'@umbraco-cms/internal/router': './src/core/router/index.ts',
-						'@umbraco-cms/internal/sorter': './src/core/sorter/index.ts',
+						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',
+						'@umbraco-cms/internal/modal': './src/shared/modal/index.ts',
+						'@umbraco-cms/internal/router': './src/shared/router/index.ts',
+						'@umbraco-cms/internal/sorter': './src/shared/sorter/index.ts',
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
 				},
@@ -89,7 +90,7 @@ export default {
 				<base href="/" />
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
-				<link rel="stylesheet" href="src/core/css/custom-properties.css">
+				<link rel="stylesheet" href="src/shared/css/custom-properties.css">
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>

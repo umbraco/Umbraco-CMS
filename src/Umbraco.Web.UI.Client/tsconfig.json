@@ -47,12 +47,12 @@
 			"@umbraco-cms/backoffice/section": ["libs/section"],
 			"@umbraco-cms/backoffice/variant": ["libs/variant"],
 
-			"@umbraco-cms/backoffice/core/components": ["src/backoffice/core/components"],
-			"@umbraco-cms/backoffice/user-group": ["src/backoffice/users/user-groups"],
+			"@umbraco-cms/backoffice/core/components": ["src/packages/core/components"],
+			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
 
-			"@umbraco-cms/internal/lit-element": ["src/core/lit-element"],
-			"@umbraco-cms/internal/modal": ["src/core/modal"],
-			"@umbraco-cms/internal/router": ["src/core/router"],
+			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],
+			"@umbraco-cms/internal/modal": ["src/shared/modal"],
+			"@umbraco-cms/internal/router": ["src/shared/router"],
 			"@umbraco-cms/internal/test-utils": ["utils/test-utils.ts"]
 		}
 	},
