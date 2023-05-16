@@ -1,6 +1,6 @@
 import { LANGUAGE_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'language';
 

@@ -1,4 +1,4 @@
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 

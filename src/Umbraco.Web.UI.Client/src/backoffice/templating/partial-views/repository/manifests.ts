@@ -2,8 +2,7 @@ import { UmbTemplateRepository } from '../repository/partial-views.repository';
 import { PARTIAL_VIEW_REPOSITORY_ALIAS } from '../config';
 import { UmbPartialViewsTreeStore } from './partial-views.tree.store';
 import { UmbPartialViewsStore } from './partial-views.store';
-import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
-
+import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
 
 const repository: ManifestRepository = {
 	type: 'repository',

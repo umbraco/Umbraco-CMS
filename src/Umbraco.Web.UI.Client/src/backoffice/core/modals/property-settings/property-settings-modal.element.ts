@@ -8,7 +8,7 @@ import {
 	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
 	UmbPropertySettingsModalResult,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-property-settings-modal')

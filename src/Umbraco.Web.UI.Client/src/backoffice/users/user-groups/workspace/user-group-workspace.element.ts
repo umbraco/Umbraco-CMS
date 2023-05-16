@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
 import { UmbUserGroupWorkspaceEditElement } from './user-group-workspace-edit.element';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import { ManifestWorkspaceAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestWorkspaceAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 

@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { isManifestElementNameType } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 

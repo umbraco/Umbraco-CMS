@@ -11,7 +11,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.

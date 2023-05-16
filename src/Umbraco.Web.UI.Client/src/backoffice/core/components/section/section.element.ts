@@ -9,7 +9,7 @@ import {
 	ManifestSectionSidebarApp,
 	UmbSectionExtensionElement,
 	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

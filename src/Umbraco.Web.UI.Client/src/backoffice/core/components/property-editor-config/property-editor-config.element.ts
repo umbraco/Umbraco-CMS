@@ -6,7 +6,7 @@ import {
 	PropertyEditorConfigDefaultData,
 	PropertyEditorConfigProperty,
 	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

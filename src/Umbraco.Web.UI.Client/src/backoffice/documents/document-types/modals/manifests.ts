@@ -1,4 +1,4 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 const modals: Array<ManifestModal> = [
 	{

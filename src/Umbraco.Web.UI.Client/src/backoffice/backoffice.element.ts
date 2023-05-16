@@ -7,7 +7,7 @@ import {
 } from './core/components/backoffice-frame/backoffice.context';
 import { UmbExtensionInitializer } from './packages/repository/server-extension.controller';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 const CORE_PACKAGES = [

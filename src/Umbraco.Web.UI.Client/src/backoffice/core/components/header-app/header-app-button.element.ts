@@ -6,7 +6,7 @@ import {
 	ManifestHeaderAppButtonKind,
 	UmbBackofficeManifestKind,
 	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',

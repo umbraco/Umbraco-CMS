@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import type { ManifestElementWithElementName, ManifestKind, ManifestWithMeta } from '../types';
 import { UmbExtensionRegistry } from './extension.registry';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 describe('UmbExtensionRegistry', () => {
 	let extensionRegistry: UmbExtensionRegistry<ManifestWithMeta>;

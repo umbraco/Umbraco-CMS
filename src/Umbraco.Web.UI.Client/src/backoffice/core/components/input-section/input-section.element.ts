@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbInputListBaseElement } from '../input-list-base/input-list-base';
 import { UMB_SECTION_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
-import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-input-section')
 export class UmbInputPickerSectionElement extends UmbInputListBaseElement {

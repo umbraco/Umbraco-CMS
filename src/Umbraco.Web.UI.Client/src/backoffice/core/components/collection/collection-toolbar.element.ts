@@ -3,7 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import type { TooltipMenuItem } from '../tooltip-menu';
-import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-collection-toolbar')

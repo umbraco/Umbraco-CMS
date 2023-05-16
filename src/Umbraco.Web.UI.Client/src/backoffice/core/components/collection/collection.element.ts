@@ -6,7 +6,7 @@ import './collection-selection-actions.element';
 import './collection-toolbar.element';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';

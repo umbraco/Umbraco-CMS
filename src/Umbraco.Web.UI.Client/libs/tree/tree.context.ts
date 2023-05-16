@@ -1,6 +1,6 @@
 import { Observable, map } from 'rxjs';
 import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
