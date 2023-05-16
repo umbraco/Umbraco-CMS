@@ -1,12 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbUserGroupRepository } from '../../repository/user-group.repository';
+import type { UmbUserGroupRepository } from '../../repository/user-group.repository';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionClass, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {

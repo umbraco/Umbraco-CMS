@@ -1,8 +1,8 @@
 import { USER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbUserGroupCollectionFilterModel } from '../types';
+import type { UmbUserGroupCollectionFilterModel } from '../types';
 import { UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupCollectionContext extends UmbCollectionContext<
 	UserGroupResponseModel,

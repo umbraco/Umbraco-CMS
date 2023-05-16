@@ -1,5 +1,5 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UserItemResponseModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
 

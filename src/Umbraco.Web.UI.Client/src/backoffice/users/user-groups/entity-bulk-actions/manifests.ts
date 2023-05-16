@@ -1,6 +1,6 @@
 import { USER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbDeleteUserGroupEntityBulkAction } from './delete/delete.action';
-import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'user-group';
 

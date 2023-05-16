@@ -1,6 +1,6 @@
 import type { UmbUserGroupCollectionFilterModel } from '../../types';
-import { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UserGroupResponseModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
