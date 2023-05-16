@@ -1,4 +1,4 @@
-﻿<div ng-controller="Umbraco.PropertyEditors.MultiUrlPickerController" class="umb-property-editor umb-contentpicker">
+<div ng-controller="Umbraco.PropertyEditors.MultiUrlPickerController" class="umb-property-editor umb-contentpicker">
     <p ng-if="(renderModel|filter:{trashed:true}).length == 1"><localize key="contentPicker_pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</localize></p>
     <p ng-if="(renderModel|filter:{trashed:true}).length > 1"><localize key="contentPicker_pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</localize></p>
 
@@ -28,7 +28,6 @@
         </button>
 
         <div class="umb-contentpicker__min-max-help">
-
 
             <!-- Both min and max items -->
             <span ng-if="model.config.minNumber && model.config.maxNumber && model.config.minNumber !== model.config.maxNumber">
