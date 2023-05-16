@@ -11,7 +11,12 @@ import type {
 	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-import { UmbDataSource, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import {
+	DataSourceResponse,
+	UmbDataSource,
+	UmbDataSourceErrorResponse,
+	UmbDetailRepository,
+} from '@umbraco-cms/backoffice/repository';
 
 export interface UmbCreateUserResponseModel {
 	user: UserResponseModel;
@@ -33,6 +38,10 @@ export interface UmbUserDetailDataSource
 	invite(data: InviteUserRequestModel): Promise<any>;
 	enable(data: EnableUserRequestModel): Promise<any>;
 	disable(data: DisableUserRequestModel): Promise<any>;
+}
+
+export interface UmbUserSetGroupDataSource {
+	setGroups(userIds: string[], userGroupIds: string[]): Promise<UmbDataSourceErrorResponse>;
 }
 
 export interface UmbUserDetailRepository

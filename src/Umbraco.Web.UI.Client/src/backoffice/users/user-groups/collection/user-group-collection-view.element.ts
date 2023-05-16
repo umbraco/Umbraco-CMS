@@ -1,27 +1,24 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { UmbUserGroupCollectionContext } from './user-group-collection.context';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
+import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+
+import './user-group-table-name-column-layout.element';
+import './user-group-table-sections-column-layout.element';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
 	UmbTableElement,
 	UmbTableItem,
-	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/core/components';
-import { UmbUserGroupStore, UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.store';
-import type { UserGroupDetails } from '../types';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './user-group-table-name-column-layout.element';
-//import '../../user-section/views/user-groups/user-group-table-sections-column-layout.element';
-
-@customElement('umb-workspace-view-user-groups')
-export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
-	@state()
-	private _userGroups: Array<UserGroupDetails> = [];
-
+@customElement('umb-user-group-collection-view')
+export class UmbUserGroupCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: true,
@@ -55,49 +52,47 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _userGroupStore?: UmbUserGroupStore;
+	@state()
+	private _userGroups: Array<UserGroupResponseModel> = [];
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	#collectionContext?: UmbUserGroupCollectionContext;
 
-		this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (userGroupStore) => {
-			this._userGroupStore = userGroupStore;
-			this._observeUserGroups();
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_COLLECTION_CONTEXT_TOKEN, (instance) => {
+			this.#collectionContext = instance;
+			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
+			this.observe(this.#collectionContext.items, (items) => {
+				this._userGroups = items;
+				this._createTableItems(items);
+			});
 		});
 	}
 
-	private _observeUserGroups() {
-		if (!this._userGroupStore) return;
-
-		this.observe(this._userGroupStore.getAll(), (userGroups) => {
-			this._userGroups = userGroups;
-			this._createTableItems(this._userGroups);
-		});
-	}
-
-	private _createTableItems(userGroups: Array<UserGroupDetails>) {
+	private _createTableItems(userGroups: Array<UserGroupResponseModel>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
 				id: userGroup.id || '',
-				icon: userGroup.icon,
+				icon: userGroup.icon || '',
 				data: [
 					{
 						columnAlias: 'userGroupName',
 						value: {
-							name: userGroup.name,
+							name: userGroup.name || '',
 						},
 					},
 					{
 						columnAlias: 'userGroupSections',
-						value: userGroup.sections,
+						value: userGroup.sections || [],
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.contentStartNode || 'Content root',
+						value: userGroup.documentStartNodeId || 'Content root',
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNode || 'Media root',
+						value: userGroup.mediaStartNodeId || 'Media root',
 					},
 				],
 			};
@@ -106,19 +101,16 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 
 	private _handleSelected(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
-		console.log('HANDLE SELECT');
+		const table = event.target as UmbTableElement;
+		const selection = table.selection;
+		this.#collectionContext?.setSelection(selection);
 	}
 
 	private _handleDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
-		console.log('HANDLE DESELECT');
-	}
-
-	private _handleOrdering(event: UmbTableOrderedEvent) {
 		const table = event.target as UmbTableElement;
-		const orderingColumn = table.orderingColumn;
-		const orderingDesc = table.orderingDesc;
-		console.log(`fetch users, order column: ${orderingColumn}, desc: ${orderingDesc}`);
+		const selection = table.selection;
+		this.#collectionContext?.setSelection(selection);
 	}
 
 	render() {
@@ -129,8 +121,7 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 				.items=${this._tableItems}
 				.selection=${this._selection}
 				@selected="${this._handleSelected}"
-				@deselected="${this._handleDeselected}"
-				@ordered="${this._handleOrdering}"></umb-table>
+				@deselected="${this._handleDeselected}"></umb-table>
 		`;
 	}
 
@@ -151,10 +142,10 @@ export class UmbWorkspaceViewUserGroupsElement extends UmbLitElement {
 	];
 }
 
-export default UmbWorkspaceViewUserGroupsElement;
+export default UmbUserGroupCollectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-user-groups': UmbWorkspaceViewUserGroupsElement;
+		'umb-user-group-collection-view': UmbUserGroupCollectionViewElement;
 	}
 }

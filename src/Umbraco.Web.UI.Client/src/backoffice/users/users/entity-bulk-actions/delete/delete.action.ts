@@ -1,5 +1,3 @@
-import { html } from 'lit';
-
 import { UmbUserRepository } from '../../repository/user.repository';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

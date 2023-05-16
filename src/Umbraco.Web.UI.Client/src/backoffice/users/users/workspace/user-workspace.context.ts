@@ -16,8 +16,6 @@ export class UmbUserWorkspaceContext
 	data = this.#data.asObservable();
 
 	async load(id: string) {
-		console.log('load');
-
 		const { data } = await this.repository.requestById(id);
 		if (data) {
 			this.setIsNew(false);
@@ -47,8 +45,6 @@ export class UmbUserWorkspaceContext
 	async save() {
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
-
-		console.log('save', this.#data.value, this.getIsNew());
 
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);

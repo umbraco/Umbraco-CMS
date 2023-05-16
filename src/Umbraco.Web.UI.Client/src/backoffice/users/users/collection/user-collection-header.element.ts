@@ -193,11 +193,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#user-list {
-				padding: var(--uui-size-layout-1);
-				padding-top: var(--uui-size-space-2);
-			}
-
 			#input-search {
 				width: 100%;
 			}

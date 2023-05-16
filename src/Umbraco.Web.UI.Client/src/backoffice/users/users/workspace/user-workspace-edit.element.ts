@@ -8,6 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
 import { getLookAndColorFromUserStatus } from '../../utils';
 import { UmbUserRepository } from '../repository/user.repository';
+import UmbUserGroupInputElement from '../../user-groups/components/input-user-group/user-group-input.element';
 import { UmbUserWorkspaceContext } from './user-workspace.context';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -86,6 +87,10 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 		}
 	}
 
+	#onUserGroupsChange(userGroupIds: Array<string>) {
+		this.#workspaceContext?.updateProperty('userGroupIds', userGroupIds);
+	}
+
 	#onUserDelete() {
 		if (!this._user || !this._user.id) return;
 
@@ -151,11 +156,11 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 				<div slot="headline">Assign access</div>
 				<div id="assign-access">
 					<umb-workspace-property-layout label="Groups" description="Add groups to assign access and permissions">
-						<umb-input-user-group
+						<umb-user-group-input
 							slot="editor"
-							.value=${this._user.userGroupIds ?? []}
-							@change=${(e: any) =>
-								this.#workspaceContext?.updateProperty('userGroupIds', e.target.value)}></umb-input-user-group>
+							.selectedIds=${this._user.userGroupIds ?? []}
+							@change=${(e: Event) =>
+								this.#onUserGroupsChange((e.target as UmbUserGroupInputElement).selectedIds)}></umb-user-group-input>
 					</umb-workspace-property-layout>
 					<umb-workspace-property-layout
 						label="Content start node"

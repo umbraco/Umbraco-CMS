@@ -6,7 +6,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 // describe('UmbPickerLayoutUserGroupElement', () => {
 // 	let element: UmbPickerUserGroupElement;
 // 	beforeEach(async () => {
-// 		element = await fixture(html`<umb-input-user-group></umb-input-user-group>`);
+// 		element = await fixture(html`<umb-user-group-input></umb-user-group-input>`);
 // 	});
 
 // 	it('is defined with its own instance', () => {

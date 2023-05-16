@@ -6,7 +6,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		type: 'sectionView',
 		alias: 'Umb.SectionView.UserGroups',
 		name: 'User Groups Section View',
-		loader: () => import('./section-view-user-groups.element'),
+		loader: () => import('./user-groups-section-view.element'),
 		weight: 100,
 		meta: {
 			label: 'User Groups',

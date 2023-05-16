@@ -8,8 +8,7 @@ import * as serverHandlers from './handlers/server.handlers';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers';
 import { handlers as userHandlers } from './handlers/user.handlers';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers';
-import { handlers as usersHandlers } from './handlers/users.handlers';
-import { handlers as userGroupsHandlers } from './handlers/user-groups.handlers';
+import { handlers as userGroupsHandlers } from './handlers/user-group.handlers';
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers';
 import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers';
@@ -45,7 +44,6 @@ const handlers = [
 	...documentTypeHandlers,
 	...telemetryHandlers,
 	...publishedStatusHandlers,
-	...usersHandlers,
 	...userGroupsHandlers,
 	...mediaTypeHandlers,
 	...memberGroupHandlers,
