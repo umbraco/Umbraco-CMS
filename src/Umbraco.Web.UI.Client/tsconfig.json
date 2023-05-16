@@ -23,7 +23,7 @@
 			"@umbraco-cms/backoffice/context-api": ["libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["libs/controller-api"],
 			"@umbraco-cms/backoffice/css": ["libs/css/custom-properties.css"],
-			"@umbraco-cms/backoffice/element-api-api": ["libs/element-api"],
+			"@umbraco-cms/backoffice/element-api": ["libs/element-api"],
 			"@umbraco-cms/backoffice/entity-action": ["libs/entity-action"],
 			"@umbraco-cms/backoffice/events": ["libs/umb-events"],
 			"@umbraco-cms/backoffice/extension-api": ["libs/extension-api"],
