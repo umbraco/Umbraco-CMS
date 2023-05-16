@@ -1,5 +1,5 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import '../src/core/css/custom-properties.css';
+import '../src/shared/css/custom-properties.css';
 
 import 'element-internals-polyfill';
 import '@umbraco-ui/uui';
@@ -14,11 +14,11 @@ import { UmbDocumentStore } from '../src/packages/documents/documents/repository
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store.ts';
 
 import customElementManifests from '../dist/libs/custom-elements.json';
-import { UmbIconRegistry } from '../src/core/icon-registry/icon.registry';
-import { onUnhandledRequest } from '../src/core/mocks';
-import { handlers } from '../src/core/mocks/browser-handlers';
+import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
+import { onUnhandledRequest } from '../src/shared/mocks';
+import { handlers } from '../src/shared/mocks/browser-handlers';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
-import { UmbLitElement } from '../src/core/lit-element';
+import { UmbLitElement } from '../src/shared/lit-element';
 
 import { umbExtensionsRegistry } from '../libs/extension-registry';
 
