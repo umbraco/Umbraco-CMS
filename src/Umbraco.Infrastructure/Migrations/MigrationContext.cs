@@ -23,6 +23,7 @@ internal class MigrationContext : IMigrationContext
     // this is only internally exposed
     [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
     internal IReadOnlyList<Type> PostMigrations => _postMigrations;
+
     /// <inheritdoc />
     public ILogger<IMigrationContext> Logger { get; }
 

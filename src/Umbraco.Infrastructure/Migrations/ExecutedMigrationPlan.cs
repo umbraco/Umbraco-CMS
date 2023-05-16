@@ -12,7 +12,6 @@ public class ExecutedMigrationPlan
     }
 
     [SetsRequiredMembers]
-
     public ExecutedMigrationPlan(
         MigrationPlan plan,
         string initialState,
