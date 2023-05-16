@@ -48,6 +48,7 @@ export default {
 						'@umbraco-cms/backoffice/observable-api': './libs/observable-api/index.ts',
 
 						// PACKAGES
+						'@umbraco-cms/backoffice/resources': './libs/resources/index.ts',
 						'@umbraco-cms/backoffice/content-type': './libs/content-type/index.ts',
 						'@umbraco-cms/backoffice/entity-action': './libs/entity-action/index.ts',
 						'@umbraco-cms/backoffice/events': './libs/umb-events/index.ts',
