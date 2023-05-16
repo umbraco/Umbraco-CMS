@@ -12,6 +12,7 @@ public class ExecutedMigrationPlan
     }
 
     [SetsRequiredMembers]
+
     public ExecutedMigrationPlan(
         MigrationPlan plan,
         string initialState,
@@ -24,6 +25,7 @@ public class ExecutedMigrationPlan
         FinalState = finalState ?? throw new ArgumentNullException(nameof(finalState));
         Successful = successful;
         CompletedTransitions = completedTransitions;
+        ExecutedMigrationContexts = Array.Empty<IMigrationContext>();
     }
 
     public ExecutedMigrationPlan()
@@ -59,4 +61,7 @@ public class ExecutedMigrationPlan
     /// A collection of all the succeeded transition.
     /// </summary>
     public required IReadOnlyList<MigrationPlan.Transition> CompletedTransitions { get; init; }
+
+    [Obsolete("This will be removed in the V13, and replaced with UmbracoPlanExecutedNotification")]
+    internal IReadOnlyList<IMigrationContext> ExecutedMigrationContexts { get; init; } = Array.Empty<IMigrationContext>();
 }
