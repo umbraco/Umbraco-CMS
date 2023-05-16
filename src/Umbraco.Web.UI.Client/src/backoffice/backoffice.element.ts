@@ -1,28 +1,28 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import {
-	UmbBackofficeContext,
-	UMB_BACKOFFICE_CONTEXT_TOKEN,
-} from './core/components/backoffice-frame/backoffice.context';
-import { UmbExtensionInitializer } from './packages/repository/server-extension.controller';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import {
+	UmbBackofficeContext,
+	UMB_BACKOFFICE_CONTEXT_TOKEN,
+} from '../packages/core/components/backoffice-frame/backoffice.context';
+import { UmbExtensionInitializer } from '../packages/packages/repository/server-extension.controller';
 
 const CORE_PACKAGES = [
-	import('./core/umbraco-package'),
-	import('./settings/umbraco-package'),
-	import('./documents/umbraco-package'),
-	import('./media/umbraco-package'),
-	import('./members/umbraco-package'),
-	import('./translation/umbraco-package'),
-	import('./users/umbraco-package'),
-	import('./packages/umbraco-package'),
-	import('./search/umbraco-package'),
-	import('./templating/umbraco-package'),
-	import('./umbraco-news/umbraco-package'),
-	import('./tags/umbraco-package'),
+	import('../packages/core/umbraco-package'),
+	import('../packages/settings/umbraco-package'),
+	import('../packages/documents/umbraco-package'),
+	import('../packages/media/umbraco-package'),
+	import('../packages/members/umbraco-package'),
+	import('../packages/translation/umbraco-package'),
+	import('../packages/users/umbraco-package'),
+	import('../packages/packages/umbraco-package'),
+	import('../packages/search/umbraco-package'),
+	import('../packages/templating/umbraco-package'),
+	import('../packages/umbraco-news/umbraco-package'),
+	import('../packages/tags/umbraco-package'),
 ];
 
 @defineElement('umb-backoffice')

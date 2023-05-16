@@ -1,6 +1,5 @@
 const { rest } = window.MockServiceWorker;
 import { umbMediaData } from '../data/media.data';
-import type { MediaDetails } from '../../../backoffice/media/media';
 
 // TODO: add schema
 export const handlers = [
@@ -14,7 +13,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([media]));
 	}),
 
-	rest.post<MediaDetails[]>('/umbraco/management/api/v1/media/save', async (req, res, ctx) => {
+	rest.post('/umbraco/management/api/v1/media/save', async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 

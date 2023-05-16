@@ -2,12 +2,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputElement } from '@umbraco-ui/uui';
-import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element';
-import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element';
-import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/core/components';
+import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element';
+import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element';
+import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 
 @customElement('umb-template-workspace-edit')
 export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
