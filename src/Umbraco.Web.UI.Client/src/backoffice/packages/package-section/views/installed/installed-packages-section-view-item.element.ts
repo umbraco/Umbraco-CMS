@@ -5,7 +5,7 @@ import { UUIButtonState } from '@umbraco-ui/uui';
 import { map } from 'rxjs';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestPackageView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestPackageView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PackageResource } from '@umbraco-cms/backoffice/backend-api';

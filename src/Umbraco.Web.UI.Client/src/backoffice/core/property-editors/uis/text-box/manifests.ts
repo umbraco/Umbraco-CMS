@@ -1,4 +1,4 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: we don't really want this config value to be changed from the UI. We need a way to handle hidden config properties.
 const inputTypeConfig = {

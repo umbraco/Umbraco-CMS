@@ -8,7 +8,7 @@ import type { UmbPackageWithMigrationStatus } from '../../../types';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './installed-packages-section-view-item.element';
-import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-installed-packages-section-view')
 export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {

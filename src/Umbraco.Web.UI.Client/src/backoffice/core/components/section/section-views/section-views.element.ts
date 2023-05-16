@@ -11,7 +11,7 @@ import {
 	UmbDashboardExtensionElement,
 	UmbSectionViewExtensionElement,
 	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';

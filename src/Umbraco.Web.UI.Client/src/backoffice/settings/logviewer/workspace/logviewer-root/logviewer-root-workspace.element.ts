@@ -11,7 +11,7 @@ import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 

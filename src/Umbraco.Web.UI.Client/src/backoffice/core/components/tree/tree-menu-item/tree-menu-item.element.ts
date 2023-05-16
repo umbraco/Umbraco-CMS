@@ -6,7 +6,7 @@ import {
 	UmbBackofficeManifestKind,
 	UmbMenuItemExtensionElement,
 	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: Move to separate file:
 const manifest: UmbBackofficeManifestKind = {

@@ -4,7 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui';
 import type { UmbPropertyAction } from './property-action.model';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
-import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-property-action')
 export class UmbPropertyActionElement extends LitElement implements UmbPropertyAction {

@@ -13,7 +13,7 @@ import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api'
 import {
 	UmbWorkspaceEditorViewExtensionElement,
 	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extensions-registry';
+} from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement
