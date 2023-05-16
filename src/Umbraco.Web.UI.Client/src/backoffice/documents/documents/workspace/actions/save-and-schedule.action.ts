@@ -1,6 +1,6 @@
 import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActionBase<UmbDocumentWorkspaceContext> {
 	constructor(host: UmbControllerHostElement) {

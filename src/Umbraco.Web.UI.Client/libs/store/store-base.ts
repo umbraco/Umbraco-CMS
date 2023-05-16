@@ -1,6 +1,6 @@
 import { UmbStore } from './store.interface';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Make a Store interface?

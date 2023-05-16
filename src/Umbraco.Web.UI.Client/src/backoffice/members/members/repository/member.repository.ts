@@ -1,6 +1,6 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store';
 import { UmbMemberTreeServerDataSource } from './sources/member.tree.server.data';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';

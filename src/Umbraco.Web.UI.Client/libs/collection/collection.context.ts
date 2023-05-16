@@ -1,4 +1,4 @@
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import {
 	UmbArrayState,

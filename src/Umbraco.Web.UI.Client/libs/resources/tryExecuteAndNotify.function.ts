@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UmbResourceController } from './resource.controller';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 
 export function tryExecuteAndNotify<T>(

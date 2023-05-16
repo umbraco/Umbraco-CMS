@@ -1,6 +1,6 @@
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbStoreExtensionInitializer {
