@@ -1,7 +1,7 @@
 import { UmbContextToken } from '../token/context-token';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextCallback } from './context-request.event';
-import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextConsumerController<T = unknown>
 	extends UmbContextConsumer<UmbControllerHostElement, T>

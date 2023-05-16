@@ -3,7 +3,7 @@ import { umbMemberData } from '../../../core/mocks/data/member.data';
 import type { MemberDetails } from './types';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityDetailStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**

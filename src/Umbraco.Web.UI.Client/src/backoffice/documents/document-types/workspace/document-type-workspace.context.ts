@@ -6,7 +6,7 @@ import type {
 	ContentTypeSortModel,
 	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext

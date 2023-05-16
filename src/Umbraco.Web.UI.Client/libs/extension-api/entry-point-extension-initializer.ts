@@ -2,7 +2,7 @@ import type { ManifestEntryPoint } from './types';
 import { hasInitExport } from './has-init-export.function';
 import { loadExtension } from './load-extension.function';
 import { UmbExtensionRegistry } from './registry/extension.registry';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbEntryPointExtensionInitializer {
 	#host;

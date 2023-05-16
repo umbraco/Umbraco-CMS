@@ -1,4 +1,4 @@
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: implement
 export class UmbUserGroupRepository {

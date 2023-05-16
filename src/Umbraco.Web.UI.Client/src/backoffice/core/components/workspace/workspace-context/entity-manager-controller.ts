@@ -1,6 +1,6 @@
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,

@@ -2,7 +2,7 @@ import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.de
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data';
 import { UmbPartialViewsStore, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN } from './partial-views.store';
 import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
@@ -48,9 +48,7 @@ export class UmbTemplateRepository implements UmbTreeRepository<any>, UmbDetailR
 	}
 
 	requestItemsLegacy?:
-		| ((
-				uniques: string[]
-		  ) => Promise<{
+		| ((uniques: string[]) => Promise<{
 				data?: any[] | undefined;
 				error?: ProblemDetailsModel | undefined;
 				asObservable?: (() => Observable<any[]>) | undefined;

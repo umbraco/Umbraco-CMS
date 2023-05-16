@@ -1,7 +1,7 @@
 import { UmbTemplateRepository } from '../repository/partial-views.repository';
 import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export class UmbPartialViewsWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel> {

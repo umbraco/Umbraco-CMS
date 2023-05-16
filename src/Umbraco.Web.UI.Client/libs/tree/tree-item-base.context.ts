@@ -10,7 +10,7 @@ import {
 	UmbStringState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,

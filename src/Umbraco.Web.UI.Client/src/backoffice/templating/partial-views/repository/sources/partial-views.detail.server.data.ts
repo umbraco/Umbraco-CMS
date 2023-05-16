@@ -1,5 +1,5 @@
 import { PartialViewDetails } from '../../config';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 //TODO Pass proper models

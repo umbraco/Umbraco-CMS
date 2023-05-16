@@ -5,7 +5,7 @@ import {
 	UmbNotificationOptions,
 } from '@umbraco-cms/backoffice/notification';
 import { ApiError, CancelError, CancelablePromise } from '@umbraco-cms/backoffice/backend-api';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 

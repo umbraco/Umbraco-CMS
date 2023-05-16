@@ -2,7 +2,7 @@ import { UmbDataTypeRepository } from '../repository/data-type.repository';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>

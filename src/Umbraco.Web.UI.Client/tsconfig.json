@@ -21,7 +21,7 @@
 			"@umbraco-cms/backoffice/backend-api": ["libs/backend-api"],
 			"@umbraco-cms/backoffice/content-type": ["libs/content-type"],
 			"@umbraco-cms/backoffice/context-api": ["libs/context-api"],
-			"@umbraco-cms/backoffice/controller": ["libs/controller"],
+			"@umbraco-cms/backoffice/controller-api": ["libs/controller-api"],
 			"@umbraco-cms/backoffice/css": ["libs/css/custom-properties.css"],
 			"@umbraco-cms/backoffice/element": ["libs/element"],
 			"@umbraco-cms/backoffice/element.js": ["libs/element"],

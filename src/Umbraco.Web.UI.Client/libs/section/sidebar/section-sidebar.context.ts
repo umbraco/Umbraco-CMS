@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStringState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbSectionSidebarContext {

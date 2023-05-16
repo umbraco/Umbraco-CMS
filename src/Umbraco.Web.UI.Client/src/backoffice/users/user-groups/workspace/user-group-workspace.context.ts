@@ -3,7 +3,7 @@ import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN } from '../repository/user-group.sto
 import { UmbUserGroupRepository } from '../repository/user-group.repository';
 import type { UserGroupDetails } from '../types';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupDetails>

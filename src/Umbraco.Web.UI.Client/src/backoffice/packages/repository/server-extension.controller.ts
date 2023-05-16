@@ -1,6 +1,6 @@
 import { Subject, takeUntil } from 'rxjs';
 import { UmbPackageRepository } from './package.repository';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbExtensionInitializer extends UmbController {

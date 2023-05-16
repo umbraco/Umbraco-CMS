@@ -1,7 +1,7 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
 import { StylesheetDetails } from '..';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> {

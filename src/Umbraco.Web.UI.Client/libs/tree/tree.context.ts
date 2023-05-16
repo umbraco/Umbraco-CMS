@@ -2,7 +2,7 @@ import { Observable, map } from 'rxjs';
 import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';

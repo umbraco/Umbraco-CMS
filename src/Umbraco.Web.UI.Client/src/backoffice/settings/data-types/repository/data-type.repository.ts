@@ -22,7 +22,7 @@ import type {
 	UmbMoveDataSource,
 	UmbCopyDataSource,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateDataTypeRequestModel,

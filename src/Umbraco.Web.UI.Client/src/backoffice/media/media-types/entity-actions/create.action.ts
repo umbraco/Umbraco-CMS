@@ -1,6 +1,6 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbCreateMediaTypeEntityAction extends UmbEntityActionBase<UmbMediaTypeRepository> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {

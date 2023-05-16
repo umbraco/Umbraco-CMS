@@ -1,7 +1,7 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository';
 import type { MediaTypeDetails } from '../types';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MediaTypeDetails;
