@@ -1,4 +1,4 @@
-import type { ManifestEntrypoint } from './types';
+import type { ManifestEntryPoint } from './types';
 import { hasInitExport } from './has-init-export.function';
 import { loadExtension } from './load-extension.function';
 import { UmbExtensionRegistry } from './registry/extension.registry';
@@ -9,7 +9,7 @@ export class UmbEntryPointExtensionInitializer {
 	#extensionRegistry;
 	#entryPointMap = new Map();
 
-	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry) {
+	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry<ManifestEntryPoint>) {
 		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
 		extensionRegistry.extensionsOfType('entryPoint').subscribe((entryPoints) => {
@@ -21,7 +21,7 @@ export class UmbEntryPointExtensionInitializer {
 		});
 	}
 
-	async instantiateEntryPoint(manifest: ManifestEntrypoint) {
+	async instantiateEntryPoint(manifest: ManifestEntryPoint) {
 		const js = await loadExtension(manifest);
 		// If the extension has an onInit export, be sure to run that or else let the module handle itself
 		if (hasInitExport(js)) {

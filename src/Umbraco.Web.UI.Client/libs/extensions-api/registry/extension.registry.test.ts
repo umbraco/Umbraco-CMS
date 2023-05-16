@@ -1,10 +1,10 @@
 import { expect } from '@open-wc/testing';
-import type { ManifestKind } from '../types';
+import type { ManifestElementWithElementName, ManifestKind, ManifestWithMeta } from '../types';
 import { UmbExtensionRegistry } from './extension.registry';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
 
 describe('UmbExtensionRegistry', () => {
-	let extensionRegistry: UmbExtensionRegistry;
+	let extensionRegistry: UmbExtensionRegistry<ManifestWithMeta>;
 	let manifests: Array<ManifestTypes>;
 
 	beforeEach(() => {
@@ -153,11 +153,13 @@ describe('UmbExtensionRegistry', () => {
 });
 
 describe('UmbExtensionRegistry with kinds', () => {
-	let extensionRegistry: UmbExtensionRegistry;
-	let manifests: Array<ManifestTypes | ManifestKind>;
+	let extensionRegistry: UmbExtensionRegistry<any>;
+	let manifests: Array<
+		ManifestElementWithElementName | ManifestWithMeta | ManifestKind<ManifestElementWithElementName>
+	>;
 
 	beforeEach(() => {
-		extensionRegistry = new UmbExtensionRegistry();
+		extensionRegistry = new UmbExtensionRegistry<any>();
 		manifests = [
 			{
 				type: 'kind',
