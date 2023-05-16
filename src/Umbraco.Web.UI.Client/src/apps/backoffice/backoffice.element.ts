@@ -7,22 +7,22 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
-} from '../packages/core/components/backoffice-frame/backoffice.context';
-import { UmbExtensionInitializer } from '../packages/packages/repository/server-extension.controller';
+} from '../../packages/core/components/backoffice-frame/backoffice.context';
+import { UmbExtensionInitializer } from '../../packages/packages/repository/server-extension.controller';
 
 const CORE_PACKAGES = [
-	import('../packages/core/umbraco-package'),
-	import('../packages/settings/umbraco-package'),
-	import('../packages/documents/umbraco-package'),
-	import('../packages/media/umbraco-package'),
-	import('../packages/members/umbraco-package'),
-	import('../packages/translation/umbraco-package'),
-	import('../packages/users/umbraco-package'),
-	import('../packages/packages/umbraco-package'),
-	import('../packages/search/umbraco-package'),
-	import('../packages/templating/umbraco-package'),
-	import('../packages/umbraco-news/umbraco-package'),
-	import('../packages/tags/umbraco-package'),
+	import('../../packages/core/umbraco-package'),
+	import('../../packages/settings/umbraco-package'),
+	import('../../packages/documents/umbraco-package'),
+	import('../../packages/media/umbraco-package'),
+	import('../../packages/members/umbraco-package'),
+	import('../../packages/translation/umbraco-package'),
+	import('../../packages/users/umbraco-package'),
+	import('../../packages/packages/umbraco-package'),
+	import('../../packages/search/umbraco-package'),
+	import('../../packages/templating/umbraco-package'),
+	import('../../packages/umbraco-news/umbraco-package'),
+	import('../../packages/tags/umbraco-package'),
 ];
 
 @defineElement('umb-backoffice')
