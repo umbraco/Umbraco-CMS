@@ -8,7 +8,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
 import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extension-api';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {

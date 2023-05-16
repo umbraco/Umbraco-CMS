@@ -1,5 +1,5 @@
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 

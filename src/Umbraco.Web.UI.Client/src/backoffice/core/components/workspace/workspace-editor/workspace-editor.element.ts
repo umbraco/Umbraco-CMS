@@ -10,7 +10,7 @@ import {
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extensions-registry';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

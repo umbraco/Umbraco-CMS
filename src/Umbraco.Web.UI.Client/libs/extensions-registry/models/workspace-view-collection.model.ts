@@ -2,7 +2,7 @@ import type {
 	ManifestWithConditions,
 	ManifestWithView,
 	MetaManifestWithView,
-} from '@umbraco-cms/backoffice/extensions-api';
+} from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestWorkspaceViewCollection
 	extends ManifestWithView,

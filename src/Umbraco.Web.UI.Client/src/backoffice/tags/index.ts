@@ -1,6 +1,6 @@
 import { manifests as repositoryManifests } from './repository/manifests';
 import { manifests as propertyEditorManifests } from './property-editors/manifests';
-import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './components';
 

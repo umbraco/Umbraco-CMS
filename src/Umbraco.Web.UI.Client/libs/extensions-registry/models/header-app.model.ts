@@ -1,4 +1,4 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * Header apps are displayed in the top right corner of the backoffice

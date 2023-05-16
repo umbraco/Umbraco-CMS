@@ -1,5 +1,5 @@
 import { isManifestJSType, isManifestLoaderType } from './type-guards';
-import type { ManifestWithLoader } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestWithLoader } from './types';
 
 export async function loadExtension<T = unknown>(manifest: ManifestWithLoader<T>): Promise<T | null> {
 	try {

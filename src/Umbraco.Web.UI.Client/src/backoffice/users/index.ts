@@ -9,7 +9,7 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from './current-user/current-user-history.store';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './users/components';
 import './user-groups/components';

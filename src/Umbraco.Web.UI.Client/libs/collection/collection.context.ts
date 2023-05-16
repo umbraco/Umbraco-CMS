@@ -6,7 +6,7 @@ import {
 	UmbObjectState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';

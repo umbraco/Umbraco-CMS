@@ -1,4 +1,4 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * An action to perform on an entity

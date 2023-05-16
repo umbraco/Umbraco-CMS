@@ -13,7 +13,7 @@ import {
 	UMB_APP_LANGUAGE_CONTEXT_TOKEN,
 } from './languages/app-language-select/app-language.context';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './cultures/components';
 import './languages/components';

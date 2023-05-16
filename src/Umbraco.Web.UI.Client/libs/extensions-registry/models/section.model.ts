@@ -1,5 +1,5 @@
 import type { UmbSectionExtensionElement } from '../interfaces';
-import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSection extends ManifestElement<UmbSectionExtensionElement> {
 	type: 'section';

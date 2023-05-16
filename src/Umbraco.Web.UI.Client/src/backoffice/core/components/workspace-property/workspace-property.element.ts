@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

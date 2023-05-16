@@ -3,7 +3,7 @@ import { manifests as menuSectionManifests } from './menu.manifests';
 import { manifests as memberGroupManifests } from './member-groups/manifests';
 import { manifests as memberTypeManifests } from './member-types/manifests';
 import { manifests as memberManifests } from './members/manifests';
-import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 export const manifests = [
 	...memberSectionManifests,

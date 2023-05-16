@@ -9,7 +9,7 @@ import { UmbBackofficeModalContainerElement } from './components/backoffice-fram
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extensions-registry';
 
 import './notification';

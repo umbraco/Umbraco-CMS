@@ -15,7 +15,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 

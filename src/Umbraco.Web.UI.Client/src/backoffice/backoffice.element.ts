@@ -6,7 +6,7 @@ import {
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './core/components/backoffice-frame/backoffice.context';
 import { UmbExtensionInitializer } from './packages/repository/server-extension.controller';
-import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

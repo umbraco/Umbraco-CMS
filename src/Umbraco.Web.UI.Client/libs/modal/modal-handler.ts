@@ -8,7 +8,7 @@ import { BehaviorSubject } from 'rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';

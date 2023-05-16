@@ -1,5 +1,5 @@
 import type { UmbMenuItemExtensionElement } from '../interfaces/menu-item-extension-element.interface';
-import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestMenuItem extends ManifestElement<UmbMenuItemExtensionElement> {
 	type: 'menuItem';

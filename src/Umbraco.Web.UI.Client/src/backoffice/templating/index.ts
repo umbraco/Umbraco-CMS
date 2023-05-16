@@ -3,7 +3,7 @@ import { manifests as templateManifests } from './templates/manifests';
 import { manifests as stylesheetManifests } from './stylesheets/manifests';
 import { manifests as partialManifests } from './partial-views/manifests';
 import { manifests as modalManifests } from './modals/manifests';
-import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './components';
 import './templates/components';

@@ -1,4 +1,4 @@
-import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestDashboard } from '@umbraco-cms/backoffice/extensions-registry';
 
 const dashboard: ManifestDashboard = {

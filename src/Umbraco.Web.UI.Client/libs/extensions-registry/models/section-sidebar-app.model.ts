@@ -1,5 +1,5 @@
 import type { UmbSectionSidebarAppExtensionElement } from '../interfaces/section-sidebar-app-extension-element.interface';
-import type { ManifestElement } from '@umbraco-cms/backoffice/extensions-api';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSectionSidebarApp extends ManifestElement<UmbSectionSidebarAppExtensionElement> {
 	type: 'sectionSidebarApp';

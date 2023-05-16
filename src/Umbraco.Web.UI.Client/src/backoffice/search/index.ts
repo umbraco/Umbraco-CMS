@@ -1,6 +1,6 @@
 import { manifests as searchManifests } from '../search/manifests';
 
-import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 export const manifests = [...searchManifests];
 

@@ -3,7 +3,7 @@ import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/reposit
 import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';

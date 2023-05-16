@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import './collection-selection-actions.element';
 import './collection-toolbar.element';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';

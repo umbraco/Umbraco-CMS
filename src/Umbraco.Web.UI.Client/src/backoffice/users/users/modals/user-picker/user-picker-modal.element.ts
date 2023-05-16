@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbUserRepository } from '../../repository/user.repository';
 import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';

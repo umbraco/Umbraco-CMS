@@ -6,7 +6,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
