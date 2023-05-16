@@ -228,6 +228,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             FinalState = finalState,
             CompletedTransitions = completedTransitions,
             Plan = plan,
+            ExecutedMigrationContexts = executedMigrationContexts
         };
     }
 
