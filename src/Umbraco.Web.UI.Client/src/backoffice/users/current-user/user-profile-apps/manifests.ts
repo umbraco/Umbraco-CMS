@@ -1,4 +1,4 @@
-import { ManifestUserProfileApp } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestUserProfileApp } from '@umbraco-cms/backoffice/extension-registry';
 
 export const userProfileApps: Array<ManifestUserProfileApp> = [
 	{

@@ -45,7 +45,7 @@
 		"format:fix": "npm run format -- --write",
 		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output libs/backend-api/src --postfixServices Resource --useOptions",
 		"generate:api-dev": "openapi --input http://localhost:11000/umbraco/swagger/v1/swagger.json --output libs/backend-api/src --postfixServices Resource --useOptions",
-		"generate:jsonschema": "typescript-json-schema --required --include \"./libs/extensions-registry/*.ts\" --out dist/libs/umbraco-package-schema.json tsconfig.json UmbracoPackage",
+		"generate:jsonschema": "typescript-json-schema --required --include \"./libs/extension-registry/*.ts\" --out dist/libs/umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"storybook": "npm run wc-analyze && storybook dev -p 6006",
 		"storybook:build": "npm run wc-analyze && storybook build",
 		"build-storybook": "npm run wc-analyze && storybook build",

@@ -4,7 +4,7 @@ import UmbImportDictionaryEntityAction from './import/import.action';
 import UmbExportDictionaryEntityAction from './export/export.action';
 import UmbCreateDictionaryEntityAction from './create/create.action';
 import { UmbDeleteEntityAction, UmbMoveEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'dictionary-item';
 const repositoryAlias = DICTIONARY_REPOSITORY_ALIAS;

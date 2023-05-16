@@ -4,8 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UUISelectEvent } from '@umbraco-ui/uui';
 import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestTheme, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-profile-app-themes')
 export class UmbUserProfileAppThemesElement extends UmbLitElement {

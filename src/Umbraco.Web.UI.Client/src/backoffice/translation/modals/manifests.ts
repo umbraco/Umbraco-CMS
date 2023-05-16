@@ -1,4 +1,4 @@
-import { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_DICTIONARY_ITEM_PICKER_MODAL_ALIAS } from '@umbraco-cms/backoffice/modal';
 
 const modals: Array<ManifestModal> = [

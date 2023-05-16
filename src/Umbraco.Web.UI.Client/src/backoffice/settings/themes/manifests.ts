@@ -1,4 +1,4 @@
-import type { ManifestTheme } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 
 export const themes: Array<ManifestTheme> = [
 	{

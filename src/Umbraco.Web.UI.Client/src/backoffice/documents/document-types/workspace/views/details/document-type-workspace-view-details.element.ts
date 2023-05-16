@@ -5,7 +5,7 @@ import type { UUIToggleElement } from '@umbraco-ui/uui';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-details')
 export class UmbDocumentTypeWorkspaceViewDetailsElement

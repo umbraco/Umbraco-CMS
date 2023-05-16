@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import '../../../components/input-radio-button-list/input-radio-button-list.element';
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -11,9 +11,10 @@ import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/
  * @element umb-property-editor-ui-radio-button-list
  */
 @customElement('umb-property-editor-ui-radio-button-list')
-export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
+export class UmbPropertyEditorUIRadioButtonListElement
+	extends UmbLitElement
+	implements UmbPropertyEditorExtensionElement
+{
 	#value = '';
 	@property({ type: String })
 	public get value(): string {

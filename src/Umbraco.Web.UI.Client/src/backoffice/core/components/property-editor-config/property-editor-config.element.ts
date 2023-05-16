@@ -2,11 +2,11 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import type {
+import {
 	PropertyEditorConfigDefaultData,
 	PropertyEditorConfigProperty,
-} from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

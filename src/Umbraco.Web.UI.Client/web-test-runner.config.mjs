@@ -31,22 +31,27 @@ export default {
 				importMap: {
 					imports: {
 						'src/': './src/',
+
+						// LIBS
 						'@umbraco-cms/backoffice/backend-api': './libs/backend-api/index.ts',
-						'@umbraco-cms/backoffice/content-type': './libs/content-type/index.ts',
 						'@umbraco-cms/backoffice/context-api': './libs/context-api/index.ts',
-						'@umbraco-cms/backoffice/controller': './libs/controller/index.ts',
-						'@umbraco-cms/backoffice/element': './libs/element/index.ts',
+						'@umbraco-cms/backoffice/controller-api': './libs/controller-api/index.ts',
+						'@umbraco-cms/backoffice/element-api': './libs/element-api/index.ts',
+						'@umbraco-cms/backoffice/extension-api': './libs/extension-api/index.ts',
+						'@umbraco-cms/backoffice/observable-api': './libs/observable-api/index.ts',
+
+						// PACKAGES
+						'@umbraco-cms/backoffice/resources': './libs/resources/index.ts',
+						'@umbraco-cms/backoffice/content-type': './libs/content-type/index.ts',
 						'@umbraco-cms/backoffice/entity-action': './libs/entity-action/index.ts',
 						'@umbraco-cms/backoffice/events': './libs/umb-events/index.ts',
-						'@umbraco-cms/backoffice/extensions-api': './libs/extensions-api/index.ts',
-						'@umbraco-cms/backoffice/extensions-registry': './libs/extensions-registry/index.ts',
+						'@umbraco-cms/backoffice/extension-registry': './libs/extension-registry/index.ts',
 						'@umbraco-cms/backoffice/modal': './libs/modal/index.ts',
 						'@umbraco-cms/backoffice/models': './libs/models/index.ts',
 						'@umbraco-cms/backoffice/notification': './libs/notification/index.ts',
-						'@umbraco-cms/backoffice/observable-api': './libs/observable-api/index.ts',
 						'@umbraco-cms/backoffice/property-editor': './libs/property-editor/index.ts',
 						'@umbraco-cms/backoffice/repository': './libs/repository/index.ts',
-						'@umbraco-cms/backoffice/resources': './libs/resources/index.ts',
+						'@umbraco-cms/backoffice/			': './libs/resources/index.ts',
 						'@umbraco-cms/backoffice/store': './libs/store/index.ts',
 						'@umbraco-cms/backoffice/utils': './libs/utils/index.ts',
 						'@umbraco-cms/backoffice/workspace': './libs/workspace/index.ts',
@@ -56,10 +61,10 @@ export default {
 						'@umbraco-cms/backoffice/tree': './libs/tree/index.ts',
 						'@umbraco-cms/backoffice/section': './libs/section/index.ts',
 						'@umbraco-cms/backoffice/variant': './libs/variant/index.ts',
-
 						'@umbraco-cms/backoffice/core/components': './src/backoffice/core/components/index.ts',
 						'@umbraco-cms/backoffice/user-group': './src/backoffice/users/user-groups/index.ts',
 
+						// SHARED
 						'@umbraco-cms/internal/lit-element': './src/core/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/core/modal/index.ts',
 						'@umbraco-cms/internal/router': './src/core/router/index.ts',

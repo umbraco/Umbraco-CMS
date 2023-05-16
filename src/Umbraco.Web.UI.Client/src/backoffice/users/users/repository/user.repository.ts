@@ -2,7 +2,7 @@ import { UmbUserCollectionFilterModel, UmbUserDetailDataSource, UmbUserDetailRep
 import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store';
 import { UmbUserServerDataSource } from './sources/user.server.data';
 import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,

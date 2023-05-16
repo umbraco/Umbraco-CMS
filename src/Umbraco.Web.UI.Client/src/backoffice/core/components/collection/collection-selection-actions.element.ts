@@ -3,9 +3,8 @@ import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
-import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityBulkAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 
 @customElement('umb-collection-selection-actions')

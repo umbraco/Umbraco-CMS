@@ -5,7 +5,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 import '../../../../collection/dashboards/dashboard-collection.element';

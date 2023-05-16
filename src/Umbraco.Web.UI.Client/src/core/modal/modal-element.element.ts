@@ -1,7 +1,7 @@
 import { property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
-import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 export abstract class UmbModalBaseElement<
 		ModalDataType extends object = object,

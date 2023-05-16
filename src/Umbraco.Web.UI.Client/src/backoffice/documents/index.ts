@@ -4,7 +4,7 @@ import { manifests as contentMenuManifest } from './menu.manifests';
 import { manifests as documentBlueprintManifests } from './document-blueprints/manifests';
 import { manifests as documentTypeManifests } from './document-types/manifests';
 import { manifests as documentManifests } from './documents/manifests';
-import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './document-types/components';
 import './documents/components';
@@ -18,6 +18,6 @@ export const manifests = [
 	...documentManifests,
 ];
 
-export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+export const onInit: UmbEntryPointOnInit = (_host, extensionRegistry) => {
 	extensionRegistry.registerMany(manifests);
 };
