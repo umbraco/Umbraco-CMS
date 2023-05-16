@@ -1,4 +1,4 @@
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ServertimeOffset } from '@umbraco-cms/backoffice/models';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
