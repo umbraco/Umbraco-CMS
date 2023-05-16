@@ -43,7 +43,7 @@ export default {
 						'@umbraco-cms/backoffice/backend-api': './libs/backend-api/index.ts',
 						'@umbraco-cms/backoffice/context-api': './libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller-api': './libs/controller-api/index.ts',
-						'@umbraco-cms/backoffice/element': './libs/element/index.ts',
+						'@umbraco-cms/backoffice/element-api': './libs/element-api/index.ts',
 						'@umbraco-cms/backoffice/extension-api': './libs/extension-api/index.ts',
 						'@umbraco-cms/backoffice/observable-api': './libs/observable-api/index.ts',
 

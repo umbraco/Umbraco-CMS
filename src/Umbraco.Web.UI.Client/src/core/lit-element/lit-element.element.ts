@@ -1,6 +1,4 @@
 import { LitElement } from 'lit';
-import { UmbElementMixin } from '@umbraco-cms/backoffice/element';
+import { UmbElementMixin } from 'libs/element-api';
 
-export class UmbLitElement extends UmbElementMixin(LitElement) {
-
-}
+export class UmbLitElement extends UmbElementMixin(LitElement) {}
