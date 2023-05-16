@@ -1,6 +1,6 @@
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**

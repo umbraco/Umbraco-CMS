@@ -10,8 +10,7 @@ import {
 	UMB_SECTION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-menu-item-base')

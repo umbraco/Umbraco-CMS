@@ -2,7 +2,7 @@ import { UmbDocumentBlueprintStore } from './document-blueprint.detail.store';
 import { UmbDocumentBlueprintTreeStore } from './document-blueprint.tree.store';
 import { manifests as menuItemManifests } from './menu-item/manifests';
 import { manifests as workspaceManifests } from './workspace/manifests';
-import type { ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const DOCUMENT_BLUEPRINT_STORE_ALIAS = 'Umb.Store.DocumentBlueprint';
 export const DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS = 'Umb.Store.DocumentBlueprintTree';

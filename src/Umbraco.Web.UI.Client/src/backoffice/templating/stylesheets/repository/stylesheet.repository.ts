@@ -1,7 +1,7 @@
 import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from './stylesheet.tree.store';
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';

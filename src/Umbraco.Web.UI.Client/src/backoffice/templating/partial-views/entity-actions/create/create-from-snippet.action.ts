@@ -1,5 +1,5 @@
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbCreateFromSnippetPartialViewAction<T extends { copy(): Promise<void> }> extends UmbEntityActionBase<T> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {

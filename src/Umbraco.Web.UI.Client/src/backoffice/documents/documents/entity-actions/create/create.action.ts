@@ -1,6 +1,6 @@
 import type { UmbDocumentRepository } from '../../repository/document.repository';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,

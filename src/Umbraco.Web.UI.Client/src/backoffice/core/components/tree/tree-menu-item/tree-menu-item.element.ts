@@ -1,15 +1,15 @@
 import { html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import {
-	ManifestKind,
 	ManifestMenuItemTreeKind,
+	UmbBackofficeManifestKind,
 	UmbMenuItemExtensionElement,
-} from '@umbraco-cms/backoffice/extensions-registry';
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: Move to separate file:
-const manifest: ManifestKind = {
+const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.Tree',
 	matchKind: 'tree',

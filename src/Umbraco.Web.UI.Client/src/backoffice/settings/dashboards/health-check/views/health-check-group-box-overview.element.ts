@@ -7,14 +7,12 @@ import {
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context';
 import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
-import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
 import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-health-check-group-box-overview')
 export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
-	
-
 	@property({ type: Object })
 	manifest?: ManifestHealthCheck;
 
@@ -114,7 +112,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 		});
 		return tags;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

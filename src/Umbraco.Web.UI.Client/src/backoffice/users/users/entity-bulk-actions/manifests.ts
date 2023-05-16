@@ -4,7 +4,7 @@ import { UmbEnableUserEntityBulkAction } from './enable/enable.action';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action';
 import { UmbDisableUserEntityBulkAction } from './disable/disable.action';
-import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'user';
 

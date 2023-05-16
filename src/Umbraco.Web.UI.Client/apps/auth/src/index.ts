@@ -1,5 +1,4 @@
-import { ManifestTypes } from '@umbraco-cms/backoffice/extensions-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { manifests as externalLoginProviders } from './external-login-providers/manifests';
 
 import '@umbraco-ui/uui-css/dist/uui-css.css';

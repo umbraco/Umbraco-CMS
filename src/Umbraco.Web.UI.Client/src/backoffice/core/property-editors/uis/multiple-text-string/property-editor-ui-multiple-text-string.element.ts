@@ -5,7 +5,7 @@ import { UmbPropertyValueChangeEvent } from '../..';
 import UmbInputMultipleTextStringElement, {
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

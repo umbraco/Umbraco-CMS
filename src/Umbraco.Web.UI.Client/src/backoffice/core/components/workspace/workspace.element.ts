@@ -2,12 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestWorkspace } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-workspace')
 export class UmbWorkspaceElement extends UmbLitElement {
-	
-
 	@property({ type: String, attribute: 'entity-type' })
 	entityType = '';
 
@@ -17,7 +15,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 			type="workspace"
 			.filter=${(manifest: ManifestWorkspace) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 
