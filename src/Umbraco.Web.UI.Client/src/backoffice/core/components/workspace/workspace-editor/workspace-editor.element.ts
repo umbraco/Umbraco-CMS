@@ -3,14 +3,14 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-
 import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import type {
+import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
-} from '@umbraco-cms/backoffice/extensions-registry';
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

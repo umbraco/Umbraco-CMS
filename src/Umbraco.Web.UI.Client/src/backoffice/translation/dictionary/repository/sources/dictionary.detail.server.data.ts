@@ -1,5 +1,5 @@
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
 	CreateDictionaryItemRequestModel,

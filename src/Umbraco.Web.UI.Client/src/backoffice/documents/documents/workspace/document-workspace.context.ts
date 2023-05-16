@@ -10,7 +10,7 @@ import {
 	UmbObjectState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: should this context be called DocumentDraft instead of workspace? or should the draft be part of this?
 // TODO: Should we have a DocumentStructureContext and maybe even a DocumentDraftContext?

@@ -1,14 +1,13 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { UmbStoreExtensionInitializer } from '../core/store-extension-initializer';
 import {
 	UmbBackofficeContext,
 	UMB_BACKOFFICE_CONTEXT_TOKEN,
 } from './core/components/backoffice-frame/backoffice.context';
 import { UmbExtensionInitializer } from './packages/repository/server-extension.controller';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
-import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 const CORE_PACKAGES = [
@@ -32,7 +31,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 		super();
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbStoreExtensionInitializer(this);
 		new UmbExtensionInitializer(this, umbExtensionsRegistry, CORE_PACKAGES);
 	}
 

@@ -1,5 +1,5 @@
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbPropertyActionMenuContext {

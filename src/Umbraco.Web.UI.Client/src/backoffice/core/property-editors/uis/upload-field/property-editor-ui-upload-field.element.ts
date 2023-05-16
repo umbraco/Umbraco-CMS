@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbInputUploadFieldElement } from '../../../components/input-upload-field/input-upload-field.element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**

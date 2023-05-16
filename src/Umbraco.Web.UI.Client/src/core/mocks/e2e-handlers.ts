@@ -1,20 +1,20 @@
-import { handlers as dataTypeHandlers } from './domains/data-type';
-import { handlers as documentTypeHandlers } from './domains/document-type.handlers';
-import { handlers as installHandlers } from './domains/install.handlers';
-import * as manifestsHandlers from './domains/manifests.handlers';
-import { handlers as publishedStatusHandlers } from './domains/published-status.handlers';
-import * as serverHandlers from './domains/server.handlers';
-import { handlers as upgradeHandlers } from './domains/upgrade.handlers';
-import { handlers as userHandlers } from './domains/user.handlers';
-import { handlers as telemetryHandlers } from './domains/telemetry.handlers';
-import { handlers as examineManagementHandlers } from './domains/examine-management.handlers';
-import { handlers as modelsBuilderHandlers } from './domains/modelsbuilder.handlers';
-import { handlers as profileHandlers } from './domains/performance-profiling.handlers';
-import { handlers as healthCheckHandlers } from './domains/health-check.handlers';
-import { handlers as languageHandlers } from './domains/language.handlers';
-import { handlers as redirectManagementHandlers } from './domains/redirect-management.handlers';
-import { handlers as packageHandlers } from './domains/package.handlers';
-import { handlers as configHandlers } from './domains/config.handlers';
+import { handlers as dataTypeHandlers } from './handlers/data-type';
+import { handlers as documentTypeHandlers } from './handlers/document-type.handlers';
+import { handlers as installHandlers } from './handlers/install.handlers';
+import * as manifestsHandlers from './handlers/manifests.handlers';
+import { handlers as publishedStatusHandlers } from './handlers/published-status.handlers';
+import * as serverHandlers from './handlers/server.handlers';
+import { handlers as upgradeHandlers } from './handlers/upgrade.handlers';
+import { handlers as userHandlers } from './handlers/user.handlers';
+import { handlers as telemetryHandlers } from './handlers/telemetry.handlers';
+import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers';
+import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers';
+import { handlers as profileHandlers } from './handlers/performance-profiling.handlers';
+import { handlers as healthCheckHandlers } from './handlers/health-check.handlers';
+import { handlers as languageHandlers } from './handlers/language.handlers';
+import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers';
+import { handlers as packageHandlers } from './handlers/package.handlers';
+import { handlers as configHandlers } from './handlers/config.handlers';
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,

@@ -4,7 +4,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbEntityBulkAction } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-bulk-action')
 class UmbEntityBulkActionElement extends UmbLitElement {

@@ -1,4 +1,4 @@
-import { manifests as componentManifests } from './components';
+import { manifests as componentManifests, UmbStoreExtensionInitializer } from './components';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as propertyEditorManifests } from './property-editors/manifests';
 import { manifests as modalManifests } from './modals/manifests';
@@ -9,18 +9,21 @@ import { UmbBackofficeModalContainerElement } from './components/backoffice-fram
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 import './notification';
 
-export const manifests = [
+export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...componentManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...modalManifests,
 ];
 
-export const onInit: UmbEntrypointOnInit = (host, extensionRegistry) => {
+export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
+	new UmbStoreExtensionInitializer(host);
+
 	extensionRegistry.registerMany(manifests);
 
 	const notificationContainerElement = new UmbBackofficeNotificationContainerElement();

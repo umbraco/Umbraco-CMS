@@ -1,9 +1,11 @@
 import { manifests as translationSectionManifests } from './section.manifest';
 import { manifests as dictionaryManifests } from './dictionary/manifests';
-import { UmbEntrypointOnInit } from '@umbraco-cms/backoffice/extensions-api';
+import { manifests as modalManifests } from './modals/manifests';
 
-export const manifests = [...translationSectionManifests, ...dictionaryManifests];
+import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
-export const onInit: UmbEntrypointOnInit = (_host, extensionRegistry) => {
+export const manifests = [...modalManifests, ...translationSectionManifests, ...dictionaryManifests];
+
+export const onInit: UmbEntryPointOnInit = (_host, extensionRegistry) => {
 	extensionRegistry.registerMany(manifests);
 };

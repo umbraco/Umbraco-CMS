@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element';
-import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -11,8 +11,6 @@ import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/
  */
 @customElement('umb-property-editor-ui-checkbox-list')
 export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	#value: Array<string> = [];
 	@property({ type: Array })
 	public get value(): Array<string> {

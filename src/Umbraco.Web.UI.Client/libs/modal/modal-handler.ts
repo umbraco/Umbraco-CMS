@@ -8,10 +8,10 @@ import { BehaviorSubject } from 'rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import type { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
@@ -72,6 +72,9 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		this.type = config?.type || this.type;
 		this.size = config?.size || this.size;
 
+		const defaultData = modalAlias instanceof UmbModalToken ? modalAlias.getDefaultData() : undefined;
+		const combinedData = { ...defaultData, ...data } as ModalData;
+
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this._submitPromise = new Promise((resolve, reject) => {
 			this._submitResolver = resolve;
@@ -79,7 +82,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		});
 
 		this.modalElement = this.#createContainerElement();
-		this.#observeModal(modalAlias.toString(), data);
+		this.#observeModal(modalAlias.toString(), combinedData);
 	}
 
 	#createContainerElement() {
@@ -109,6 +112,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			innerElement.data = data;
 			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
+			innerElement.manifest = manifest;
 		}
 
 		return innerElement;

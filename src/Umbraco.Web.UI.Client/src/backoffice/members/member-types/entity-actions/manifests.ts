@@ -1,6 +1,6 @@
 import { MEMBER_TYPES_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'member-type';
 const repositoryAlias = MEMBER_TYPES_REPOSITORY_ALIAS;

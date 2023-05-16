@@ -2,7 +2,7 @@ import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { ManifestTreeItem } from '@umbraco-cms/backoffice/extensions-registry';
+import { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-tree-item')

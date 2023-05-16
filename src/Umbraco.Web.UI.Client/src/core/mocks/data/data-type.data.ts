@@ -483,7 +483,11 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		values: [
 			{
 				alias: 'fileExtensions',
-				value: ['jpg', 'jpeg', 'png'],
+				value: ['jpg', 'jpeg', 'png', 'pdf'],
+			},
+			{
+				alias: 'multiple',
+				value: true,
 			},
 		],
 	},

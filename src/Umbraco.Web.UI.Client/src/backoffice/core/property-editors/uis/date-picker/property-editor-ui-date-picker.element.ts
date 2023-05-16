@@ -3,7 +3,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { InputType } from '@umbraco-ui/uui';
 import { UmbPropertyValueChangeEvent } from '../..';
-import { UmbPropertyEditorExtensionElement , PropertyEditorConfigDefaultData } from '@umbraco-cms/backoffice/extensions-registry';
+import {
+	UmbPropertyEditorExtensionElement,
+	PropertyEditorConfigDefaultData,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -11,8 +14,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-date-picker')
 export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-
-
 	private _value?: Date;
 	private _valueString?: string;
 

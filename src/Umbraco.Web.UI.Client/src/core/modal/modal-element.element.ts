@@ -1,15 +1,22 @@
 import { property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
-import type { UmbModalExtensionElement } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
-export abstract class UmbModalBaseElement<UmbModalData extends object = object, UmbModalResult = unknown>
+export abstract class UmbModalBaseElement<
+		ModalDataType extends object = object,
+		ModalResultType = unknown,
+		ModalManifestType extends ManifestModal = ManifestModal
+	>
 	extends UmbLitElement
-	implements UmbModalExtensionElement<UmbModalData, UmbModalResult>
+	implements UmbModalExtensionElement<ModalDataType, ModalResultType, ModalManifestType>
 {
+	@property({ type: Array, attribute: false })
+	public manifest?: ModalManifestType;
+
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbModalData, UmbModalResult>;
+	public modalHandler?: UmbModalHandler<ModalDataType, ModalResultType>;
 
 	@property({ type: Object, attribute: false })
-	data?: UmbModalData;
+	public data?: ModalDataType;
 }
