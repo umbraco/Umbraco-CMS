@@ -6,7 +6,7 @@ const path = pathModule.default;
 const getDirName = path.dirname;
 const glob = globModule.default;
 
-const moduleDirectory = 'libs/store/icon/';
+const moduleDirectory = 'src/shared/icon-registry/';
 const iconsSVGDirectory = `${moduleDirectory}svgs/`;
 const iconsOutputDirectory = `public-assets/icons/`;
 

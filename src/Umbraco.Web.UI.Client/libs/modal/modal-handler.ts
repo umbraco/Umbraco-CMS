@@ -8,13 +8,13 @@ import type {
 } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
 import { UmbRouterSlotElement } from '@umbraco-cms/internal/router';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestModal, umbExtensionsRegistry } from '../extension-registry';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { createExtensionElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
-import type { ManifestModal } from '@umbraco-cms/backoffice/extensions-registry';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
@@ -80,6 +80,9 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		this.type = config?.type || this.type;
 		this.size = config?.size || this.size;
 
+		const defaultData = modalAlias instanceof UmbModalToken ? modalAlias.getDefaultData() : undefined;
+		const combinedData = { ...defaultData, ...data } as ModalData;
+
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this._submitPromise = new Promise((resolve, reject) => {
 			this._submitResolver = resolve;
@@ -87,6 +90,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		});
 
 		this.modalElement = this.#createContainerElement();
+
 		/**
 		 *
 		 * Maybe we could just get a Modal Router Slot. But it needs to have the ability to actually inject via slot. so the modal inner element can be within.
@@ -96,7 +100,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			this.#modalRouterElement.parent = router;
 		}
 		this.modalElement.appendChild(this.#modalRouterElement);
-		this.#observeModal(modalAlias.toString(), data);
+		this.#observeModal(modalAlias.toString(), combinedData);
 	}
 
 	public hostConnected() {
@@ -131,6 +135,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 			innerElement.data = data;
 			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
+			innerElement.manifest = manifest;
 		}
 
 		return innerElement;

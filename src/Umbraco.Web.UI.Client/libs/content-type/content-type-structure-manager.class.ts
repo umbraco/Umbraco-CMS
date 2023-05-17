@@ -6,7 +6,7 @@ import {
 	PropertyTypeResponseModelBaseModel,
 	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
 	UmbObserverController,

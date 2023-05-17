@@ -44,7 +44,7 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 
 **How to convert it:**
 
-* Run `npm run generate:api`
+- Run `npm run generate:api`
 
 ## A contribution example
 
@@ -56,9 +56,9 @@ The frontend has an API formatter that takes the OpenAPI schema file and convert
 
 Links for Lit examples and documentation:
 
-* [https://lit.dev](https://lit.dev)
-* [https://lit.dev/docs/](https://lit.dev/docs/)
-* [https://lit.dev/playground/](https://lit.dev/playground/)
+- [https://lit.dev](https://lit.dev)
+- [https://lit.dev/docs/](https://lit.dev/docs/)
+- [https://lit.dev/playground/](https://lit.dev/playground/)
 
 ### Functionality
 
@@ -128,28 +128,29 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 
 Let’s go through each of these properties…
 
-* Type: can be one of the following:
-  * section - examples include: `Content`, `Media`
-  * dashboard - a view within a section. Examples include: the welcome dashboard
-  * propertyEditorUI
-  * editorView
-  * propertyAction
-  * tree
-  * editor
-  * treeItemAction
+- Type: can be one of the following:
 
-* Alias: is the unique key used to identify this item.
-* Name: is the human-readable name for this item.
+  - section - examples include: `Content`, `Media`
+  - dashboard - a view within a section. Examples include: the welcome dashboard
+  - propertyEditorUI
+  - editorView
+  - propertyAction
+  - tree
+  - editor
+  - treeItemAction
 
-* ElementName: this is the customElementName declared on the element at the top of the file i.e
+- Alias: is the unique key used to identify this item.
+- Name: is the human-readable name for this item.
+
+- ElementName: this is the customElementName declared on the element at the top of the file i.e
 
 ```typescript
 @customElement('umb-dashboard-published-status')
 ```
 
-* Loader: references a function call to import the file that the element is declared within
+- Loader: references a function call to import the file that the element is declared within
 
-* Meta: allows us to reference additional data - in our case we can specify the section that our dashboard will sit within, the pathname that will be displayed in the url and the weight of the section
+- Meta: allows us to reference additional data - in our case we can specify the section that our dashboard will sit within, the pathname that will be displayed in the url and the weight of the section
 
 ## API mock handlers
 
@@ -162,19 +163,19 @@ From the existing functionality, we can see that this is a string message that i
 So to define this, we must first add a handler for the Published Status called `published-status.handlers.ts` within the mocks/domains folder. In this file we will have code that looks like the following:
 
 ```typescript
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/utils';
 
 export const handlers = [
- rest.get(umbracoPath('/published-cache/status'), (_req, res, ctx) => {
-  return res(
-   // Respond with a 200 status code
-   ctx.status(200),
-   ctx.json<string>(
-    'Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot.'
-   )
-  );
- }),
+	rest.get(umbracoPath('/published-cache/status'), (_req, res, ctx) => {
+		return res(
+			// Respond with a 200 status code
+			ctx.status(200),
+			ctx.json<string>(
+				'Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot.'
+			)
+		);
+	}),
 ];
 ```
 
@@ -211,7 +212,7 @@ In depth: [https://storybook.js.org/docs/web-components/get-started/introduction
 
 Reference: [https://ambitious-stone-0033b3603.1.azurestaticapps.net/](https://ambitious-stone-0033b3603.1.azurestaticapps.net/)
 
-* Locally: `npm run storybook`
+- Locally: `npm run storybook`
 
 For Umbraco UI stories, please navigate to [https://uui.umbraco.com/](https://uui.umbraco.com/)
 

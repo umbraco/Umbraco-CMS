@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { ProblemDetailsModel, RuntimeLevelModel, ServerStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { expect, test } from './test';
