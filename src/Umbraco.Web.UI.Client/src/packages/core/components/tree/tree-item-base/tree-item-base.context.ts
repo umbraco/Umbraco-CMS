@@ -1,5 +1,5 @@
 import { map } from 'rxjs';
-import { UmbTreeItemContext } from './tree-item.context.interface';
+import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from 'src/libs/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from 'src/libs/section';
 import { UmbTreeContextBase } from 'src/libs/tree';
