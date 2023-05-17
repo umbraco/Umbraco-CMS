@@ -5,6 +5,7 @@ import { UmbModalConfig, UmbModalContext } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Params } from '@umbraco-cms/backoffice/router';
+import { encodeFolderName } from '@umbraco-cms/internal/router';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -43,7 +44,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	}
 
 	public generateModalPath() {
-		return `modal/${this.alias.toString()}${this.path && this.path !== '' ? `/${this.path}` : ''}`;
+		return `modal/${encodeFolderName(this.alias.toString())}${this.path && this.path !== '' ? `/${this.path}` : ''}`;
 	}
 
 	public get path() {
