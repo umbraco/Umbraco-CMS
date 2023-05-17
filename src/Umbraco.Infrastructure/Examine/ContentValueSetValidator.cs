@@ -19,7 +19,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
 
     // used for tests
     public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null, IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
-        : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
+        : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes, null, null)
     {
     }
 
@@ -29,9 +29,9 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         bool supportProtectedContent,
         IPublicAccessService? publicAccessService,
         IScopeProvider? scopeProvider,
-        int? parentId = null,
-        IEnumerable<string>? includeItemTypes = null,
-        IEnumerable<string>? excludeItemTypes = null)
+        int? parentId,
+        IEnumerable<string>? includeItemTypes,
+        IEnumerable<string>? excludeItemTypes)
         : base(includeItemTypes, excludeItemTypes, null, null)
     {
         PublishedValuesOnly = publishedValuesOnly;
