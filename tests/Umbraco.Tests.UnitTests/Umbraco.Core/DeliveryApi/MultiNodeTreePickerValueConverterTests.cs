@@ -93,7 +93,9 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
     }
 
     [Test]
-    public void MultiNodeTreePickerValueConverter_RendersContentProperties()
+    [TestCase(Constants.UdiEntityType.Document)]
+    [TestCase("content")]
+    public void MultiNodeTreePickerValueConverter_RendersContentProperties(string entityType)
     {
         var content = new Mock<IPublishedContent>();
 
@@ -112,7 +114,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
             .Setup(pcc => pcc.GetById(key))
             .Returns(content.Object);
 
-        var publishedDataType = MultiNodePickerPublishedDataType(false, Constants.UdiEntityType.Document);
+        var publishedDataType = MultiNodePickerPublishedDataType(false, entityType);
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.DataType).Returns(publishedDataType);
 
