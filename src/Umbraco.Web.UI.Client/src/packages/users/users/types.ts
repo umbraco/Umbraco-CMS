@@ -44,6 +44,13 @@ export interface UmbUserSetGroupDataSource {
 	setGroups(userIds: string[], userGroupIds: string[]): Promise<UmbDataSourceErrorResponse>;
 }
 
+export interface UmbUserDisableDataSource {
+	disable(userIds: string[]): Promise<UmbDataSourceErrorResponse>;
+}
+export interface UmbUserEnableDataSource {
+	enable(userIds: string[]): Promise<UmbDataSourceErrorResponse>;
+}
+
 export interface UmbUserDetailRepository
 	extends UmbDetailRepository<
 		CreateUserRequestModel,

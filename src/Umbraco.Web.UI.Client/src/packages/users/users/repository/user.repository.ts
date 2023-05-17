@@ -1,3 +1,4 @@
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbUserCollectionFilterModel,
 	UmbUserDetailDataSource,
@@ -16,7 +17,6 @@ import {
 	UmbItemDataSource,
 	UmbItemRepository,
 } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateUserRequestModel,
 	InviteUserRequestModel,
