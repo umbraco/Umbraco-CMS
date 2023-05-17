@@ -1,7 +1,6 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_1_0;
 
 public class TablesIndexesImprovement : MigrationBase
 {
