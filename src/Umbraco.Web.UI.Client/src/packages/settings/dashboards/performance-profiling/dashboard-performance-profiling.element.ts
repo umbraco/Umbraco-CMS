@@ -10,13 +10,12 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 	@state()
 	private _profilingStatus?: boolean;
 
+	// TODO: Get this from the management api configuration when available
 	@state()
-	private _profilingPerformance = false;
+	private _isDebugMode = true;
 
-	constructor() {
-		super();
+	firstUpdated() {
 		this._getProfilingStatus();
-		this._profilingPerformance = localStorage.getItem('profilingPerformance') === 'true';
 	}
 
 	private async _getProfilingStatus() {
@@ -27,9 +26,15 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 		}
 	}
 
-	private _changeProfilingPerformance() {
-		this._profilingPerformance = !this._profilingPerformance;
-		localStorage.setItem('profilingPerformance', this._profilingPerformance.toString());
+	private async _changeProfilingStatus() {
+		const { error } = await tryExecuteAndNotify(
+			this,
+			ProfilingResource.putProfilingStatus({ requestBody: { enabled: !this._profilingStatus } })
+		);
+
+		if (!error) {
+			this._profilingStatus = !this._profilingStatus;
+		}
 	}
 
 	private renderProfilingStatus() {
