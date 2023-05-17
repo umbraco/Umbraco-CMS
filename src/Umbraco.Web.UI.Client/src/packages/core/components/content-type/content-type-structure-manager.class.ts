@@ -1,4 +1,4 @@
-import { UmbDetailRepository } from '../repository';
+import { UmbDetailRepository } from '../../../../libs/repository';
 import { UmbId } from 'src/libs/id';
 import {
 	DocumentTypePropertyTypeResponseModel,
