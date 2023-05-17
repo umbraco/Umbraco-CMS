@@ -3,11 +3,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { InputType } from '@umbraco-ui/uui';
 import { UmbPropertyValueChangeEvent } from '../..';
-import {
-	UmbPropertyEditorExtensionElement,
-	PropertyEditorConfigDefaultData,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-date-picker
@@ -58,11 +56,11 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 	private _offsetTime?: boolean;
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<PropertyEditorConfigDefaultData>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const oldVal = this._inputType;
 
 		// Format string prevalue/config
-		this._format = config.find((x) => x.alias === 'format')?.value;
+		this._format = config.getValueByAlias('format');
 		const pickTime = this._format?.includes('H') || this._format?.includes('m');
 		if (pickTime) {
 			this._inputType = 'datetime-local';
@@ -77,16 +75,10 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 		}
 
 		//TODO:
-		this._offsetTime = config.find((x) => x.alias === 'offsetTime')?.value;
-
-		const min = config.find((x) => x.alias === 'min');
-		if (min) this._min = min.value;
-
-		const max = config.find((x) => x.alias === 'max');
-		if (max) this._max = max.value;
-
-		const step = config.find((x) => x.alias === 'step');
-		if (step) this._step = step.value;
+		this._offsetTime = config.getValueByAlias('offsetTime');
+		this._min = config.getValueByAlias('min');
+		this._max = config.getValueByAlias('max');
+		this._step = config.getValueByAlias('step');
 
 		this.requestUpdate('_inputType', oldVal);
 	}

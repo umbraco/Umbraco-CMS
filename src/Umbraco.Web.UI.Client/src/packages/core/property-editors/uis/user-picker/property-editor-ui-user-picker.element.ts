@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-user-picker
@@ -13,7 +14,7 @@ export class UmbPropertyEditorUIUserPickerElement extends UmbLitElement implemen
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public config = new UmbDataTypePropertyCollection();
 
 	// TODO: implement config
 	render() {

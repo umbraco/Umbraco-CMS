@@ -4,6 +4,7 @@ import type { UUISelectEvent } from '@umbraco-ui/uui';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-value-type
@@ -36,7 +37,7 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 	}
 
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public config?: UmbDataTypePropertyCollection;
 
 	#onChange(e: UUISelectEvent) {
 		this.value = e.target.value as string;

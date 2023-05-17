@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
@@ -21,15 +21,10 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	private _step?: number;
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		const min = config.find((x) => x.alias === 'min');
-		if (min) this._min = min.value;
-
-		const max = config.find((x) => x.alias === 'max');
-		if (max) this._max = max.value;
-
-		const step = config.find((x) => x.alias === 'step');
-		if (step) this._step = step.value;
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._min = config.getValueByAlias('min');
+		this._max = config.getValueByAlias('max');
+		this._step = config.getValueByAlias('step');
 	}
 
 	private onInput(e: InputEvent) {
