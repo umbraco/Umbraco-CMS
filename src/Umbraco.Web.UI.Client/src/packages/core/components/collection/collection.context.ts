@@ -4,7 +4,7 @@ import { UmbArrayState, UmbNumberState, UmbObjectState, UmbObserverController } 
 import { createExtensionClass } from 'src/libs/extension-api';
 import { umbExtensionsRegistry } from 'src/libs/extension-registry';
 import { UmbCollectionRepository } from 'src/libs/repository';
-import type { UmbCollectionFilterModel } from 'src/libs/collection';
+import type { UmbCollectionFilterModel } from 'src/packages/core/components/collection';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> {
