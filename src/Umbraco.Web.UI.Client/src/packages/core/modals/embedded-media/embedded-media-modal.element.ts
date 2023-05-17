@@ -36,7 +36,13 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	data?: UmbEmbeddedMediaModalData;
 
 	#handleConfirm() {
-		this.modalHandler?.submit();
+		this.modalHandler?.submit({
+			preview: this.#embedResult.markup,
+			originalWidth: this._model.width,
+			originalHeight: this._model.originalHeight,
+			width: this.#embedResult.width,
+			height: this.#embedResult.height,
+		});
 	}
 
 	#handleCancel() {

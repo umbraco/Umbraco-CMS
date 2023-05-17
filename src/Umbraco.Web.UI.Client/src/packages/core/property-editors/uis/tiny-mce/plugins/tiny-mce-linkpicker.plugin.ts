@@ -1,4 +1,3 @@
-import { Editor } from 'tinymce';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbModalContext,
@@ -25,63 +24,6 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 			this.#modalContext = modalContext;
 		});
 
-		this.#createLinkPicker(this.editor, (currentTarget: UmbLinkPickerLink, anchorElement: HTMLAnchorElement) => {
-			this.#openLinkPicker(currentTarget, anchorElement);
-		});
-	}
-
-	#createLinkPicker(
-		editor: Editor,
-		createLinkPickerCallback: (currentTarget: UmbLinkPickerLink, anchorElement: HTMLAnchorElement) => void
-	) {
-		async function showDialog() {
-			const data: { text?: string; href?: string; target?: string; rel?: string } = {};
-			const selection = editor.selection;
-			const dom = editor.dom;
-
-			const selectedElm = selection.getNode();
-			const anchorElm = dom.getParent(selectedElm, 'a[href]') as HTMLAnchorElement;
-
-			data.text = anchorElm
-				? anchorElm.innerText || (anchorElm.textContent ?? '')
-				: selection.getContent({ format: 'text' });
-
-			data.href = anchorElm?.getAttribute('href') ?? '';
-			data.target = anchorElm?.target ?? '';
-			data.rel = anchorElm?.rel ?? '';
-
-			if (selectedElm.nodeName === 'IMG') {
-				data.text = ' ';
-			}
-
-			let currentTarget: UmbLinkPickerLink = {};
-
-			if (!anchorElm) {
-				createLinkPickerCallback(currentTarget, anchorElm);
-				return;
-			}
-
-			//if we already have a link selected, we want to pass that data over to the dialog
-			currentTarget = {
-				name: anchorElm.title,
-				url: anchorElm.getAttribute('href') ?? '',
-				target: anchorElm.target,
-			};
-
-			// drop the lead char from the anchor text, if it has a value
-			const anchorVal = anchorElm.dataset.anchor;
-			if (anchorVal) {
-				currentTarget.queryString = anchorVal.substring(1);
-			}
-
-			if (currentTarget.url?.includes('localLink:')) {
-				currentTarget.udi =
-					currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';
-			}
-
-			createLinkPickerCallback(currentTarget, anchorElm);
-		}
-
 		// const editorEventSetupCallback = (buttonApi: { setEnabled: (state: boolean) => void }) => {
 		// 	const editorEventCallback = (eventApi: { element: Element}) => {
 		// 		buttonApi.setEnabled(eventApi.element.nodeName.toLowerCase() === 'a' && eventApi.element.hasAttribute('href'));
@@ -91,17 +33,65 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 		// 	return () => editor.off('NodeChange', editorEventCallback);
 		// };
 
-		editor.ui.registry.addButton('link', {
+		args.editor.ui.registry.addButton('link', {
 			icon: 'link',
 			tooltip: 'Insert/edit link',
-			onAction: showDialog,
+			onAction: () => this.showDialog(),
 		});
 
-		editor.ui.registry.addButton('unlink', {
+		args.editor.ui.registry.addButton('unlink', {
 			icon: 'unlink',
 			tooltip: 'Remove link',
-			onAction: () => editor.execCommand('unlink'),
+			onAction: () => args.editor.execCommand('unlink'),
 		});
+	}
+
+	async showDialog() {
+		const data: { text?: string; href?: string; target?: string; rel?: string } = {};
+		const selection = this.editor.selection;
+		const dom = this.editor.dom;
+
+		const selectedElm = selection.getNode();
+		const anchorElm = dom.getParent(selectedElm, 'a[href]') as HTMLAnchorElement;
+
+		data.text = anchorElm
+			? anchorElm.innerText || (anchorElm.textContent ?? '')
+			: selection.getContent({ format: 'text' });
+
+		data.href = anchorElm?.getAttribute('href') ?? '';
+		data.target = anchorElm?.target ?? '';
+		data.rel = anchorElm?.rel ?? '';
+
+		if (selectedElm.nodeName === 'IMG') {
+			data.text = ' ';
+		}
+
+		let currentTarget: UmbLinkPickerLink = {};
+
+		if (!anchorElm) {
+			this.#openLinkPicker(currentTarget, anchorElm);
+			return;
+		}
+
+		//if we already have a link selected, we want to pass that data over to the dialog
+		currentTarget = {
+			name: anchorElm.title,
+			url: anchorElm.getAttribute('href') ?? '',
+			target: anchorElm.target,
+		};
+
+		// drop the lead char from the anchor text, if it has a value
+		const anchorVal = anchorElm.dataset.anchor;
+		if (anchorVal) {
+			currentTarget.queryString = anchorVal.substring(1);
+		}
+
+		if (currentTarget.url?.includes('localLink:')) {
+			currentTarget.udi =
+				currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';
+		}
+
+		this.#openLinkPicker(currentTarget, anchorElm);
 	}
 
 	// TODO => get anchors to provide to link picker?
