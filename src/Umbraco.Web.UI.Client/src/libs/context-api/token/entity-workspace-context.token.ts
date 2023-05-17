@@ -1,4 +1,4 @@
-import { UmbEntityWorkspaceContextInterface } from '../../workspace/context/workspace-entity-context.interface';
+import { UmbEntityWorkspaceContextInterface } from '../../../packages/core/components/workspace/workspace-context/workspace-entity-context.interface';
 import { UmbContextToken } from './context-token';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 
