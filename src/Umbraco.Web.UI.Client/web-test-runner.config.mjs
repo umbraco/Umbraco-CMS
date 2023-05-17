@@ -52,7 +52,7 @@ export default {
 						'@umbraco-cms/backoffice/notification': './libs/notification/index.ts',
 						'@umbraco-cms/backoffice/property-editor': './libs/property-editor/index.ts',
 						'@umbraco-cms/backoffice/repository': './libs/repository/index.ts',
-						'@umbraco-cms/backoffice/			': './libs/resources/index.ts',
+						'@umbraco-cms/backoffice/resources': './libs/resources/index.ts',
 						'@umbraco-cms/backoffice/store': './libs/store/index.ts',
 						'@umbraco-cms/backoffice/utils': './libs/utils/index.ts',
 						'@umbraco-cms/backoffice/workspace': './libs/workspace/index.ts',

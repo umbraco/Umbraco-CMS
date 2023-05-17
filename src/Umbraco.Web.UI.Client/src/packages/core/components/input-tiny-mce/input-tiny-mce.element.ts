@@ -56,12 +56,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		},
 	];
 
-	// these languages are available for localization
-	#availableLanguages = availableLanguages;
-
-	//define fallback language
-	#defaultLanguage = 'en_US';
-
 	//These are absolutely required in order for the macros to render inline
 	//we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
 	#extendedValidElements =
@@ -166,7 +160,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.shadowRoot?.appendChild(target);
 
 		// set the default values that will not be modified via configuration
-		const tinyConfig: { [key: string]: any } = {
+		const tinyConfig: Record<string, any> = {
 			autoresize_bottom_margin: 10,
 			base_url: '/tinymce',
 			body_class: 'umb-rte',
@@ -174,7 +168,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster,
 			contextMenu: false,
 			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
-			language: this.#getLanguage(),
 			menubar: false,
 			paste_remove_styles_if_webkit: true,
 			paste_preprocess: (_: Editor, args: { content: string }) => this.#cleanupPasteData(args),
@@ -185,17 +178,14 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			setup: (editor: Editor) => this.#editorSetup(editor),
 		};
 
-		const plugins: Array<string> = this._configObject.plugins.map((x: any) => x.name);
-		const toolbar = this._configObject.toolbar.join(' ');
-
 		// extend with configuration values
 		Object.assign(tinyConfig, {
 			content_css: this._configObject.stylesheets.join(','),
 			extended_valid_elements: this.#extendedValidElements,
 			height: this._configObject.height ?? 500,
 			invalid_elements: this._configObject.invalidElements,
-			plugins,
-			toolbar,
+			plugins: this._configObject.plugins.map((x: any) => x.name),
+			toolbar: this._configObject.toolbar.join(' '),
 			style_formats: this._styleFormats,
 			valid_elements: this._configObject.validElements,
 			width: this._configObject.width,
@@ -213,6 +203,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				paste_data_images: true,
 			});
 		}
+
+		this.#setLanguage(tinyConfig);
 
 		tinymce.init(tinyConfig);
 	}
@@ -285,21 +277,24 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	/**
-	 * Returns the language to use for TinyMCE */
-	#getLanguage() {
+	 * Sets the language to use for TinyMCE */
+	#setLanguage(tinyConfig: Record<string, any>) {
 		const localeId = this.#currentUser?.language;
 		//try matching the language using full locale format
-		let languageMatch = this.#availableLanguages.find((x) => x.toLowerCase() === localeId);
+		let languageMatch = availableLanguages.find((x) => x.toLowerCase() === localeId);
 
 		//if no matches, try matching using only the language
 		if (!languageMatch) {
 			const localeParts = localeId?.split('_');
 			if (localeParts) {
-				languageMatch = this.#availableLanguages.find((x) => x === localeParts[0]);
+				languageMatch = availableLanguages.find((x) => x === localeParts[0]);
 			}
 		}
 
-		return languageMatch ?? this.#defaultLanguage;
+		// only set if language exists, will fall back to tiny default
+		if (languageMatch) {
+			tinyConfig.language = languageMatch;
+		}
 	}
 
 	#editorSetup(editor: Editor) {
@@ -310,6 +305,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 		// instantiate plugins - these are already loaded in this.#loadPlugins
 		// to ensure they are available before setting up the editor.
+		// Plugins require a reference to the current editor as a param, so can not
+		// be instantiated until we have an editor
 		for (const plugin of this.#plugins) {
 			new plugin({ host: this, editor, configuration: this.configuration });
 		}
@@ -318,6 +315,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		editor.addShortcut('Ctrl+S', '', () =>
 			this.dispatchEvent(new CustomEvent('rte.shortcut.save', { composed: true, bubbles: true }))
 		);
+		
 		editor.addShortcut('Ctrl+P', '', () =>
 			this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish', { composed: true, bubbles: true }))
 		);

@@ -24,22 +24,34 @@ const path = pathModule.default;
 const cleanCss = cleanCssModule.default;
 
 const getDirName = path.dirname;
-
-const sourceDir = 'node_modules/tinymce';
 const destDir = 'public/tinymce';
 
-const globs = [
-	'/license.txt',
-	'/icons/default/icons.min.js',
-	'/models/dom/model.min.js',
-	'/plugins/**/plugin.js',
-	'/skins/ui/**/content.css',
-	'/skins/ui/**/content.inline.css',
-	'/skins/ui/**/skin.css',
-	'/skins/ui/**/skin.shadowdom.css',
-	'/skins/content/**/content.css',
-	'/themes/silver/theme.min.js',
-];
+const tinyAssets = {
+	source: 'node_modules/tinymce',
+	globs: [
+		'/license.txt',
+		'/icons/default/icons.min.js',
+		'/models/dom/model.min.js',
+		'/plugins/**/plugin.js',
+		'/skins/ui/**/content.css',
+		'/skins/ui/**/content.inline.css',
+		'/skins/ui/**/skin.css',
+		'/skins/ui/**/skin.shadowdom.css',
+		'/skins/content/**/content.css',
+		'/themes/silver/theme.min.js',
+	],
+}
+
+const i18nAssets = {
+	source: 'node_modules/tinymce-i18n',
+	globs: [
+		'/license',
+		'/langs6/**/*.js',
+	],
+	pathMaps: [
+		{from: 'langs6', to: 'langs'},
+	],
+}
 
 const min = (path) => {
 	const parts = path.split('.');
@@ -47,16 +59,19 @@ const min = (path) => {
 	return parts.join('.');
 };
 
-const copyTinyMceAssets = async (globPath) => {
+const copyTinyMceAssets = async (sourceDir, globPath, pathMaps = [], minify = true) => {
 	const filesToCopy = await glob(`${sourceDir}${globPath}`);
-
 	for (let file of filesToCopy) {
 		file = file.replace(/\\/g, '/');
-		const to = file.replace(sourceDir, destDir);
+
+		let to = file.replace(sourceDir, destDir);
+		pathMaps.forEach(map => {
+			to = to.replace(map.from, map.to);
+		});
 
 		await fs.mkdir(getDirName(to), { recursive: true });
 
-		if (file.includes('.min.') || file.includes('.txt')) {
+		if (!minify || file.includes('.min.') || file.includes('.txt')) {
 			await fs.copyFile(file, to);
 		} else {
             const content = await fs.readFile(file, 'utf8');
@@ -74,8 +89,12 @@ const copyTinyMceAssets = async (globPath) => {
 const run = async () => {
 	await fs.rm(destDir, { recursive: true, force: true });
 
-	for (const glob of globs) {
-		await copyTinyMceAssets(glob);
+	for (const glob of tinyAssets.globs) {
+		await copyTinyMceAssets(tinyAssets.source, glob);
+	}
+
+	for (const glob of i18nAssets.globs) {
+		await copyTinyMceAssets(i18nAssets.source, glob, i18nAssets.pathMaps, false);
 	}
 };
 
