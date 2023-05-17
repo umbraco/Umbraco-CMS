@@ -1,6 +1,6 @@
-import type { ManifestSection } from 'src/libs/extension-registry';
-import { UmbStringState } from 'src/libs/observable-api';
-import { UmbContextToken } from 'src/libs/context-api';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbSectionContext {
 	#manifestAlias = new UmbStringState<string | undefined>(undefined);

@@ -1,7 +1,7 @@
-import { FileSystemTreeItemPresentationModel } from 'src/libs/backend-api';
-import { UmbArrayState } from 'src/libs/observable-api';
-import { UmbStoreBase, UmbTreeStore } from 'src/libs/store';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
+import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStoreBase, UmbTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export

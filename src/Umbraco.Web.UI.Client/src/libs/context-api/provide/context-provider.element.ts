@@ -1,5 +1,5 @@
-import { UmbControllerHostElement, UmbControllerHostMixin } from 'src/libs/controller-api';
-import { UmbContextProviderController, UmbContextToken } from 'src/libs/context-api';
+import { UmbControllerHostElement, UmbControllerHostMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * Provides a value to the context down the DOM tree.

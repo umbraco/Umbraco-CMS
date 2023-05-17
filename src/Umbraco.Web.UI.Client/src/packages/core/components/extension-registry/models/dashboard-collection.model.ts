@@ -1,4 +1,4 @@
-import type { ManifestBase } from 'src/libs/extension-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestDashboardCollection extends ManifestBase {
 	type: 'dashboardCollection';

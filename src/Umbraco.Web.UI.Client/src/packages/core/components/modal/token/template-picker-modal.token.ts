@@ -1,5 +1,5 @@
-import { EntityTreeItemResponseModel } from 'src/libs/backend-api';
-import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from 'src/libs/modal';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
 export type UmbTemplatePickerModalData = UmbTreePickerModalData<EntityTreeItemResponseModel>;
 export type UmbTemplatePickerModalResult = UmbPickerModalResult;

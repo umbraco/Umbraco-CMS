@@ -3,12 +3,12 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { state } from 'lit/decorators.js';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from 'src/libs/section';
-import type { UmbRoute } from 'src/libs/router';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import type { ManifestSection, UmbSectionExtensionElement } from 'src/libs/extension-registry';
+import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { createExtensionElementOrFallback } from 'src/libs/extension-api';
+import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extension-api';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {

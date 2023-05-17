@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { UmbModalToken } from 'src/libs/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 // TODO: add interface for data
 // PropertyTypeViewModelBaseModel

@@ -1,5 +1,5 @@
-import { UmbModalToken, UmbPickerModalData } from 'src/libs/modal';
-import { UserResponseModel } from 'src/libs/backend-api';
+import { UmbModalToken, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
+import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UmbUserPickerModalData = UmbPickerModalData<UserResponseModel>;
 

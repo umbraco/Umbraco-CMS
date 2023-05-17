@@ -1,4 +1,4 @@
-import { UmbDataTypePropertyCollection } from 'src/libs/data-type';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 export interface UmbPropertyEditorExtensionElement extends HTMLElement {
 	value: unknown;

@@ -2,7 +2,7 @@ import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
-import { ProblemDetailsModel } from 'src/libs/backend-api';
+import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-error')

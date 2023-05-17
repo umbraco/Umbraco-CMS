@@ -1,10 +1,15 @@
-import type { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbContextToken } from 'src/libs/context-api';
-import { UmbArrayState, UmbNumberState, UmbObjectState, UmbObserverController } from 'src/libs/observable-api';
-import { createExtensionClass } from 'src/libs/extension-api';
-import { umbExtensionsRegistry } from 'src/packages/core/components/extension-registry';
-import { UmbCollectionRepository } from 'src/libs/repository';
-import type { UmbCollectionFilterModel } from 'src/packages/core/components/collection';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import {
+	UmbArrayState,
+	UmbNumberState,
+	UmbObjectState,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> {

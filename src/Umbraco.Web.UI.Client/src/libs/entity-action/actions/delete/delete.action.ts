@@ -1,8 +1,8 @@
-import { UmbEntityActionBase } from 'src/libs/entity-action';
-import { UmbContextConsumerController } from 'src/libs/context-api';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from 'src/libs/modal';
-import { UmbDetailRepository, UmbItemRepository } from 'src/libs/repository';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDeleteEntityAction<
 	T extends UmbDetailRepository & UmbItemRepository<any>

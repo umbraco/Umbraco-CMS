@@ -1,6 +1,6 @@
 import type { UmbExtensionRegistry } from './registry/extension.registry';
 import { ManifestBase } from './types';
-import type { UmbControllerHostElement } from 'src/libs/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbEntryPointOnInit = (
 	host: UmbControllerHostElement,

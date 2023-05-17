@@ -1,8 +1,8 @@
 import { UmbModalHandler } from './modal-handler';
 import { UmbModalConfig, UmbModalContext } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
-import { UmbId } from 'src/libs/id';
-import type { Params } from 'src/libs/router';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { Params } from '@umbraco-cms/backoffice/router';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) => string;
 

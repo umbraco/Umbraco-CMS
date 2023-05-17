@@ -1,8 +1,8 @@
-import { UmbEntityActionBase } from 'src/libs/entity-action';
-import { UmbContextConsumerController } from 'src/libs/context-api';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbModalContext, UMB_FOLDER_MODAL, UMB_MODAL_CONTEXT_TOKEN } from 'src/libs/modal';
-import { UmbFolderRepository } from 'src/libs/repository';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbModalContext, UMB_FOLDER_MODAL, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbFolderUpdateEntityAction<
 	T extends UmbFolderRepository = UmbFolderRepository

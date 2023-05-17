@@ -1,6 +1,6 @@
-import { UmbContextToken } from 'src/libs/context-api';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbStringState, UmbBooleanState } from 'src/libs/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbStringState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbSectionSidebarContext {
 	#host: UmbControllerHostElement;

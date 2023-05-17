@@ -1,6 +1,6 @@
 import { UmbWorkspaceContextInterface } from '../context';
-import type { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from 'src/libs/context-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbWorkspaceAction<WorkspaceType = unknown> {
 	host: UmbControllerHostElement;

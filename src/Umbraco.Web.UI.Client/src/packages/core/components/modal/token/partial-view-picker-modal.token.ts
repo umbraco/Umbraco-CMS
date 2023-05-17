@@ -1,4 +1,4 @@
-import { UmbModalToken } from 'src/libs/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbPartialViewPickerModalData {
 	multiple: boolean;

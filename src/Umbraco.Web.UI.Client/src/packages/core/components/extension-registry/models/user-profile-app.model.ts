@@ -1,4 +1,4 @@
-import type { ManifestElement } from 'src/libs/extension-api';
+import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestUserProfileApp extends ManifestElement {
 	type: 'userProfileApp';

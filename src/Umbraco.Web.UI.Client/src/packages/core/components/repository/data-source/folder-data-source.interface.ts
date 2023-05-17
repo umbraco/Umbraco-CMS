@@ -1,5 +1,9 @@
 import { DataSourceResponse } from './data-source-response.interface';
-import { CreateFolderRequestModel, FolderReponseModel, UpdateFolderReponseModel } from 'src/libs/backend-api';
+import {
+	CreateFolderRequestModel,
+	FolderReponseModel,
+	UpdateFolderReponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbFolderDataSource {
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderReponseModel>>;

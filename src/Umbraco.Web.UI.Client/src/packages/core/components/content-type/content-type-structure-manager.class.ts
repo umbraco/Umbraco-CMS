@@ -1,12 +1,12 @@
 import { UmbDetailRepository } from '../../../../libs/repository';
-import { UmbId } from 'src/libs/id';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeContainerResponseModelBaseModel,
 	PropertyTypeResponseModelBaseModel,
 	DocumentTypeResponseModel,
-} from 'src/libs/backend-api';
-import { UmbControllerHostElement, UmbControllerInterface } from 'src/libs/controller-api';
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
 	UmbObserverController,
@@ -14,7 +14,7 @@ import {
 	partialUpdateFrozenArray,
 	appendToFrozenArray,
 	filterFrozenArray,
-} from 'src/libs/observable-api';
+} from '@umbraco-cms/backoffice/observable-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
 

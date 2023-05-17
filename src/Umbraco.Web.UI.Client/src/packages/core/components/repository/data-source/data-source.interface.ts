@@ -1,4 +1,4 @@
-import type { DataSourceResponse } from 'src/libs/repository';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbDataSource<CreateRequestType, CreateResponseType, UpdateRequestType, ResponseType> {
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<CreateRequestType>>;

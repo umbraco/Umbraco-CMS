@@ -12,12 +12,12 @@ import { UmbIconRegistry } from '../../shared/icon-registry/icon.registry';
 import type { UmbAppErrorElement } from './app-error.element';
 import { UmbAuthFlow } from './auth';
 import { UMB_APP, UmbAppContext } from './app.context';
-import type { Guard, UmbRoute } from 'src/libs/router';
-import { pathWithoutBasePath } from 'src/libs/router';
+import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
+import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { tryExecute } from 'src/libs/resources';
-import { OpenAPI, RuntimeLevelModel, ServerResource } from 'src/libs/backend-api';
-import { contextData, umbDebugContextEventType } from 'src/libs/context-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
+import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {

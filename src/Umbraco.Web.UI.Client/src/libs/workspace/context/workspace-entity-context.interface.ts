@@ -1,4 +1,4 @@
-import type { UmbWorkspaceContextInterface } from 'src/libs/workspace';
+import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbEntityWorkspaceContextInterface<EntityType = unknown>
 	extends UmbWorkspaceContextInterface<EntityType> {

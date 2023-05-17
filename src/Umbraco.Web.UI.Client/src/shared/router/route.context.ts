@@ -2,9 +2,13 @@
 import type { IRoutingInfo } from 'router-slot/model';
 import type { UmbRoute } from './route.interface';
 import { generateRoutePathBuilder } from './generate-route-path-builder.function';
-import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from 'src/libs/context-api';
-import type { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from 'src/libs/modal';
+import {
+	UmbContextConsumerController,
+	UmbContextProviderController,
+	UmbContextToken,
+} from '@umbraco-cms/backoffice/context-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
 

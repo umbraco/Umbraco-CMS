@@ -1,4 +1,4 @@
-import { UmbModalToken } from 'src/libs/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbAllowedDocumentTypesModalData {
 	id: string | null;

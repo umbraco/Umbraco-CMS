@@ -1,6 +1,6 @@
-import { UmbVariantId } from 'src/libs/variant';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbArrayState } from 'src/libs/observable-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export type ActiveVariant = {
 	index: number;

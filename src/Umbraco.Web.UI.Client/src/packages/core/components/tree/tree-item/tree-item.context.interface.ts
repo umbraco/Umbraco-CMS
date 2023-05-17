@@ -1,7 +1,7 @@
 import type { Observable } from 'rxjs';
-import type { UmbControllerHostElement } from 'src/libs/controller-api';
-import type { ProblemDetailsModel, TreeItemPresentationModel } from 'src/libs/backend-api';
-import { UmbPagedData } from 'src/libs/repository';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationModel> {
 	host: UmbControllerHostElement;

@@ -1,7 +1,7 @@
 import { css, html, nothing, unsafeCSS } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ProblemDetailsModel } from 'src/libs/backend-api';
+import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 import logoImg from '/umbraco_logomark_white.svg';
 import backgroundImg from '/umbraco_background.jpg';

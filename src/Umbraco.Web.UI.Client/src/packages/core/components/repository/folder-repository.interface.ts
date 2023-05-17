@@ -4,7 +4,7 @@ import type {
 	FolderReponseModel,
 	ProblemDetailsModel,
 	UpdateFolderReponseModel,
-} from 'src/libs/backend-api';
+} from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbFolderRepository {
 	createFolderScaffold(parentId: string | null): Promise<{

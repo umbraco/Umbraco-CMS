@@ -1,4 +1,4 @@
-import { DataTypePropertyPresentationModel } from 'src/libs/backend-api';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * Extends Array to add utility functions for accessing data type properties

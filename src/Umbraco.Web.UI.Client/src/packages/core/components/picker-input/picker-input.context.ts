@@ -1,17 +1,17 @@
-import { UmbItemRepository } from 'src/libs/repository';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbArrayState, UmbObserverController } from 'src/libs/observable-api';
-import { createExtensionClass } from 'src/libs/extension-api';
-import { umbExtensionsRegistry } from 'src/libs/extension-registry';
+import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_CONTEXT_TOKEN,
 	UmbModalContext,
 	UmbModalToken,
 	UmbPickerModalData,
-} from 'src/libs/modal';
-import { UmbContextConsumerController } from 'src/libs/context-api';
-import { ItemResponseModelBaseModel } from 'src/libs/backend-api';
+} from '@umbraco-cms/backoffice/modal';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 
 export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> {

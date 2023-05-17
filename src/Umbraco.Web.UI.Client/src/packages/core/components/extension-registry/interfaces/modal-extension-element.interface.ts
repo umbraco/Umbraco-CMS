@@ -1,5 +1,5 @@
 import type { ManifestModal } from '../models';
-import type { UmbModalHandler } from 'src/libs/modal';
+import type { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbModalExtensionElement<
 	UmbModalData extends object = object,

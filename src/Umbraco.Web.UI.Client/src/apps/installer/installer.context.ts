@@ -5,10 +5,10 @@ import {
 	InstallSettingsResponseModel,
 	ProblemDetailsModel,
 	TelemetryLevelModel,
-} from 'src/libs/backend-api';
-import { tryExecute } from 'src/libs/resources';
-import { UmbContextToken } from 'src/libs/context-api';
-import { UmbObjectState, UmbNumberState } from 'src/libs/observable-api';
+} from '@umbraco-cms/backoffice/backend-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Context API for the installer

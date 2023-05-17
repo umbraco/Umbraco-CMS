@@ -25,7 +25,7 @@ import type { ManifestWorkspace } from './workspace.model';
 import type { ManifestWorkspaceAction } from './workspace-action.model';
 import type { ManifestWorkspaceEditorView } from './workspace-editor-view.model';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model';
-import type { ManifestBase, ManifestEntryPoint } from 'src/libs/extension-api';
+import type { ManifestBase, ManifestEntryPoint } from '@umbraco-cms/backoffice/extension-api';
 
 export * from './collection-view.model';
 export * from './dashboard-collection.model';

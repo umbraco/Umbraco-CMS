@@ -1,7 +1,7 @@
 import { PropertyContainerTypes, UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class';
-import { PropertyTypeContainerResponseModelBaseModel } from 'src/libs/backend-api';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbArrayState, UmbBooleanState, UmbObserverController } from 'src/libs/observable-api';
+import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbContentTypeContainerStructureHelper {
 	#host: UmbControllerHostElement;

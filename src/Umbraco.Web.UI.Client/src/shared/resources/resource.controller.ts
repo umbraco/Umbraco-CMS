@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationOptions } from 'src/libs/notification';
-import { ApiError, CancelError, CancelablePromise } from 'src/libs/backend-api';
-import { UmbController, UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbContextConsumerController } from 'src/libs/context-api';
-import type { DataSourceResponse } from 'src/libs/repository';
+import {
+	UmbNotificationContext,
+	UMB_NOTIFICATION_CONTEXT_TOKEN,
+	UmbNotificationOptions,
+} from '@umbraco-cms/backoffice/notification';
+import { ApiError, CancelError, CancelablePromise } from '@umbraco-cms/backoffice/backend-api';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbResourceController extends UmbController {
 	#promise: Promise<any>;

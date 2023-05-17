@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import type { ProblemDetailsModel } from 'src/libs/backend-api';
+import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbRepositoryErrorResponse {
 	error?: ProblemDetailsModel;

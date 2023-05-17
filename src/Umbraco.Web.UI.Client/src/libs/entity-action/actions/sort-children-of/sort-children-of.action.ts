@@ -1,5 +1,5 @@
-import { UmbEntityActionBase } from 'src/libs/entity-action';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSortChildrenOfEntityAction<
 	T extends { sortChildrenOf(): Promise<void> }

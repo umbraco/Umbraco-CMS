@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UpgradeSettingsResponseModel } from 'src/libs/backend-api';
+import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-upgrader-view

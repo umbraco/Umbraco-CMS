@@ -1,4 +1,4 @@
-import type { ApiError, CancelError } from 'src/libs/backend-api';
+import type { ApiError, CancelError } from '@umbraco-cms/backoffice/backend-api';
 
 export interface DataSourceResponse<T = undefined> extends UmbDataSourceErrorResponse {
 	data?: T;

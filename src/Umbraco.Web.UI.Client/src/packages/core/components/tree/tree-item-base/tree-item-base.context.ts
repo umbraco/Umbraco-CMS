@@ -1,13 +1,22 @@
 import { map } from 'rxjs';
 import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface';
-import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from 'src/libs/section';
-import type { UmbSectionContext, UmbSectionSidebarContext } from 'src/libs/section';
-import { UmbTreeContextBase } from 'src/libs/tree';
-import { ManifestEntityAction, umbExtensionsRegistry } from 'src/libs/extension-registry';
-import { UmbBooleanState, UmbDeepState, UmbStringState, UmbObserverController } from 'src/libs/observable-api';
-import { UmbControllerHostElement } from 'src/libs/controller-api';
-import { UmbContextConsumerController, UmbContextProviderController, UmbContextToken } from 'src/libs/context-api';
-import type { TreeItemPresentationModel } from 'src/libs/backend-api';
+import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
+import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
+import { UmbTreeContextBase } from '@umbraco-cms/backoffice/tree';
+import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UmbBooleanState,
+	UmbDeepState,
+	UmbStringState,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import {
+	UmbContextConsumerController,
+	UmbContextProviderController,
+	UmbContextToken,
+} from '@umbraco-cms/backoffice/context-api';
+import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 // add type for unique function
 export type UmbTreeItemUniqueFunction<TreeItemType extends TreeItemPresentationModel> = (

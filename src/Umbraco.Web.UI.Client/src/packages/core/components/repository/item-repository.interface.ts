@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import { ItemResponseModelBaseModel, ProblemDetailsModel } from 'src/libs/backend-api';
+import { ItemResponseModelBaseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbItemRepository<ItemType extends ItemResponseModelBaseModel> {
 	requestItems: (uniques: string[]) => Promise<{
