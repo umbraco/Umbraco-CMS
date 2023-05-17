@@ -1,6 +1,6 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository';
 import { UMB_DATA_TYPE_CREATE_OPTIONS_MODAL } from './modal';
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/components';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';

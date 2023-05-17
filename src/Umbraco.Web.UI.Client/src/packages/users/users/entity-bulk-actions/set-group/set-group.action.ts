@@ -1,5 +1,5 @@
 import { UmbUserRepository } from '../../repository/user.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/components';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';

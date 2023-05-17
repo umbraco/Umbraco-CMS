@@ -1,7 +1,7 @@
 import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS } from '../config';
 import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action';
 import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action';
-import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/components';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 //TODO: this is temporary until we have a proper way of registering actions for folder types in a specific tree

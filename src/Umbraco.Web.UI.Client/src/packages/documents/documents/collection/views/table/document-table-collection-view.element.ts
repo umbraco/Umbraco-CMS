@@ -10,7 +10,7 @@ import {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '@umbraco-cms/backoffice/core/components';
+} from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

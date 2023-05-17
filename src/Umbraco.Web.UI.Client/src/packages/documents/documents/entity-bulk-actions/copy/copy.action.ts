@@ -1,5 +1,5 @@
 import { UmbDocumentRepository } from '../../repository/document.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/components';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentCopyEntityBulkAction extends UmbEntityBulkActionBase<UmbDocumentRepository> {

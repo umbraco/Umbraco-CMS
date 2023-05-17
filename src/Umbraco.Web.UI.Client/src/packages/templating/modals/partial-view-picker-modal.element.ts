@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbPartialViewPickerModalData, UmbPartialViewPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
-import { UmbTreeElement } from '@umbraco-cms/backoffice/core/components';
+import { UmbTreeElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-partial-view-picker-modal')
 export default class UmbPartialViewPickerModalElement extends UmbModalBaseElement<

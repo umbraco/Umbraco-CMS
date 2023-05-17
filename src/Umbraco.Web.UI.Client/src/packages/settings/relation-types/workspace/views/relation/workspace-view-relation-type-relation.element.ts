@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbTableColumn, UmbTableConfig } from '@umbraco-cms/backoffice/core/components';
+import { UmbTableColumn, UmbTableConfig } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

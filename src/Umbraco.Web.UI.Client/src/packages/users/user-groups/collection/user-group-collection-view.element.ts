@@ -15,7 +15,7 @@ import {
 	UmbTableElement,
 	UmbTableItem,
 	UmbTableSelectedEvent,
-} from '@umbraco-cms/backoffice/core/components';
+} from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-user-group-collection-view')
 export class UmbUserGroupCollectionViewElement extends UmbLitElement {

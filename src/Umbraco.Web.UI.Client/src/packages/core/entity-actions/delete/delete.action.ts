@@ -1,4 +1,4 @@
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/components';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';

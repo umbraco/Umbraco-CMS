@@ -8,7 +8,7 @@ import {
 	UmbDeleteEntityAction,
 	UmbDeleteFolderEntityAction,
 	UmbFolderUpdateEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
+} from '@umbraco-cms/backoffice/components';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [

@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/components';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';

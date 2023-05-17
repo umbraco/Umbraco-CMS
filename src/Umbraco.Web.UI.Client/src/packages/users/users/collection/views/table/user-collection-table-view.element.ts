@@ -14,7 +14,7 @@ import {
 	UmbTableSelectedEvent,
 	UmbTableConfig,
 	UmbTableOrderedEvent,
-} from '@umbraco-cms/backoffice/core/components';
+} from '@umbraco-cms/backoffice/components';
 import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

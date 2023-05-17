@@ -1,7 +1,7 @@
 import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests';
 import { UmbCreateEntityAction } from './create/create.action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/components';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{

@@ -7,7 +7,7 @@ import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-s
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/core/components';
+import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-template-workspace-edit')
 export class UmbTemplateWorkspaceEditElement extends UmbLitElement {

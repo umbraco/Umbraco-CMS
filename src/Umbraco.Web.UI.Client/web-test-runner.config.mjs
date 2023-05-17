@@ -63,7 +63,7 @@ export default {
 						'@umbraco-cms/backoffice/section': './libs/section/index.ts',
 						'@umbraco-cms/backoffice/variant': './libs/variant/index.ts',
 
-						'@umbraco-cms/backoffice/core/components': './src/packages/core/components/index.ts',
+						'@umbraco-cms/backoffice/components': './src/packages/core/components/index.ts',
 						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
 
 						// SHARED

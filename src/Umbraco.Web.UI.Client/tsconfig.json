@@ -50,7 +50,9 @@
 			"@umbraco-cms/backoffice/section": ["src/packages/core/components/section"],
 			"@umbraco-cms/backoffice/variant": ["src/packages/core/components/variant"],
 
-			"@umbraco-cms/backoffice/core/components": ["src/packages/core/components"],
+			"@umbraco-cms/backoffice/components": ["src/packages/core/components"],
+			"@umbraco-cms/backoffice/workspace-actions": ["src/packages/core/workspace-actions"],
+
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
 
 			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],

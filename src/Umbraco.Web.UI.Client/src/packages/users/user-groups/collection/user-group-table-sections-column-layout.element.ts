@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { UmbTableItem } from '@umbraco-cms/backoffice/core/components';
+import type { UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
