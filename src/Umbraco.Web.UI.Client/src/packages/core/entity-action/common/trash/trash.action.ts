@@ -1,11 +1,11 @@
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityActionBase } from 'src/packages/core/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
-import { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbDeleteEntityAction<
-	T extends UmbDetailRepository & UmbItemRepository<any>
+export class UmbTrashEntityAction<
+	T extends UmbItemRepository<any> & { trash(unique: Array<string>): Promise<void> }
 > extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalContext;
 
@@ -18,22 +18,23 @@ export class UmbDeleteEntityAction<
 	}
 
 	async execute() {
-		if (!this.repository || !this.#modalContext) return;
+		if (!this.repository) return;
 
 		const { data } = await this.repository.requestItems([this.unique]);
 
 		if (data) {
 			const item = data[0];
 
-			const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
-				headline: `Delete ${item.name}`,
-				content: 'Are you sure you want to delete this item?',
+			const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
+				headline: `Trash ${item.name}`,
+				content: 'Are you sure you want to move this item to the recycle bin?',
 				color: 'danger',
-				confirmLabel: 'Delete',
+				confirmLabel: 'Trash',
 			});
 
-			await modalHandler.onSubmit();
-			await this.repository?.delete(this.unique);
+			modalHandler?.onSubmit().then(() => {
+				this.repository?.trash([this.unique]);
+			});
 		}
 	}
 }
