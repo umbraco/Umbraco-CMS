@@ -3,8 +3,8 @@ import './upgrader-view.element';
 
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UpgradeResource, UpgradeSettingsResponseModel, ApiError } from '@umbraco-cms/backoffice/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UpgradeResource, UpgradeSettingsResponseModel, ApiError } from 'src/libs/backend-api';
+import { tryExecute } from 'src/libs/resources';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**

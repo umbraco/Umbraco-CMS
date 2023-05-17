@@ -1,0 +1,39 @@
+import { UmbEntityActionBase } from 'src/libs/entity-action';
+import { UmbContextConsumerController } from 'src/libs/context-api';
+import { UmbControllerHostElement } from 'src/libs/controller-api';
+import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from 'src/libs/modal';
+import { UmbDetailRepository, UmbItemRepository } from 'src/libs/repository';
+
+export class UmbDeleteEntityAction<
+	T extends UmbDetailRepository & UmbItemRepository<any>
+> extends UmbEntityActionBase<T> {
+	#modalContext?: UmbModalContext;
+
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
+		super(host, repositoryAlias, unique);
+
+		new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
+	}
+
+	async execute() {
+		if (!this.repository || !this.#modalContext) return;
+
+		const { data } = await this.repository.requestItems([this.unique]);
+
+		if (data) {
+			const item = data[0];
+
+			const modalHandler = this.#modalContext.open(UMB_CONFIRM_MODAL, {
+				headline: `Delete ${item.name}`,
+				content: 'Are you sure you want to delete this item?',
+				color: 'danger',
+				confirmLabel: 'Delete',
+			});
+
+			await modalHandler.onSubmit();
+			await this.repository?.delete(this.unique);
+		}
+	}
+}

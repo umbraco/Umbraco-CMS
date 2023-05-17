@@ -9,9 +9,9 @@ import {
 	DatabaseSettingsPresentationModel,
 	InstallResource,
 	ProblemDetailsModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from 'src/libs/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { tryExecute } from 'src/libs/resources';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabaseElement extends UmbLitElement {

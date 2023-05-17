@@ -7,7 +7,7 @@ const { rest } = window.MockServiceWorker;
 import { installerContextProvider } from '../shared/utils.story-helpers';
 
 import type { UmbInstallerDatabaseElement } from './installer-database.element';
-import type { InstallSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { InstallSettingsResponseModel } from 'src/libs/backend-api';
 export default {
 	title: 'Apps/Installer/Steps',
 	component: 'umb-installer-database',

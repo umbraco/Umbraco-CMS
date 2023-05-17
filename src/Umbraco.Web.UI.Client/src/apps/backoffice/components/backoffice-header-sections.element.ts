@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
 import type { UmbBackofficeContext } from '../backoffice.context';
-import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection } from 'src/libs/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-header-sections')

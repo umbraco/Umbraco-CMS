@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UpgradeSettingsResponseModel } from 'src/libs/backend-api';
 
 /**
  * @element umb-upgrader-view
@@ -9,8 +9,6 @@ import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-ap
  */
 @customElement('umb-upgrader-view')
 export class UmbUpgraderViewElement extends LitElement {
-	
-
 	@property({ type: Boolean })
 	fetching = false;
 
@@ -87,7 +85,7 @@ export class UmbUpgraderViewElement extends LitElement {
 		e.preventDefault();
 		this.dispatchEvent(new CustomEvent('onAuthorizeUpgrade', { detail: e, bubbles: true }));
 	};
-	
+
 	static styles: CSSResultGroup = [
 		css`
 			.center {

@@ -1,5 +1,5 @@
 import { UmbAppContextConfig } from './app-context-config.interface';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextToken } from 'src/libs/context-api';
 
 export class UmbAppContext {
 	#serverUrl: string;

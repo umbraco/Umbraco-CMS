@@ -1,6 +1,6 @@
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { umbExtensionsRegistry } from 'src/libs/extension-registry';
+import { UmbContextToken } from 'src/libs/context-api';
+import { UmbStringState } from 'src/libs/observable-api';
 
 export class UmbBackofficeContext {
 	#activeSectionAlias = new UmbStringState(undefined);
