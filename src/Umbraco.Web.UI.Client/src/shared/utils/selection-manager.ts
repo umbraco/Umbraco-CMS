@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { UmbArrayState, UmbBooleanState } from '../observable-api';
+import { UmbArrayState, UmbBooleanState } from '../../libs/observable-api';
 
 export interface UmbSelectionManager {
 	selection: Observable<Array<string | null>>;

@@ -6,7 +6,7 @@ import { UmbControllerHostElement } from 'src/libs/controller-api';
 import { createExtensionClass } from 'src/libs/extension-api';
 import { ProblemDetailsModel, TreeItemPresentationModel } from 'src/libs/backend-api';
 import { UmbContextProviderController } from 'src/libs/context-api';
-import { UmbSelectionManagerBase } from 'src/libs/utils';
+import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 
 // TODO: update interface
 export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> {
