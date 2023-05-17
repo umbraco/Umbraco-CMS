@@ -1,7 +1,7 @@
 import { fixture, expect, html } from '@open-wc/testing';
 import { UUIToastNotificationLayoutElement } from '@umbraco-ui/uui';
 import { UmbNotificationLayoutDefaultElement, UmbNotificationDefaultData } from './notification-layout-default.element';
-import { UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationHandler } from 'src/packages/core/notification';
 
 describe('UmbNotificationLayoutDefault', () => {
 	let element: UmbNotificationLayoutDefaultElement;

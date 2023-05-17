@@ -10,7 +10,7 @@ import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/notification';
+} from 'src/packages/core/notification';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UsersViewType = 'list' | 'grid';

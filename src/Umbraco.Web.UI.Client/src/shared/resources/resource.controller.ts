@@ -3,7 +3,7 @@ import {
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 	UmbNotificationOptions,
-} from '@umbraco-cms/backoffice/notification';
+} from 'src/packages/core/notification';
 import { ApiError, CancelError, CancelablePromise } from '@umbraco-cms/backoffice/backend-api';
 import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';

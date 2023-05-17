@@ -2,14 +2,12 @@ import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import type { UmbNotificationDefaultData, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationDefaultData, UmbNotificationHandler } from 'src/packages/core/notification';
 
 export type { UmbNotificationDefaultData };
 
 @customElement('umb-notification-layout-default')
 export class UmbNotificationLayoutDefaultElement extends LitElement {
-	
-
 	@property({ attribute: false })
 	notificationHandler!: UmbNotificationHandler;
 
@@ -23,7 +21,7 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 			</uui-toast-notification-layout>
 		`;
 	}
-	
+
 	static styles = [UUITextStyles];
 }
 
