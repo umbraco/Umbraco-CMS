@@ -9,8 +9,6 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-code-editor-modal')
 export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditorModalData, UmbCodeEditorModalResult> {
-	
-
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditor;
 
@@ -34,13 +32,13 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 
 	render() {
 		return html`
-			<umb-workspace-layout .headline=${this.data?.headline ?? 'Code Editor'}>
-				<uui-box>
+			<umb-body-layout .headline=${this.data?.headline ?? 'Code Editor'}>
+				<div id="editor-box">
 					<umb-code-editor
 						language=${ifDefined(this.data?.language)}
 						.code=${this.data?.content ?? ''}
 						@input=${this.#onCodeEditorInput}></umb-code-editor>
-				</uui-box>
+				</div>
 				<div slot="actions">
 					<uui-button id="cancel" label="Cancel" @click="${this.#handleCancel}">Cancel</uui-button>
 					<uui-button
@@ -50,16 +48,21 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 						label="${this.data?.confirmLabel || 'Submit'}"
 						@click=${this.#handleConfirm}></uui-button>
 				</div>
-			</umb-workspace-layout>
+			</umb-body-layout>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-box {
-				flex: 1;
-				--editor-height: calc(100vh - var(--umb-header-layout-height) - (var(--uui-size-space-5) * 2) - 54px);
+			#editor-box {
+				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));
+				height:100%;
+				display:flex;
+			}
+
+			umb-code-editor {
+				width:100%;
 			}
 		`,
 	];

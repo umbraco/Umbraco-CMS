@@ -162,7 +162,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor headline="Embed">
+			<umb-body-layout headline="Embed">
 				<uui-box>
 					<umb-workspace-property-layout label="URL" orientation="vertical">
 						<div slot="editor">
@@ -225,7 +225,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 					look="primary"
 					label="Submit"
 					@click=${this.#handleConfirm}></uui-button>
-			</umb-workspace-editor>
+			</umb-body-layout>
 		`;
 	}
 
