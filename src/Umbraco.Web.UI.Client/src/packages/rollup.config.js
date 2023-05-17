@@ -3,10 +3,10 @@ import pluginJson from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { readdirSync, lstatSync } from 'fs';
 
-const exclude = ['core', 'users'];
+const exclude = [];
 
-const corePackages = readdirSync('./src/backoffice').filter((corePackage) =>
-	lstatSync(`src/backoffice/${corePackage}`).isDirectory()
+const corePackages = readdirSync('./src/packages').filter((corePackage) =>
+	lstatSync(`src/packages/${corePackage}`).isDirectory()
 );
 
 const allowedPackages = corePackages.filter((corePackage) => !exclude.includes(corePackage));
@@ -16,13 +16,13 @@ export default allowedPackages
 		/** @type {import('rollup').RollupOptions[]} */
 		return [
 			{
-				input: `./src/backoffice/${corePackage}/index.ts`,
+				input: `./src/packages/${corePackage}/index.ts`,
 				external: [/^@umbraco-cms\//],
 				output: {
-					dir: `./src/backoffice/${corePackage}/dist`,
+					dir: `./src/packages/${corePackage}/dist`,
 					format: 'es',
 					preserveModules: true,
-					preserveModulesRoot: `./src/backoffice/${corePackage}`,
+					preserveModulesRoot: `./src/packages/${corePackage}`,
 				},
 				plugins: [nodeResolve(), pluginJson(), esbuild()],
 			},

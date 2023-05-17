@@ -55,7 +55,9 @@
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
 		"check": "npm run lint && npm run compile && npm run build-storybook",
-		"build:packages": "rollup -c rollup-packages.config.js"
+		"build:packages": "rollup -c ./src/packages/rollup.config.js",
+		"build:apps": "rollup -c ./src/apps/rollup.config.js",
+		"copy": "node ./devops/build/copy-packages.mjs"
 	},
 	"engines": {
 		"node": ">=18.14 <19",
