@@ -1,4 +1,4 @@
-import { UmbDetailRepository } from '../../../../libs/repository';
+import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	DocumentTypePropertyTypeResponseModel,

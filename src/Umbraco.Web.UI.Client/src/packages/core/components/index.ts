@@ -72,8 +72,13 @@ import './workspace-property/workspace-property.element';
 import './variant-selector/variant-selector.element';
 
 export * from './table';
-export * from './tree/tree.element';
-//export * from './code-editor';
+export * from './tree';
 export * from './store';
+
+export * from './action';
+export * from './entity-action';
+export * from './entity-bulk-action';
+
+//export * from './code-editor';
 
 export const manifests = [...debugManifests];

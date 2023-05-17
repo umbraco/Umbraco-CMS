@@ -3,12 +3,6 @@ import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export interface UmbAction<RepositoryType = unknown> {
-	host: UmbControllerHostElement;
-	repository: RepositoryType;
-	execute(): Promise<void>;
-}
-
 export class UmbActionBase<RepositoryType> {
 	host: UmbControllerHostElement;
 	repository?: RepositoryType;
