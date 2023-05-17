@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import { ItemResponseModelBaseModel } from '../backend-api';
+import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbStore } from './store.interface';
 
 export interface UmbItemStore<T extends ItemResponseModelBaseModel = any> extends UmbStore<T> {
