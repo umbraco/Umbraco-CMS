@@ -1,4 +1,4 @@
-import '../../components/body-layout/body-layout.element';
+import '../../../body-layout/body-layout.element';
 import './embedded-media-modal.element';
 
 import { Meta } from '@storybook/web-components';

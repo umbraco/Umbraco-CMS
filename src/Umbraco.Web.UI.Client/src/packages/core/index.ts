@@ -1,7 +1,7 @@
 import { manifests as componentManifests, UmbStoreExtensionInitializer } from './components';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as propertyEditorManifests } from './property-editors/manifests';
-import { manifests as modalManifests } from './modals/manifests';
+import { manifests as modalManifests } from './components/modal/common/manifests';
 
 import { UmbBackofficeNotificationContainerElement } from './components/backoffice-notification-container/backoffice-notification-container.element';
 import { UmbBackofficeModalContainerElement } from './components/backoffice-modal-container/backoffice-modal-container.element';

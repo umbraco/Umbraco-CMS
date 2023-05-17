@@ -1,4 +1,4 @@
-import '../../components/body-layout/body-layout.element';
+import '../../../body-layout/body-layout.element';
 import './icon-picker-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';
