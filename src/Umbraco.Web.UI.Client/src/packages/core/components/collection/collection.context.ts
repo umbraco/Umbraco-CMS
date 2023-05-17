@@ -2,7 +2,7 @@ import type { UmbControllerHostElement } from 'src/libs/controller-api';
 import { UmbContextToken } from 'src/libs/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState, UmbObserverController } from 'src/libs/observable-api';
 import { createExtensionClass } from 'src/libs/extension-api';
-import { umbExtensionsRegistry } from 'src/libs/extension-registry';
+import { umbExtensionsRegistry } from 'src/packages/core/components/extension-registry';
 import { UmbCollectionRepository } from 'src/libs/repository';
 import type { UmbCollectionFilterModel } from 'src/packages/core/components/collection';
 
