@@ -4,9 +4,6 @@ import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import logoImg from '/umbraco_logomark_white.svg';
 
-import './backoffice-header-sections.element';
-import './backoffice-header-apps.element';
-
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeaderElement extends UmbLitElement {
 	render() {
