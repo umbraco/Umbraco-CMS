@@ -10,7 +10,7 @@ interface DialogData {
 }
 
 // TODO => This is a quick transplant of the existing macro plugin - needs to be finished, and need to
-// determine how to replicate the existing macro service (backend doens')
+// determine how to replicate the existing macro service
 export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
     #macroService = new UmbMacroService();
 
@@ -25,7 +25,8 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 
 		/** Adds custom rules for the macro plugin and custom serialization */
 		this.editor.on('preInit', () => {
-			//this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
+			//this is requires so that we tell the serializer that a 'div' is actually allowed in the root, 
+			// otherwise the cleanup will strip it out
 			this.editor.serializer.addRules('div');
 
 			/** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
@@ -137,16 +138,16 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 
 		//put the macro syntax in comments, we will parse this out on the server side to be used
 		//for persisting.
-		const macroSyntaxComment = '<!-- ' + macroObject.syntax + ' -->';
+		const macroSyntaxComment = `<!-- ${macroObject.syntax} -->`;
 		//create an id class for this element so we can re-select it after inserting
 		const uniqueId = 'umb-macro-' + this.editor.dom.uniqueId();
 		let macroDiv = this.editor.dom.create(
 			'div',
 			{
-				class: 'umb-macro-holder ' + macroObject.macroAlias + ' ' + uniqueId + ' mceNonEditable',
+				class: `umb-macro-holder ${macroObject.macroAlias} ${uniqueId} mceNonEditable`,
 				contenteditable: 'false',
 			},
-			macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>'
+			`${macroSyntaxComment}<ins>Macro alias: <strong>${macroObject.macroAlias}</strong></ins>`
 		);
 
 		//if there's an activeMacroElement then replace it, otherwise set the contents of the selected node
