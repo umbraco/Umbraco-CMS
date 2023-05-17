@@ -38,7 +38,7 @@
 
 			"@umbraco-cms/backoffice/content-type": ["src/packages/core/content-type"],
 			"@umbraco-cms/backoffice/action": ["src/packages/core/action"],
-			"@umbraco-cms/backoffice/entity-action": ["src/psrc/packages/core/extension-registry
+			"@umbraco-cms/backoffice/entity-action": ["src/psrc/packages/core/extension-registry"],
 			"@umbraco-cms/backoffice/entity-bulk-action": ["src/packages/core/entity-bulk-action"],
 			"@umbraco-cms/backoffice/extension-registry": ["src/packages/core/extension-registry"],
 			"@umbraco-cms/backoffice/modal": ["src/packages/core/modal"],
