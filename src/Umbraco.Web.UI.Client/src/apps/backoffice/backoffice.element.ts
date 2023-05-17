@@ -7,6 +7,8 @@ import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/exten
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
+import './components';
+
 const CORE_PACKAGES = [
 	import('../../packages/core/umbraco-package'),
 	import('../../packages/settings/umbraco-package'),
