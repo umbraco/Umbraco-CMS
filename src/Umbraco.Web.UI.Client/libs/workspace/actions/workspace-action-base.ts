@@ -1,5 +1,5 @@
 import { UmbWorkspaceContextInterface } from '../context';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
 
 export interface UmbWorkspaceAction<WorkspaceType = unknown> {
@@ -8,7 +8,9 @@ export interface UmbWorkspaceAction<WorkspaceType = unknown> {
 	execute(): Promise<void>;
 }
 
-export abstract class UmbWorkspaceActionBase<WorkspaceType extends UmbWorkspaceContextInterface> implements UmbWorkspaceAction<WorkspaceType> {
+export abstract class UmbWorkspaceActionBase<WorkspaceType extends UmbWorkspaceContextInterface>
+	implements UmbWorkspaceAction<WorkspaceType>
+{
 	host: UmbControllerHostElement;
 	workspaceContext?: WorkspaceType;
 	constructor(host: UmbControllerHostElement) {

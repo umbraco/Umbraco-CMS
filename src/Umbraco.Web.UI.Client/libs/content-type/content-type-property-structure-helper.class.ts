@@ -3,7 +3,7 @@ import {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbContentTypePropertyStructureHelper {
