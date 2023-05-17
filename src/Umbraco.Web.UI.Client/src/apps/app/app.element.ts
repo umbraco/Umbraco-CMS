@@ -10,7 +10,7 @@ import { customElement, property } from 'lit/decorators.js';
 
 import { UmbIconRegistry } from '../../shared/icon-registry/icon.registry';
 import type { UmbAppErrorElement } from './app-error.element';
-import { UmbAuthFlow } from './auth/auth-flow';
+import { UmbAuthFlow } from './auth';
 import { UMB_APP, UmbAppContext } from './app.context';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
