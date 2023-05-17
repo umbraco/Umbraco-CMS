@@ -9,6 +9,7 @@ import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { appendToFrozenArray } from '../observable-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -65,7 +66,9 @@ export class UmbModalContext {
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
-		this.#modals.next([...this.#modals.getValue(), modalHandler]);
+		this.#modals.next(
+			appendToFrozenArray(this.#modals.getValue(), modalHandler, (entry) => entry.key === modalHandler.key)
+		);
 		return modalHandler;
 	}
 
@@ -93,7 +96,9 @@ export class UmbModalContext {
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
-		this.#modals.next([...this.#modals.getValue(), modalHandler]);
+		this.#modals.next(
+			appendToFrozenArray(this.#modals.getValue(), modalHandler, (entry) => entry.key === modalHandler.key)
+		);
 		return modalHandler;
 	}
 
@@ -104,6 +109,7 @@ export class UmbModalContext {
 	 * @memberof UmbModalContext
 	 */
 	public close(key: string) {
+		console.log('close', key, this.#modals);
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
 			modal.reject();

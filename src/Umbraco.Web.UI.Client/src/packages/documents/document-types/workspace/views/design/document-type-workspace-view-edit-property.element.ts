@@ -48,10 +48,13 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		console.log('### constructor');
+
+		const rnd = Math.random();
 		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
-				console.log('UMB_PROPERTY_SETTINGS_MODAL setup!');
+				console.log('UMB_PROPERTY_SETTINGS_MODAL setup!', this.#modalRegistration, rnd);
 				return this.property ?? false;
 			})
 			.onSubmit((result) => {

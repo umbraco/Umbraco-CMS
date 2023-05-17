@@ -47,21 +47,33 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _createRoutes() {
 		if (!this._sections) return;
 
-		this._routes = [];
+		//if (this._sections.length < 8) return;
+		console.log('€€€€ create routes', this._sections);
+
+		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
 		this._routes = this._sections.map((section) => {
-			return {
-				path: this._routePrefix + section.meta.pathname,
-				component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
-				setup: (component) => {
-					(component as UmbSectionExtensionElement).manifest = section;
-				},
-			};
+			const path = this._routePrefix + section.meta.pathname;
+			const existingRoute = this._routes.find((r) => r.path === path);
+			if (existingRoute) {
+				return existingRoute;
+			} else {
+				return {
+					path: path,
+					component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
+					setup: (component) => {
+						console.log('€€€€ setup route', this._routePrefix + section.meta.pathname);
+						(component as UmbSectionExtensionElement).manifest = section;
+					},
+				};
+			}
 		});
 
-		this._routes.push({
-			path: '**',
-			redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
-		});
+		if (!this._routes.find((r) => r.path === '**')) {
+			this._routes.push({
+				path: '**',
+				redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
+			});
+		}
 	}
 
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
@@ -82,7 +94,9 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`;
+		return this._routes.length > 0
+			? html`<umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`
+			: '';
 	}
 
 	static styles = [

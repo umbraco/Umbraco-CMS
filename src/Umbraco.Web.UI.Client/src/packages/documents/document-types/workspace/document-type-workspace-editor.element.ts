@@ -29,6 +29,8 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		console.log('#### constructor workspace editor...');
+
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbDocumentTypeWorkspaceContext;
 			this.#observeDocumentType();

@@ -17,11 +17,18 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (_component, info) => {
+				console.log('Setup for edit/id');
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},
 		},
 	];
+
+	constructor() {
+		super();
+
+		console.log('!!## constructor workspace element!');
+	}
 
 	render() {
 		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;

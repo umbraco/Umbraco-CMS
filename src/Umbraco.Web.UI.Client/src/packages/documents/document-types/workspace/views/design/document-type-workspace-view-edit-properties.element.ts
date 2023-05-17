@@ -89,6 +89,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	constructor() {
 		super();
 
+		console.log('#### constructor properties...');
+
 		this.consumeContext(UMB_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager(
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure
