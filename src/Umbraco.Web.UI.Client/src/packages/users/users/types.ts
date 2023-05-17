@@ -41,6 +41,9 @@ export interface UmbUserDisableDataSource {
 export interface UmbUserEnableDataSource {
 	enable(userIds: string[]): Promise<UmbDataSourceErrorResponse>;
 }
+export interface UmbUserUnlockDataSource {
+	unlock(userIds: string[]): Promise<UmbDataSourceErrorResponse>;
+}
 
 export interface UmbUserDetailRepository
 	extends UmbDetailRepository<
