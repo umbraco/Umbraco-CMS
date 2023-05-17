@@ -91,7 +91,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: Object, attribute: false })
-	public set config(value: UmbDataTypePropertyCollection) {
+	public set config(value: DataTypePropertyPresentationModel[]) {
 		this._propertyContext.setConfig(value);
 	}
 

@@ -9,12 +9,8 @@ export class UmbDataTypePropertyCollection extends Array<DataTypePropertyPresent
 		super(...args);
 	}
 
-	private _getByAlias(alias: string) {
-		return this.find((x) => x.alias === alias);
-	}
-
 	getValueByAlias<T>(alias: string): T | undefined {
-		const property = this._getByAlias(alias);
+		const property = this.getByAlias(alias);
 
 		if (property?.value === undefined || property?.value === null) {
 			return;
@@ -24,7 +20,6 @@ export class UmbDataTypePropertyCollection extends Array<DataTypePropertyPresent
 	}
 
 	getByAlias(alias: string): DataTypePropertyPresentationModel | undefined {
-		const property = this._getByAlias(alias);
-		return property;
+		return this.find((x) => x.alias === alias);
 	}
 }
