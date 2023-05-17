@@ -13,7 +13,7 @@ import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extens
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {
 	@state()
-	private _routes: Array<UmbRoute> = [];
+	private _routes: Array<UmbRoute & { alias: string }> = [];
 
 	@state()
 	private _sections: Array<ManifestSection> = [];
@@ -48,14 +48,15 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		if (!this._sections) return;
 
 		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
+		// TODO: remove section-routes that does not exist anymore.
 		this._routes = this._sections.map((section) => {
-			const path = this._routePrefix + section.meta.pathname;
-			const existingRoute = this._routes.find((r) => r.path === path);
+			const existingRoute = this._routes.find((r) => r.alias === section.alias);
 			if (existingRoute) {
 				return existingRoute;
 			} else {
 				return {
-					path: path,
+					alias: section.alias,
+					path: this._routePrefix + section.meta.pathname,
 					component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
 					setup: (component) => {
 						(component as UmbSectionExtensionElement).manifest = section;
@@ -66,6 +67,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 		if (!this._routes.find((r) => r.path === '**')) {
 			this._routes.push({
+				alias: '__redirect',
 				path: '**',
 				redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
 			});
