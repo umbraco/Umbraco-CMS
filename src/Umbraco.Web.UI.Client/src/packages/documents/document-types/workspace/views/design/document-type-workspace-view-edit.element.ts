@@ -39,8 +39,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	constructor() {
 		super();
 
-		console.log('#### constructor edit...');
-
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {

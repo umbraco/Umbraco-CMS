@@ -24,12 +24,6 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 		},
 	];
 
-	constructor() {
-		super();
-
-		console.log('!!## constructor workspace element!');
-	}
-
 	render() {
 		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}

@@ -111,8 +111,6 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	};
 
 	routeSetup(router: IRouterSlot, modalContext: UmbModalContext, params: Params) {
-		console.log('routeSetup', this.active);
-
 		// If already open, don't do anything:
 		if (this.active) return;
 

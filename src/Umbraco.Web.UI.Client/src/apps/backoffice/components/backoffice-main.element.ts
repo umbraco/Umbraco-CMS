@@ -47,9 +47,6 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _createRoutes() {
 		if (!this._sections) return;
 
-		//if (this._sections.length < 8) return;
-		console.log('€€€€ create routes', this._sections);
-
 		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
 		this._routes = this._sections.map((section) => {
 			const path = this._routePrefix + section.meta.pathname;
@@ -61,7 +58,6 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 					path: path,
 					component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
 					setup: (component) => {
-						console.log('€€€€ setup route', this._routePrefix + section.meta.pathname);
 						(component as UmbSectionExtensionElement).manifest = section;
 					},
 				};

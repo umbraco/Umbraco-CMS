@@ -98,10 +98,8 @@ export class UmbRouteContext {
 	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
 		if (this.#activeModalPath === activeModalPath) return;
 		if (this.#activeModalPath) {
-			console.log('_internal_modalRouterChanged', this.#activeModalPath);
 			// If if there is a modal using the old path.
 			const activeModal = this.#modalRegistrations.find((registration) => {
-				console.log('/' + registration.generateModalPath(), ' === ', this.#activeModalPath);
 				return '/' + registration.generateModalPath() === this.#activeModalPath;
 			});
 			if (activeModal) {
