@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
-import { umbDataTypeData } from '../../../../../../../../core/mocks/data/data-type.data';
 
 import './property-editor-ui-tiny-mce-dimensions-configuration.element';
+import { umbDataTypeData } from '../../../../../../../shared/mocks/data/data-type.data';
 import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as DataTypeResponseModel;

@@ -3,20 +3,35 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-property-editor-ui-tiny-mce
  */
 @customElement('umb-property-editor-ui-tiny-mce')
 export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
-	@property()
+
+
+	@property({ type: String })
 	value = '';
 
+	configuration: Array<DataTypePropertyPresentationModel> = [];
+
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public set config(config: Array<DataTypePropertyPresentationModel>) {
+		this.configuration = config;
+	}
+
+	#onChange(event: InputEvent) {
+		this.value = (event.target as HTMLInputElement).value;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
 
 	render() {
-		return html`<div>umb-property-editor-ui-tiny-mce</div>`;
+		return html`<umb-input-tiny-mce
+			@change=${this.#onChange}
+			.configuration=${this.configuration}
+			.value=${this.value}></umb-input-tiny-mce>`;
 	}
 
 	static styles = [UUITextStyles];

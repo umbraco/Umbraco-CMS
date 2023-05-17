@@ -15,12 +15,12 @@ import {
 	TinyMcePluginArguments,
 	UmbTinyMcePluginBase,
 	ManifestTinyMcePlugin,
-} from '@umbraco-cms/backoffice/extensions-registry';
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import type { ClassConstructor } from '@umbraco-cms/backoffice/models';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { hasDefaultExport, loadExtension, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extensions-api';
+import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
@@ -104,12 +104,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
-			this.modalContext = instance;
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+			this.modalContext = modalContext;
 		});
 
-		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#currentUserStore = instance;
+		this.consumeContext(UMB_CURRENT_USER_STORE_CONTEXT_TOKEN, (currentUserStore) => {
+			this.#currentUserStore = currentUserStore;
 			this.#observeCurrentUser();
 		});
 	}
@@ -117,7 +117,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	async #observeCurrentUser() {
 		if (!this.#currentUserStore) return;
 
-		this.observe(this.#currentUserStore.currentUser, (currentUser?: UmbLoggedInUser) => {
+		this.observe(this.#currentUserStore.currentUser, (currentUser) => {
 			this.#currentUser = currentUser;
 		});
 	}

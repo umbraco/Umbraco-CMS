@@ -1,10 +1,9 @@
-import { TinyMcePluginArguments } from "./tinymce-plugin.model";
+import { UmbLitElement } from "@umbraco-cms/internal/lit-element";
 import { DataTypePropertyPresentationModel } from "@umbraco-cms/backoffice/backend-api";
-import { UmbElementMixinInterface } from "@umbraco-cms/backoffice/element";
 
 // TODO => editor property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
 export class UmbTinyMcePluginBase {
-    host: UmbElementMixinInterface;
+    host: UmbLitElement;
     editor: any;
     configuration?: Array<DataTypePropertyPresentationModel>;
 
@@ -13,4 +12,11 @@ export class UmbTinyMcePluginBase {
         this.editor = arg.editor;
         this.configuration = arg.configuration;
     }
+}
+
+// TODO => editor property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
+export interface TinyMcePluginArguments {
+    host: UmbLitElement;
+	editor: any; 
+	configuration?: Array<DataTypePropertyPresentationModel>;
 }

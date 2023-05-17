@@ -36,7 +36,7 @@ export class UmbEmbeddedMediaModalElement extends UmbLitElement {
 	data?: UmbEmbeddedMediaModalData;
 
 	#handleConfirm() {
-		this.modalHandler?.submit({ selection: this.#embedResult });
+		this.modalHandler?.submit();
 	}
 
 	#handleCancel() {

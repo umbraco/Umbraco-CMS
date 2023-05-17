@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
-import { umbDataTypeData } from '../../../../../../../../core/mocks/data/data-type.data';
+import { umbDataTypeData } from '../../../../../../../shared/mocks/data/data-type.data';
 
 import './property-editor-ui-tiny-mce-stylesheets-configuration.element';
 import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';

@@ -1,5 +1,5 @@
 import { AstNode } from 'tinymce';
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
 
@@ -19,8 +19,8 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance: UmbModalContext) => {
-			this.#modalContext = instance;
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+			this.#modalContext = modalContext;
 		});
 
 		/** Adds custom rules for the macro plugin and custom serialization */

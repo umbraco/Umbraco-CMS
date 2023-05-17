@@ -1,5 +1,4 @@
-import { UmbEmbeddedMediaModalElement as ModalElement } from '../../../../modals/embedded-media/embedded-media-modal.element';
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -14,8 +13,8 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance: UmbModalContext) => {
-			this.#modalContext = instance;
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+			this.#modalContext = modalContext;
 		});
 
 		this.editor.ui.registry.addButton('umbembeddialog', {
@@ -32,8 +31,8 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 		const nodeName = selectedElm.nodeName;
 
 		let modify: UmbEmbeddedMediaModalData = {
-			width: ModalElement.defaultWidth,
-			height: ModalElement.defaultHeight,
+			width: 360,
+			height: 240,
 		};
 
 		if (nodeName.toUpperCase() === 'DIV' && selectedElm.classList.contains('umb-embed-holder')) {

@@ -1,4 +1,4 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extensions-registry';
+import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -13,8 +13,8 @@ export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {		
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance: UmbModalContext) => {
-			this.#modalContext = instance;
+		this.host.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+			this.#modalContext = modalContext;
 		});
 
 		this.editor.ui.registry.addButton('ace', {

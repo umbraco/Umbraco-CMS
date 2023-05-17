@@ -1,4 +1,4 @@
-import { manifest as configuration } from './config/configuration/manifests';
+import { manifests as configuration } from './config/manifests';
 import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUI = {
@@ -14,13 +14,9 @@ const manifest: ManifestPropertyEditorUI = {
 		config: {
 			properties: [
 				{
-					alias: 'editor',
-					label: 'Editor',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.Configuration',
-				},
-				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
+					description: 'Select the width of the overlay (link picker)',
 					propertyEditorUI: 'Umb.PropertyEditorUI.OverlaySize',
 				},
 				{
@@ -33,6 +29,4 @@ const manifest: ManifestPropertyEditorUI = {
 	},
 };
 
-const config = [configuration];
-
-export const manifests = [manifest, ...config];
+export const manifests = [manifest, ...configuration];

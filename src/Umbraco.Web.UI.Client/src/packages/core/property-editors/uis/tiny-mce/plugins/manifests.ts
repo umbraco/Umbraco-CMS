@@ -1,4 +1,4 @@
-import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extensions-registry';
+import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extension-registry';
 
 const pluginBaseUrl = '/src/backoffice/core/property-editors/uis/tiny-mce/plugins/';
 const pluginManifests: Array<ManifestTinyMcePlugin> = [
