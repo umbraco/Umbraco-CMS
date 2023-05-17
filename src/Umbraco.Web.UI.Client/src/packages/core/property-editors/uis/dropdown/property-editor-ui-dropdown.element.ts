@@ -13,8 +13,8 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	@property()
 	value = '';
 
-	@property({ type: Array, attribute: false })
-	public config = new UmbDataTypePropertyCollection();
+	@property({ attribute: false })
+	public config?: UmbDataTypePropertyCollection;
 
 	render() {
 		return html`<div>umb-property-editor-ui-dropdown</div>`;

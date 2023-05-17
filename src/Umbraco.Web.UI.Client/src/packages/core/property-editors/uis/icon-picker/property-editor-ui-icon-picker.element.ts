@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from 'libs/data-type/data-type-property-collection.class';
 
 /**
  * @element umb-property-editor-ui-icon-picker
@@ -14,7 +15,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public config?: UmbDataTypePropertyCollection;
 
 	private _modalContext?: UmbModalContext;
 

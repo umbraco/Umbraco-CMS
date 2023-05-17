@@ -6,8 +6,8 @@ import { UmbInputMultiUrlPickerElement } from '../../../components/input-multi-u
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -21,22 +21,14 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	value: UmbLinkPickerLink[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: DataTypePropertyPresentationModel[]) {
-		const overlaySize = config.find((x) => x.alias === 'overlaySize');
-		if (overlaySize) this._overlaySize = overlaySize.value;
-
-		const hideAnchor = config.find((x) => x.alias === 'hideAnchor');
-		if (hideAnchor) this._hideAnchor = hideAnchor.value;
-
-		const ignoreUserStartNodes = config.find((x) => x.alias === 'ignoreUserStartNodes');
-		if (ignoreUserStartNodes) this._ignoreUserStartNodes = ignoreUserStartNodes.value;
-
-		const maxNumber = config.find((x) => x.alias === 'maxNumber');
-		if (maxNumber) this._maxNumber = maxNumber.value;
-
-		const minNumber = config.find((x) => x.alias === 'minNumber');
-		if (minNumber) this._minNumber = minNumber.value;
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._overlaySize = config.getValueByAlias('overlaySize');
+		this._hideAnchor = config.getValueByAlias('hideAnchor');
+		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
+		this._minNumber = config.getValueByAlias('minNumber');
+		this._maxNumber = config.getValueByAlias('maxNumber');	
 	}
+
 	@state()
 	private _overlaySize?: UUIModalSidebarSize;
 

@@ -41,7 +41,7 @@ WithFormat.args = {
 
 export const Timeframe = Template.bind({});
 Timeframe.args = {
-	config: [
+	config: new UmbDataTypePropertyCollection([
 		{
 			alias: 'format',
 			value: 'dd/MM/yyyy HH:mm:ss',
@@ -54,7 +54,7 @@ Timeframe.args = {
 			alias: 'max',
 			value: '2021-01-30 00:00',
 		},
-	],
+	]),
 };
 
 export const TimeOnly = Template.bind({});
