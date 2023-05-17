@@ -81,7 +81,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 						alias=${this._selectedPropertyEditorUI.alias}
 						property-editor-model-alias=${this._selectedPropertyEditorUI.meta.propertyEditorModel}
 						@open=${() => {
-							console.log('TO BE DONE..');
+							console.warn('TO BE DONE..');
 						}}
 						border>
 						<uui-icon name="${this._selectedPropertyEditorUI.meta.icon}" slot="icon"></uui-icon>

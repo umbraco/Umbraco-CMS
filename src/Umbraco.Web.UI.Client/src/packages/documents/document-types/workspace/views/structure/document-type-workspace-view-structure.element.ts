@@ -38,7 +38,6 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 			this._allowedContentTypeIDs = allowedContentTypes
 				?.map((x) => x.id)
 				.filter((x) => x !== undefined) as Array<string>;
-			console.log('this._allowedContentTypeIDs', this._allowedContentTypeIDs);
 		});
 	}
 

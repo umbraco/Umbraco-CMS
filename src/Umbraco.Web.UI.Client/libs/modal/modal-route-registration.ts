@@ -1,11 +1,11 @@
 // eslint-disable-next-line local-rules/no-external-imports
 import type { IRouterSlot } from 'router-slot/model';
+import { encodeFolderName } from '@umbraco-cms/internal/router';
 import { UmbModalHandler } from './modal-handler';
 import { UmbModalConfig, UmbModalContext } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Params } from '@umbraco-cms/backoffice/router';
-import { encodeFolderName } from '@umbraco-cms/internal/router';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -111,12 +111,13 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	};
 
 	routeSetup(router: IRouterSlot, modalContext: UmbModalContext, params: Params) {
+		console.log('routeSetup', this.active);
+
 		// If already open, don't do anything:
 		if (this.active) return;
 
 		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			console.log('routeSetup has router:', router);
 			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
 			this.#modalHandler.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalHandler;

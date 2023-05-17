@@ -90,6 +90,9 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		});
 
 		this.modalElement = this.#createContainerElement();
+		this.modalElement.addEventListener('close', () => {
+			this._submitRejecter?.();
+		});
 
 		/**
 		 *
@@ -97,6 +100,12 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		 *
 		 */
 		if (router) {
+			this.#modalRouterElement.routes = [
+				{
+					path: '',
+					component: document.createElement('slot'),
+				},
+			];
 			this.#modalRouterElement.parent = router;
 		}
 		this.modalElement.appendChild(this.#modalRouterElement);
@@ -148,7 +157,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	}
 
 	public reject() {
-		this._submitRejecter?.();
 		this.modalElement.close();
 	}
 
