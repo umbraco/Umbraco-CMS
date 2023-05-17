@@ -1,9 +1,9 @@
-import { UmbSaveWorkspaceAction } from 'src/packages/core/components/workspace/workspace-action/common';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceEditorView,
-} from '@umbraco-cms/backoffice/extension-registry';
+} from '@umbraco-cms/backoffice/workspace';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',

@@ -1,6 +1,6 @@
 export * from './tree.context';
-export * from './tree-item-base/tree-item-base.context';
-export * from './tree-item/tree-item.context.interface';
+export * from './tree-item-base';
+export * from './tree-item';
 export * from './tree.element';
 
 export interface UmbTreeRootModel {
