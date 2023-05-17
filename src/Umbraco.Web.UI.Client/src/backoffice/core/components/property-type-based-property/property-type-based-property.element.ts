@@ -93,7 +93,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 			this._dataTypeObserver = this.observe(
 				await this._dataTypeRepository.byId(dataTypeId),
 				(dataType) => {
-					this._dataTypeData = new UmbDataTypePropertyCollection(dataType?.values || []);
+					this._dataTypeData = new UmbDataTypePropertyCollection(dataType?.values);
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
 				},
 				'observeDataType'
