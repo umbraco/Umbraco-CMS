@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeItemContext, UMB_TREE_ITEM_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeItemContext, UMB_TREE_ITEM_CONTEXT_TOKEN } from 'src/packages/core/tree';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 

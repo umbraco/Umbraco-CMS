@@ -1,9 +1,6 @@
 import type { Observable } from 'rxjs';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type {
-	UmbEntityWorkspaceContextInterface,
-	UmbWorkspaceSplitViewManager,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbEntityWorkspaceContextInterface, UmbWorkspaceSplitViewManager } from 'src/packages/core/workspace';
 import type { ValueModelBaseModel, VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbWorkspaceVariableEntityContextInterface<T = unknown> extends UmbEntityWorkspaceContextInterface<T> {
