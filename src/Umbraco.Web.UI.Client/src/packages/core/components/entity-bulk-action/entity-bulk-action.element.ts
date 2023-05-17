@@ -1,13 +1,13 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbEntityBulkAction } from '@umbraco-cms/backoffice/components';
+import { UmbEntityBulkAction } from './entity-bulk-action';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-entity-bulk-action')
-class UmbEntityBulkActionElement extends UmbLitElement {
+export class UmbEntityBulkActionElement extends UmbLitElement {
 	private _selection: Array<string> = [];
 	@property({ type: Array, attribute: false })
 	public get selection() {

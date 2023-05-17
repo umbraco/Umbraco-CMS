@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/components';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_EXPORT_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';

@@ -1,5 +1,5 @@
 import { UmbUserRepository } from '../../repository/user.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/components';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {

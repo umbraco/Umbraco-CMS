@@ -1,5 +1,5 @@
 import type { UmbDocumentRepository } from '../../repository/document.repository';
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/components';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbModalContext,

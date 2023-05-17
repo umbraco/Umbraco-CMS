@@ -1,4 +1,4 @@
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/components';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: investigate what we need to finish the generic move action. We would need to open a picker, which requires a modal token,

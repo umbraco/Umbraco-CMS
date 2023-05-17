@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-action')
-class UmbEntityActionElement extends UmbLitElement {
+export class UmbEntityActionElement extends UmbLitElement {
 	private _unique?: string;
 	@property({ type: String })
 	public get unique() {

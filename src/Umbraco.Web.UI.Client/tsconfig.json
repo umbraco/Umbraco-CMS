@@ -35,7 +35,9 @@
 
 			"@umbraco-cms/backoffice/content-type": ["src/packages/core/components/content-type"],
 			"@umbraco-cms/backoffice/data-type": ["src/packages/core/components/data-type"],
+			"@umbraco-cms/backoffice/action": ["src/packages/core/components/action"],
 			"@umbraco-cms/backoffice/entity-action": ["src/packages/core/components/entity-action"],
+			"@umbraco-cms/backoffice/entity-bulk-action": ["src/packages/core/components/entity-bulk-action"],
 			"@umbraco-cms/backoffice/extension-registry": ["src/packages/core/components/extension-registry"],
 			"@umbraco-cms/backoffice/modal": ["src/packages/core/components/modal"],
 			"@umbraco-cms/backoffice/notification": ["src/packages/core/components/notification"],
@@ -51,7 +53,6 @@
 			"@umbraco-cms/backoffice/variant": ["src/packages/core/components/variant"],
 
 			"@umbraco-cms/backoffice/components": ["src/packages/core/components"],
-			"@umbraco-cms/backoffice/workspace-actions": ["src/packages/core/workspace-actions"],
 
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
 

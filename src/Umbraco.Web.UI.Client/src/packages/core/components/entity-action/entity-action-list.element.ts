@@ -5,7 +5,7 @@ import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backof
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-entity-action-list')
-class UmbEntityActionListElement extends UmbLitElement {
+export class UmbEntityActionListElement extends UmbLitElement {
 	private _entityType = '';
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType() {

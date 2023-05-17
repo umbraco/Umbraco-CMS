@@ -1,4 +1,4 @@
-import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace-actions';
+import { UmbSaveWorkspaceAction } from 'src/packages/core/components/workspace/workspace-action/common';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,

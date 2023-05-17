@@ -1,6 +1,6 @@
 import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/components';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
