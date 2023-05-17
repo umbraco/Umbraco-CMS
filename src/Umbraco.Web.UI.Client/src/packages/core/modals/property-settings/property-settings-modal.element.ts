@@ -89,7 +89,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#onNameChange(event: UUIInputEvent) {
-		//TODO: Generate alias
 		const oldName = this._returnData.name;
 		const oldAlias = this._returnData.alias;
 		this._returnData.name = event.target.value.toString();
