@@ -35,7 +35,6 @@ import './date-input/date-input.element';
 import './input-color-picker/input-color-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
 import './input-multi-url/input-multi-url.element';
-import './input-data-type/input-data-type.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
 import './input-upload-field/input-upload-field.element';

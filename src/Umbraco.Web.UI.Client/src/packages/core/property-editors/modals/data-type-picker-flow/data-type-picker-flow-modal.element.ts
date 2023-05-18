@@ -15,8 +15,11 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUI>;
 }
-@customElement('umb-property-editor-ui-picker-modal')
-export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
+@customElement('umb-data-type-picker-flow-modal')
+export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
+	@property({ attribute: false })
+	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
+
 	@property({ type: Object })
 	data?: UmbPropertyEditorUIPickerModalData;
 
@@ -24,13 +27,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};
 
 	@state()
-	private _propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
-
-	@state()
 	private _selection: Array<string> = [];
 
 	@state()
 	private _submitLabel = 'Select';
+
+	#propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
+	#currentFilterQuery = '';
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -45,8 +48,9 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		if (!this.data) return;
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUI'), (propertyEditorUIs) => {
-			this._propertyEditorUIs = propertyEditorUIs;
-			this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
+			// TODO: this should use same code as querying.
+			this.#propertyEditorUIs = propertyEditorUIs;
+			this._performFiltering();
 		});
 	}
 
@@ -59,16 +63,21 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	}
 
 	private _handleFilterInput(event: UUIInputEvent) {
-		let query = (event.target.value as string) || '';
-		query = query.toLowerCase();
-
-		const result = !query
-			? this._propertyEditorUIs
-			: this._propertyEditorUIs.filter((propertyEditorUI) => {
+		const query = (event.target.value as string) || '';
+		this.#currentFilterQuery = query.toLowerCase();
+		this._performFiltering();
+	}
+	private _performFiltering() {
+		const result = !this.#currentFilterQuery
+			? this.#propertyEditorUIs
+			: this.#propertyEditorUIs.filter((propertyEditorUI) => {
 					return (
-						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query)
+						propertyEditorUI.name.toLowerCase().includes(this.#currentFilterQuery) ||
+						propertyEditorUI.alias.toLowerCase().includes(this.#currentFilterQuery)
 					);
 			  });
+
+		// TODO: When filtering, then we should also display the available data types, in a separate list as the UIs.
 
 		this._groupedPropertyEditorUIs = groupBy(result, 'meta.group');
 	}
@@ -77,16 +86,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		this.modalHandler?.reject();
 	}
 
-	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
-
 	private _submit() {
 		this.modalHandler?.submit({ selection: this._selection });
 	}
 
 	render() {
 		return html`
-			<umb-body-layout headline="Select Property Editor UI">
+			<umb-body-layout headline="Select Property Editor">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
@@ -194,10 +200,10 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	];
 }
 
-export default UmbPropertyEditorUIPickerModalElement;
+export default UmbDataTypePickerFlowModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-picker-modal': UmbPropertyEditorUIPickerModalElement;
+		'umb-data-type-picker-flow-modal': UmbDataTypePickerFlowModalElement;
 	}
 }

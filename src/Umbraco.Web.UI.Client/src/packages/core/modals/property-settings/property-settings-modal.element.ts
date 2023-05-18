@@ -209,9 +209,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										placeholder="Enter description..."
 										.value=${this._returnData.description}></uui-textarea>
 								</div>
-								<umb-input-data-type
+								<umb-data-type-flow-input
 									.value=${this._returnData.dataTypeId}
-									@change=${this.#onDataTypeIdChange}></umb-input-data-type>
+									@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
 								<hr />
 								<div class="container">
 									<b>Validation</b>

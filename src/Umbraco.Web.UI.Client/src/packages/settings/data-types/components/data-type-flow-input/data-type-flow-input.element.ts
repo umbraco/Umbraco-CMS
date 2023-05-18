@@ -3,27 +3,25 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbModalRouteRegistrationController,
-	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbModalRouteRegistrationController, UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UmbDataTypeModel } from '@umbraco-cms/backoffice/models';
 
 // Note: Does only support picking a single data type. But this could be developed later into this same component. To follow other picker input components.
 /**
- * Form control for picking a data type.
- * @element umb-input-data-type
+ * Form control for picking or creating a data type.
+ * @element umb-data-type-flow-input
  * @fires change - when the value of the input changes
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-@customElement('umb-input-data-type')
+@customElement('umb-data-type-flow-input')
 export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
 
-	@state() private _selectedPropertyEditorUI?: ManifestPropertyEditorUI;
+	@state() private _selectedDataType?: UmbDataTypeModel;
 
 	/**
 	 * @param {string} dataTypeId
@@ -41,7 +39,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
 					selection: [this._value.toString()],
@@ -62,33 +60,34 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	#observeDataTypeId() {
 		if (!this._value) return;
 
-		this.observe(
+		/*this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._value.toString()),
 			(propertyEditorUI) => {
 				if (!propertyEditorUI) return;
 
-				this._selectedPropertyEditorUI = propertyEditorUI;
+				this._selectedDataType = propertyEditorUI;
 			},
 			'observePropertyEditorUI'
-		);
+		);*/
 	}
 
 	render() {
-		return this._selectedPropertyEditorUI
+		return this._selectedDataType
 			? html`
-					<umb-ref-property-editor-ui
-						name=${this._selectedPropertyEditorUI.meta.label}
-						alias=${this._selectedPropertyEditorUI.alias}
-						property-editor-model-alias=${this._selectedPropertyEditorUI.meta.propertyEditorModel}
+					<umb-ref-data-type
+						name=${this._selectedDataType.name}
+						property-editor-ui-alias=${this._selectedDataType.propertyEditorAlias}
+						property-editor-model-alias=${this._selectedDataType.propertyEditorUiAlias}
 						@open=${() => {
 							console.warn('TO BE DONE..');
 						}}
 						border>
-						<uui-icon name="${this._selectedPropertyEditorUI.meta.icon}" slot="icon"></uui-icon>
+						<!-- TODO: Get the icon from property editor UI -->
+						<uui-icon name="${'document'}" slot="icon"></uui-icon>
 						<uui-action-bar slot="actions">
 							<uui-button label="Change" .href=${this._modalRoute}></uui-button>
 						</uui-action-bar>
-					</umb-ref-property-editor-ui>
+					</umb-ref-data-type>
 			  `
 			: html`
 					<uui-button
@@ -114,6 +113,6 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-data-type': UmbInputDataTypeElement;
+		'umb-data-type-flow-input': UmbInputDataTypeElement;
 	}
 }
