@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_1_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -80,6 +79,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_12_0_0.ResetCache>("{539F2F83-FBA7-4C48-81A3-75081A56BB9D}");
 
         // To 12.1.0
-        To<TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
+        To<V_12_1_0.TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
     }
 }
