@@ -27,7 +27,7 @@ export class UmbAppElement extends UmbLitElement {
 	 * @remarks This is the base URL of the Umbraco server, not the base URL of the backoffice.
 	 */
 	@property({ type: String })
-	serverUrl = '';
+	serverUrl = window.location.origin;
 
 	/**
 	 * The base path of the backoffice.
