@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalRouteRegistrationController, UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbDataTypeModel } from '@umbraco-cms/backoffice/models';
+import { UmbRepositorySelectionManager } from '@umbraco-cms/backoffice/repository';
 
 // Note: Does only support picking a single data type. But this could be developed later into this same component. To follow other picker input components.
 /**
@@ -17,20 +17,26 @@ import type { UmbDataTypeModel } from '@umbraco-cms/backoffice/models';
  */
 @customElement('umb-data-type-flow-input')
 export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
+	#selectionManager;
+
 	protected getFormElement() {
 		return undefined;
 	}
 
-	@state() private _selectedDataType?: UmbDataTypeModel;
+	@state()
+	private _items?: Array<UmbDataTypeModel>;
 
 	/**
 	 * @param {string} dataTypeId
 	 * @default []
 	 */
 	@property({ attribute: false })
+	get value(): string {
+		return super.value.toString();
+	}
 	set value(dataTypeId: string) {
 		super.value = dataTypeId;
-		this.#observeDataTypeId();
+		this.#selectionManager.setSelection(dataTypeId.split(','));
 	}
 
 	@state()
@@ -39,16 +45,22 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
+		this.#selectionManager = new UmbRepositorySelectionManager<UmbDataTypeModel>(this, 'dataType');
+		this.observe(this.#selectionManager.selection, (selection) => {
+			super.value = selection.join(',');
+		});
+		this.observe(this.#selectionManager.selectedItems, (selectedItems) => (this._items = selectedItems));
+
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					selection: [this._value.toString()],
+					selection: this.#selectionManager.getSelection(),
 					submitLabel: 'Submit',
 				};
 			})
 			.onSubmit((submitData) => {
 				// TODO: we might should set the alias to null or empty string, if no selection.
-				this.value = submitData.selection[0] ?? null;
+				this.#selectionManager.setSelection(submitData.selection);
 				this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -57,27 +69,13 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 			});
 	}
 
-	#observeDataTypeId() {
-		if (!this._value) return;
-
-		/*this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._value.toString()),
-			(propertyEditorUI) => {
-				if (!propertyEditorUI) return;
-
-				this._selectedDataType = propertyEditorUI;
-			},
-			'observePropertyEditorUI'
-		);*/
-	}
-
 	render() {
-		return this._selectedDataType
+		return this._items && this._items.length > 0
 			? html`
 					<umb-ref-data-type
-						name=${this._selectedDataType.name}
-						property-editor-ui-alias=${this._selectedDataType.propertyEditorAlias}
-						property-editor-model-alias=${this._selectedDataType.propertyEditorUiAlias}
+						name=${this._items[0].name}
+						property-editor-ui-alias=${this._items[0].propertyEditorAlias}
+						property-editor-model-alias=${this._items[0].propertyEditorUiAlias}
 						@open=${() => {
 							console.warn('TO BE DONE..');
 						}}
