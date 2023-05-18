@@ -173,7 +173,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          */
         getTreePackageFolder: function (sectionAlias, treeAlias) {
             //we determine this based on the server variables
-            if (!Umbraco.Sys.ServerVariables.umbracoPlugins ||!Utilities.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
+            if (!Umbraco.Sys.ServerVariables.umbracoPlugins || !Utilities.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
                 return undefined;
             }
 
