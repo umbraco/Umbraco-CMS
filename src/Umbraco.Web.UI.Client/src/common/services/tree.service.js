@@ -178,7 +178,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             }
 
             const found = Umbraco.Sys.ServerVariables.umbracoPlugins.trees.find(item =>
-              invariantEquals(item.alias, treeAlias) && invariantEquals(item.packageFolder, sectionAlias));
+              invariantEquals(item.alias, treeAlias) && invariantEquals(item.sectionAlias, sectionAlias));
 
             return found ? found.packageFolder : undefined;            
         },
