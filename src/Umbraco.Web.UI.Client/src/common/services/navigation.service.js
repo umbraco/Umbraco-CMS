@@ -616,7 +616,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 if (!treeAlias) {
                     throw "Could not get tree alias for node " + args.node.id;
                 }
-                templateUrl = this.getTreeTemplateUrl(treeAlias, args.action.alias);
+                templateUrl = this.getTreeTemplateUrl(args.node.section, treeAlias, args.action.alias);
             }
 
             setMode("dialog");
@@ -631,6 +631,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           * @name umbraco.services.navigationService#getTreeTemplateUrl
           * @methodOf umbraco.services.navigationService
           *
+          * @param {string} sectionAlias the alias of the current section
           * @param {string} treeAlias the alias of the tree to look up
           * @param {string} action the view file name
           * @description
@@ -640,8 +641,8 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
           * we will also check for a 'packageName' for the current tree, if it exists then the convention will be:
           * for example: /App_Plugins/{mypackage}/backoffice/{treetype}/create.html
           */
-        getTreeTemplateUrl: function (treeAlias, action) {
-            var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
+          getTreeTemplateUrl: function (sectionAlias, treeAlias, action) {
+            var packageTreeFolder = treeService.getTreePackageFolder(sectionAlias, treeAlias);
             if (packageTreeFolder) {
                 return (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                     "/" + packageTreeFolder +

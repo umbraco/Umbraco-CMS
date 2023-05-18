@@ -175,8 +175,9 @@ window.app.config(function ($routeProvider) {
                 if ($routeParams.section.toLowerCase() === "users" && $routeParams.tree.toLowerCase() === "users" && usersPages.indexOf($routeParams.method.toLowerCase()) === -1) {
                     $scope.templateUrl = "views/users/overview.html";
                     return;
-                }
-                $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method);
+              }
+
+              $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.section, $routeParams.tree, $routeParams.method);
             },
             reloadOnSearch: false,
             resolve: canRoute(true)
@@ -190,8 +191,9 @@ window.app.config(function ($routeProvider) {
                 if (!$routeParams.tree || !$routeParams.method) {
                     $scope.templateUrl = "views/common/dashboard.html";
                     return;
-                }
-                $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method);
+              }
+
+              $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.section, $routeParams.tree, $routeParams.method);
             },
             reloadOnSearch: false,
             reloadOnUrl: false,
