@@ -1,18 +1,15 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyValueChangeEvent } from '../..';
-import UmbInputMultipleTextStringElement, {
+import {
+	UmbInputMultipleTextStringElement,
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-export type MultipleTextStringConfigData = Array<{
-	alias: 'minNumber' | 'maxNumber';
-	value: number;
-}>;
 
 /**
  * @element umb-property-editor-ui-multiple-text-string
@@ -26,9 +23,9 @@ export class UmbPropertyEditorUIMultipleTextStringElement
 	public value: MultipleTextStringValue = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: MultipleTextStringConfigData) {
-		this._limitMin = config.find((x) => x.alias === 'minNumber')?.value;
-		this._limitMax = config.find((x) => x.alias === 'maxNumber')?.value;
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._limitMin = config.getValueByAlias('minNumber');
+		this._limitMax = config.getValueByAlias('maxNumber');
 	}
 
 	/**

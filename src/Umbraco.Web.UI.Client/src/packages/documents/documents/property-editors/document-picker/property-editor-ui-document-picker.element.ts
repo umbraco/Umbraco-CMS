@@ -4,6 +4,7 @@ import type { UmbInputDocumentPickerElement } from '../../components/input-docum
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIContentPickerElement
@@ -21,7 +22,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
+	public set config(config: UmbDataTypePropertyCollection) {
 		const validationLimit = config.find((x) => x.alias === 'validationLimit');
 
 		this._limitMin = (validationLimit?.value as any).min;

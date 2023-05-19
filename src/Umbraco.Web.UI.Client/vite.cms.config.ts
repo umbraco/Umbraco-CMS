@@ -6,7 +6,7 @@ import { plugins } from './vite.config';
 export default defineConfig({
 	build: {
 		lib: {
-			entry: 'src/app.ts',
+			entry: 'src/apps/app/app.element.ts',
 			formats: ['es'],
 			fileName: 'main',
 		},

@@ -2,6 +2,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { UmbDateInputElement } from '../../../components/date-input/date-input.element';
 import { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 describe('UmbPropertyEditorUIDatePickerElement', () => {
 	let element: UmbPropertyEditorUIDatePickerElement;
@@ -25,13 +26,13 @@ describe('UmbPropertyEditorUIDatePickerElement', () => {
 	});
 
 	it('should show a type=date field if the format only contains a date', async () => {
-		element.config = [{ alias: 'format', value: 'YYYY-MM-dd' }];
+		element.config = new UmbDataTypePropertyCollection([{ alias: 'format', value: 'YYYY-MM-dd' }]);
 		await element.updateComplete;
 		expect(inputElement.type).to.equal('date');
 	});
 
 	it('should show a type=time field if the format only contains a time', async () => {
-		element.config = [{ alias: 'format', value: 'HH:mm' }];
+		element.config = new UmbDataTypePropertyCollection([{ alias: 'format', value: 'HH:mm' }]);
 		await element.updateComplete;
 		expect(inputElement.type).to.equal('time');
 	});

@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbInputMediaPickerElement } from '../../../../media/media/components/input-media-picker/input-media-picker.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @element umb-property-editor-ui-media-picker
@@ -21,12 +21,14 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	}
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		const validationLimit = config.find((x) => x.alias === 'validationLimit');
+	public set config(config: UmbDataTypePropertyCollection) {
+		const validationLimit = config.getByAlias('validationLimit');
 		if (!validationLimit) return;
 
-		this._limitMin = (validationLimit?.value as any).min;
-		this._limitMax = (validationLimit?.value as any).max;
+		const minMax: Record<string, number> = validationLimit.value;
+
+		this._limitMin = minMax.min;
+		this._limitMax = minMax.max;
 	}
 
 	@state()

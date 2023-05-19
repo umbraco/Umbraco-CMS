@@ -4,29 +4,28 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorPickerChangeEvent } from '@umbraco-ui/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-eye-dropper
  */
 @customElement('umb-property-editor-ui-eye-dropper')
 export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+	#defaultOpacity = false;
+
 	@property()
 	value = '';
 
 	@state()
-	private _opacity = false;
+	private _opacity = this.#defaultOpacity;
 
 	@state()
 	private _swatches: string[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		const showAlpha = config.find((x) => x.alias === 'showAlpha');
-		if (showAlpha) this._opacity = showAlpha.value;
-
-		const colorSwatches = config.find((x) => x.alias === 'palette');
-		if (colorSwatches) this._swatches = colorSwatches.value;
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._opacity = config.getValueByAlias('showAlpha') ?? this.#defaultOpacity;
+		this._swatches = config.getValueByAlias('palette') ?? [];
 	}
 
 	private _onChange(event: UUIColorPickerChangeEvent) {
