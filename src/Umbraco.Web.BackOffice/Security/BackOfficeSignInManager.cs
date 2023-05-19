@@ -45,9 +45,29 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         _globalSettings = globalSettings.Value;
     }
 
-    [Obsolete("Use ctor with all params")]
+    [Obsolete("Use ctor which takes IBackOfficeUserManager - this one will be removed in v14")]
     public BackOfficeSignInManager(
-        IBackOfficeUserManager userManager,
+        BackOfficeUserManager userManager,
+        IHttpContextAccessor contextAccessor,
+        IBackOfficeExternalLoginProviders externalLogins,
+        IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
+        IOptions<IdentityOptions> optionsAccessor,
+        IOptions<GlobalSettings> globalSettings,
+        ILogger<SignInManager<BackOfficeIdentityUser>> logger,
+        IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<BackOfficeIdentityUser> confirmation,
+        IEventAggregator eventAggregator)
+        : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
+    {
+        _userManager = userManager;
+        _externalLogins = externalLogins;
+        _eventAggregator = eventAggregator;
+        _globalSettings = globalSettings.Value;
+    }
+
+    [Obsolete("Use ctor with all params - this one will be removed in v14")]
+    public BackOfficeSignInManager(
+        BackOfficeUserManager userManager,
         IHttpContextAccessor contextAccessor,
         IBackOfficeExternalLoginProviders externalLogins,
         IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
