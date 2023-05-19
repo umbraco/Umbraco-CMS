@@ -9,9 +9,6 @@ import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/ba
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-
-import '../../property-actions/shared/property-action-menu/property-action-menu.element';
-import '../workspace/workspace-property-layout/workspace-property-layout.element';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
