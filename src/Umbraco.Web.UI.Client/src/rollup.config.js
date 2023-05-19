@@ -14,13 +14,14 @@ const createModuleDescriptors = (folderName) =>
 		};
 	});
 
-const exclude = [''];
+const exclude = ['css'];
 
 const libs = createModuleDescriptors('libs');
 const packages = createModuleDescriptors('packages');
 const apps = createModuleDescriptors('apps');
+const shared = createModuleDescriptors('shared');
 
-const modules = [...libs, ...apps, ...packages];
+const modules = [...libs, ...shared, ...apps, ...packages];
 const allowedModules = modules.filter((module) => !exclude.includes(module.name));
 
 export default allowedModules
