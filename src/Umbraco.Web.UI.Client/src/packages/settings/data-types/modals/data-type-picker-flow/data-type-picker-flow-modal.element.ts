@@ -12,9 +12,10 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-interface GroupedPropertyEditorUIs {
-	[key: string]: Array<ManifestPropertyEditorUI>;
+interface GroupedItems<T> {
+	[key: string]: Array<T>;
 }
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
@@ -33,7 +34,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _data?: UmbPropertyEditorUIPickerModalData | undefined;
 
 	@state()
-	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};
+	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
+
+	@state()
+	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUI> = {};
 
 	@state()
 	private _selection: Array<string> = [];
@@ -42,6 +46,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _submitLabel = 'Select';
 
 	#repository;
+	#dataTypes: Array<EntityTreeItemResponseModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
 	#currentFilterQuery = '';
 
@@ -49,16 +54,19 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		super();
 		this.#repository = new UmbDataTypeRepository(this);
 
+		this.#init();
+	}
+
+	async #init() {
 		// TODO: Get ALL items, or traverse the structure aka. multiple recursive calls.
-		this.#repository.requestRootTreeItems().then((response) => {
-			this.observe(
-				response.asObservable(),
-				(items) => {
-					console.log('items', items);
-				},
-				'_repositoryItemsObserver'
-			);
-		});
+		this.observe(
+			(await this.#repository.requestRootTreeItems()).asObservable(),
+			(items) => {
+				this.#dataTypes = items;
+				this._performFiltering();
+			},
+			'_repositoryItemsObserver'
+		);
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUI'), (propertyEditorUIs) => {
 			this.#propertyEditorUIs = propertyEditorUIs;
@@ -66,12 +74,18 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		});
 	}
 
-	private _handleClick(propertyEditorUI: ManifestPropertyEditorUI) {
-		this._select(propertyEditorUI.alias);
+	private _handleUIClick(propertyEditorUI: ManifestPropertyEditorUI) {
+		alert('To BE DONE.');
 	}
 
-	private _select(alias: string) {
-		this._selection = [alias];
+	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
+		if (dataType.id) {
+			this._select(dataType.id);
+		}
+	}
+
+	private _select(id: string) {
+		this._selection = [id];
 	}
 
 	private _handleFilterInput(event: UUIInputEvent) {
@@ -80,7 +94,18 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		this._performFiltering();
 	}
 	private _performFiltering() {
-		const result = !this.#currentFilterQuery
+		if (this.#currentFilterQuery) {
+			this._groupedDataTypes = groupBy(
+				this.#dataTypes.filter((dataType) => {
+					return dataType.name?.toLowerCase().includes(this.#currentFilterQuery);
+				}),
+				'meta.group'
+			);
+		} else {
+			this._groupedDataTypes = undefined;
+		}
+
+		const filteredUIs = !this.#currentFilterQuery
 			? this.#propertyEditorUIs
 			: this.#propertyEditorUIs.filter((propertyEditorUI) => {
 					return (
@@ -89,9 +114,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 					);
 			  });
 
-		// TODO: When filtering, then we should also display the available data types, in a separate list as the UIs.
-
-		this._groupedPropertyEditorUIs = groupBy(result, 'meta.group');
+		this._groupedPropertyEditorUIs = groupBy(filteredUIs, 'meta.group');
 	}
 
 	private _close() {
@@ -104,7 +127,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-body-layout headline="Select Property Editor">
+			<umb-body-layout headline="Select editor">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
@@ -112,6 +135,17 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				</div>
 			</umb-body-layout>
 		`;
+	}
+
+	private _renderGrid() {
+		return this.#currentFilterQuery
+			? html`
+					<h5>Available configurations</h5>
+					${this._renderDataTypes()}
+					<h5>Create a new configuration</h5>
+					${this._renderUIs()}
+			  `
+			: html`${this._renderUIs()}`;
 	}
 
 	private _renderFilter() {
@@ -124,21 +158,46 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		</uui-input>`;
 	}
 
-	private _renderGrid() {
+	private _renderDataTypes() {
+		return this._groupedDataTypes
+			? html` ${Object.entries(this._groupedDataTypes).map(
+					([key, value]) =>
+						html` <h4>${key}</h4>
+							${this._renderGroupDataTypes(value)}`
+			  )}`
+			: '';
+	}
+
+	private _renderGroupDataTypes(dataTypes: Array<EntityTreeItemResponseModel>) {
+		return html` <ul id="item-grid">
+			${repeat(
+				dataTypes,
+				(dataType) => dataType.id,
+				(dataType) => html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
+					<button type="button" @click="${() => this._handleDataTypeClick(dataType)}">
+						<uui-icon name="${dataType.icon}" class="icon"></uui-icon>
+						${dataType.name}
+					</button>
+				</li>`
+			)}
+		</ul>`;
+	}
+
+	private _renderUIs() {
 		return html` ${Object.entries(this._groupedPropertyEditorUIs).map(
 			([key, value]) =>
 				html` <h4>${key}</h4>
-					${this._renderGroupItems(value)}`
+					${this._renderGroupUIs(value)}`
 		)}`;
 	}
 
-	private _renderGroupItems(groupItems: Array<ManifestPropertyEditorUI>) {
+	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUI>) {
 		return html` <ul id="item-grid">
 			${repeat(
-				groupItems,
+				uis,
 				(propertyEditorUI) => propertyEditorUI.alias,
-				(propertyEditorUI) => html` <li class="item" ?selected=${this._selection.includes(propertyEditorUI.alias)}>
-					<button type="button" @click="${() => this._handleClick(propertyEditorUI)}">
+				(propertyEditorUI) => html` <li class="item">
+					<button type="button" @click="${() => this._handleUIClick(propertyEditorUI)}">
 						<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
 						${propertyEditorUI.meta.label || propertyEditorUI.name}
 					</button>
