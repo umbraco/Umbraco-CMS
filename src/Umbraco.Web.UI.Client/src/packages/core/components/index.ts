@@ -2,43 +2,38 @@ import { manifests as debugManifests } from './debug/manifests';
 
 // TODO: we need to figure out what components should be available for extensions and load them upfront
 // TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
-import './body-layout/body-layout.element';
-import './footer-layout/footer-layout.element';
-
-// TODO: delete these two and change usage to umb-dropdown
-import './button-with-dropdown/button-with-dropdown.element';
-import './tooltip-menu/tooltip-menu.element';
-
-import './dropdown/dropdown.element';
-import './code-block/code-block.element';
-import './debug/debug.element';
-import './empty-state/empty-state.element';
-import './extension-slot/extension-slot.element';
-
-import './date-input/date-input.element';
-
-import './input-checkbox-list/input-checkbox-list.element';
-import './input-color-picker/input-color-picker.element';
-import './input-eye-dropper/input-eye-dropper.element';
-import './input-multi-url-picker/input-multi-url-picker.element';
-import './input-slider/input-slider.element';
-import './input-toggle/input-toggle.element';
-import './input-upload-field/input-upload-field.element';
-
-import './property-type-based-property/property-type-based-property.element';
-import './ref-property-editor-ui/ref-property-editor-ui.element';
-import './property-editor-config/property-editor-config.element';
-import '../workspace/workspace-variant/variantable-property/variantable-property.element';
-import './property-creator/property-creator.element';
-import './header-app/header-app-button.element';
-import './history/history-list.element';
-import './history/history-item.element';
-import './variant-selector/variant-selector.element';
-
-export * from './table';
-export * from './backoffice-notification-container/backoffice-notification-container.element';
 export * from './backoffice-modal-container/backoffice-modal-container.element';
-
-//export * from './code-editor';
+export * from './backoffice-notification-container/backoffice-notification-container.element';
+export * from './body-layout/body-layout.element';
+export * from './button-with-dropdown/button-with-dropdown.element'; // TODO: delete this and change usage to umb-dropdown
+export * from './code-block';
+export * from './code-editor';
+export * from './data-type';
+export * from './date-input';
+export * from './debug';
+export * from './dropdown';
+export * from './empty-state';
+export * from './extension-slot';
+export * from './footer-layout';
+export * from './header-app';
+export * from './history';
+export * from './input-checkbox-list';
+export * from './input-color-picker';
+export * from './input-eye-dropper';
+export * from './input-list-base';
+export * from './input-multi-url-picker';
+export * from './input-number-range';
+export * from './input-radio-button-list';
+export * from './input-section';
+export * from './input-slider';
+export * from './input-toggle';
+export * from './input-upload-field';
+export * from './property-creator';
+export * from './property-editor-config';
+export * from './property-type-based-property';
+export * from './ref-property-editor-ui';
+export * from './table';
+export * from './tooltip-menu';
+export * from './variant-selector';
 
 export const manifests = [...debugManifests];
