@@ -2,9 +2,9 @@
 import { RouterSlot } from 'router-slot/router-slot';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbLitElement } from '../lit-element';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRouteContext, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 /**
@@ -16,8 +16,6 @@ import { UmbRouteContext, UmbRoute } from '@umbraco-cms/backoffice/router';
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends UmbLitElement {
-	
-
 	#router: RouterSlot = new RouterSlot();
 	#modalRouter: RouterSlot = new RouterSlot();
 	#listening = false;
@@ -115,7 +113,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	render() {
 		return html`${this.#router}${this.#modalRouter}`;
 	}
-	
+
 	static styles = [
 		css`
 			:host {
