@@ -1,5 +1,3 @@
-// eslint-disable-next-line local-rules/no-external-imports
-import { RouterSlot } from 'router-slot/router-slot';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '../lit-element';
@@ -16,8 +14,8 @@ import { UmbRouteContext, UmbRoute, IRouterSlot } from '@umbraco-cms/backoffice/
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends UmbLitElement {
-	#router: RouterSlot = new RouterSlot();
-	#modalRouter: RouterSlot = new RouterSlot();
+	#router: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
+	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
 
 	@property()
