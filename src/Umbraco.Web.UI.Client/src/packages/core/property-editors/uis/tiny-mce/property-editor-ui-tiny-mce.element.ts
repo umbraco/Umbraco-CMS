@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-tiny-mce
@@ -11,16 +11,14 @@ import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type
 @customElement('umb-property-editor-ui-tiny-mce')
 export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
 
+	#configuration?: UmbDataTypePropertyCollection;
 
 	@property({ type: String })
 	value = '';
 
-	configuration: Array<DataTypePropertyPresentationModel> = [];
-
 	@property({ type: Array, attribute: false })
-	public config = new UmbDataTypePropertyCollection();
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		this.configuration = config;
+	public set config(config: UmbDataTypePropertyCollection) {
+		this.#configuration = config;
 	}
 
 	#onChange(event: InputEvent) {
@@ -31,7 +29,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	render() {
 		return html`<umb-input-tiny-mce
 			@change=${this.#onChange}
-			.configuration=${this.configuration}
+			.configuration=${this.#configuration}
 			.value=${this.value}></umb-input-tiny-mce>`;
 	}
 

@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import tinymce, { AstNode, Editor, EditorEvent } from 'tinymce';
 import { firstValueFrom } from 'rxjs';
-
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
@@ -19,7 +19,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -27,7 +26,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@property()
-	configuration: Array<DataTypePropertyPresentationModel> = [];
+	configuration?: UmbDataTypePropertyCollection;
 
 	// TODO => create interface when we know what shape that will take
 	// TinyMCE provides the EditorOptions interface, but all props are required
@@ -123,7 +122,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		Object.assign(
 			this._configObject,
 			this.#fallbackConfig,
-			this.configuration ? Object.fromEntries(this.configuration.map((x) => [x.alias, x.value])) : {}
+			this.configuration ? this.configuration?.toObject() : {}
 		);
 
 		// no auto resize when a fixed height is set
@@ -315,7 +314,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		editor.addShortcut('Ctrl+S', '', () =>
 			this.dispatchEvent(new CustomEvent('rte.shortcut.save', { composed: true, bubbles: true }))
 		);
-		
+
 		editor.addShortcut('Ctrl+P', '', () =>
 			this.dispatchEvent(new CustomEvent('rte.shortcut.saveAndPublish', { composed: true, bubbles: true }))
 		);
@@ -446,7 +445,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		return html``;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
