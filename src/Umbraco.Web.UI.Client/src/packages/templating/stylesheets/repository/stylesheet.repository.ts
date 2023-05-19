@@ -2,7 +2,7 @@ import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from 
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from 'src/packages/core/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';

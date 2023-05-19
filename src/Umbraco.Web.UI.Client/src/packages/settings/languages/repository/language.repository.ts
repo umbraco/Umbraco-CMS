@@ -4,7 +4,7 @@ import { UmbLanguageItemServerDataSource } from './sources/language-item.server.
 import { UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, UmbLanguageItemStore } from './language-item.store';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from 'src/packages/core/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 

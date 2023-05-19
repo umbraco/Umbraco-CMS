@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import type { UmbNotificationDefaultData, UmbNotificationHandler } from 'src/packages/core/notification';
+import type { UmbNotificationDefaultData, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 
 export type { UmbNotificationDefaultData };
 

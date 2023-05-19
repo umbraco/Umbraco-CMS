@@ -5,7 +5,7 @@ import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from 'src/packages/core/notification';
+} from '@umbraco-cms/backoffice/notification';
 import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';

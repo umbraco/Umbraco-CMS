@@ -4,7 +4,7 @@ import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.det
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store';
 import { UmbMemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from 'src/packages/core/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

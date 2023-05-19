@@ -33,7 +33,7 @@ import {
 	FolderTreeItemResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from 'src/packages/core/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 export class UmbDataTypeRepository
 	implements
 		UmbItemRepository<DataTypeItemResponseModel>,

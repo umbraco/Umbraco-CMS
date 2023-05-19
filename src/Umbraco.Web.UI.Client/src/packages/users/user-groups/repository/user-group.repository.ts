@@ -22,7 +22,7 @@ import {
 	UmbRepositoryResponse,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from 'src/packages/core/notification';
+import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: implement

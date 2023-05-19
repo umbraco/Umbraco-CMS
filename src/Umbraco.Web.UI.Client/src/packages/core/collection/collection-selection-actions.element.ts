@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
-import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from 'src/packages/core/collection';
+import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { ManifestEntityBulkAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
