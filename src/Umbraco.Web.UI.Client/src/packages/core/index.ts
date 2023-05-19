@@ -11,6 +11,12 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
+// TODO: temp solution to make sure all elements are registered
+import './collection';
+import './tree';
+import './debug';
+import './entity-action';
+import './entity-bulk-action';
 import './menu';
 
 export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [

@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbTreeContextBase } from 'src/packages/core/tree';
+import { UmbTreeContextBase } from './tree.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
