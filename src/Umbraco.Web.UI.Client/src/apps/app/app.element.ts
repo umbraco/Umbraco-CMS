@@ -1,9 +1,6 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 import 'element-internals-polyfill';
 
-import '../../shared/router/router-slot.element';
-import '../../shared/router/variant-router-slot.element';
-
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';

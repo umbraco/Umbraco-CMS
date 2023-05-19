@@ -1,4 +1,4 @@
-import type { UmbWorkspaceContextInterface } from 'src/packages/core/workspace';
+import type { UmbWorkspaceContextInterface } from './workspace-context.interface';
 
 export interface UmbEntityWorkspaceContextInterface<EntityType = unknown>
 	extends UmbWorkspaceContextInterface<EntityType> {

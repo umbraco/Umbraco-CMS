@@ -1,12 +1,14 @@
-import { manifests as componentManifests, UmbStoreExtensionInitializer } from './components';
+import {
+	manifests as componentManifests,
+	UmbBackofficeNotificationContainerElement,
+	UmbBackofficeModalContainerElement,
+} from './components';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as propertyEditorManifests } from './property-editors/manifests';
-import { manifests as modalManifests } from './components/modal/common/manifests';
+import { manifests as modalManifests } from './modal/common/manifests';
+import { UmbStoreExtensionInitializer } from './store';
 
-import { UmbBackofficeNotificationContainerElement } from './components/backoffice-notification-container/backoffice-notification-container.element';
-import { UmbBackofficeModalContainerElement } from './components/backoffice-modal-container/backoffice-modal-container.element';
-
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from 'src/packages/core/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';

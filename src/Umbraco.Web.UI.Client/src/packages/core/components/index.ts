@@ -15,9 +15,6 @@ import './debug/debug.element';
 import './empty-state/empty-state.element';
 import './extension-slot/extension-slot.element';
 
-import './backoffice-modal-container/backoffice-modal-container.element';
-import './backoffice-notification-container/backoffice-notification-container.element';
-
 import './date-input/date-input.element';
 
 import './input-checkbox-list/input-checkbox-list.element';
@@ -39,6 +36,8 @@ import './history/history-item.element';
 import './variant-selector/variant-selector.element';
 
 export * from './table';
+export * from './backoffice-notification-container/backoffice-notification-container.element';
+export * from './backoffice-modal-container/backoffice-modal-container.element';
 
 //export * from './code-editor';
 

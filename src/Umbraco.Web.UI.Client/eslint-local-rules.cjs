@@ -142,6 +142,7 @@ module.exports = {
 
 	// TODO: Its not bullet proof, but it will catch most/some cases.
 	/** @type {import('eslint').Rule.RuleModule} */
+	/*
 	'prefer-umbraco-cms-imports': {
 		meta: {
 			type: 'suggestion',
@@ -174,6 +175,7 @@ module.exports = {
 			};
 		},
 	},
+	*/
 
 	/** @type {import('eslint').Rule.RuleModule} */
 	'no-external-imports': {
