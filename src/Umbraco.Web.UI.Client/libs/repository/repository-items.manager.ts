@@ -5,24 +5,40 @@ import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbRepositorySelectionManager<ItemType extends ItemResponseModelBaseModel> {
+/**
+ *
+ * !!!!!!!!!!!!!!!!!!!!!
+ * !!!!!!!!!!!!!!!!!!!!!
+ * NOTE FOR MY SELF:
+ * !!!!!!!!!!!!!!!!!!!!!
+ * !!!!!!!!!!!!!!!!!!!!!
+ *
+ * Maybe this should not be called something with selection, but rather something with items/consumption/usage/... so its not about a selection, but just a given set of ids/uniques. We most likely need the unique getter method anyway.
+ */
+export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
 	repository?: UmbItemRepository<ItemType>;
+	#getUnique: (entry: ItemType) => string | undefined;
 
 	init: Promise<void>;
 
-	#selection = new UmbArrayState<string>([]);
-	selection = this.#selection.asObservable();
+	#uniques = new UmbArrayState<string>([]);
+	uniques = this.#uniques.asObservable();
 
-	#selectedItems = new UmbArrayState<ItemType>([]);
-	selectedItems = this.#selectedItems.asObservable();
+	#items = new UmbArrayState<ItemType>([]);
+	items = this.#items.asObservable();
 
-	#selectedItemsObserver?: UmbObserverController<ItemType[]>;
+	itemsObserver?: UmbObserverController<ItemType[]>;
 
 	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
 	then it need to be bound to the type and can't be a generic method we pass in. */
-	constructor(host: UmbControllerHostElement, repositoryAlias: string) {
+	constructor(
+		host: UmbControllerHostElement,
+		repositoryAlias: string,
+		getUniqueMethod?: (entry: ItemType) => string | undefined
+	) {
 		this.host = host;
+		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
 		//TODO: The promise can probably be done in a cleaner way.
 		this.init = new Promise((resolve) => {
@@ -46,34 +62,32 @@ export class UmbRepositorySelectionManager<ItemType extends ItemResponseModelBas
 		});
 	}
 
-	getSelection() {
-		return this.#selection.value;
+	getUniques() {
+		return this.#uniques.value;
 	}
 
-	setSelection(selection: string[]) {
-		this.#selection.next(selection);
+	setUniques(uniques: string[]) {
+		this.#uniques.next(uniques);
 
 		//TODO: Check if it's safe to call requestItems here.
 		this.#requestItems();
 	}
 
-	getSelectedItems() {
-		return this.#selectedItems.value;
+	getItems() {
+		return this.#items.value;
 	}
 
 	async #requestItems() {
 		await this.init;
 		if (!this.repository) throw new Error('Repository is not initialized');
-		if (this.#selectedItemsObserver) this.#selectedItemsObserver.destroy();
+		if (this.itemsObserver) this.itemsObserver.destroy();
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
 
-		const { asObservable } = await this.repository.requestItems(this.getSelection());
+		const { asObservable } = await this.repository.requestItems(this.getUniques());
 
 		if (asObservable) {
-			this.#selectedItemsObserver = new UmbObserverController(this.host, asObservable(), (data) =>
-				this.#selectedItems.next(data)
-			);
+			this.itemsObserver = new UmbObserverController(this.host, asObservable(), (data) => this.#items.next(data));
 		}
 	}
 

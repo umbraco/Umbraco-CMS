@@ -2,10 +2,10 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import type { UmbDataTypeModel } from '../../models';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalRouteRegistrationController, UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { UmbDataTypeModel } from '@umbraco-cms/backoffice/models';
-import { UmbRepositorySelectionManager } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 
 // Note: Does only support picking a single data type. But this could be developed later into this same component. To follow other picker input components.
 /**
@@ -36,7 +36,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	}
 	set value(dataTypeId: string) {
 		super.value = dataTypeId;
-		this.#selectionManager.setSelection(dataTypeId.split(','));
+		this.#selectionManager.setUniques(dataTypeId.split(','));
 	}
 
 	@state()
@@ -45,22 +45,22 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.#selectionManager = new UmbRepositorySelectionManager<UmbDataTypeModel>(this, 'dataType');
-		this.observe(this.#selectionManager.selection, (selection) => {
+		this.#selectionManager = new UmbRepositoryItemsManager<UmbDataTypeModel>(this, 'dataType');
+		this.observe(this.#selectionManager.uniques, (selection) => {
 			super.value = selection.join(',');
 		});
-		this.observe(this.#selectionManager.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#selectionManager.items, (selectedItems) => (this._items = selectedItems));
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					selection: this.#selectionManager.getSelection(),
+					selection: this.#selectionManager.getUniques(),
 					submitLabel: 'Submit',
 				};
 			})
 			.onSubmit((submitData) => {
 				// TODO: we might should set the alias to null or empty string, if no selection.
-				this.#selectionManager.setSelection(submitData.selection);
+				this.#selectionManager.setUniques(submitData.selection);
 				this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 			})
 			.observeRouteBuilder((routeBuilder) => {

@@ -1,4 +1,4 @@
-import { UmbItemRepository, UmbRepositorySelectionManager } from '@umbraco-cms/backoffice/repository';
+import { UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UMB_CONFIRM_MODAL,
@@ -23,7 +23,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 	#init: Promise<unknown>;
 
-	#selectionManager;
+	#itemManager;
 
 	selection;
 	selectedItems;
@@ -43,13 +43,13 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		this.modalAlias = modalAlias;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		this.#selectionManager = new UmbRepositorySelectionManager<ItemType>(host, repositoryAlias);
+		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(host, repositoryAlias, this.#getUnique);
 
-		this.selection = this.#selectionManager.selection;
-		this.selectedItems = this.#selectionManager.selectedItems;
+		this.selection = this.#itemManager.uniques;
+		this.selectedItems = this.#itemManager.items;
 
 		this.#init = Promise.all([
-			this.#selectionManager.init,
+			this.#itemManager.init,
 			new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 				this.modalContext = instance;
 			}).asPromise(),
@@ -57,11 +57,11 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	}
 
 	getSelection() {
-		return this.#selectionManager.getSelection();
+		return this.#itemManager.getUniques();
 	}
 
 	setSelection(selection: string[]) {
-		this.#selectionManager.setSelection(selection);
+		this.#itemManager.setUniques(selection);
 	}
 
 	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
@@ -87,7 +87,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		if (!this.repository) throw new Error('Repository is not initialized');
 
 		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
-		const item = this.#selectionManager.getSelectedItems().find((item) => this.#getUnique(item) === unique);
+		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
 		const modalHandler = this.modalContext?.open(UMB_CONFIRM_MODAL, {
