@@ -1,6 +1,6 @@
 import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types/index';
 import type { ManifestElement, ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
-import { UmbWorkspaceAction } from 'src/packages/core/workspace';
+import { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export interface ManifestWorkspaceAction extends ManifestElement {
 	type: 'workspaceAction';

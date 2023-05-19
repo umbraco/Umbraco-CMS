@@ -1,5 +1,5 @@
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbId } from 'src/packages/core/id';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeContainerResponseModelBaseModel,

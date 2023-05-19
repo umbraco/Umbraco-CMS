@@ -1,9 +1,10 @@
 // TODO: Be aware here we import a class from src!
-import { UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/router';
 import { UmbModalRouteRegistration } from './modal-route-registration';
+import { UmbModalToken } from './token';
+import { UmbModalConfig } from './modal.context';
+import { UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/router';
 import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbModalConfig, UmbModalToken } from 'src/packages/core/modal';
 
 export class UmbModalRouteRegistrationController<D extends object = object, R = any>
 	extends UmbModalRouteRegistration<D, R>

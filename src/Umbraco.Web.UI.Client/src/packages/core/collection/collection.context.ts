@@ -9,7 +9,7 @@ import {
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbCollectionFilterModel } from 'src/packages/core/collection';
+import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
 // TODO: Clean up the need for store as Media has switched to use Repositories(repository).
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> {
