@@ -5,16 +5,6 @@ import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-/**
- *
- * !!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!
- * NOTE FOR MY SELF:
- * !!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!
- *
- * Maybe this should not be called something with selection, but rather something with items/consumption/usage/... so its not about a selection, but just a given set of ids/uniques. We most likely need the unique getter method anyway.
- */
 export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
 	repository?: UmbItemRepository<ItemType>;
