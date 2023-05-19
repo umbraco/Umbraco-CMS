@@ -5,8 +5,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import type { MemberGroupDetails } from '../types';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-member-group-edit-workspace
  * @description - Element for displaying a Member Group Workspace

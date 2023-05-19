@@ -1,5 +1,5 @@
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -13,7 +13,6 @@ import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
-	UMB_ENTITY_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/context-api';
 
 // If we get this from the server then we can consider using TypeScripts Partial<> around the model from the Management-API.

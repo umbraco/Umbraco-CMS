@@ -4,8 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbUserWorkspaceContext } from '../user-workspace.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-user-workspace-action-save')
 export class UmbUserWorkspaceActionSaveElement extends UmbLitElement {
 	@state()

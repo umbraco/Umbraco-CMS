@@ -1,13 +1,12 @@
 import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
 import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { ActiveVariant } from 'src/packages/core/workspace';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 	UmbContextToken,
-	UMB_ENTITY_WORKSPACE_CONTEXT,
 } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT, ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbClassState,

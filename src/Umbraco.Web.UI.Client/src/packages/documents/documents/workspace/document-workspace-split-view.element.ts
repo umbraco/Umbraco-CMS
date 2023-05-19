@@ -5,8 +5,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context';
 import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	private _workspaceContext?: UmbDocumentWorkspaceContext;
