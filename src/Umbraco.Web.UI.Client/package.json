@@ -79,6 +79,7 @@
 		"@mdx-js/react": "^2.2.1",
 		"@open-wc/testing": "^3.1.7",
 		"@playwright/test": "^1.30.0",
+		"@rollup/plugin-commonjs": "^25.0.0",
 		"@rollup/plugin-json": "^6.0.0",
 		"@rollup/plugin-node-resolve": "^15.0.1",
 		"@storybook/addon-a11y": "^7.0.11",
