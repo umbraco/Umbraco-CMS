@@ -4,3 +4,4 @@ export * from './workspace-editor';
 export * from './workspace-context';
 export * from './workspace-variant';
 export * from './workspace-split-view-manager.class';
+export * from './workspace-property';

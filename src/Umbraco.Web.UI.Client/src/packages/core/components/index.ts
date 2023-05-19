@@ -28,7 +28,7 @@ import './input-upload-field/input-upload-field.element';
 import './property-type-based-property/property-type-based-property.element';
 import './ref-property-editor-ui/ref-property-editor-ui.element';
 import './property-editor-config/property-editor-config.element';
-import './variantable-property/variantable-property.element';
+import '../workspace/workspace-variant/variantable-property/variantable-property.element';
 import './property-creator/property-creator.element';
 import './header-app/header-app-button.element';
 import './history/history-list.element';
