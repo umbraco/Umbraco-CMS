@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash-es';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
+import { UmbDataTypeRepository } from '../../repository/data-type.repository';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult,
@@ -21,7 +22,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
 
 	@property({ type: Object })
-	data?: UmbPropertyEditorUIPickerModalData;
+	public get data(): UmbPropertyEditorUIPickerModalData | undefined {
+		return this._data;
+	}
+	public set data(value: UmbPropertyEditorUIPickerModalData | undefined) {
+		this._data = value;
+		this._selection = this.data?.selection ?? [];
+		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
+	}
+	private _data?: UmbPropertyEditorUIPickerModalData | undefined;
 
 	@state()
 	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};
@@ -32,23 +41,26 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@state()
 	private _submitLabel = 'Select';
 
+	#repository;
 	#propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
 	#currentFilterQuery = '';
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	constructor() {
+		super();
+		this.#repository = new UmbDataTypeRepository(this);
 
-		this._selection = this.data?.selection ?? [];
-		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
-
-		this._usePropertyEditorUIs();
-	}
-
-	private _usePropertyEditorUIs() {
-		if (!this.data) return;
+		// TODO: Get ALL items, or traverse the structure aka. multiple recursive calls.
+		this.#repository.requestRootTreeItems().then((response) => {
+			this.observe(
+				response.asObservable(),
+				(items) => {
+					console.log('items', items);
+				},
+				'_repositoryItemsObserver'
+			);
+		});
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUI'), (propertyEditorUIs) => {
-			// TODO: this should use same code as querying.
 			this.#propertyEditorUIs = propertyEditorUIs;
 			this._performFiltering();
 		});

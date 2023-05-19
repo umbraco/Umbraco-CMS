@@ -4,7 +4,7 @@ import type { UmbDataTypePickerFlowModalElement } from './data-type-picker-flow-
 import type { UmbPropertyEditorUIPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 import './data-type-picker-flow-modal.element';
-import '../../../components/body-layout/body-layout.element';
+import '../../../../core/components/body-layout/body-layout.element';
 
 export default {
 	title: 'API/Modals/Layouts/Data Type Picker Flow',
