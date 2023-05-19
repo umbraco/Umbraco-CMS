@@ -82,13 +82,16 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson
             ? typeof(IRichTextElement)
-            : typeof(string);
+            : typeof(RichTextModel);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (_deliveryApiSettings.RichTextOutputAsJson is false)
         {
-            return Convert(inter, preview) ?? string.Empty;
+            return new RichTextModel
+            {
+                Markup = Convert(inter, preview, false) ?? string.Empty
+            };
         }
 
         var sourceString = inter?.ToString();
@@ -126,7 +129,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         }
     }
 
-    private string? Convert(object? source, bool preview)
+    private string? Convert(object? source, bool preview, bool handleMacros = true)
     {
         if (source == null)
         {
@@ -141,7 +144,10 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         sourceString = _imageSourceParser.EnsureImageSources(sourceString);
 
         // ensure string is parsed for macros and macros are executed correctly
-        sourceString = RenderRteMacros(sourceString, preview);
+        if (handleMacros)
+        {
+            sourceString = RenderRteMacros(sourceString, preview);
+        }
 
         // find and remove the rel attributes used in the Umbraco UI from img tags
         var doc = new HtmlDocument();

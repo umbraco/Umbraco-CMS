@@ -37,4 +37,11 @@ public interface IMigrationContext
     ///     Gets or sets a value indicating whether an expression is being built.
     /// </summary>
     bool BuildingExpression { get; set; }
+
+    /// <summary>
+    ///     Adds a post-migration.
+    /// </summary>
+    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
+    void AddPostMigration<TMigration>()
+        where TMigration : MigrationBase;
 }
