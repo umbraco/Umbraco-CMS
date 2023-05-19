@@ -8,11 +8,11 @@ import type {
 } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
 import { UmbRouterSlotElement } from '@umbraco-cms/internal/router';
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestModal, umbExtensionsRegistry } from '../extension-registry';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
