@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence
 {
@@ -86,6 +88,22 @@ namespace Umbraco.Core.Persistence
                     parameter.DbType = DbType.String;
 
             return command;
+        }
+
+        public void AddParameter(DbCommand cmd, PocoColumn column, object value)
+        {
+            if (DatabaseType.IsSqlServer())
+            {
+                if (column.ColumnType == typeof(byte[]) && value == null)
+                {
+                    value = new SqlParameter("_bytes", SqlDbType.VarBinary, -1)
+                    {
+                        Value = DBNull.Value
+                    };
+                }
+            }
+
+            base.AddParameter(cmd, value);
         }
 
         #endregion
