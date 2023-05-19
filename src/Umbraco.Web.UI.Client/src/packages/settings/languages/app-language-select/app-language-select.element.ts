@@ -120,12 +120,11 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			}
 
 			#toggle {
-				display: block;
-				width: 100%;
+				width: var(--umb-section-sidebar-layout-width);
 				text-align: left;
 				background: none;
 				border: none;
-				height: 70px;
+				height: var(--umb-header-layout-height);
 				padding: 0 var(--uui-size-8);
 				border-bottom: 1px solid var(--uui-color-border);
 				font-size: 14px;
@@ -137,6 +136,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 			#toggle:hover {
 				background-color: var(--uui-color-surface-emphasis);
+			}
+
+			[open] uui-symbol-expand {
+				transform: rotate(90deg);
 			}
 		`,
 	];

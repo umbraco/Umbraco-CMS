@@ -30,7 +30,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 		UUITextStyles,
 		css`
 			:host {
-				flex: 0 0 300px;
+				flex: 0 0 var(--umb-section-sidebar-layout-width);
 				background-color: var(--uui-color-surface);
 				height: 100%;
 				border-right: 1px solid var(--uui-color-border);
