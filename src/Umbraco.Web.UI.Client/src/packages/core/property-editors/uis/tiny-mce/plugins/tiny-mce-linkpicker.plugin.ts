@@ -14,8 +14,21 @@ export interface LinkListItem {
 	menu?: unknown;
 }
 
+interface AnchorElementAttributes {
+	href?: string | null;
+	title?: string | null;
+	target?: string | null;
+	'data-anchor'?: string | null;
+	rel?: string | null;
+	text?: string;
+}
+
 export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalContext;
+
+	#linkPickerData?: UmbLinkPickerModalResult;
+
+	#anchorElement?: HTMLAnchorElement;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
@@ -47,41 +60,36 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	}
 
 	async showDialog() {
-		const data: { text?: string; href?: string; target?: string; rel?: string } = {};
-		const selection = this.editor.selection;
-		const dom = this.editor.dom;
+		const selectedElm = this.editor.selection.getNode();
+		this.#anchorElement = this.editor.dom.getParent(selectedElm, 'a[href]') as HTMLAnchorElement;
 
-		const selectedElm = selection.getNode();
-		const anchorElm = dom.getParent(selectedElm, 'a[href]') as HTMLAnchorElement;
-
-		data.text = anchorElm
-			? anchorElm.innerText || (anchorElm.textContent ?? '')
-			: selection.getContent({ format: 'text' });
-
-		data.href = anchorElm?.getAttribute('href') ?? '';
-		data.target = anchorElm?.target ?? '';
-		data.rel = anchorElm?.rel ?? '';
+		const data: AnchorElementAttributes = {
+			text: this.#anchorElement
+				? this.#anchorElement.innerText || (this.#anchorElement.textContent ?? '')
+				: this.editor.selection.getContent({ format: 'text' }),
+			href: this.#anchorElement?.getAttribute('href') ?? '',
+			target: this.#anchorElement?.target ?? '',
+			rel: this.#anchorElement?.rel ?? '',
+		};
 
 		if (selectedElm.nodeName === 'IMG') {
 			data.text = ' ';
 		}
 
-		let currentTarget: UmbLinkPickerLink = {};
-
-		if (!anchorElm) {
-			this.#openLinkPicker(currentTarget, anchorElm);
+		if (!this.#anchorElement) {
+			this.#openLinkPicker();
 			return;
 		}
 
 		//if we already have a link selected, we want to pass that data over to the dialog
-		currentTarget = {
-			name: anchorElm.title,
-			url: anchorElm.getAttribute('href') ?? '',
-			target: anchorElm.target,
+		const currentTarget: UmbLinkPickerLink = {
+			name: this.#anchorElement.title,
+			url: this.#anchorElement.getAttribute('href') ?? '',
+			target: this.#anchorElement.target,
 		};
 
 		// drop the lead char from the anchor text, if it has a value
-		const anchorVal = anchorElm.dataset.anchor;
+		const anchorVal = this.#anchorElement.dataset.anchor;
 		if (anchorVal) {
 			currentTarget.queryString = anchorVal.substring(1);
 		}
@@ -91,16 +99,16 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 				currentTarget.url?.substring(currentTarget.url.indexOf(':') + 1, currentTarget.url.lastIndexOf('}')) ?? '';
 		}
 
-		this.#openLinkPicker(currentTarget, anchorElm);
+		this.#openLinkPicker(currentTarget);
 	}
 
 	// TODO => get anchors to provide to link picker?
-	async #openLinkPicker(currentTarget: UmbLinkPickerLink, anchorElement?: HTMLAnchorElement) {
+	async #openLinkPicker(currentTarget?: UmbLinkPickerLink) {
 		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL, {
 			config: {
 				ignoreUserStartNodes: this.configuration?.find((x) => x.alias === 'ignoreUserStartNodes')?.value,
 			},
-			link: currentTarget,
+			link: currentTarget ?? {},
 			index: null,
 		});
 
@@ -109,119 +117,106 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 		const linkPickerData = await modalHandler.onSubmit();
 		if (!linkPickerData) return;
 
-		this.#updateLink(linkPickerData, anchorElement);
+		this.#linkPickerData = linkPickerData;
+		this.#updateLink();
 	}
 
-	#updateLink(linkPickerData: UmbLinkPickerModalResult, anchorElement?: HTMLAnchorElement) {
-		const editor = this.editor;
-		let href = linkPickerData.link.url;
+	//Create a json obj used to create the attributes for the tag
+	// TODO => where has rel gone?
+	#createElemAttributes() {
+		const a: AnchorElementAttributes = Object.assign({}, this.#linkPickerData?.link, { 'data-anchor': null });
+		if (this.#linkPickerData?.link.queryString?.startsWith('#')) {
+			a['data-anchor'] = this.#linkPickerData?.link.queryString;
+			a.href += this.#linkPickerData?.link.queryString;
+		}
 
+		return a;
+	}
+
+	#insertLink() {
+		if (this.#anchorElement) {
+			this.editor.dom.setAttribs(this.#anchorElement, this.#createElemAttributes());
+			this.editor.selection.select(this.#anchorElement);
+			this.editor.execCommand('mceEndTyping');
+			return;
+		}
+
+		// If there is no selected content, we can't insert a link
+		// as TinyMCE needs selected content for this, so instead we
+		// create a new dom element and insert it, using the chosen
+		// link name as the content.
+		if (this.editor.selection.getContent() !== '') {
+			this.editor.execCommand('mceInsertLink', false, this.#createElemAttributes());
+			return;
+		}
+
+		// Using the target url as a fallback, as href might be confusing with a local link
+		const linkContent =
+			typeof this.#linkPickerData?.link.name !== 'undefined' && this.#linkPickerData?.link.name !== ''
+				? this.#linkPickerData?.link.name
+				: this.#linkPickerData?.link.url;
+
+		// only insert if link has content
+		if (linkContent) {
+			const domElement = this.editor.dom.createHTML('a', this.#createElemAttributes(), linkContent);
+			this.editor.execCommand('mceInsertContent', false, domElement);
+		}
+	}
+
+	#updateLink() {
 		// if an anchor exists, check that it is appropriately prefixed
 		if (
-			linkPickerData.link.queryString &&
-			!linkPickerData.link.queryString.startsWith('?') &&
-			!linkPickerData.link.queryString.startsWith('#')
+			this.#linkPickerData?.link.queryString &&
+			!this.#linkPickerData.link.queryString.startsWith('?') &&
+			!this.#linkPickerData.link.queryString.startsWith('#')
 		) {
-			linkPickerData.link.queryString =
-				(linkPickerData.link.queryString.startsWith('=') ? '#' : '?') + linkPickerData.link.queryString;
+			this.#linkPickerData.link.queryString =
+				(this.#linkPickerData.link.queryString.startsWith('=') ? '#' : '?') + this.#linkPickerData.link.queryString;
 		}
 
 		// the href might be an external url, so check the value for an anchor/qs
 		// href has the anchor re-appended later, hence the reset here to avoid duplicating the anchor
-		if (!linkPickerData.link.queryString) {
-			const urlParts = href?.split(/(#|\?)/);
+		if (this.#linkPickerData && !this.#linkPickerData?.link.queryString) {
+			const urlParts = this.#linkPickerData?.link.url?.split(/(#|\?)/);
 			if (urlParts?.length === 3) {
-				href = urlParts[0];
-				linkPickerData.link.queryString = urlParts[1] + urlParts[2];
+				this.#linkPickerData.link.url = urlParts[0];
+				this.#linkPickerData.link.queryString = urlParts[1] + urlParts[2];
 			}
 		}
 
-		//Create a json obj used to create the attributes for the tag
-		// TODO => where has rel gone?
-		function createElemAttributes() {
-			const a: {
-				href?: string | null;
-				title?: string | null;
-				target?: string | null;
-				'data-anchor'?: string | null;
-				rel?: string | null;
-			} = {
-				href,
-				title: linkPickerData.link.name,
-				target: linkPickerData.link.target ?? null,
-				'data-anchor': null,
-				//rel: linkPickerData.rel ?? null,
-			};
-
-			if (linkPickerData.link.queryString?.startsWith('#')) {
-				a['data-anchor'] = linkPickerData.link.queryString;
-				a.href = a.href + linkPickerData.link.queryString;
-			}
-
-			return a;
-		}
-
-		function insertLink() {
-			if (anchorElement) {
-				editor.dom.setAttribs(anchorElement, createElemAttributes());
-				editor.selection.select(anchorElement);
-				editor.execCommand('mceEndTyping');
-			} else {
-				const selectedContent = editor.selection.getContent();
-				// If there is no selected content, we can't insert a link
-				// as TinyMCE needs selected content for this, so instead we
-				// create a new dom element and insert it, using the chosen
-				// link name as the content.
-				if (selectedContent !== '') {
-					editor.execCommand('mceInsertLink', false, createElemAttributes());
-				} else {
-					// Using the target url as a fallback, as href might be confusing with a local link
-					const linkContent =
-						typeof linkPickerData.link.name !== 'undefined' && linkPickerData.link.name !== ''
-							? linkPickerData.link.name
-							: linkPickerData.link.url;
-
-					// only insert if link has content
-					if (linkContent) {
-						const domElement = editor.dom.createHTML('a', createElemAttributes(), linkContent);
-						editor.execCommand('mceInsertContent', false, domElement);
-					}
-				}
-			}
-		}
-
-		if (!href && !linkPickerData.link.queryString) {
-			editor.execCommand('unlink');
+		if (!this.#linkPickerData?.link.url && !this.#linkPickerData?.link.queryString) {
+			this.editor.execCommand('unlink');
 			return;
 		}
 
 		//if we have an id, it must be a locallink:id
-		if (linkPickerData.link.udi) {
-			href = '/{localLink:' + linkPickerData.link.udi + '}';
-
-			insertLink();
+		if (this.#linkPickerData?.link.udi) {
+			this.#linkPickerData.link.url = '/{localLink:' + this.#linkPickerData.link.udi + '}';
+			this.#insertLink();
 			return;
 		}
 
-		if (!href) {
-			href = '';
+		if (!this.#linkPickerData?.link.url) {
+			this.#linkPickerData.link.url = '';
 		}
 
 		// Is email and not //user@domain.com and protocol (e.g. mailto:, sip:) is not specified
-		if (href.includes('@') && !href.includes('//') && !href.includes(':')) {
+		if (
+			this.#linkPickerData?.link.url.includes('@') &&
+			!this.#linkPickerData.link.url.includes('//') &&
+			!this.#linkPickerData.link.url.includes(':')
+		) {
 			// assume it's a mailto link
-			href = 'mailto:' + href;
-			insertLink();
+			this.#linkPickerData.link.url = 'mailto:' + this.#linkPickerData?.link.url;
+			this.#insertLink();
 			return;
 		}
 
 		// Is www. prefixed
-		if (/^\s*www\./i.test(href)) {
-			href = 'http://' + href;
-			insertLink();
-			return;
+		if (/^\s*www\./i.test(this.#linkPickerData?.link.url)) {
+			this.#linkPickerData.link.url = 'http://' + this.#linkPickerData.link.url;
 		}
 
-		insertLink();
+		this.#insertLink();
 	}
 }

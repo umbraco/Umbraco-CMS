@@ -28,14 +28,13 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 		// Get the selected element
 		// Check nodename is a DIV and the claslist contains 'umb-embed-holder'
 		const selectedElm = this.editor.selection.getNode();
-		const nodeName = selectedElm.nodeName;
 
 		let modify: UmbEmbeddedMediaModalData = {
 			width: 360,
 			height: 240,
 		};
 
-		if (nodeName.toUpperCase() === 'DIV' && selectedElm.classList.contains('umb-embed-holder')) {
+		if (selectedElm.nodeName.toUpperCase() === 'DIV' && selectedElm.classList.contains('umb-embed-holder')) {
 			// See if we can go and get the attributes
 			const url = this.editor.dom.getAttrib(selectedElm, 'data-embed-url');
 			const embedWidth = this.editor.dom.getAttrib(selectedElm, 'data-embed-width');
