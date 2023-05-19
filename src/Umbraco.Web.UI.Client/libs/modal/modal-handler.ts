@@ -7,7 +7,7 @@ import type {
 	UUIModalSidebarSize,
 } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
-import { UmbRouterSlotElement } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotElement } from '@umbraco-cms/internal/router';
 import { ManifestModal, umbExtensionsRegistry } from '../extension-registry';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
@@ -49,7 +49,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	private _parentRouter: IRouterSlot | null;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
-	#modalRouterElement: UmbRouterSlotElement = new UmbRouterSlotElement();
+	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
 
 	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
