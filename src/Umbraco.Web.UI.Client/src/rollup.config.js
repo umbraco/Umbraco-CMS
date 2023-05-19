@@ -1,5 +1,6 @@
 import esbuild from 'rollup-plugin-esbuild';
 import pluginJson from '@rollup/plugin-json';
+import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { readdirSync, lstatSync } from 'fs';
 
@@ -13,14 +14,14 @@ const createModuleDescriptors = (folderName) =>
 		};
 	});
 
-const exclude = ['app'];
+const exclude = [''];
+
+const libs = createModuleDescriptors('libs');
 const packages = createModuleDescriptors('packages');
 const apps = createModuleDescriptors('apps');
 
-const modules = [...apps, ...packages];
+const modules = [...libs, ...apps, ...packages];
 const allowedModules = modules.filter((module) => !exclude.includes(module.name));
-
-console.log(allowedModules);
 
 export default allowedModules
 	.map((module) => {
@@ -35,7 +36,7 @@ export default allowedModules
 					preserveModules: true,
 					preserveModulesRoot: `${module.root}`,
 				},
-				plugins: [nodeResolve(), pluginJson(), esbuild()],
+				plugins: [nodeResolve(), commonjs(), pluginJson(), esbuild()],
 			},
 		];
 	})
