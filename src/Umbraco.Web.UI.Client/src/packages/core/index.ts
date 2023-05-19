@@ -1,8 +1,5 @@
-import {
-	manifests as componentManifests,
-	UmbBackofficeNotificationContainerElement,
-	UmbBackofficeModalContainerElement,
-} from './components';
+import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components';
+import { manifests as debugManifests } from './debug/manifests';
 import { manifests as propertyActionManifests } from './property-actions/manifests';
 import { manifests as propertyEditorManifests } from './property-editors/manifests';
 import { manifests as modalManifests } from './modal/common/manifests';
@@ -17,7 +14,7 @@ import { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffic
 import './notification/common';
 
 export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
-	...componentManifests,
+	...debugManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
 	...modalManifests,
