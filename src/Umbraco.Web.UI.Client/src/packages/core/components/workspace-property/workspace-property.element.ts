@@ -12,6 +12,7 @@ import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backe
 
 import '../../property-actions/shared/property-action-menu/property-action-menu.element';
 import '../workspace/workspace-property-layout/workspace-property-layout.element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  *  @element umb-workspace-property
@@ -201,7 +202,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 						this._propertyContext.config,
 						(config) => {
 							if (this._element && config) {
-								this._element.config = config;
+								this._element.config = new UmbDataTypePropertyCollection(config);
 							}
 						},
 						'_observePropertyConfig'

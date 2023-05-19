@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-tiny-mce
@@ -18,6 +18,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	configuration: Array<DataTypePropertyPresentationModel> = [];
 
 	@property({ type: Array, attribute: false })
+	public config = new UmbDataTypePropertyCollection();
 	public set config(config: Array<DataTypePropertyPresentationModel>) {
 		this.configuration = config;
 	}

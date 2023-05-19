@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-property-editor-ui-textarea')
 export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
@@ -20,31 +20,24 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	private _rows?: number;
 
 	@state()
-	private _maxheight?: number;
+	private _maxHeight?: number;
 
 	@state()
-	private _minheight?: number;
+	private _minHeight?: number;
 
 	@state()
 	private _css?: any;
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		const maxChars = config.find((x) => x.alias === 'maxChars');
-		if (maxChars) this._maxChars = maxChars.value;
-
-		const rows = config.find((x) => x.alias === 'rows');
-		if (rows) this._rows = rows.value;
-
-		const minheight = config.find((x) => x.alias === 'minHeight');
-		if (minheight) this._minheight = minheight.value;
-
-		const maxheight = config.find((x) => x.alias === 'maxHeight');
-		if (maxheight) this._maxheight = maxheight.value;
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._maxChars = config.getValueByAlias('maxChars');
+		this._rows = config.getValueByAlias('rows');
+		this._minHeight = config.getValueByAlias('minHeight');
+		this._maxHeight = config.getValueByAlias('maxHeight');
 
 		this._css = {
-			'--uui-textarea-min-height': `${this._minheight ? `${this._minheight}px` : 'reset'}`,
-			'--uui-textarea-max-height': `${this._maxheight ? `${this._maxheight}px` : 'reset'}`,
+			'--uui-textarea-min-height': `${this._minHeight ? `${this._minHeight}px` : 'reset'}`,
+			'--uui-textarea-max-height': `${this._maxHeight ? `${this._maxHeight}px` : 'reset'}`,
 		};
 	}
 

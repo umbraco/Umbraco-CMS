@@ -3,6 +3,7 @@ import { html } from 'lit';
 
 import type { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element';
 import './property-editor-ui-date-picker.element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 export default {
 	title: 'Property Editor UIs/Date Picker',
@@ -30,17 +31,17 @@ WithDateValue.args = {
 
 export const WithFormat = Template.bind({});
 WithFormat.args = {
-	config: [
+	config: new UmbDataTypePropertyCollection([
 		{
 			alias: 'format',
 			value: 'dd/MM/yyyy HH:mm:ss',
 		},
-	],
+	]),
 };
 
 export const Timeframe = Template.bind({});
 Timeframe.args = {
-	config: [
+	config: new UmbDataTypePropertyCollection([
 		{
 			alias: 'format',
 			value: 'dd/MM/yyyy HH:mm:ss',
@@ -53,25 +54,25 @@ Timeframe.args = {
 			alias: 'max',
 			value: '2021-01-30 00:00',
 		},
-	],
+	]),
 };
 
 export const TimeOnly = Template.bind({});
 TimeOnly.args = {
-	config: [
+	config: new UmbDataTypePropertyCollection([
 		{
 			alias: 'format',
 			value: 'HH:mm:ss',
 		},
-	],
+	]),
 };
 
 export const DateOnly = Template.bind({});
 DateOnly.args = {
-	config: [
+	config: new UmbDataTypePropertyCollection([
 		{
 			alias: 'format',
 			value: 'dd/MM/yyyy',
 		},
-	],
+	]),
 };

@@ -4,30 +4,29 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-ui-color-picker
  */
 @customElement('umb-property-editor-ui-color-picker')
 export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+	#defaultShowLabels = false;
+	
 	@property()
 	value = '';
 
 	@state()
-	private _showLabels = false;
+	private _showLabels = this.#defaultShowLabels;
 
 	@state()
 	private _swatches: UmbSwatchDetails[] = [];
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		const useLabel = config.find((x) => x.alias === 'useLabel');
-		if (useLabel) this._showLabels = useLabel.value;
-
-		const colorSwatches = config.find((x) => x.alias === 'items');
-		if (colorSwatches) this._swatches = colorSwatches.value as any[];
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._showLabels = config.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
+		this._swatches = config.getValueByAlias('items') ?? [];
 	}
 
 	private _onChange(event: UUIColorSwatchesEvent) {

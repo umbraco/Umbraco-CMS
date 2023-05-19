@@ -43,6 +43,7 @@ export default {
 						// PACKAGES
 						'@umbraco-cms/backoffice/resources': './libs/resources/index.ts',
 						'@umbraco-cms/backoffice/content-type': './libs/content-type/index.ts',
+						'@umbraco-cms/backoffice/data-type': './libs/data-type/index.ts',
 						'@umbraco-cms/backoffice/entity-action': './libs/entity-action/index.ts',
 						'@umbraco-cms/backoffice/events': './libs/umb-events/index.ts',
 						'@umbraco-cms/backoffice/extension-registry': './libs/extension-registry/index.ts',

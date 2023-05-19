@@ -4,26 +4,25 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-property-editor-ui-text-box')
 export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
+	#defaultType = 'text';
+
 	@property()
 	value = '';
 
 	@state()
-	private _type = 'text';
+	private _type?: string;
 
 	@state()
 	private _maxChars?: number;
 
 	@property({ type: Array, attribute: false })
-	public set config(config: Array<DataTypePropertyPresentationModel>) {
-		const inputType = config.find((x) => x.alias === 'inputType');
-		if (inputType) this._type = inputType.value;
-
-		const maxChars = config.find((x) => x.alias === 'maxChars');
-		if (maxChars) this._maxChars = maxChars.value;
+	public set config(config: UmbDataTypePropertyCollection) {
+		this._type = config.getValueByAlias('inputType') ?? this.#defaultType;
+		this._maxChars = config.getValueByAlias('maxChars');
 	}
 
 	private onInput(e: InputEvent) {
