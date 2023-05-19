@@ -25,6 +25,7 @@
 			"@umbraco-cms/backoffice/extension-api": ["src/libs/extension-api"],
 			"@umbraco-cms/backoffice/observable-api": ["src/libs/observable-api"],
 
+			// SHARED
 			"@umbraco-cms/backoffice/css": ["src/shared/css/custom-properties.css"],
 			"@umbraco-cms/backoffice/events": ["src/shared/umb-events"],
 			"@umbraco-cms/backoffice/models": ["src/shared/models"],
@@ -32,10 +33,11 @@
 			"@umbraco-cms/backoffice/resources": ["src/shared/resources"],
 			"@umbraco-cms/backoffice/router": ["src/shared/router"],
 			"@umbraco-cms/backoffice/utils": ["src/shared/utils"],
-
+				
 			"@umbraco-cms/backoffice/data-type": ["src/packages/core/components/data-type"],
-			"@umbraco-cms/backoffice/components": ["src/packages/core/components"],
 
+			// CORE
+			"@umbraco-cms/backoffice/components": ["src/packages/core/components"],
 			"@umbraco-cms/backoffice/content-type": ["src/packages/core/content-type"],
 			"@umbraco-cms/backoffice/action": ["src/packages/core/action"],
 			"@umbraco-cms/backoffice/entity-action": ["src/packages/core/entity-action"],
@@ -54,6 +56,7 @@
 			"@umbraco-cms/backoffice/variant": ["src/packages/core/variant"],
 			"@umbraco-cms/backoffice/picker-input": ["src/packages/core/picker-input"],
 
+			// USERS
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
 
 			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],
