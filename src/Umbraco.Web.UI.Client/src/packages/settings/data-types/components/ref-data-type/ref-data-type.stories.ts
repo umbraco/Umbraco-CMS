@@ -14,16 +14,16 @@ type Story = StoryObj<UmbRefDataTypeElement>;
 export const Overview: Story = {
 	args: {
 		name: 'Custom Data Type',
-		name: 'Umb.DataType.CustomUI',
-		dataTypeKey: 'Umbraco.JSON',
+		propertyEditorUiAlias: 'Umb.DataTypeInput.CustomUI',
+		propertyEditorModelAlias: 'Umbraco.JSON',
 	},
 };
 
 export const WithDetail: Story = {
 	args: {
 		name: 'Custom Data Type',
-		name: 'Umb.DataType.CustomUI',
-		dataTypeKey: 'Umbraco.JSON',
+		propertyEditorUiAlias: 'Umb.DataType.CustomUI',
+		propertyEditorModelAlias: 'UmbracoInput.JSON',
 		detail: 'With some custom details',
 	},
 };
@@ -31,15 +31,15 @@ export const WithDetail: Story = {
 export const WithSlots: Story = {
 	args: {
 		name: 'Custom Data Type',
-		name: 'Umb.DataType.CustomUI',
-		dataTypeKey: 'Umbraco.JSON',
+		propertyEditorUiAlias: 'Umb.DataTypeInput.CustomUI',
+		propertyEditorModelAlias: 'Umbraco.JSON',
 		detail: 'With some custom details',
 	},
 	render: (args) => html`
 		<umb-ref-data-type
 			.name=${args.name}
-			.propertyEditorUiAlias=${args.name}
-			.propertyEditorModelAlias=${args.dataTypeKey}
+			.propertyEditorUiAlias=${args.propertyEditorUiAlias}
+			.propertyEditorModelAlias=${args.propertyEditorModelAlias}
 			.detail=${args.detail}>
 			<div slot="tag"><uui-tag color="positive">10</uui-tag></div>
 			<div slot="actions">
