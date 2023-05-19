@@ -33,27 +33,6 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 			// TODO: Some test that this repository is a items repository?
 			this.repository = repository as UmbItemRepository<ItemType>;
 		}).asPromise();
-
-		/*
-		this.init = new Promise((resolve) => {
-			new UmbObserverController(
-				this.host,
-
-				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
-				async (repositoryManifest) => {
-					if (!repositoryManifest) return;
-
-					try {
-						const result = await createExtensionClass<UmbItemRepository<ItemType>>(repositoryManifest, [this.host]);
-						this.repository = result;
-						resolve();
-					} catch (error) {
-						throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
-					}
-				}
-			);
-		});
-		*/
 	}
 
 	getUniques() {
