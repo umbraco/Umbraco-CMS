@@ -11,14 +11,14 @@ export const themes: Array<ManifestTheme> = [
 		type: 'theme',
 		alias: 'umb-dark-theme',
 		name: 'Dark',
-		css: 'src/backoffice/themes/themes/dark.theme.css',
+		css: 'src/packages/settings/themes/themes/dark.theme.css',
 		weight: 200,
 	},
 	{
 		type: 'theme',
 		alias: 'umb-high-contrast-theme',
 		name: 'High contrast',
-		css: 'src/backoffice/themes/themes/high-contrast.theme.css',
+		css: 'src/packages/settings/themes/themes/high-contrast.theme.css',
 		weight: 100,
 	},
 ];
