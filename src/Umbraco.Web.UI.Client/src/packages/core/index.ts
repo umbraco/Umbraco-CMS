@@ -11,8 +11,6 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-import './notification/common';
-
 export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...debugManifests,
 	...propertyActionManifests,
