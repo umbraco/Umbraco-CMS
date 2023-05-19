@@ -45,11 +45,13 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.#itemsManager = new UmbRepositoryItemsManager<UmbDataTypeModel>(this, 'dataType');
+		this.#itemsManager = new UmbRepositoryItemsManager<UmbDataTypeModel>(this, 'Umb.Repository.DataType');
 		this.observe(this.#itemsManager.uniques, (uniques) => {
 			super.value = uniques.join(',');
 		});
-		this.observe(this.#itemsManager.items, (items) => (this._items = items));
+		this.observe(this.#itemsManager.items, (items) => {
+			this._items = items;
+		});
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {

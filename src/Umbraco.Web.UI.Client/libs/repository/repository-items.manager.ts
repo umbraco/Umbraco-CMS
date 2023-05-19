@@ -1,8 +1,7 @@
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionClassInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
@@ -10,7 +9,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
-	init: Promise<void>;
+	init: Promise<unknown>;
 
 	#uniques = new UmbArrayState<string>([]);
 	uniques = this.#uniques.asObservable();
@@ -30,12 +29,16 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		this.host = host;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		//TODO: The promise can probably be done in a cleaner way.
+		this.init = new UmbExtensionClassInitializer(host, 'repository', repositoryAlias, (repository) => {
+			// TODO: Some test that this repository is a items repository?
+			this.repository = repository as UmbItemRepository<ItemType>;
+		}).asPromise();
+
+		/*
 		this.init = new Promise((resolve) => {
 			new UmbObserverController(
 				this.host,
 
-				// TODO: this code is reused in multiple places, so it should be extracted to a function
 				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 				async (repositoryManifest) => {
 					if (!repositoryManifest) return;
@@ -50,6 +53,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 				}
 			);
 		});
+		*/
 	}
 
 	getUniques() {
@@ -73,6 +77,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		if (this.itemsObserver) this.itemsObserver.destroy();
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
+		// This is where this.#getUnique comes in play. Unless that can come from the repository, but that collides with the idea of having a multi-type repository. If that happens.
 
 		const { asObservable } = await this.repository.requestItems(this.getUniques());
 
