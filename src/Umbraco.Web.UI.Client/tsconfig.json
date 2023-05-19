@@ -22,7 +22,6 @@
 			"@umbraco-cms/backoffice/content-type": ["libs/content-type"],
 			"@umbraco-cms/backoffice/context-api": ["libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["libs/controller-api"],
-			"@umbraco-cms/backoffice/css": ["libs/css/custom-properties.css"],
 			"@umbraco-cms/backoffice/data-type": ["libs/data-type"],
 			"@umbraco-cms/backoffice/element-api": ["libs/element-api"],
 			"@umbraco-cms/backoffice/entity-action": ["libs/entity-action"],
@@ -50,6 +49,7 @@
 
 			"@umbraco-cms/backoffice/core/components": ["src/packages/core/components"],
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
+			"@umbraco-cms/backoffice/css": ["src/shared/css/custom-properties.css"],
 
 			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],
 			"@umbraco-cms/internal/modal": ["src/shared/modal"],

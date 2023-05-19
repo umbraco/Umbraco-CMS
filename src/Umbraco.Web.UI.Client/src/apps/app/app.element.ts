@@ -1,4 +1,6 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
+import '../../shared/css/custom-properties.css';
+
 import 'element-internals-polyfill';
 
 import '../../shared/router/router-slot.element';

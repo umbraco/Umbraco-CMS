@@ -30,7 +30,7 @@ export class UmbFooterLayoutElement extends LitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
-				height: 54px; /* TODO: missing var(--uui-size-18);*/
+				height: var(--umb-footer-layout-height);
 				border-top: 1px solid var(--uui-color-border);
 				background-color: var(--uui-color-surface);
 				box-sizing: border-box;
