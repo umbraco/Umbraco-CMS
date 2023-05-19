@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { UmbFolderModalData, UmbFolderModalResult, UmbModalHandler } from 'src/packages/core/modal';
+import { UmbFolderModalData, UmbFolderModalResult, UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionClass, ManifestBase } from '@umbraco-cms/backoffice/extension-api';

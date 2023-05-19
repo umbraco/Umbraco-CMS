@@ -9,7 +9,7 @@ import {
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalResult,
 	UmbModalHandler,
-} from 'src/packages/core/modal';
+} from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

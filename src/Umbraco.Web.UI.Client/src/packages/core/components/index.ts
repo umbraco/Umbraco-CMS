@@ -4,8 +4,8 @@ export * from './backoffice-modal-container/backoffice-modal-container.element';
 export * from './backoffice-notification-container/backoffice-notification-container.element';
 export * from './body-layout/body-layout.element';
 export * from './button-with-dropdown/button-with-dropdown.element'; // TODO: delete this and change usage to umb-dropdown
-export * from './code-block';
-export * from './code-editor';
+//export * from './code-block';
+//export * from './code-editor';
 export * from './data-type';
 export * from './date-input';
 export * from './dropdown';

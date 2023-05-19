@@ -1,5 +1,5 @@
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from 'src/packages/core/modal';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
 export type UmbDocumentPickerModalData = UmbTreePickerModalData<DocumentTreeItemResponseModel>;
 export type UmbDocumentPickerModalResult = UmbPickerModalResult;

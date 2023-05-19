@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import type { UmbTreeElement } from '../../../tree/tree.element';
-import { UmbTreePickerModalData, UmbPickerModalResult } from 'src/packages/core/modal';
+import { UmbTreePickerModalData, UmbPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 

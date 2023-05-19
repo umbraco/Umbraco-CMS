@@ -6,7 +6,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 
 import icons from '../../../../../../public-assets/icons/icons.json';
-import { UmbIconPickerModalData, UmbIconPickerModalResult } from 'src/packages/core/modal';
+import { UmbIconPickerModalData, UmbIconPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 // TODO: Make use of UmbPickerLayoutBase

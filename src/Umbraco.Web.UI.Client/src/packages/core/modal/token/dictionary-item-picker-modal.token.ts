@@ -1,4 +1,4 @@
-import { UmbModalToken } from 'src/packages/core/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDictionaryItemPickerModalData {
 	multiple: boolean;

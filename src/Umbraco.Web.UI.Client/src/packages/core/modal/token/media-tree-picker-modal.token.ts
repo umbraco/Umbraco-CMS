@@ -1,4 +1,4 @@
-import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from 'src/packages/core/modal';
+import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 import { ContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UmbMediaTreePickerModalData = UmbTreePickerModalData<ContentTreeItemResponseModel>;

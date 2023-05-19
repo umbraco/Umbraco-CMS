@@ -8,7 +8,7 @@ import {
 	UMB_SECTION_SIDEBAR_CONTEXT_TOKEN,
 	UmbSectionContext,
 	UMB_SECTION_CONTEXT_TOKEN,
-} from 'src/packages/core/section';
+} from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestEntityAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';

@@ -1,4 +1,4 @@
-import { UmbEntityActionBase } from 'src/packages/core/entity-action';
+import { UmbEntityActionBase } from '../../entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSortChildrenOfEntityAction<

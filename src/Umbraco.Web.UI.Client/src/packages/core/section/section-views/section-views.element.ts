@@ -2,9 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map, of } from 'rxjs';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from 'src/packages/core/section';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestDashboard,
 	ManifestSectionView,

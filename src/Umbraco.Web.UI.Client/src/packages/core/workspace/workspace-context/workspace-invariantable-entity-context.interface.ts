@@ -1,5 +1,5 @@
 import type { Observable } from 'rxjs';
-import type { UmbEntityWorkspaceContextInterface } from 'src/packages/core/workspace';
+import type { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface';
 import type { ValueModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbWorkspaceInvariantableEntityContextInterface<T = unknown>

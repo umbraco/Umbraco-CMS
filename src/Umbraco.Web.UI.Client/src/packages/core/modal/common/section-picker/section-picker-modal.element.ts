@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbSectionPickerModalData, UmbSectionPickerModalResult } from 'src/packages/core/modal';
+import { UmbSectionPickerModalData, UmbSectionPickerModalResult } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalBaseElement<

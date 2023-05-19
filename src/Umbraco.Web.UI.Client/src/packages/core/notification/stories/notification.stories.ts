@@ -2,7 +2,7 @@ import './story-notification-default-example.element';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import { UmbNotificationContext } from 'src/packages/core/notification';
+import { UmbNotificationContext } from '../notification.context';
 
 export default {
 	title: 'API/Notifications/Overview',

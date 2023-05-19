@@ -7,7 +7,7 @@ import {
 	UMB_MODAL_CONTEXT_TOKEN,
 	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
 	UmbPropertySettingsModalResult,
-} from 'src/packages/core/modal';
+} from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 

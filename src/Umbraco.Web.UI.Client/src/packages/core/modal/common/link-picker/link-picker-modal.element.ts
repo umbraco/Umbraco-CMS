@@ -8,7 +8,7 @@ import {
 	UmbLinkPickerLink,
 	UmbLinkPickerModalData,
 	UmbLinkPickerModalResult,
-} from 'src/packages/core/modal';
+} from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 

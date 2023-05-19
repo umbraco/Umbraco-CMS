@@ -1,5 +1,5 @@
 import type { TemplateResult } from 'lit';
-import { UmbModalToken } from 'src/packages/core/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbConfirmModalData {
 	headline: string;
