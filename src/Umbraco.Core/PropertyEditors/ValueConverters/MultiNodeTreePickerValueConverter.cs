@@ -204,6 +204,13 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
 
         var entityType = GetEntityType(propertyType);
+
+        if (entityType == "content")
+        {
+            // TODO Why do MNTP config saves "content" and not "document"?
+            entityType = Constants.UdiEntityType.Document;
+        }
+
         GuidUdi[] entityTypeUdis = udis.Where(udi => udi.EntityType == entityType).OfType<GuidUdi>().ToArray();
         return entityType switch
         {
