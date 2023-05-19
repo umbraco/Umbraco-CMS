@@ -17,7 +17,7 @@ import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
  */
 @customElement('umb-data-type-flow-input')
 export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
-	#selectionManager;
+	#itemsManager;
 
 	protected getFormElement() {
 		return undefined;
@@ -36,7 +36,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	}
 	set value(dataTypeId: string) {
 		super.value = dataTypeId;
-		this.#selectionManager.setUniques(dataTypeId.split(','));
+		this.#itemsManager.setUniques(dataTypeId.split(','));
 	}
 
 	@state()
@@ -45,22 +45,22 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.#selectionManager = new UmbRepositoryItemsManager<UmbDataTypeModel>(this, 'dataType');
-		this.observe(this.#selectionManager.uniques, (selection) => {
-			super.value = selection.join(',');
+		this.#itemsManager = new UmbRepositoryItemsManager<UmbDataTypeModel>(this, 'dataType');
+		this.observe(this.#itemsManager.uniques, (uniques) => {
+			super.value = uniques.join(',');
 		});
-		this.observe(this.#selectionManager.items, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#itemsManager.items, (items) => (this._items = items));
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					selection: this.#selectionManager.getUniques(),
+					selection: this.#itemsManager.getUniques(),
 					submitLabel: 'Submit',
 				};
 			})
 			.onSubmit((submitData) => {
 				// TODO: we might should set the alias to null or empty string, if no selection.
-				this.#selectionManager.setUniques(submitData.selection);
+				this.#itemsManager.setUniques(submitData.selection);
 				this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 			})
 			.observeRouteBuilder((routeBuilder) => {
