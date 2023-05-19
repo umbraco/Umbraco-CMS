@@ -55,6 +55,7 @@
 			"@umbraco-cms/backoffice/section": ["src/packages/core/section"],
 			"@umbraco-cms/backoffice/variant": ["src/packages/core/variant"],
 			"@umbraco-cms/backoffice/picker-input": ["src/packages/core/picker-input"],
+			"@umbraco-cms/backoffice/menu": ["src/packages/core/menu"],
 
 			// USERS
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
