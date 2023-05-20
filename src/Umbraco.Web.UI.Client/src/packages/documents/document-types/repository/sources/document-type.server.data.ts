@@ -63,6 +63,8 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 			allowedTemplateIds: [],
 			defaultTemplateId: null,
 			cleanup: undefined,
+			properties: [],
+			containers: [],
 		};
 
 		return { data };

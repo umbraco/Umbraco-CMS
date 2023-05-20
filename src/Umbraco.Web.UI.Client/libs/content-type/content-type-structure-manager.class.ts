@@ -219,8 +219,23 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		const property: PropertyTypeResponseModelBaseModel = {
 			id: UmbId.new(),
 			containerId: containerId,
-			//sortOrder: sortOrder ?? 0,
-		};
+			alias: '',
+			name: '',
+			description: '',
+			dataTypeId: '',
+			variesByCulture: false,
+			variesBySegment: false,
+			validation: {
+				mandatory: false,
+				mandatoryMessage: null,
+				regEx: null,
+				regExMessage: null,
+			},
+			appearance: {
+				labelOnTop: false,
+			},
+			sortOrder: sortOrder ?? 0,
+		} as any; // Sort order was not allowed when this was written.
 
 		const properties = [...(this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [])];
 		properties.push(property);
