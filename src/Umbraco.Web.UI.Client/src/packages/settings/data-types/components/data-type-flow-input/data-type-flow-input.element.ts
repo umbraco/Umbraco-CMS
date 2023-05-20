@@ -32,11 +32,11 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ attribute: false })
 	get value(): string {
-		return super.value.toString();
+		return super.value?.toString() ?? '';
 	}
 	set value(dataTypeId: string) {
-		super.value = dataTypeId;
-		this.#itemsManager.setUniques(dataTypeId.split(','));
+		super.value = dataTypeId ?? '';
+		this.#itemsManager.setUniques(super.value.split(','));
 	}
 
 	@state()

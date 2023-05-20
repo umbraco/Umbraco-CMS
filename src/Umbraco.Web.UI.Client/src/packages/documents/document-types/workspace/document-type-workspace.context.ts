@@ -114,13 +114,14 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerDocumentType({ defaultTemplateId });
 	}
 
-	async createScaffold(parentId: string) {
+	async createScaffold(parentId: string | null) {
 		const { data } = await this.structure.createScaffold(parentId);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
 		//this.#draft.next(data);
 		return data || undefined;
+		// TODO: Is this wrong? should we return { data }??
 	}
 
 	async load(entityId: string) {
@@ -130,12 +131,20 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsNew(false);
 		//this.#draft.next(data);
 		return data || undefined;
+		// TODO: Is this wrong? should we return { data }??
 	}
 
+	/**
+	 * Save or creates the document type, based on wether its a new one or existing.
+	 */
 	async save() {
-		const id = this.getEntityId();
-		if (!id) throw new Error('Cannot save entity without id');
-		this.repository.save(id, this.getData());
+		if (this.getIsNew()) {
+			if ((await this.structure.create()) === true) {
+				this.setIsNew(false);
+			}
+		} else {
+			await this.structure.save();
+		}
 	}
 
 	public destroy(): void {

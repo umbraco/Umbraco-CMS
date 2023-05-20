@@ -27,7 +27,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	}
 	public set selectedIds(ids: Array<string>) {
 		this._selectedIds = ids ?? [];
-		super.value = ids.join(',');
+		super.value = this._selectedIds.join(',');
 		this._observePickedDocuments();
 	}
 

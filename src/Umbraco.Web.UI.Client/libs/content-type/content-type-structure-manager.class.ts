@@ -66,10 +66,10 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return promiseResult;
 	}
 
-	public async createScaffold(parentId: string) {
+	public async createScaffold(parentId: string | null) {
 		this._reset();
 
-		if (!parentId) return {};
+		if (parentId === undefined) return {};
 
 		const { data } = await this.#contentTypeRepository.createScaffold(parentId);
 		if (!data) return {};
@@ -79,6 +79,24 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		this.#init = this._observeDocumentType(data);
 		await this.#init;
 		return { data };
+	}
+
+	public async save() {
+		const documentType = this.getOwnerDocumentType();
+		if (!documentType || !documentType.id) return false;
+
+		await this.#contentTypeRepository.save(documentType.id, documentType);
+
+		return true;
+	}
+
+	public async create() {
+		const documentType = this.getOwnerDocumentType();
+		if (!documentType || !documentType.id) return false;
+
+		//const value = documentType as CreateDocumentTypeRequestModel & { id: string };
+		await this.#contentTypeRepository.create(documentType);
+		return true;
 	}
 
 	private async _ensureType(id?: string) {

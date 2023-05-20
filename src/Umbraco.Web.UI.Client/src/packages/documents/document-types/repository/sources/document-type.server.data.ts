@@ -2,6 +2,7 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { DocumentTypeResource, DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -48,7 +49,20 @@ export class UmbDocumentTypeServerDataSource implements UmbDataSource<any, any, 
 	 */
 	async createScaffold(parentId: string | null) {
 		const data: DocumentTypeResponseModel = {
-			properties: [],
+			id: UmbId.new(),
+			name: '',
+			alias: '',
+			description: '',
+			icon: 'umb:document',
+			allowedAsRoot: false,
+			variesByCulture: false,
+			variesBySegment: false,
+			isElement: false,
+			allowedContentTypes: [],
+			compositions: [],
+			allowedTemplateIds: [],
+			defaultTemplateId: null,
+			cleanup: undefined,
 		};
 
 		return { data };
