@@ -39,7 +39,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
     }
 
-    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, int skip, int take)
+    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, bool preview, int skip, int take)
     {
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? index))
         {
@@ -47,7 +47,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             return new PagedModel<Guid>();
         }
 
-        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture);
+        IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture, preview);
 
         ApplyFiltering(filterOptions, queryOperation);
         ApplySorting(sortOptions, queryOperation);
@@ -75,7 +75,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         FieldName = UmbracoExamineFieldNames.CategoryFieldName, Values = new[] { "content" }
     };
 
-    private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture)
+    private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture, bool preview)
     {
         IQuery query = index.Searcher.CreateQuery();
 
@@ -85,6 +85,12 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
         // Item culture must be either the requested culture or "none"
         selectorOperation.And().GroupedOr(new[] { UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture }, culture.ToLowerInvariant().IfNullOrWhiteSpace(_fallbackGuidValue), "none");
+
+        // when not fetching for preview, make sure the "published" field is "y"
+        if (preview is false)
+        {
+            selectorOperation.And().Field(UmbracoExamineFieldNames.DeliveryApiContentIndex.Published, "y");
+        }
 
         return selectorOperation;
     }

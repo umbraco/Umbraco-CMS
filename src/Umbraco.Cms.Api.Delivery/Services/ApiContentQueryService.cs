@@ -15,6 +15,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
     private readonly SortHandlerCollection _sortHandlers;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IApiContentQueryProvider _apiContentQueryProvider;
+    private readonly IRequestPreviewService _requestPreviewService;
 
     public ApiContentQueryService(
         IRequestStartItemProviderAccessor requestStartItemProviderAccessor,
@@ -22,7 +23,8 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         FilterHandlerCollection filterHandlers,
         SortHandlerCollection sortHandlers,
         IVariationContextAccessor variationContextAccessor,
-        IApiContentQueryProvider apiContentQueryProvider)
+        IApiContentQueryProvider apiContentQueryProvider,
+        IRequestPreviewService requestPreviewService)
     {
         _requestStartItemProviderAccessor = requestStartItemProviderAccessor;
         _selectorHandlers = selectorHandlers;
@@ -30,6 +32,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         _sortHandlers = sortHandlers;
         _variationContextAccessor = variationContextAccessor;
         _apiContentQueryProvider = apiContentQueryProvider;
+        _requestPreviewService = requestPreviewService;
     }
 
     /// <inheritdoc/>
@@ -71,8 +74,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         }
 
         var culture = _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
+        var isPreview = _requestPreviewService.IsPreview();
 
-        PagedModel<Guid> result = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, skip, take);
+        PagedModel<Guid> result = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, isPreview, skip, take);
         return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, result);
     }
 
