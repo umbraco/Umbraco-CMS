@@ -1,6 +1,8 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -207,6 +209,22 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual("the-root", result.StartItem.Path);
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void UnpublishedChildRouteRespectsTrailingSlashSettings(bool addTrailingSlash)
+    {
+        var rootKey = Guid.NewGuid();
+        var root = SetupInvariantPublishedContent("The Root", rootKey);
+
+        var childKey = Guid.NewGuid();
+        var child = SetupInvariantPublishedContent("The Child", childKey, root, false);
+
+        var builder = CreateApiContentRouteBuilder(true, addTrailingSlash);
+        var result = builder.Build(child);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(addTrailingSlash, result.Path.EndsWith("/"));
+    }
+
     private IPublishedContent SetupInvariantPublishedContent(string name, Guid key, IPublishedContent? parent = null, bool published = true)
     {
         var publishedContentType = CreatePublishedContentType();
@@ -259,12 +277,17 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         return publishedUrlProvider.Object;
     }
 
-    private ApiContentRouteBuilder CreateApiContentRouteBuilder(bool hideTopLevelNodeFromPath)
-        => new(
+    private ApiContentRouteBuilder CreateApiContentRouteBuilder(bool hideTopLevelNodeFromPath, bool addTrailingSlash = false)
+    {
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = addTrailingSlash };
+        var requestHandlerSettingsMonitorMock = new Mock<IOptionsMonitor<RequestHandlerSettings>>();
+        requestHandlerSettingsMonitorMock.Setup(m => m.CurrentValue).Returns(requestHandlerSettings);
+
+        return CreateContentRouteBuilder(
             SetupPublishedUrlProvider(hideTopLevelNodeFromPath),
             CreateGlobalSettings(hideTopLevelNodeFromPath),
-            Mock.Of<IVariationContextAccessor>(),
-            Mock.Of<IPublishedSnapshotAccessor>());
+            requestHandlerSettingsMonitor: requestHandlerSettingsMonitorMock.Object);
+    }
 
     private IApiContentRoute? GetUnRoutableRoute(string publishedUrl, string routeById)
     {
@@ -291,11 +314,10 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
         var content = SetupVariantPublishedContent("The Content", Guid.NewGuid());
 
-        var builder = new ApiContentRouteBuilder(
+        var builder = CreateContentRouteBuilder(
             publishedUrlProviderMock.Object,
             CreateGlobalSettings(),
-            Mock.Of<IVariationContextAccessor>(),
-            publishedSnapshotAccessorMock.Object);
+            publishedSnapshotAccessor: publishedSnapshotAccessorMock.Object);
 
         return builder.Build(content);
     }

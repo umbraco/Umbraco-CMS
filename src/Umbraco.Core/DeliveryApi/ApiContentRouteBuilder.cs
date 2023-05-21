@@ -14,17 +14,21 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly GlobalSettings _globalSettings;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private RequestHandlerSettings _requestSettings;
 
     public ApiContentRouteBuilder(
         IPublishedUrlProvider publishedUrlProvider,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor variationContextAccessor,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IOptionsMonitor<RequestHandlerSettings> requestSettings)
     {
         _publishedUrlProvider = publishedUrlProvider;
         _variationContextAccessor = variationContextAccessor;
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _globalSettings = globalSettings.Value;
+        _requestSettings = requestSettings.CurrentValue;
+        requestSettings.OnChange(settings => _requestSettings = settings);
     }
 
     public IApiContentRoute? Build(IPublishedContent content, string? culture = null)
@@ -59,7 +63,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         // so we'll use the content key as path.
         if (content.IsPublished() is false)
         {
-            return $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}";
+            return $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
         }
 
         // grab the content path from the URL provider
