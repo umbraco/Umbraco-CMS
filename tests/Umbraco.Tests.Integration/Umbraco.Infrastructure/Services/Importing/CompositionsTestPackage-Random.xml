@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <files />
+  <info>
+    <package>
+      <name>Composite Test</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <CompositeTest id="1083" parentID="-1" level="1" creatorID="0" sortOrder="1" createDate="2014-11-26T15:02:43" updateDate="2014-11-26T15:02:43" nodeName="Composite test" urlName="composite-test" path="-1,1083" isDoc="" nodeType="1082" creatorName="Niels Hartvig" writerName="Niels Hartvig" writerID="0" template="1081" nodeTypeAlias="CompositeTest">
+        <description><![CDATA[Description]]></description>
+        <tags><![CDATA[umbraco,7.2]]></tags>
+        <fancy><![CDATA[Fancy pancy]]></fancy>
+        <content><![CDATA[<p>Hello World</p>]]></content>
+      </CompositeTest>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>Composite Test</Name>
+        <Key>eebd6e3a-91bc-4bac-be16-3c8d47ee3359</Key>
+        <Alias>CompositeTest</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions>
+          <Composition>Meta</Composition>
+          <Composition>Seo</Composition>
+          <Composition>Content</Composition>
+        </Compositions>
+        <AllowedTemplates>
+          <Template>CompositeTest</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>CompositeTest</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Content</Name>
+        <Key>1c51fc0a-79f7-4d3f-9174-95a2628505de</Key>
+        <Alias>Content</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions />
+        <AllowedTemplates />
+        <DefaultTemplate />
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Content</Name>
+          <Alias>content</Alias>
+          <Type>Umbraco.TinyMCE</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>21</Id>
+          <Caption>Content</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Meta</Name>
+        <Key>0e0ad7de-aff1-4e4b-af8c-85e790669412</Key>
+        <Alias>Meta</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions />
+        <AllowedTemplates />
+        <DefaultTemplate />
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Description</Name>
+          <Alias>description</Alias>
+          <Type>Umbraco.TextboxMultiple</Type>
+          <Definition>c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3</Definition>
+          <Tab>Meta</Tab>
+          <Mandatory>True</Mandatory>
+          <Validation />
+          <Description><![CDATA[Enter a description]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Tags</Name>
+          <Alias>tags</Alias>
+          <Type>Umbraco.Tags</Type>
+          <Definition>b6b73142-b9c1-4bf8-a16d-e1c23320b549</Definition>
+          <Tab>Meta</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>19</Id>
+          <Caption>Meta</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>SEO</Name>
+        <Key>cc58b45e-369c-4429-be1b-1b9f7acfd360</Key>
+        <Alias>Seo</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions />
+        <AllowedTemplates />
+        <DefaultTemplate />
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Fancy</Name>
+          <Alias>fancy</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>SEO</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>20</Id>
+          <Caption>SEO</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+  </DocumentTypes>
+  <Templates />
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+</umbPackage>

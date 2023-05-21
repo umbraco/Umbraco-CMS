@@ -1,0 +1,865 @@
+// Gridview
+// -------------------------
+
+ .mceContentBody{
+         overflow-y:hidden!important;
+      }
+
+.usky-grid IFRAME {overflow:hidden;}
+
+
+ // Sortabel
+ // -------------------------
+
+ .usky-grid .ui-sortable-helper  {
+     position:absolute !important;
+     border: dashed 1px @black !important;
+     background: @gray-7;
+     opacity: 0.4;
+     height: 80px !important;
+     width: 160px !important;
+     overflow: hidden;
+     padding: 5px;
+     border-radius:5px;
+     box-shadow: 3px 3px 12px 0 rgba(50, 50, 50, 0.45);
+ }
+
+ .usky-grid .ui-sortable-helper *{
+     border: none !important;
+     background: none !important;
+     color: @gray-5 !important;
+     padding: 0 !important;
+     margin: 0 !important;
+ }
+
+ .usky-grid .ui-sortable-helper .cell-tools{
+     display: none !important;
+ }
+
+ .usky-grid .ui-sortable-placeholder{
+     border: 2px dashed @gray-8;
+     padding: 20px;
+     font-family: icomoon;
+     text-align: center;
+     font-size: 85px;
+     line-height: 65px;
+     color: @gray-3;
+     vertical-align: middle;
+     background-color:@gray-10;
+ }
+
+ .usky-grid .ui-sortable-placeholder:hover{
+     border-color: @gray-3;
+ }
+
+ .usky-grid .ui-sortable-placeholder:before{
+     content: "\e1bd";
+ }
+
+
+
+ // utils
+ // -------------------------
+ .usky-grid-width {
+     margin: 20px auto;
+     width:100%;
+ }
+ .usky-grid  .right {
+     float:right;
+ }
+
+
+ // general layout components
+ // -------------------------
+ .usky-grid  .tb {
+     width: 100%;
+ }
+
+ .usky-grid  .td {
+     width: 100%;
+     display: inline-block;
+     vertical-align:top;
+     border-right:1px dashed rgba(182, 182, 182, 0.0);
+     box-sizing: border-box;
+ }
+
+ .usky-grid .tb:hover .td{
+     border-right:1px dashed @gray-9;
+ }
+ .usky-grid  .td.last {
+     border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
+ }
+
+ .usky-grid  .middle {
+     text-align: center;
+ }
+
+ .usky-grid  .mainTb {
+     border-collapse: separate;
+ }
+ .usky-grid  .mainTd {
+     position:relative;
+ }
+
+ .usky-grid .grid-layout {
+    max-width: 600px;
+}
+
+ // ROW
+ // -------------------------
+.usky-grid .usky-row{
+     position: relative;
+     border: 1px dashed rgba(0,0,0,0);
+}
+
+.umb-grid .tb:hover .usky-row{
+    border-bottom:1px dashed rgba(182, 182, 182, 0) !important;
+}
+
+
+
+// CELL
+// -------------------------
+.usky-grid .usky-cell{
+     position: relative;
+     border: 1px dashed rgba(0,0,0,0);
+     min-height:127px;
+}
+
+.usky-grid  .cell-tools {
+    transition: all .20s ease-in-out;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    width: 50px;
+    opacity: 0.3;
+    z-index: 50;
+}
+//special rule to ensure forms doesnt overrride (forms will align in a later release)
+.umb-grid .cell-tools{width: 50px !important;}
+
+.usky-grid  .cell-tools.with-prompt {
+    width:200px;
+}
+
+.usky-grid .cell-tools:hover{
+    opacity: 1;
+}
+
+.usky-grid  .cell-tools-add {
+    position: absolute;
+    text-align: center;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 45px 1px 0;
+
+    &.emptyArea{
+        margin: 0 0 1px 0;
+    }
+}
+
+.usky-grid .usky-control:hover .cell-tools-add{
+    opacity: 1;
+}
+
+.usky-grid .cell-tools-remove {
+    display:inline-block;
+    position: absolute;
+    top: 0;
+    right: 5px;
+    text-align: right;
+    z-index: 500;
+}
+
+.usky-grid .cell-tools-remove .iconBox:hover, .usky-grid .cell-tools-remove .iconBox:hover *{
+    background: @red !important;
+    border-color: @red !important;
+}
+
+.usky-grid  .cell-tools-move {
+    display:inline-block;
+    position: absolute;
+    top: 33px;
+    right: 5px;
+    z-index: 500;
+    cursor: move
+}
+
+.usky-grid .cell-tools-edit{
+    position: absolute;
+    top: 66px;
+    right: 5px;
+}
+
+
+// CONTROL
+// -------------------------
+.usky-grid .usky-control {
+    position:relative;
+    display:block;
+    background-clip: padding-box;
+
+    margin: 10px 0 0 0;
+}
+
+.usky-grid .warnhighlight, .usky-grid  .td.last.warnhighlight{
+     border: 1px dashed @red !important;
+}
+
+.usky-grid .infohighlight, .usky-grid  .td.last.infohighlight{
+     border: 1px dashed @blueMid !important;
+}
+
+.usky-grid .warnhighlight > ins.item-label{border-color: @red; color: @red;}
+.usky-grid .infohighlight > ins.item-label{border-color: @blueMid; color: @blueMid;}
+
+
+.usky-grid ins.item-label {
+    position: absolute;
+    top: -22px;
+    left: -1px;
+    text-decoration: none;
+    padding: 0 7px;
+    display:none;
+    font-size:0.8em;
+    background-color: @white;
+    color: @gray-8;
+    border: 1px dashed @gray-8;
+    border-bottom: 1px solid @white !important;
+    height: 20px;
+    overflow: hidden;
+}
+
+.usky-grid .usky-row-inner > ins.item-label{
+    top: -20px;
+    left: 0;
+}
+
+.usky-grid .usky-control-inner.selectedControl , .usky-grid .usky-row-inner.selectedRow{
+    border: 1px dashed @gray-8;
+
+    > ins.item-label {
+        display: block;
+        z-index:100000;
+    }
+}
+
+
+
+// CONTROL PLACEHOLDER
+// -------------------------
+.usky-grid  .usky-control-placeholder {
+    min-height: 20px;
+    position: relative;
+    text-align: center;
+    text-align: -moz-center;
+    cursor: text;
+}
+
+.usky-grid  .usky-control-placeholder .placeholder{
+    font-size: 14px; opacity: 0.7; text-align: left;
+    padding: 5px;
+    border:1px solid @gray-8;
+    height: 20px;
+}
+
+.usky-grid  .usky-control-placeholder:hover .placeholder{
+    border:1px solid @gray-7;
+}
+
+
+
+
+
+
+// EDITOR PLACEHOLDER
+// -------------------------
+.usky-grid .usky-editor-placeholder{
+    min-height: 65px;
+    padding: 20px;
+    padding-bottom: 30px;
+    position: relative;
+    background-color: @white;
+    border: 4px dashed @gray-10;
+    text-align: center;
+    text-align: -moz-center;
+}
+.usky-grid .usky-editor-placeholder i{
+    color: @gray-10;
+    font-size: 85px;
+    line-height: 85px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+
+// Form elements
+// -------------------------
+ .usky-grid  textarea.textstring{
+     display: block;
+     overflow: hidden;
+     border: none;
+     background: @white;
+     outline: none;
+     resize: none;
+     color: @gray-3;
+ }
+
+.usky-grid .usky-cell-rte textarea{
+     display: none !important
+}
+
+.usky-grid .usky-cell-media .caption{
+     display: block;
+     overflow: hidden;
+     border: none;
+     background: @white;
+     outline: none;
+     width: 98%;
+     resize: none;
+     font-style: italic;
+}
+
+ .usky-grid  .cellPanelRte {
+     min-height:60px;
+ }
+
+ .usky-grid .usky-cell-embed iframe {
+     width: 100%;
+}
+
+// ICONS
+// -------------------------
+ .usky-grid  .iconBox {
+     padding: 4px 6px 4px 6px;
+     display: inline-block;
+     cursor: pointer;
+     border-radius: 200px;
+     background: @white;
+     border:1px solid @gray-7;
+     margin: 2px;
+ }
+
+  .usky-grid  .iconBox span.prompt {
+      display:block;
+      white-space: nowrap;
+      text-align:center;
+
+  }
+
+  .usky-grid  .iconBox span.prompt > a {
+      text-decoration:underline;
+  }
+
+ .usky-grid .iconBox:hover, .usky-grid .iconBox:hover *{
+    background: @blueMid !important;
+    color: @white !important;
+    border-color: @blueMid !important;
+    text-decoration:none;
+ }
+
+ .usky-grid  .iconBox a:hover {
+     text-decoration:none;
+     color: @white !important;
+ }
+
+ .usky-grid  .iconBox.selected {
+     -webkit-appearance: none;
+     background-image: -webkit-gradient(linear,0 0,0 100%,from(@gray-9),to(@gray-7));
+     background-image: -webkit-linear-gradient(top,@gray-9,@gray-7);
+     background-image: linear-gradient(to bottom,@gray-9,@gray-7);
+     background-repeat: repeat-x;
+     zoom: 1;
+     border-color: @gray-7 @gray-7 @gray-6;
+     border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+     border-radius: 3px;
+     background: transparent;
+ }
+
+ .usky-grid  .iconBox i {
+     font-size:16px !important;
+     color: @gray-4;
+     display:block;
+ }
+
+
+ .usky-grid  ul {
+     display:inline-block;
+     list-style:none;
+     padding:0;
+     margin: 10px 0 0 0;
+     text-align:center;
+ }
+
+ .usky-grid  .help-text {
+     background: @gray-10;
+     color: @gray-3;
+     font-size: 14px;
+     padding: 10px 20px 10px 20px;
+     border-radius: 15px;
+     display: inline-block;
+     clear: both;
+ }
+
+ .usky-grid  ul li {
+     display: inline-block;
+     width: 120px;
+     margin: 8px 8px 0 8px;
+ }
+
+
+
+
+ // TINYMCE EDITOR
+ // -------------------------
+ .usky-grid .mce-panel {
+     border: none !important;
+     clear:both;
+ }
+
+ .usky-grid .mce-btn button {
+     padding: 8px 6px;
+     line-height: inherit;
+ }
+
+ .usky-grid .mce-toolbar {
+     border: 1px solid @gray-8;
+     background-color: @gray-10;
+     z-index: 100;
+     display: inline-block;
+     float: left;
+     padding: -1px;
+     position: absolute;
+     margin: -1px -1px 0 -1px;
+     box-shadow: 2px 2px 10px 0 rgba(50, 50, 50, 0.14);
+     z-index: 9999999;
+ }
+
+ .mce-flow-layout-item {
+     margin: 0;
+ }
+
+ .usky-grid  .mce-panel {
+     background: transparent !important;
+ }
+ .usky-grid  .mce-floatpanel {
+     background-color: @gray-10 !important;
+ }
+
+.usky-cell-rte{
+    border: 1px solid @gray-10;
+}
+
+ // MEDIA EDITOR
+ // -------------------------
+ .usky-grid  .fullSizeImage {
+     width:100%
+ }
+
+
+
+
+ /**************************************************************************************************/
+ /* Width */
+ /**************************************************************************************************/
+
+ .usky-grid  .boxWidth {
+     text-align:right;
+     margin-bottom: 10px;
+ }
+
+ .usky-grid  .boxWidth input {
+     text-align: center;
+     width: 40px;
+ }
+
+ .usky-grid  .boxWidth label {
+     font-size: 10px;
+     padding: 0;
+     margin: 5px 5px 0 0;
+     color: @gray-5;
+ }
+
+
+
+ /**************************************************************************************************/
+ /* Margin control */
+ /**************************************************************************************************/
+
+ .usky-grid .usky-cell{
+    padding-top: 5px;
+    padding-bottom: 15px;
+ }
+
+ .usky-grid .usky-control{
+     margin: 10px 0 0 0;
+     padding: 5px;
+     border: 1px dashed transparent;
+ }
+
+ .usky-grid .usky-templates-columns{
+     margin-top: 30px;
+ }
+
+ .usky-grid .usky-row-inner{
+    margin-right: 45px;
+    border: 1px dashed transparent;
+ }
+
+ .usky-grid .usky-control-inner {
+    padding: 5px;
+    margin-right: 45px;
+    margin-bottom: 15px;
+
+    border: 1px dashed transparent;
+    min-height: 60px;
+    position:relative;
+ }
+
+ .usky-grid .uSky-templates .layout {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    float: left;
+}
+
+
+.usky-grid .uSky-templates .columns {
+    margin-top: 5px;
+    margin-bottom: 25px;
+    float: left;
+}
+
+
+.usky-grid .uSky-templates .columns .preview-cell p {
+    font-size: 6px;
+    line-height: 8px;
+    text-align: center;
+}
+
+
+ /**************************************************************************************************/
+ /* template */
+ /**************************************************************************************************/
+
+ .usky-grid .uSky-templates {
+     text-align:center;
+     overflow:hidden;
+     width:100%;
+ }
+
+ .usky-grid .uSky-templates-template {
+     display:inline-block;
+     width:100px;
+     padding-right: 30px;
+     margin: 20px;
+ }
+
+ .usky-grid .uSky-templates-template button.tb:hover,
+ .usky-grid .uSky-templates-template button.tb:focus {
+     border:5px solid @blueMid;
+ }
+
+ .usky-grid .uSky-templates-template .tb {
+     width:100%;
+     height:150px;
+     padding:10px;
+     background-color: @gray-10;
+     border: 5px solid @gray-8;
+     cursor:pointer;
+     position: relative;
+ }
+
+ .usky-grid .uSky-templates-template .tr {
+     height: 100%;
+     position: relative;
+ }
+
+ .usky-grid .uSky-templates-template .tb .uSky-templates-column {
+     height:100%;
+     border: 1px dashed @gray-8;
+     border-right: none;
+ }
+
+ .usky-grid .uSky-templates-template .tb .uSky-templates-column.last {
+     border-right: 1px dashed @gray-8 !important;
+ }
+
+ .usky-grid button.uSky-templates-column:hover, 
+ .usky-grid button.uSky-templates-column:focus, 
+ .usky-grid button.uSky-templates-column.selected{
+    background-color: @blueMid;
+ }
+
+
+ /**************************************************************************************************/
+ /* template column */
+ /**************************************************************************************************/
+
+/* New template preview */
+.usky-grid {
+
+	.templates-preview {
+		display: inline-block;
+		width: 100%;
+		text-align: center;
+
+		small {
+			position: absolute;
+			width: 100%;
+			left: 0;
+			bottom: -25px;
+			padding-top: 15px;
+		}
+
+		.help-text {
+			margin: 35px 35px 0 0;
+		}
+	}
+
+	.preview-rows {
+		display: inline-block;
+		position: relative;
+		box-sizing: border-box;
+		width: 125px;
+		margin: 35px 40px 15px 0;
+		border: 2px solid @gray-8; /* @grayLight */
+		transition: border 200ms linear;
+
+        &.prevalues-rows {
+            margin: 0 20px 20px 0;
+            width: 80px;
+            float:left;
+        }
+
+        &.prevalues-templates {
+            margin: 0 20px 20px 0;
+            float:left;
+
+        }
+
+		&:hover {
+			border-color: @blueMid;
+			cursor: pointer;
+		}
+
+		.preview-row {
+			display: inline-block;
+			width: 100%;
+			vertical-align: bottom;
+		}
+	}
+
+	.preview-rows.layout {
+		padding: 2px;
+
+		.preview-row {
+			height: 100%;
+		}
+
+		.preview-col {
+			height: 180px;
+			border: dashed 1px @gray-8;
+		}
+
+		.preview-cell {
+			background-color: @gray-10;
+		}
+		.preview-overlay {
+			display: none;
+		}
+	}
+
+	.preview-rows.columns {
+		min-height: 16px;
+		line-height: 11px;
+        padding: 0 1px 1px 1px;
+
+        &.prevalues-rows {
+            min-height: 30px;
+        }
+	}
+
+    .preview-rows {
+
+        .preview-col {
+
+		    display: block;
+		    float: left;
+		    box-sizing: border-box;
+		    width: 33.3%; /* temp value */
+		    height: 10px;
+		    margin: 0;
+		    border: 1px solid @white; /* @white */
+
+		    .preview-cell {
+			    display: block;
+			    width: 100%;
+			    height: 100%;
+			    background-color: @gray-8; /* @grayLight */
+			    margin: 0 1px 1px 0;
+		    }
+	    }
+
+        &.prevalues-templates {
+            .preview-col {
+                height: 80px;
+            }
+        }
+
+    }
+
+	.preview-overlay {
+		display: block;
+        width: 100%;
+        position: absolute;
+        height: 100%;
+        top: 0;
+        box-sizing: border-box;
+        left: 0;
+        border: 3px solid @white;
+	}
+}
+
+ /**************************************************************************************************/
+ /* overlay */
+ /**************************************************************************************************/
+ .usky-grid  .cell-tools-menu{
+     position: absolute;
+     width: 360px;
+     height: 380px;
+     overflow: auto;
+     border: 1px solid @gray-8;
+     margin-top: -270px;
+     margin-left: -150px;
+     background: @white;
+     padding: 7px;
+     top: 0;
+     left: 50%;
+     z-index: 6660;
+     box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+ }
+
+
+ .usky-grid .cell-tools-menu h5{
+     border-bottom: 1px solid @gray-8;
+     color: @gray-6;
+     padding: 10px;
+     margin-top: 0;
+ }
+
+ .usky-grid .elements{
+     display: block;
+     padding: 0;
+     margin: 0;
+ }
+
+ .usky-grid .elements li{
+     display: inline-block;
+     width: 90px;
+     height: 80px;
+     margin: 5px;
+     padding: 5px;
+     overflow: hidden;
+     font-size: 12px;
+ }
+
+ .usky-grid .elements li:hover, .usky-grid .elements li:hover *{
+     background: @blueMid;
+     color: @white;
+ }
+
+ .usky-grid .elements a{
+     color: @gray-2;
+     text-decoration: none;
+ }
+
+ .usky-grid .elements i{
+     font-size: 30px;
+     line-height: 50px;
+     color: @gray-5;
+     display: block
+ }
+
+
+ /**************************************************************************************************/
+ /* Configuration specific styles */
+ /**************************************************************************************************/
+.usky-grid-configuration .uSky-templates{
+    text-align: left;
+}
+
+.usky-grid-configuration ul{
+    display: block;
+}
+
+.usky-grid-configuration ul li{
+    display: block;
+    width: auto;
+    text-align: left;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template .tb{
+    max-height: 50px;
+    border-width: 2px !important;
+    padding: 0;
+    border-spacing:2px;
+    overflow: hidden;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template span{
+    background: @gray-8;
+    display: inline-block;
+}
+
+.usky-grid-configuration .uSky-templates .uSky-templates-template .tb:hover{
+    border-width: 2px !important;
+}
+
+.usky-grid-configuration .uSky-templates-column{
+    display: block;
+    float: left;
+    margin-left: -1px;
+    border: 1px @white solid !important;
+    background: @gray-8;
+}
+
+.usky-grid-configuration .uSky-templates-column.last{
+    margin-right: -1px;
+}
+
+.usky-grid-configuration .uSky-templates-column.add{
+    text-align: center;
+    font-size: 20px;
+    line-height: 70px;
+    color: @gray-8;
+    text-decoration: none;
+    background: @white;
+}
+
+.usky-grid-configuration .mainTdpt{
+    height: initial;
+    border: none;
+}
+
+.usky-grid-configuration .uSky-templates-rows .uSky-templates-row{
+    margin: 0 50px 20px 0;
+    width: 60px;
+}
+
+.usky-grid-configuration .uSky-templates-rows .uSky-templates-row .tb{
+    border-width: 2px !important;
+    padding: 0;
+    border-spacing:2px;
+}
+
+.usky-grid-configuration .uSky-templates-rows .mainTdpt{
+    height: 10px !important;
+}
+
+.usky-grid-configuration button.uSky-templates-column {
+    height: 70px !important;
+}

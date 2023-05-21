@@ -1,0 +1,30 @@
+.umb-backdrop {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: @zindexUmbOverlay;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.umb-backdrop__backdrop {
+    height: 100%;
+    width: 100%;
+}
+
+.umb-backdrop__rect {
+    position: absolute;
+    pointer-events: all;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: @black;
+    opacity: 0.4;
+    transition: 200ms opacity ease-in-out;
+}
+
+.umb-backdrop__highlight-prevent-click {
+    position: absolute;
+    pointer-events: all;
+}

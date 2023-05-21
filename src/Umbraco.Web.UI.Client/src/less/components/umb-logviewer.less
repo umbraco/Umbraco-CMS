@@ -1,0 +1,170 @@
+.umb-logviewer {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+@sidebarwidth: 350px; // Width of sidebar. Ugly hack because of old version of Less
+
+.umb-logviewer__main-content {
+    flex: 1 1 auto;
+    margin-right: 20px;
+    width: calc(~'100%' - ~'@{sidebarwidth}' - ~'20px'); // Make sure that the main content area doesn't gets affected by inline styling
+    min-width: 500px;
+
+    .btn-link {
+        text-align: left;
+    }
+}
+
+.umb-logviewer__sidebar {
+    flex: 0 0 @sidebarwidth;
+
+    .flatpickr-input {
+        background-color: @white;
+        border: 0;
+        width: 100%;
+        text-align: center;
+        font-size: larger;
+        padding-top: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .umb-logviewer {
+        flex-direction: column;
+    }
+
+    .umb-logviewer__main-content {
+        flex: 1 1 auto;
+        width: 100%;
+        margin-bottom: 30px;
+        margin-right: 0;
+    }
+
+    .umb-logviewer__sidebar {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+}
+
+.umb-logviewer-search {
+    .filter-name {
+        margin-left: 5px;
+        margin-right: 3px;
+        max-width: 150px;
+    }
+
+    .dropdown-item {
+        padding: 8px 20px 8px 16px;
+    }
+
+    .filter {
+        position: relative;
+
+        a.btn-link {
+            padding-left: 0px;
+        }
+    }
+
+    .search-box {
+        width: 100%;
+
+        .flex-auto {
+            position: relative;
+
+            .search-input {
+                width: 100%;
+                padding-right: 160px;
+            }
+
+            .save-search,
+            .filter-search {
+                position: absolute;
+                top: 0;
+                display: flex;
+                align-items: center;;
+                height: 32px;
+            }
+
+            .save-search {
+                right: 140px;
+                color: @yellow-d1;
+                cursor: pointer;
+            }
+
+            .filter-search {
+                right: 120px;
+                color: @gray-7;
+                cursor: pointer;
+            }
+
+            .umb-variant-switcher__toggle {
+                top: 1px;
+                right: 0;
+                position: absolute;
+
+                .icon-navigation-down {
+                    margin-top: 0;
+                }
+            }
+
+            .saved-searches {
+                width: 100%;
+                max-height: 250px;
+                overflow-y: scroll;
+                margin-top: -10px;
+
+                > li {
+
+                    > button {
+                        white-space: normal;
+                        flex-wrap: wrap;
+                        column-gap: 5px;
+                    }
+
+                }
+            }
+        }
+    }
+
+    .log-items {
+        .table {
+            table-layout: fixed;
+
+            table {
+                display: table;
+                width: 100%;
+            }
+
+            thead th:first-child, thead th:nth-child(3) {
+                width: 20%;
+            }
+
+            thead th:nth-child(2) {
+                width: 15%;
+            }
+
+
+            tr td:nth-child(3) {
+                word-break: break-word;
+            }
+
+            button {
+                white-space: normal;
+                word-break: break-word;
+                text-align-last: left;
+            }
+        }
+
+        .exception {
+            border-left: 4px solid @red;
+            padding: 0 10px 10px 10px;
+            box-shadow: rgba(0,0,0,0.07) 2px 2px 10px;
+
+            .exception-message {
+                white-space: pre-wrap;
+            }
+        }
+    }
+}

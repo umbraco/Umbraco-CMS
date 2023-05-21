@@ -1,0 +1,111 @@
+﻿<div id="nuCache" style="position: relative;" ng-controller="Umbraco.Dashboard.PublishedSnapshotCacheController as vm">
+
+    <div ng-show="vm.loading || vm.working" style="background: rgba(255, 255, 255, 0.60); position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 1;">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+
+    <div class="umb-panel-group__details-group">
+        <div class="umb-panel-group__details-group-title">
+            <div class="umb-panel-group__details-group-name">
+                <localize key="nuCache_publishedCacheStatus">Published Cache Status</localize>
+            </div>
+        </div>
+        <div class="umb-panel-group__details-checks">
+            <div class="umb-panel-group__details-check">
+                <div class="umb-panel-group__details-status">
+                    <div class="umb-panel-group__details-status-content">
+                        <div class="umb-panel-group__details-status-text">
+                            <p class="umb-panel-group__details-status-action" ng-show="!vm.working">{{vm.status}}</p>
+                        </div>
+                        <div class="umb-panel-group__details-status-actions">
+                            <div class="umb-panel-group__details-status-action no-background no-left-padding">
+                                <button type="button" ng-click="vm.verify($event)" class="btn btn-danger">
+                                    <localize key="nuCache_refreshStatus">Refresh status</localize>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="umb-panel-group__details-group">
+        <div class="umb-panel-group__details-group-title">
+            <div class="umb-panel-group__details-group-name">
+                <localize key="nuCache_caches">Caches</localize>
+            </div>
+        </div>
+        <div class="umb-panel-group__details-checks">
+            <div class="umb-panel-group__details-check">
+                <div class="umb-panel-group__details-check-title">
+                    <div class="umb-panel-group__details-check-name">
+                        <localize key="nuCache_memoryCache">Memory Cache</localize>
+                    </div>
+                    <div class="umb-panel-group__details-check-description">
+                        <localize key="nuCache_memoryCacheDescription">
+                            This button lets you reload the in-memory cache, by entirely reloading it from the database
+                            cache (but it does not rebuild that database cache). This is relatively fast.
+                            Use it when you think that the memory cache has not been properly refreshed, after some events
+                            triggered&mdash;which would indicate a minor Umbraco issue.
+                            (note: triggers the reload on all servers in an LB environment).
+                        </localize>
+
+                    </div>
+
+                    <div class="umb-panel-group__details-status-actions">
+                        <div class="umb-panel-group__details-status-action no-background no-left-padding">
+                            <button type="button" ng-click="vm.reload($event)" class="btn btn-danger">
+                                <localize key="nuCache_reload">Reload</localize>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="umb-panel-group__details-check-title top-border">
+                    <div class="umb-panel-group__details-check-name">
+                        <localize key="nuCache_databaseCache">Database Cache</localize>
+                    </div>
+                    <div class="umb-panel-group__details-check-description">
+                        <localize key="nuCache_databaseCacheDescription">
+                            This button lets you rebuild the database cache, ie the content of the cmsContentNu table.
+                            <strong>Rebuilding can be expensive.</strong>
+                            Use it when reloading is not enough, and you think that the database cache has not been
+                            properly generated&mdash;which would indicate some critical Umbraco issue.
+                        </localize>
+                    </div>
+                    <div class="umb-panel-group__details-status-actions">
+                        <div class="umb-panel-group__details-status-action no-background no-left-padding">
+                            <button type="button" ng-click="vm.rebuild($event)" class="btn btn-danger">
+                                <localize key="nuCache_rebuild">Rebuild</localize>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="umb-panel-group__details-check-title top-border">
+                    <div class="umb-panel-group__details-check-name">
+                        <localize key="nuCache_internals">Internals</localize>
+                    </div>
+                    <div class="umb-panel-group__details-check-description">
+                        <localize key="nuCache_internalsDescription">
+                            This button lets you trigger a NuCache snapshots collection (after running a fullCLR GC).
+                            Unless you know what that means, you probably do <em>not</em> need to use it.
+                        </localize>
+
+                    </div>
+                    <div class="umb-panel-group__details-status-actions">
+                        <div class="umb-panel-group__details-status-action no-background no-left-padding">
+                            <button type="button" ng-click="vm.collect($event)" class="btn btn-danger">
+                                <localize key="nuCache_collect">Collect</localize>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

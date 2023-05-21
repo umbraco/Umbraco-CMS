@@ -1,0 +1,50 @@
+<div ng-controller="Umbraco.Editors.MemberTypes.CreateController">
+    <div class="umbracoDialog umb-dialog-body with-footer">
+        <div class="umb-pane" ng-if="!model.creatingFolder">
+            <h5>
+                <localize key="create_createUnder">Create a type under</localize> {{currentNode.name}}
+            </h5>
+
+            <ul class="umb-actions umb-actions-child">
+                <li class="umb-action">
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="showCreateFolder()">
+                        <umb-icon icon="icon-folder" class="icon large"></umb-icon>
+                        <span class="menu-label">
+                            <localize key="general_folder">Folder</localize>
+                        </span>
+                    </button>
+                </li>
+                <li class="umb-action">
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createMemberType()">
+                        <umb-icon icon="icon-item-arrangement" class="icon large"></umb-icon>
+                        <span class="menu-label">
+                            <localize key="general_new">New</localize>&nbsp;
+                            <localize key="content_memberType">Member type</localize>
+                        </span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="umb-pane" ng-if="model.creatingFolder">
+            <form novalidate name="createFolderForm" ng-submit="createFolder()" val-form-manager>
+
+                <umb-control-group label="Enter a folder name" hide-label="false">
+                    <input type="text" name="folderName" ng-model="model.folderName"
+                        class="umb-textstring textstring input-block-level" required />
+                </umb-control-group>
+
+                <button type="submit" class="btn btn-primary">
+                    <localize key="general_create">Create</localize>
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!model.creatingFolder">
+        <button type="button" class="btn btn-info" ng-click="nav.hideDialog(true)">
+            <localize key="buttons_somethingElse">Do something else</localize>
+        </button>
+    </div>
+</div>

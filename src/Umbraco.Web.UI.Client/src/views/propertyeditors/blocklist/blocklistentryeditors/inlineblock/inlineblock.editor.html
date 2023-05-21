@@ -1,0 +1,14 @@
+<div class="blockelement-inlineblock-editor"
+        ng-controller="Umbraco.PropertyEditors.BlockEditor.InlineBlockEditor as vm"
+        ng-class="{ '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
+    <button type="button" class="btn-reset umb-outline blockelement__draggable-element"
+            ng-click="vm.openBlock(block)"
+            ng-focus="block.focus">
+        <span class="caret"></span>
+        <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
+        <span class="name">{{block.label}}</span>
+    </button>
+    <div class="blockelement-inlineblock-editor__inner" ng-class="{'--singleGroup':block.content.variants[0].tabs.length === 1}" ng-if="block.active === true">
+        <umb-element-editor-content model="block.content"></umb-element-editor-content>
+    </div>
+</div>

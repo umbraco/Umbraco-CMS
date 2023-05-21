@@ -1,0 +1,14 @@
+<div class="umb-tour-step umb-tour-step--{{size}}">
+
+    <div ng-if="hideClose !== true">
+        <button type="button" class="umb-tour-step__close" hotkey="esc" ng-click="close()">
+            <umb-icon icon="icon-wrong"></umb-icon>
+            <span class="sr-only">
+                <localize key="general_close">Close</localize>
+            </span>
+        </button>
+    </div>
+
+    <div ng-transclude></div>
+
+</div>

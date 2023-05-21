@@ -1,0 +1,108 @@
+<div data-element="editor-languages" ng-controller="Umbraco.Editors.Languages.EditController as vm" class="clearfix">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <form name="editLanguageForm" novalidate val-form-manager>
+
+        <umb-editor-view ng-if="!vm.loading">
+    
+            <umb-editor-header name="vm.language.name"
+                               name-locked="vm.isNew"
+                               on-back="vm.back()"
+                               show-back-button="true"
+                               hide-icon="true"
+                               hide-alias="true"
+                               hide-description="true">
+            </umb-editor-header>
+    
+            <umb-editor-container class="form-horizontal">
+
+                <umb-box>
+                    <umb-box-content>
+
+                        <umb-control-group label="@general_language" required="true">
+                            <select name="newLang"
+                                    class="input-block-level"
+                                    ng-model="vm.language.culture"
+                                    ng-options="key as value for (key, value) in vm.availableCultures"
+                                    val-server-field="IsoCode"
+                                    required></select>
+                            <span ng-messages="editLanguageForm.newLang.$error" show-validation-on-submit>
+                                <span class="help-inline" ng-message="required">Required</span>
+                                <span class="help-inline" ng-message="valServerField">{{editLanguageForm.newLang.errorMsg}}</span>
+                            </span>
+                        </umb-control-group>
+
+                        <umb-control-group label="@languages_culture">
+                            <span ng-bind="vm.language.culture"></span>
+                        </umb-control-group>
+
+                        <umb-control-group label="@general_settings" class="umb-toggle-group">
+
+                            <div class="umb-toggle-group-item" ng-click="vm.toggleDefault()" ng-class="{ 'umb-toggle-group-item--disabled': vm.initIsDefault }">
+                                <umb-toggle class="umb-toggle-group-item__toggle"
+                                            checked="vm.language.isDefault"
+                                            disabled="vm.initIsDefault">
+                                </umb-toggle>
+                                <div class="umb-toggle-group-item__content">
+                                    <localize key="languages_defaultLanguage"></localize>
+                                    <span class="umb-toggle-group-item__description"><localize key="languages_defaultLanguageHelp"></localize></span>
+                                </div>
+                            </div>
+
+                            <div class="umb-toggle-group-item" ng-click="vm.toggleMandatory()">
+                                <umb-toggle class="umb-toggle-group-item__toggle"
+                                            checked="vm.language.isMandatory">
+                                </umb-toggle>
+                                <div class="umb-toggle-group-item__content">
+                                    <localize key="languages_mandatoryLanguage"></localize>
+                                    <span class="umb-toggle-group-item__description"><localize key="languages_mandatoryLanguageHelp"></localize></span>
+                                </div>
+                            </div>
+
+                            <div class="umb-alert umb-alert--info" style="margin-top: 20px;" ng-if="vm.showDefaultLanguageInfo">
+                                <localize key="languages_changingDefaultLanguageWarning">Switching default language may result in default content missing.</localize>
+                            </div>
+
+                        </umb-control-group>
+
+                        <umb-control-group label="@languages_fallbackLanguage" description="@languages_fallbackLanguageDescription">
+                            <select ng-model="vm.language.fallbackLanguageId"
+                                    ng-options="l.id as l.name for l in vm.availableLanguages">
+                                <option value="" localize="label" label="languages_noFallbackLanguageOption"></option>
+                            </select>
+                        </umb-control-group>
+
+                    </umb-box-content>
+                </umb-box>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+                    <umb-breadcrumbs ancestors="vm.breadcrumbs"
+                                     allow-on-open="true"
+                                     on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+                    <umb-button type="button"
+                                action="vm.save()"
+                                state="vm.saveButtonState"
+                                button-style="success"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save"
+                                disabled="vm.loading">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+    
+        </umb-editor-view>
+
+    </form>
+    
+</div>

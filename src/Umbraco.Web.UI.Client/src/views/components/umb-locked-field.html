@@ -1,0 +1,51 @@
+<ng-form name="lockedFieldForm" class="umb-locked-field">
+
+    <div class="umb-locked-field__wrapper">
+
+        <button aria-label="Unlock" ng-if="locked" ng-click="unlock()" class="umb-locked-field__toggle">
+            <umb-icon icon="icon-lock" class="umb-locked-field__lock-icon"></umb-icon>
+        </button>
+
+        <button aria-label="Lock" ng-if="!locked" ng-click="lock()" class="umb-locked-field__toggle">
+            <umb-icon icon="icon-unlocked" class="umb-locked-field__lock-icon -unlocked"></umb-icon>
+        </button>
+
+        <input type="text"
+               no-password-manager
+               class="umb-locked-field__input"
+               name="lockedField"
+               ng-model="ngModel"
+               ng-disabled="locked"
+               ng-class="{'-unlocked': !locked}"
+               placeholder="{{placeholderText}}"
+               val-regex="{{regexValidation}}"
+               umb-auto-resize
+               required
+               val-server-field="{{serverValidationField}}"
+               title="{{ngModel}}"
+               focus-when="{{!locked}}"
+               umb-select-when="{{!locked}}"
+               ng-blur="lock()" />
+
+    </div>
+
+    <div ng-messages="lockedFieldForm.lockedField.$error" show-validation-on-submit>
+        <div class="umb-validation-label"
+             ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
+             ng-message="required">
+            <localize key="general_required">Required</localize> <localize key="content_alias">alias</localize>
+        </div>
+        <div class="umb-validation-label"
+             ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
+             ng-if="regexValidation.length > 0"
+             ng-message="valRegex">
+            <localize key="general_invalid">Invalid</localize> <localize key="content_alias">alias</localize>
+        </div>
+        <div class="umb-validation-label"
+             ng-class="{ '-left': validationPosition === 'left', '-right': validationPosition === 'right' }"
+             ng-if="serverValidationField.length > 0"
+             ng-message="valServerField">{{lockedFieldForm.lockedField.errorMsg}}
+        </div>
+    </div>
+
+</ng-form>

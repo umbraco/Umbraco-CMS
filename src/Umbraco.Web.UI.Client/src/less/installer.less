@@ -1,0 +1,310 @@
+﻿// Core variables and mixins
+@import "fonts.less"; // Loading fonts
+@import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "colors.less";
+@import "mixins.less";
+@import "application/umb-outline.less";
+@import "buttons.less";
+@import "forms.less";
+
+// Grid system and page structure
+@import "../../lib/bootstrap/less/scaffolding.less";
+@import "../../lib/bootstrap/less/grid.less";
+@import "../../lib/bootstrap/less/layouts.less";
+
+@import "../../lib/bootstrap/less/thumbnails.less";
+@import "../../lib/bootstrap/less/media.less";
+
+// Umbraco Components
+@import "components/umb-loader.less";
+@import "components/tooltip/umb-tooltip.less";
+@import "components/umb-range-slider.less";
+
+
+[ng\:cloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak {
+  display: none !important;
+}
+
+body {
+  background: url('../img/installer.svg') no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100%;
+  font-family: @baseFontFamily;
+  font-size: @baseFontSize;
+  line-height: @baseLineHeight;
+  color: @textColor;
+  text-align: center;
+  // better font rendering
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  // center items
+  display: grid;
+  place-items: center center;
+}
+
+#logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  opacity: 0.8;
+  z-index: 777;
+}
+
+#installer {
+  background: @white;
+  width: min-content;
+  min-width: 500px;
+  text-align: left;
+  padding: 3rem;
+  z-index: 667;
+  border-radius: 6px;
+  box-shadow: 0 0 2px 4px rgba(0, 0, 0, 0.16);
+}
+
+#overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: @purple-d2;
+  z-index: 666;
+}
+
+.loading #overlay {
+  opacity: 0.5;
+  display: block !important;
+}
+
+
+#fact {
+  color: @white;
+  text-shadow: 0px 0px 4px @black;
+  font-size: 25px;
+  text-align: left;
+  line-height: 35px;
+  z-index: 667;
+  height: 600px;
+  width: 750px;
+
+  h2 {
+    font-size: 35px;
+    border-bottom: 1px solid @white;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    color: @white;
+  }
+
+  a {
+    color: @white;
+  }
+}
+
+#feedback {
+  color: @white;
+  text-shadow: 0px 0px 4px @black;
+  font-size: 14px;
+  text-align: center;
+  line-height: 20px;
+  z-index: 667;
+  bottom: 20px;
+  right: 0;
+  left: 0;
+  height: 25px;
+  position: absolute;
+}
+
+
+h1 {
+  border-bottom: 1px solid @gray-10;
+  padding-bottom: 10px;
+  color: @gray-2;
+}
+
+.error h1,
+.error .message,
+span.error {
+  color: @red;
+}
+
+legend {
+  font-size: 14px;
+  font-weight: bold
+}
+
+#installer input {
+  width: 100%;
+
+  &[type=checkbox] {
+    width: auto;
+  }
+}
+
+input.ng-dirty.ng-invalid {
+  border-color: @pink;
+  color: @pink;
+}
+
+.disabled {
+  opacity: 0.6;
+}
+
+.installer-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  gap: 120px;
+}
+
+.user-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-col {
+  min-height: 500px
+}
+
+
+#installer label.control-label,
+#installer .constrol-label {
+  padding-top: 5px !important;
+}
+
+.controls {
+  text-align: left;
+
+  small {
+    display: block;
+    color: @gray-3;
+  }
+
+  &.-with-border {
+    border: 1px solid @inputBorder;
+  }
+}
+
+.control-actions {
+  margin-top: 2rem;
+}
+
+.controls-space-between {
+  display: flex;
+  justify-content: space-between;;
+}
+
+#installer .input-readonly-text {
+  padding: 4px 6px;
+}
+
+#installer legend {
+  clear: both;
+}
+
+.fade-hide,
+.fade-show {
+  transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+
+.fade-hide {
+  opacity: 1;
+}
+
+.fade-hide.fade-hide-active {
+  opacity: 0;
+}
+
+.fade-show {
+  opacity: 0;
+}
+
+.fade-show.fade-show-active {
+  opacity: 1;
+}
+
+.umb-installer-loader {
+  margin: 0;
+  width: 0;
+  z-index: 777;
+
+  .umb-loader {
+    background-color: @white;
+    height: 5px;
+  }
+}
+
+.permissions-report {
+  overflow: auto;
+  height: 320px;
+  margin: 0;
+  display: block;
+  padding: 0;
+}
+
+.permissions-report>li {
+  list-style: none;
+}
+
+.permissions-report h4 {
+  margin: 7px;
+}
+
+.upgrade-report {
+  overflow: auto;
+  height: 280px;
+  display: block;
+}
+
+select {
+  width: 320px;
+}
+
+#ysod {
+  height: 500px;
+  width: 100%;
+  overflow: auto;
+  border: none;
+}
+
+#starterKits {
+  .thumbnails {
+    min-height: 128px;
+    padding-left: 0;
+  }
+
+  .thumbnail {
+    position: relative;
+    cursor: pointer;
+
+    small {
+      padding: 10px 10px 5px;
+      display: inline-block;
+    }
+
+    img {
+      position: relative;
+      z-index: 100;
+    }
+  }
+
+  .btn-link {
+    padding-left: 0;
+  }
+}
+
+.umb-tooltip {
+  border: 1px solid @ui-action-border;
+  max-width: 500px;
+}
+
+#consentSliderWrapper {
+  margin-bottom: 60px;
+}

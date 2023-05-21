@@ -1,0 +1,62 @@
+<div ng-controller="Umbraco.Editors.DataType.SettingsController as vm">
+
+    <umb-box>
+
+        <umb-box-content>
+
+            <umb-property property="model.properties.selectedEditor">
+
+                <ng-form name="propertyEditorForm">
+
+                    <div
+                        ng-model="model.content.selectedEditor"
+                        name="selectedEditor"
+                        val-require-component
+                        class="umb-property-editor--limit-width">
+
+                        <umb-button
+                            ng-if="!model.content.selectedEditor"
+                            data-element="property-editor-add"
+                            type="button"
+                            button-style="[placeholder, block]"
+                            label-key="propertyEditorPicker_openPropertyEditorPicker"
+                            ng-click="vm.openPropertyEditorPicker()">
+                        </umb-button>
+
+                        <div class="help-inline" ng-messages="propertyEditorForm.selectedEditor.$error" show-validation-on-submit>
+                            <span ng-message="valRequiredComponent">
+                                <localize key="general_required">Required</localize>
+                            </span>
+                        </div>
+
+                        <div ng-if="model.content.selectedEditor">
+                            <umb-node-preview
+                                single
+                                icon="vm.selectedEditorModel.icon || 'icon-autofill'"
+                                name="vm.selectedEditorModel.name"
+                                description="vm.selectedEditorModel.alias"
+                                allow-change="vm.allowChangePropertyEditor"
+                                on-change="vm.openPropertyEditorPicker()">
+                            </umb-node-preview>
+
+                            <div ng-if="vm.changePropertyEditorHelpTextIsVisible" class="mt2 umb-alert umb-alert--info" style="max-width: 800px;">
+                                <localize key="editdatatype_canChangePropertyEditorHelp">
+                                    Changing a property editor on a data type with a stored value is disabled.
+                                </localize>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+
+            </umb-property>
+
+            <umb-property property="preValue"
+                        ng-repeat="preValue in model.preValues">
+                <umb-property-editor model="preValue" pre-values="model.preValues" is-pre-value="true"></umb-property-editor>
+            </umb-property>
+
+        </umb-box-content>
+
+    </umb-box>
+
+</div>

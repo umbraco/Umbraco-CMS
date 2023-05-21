@@ -1,0 +1,42 @@
+<div>
+    <div id="applications" ng-class="{faded:stickyNavigation}">
+        <ul class="sections" data-element="sections">
+
+            <li data-element="section-{{section.alias}}" ng-repeat="section in sections | limitTo: visibleSections" ng-class="{current: section.alias == currentSection}">
+                <a href="#/{{section.alias}}"
+                   ng-dblclick="sectionDblClick(section)"
+                   ng-click="sectionClick($event, section)"
+                   prevent-default
+                   ng-attr-aria-current="{{section.alias == currentSection ? 'page' : undefined}}"
+                   aria-label="{{section.name + (section.alias == currentSection ? ' (active)' : '')}}">
+                    <span class="section__name">{{section.name}}</span>
+                </a>
+            </li>
+
+            <li data-element="section-expand" class="expand" ng-class="{ 'open': showTray === true, current: currentSectionInOverflow() }" ng-show="visibleSections < sections.length">
+                <umb-button-ellipsis
+                    action="trayClick()"
+                    text="More sections"
+                    color="#ffffff"
+                    >
+                </umb-button-ellipsis>
+
+                <ul id="applications-tray" class="sections-tray shadow-depth-2" ng-if="showTray" on-outside-click="trayClick()">
+                    <li ng-repeat="section in sections | limitTo: sections.length | limitTo: -(sections.length - visibleSections)" ng-class="{current: section.alias == currentSection}">
+                        <a href="#/{{section.alias}}"
+                            ng-dblclick="sectionDblClick(section)"
+                            ng-click="sectionClick($event, section)"
+                            prevent-default
+                            ng-attr-aria-current="{{section.alias == currentSection ? 'page' : undefined}}"
+                            aria-label="{{section.name + (section.alias == currentSection ? ' (active)' : '')}}">
+                            <span class="section__name">{{section.name}}</span>
+                        </a>
+                    </li>
+                </ul>
+
+            </li>
+
+        </ul>
+    </div>
+
+</div>

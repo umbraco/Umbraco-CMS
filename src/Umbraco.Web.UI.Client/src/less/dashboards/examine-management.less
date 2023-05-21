@@ -1,0 +1,57 @@
+﻿.examine-management {
+
+    .form-search {
+
+        .search-query {
+            flex: 1 1 auto;
+            width: auto;
+        }
+
+        button.btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
+    .umb-panel-group__details-status-content{
+        width:50%; // this is to fix flexbox not making the content too wide
+    }
+
+    .umb-panel-group__details-status-action{
+        background-color:transparent;
+        padding-left:0;
+    }
+
+    .result-table {
+        overflow-x:auto;
+        border:1px solid @tableBorder;
+
+        > table {
+            margin-bottom:0;
+            border:0;
+        }
+
+        th:first-child,
+        td:first-child {
+            position:sticky;
+            left:0;
+            background-color:@white;
+            border-right:1px solid @tableBorder;
+            border-left:0;
+
+            + td,
+            + th {
+                border-left:0;
+            }
+        }
+
+        th:last-child,
+        td:last-child {
+            position:sticky;
+            right:0;
+            background-color:@white;
+            border-left:1px solid @tableBorder;
+        }
+    }
+}
+

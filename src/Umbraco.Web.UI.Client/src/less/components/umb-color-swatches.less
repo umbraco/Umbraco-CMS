@@ -1,0 +1,106 @@
+﻿.umb-color-swatches {
+    display: flex;
+    flex-flow: row wrap;
+
+    .umb-color-box {
+        border: 1px solid rgba(0,0,0,0.15);
+        color: @white;
+        cursor: pointer;
+        padding: 1px;
+        text-align: center;
+        text-decoration: none;
+        margin: 5px;
+        border-radius: 3px;
+        width: 30px;
+        height: 30px;
+        transition: box-shadow .3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover, &:focus {
+            box-shadow: 0 1px 3px fade(@black, 12%), 0 1px 2px fade(@black, 24%);
+        }
+
+        &.umb-color-box--xs {
+            width: 27px;
+            height: 27px;
+        }
+
+        &.umb-color-box--s {
+            width: 30px;
+            height: 30px;
+        }
+
+        &.umb-color-box--m {
+            width: 40px;
+            height: 40px;
+
+            .check_circle {
+                width: 25px;
+                height: 25px;
+            }
+        }
+    }
+
+    &.with-labels {
+
+        .umb-color-box {
+            width: 130px;
+            height: auto;
+            display: flex;
+            flex-flow: row wrap;
+            border: 1px solid @gray-8;
+
+            .umb-color-box-inner {
+                display: flex;
+                flex-flow: column wrap;
+                flex: 0 0 100%;
+                max-width: 100%;
+                min-height: 80px;
+                padding: 0;
+
+                .check_circle {
+                    margin: 15px auto;
+                }
+
+                .umb-color-box__label {
+                    background: @white;
+                    font-size: 14px;
+                    padding: 1px 5px;
+                    min-height: 45px;
+                    max-width: calc(100% - 8px);
+                    margin-top: auto;
+                    margin-bottom: -3px;
+                    margin-left: -1px;
+                    margin-right: -1px;
+                    text-indent: 0;
+                    text-align: left;
+                    border-top: 1px solid @gray-8;
+                    border-bottom: 1px solid @gray-8;
+                    border-bottom-left-radius: 3px;
+                    border-bottom-right-radius: 3px;
+                    overflow: hidden;
+
+                    .umb-color-box__name {
+                        color: @black;
+                        font-weight: bold;
+                        margin-top: 3px;
+                    }
+
+                    .umb-color-box__description {
+                        font-size: 12px;
+                        line-height: 1.5em;
+                        color: @gray-3;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.umb-color-swatches[readonly] {
+    .umb-color-box {
+        cursor: not-allowed;
+    }
+}

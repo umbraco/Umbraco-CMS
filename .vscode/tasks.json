@@ -1,0 +1,80 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "detail": "Builds the client and SLN",
+            "promptOnClose": true,
+            "group": "build",
+            "dependsOn": [
+                "Client Build",
+                "Dotnet build"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Client Install",
+            "detail": "install npm for Umbraco.Web.UI.Client",
+            "promptOnClose": true,
+            "type": "npm",
+            "script": "install",
+            "path": "src/Umbraco.Web.UI.Client/",
+            "problemMatcher": []
+        },
+        {
+            "label": "Client Build",
+            "detail": "runs npm run build for Umbraco.Web.UI.Client",
+            "promptOnClose": true,
+            "group": "build",
+            "type": "npm",
+            "script": "build",
+            "path": "src/Umbraco.Web.UI.Client/",
+            "problemMatcher": [
+                "$gulp-tsc"
+            ]
+        },
+        {
+            "label": "Client Watch",
+            "detail": "runs npm run dev for Umbraco.Web.UI.Client",
+            "promptOnClose": true,
+            "group": "build",
+            "type": "npm",
+            "script": "dev",
+            "path": "src/Umbraco.Web.UI.Client/",
+            "problemMatcher": [
+                "$gulp-tsc"
+            ]
+        },
+        {
+            "label": "Dotnet build",
+            "detail": "Dotnet build of SLN",
+            "promptOnClose": true,
+            "group": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/umbraco.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Dotnet watch",
+            "detail": "Dotnet run and watch of Web.UI",
+            "promptOnClose": true,
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/src/Umbraco.Web.UI/Umbraco.Web.UI.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

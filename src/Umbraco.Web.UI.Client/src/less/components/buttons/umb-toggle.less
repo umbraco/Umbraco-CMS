@@ -1,0 +1,156 @@
+.umb-toggle {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+
+    &:focus {
+        outline: 0;
+    }
+}
+
+.umb-toggle__toggle {
+    cursor: pointer;
+    align-items: center;
+    display: flex;
+    width: 38px;
+    height: 18px;
+    border-radius: 10px;
+    border: 1px solid @inputBorder;
+    background-color: @inputBorder;
+    position: relative;
+    transition: background-color 120ms;
+
+    .umb-toggle:hover &,
+    .umb-toggle:focus & {
+        border-color: @inputBorderFocus;
+    }
+
+    .umb-toggle.umb-toggle--checked & {
+        border-color: @ui-btn;
+        background-color: @ui-btn;
+
+        &:hover {
+            background-color: @ui-btn-hover;
+        }
+    }
+
+    .tabbing-active .umb-toggle:focus & {
+        box-shadow: 0 0 0 2px highlight;
+    }
+}
+
+.umb-toggle__handler {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-color: @white;
+    border-radius: 8px;
+    transition: transform 120ms ease-in-out, background-color 120ms;
+
+    .umb-toggle.umb-toggle--checked & {
+        transform: translateX(20px);
+        background-color: @white;
+    }
+}
+
+/* Icons */
+
+.umb-toggle__icon {
+    position: absolute;
+    font-size: 12px;
+    line-height: 1em;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.umb-toggle__icon--left {
+    left: 5px;
+    color:@white;
+    transition: opacity 120ms;
+    opacity: 0;
+
+    .umb-toggle--checked & {
+        opacity: 1;
+    }
+    .umb-toggle.umb-toggle--checked:hover & {
+        color:@white;
+    }
+}
+
+.umb-toggle__icon--right {
+    right: 5px;
+    color: @ui-btn;
+    transition: opacity 120ms;
+
+    .umb-toggle--checked & {
+        opacity: 0;
+    }
+    .umb-toggle:hover & {
+        color: @ui-btn-hover;
+    }
+}
+
+.umb-toggle.umb-toggle--disabled {
+    .umb-toggle__toggle {
+        cursor: not-allowed;
+    }
+
+    &, &.umb-toggle--checked {
+
+        .umb-toggle__toggle {
+            .umb-toggle__handler {
+                background-color: @gray-10;
+            }
+        }
+    }
+
+    &:not(.umb-toggle--checked) {
+        .umb-toggle__toggle {
+            background-color: @gray-8;
+            border-color: @gray-8;
+        }
+
+        .umb-toggle__icon--left,
+        .umb-toggle__icon--right {
+            color: @gray-6;
+        }
+    }
+
+    &.umb-toggle--checked {
+        .umb-toggle__toggle {
+            background-color: lighten(@ui-btn, 50%);
+            border-color: lighten(@ui-btn, 50%);
+        }
+        .umb-toggle__icon--left,
+        .umb-toggle__icon--right {
+            color: @gray-9;
+        }
+    }
+}
+
+
+/* Labels */
+
+.umb-toggle__label {
+    color: @gray-2;
+}
+
+.umb-toggle__label--left {
+    margin-right: 8px;
+}
+
+.umb-toggle__label--right {
+    margin-left: 8px;
+}
+
+/* Readonly */
+.umb-toggle[readonly] {
+    .umb-toggle__toggle {
+        cursor: not-allowed;
+    }
+}

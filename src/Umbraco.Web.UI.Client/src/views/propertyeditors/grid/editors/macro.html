@@ -1,0 +1,13 @@
+<div ng-controller="Umbraco.PropertyEditors.Grid.MacroController">
+
+	<button type="button" class="btn-reset umb-editor-placeholder" ng-click="setMacro()">
+		<span ng-if="!preview">
+			<umb-icon icon="{{control.icon}}" class="icon"></umb-icon>
+			<span class="help-text">{{title}}</span>
+		</span>
+		<span ng-if="preview" style="text-align: left; pointer-events: none; cursor: default;"
+			ng-bind-html="preview">
+		</span>
+	</button>
+
+</div>

@@ -1,0 +1,65 @@
+<div class="form-horizontal">
+    <ng-form name="elementTypeContentForm">
+
+        <umb-editor-tab-bar ng-if="vm.tabs.length > 0">
+            <umb-tabs-nav tabs="vm.tabs" on-tab-change="vm.setActiveTab(tab)"></umb-tabs-nav>
+        </umb-editor-tab-bar>
+
+        <umb-box ng-repeat="tab in vm.tabs" ng-show="tab.alias === vm.activeTabAlias && tab.properties.length > 0">
+            <umb-box-content data-element="tab-content-{{tab.alias}}">
+                <umb-property
+                    data-element="property-{{property.alias}}"
+                    ng-repeat="property in tab.properties track by property.alias"
+                    property="property"
+                    element-key="{{vm.model.key}}"
+                    show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
+                    inherits-from="defaultVariant.language.name">
+
+                    <umb-property-editor
+                        model="property"
+                        preview="(vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue) || (!vm.allowUpdate && !property.supportsReadOnly)"
+                        ng-attr-readonly="{{!vm.allowUpdate || undefined}}">
+                    </umb-property-editor>
+
+                </umb-property>
+            </umb-box-content>
+        </umb-box>
+
+        <div class="umb-group-panel"
+             data-element="group-{{group.alias}}"
+             ng-repeat="group in vm.model.variants[0].tabs track by group.key"
+             ng-if="group.type === 'Group'"
+             ng-show="group.parentAlias === vm.activeTabAlias || vm.tabs.length === 0">
+
+            <div class="umb-group-panel__header">
+                <div id="group-{{group.id}}"><h2>{{ group.label }}</h2></div>
+            </div>
+
+            <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
+                <umb-property
+                    data-element="property-{{property.alias}}"
+                    ng-repeat="property in group.properties track by property.alias"
+                    property="property"
+                    element-key="{{vm.model.key}}"
+                    show-inherit="vm.model.variants.length > 1 && !property.culture && !activeVariant.language.isDefault"
+                    inherits-from="defaultVariant.language.name">
+
+                    <umb-property-editor
+                        model="property"
+                        preview="vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue"
+                        ng-attr-readonly="{{!vm.allowUpdate || undefined}}">
+                    </umb-property-editor>
+
+                </umb-property>
+            </div>
+
+        </div>
+
+        <umb-empty-state
+            ng-if="vm.model.tabs.length === 0"
+            position="center">
+            <localize key="content_noProperties">No content can be added for this item</localize>
+        </umb-empty-state>
+
+    </ng-form>
+</div>

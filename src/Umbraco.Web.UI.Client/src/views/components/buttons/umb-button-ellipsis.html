@@ -1,0 +1,13 @@
+<button
+    type="button"
+    data-element="{{vm.element}}"
+    class="btn-reset umb-button-ellipsis {{vm.cssClass}}"
+    style="color:{{vm.color}};"
+    ng-class="{'umb-button-ellipsis--hidden': vm.state === 'hidden', 'show-text': vm.showText, 'umb-button-ellipsis--tab' : vm.mode === 'tab', 'umb-button-ellipsis--small' : vm.mode === 'small'}"
+    ng-click="vm.clickButton($event)">
+    <span class="umb-button-ellipsis__content">
+        <span class="umb-button-ellipsis__icon" aria-hidden="true">&bull;&bull;&bull;</span>
+        <span class="umb-button-ellipsis__text" ng-class="{'sr-only': vm.showText !== true}">{{vm.text}}</span>
+    </span>
+    <ng-transclude></ng-transclude>
+</button>

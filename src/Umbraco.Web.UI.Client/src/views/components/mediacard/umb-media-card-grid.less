@@ -1,0 +1,139 @@
+.umb-media-card-grid {
+    /* Grid Setup */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-auto-rows: minmax(100px, auto);
+    grid-gap: 10px;
+
+    justify-items: center;
+    align-items: center;
+}
+.umb-media-card-grid__cell {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.umb-media-card-grid--inline-create-button {
+    position: absolute;
+    height: 100%;
+    z-index: 1;
+    opacity: 0;
+    outline: none;
+    left: 0;
+    width: 12px;
+    margin-left: -7px;
+    padding-left: 6px;
+    margin-right: -6px;
+    transition: opacity 240ms;
+
+    &::before {
+        content: '';
+        position: absolute;
+        background: @blueMid;
+        background: linear-gradient(0deg, rgba(@blueMid,0) 0%, rgba(@blueMid,1) 50%, rgba(@blueMid,0) 100%);
+        border-left: 1px solid white;
+        border-right: 1px solid white;
+        border-radius: 2px;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        animation: umb-media-card-grid--inline-create-button_before 400ms ease-in-out alternate infinite;
+        transform: scaleX(.99);
+        transition: transform 240ms ease-out;
+
+        @keyframes umb-media-card-grid--inline-create-button_before {
+            0%   { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    }
+
+    > .__plus {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
+        box-sizing: border-box;
+        width: 28px;
+        height: 28px;
+        margin-left: -18px;
+        margin-top: (-18px - 8px);
+        border-radius: 3em;
+        font-size: 14px;
+        border: 2px solid @blueMid;
+        color: @blueMid;
+        background-color: rgba(255, 255, 255, .96);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
+        transform: scale(0);
+        transition: transform 240ms ease-in;
+        
+        animation: umb-media-card-grid--inline-create-button__plus 400ms ease-in-out alternate infinite;
+
+        @keyframes umb-media-card-grid--inline-create-button__plus {
+            0%   { color: rgba(@blueMid, 1); }
+            100% { color: rgba(@blueMid, 0.8); }
+        }
+        
+    }
+
+    &:focus {
+        > .__plus {
+            border-color: @ui-outline;
+        }
+    }
+
+    &:hover, &:focus {
+        opacity: 1;
+
+        &::before {
+            transform: scaleX(1);
+        }
+        > .__plus {
+            transform: scale(1);
+            transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+        }
+    }
+}
+
+.umb-media-card-grid__create-button {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+
+    border: 1px dashed @ui-action-discreet-border;
+    color: @ui-action-discreet-type;
+    font-weight: bold;
+    box-sizing: border-box;
+    border-radius: @baseBorderRadius;
+
+    > div {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+}
+
+.umb-media-card-grid__create-button:hover {
+    color: @ui-action-discreet-type-hover;
+    border-color: @ui-action-discreet-border-hover;
+    text-decoration: none;
+}
+
+.umb-media-card-grid__create-button.--disabled,
+.umb-media-card-grid__create-button.--disabled:hover,
+.umb-media-card-grid__create-button[disabled],
+.umb-media-card-grid__create-button[disabled]:hover {
+    color: @gray-7;
+    border-color: @gray-7;
+    cursor: not-allowed;
+}

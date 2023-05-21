@@ -1,0 +1,144 @@
+<div ng-controller="Umbraco.Editors.LinkPickerController as vm" class="umb-linkpicker">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container class="block-form">
+            <umb-box>
+                <umb-box-content>
+
+                    <div ng-class="{'flex': showAnchor}">
+
+                        <umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-linkpicker__url" alias="urlLinkPicker">
+                            <input type="text"
+                                    style="margin-right: 10px;"
+                                    localize="placeholder"
+                                    placeholder="@general_url"
+                                    class="umb-property-editor umb-textstring"
+                                    ng-model="model.target.url"
+                                    umb-auto-focus
+                                    ng-disabled="model.target.id || model.target.udi"
+                                    id="urlLinkPicker"/>
+                        </umb-control-group>
+
+                        <umb-control-group label="@defaultdialogs_anchorLinkPicker" class="umb-linkpicker__anchor" ng-if="showAnchor" alias="anchor">
+                            <input type="text"
+                                    list="anchors"
+                                    localize="placeholder"
+                                    placeholder="@placeholders_anchor"
+                                    class="umb-property-editor umb-textstring"
+                                    ng-model="model.target.anchor"
+                                    id="anchor"/>
+
+                            <datalist id="anchors">
+                                <option value="{{a}}" ng-repeat="a in anchorValues"></option>
+                            </datalist>
+                        </umb-control-group>
+                    </div>
+
+                    <umb-control-group label="@defaultdialogs_nodeNameLinkPicker" alias="nodeNameLinkPicker">
+                        <input type="text"
+                                localize="placeholder"
+                                placeholder="@placeholders_entername"
+                                class="umb-property-editor umb-textstring"
+                                ng-model="model.target.name"
+                                id="nodeNameLinkPicker"/>
+                    </umb-control-group>
+
+                    <umb-control-group ng-if="showTarget" label="@content_target" alias="openInNewWindow">
+                        <umb-checkbox
+                                      model="vm.openInNewWindow"
+                                      on-change="vm.toggleOpenInNewWindow(model, value)"
+                                      text="{{vm.labels.openInNewWindow}}"
+                                      input-id="openInNewWindow">
+                        </umb-checkbox>
+                    </umb-control-group>
+
+                    <div class="umb-control-group">
+                        <h5><localize key="defaultdialogs_linkToPage">Link to page</localize></h5>
+
+                        <div ng-hide="miniListView">
+                            <label for="treeSearch" class="sr-only"><localize key="visuallyHiddenTexts_searchContentTree">Search content tree</localize></label>
+                            <umb-tree-search-box hide-search-callback="hideSearch"
+                                                 search-callback="onSearchResults"
+                                                 search-from-id="{{searchInfo.searchFromId}}"
+                                                 search-from-name="{{searchInfo.searchFromName}}"
+                                                 datatype-key="{{searchInfo.dataTypeKey}}"
+                                                 show-search="{{searchInfo.showSearch}}"
+                                                 section="{{section}}"
+                                                 input-id="treeSearch">
+                            </umb-tree-search-box>
+
+                            <br />
+                            <umb-tree-search-results ng-if="searchInfo.showSearch"
+                                                     results="searchInfo.results"
+                                                     select-result-callback="selectResult"
+                                                     empty-search-result-position="default">
+                            </umb-tree-search-results>
+
+                            <div ng-hide="searchInfo.showSearch">
+                                <umb-tree section="content"
+                                          treealias="content"
+                                          hideheader="true"
+                                          hideoptions="true"
+                                          api="dialogTreeApi"
+                                          on-init="onTreeInit()"
+                                          enablelistviewexpand="true"
+                                          isdialog="true"
+                                          enablecheckboxes="true"
+                                          customtreeparams="{{customTreeParams}}"
+                                          id="treePicker">
+                                </umb-tree>
+                            </div>
+                        </div>
+
+                        <umb-mini-list-view
+                            ng-if="miniListView"
+                            node="miniListView"
+                            entity-type="Document"
+                            on-select="selectListViewNode(node)"
+                            on-close="closeMiniListView()">
+                        </umb-mini-list-view>
+
+                    </div>
+
+                    <div class="umb-control-group">
+                        <h5><localize key="defaultdialogs_linkToMedia">Link to media</localize></h5>
+                        <button type="button" ng-click="switchToMediaPicker()" class="btn">
+                            <localize key="defaultdialogs_selectMedia">Select media</localize>
+                        </button>
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    state="vm.saveButtonState"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

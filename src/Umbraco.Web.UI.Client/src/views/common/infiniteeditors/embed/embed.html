@@ -1,0 +1,82 @@
+<div ng-controller="Umbraco.Editors.EmbedController as vm">
+    <form name="embedForm">
+
+        <umb-editor-view>
+                
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container class="block-form">
+                <umb-box>
+                    <umb-box-content>
+
+                        <umb-control-group label="@general_url" alias="url">
+                            <input type="text" id="url" class="umb-property-editor input-block-level" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" focus-when="{{true}}" required />
+                            <umb-button
+                                type="button"
+                                action="vm.showPreview()"
+                                button-style="info"
+                                label-key="general_retrieve">
+                            </umb-button>
+                        </umb-control-group>
+
+                        <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+                        <div ng-if="!vm.loading">
+
+                            <umb-control-group>
+                                <p ng-bind="model.embed.info" aria-hidden="true"></p>
+                                <p ng-bind="model.embed.a11yInfo" class="sr-only" role="alert"></p>
+                                <div ng-bind-html="vm.trustedPreview"></div>
+                            </umb-control-group>
+                            
+                            <div ng-show="model.embed.supportsDimensions && model.embed.success">
+                                <umb-control-group label="@general_width" alias="width">
+                                    <input type="number" id="width" pattern="[0-9]*" min="0" ng-model="model.embed.width" ng-blur="vm.changeSize('width')" />
+                                </umb-control-group>
+                
+                                <umb-control-group label="@general_height" alias="height">
+                                    <input type="number" id="height" pattern="[0-9]*" min="0" ng-model="model.embed.height" ng-blur="vm.changeSize('height')" />
+                                </umb-control-group>
+                
+                                <umb-control-group label="@general_constrain" alias="constrain">
+                                    <umb-toggle checked="model.embed.constrain" id="constrain"  on-click="vm.toggleConstrain()"></umb-toggle>
+                                </umb-control-group>
+                            </div>
+
+                        </div>
+                        
+                    </umb-box-content>
+                </umb-box>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="button"
+                        button-style="link"
+                        label-key="general_close"
+                        shortcut="esc"
+                        action="vm.close()">
+                    </umb-button>
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        label-key="general_submit"
+                        state="vm.saveButtonState"
+                        disabled="!model.embed.url.length || !model.embed.preview.length"
+                        action="vm.submit(model)">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

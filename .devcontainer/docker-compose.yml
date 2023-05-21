@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # [Choice] .NET version: 6.0, 3.1, 6.0-bullseye, 3.1-bullseye, 6.0-focal, 3.1-focal
+        VARIANT: 6.0-bullseye
+        # Options
+        NODE_VERSION: "lts/*"
+
+    volumes:
+      - ..:/workspace:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+    # Uncomment the next line to use a non-root user for all processes.
+    # user: vscode
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+    # DotNetCore ENV Variables
+    # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables
+    environment:
+    - ConnectionStrings__umbracoDbDSN=Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True
+    - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.Sqlite
+    - Umbraco__CMS__Unattended__InstallUnattended=true
+    - Umbraco__CMS__Unattended__UnattendedUserName=Admin
+    - Umbraco__CMS__Unattended__UnattendedUserEmail=test@umbraco.com
+    - Umbraco__CMS__Unattended__UnattendedUserPassword=password1234
+    - Umbraco__CMS__Global__Smtp__Host=smtp4dev
+    - Umbraco__CMS__Global__Smtp__Port=25
+    - Umbraco__CMS__Global__Smtp__From=noreply@umbraco.test
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    restart: always
+    ports:
+      # Change the number before : to the port the web interface should be accessible on
+      - '5000:80'
+      # Change the number before : to the port the SMTP server should be accessible on
+      - '25:25'
+      # Change the number before : to the port the IMAP server should be accessible on
+      # - '143:143'
+    volumes:
+      # This is where smtp4dev stores the database..
+        - smtp4dev-data:/smtp4dev
+    environment:
+      # Uncomment to customise these settings
+
+      #Specifies the virtual path from web server root where SMTP4DEV web interface will be hosted. e.g. "/" or "/smtp4dev"
+      #- ServerOptions__BasePath=/smtp4dev
+
+      #Specifies the server hostname. Used in auto-generated TLS certificate if enabled.
+      - ServerOptions__HostName=smtp4dev
+
+      #Specifies the path where the database will be stored relative to APPDATA env var on Windows or XDG_CONFIG_HOME on non-Windows. Specify "" to use an in memory database.
+      #- ServerOptions__Database=database.db
+
+      #Specifies the number of messages to keep
+      #- ServerOptions__NumberOfMessagesToKeep=100
+
+      #Specifies the number of sessions to keep
+      #- ServerOptions__NumberOfSessionsToKeep=100
+
+      #Specifies the TLS mode to use. None=Off. StartTls=On demand if client supports STARTTLS. ImplicitTls=TLS as soon as connection is established.
+      #- ServerOptions__TlsMode=None
+
+      #Specifies the TLS certificate to use if TLS is enabled/requested. Specify "" to use an auto-generated self-signed certificate (then see console output on first startup)
+      #- ServerOptions__TlsCertificate=
+
+      #Sets the name of the SMTP server that will be used to relay messages or "" if messages should not be relayed
+      #- RelayOptions__SmtpServer=
+
+      #Sets the port number for the SMTP server used to relay messages.
+      #- RelayOptions__SmtpPort=25
+
+      #Specifies a comma separated list of recipient addresses for which messages will be relayed. An empty list means that no messages are relayed.
+      #- RelayOptions__AllowedEmailsString=
+
+      #Specifies the address used in MAIL FROM when relaying messages. (Sender address in message headers is left unmodified). The sender of each message is used if not specified.
+      #- RelayOptions__SenderAddress=
+
+      #The username for the SMTP server used to relay messages. If "" no authentication is attempted.
+      #- RelayOptions__Login=
+
+      #The password for the SMTP server used to relay messages
+      #- RelayOptions__Password=
+
+      #Specifies the port the IMAP server will listen on - allows standard email clients to view/retrieve messages
+      #"ServerOptions__ImapPort":  143
+
+volumes:
+  smtp4dev-data:

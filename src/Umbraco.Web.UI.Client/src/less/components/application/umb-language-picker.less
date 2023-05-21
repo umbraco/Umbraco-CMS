@@ -1,0 +1,71 @@
+.umb-language-picker {
+    position: relative;
+    z-index: @zindexDropdown;
+    // When the language dropdown is present adjust height on the tree root
+    ~ #tree .umb-tree-root-link {
+        height: 50px;
+    }
+}
+
+.umb-language-picker__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: transparent;
+    border: 0 none;
+    border-bottom: 1px solid @gray-9;
+    height: @editorHeaderHeight;
+    box-sizing: border-box;
+    color: @ui-option-type;
+    width: 100%;
+    outline-offset: -3px;
+}
+
+.umb-language-picker__expand {
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.umb-language-picker__toggle:hover {
+    background: @ui-option-hover;
+    color:@ui-option-type-hover;
+    .umb-language-picker__expand {
+        color: @ui-option-type-hover;
+    }
+}
+
+
+.umb-language-picker__dropdown {
+    width: 100%;
+    background: @white;
+    box-shadow: 0 3px 6px rgba(0,0,0,.16);
+    box-sizing: border-box;
+    position: absolute;
+    border-radius: 0 0 3px 3px;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.umb-language-picker__dropdown-item {
+    background: transparent;
+    border: 0 none;
+    padding: 8px 20px;
+    display: block;
+    font-size: 14px;
+    width: 100%;
+    text-align: left;
+    outline-offset: -3px;
+}
+
+.umb-language-picker__dropdown-item:hover {
+    background: @ui-option-hover;
+    text-decoration: none;
+    color:@ui-option-type-hover;
+}
+
+.umb-language-picker__dropdown .umb-language-picker__dropdown-item.umb-language-picker__dropdown-item--current {
+    padding-left: 16px;
+    border-left: 4px solid @ui-light-active-border;
+    color:@ui-light-active-type;
+}

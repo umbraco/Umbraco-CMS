@@ -1,0 +1,31 @@
+.umb-expansion-panel {
+    background: @white;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.16);
+}
+
+.umb-expansion-panel__header {
+    box-sizing: border-box;
+    padding: 10px 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: @black;
+    width: 100%;
+
+    &:hover .umb-expansion-panel__expand,
+    &:focus .umb-expansion-panel__expand {
+        color: @gray-6;
+    }
+}
+
+.umb-expansion-panel__expand {
+    color: @gray-8;
+}
+
+.umb-expansion-panel__content {
+    padding: 20px;
+    border-top: 1px solid @gray-9;
+}

@@ -1,0 +1,17 @@
+<button role="checkbox" aria-checked="{{checked}}" ng-click="click($event)" type="button" class="umb-toggle" ng-disabled="disabled" ng-class="{'umb-toggle--checked': checked, 'umb-toggle--disabled': disabled}" id="{{inputId}}">
+    
+    <span ng-if="!labelPosition && showLabels === 'true' || labelPosition === 'left' && showLabels === 'true'">
+        <span class="umb-toggle__label umb-toggle__label--left">{{ checked ? displayLabelOn : displayLabelOff }}</span>
+    </span>
+
+    <div class="umb-toggle__toggle">
+        <umb-icon ng-show="hideIcons !== 'true'" icon="icon-check" class="umb-toggle__icon umb-toggle__icon--left"></umb-icon>
+        <umb-icon ng-show="hideIcons !== 'true'" icon="icon-wrong" class="umb-toggle__icon umb-toggle__icon--right"></umb-icon>
+        <div class="umb-toggle__handler"></div>
+    </div>
+
+    <span ng-if="labelPosition === 'right' && showLabels === 'true'">
+        <span class="umb-toggle__label umb-toggle__label--right">{{ checked ? displayLabelOn : displayLabelOff }}</span>
+    </span>
+
+</button>

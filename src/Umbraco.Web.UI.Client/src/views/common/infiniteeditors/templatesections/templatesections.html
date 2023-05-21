@@ -1,0 +1,118 @@
+<div ng-controller="Umbraco.Editors.TemplateSectionsController as vm">
+
+    <form name="templateSectionsForm" novalidate val-form-manager>
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content>
+
+                    <div class="umb-insert-code-box" ng-click="vm.select('renderBody')">
+                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderBody'  }">
+                            <umb-icon icon="icon-check" class="icon"></umb-icon>
+                        </div>
+
+                        <div class="umb-insert-code-box__title"><localize key="template_renderBody">Render child template</localize></div>
+
+                        <div class="umb-insert-code-box__description">
+                            <localize key="template_renderBodyDesc">Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.</localize>
+                        </div>
+                    </div>
+
+                    <div class="umb-insert-code-box" ng-click="vm.select('renderSection')">
+
+                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderSection' }">
+                            <umb-icon icon="icon-check" class="icon"></umb-icon>
+                        </div>
+                        <div class="umb-insert-code-box__title"><localize key="template_renderSection">Render a named section</localize></div>
+                        <div class="umb-insert-code-box__description">
+                            <localize key="template_renderSectionDesc">Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.
+                                This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.
+                            </localize>
+                        </div>
+
+                        <div ng-if="model.insertType === 'renderSection'" style="margin-top: 20px;">
+                            <div style="margin-bottom: 20px;">
+                                <label class="bold"><localize key="template_sectionName">Section Name</localize> <span class="red">*</span></label>
+                                <input type="text" name="renderSectionName" class="-full-width-input" ng-model="model.renderSectionName" required umb-auto-focus />
+                                <span ng-messages="templateSectionsForm.renderSectionName.$error" show-validation-on-submit>
+                                    <small class="red" ng-message="required"><localize key="required">Required</localize></small>
+                                </span>
+                            </div>
+
+                            <div>
+                                <div class="flex">
+                                    <umb-checkbox model="model.mandatoryRenderSection"
+                                                  text="{{vm.labels.sectionMandatory}}">
+                                    </umb-checkbox>
+                                </div>
+
+                                <div class="umb-insert-code-box__description">
+                                    <localize key="template_sectionMandatoryDesc">If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.</localize>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="umb-insert-code-box" ng-click="vm.select('addSection')">
+
+                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'addSection'  }">
+                            <umb-icon icon="icon-check" class="icon"></umb-icon>
+                        </div>
+                        <div class="umb-insert-code-box__title"><localize key="template_defineSection">Define a named section</localize></div>
+                        <div class="umb-insert-code-box__description">
+                            <localize key="template_defineSectionDesc">Defines a part of your template as a named section by wrapping it in <code>@section { ... }</code>.
+                                This can be rendered in a specific area of the parent of this template, by using <code>@RenderSection</code>.
+                            </localize>
+                        </div>
+
+                        <div ng-if="model.insertType === 'addSection'" style="margin-top: 20px;">
+                            <div>
+                                <label class="bold"><localize key="template_sectionName">Section Name</localize> <span class="red">*</span></label>
+                                <input type="text" name="sectionName" class="-full-width-input" ng-model="model.sectionName" required umb-auto-focus />
+                                <span ng-messages="templateSectionsForm.sectionName.$error" show-validation-on-submit>
+                                    <small class="red" ng-message="required"><localize key="required">Required</localize></small>
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </umb-box-content>
+            </umb-box>
+
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="vm.submit(model)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+    </form>
+
+</div>

@@ -1,0 +1,46 @@
+<div ng-controller="Umbraco.Editors.Dictionary.EditController as vm">
+  <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+  <form name="contentForm"
+        ng-submit="vm.save()"
+        novalidate
+        val-form-manager>
+
+    <umb-editor-view ng-if="!vm.page.loading">
+      <umb-editor-header name="vm.content.name"
+                         name-locked="vm.page.nameLocked"
+                         hide-icon="true"
+                         hide-description="true"
+                         hide-alias="true"
+                         navigation="vm.page.navigation"
+                         on-back="vm.back()"
+                         show-back-button="vm.showBackButton"
+                         editorfor="vm.header.editorfor"
+                         setpagetitle="vm.header.setPageTitle">
+      </umb-editor-header>
+
+      <umb-editor-container class="form-horizontal">
+        <umb-editor-sub-views sub-views="vm.page.navigation"
+                              model="vm">
+        </umb-editor-sub-views>
+      </umb-editor-container>
+
+      <umb-editor-footer>
+
+        <umb-editor-footer-content-right>
+
+          <umb-button type="submit"
+                      button-style="success"
+                      state="vm.page.saveButtonState"
+                      shortcut="ctrl+s"
+                      label="Save"
+                      label-key="buttons_save"
+                      ng-disabled="vm.page.loading">
+          </umb-button>
+
+        </umb-editor-footer-content-right>
+
+      </umb-editor-footer>
+    </umb-editor-view>
+  </form>
+</div>

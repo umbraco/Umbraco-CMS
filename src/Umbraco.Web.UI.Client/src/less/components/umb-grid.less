@@ -1,0 +1,1127 @@
+// TODO: General cleanup in !important (Round 2)
+
+// Gridview
+// -------------------------
+.umb-grid IFRAME {
+    overflow: hidden;
+    width: 100%;
+}
+
+
+
+// Sortable
+// -------------------------
+
+// sortable-helper
+.umb-grid .ui-sortable-helper {
+    position: absolute !important;
+    background-color: @blueMid !important;
+    height: 42px !important;
+    width: 42px !important;
+    overflow: hidden;
+    padding: 5px;
+    border-radius: 2px;
+    text-align: center;
+    font-family: "icomoon";
+    box-shadow: 3px 3px 12px 0 rgba(50, 50, 50, 0.45);
+
+    &:after {
+        line-height: 42px;
+        font-size: 22px;
+        content: "\e126";
+        color: @white;
+    }
+
+    * {
+        display: none;
+    }
+}
+
+.umb-grid .ui-sortable-helper .umb-row-title-bar,
+.umb-grid .ui-sortable-helper .cell-tools-add {
+    display: none !important;
+}
+
+// sortable-placeholder
+.umb-grid .ui-sortable-placeholder {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-color: @blueMid;
+    height: 2px;
+    margin-bottom: 20px;
+
+    &:before, &:after {
+        position: absolute;
+        top: -9px;
+        font-family: "icomoon";
+        font-size: 18px;
+        color: @blueMid;
+    }
+
+    &:before {
+        left: -5px;
+        content: "\e0e9";
+    }
+
+    &:after {
+        right: -5px;
+        content: "\e0d7";
+    }
+}
+
+.umb-grid .umb-cell .ui-sortable-placeholder {
+    left: 10px;
+    right: 10px;
+}
+
+
+
+
+// utils
+// -------------------------
+.umb-grid-width {
+    margin: 20px auto;
+    width: 100%;
+}
+
+.umb-grid .right {
+    float: right;
+}
+
+
+
+// general layout components
+// -------------------------
+.umb-grid .tb {
+    width: 100%;
+}
+
+.umb-grid .td {
+    width: 100%;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+
+.umb-grid .middle {
+    text-align: center;
+}
+
+.umb-grid .mainTd {
+    position: relative;
+}
+
+
+
+// COLUMN
+// -------------------------
+.umb-grid .umb-column {
+    position: relative;
+}
+
+
+
+// ROW
+// -------------------------
+.umb-grid .umb-row {
+    position: relative;
+    margin-bottom: 40px;
+    padding-top: 10px;
+    border: 1px solid @grayLighter;
+
+    &:hover {
+        border-color: @grayLight;
+    }
+
+    &[ng-click],
+    &[data-ng-click],
+    &[x-ng-click] {
+        cursor: pointer;
+    }
+}
+
+.umb-grid .row-tools a {
+    text-decoration: none;
+}
+
+
+
+// CELL
+// -------------------------
+.umb-grid .umb-cell {
+    position: relative;
+}
+
+.umb-grid .umb-cell-content {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    margin: 10px;
+    border: 1px solid transparent;
+}
+
+.umb-grid .umb-row .umb-cell-placeholder {
+    display: block;
+    width: 100%;
+    min-height: 88px;
+    border-width: 1px;
+    border-style: dashed;
+    border-color: @ui-action-discreet-border;
+    color: @ui-action-discreet-type;
+    transition: border-color 100ms linear;
+
+    &:hover {
+        border-color: @ui-action-discreet-border-hover;
+        color: @ui-action-discreet-type-hover;
+        cursor: pointer;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        &:hover {
+            border-color: @ui-action-discreet-border;
+            color: @ui-action-discreet-type;
+        }
+    }
+}
+
+.umb-grid .umb-cell-content.-has-editors {
+    padding-top: 38px;
+    background-color: @white;
+    border-width: 1px;
+    border-style: solid;
+    border-color: @gray-8;
+
+    &:hover {
+        cursor: auto;
+    }
+}
+
+.umb-grid .umb-cell-content.-has-editors.-collapsed {
+    padding-top: 10px;
+}
+
+.umb-grid .cell-tools {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: @gray-3;
+    font-size: 16px;
+}
+
+.umb-grid .cell-tool {
+    cursor: pointer;
+    float: right;
+    &:hover {
+        color: @ui-action-type-hover;
+    }
+}
+
+.umb-grid .cell-tools-add {
+    color: @ui-action-discreet-type;
+    &:focus, &:hover {
+        color: @ui-action-discreet-type-hover;
+        text-decoration: none;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        &:hover {
+            color: @ui-action-discreet-type;
+        }
+    }
+}
+
+.umb-grid .cell-tools-add.-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: @ui-action-discreet-type;
+}
+
+.umb-grid .cell-tools-add.-bar {
+    display: block;
+    width: calc(100% - 20px);
+    text-align: center;
+    padding: 5px;
+    border: 1px dashed @ui-action-discreet-border;
+    margin: 10px;
+    &:focus, &:hover {
+        border-color: @ui-action-discreet-border-hover;
+    }
+}
+
+
+.umb-grid .cell-tools-remove {
+    display: inline-block;
+    position: relative;
+}
+
+.umb-grid .cell-tools-remove .iconBox:hover,
+.umb-grid .cell-tools-remove .iconBox:hover * {
+    background: @red !important;
+    border-color: @red !important;
+}
+
+.umb-grid .cell-tools-move {
+    display: inline-block;
+}
+
+.umb-grid .cell-tools-edit {
+    display: inline-block;
+}
+
+.umb-grid .drop-overlay {
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    background: @white;
+    opacity: 0.9;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 1.3em;
+    font-weight: bold;
+    flex-direction: column;
+}
+
+.drop-overlay.-disable {
+    color: @red;
+}
+
+.drop-overlay.-allow {
+    color: @green;
+}
+
+.umb-grid .drop-overlay .drop-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+
+
+// CONTROL
+// -------------------------
+.umb-grid .umb-control {
+    position: relative;
+    display: block;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.umb-control-collapsed {
+    background-color: @gray-10;
+    padding: 5px 10px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    cursor: move;
+}
+
+.umb-control-collapsed:hover {
+    border-color: @ui-action-border-hover
+}
+
+.umb-grid .umb-control-click-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    top: 0;
+    left: 0;
+    opacity: 0;
+
+    &.-clickable {
+        cursor: pointer;
+
+        &:hover {
+            background-color: @ui-action-type-hover;
+            opacity: 0.1;
+            transition: opacity 0.1s;
+        }
+    }
+}
+
+.umb-grid .umb-row-title-bar {
+    display: flex;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.umb-grid .umb-row-title {
+    display: inline-block;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    color: @black;
+    margin-right: 6px;
+}
+
+.umb-grid .row-tools {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 18px;
+    color: @gray-3;
+}
+
+.umb-grid .row-tool {
+    cursor: pointer;
+}
+
+.umb-grid .umb-add-row {
+    text-align: center;
+}
+
+
+
+// CONTROL PLACEHOLDER
+// -------------------------
+.umb-grid .umb-control-placeholder {
+    min-height: 20px;
+    position: relative;
+    text-align: center;
+    text-align: -moz-center;
+    cursor: text;
+}
+
+.umb-grid .umb-control-placeholder .placeholder {
+    font-size: 14px;
+    opacity: 0.7;
+    text-align: left;
+    padding: 5px;
+    border: 1px solid @gray-9;
+    height: 20px;
+}
+
+.umb-grid .umb-control-placeholder:hover .placeholder {
+    border: 1px solid @gray-7;
+}
+
+
+
+// EDITOR PLACEHOLDER
+// -------------------------
+.umb-grid .umb-editor-placeholder {
+    min-height: 110px;
+    padding: 20px;
+    padding-bottom: 30px;
+    position: relative;
+    background-color: @white;
+    border: 4px dashed @gray-8;
+    text-align: center;
+    text-align: -moz-center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.umb-grid .umb-editor-placeholder .icon {
+    color: @gray-8;
+    font-size: 85px;
+    line-height: 1;
+    display: block;
+    margin: 10px auto;
+}
+
+.umb-grid .umb-editor-preview {
+    position: relative;
+    width: 100%;
+
+    .umb-editor-preview-overlay {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+}
+
+// Active states
+// -------------------------
+
+// Row states
+.umb-grid .umb-row.-active {
+    border-color: @ui-action-type;
+
+    .umb-row-title-bar {
+        cursor: move;
+    }
+}
+
+
+.umb-grid .umb-row.-active-child {
+    background-color: @gray-10;
+
+    .umb-row-title-bar {
+        cursor: inherit;
+    }
+
+    .umb-row-title {
+        color: @gray-3;
+    }
+
+}
+
+
+// Cell states
+
+.umb-grid .umb-row .umb-cell.-active {
+    border-color: @gray-8;
+
+    .umb-cell-content.-has-editors {
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, .07);
+        border-color: @ui-action-border;
+    }
+}
+
+.umb-grid .umb-row .umb-cell.-active-child {
+
+    .cell-tool {
+        color: fade(@black, 23);
+    }
+
+    .umb-cell-content.-has-editors {
+            border-color: rgba(113, 136, 160, .44);
+    }
+}
+
+// Control states 
+.umb-grid-media--controls {
+    display:none;
+    position: absolute;
+    top:0.5rem;
+    right:0.5rem;    
+}
+
+.umb-grid .umb-row .umb-control.-active {
+    .umb-grid-media--controls {
+        display:flex;
+    }
+}
+
+// Title bar and tools
+.umb-grid .umb-row-title-bar {
+    display: flex;
+}
+
+.umb-grid .umb-grid-right {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.umb-grid .umb-tools {
+    margin-left: auto;
+}
+
+
+// Add more content button
+.umb-grid-add-more-content {
+    text-align: center;
+}
+
+.umb-grid .newbtn {
+    width: auto;
+    padding: 6px 15px;
+    border-style: solid;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    margin: 10px auto 20px;
+    border-color: @gray-9;
+
+    &:hover {
+        cursor: pointer;
+        opacity: .77;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+
+
+
+// Form elements
+// -------------------------
+.umb-grid textarea.textstring {
+    display: block;
+    overflow: hidden;
+    background: @white;
+    outline: none;
+    resize: none;
+    color: @gray-3;
+    min-width: 100%;
+}
+
+.umb-grid .umb-cell-media .caption {
+    display: block;
+    overflow: hidden;
+    border: none;
+    background: @white;
+    outline: none;
+    width: 98%;
+    resize: none;
+    font-style: italic;
+}
+
+.umb-grid .cellPanelRte {
+    min-height: 60px;
+}
+
+.umb-grid .umb-cell-embed iframe {
+    width: 100%;
+}
+
+
+// ICONS
+// -------------------------
+.umb-grid .iconBox {
+    padding: 6px;
+    display: flex;
+    border-radius: 200px;
+    border: 1px solid @ui-action-discreet-border;
+    margin: 0 auto;
+
+    &:hover, &:hover * {
+        background: @ui-action-discreet-type-hover !important;
+        color: @white !important;
+        border-color: @ui-action-discreet-border-hover !important;
+        text-decoration: none;
+    }
+}
+
+.umb-grid .iconBox span.prompt {
+    display: block;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.umb-grid .iconBox span.prompt > a {
+    text-decoration: underline;
+}
+
+.umb-grid .iconBox a:hover {
+    text-decoration: none;
+    color: @white !important;
+}
+
+.umb-grid .iconBox.selected {
+    -webkit-appearance: none;
+    background-image: linear-gradient(to bottom,@gray-9,@gray-7);
+    background-repeat: repeat-x;
+    border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
+    border-radius: 3px;
+    background: transparent;
+}
+
+.umb-grid .iconBox i {
+    color: @gray-3;
+    display: block;
+    font-size: 16px;
+    line-height: inherit;
+}
+
+.umb-grid .help-text {
+    color: @black;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    clear: both;
+}
+
+// TINYMCE EDITOR
+// -------------------------
+
+.umb-grid .mce-panel {
+    background: transparent !important;
+    border: none !important;
+    clear: both;
+}
+
+.umb-grid .mce-btn {
+    button {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 6px;
+        line-height: inherit;
+
+        .mce-caret {
+            margin-top: 6px;
+        }
+    }
+
+    &:not(.mce-menubtn) {
+        button {
+            padding-right: 6px;
+        }
+    }
+}
+
+.umb-grid .mce-toolbar {
+    border-bottom: 1px solid @gray-7;
+    background-color: @white;
+    display: none;
+
+    left: 0;
+    right: 0;
+}
+
+.umb-grid .umb-control.-active .mce-toolbar {
+    display: block;
+}
+
+.umb-grid .mce-flow-layout-item {
+    margin: 0;
+}
+
+.umb-grid .mceContentBody {
+    overflow-y: hidden!important;
+}
+
+// had to overwrite defaults from TinyMCE, needed for buttons panel to float to new line in narrow space.
+.umb-grid .mce-container > div {
+    white-space: normal;
+    left:0;
+    right:0;
+}
+
+
+// MEDIA EDITOR
+// -------------------------
+.umb-grid .fullSizeImage {
+    width: 100%;
+}
+
+
+
+// Width
+// -------------------------
+.umb-grid .boxWidth {
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+.umb-grid .boxWidth input {
+    text-align: center;
+    width: 40px;
+}
+
+.umb-grid .boxWidth label {
+    font-size: 10px;
+    padding: 0;
+    margin: 5px 5px 0 0;
+    color: @gray-5;
+}
+
+
+
+// Margin Control
+// -------------------------
+.umb-grid .umb-control {
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+}
+
+.umb-grid .umb-control.-active {
+    border-color: @ui-action-border;
+}
+
+.umb-grid .umb-templates-columns {
+    margin-top: 30px;
+}
+
+.umb-grid .umb-control-inner {
+    position: relative;
+}
+
+.umb-grid .umb-control-bar {
+    opacity: 0;
+    background: @ui-action-type;
+    padding: 2px 5px;
+    color: @white;
+    font-size: 12px;
+    height: 0;
+    display: flex;
+    transition: height 80ms linear, opacity 80ms linear;
+    align-items: center;
+}
+
+.umb-grid .umb-control-title {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.umb-grid .umb-control.-active .umb-control-bar {
+    opacity: 1;
+    height: 25px;
+    cursor: move;
+}
+
+.umb-grid .umb-control-tools {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.umb-grid .umb-control-tool {
+    font-size: 16px;
+    margin-right: 5px;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.umb-grid .cell-tools,
+.umb-grid .umb-control-tool {
+    .btn-icon {
+        padding: 0;
+    }
+}
+
+.umb-grid .umb-control-tool .btn-icon {
+    color: @white;
+}
+
+
+// Template
+// -------------------------
+.umb-grid .umb-templates {
+    text-align: center;
+    overflow: hidden;
+    width: 100%;
+}
+
+.umb-grid .umb-templates-template {
+    display: inline-block;
+    width: 100px;
+    padding-right: 30px;
+    margin: 20px;
+}
+
+.umb-grid .umb-templates-template a.tb:hover {
+    border: 5px solid @blueMid;
+}
+
+.umb-grid .umb-templates-template .tb {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    background-color: @gray-10;
+    border: 5px solid @gray-8;
+    cursor: pointer;
+    position: relative;
+}
+
+.umb-grid .umb-templates-template .tr {
+    height: 100%;
+    position: relative;
+}
+
+.umb-grid .umb-templates-template .tb .umb-templates-column {
+    height: 100%;
+    border: 1px dashed @gray-8;
+    border-right: none;
+}
+
+.umb-grid .umb-templates-template .tb .umb-templates-column.last {
+    border-right: 1px dashed @gray-8 !important;
+}
+
+.umb-grid a.umb-templates-column:hover,
+.umb-grid a.umb-templates-column.selected {
+    background-color: @blueMid;
+}
+
+
+
+// Template Column
+// -------------------------
+/* New template preview */
+.umb-grid {
+    .templates-preview {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+
+        small {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            padding-top: 15px;
+            top: 15px;
+        }
+
+        .help-text {
+            margin: 35px 35px 0 0;
+        }
+    }
+
+    .preview-rows {
+        display: inline-block;
+        position: relative;
+        box-sizing: border-box;
+        width: 125px;
+        margin: 15px;
+        border: 3px solid @gray-8;
+        transition: border 100ms linear;
+
+        &.prevalues-rows {
+            margin: 0 20px 20px 0;
+            width: 80px;
+            float: left;
+        }
+
+        &.prevalues-templates {
+            margin: 0 20px 20px 0;
+            float: left;
+        }
+
+        &:hover {
+            border-color: @blueMid;
+            cursor: pointer;
+        }
+
+        .preview-row {
+            display: inline-block;
+            width: 100%;
+            vertical-align: bottom;
+        }
+    }
+
+    .preview-rows.layout {
+        padding: 2px;
+
+        .preview-row {
+            height: 100%;
+        }
+
+        .preview-col {
+            height: 180px;
+        }
+
+        .preview-cell {
+            background-color: @gray-10;
+        }
+
+        .preview-overlay {
+            display: none;
+        }
+    }
+
+    .preview-rows.columns {
+        min-height: 16px;
+        line-height: 11px;
+        padding: 1px;
+
+        &.prevalues-rows {
+            min-height: 30px;
+        }
+    }
+
+    .preview-rows {
+        .preview-col {
+            display: block;
+            float: left;
+            box-sizing: border-box;
+            width: 33.3%;
+
+            /* temp value */
+            height: 10px;
+            margin: 0;
+            border: 1px solid @white;
+
+            .preview-cell {
+                display: block;
+                width: 100%;
+                height: 100%;
+                background-color: @gray-8;
+                margin: 0 1px 1px 0;
+            }
+        }
+
+        &.prevalues-templates {
+            .preview-col {
+                height: 80px;
+            }
+        }
+    }
+
+    .preview-overlay {
+        display: block;
+        width: 100%;
+        position: absolute;
+        height: 100%;
+        top: 0;
+        box-sizing: border-box;
+        left: 0;
+        border: 3px solid @white;
+    }
+}
+
+// Has Config
+// -------------------------
+
+.umb-grid .umb-grid-has-config {
+    display: inline;
+    font-size: 13px;
+    color: @gray-5;
+}
+
+.umb-grid .umb-cell {
+    .umb-grid-has-config {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+}
+
+
+// Overlay
+// -------------------------
+.umb-grid .cell-tools-menu {
+    position: absolute;
+    width: 360px;
+    height: 380px;
+    overflow: auto;
+    border: 1px solid @gray-8;
+    margin-top: -270px;
+    margin-left: -150px;
+    background: @white;
+    padding: 7px;
+    top: 0;
+    left: 50%;
+    z-index: 6660;
+    box-shadow: 3px 3px 12px 0 rgba(50, 50, 50, 0.45);
+}
+
+.umb-grid .cell-tools-menu h5 {
+    border-bottom: 1px solid @gray-8;
+    color: @gray-5;
+    padding: 10px;
+    margin-top: 0;
+}
+
+.umb-grid .elements {
+    display: block;
+    padding: 0;
+    margin: 0;
+}
+
+.umb-grid .elements li {
+    display: inline-block;
+    width: 90px;
+    height: 80px;
+    margin: 5px;
+    padding: 5px;
+    overflow: hidden;
+    font-size: 12px;
+
+    &:hover, &:hover * {
+        background: @blueMid;
+        color: @white;
+    }
+}
+
+.umb-grid .elements a {
+    color: @gray-1;
+    text-decoration: none;
+}
+
+.umb-grid .elements i {
+    font-size: 30px;
+    line-height: 50px;
+    color: @gray-6;
+    display: block;
+}
+
+// Configuration specific styles
+// -------------------------
+.umb-grid-configuration .umb-templates {
+    text-align: left;
+}
+
+.umb-grid-configuration ul {
+    display: block;
+}
+
+.umb-grid-configuration ul li {
+    display: block;
+    width: auto;
+    text-align: left;
+}
+
+.umb-grid-configuration .umb-templates .umb-templates-template .tb {
+    max-height: 50px;
+    border-width: 2px !important;
+    padding: 0;
+    border-spacing: 2px;
+    overflow: hidden;
+}
+
+.umb-grid-configuration .umb-templates .umb-templates-template span {
+    background: @gray-8;
+    display: inline-block;
+}
+
+.umb-grid-configuration .umb-templates .umb-templates-template .tb:hover {
+    border-width: 2px !important;
+}
+
+.umb-grid-configuration .umb-templates-column {
+    display: block;
+    float: left;
+    margin-left: -1px;
+    border: 1px @white solid !important;
+    background: @gray-8;
+}
+
+.umb-grid-configuration .umb-templates-column.last {
+    margin-right: -1px;
+}
+
+.umb-grid-configuration .umb-templates-column.add {
+    text-align: center;
+    font-size: 20px;
+    line-height: 70px;
+    color: @gray-8;
+    text-decoration: none;
+    background: @white;
+}
+
+.umb-grid-configuration .mainTdpt {
+    height: initial;
+    border: none;
+}
+
+.umb-grid-configuration .umb-templates-rows .umb-templates-row {
+    margin: 0 50px 20px 0;
+    width: 60px;
+}
+
+.umb-grid-configuration .umb-templates-rows .umb-templates-row .tb {
+    border-width: 2px !important;
+    padding: 0;
+    border-spacing: 2px;
+}
+
+.umb-grid-configuration .umb-templates-rows .mainTdpt {
+    height: 10px !important;
+}
+
+.umb-grid-configuration a.umb-templates-column {
+    height: 70px !important;
+}

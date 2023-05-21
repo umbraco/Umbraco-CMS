@@ -1,0 +1,246 @@
+/*
+	contains styling for all main editor directives
+*/
+
+.umb-editor-wrapper {
+	background: @gray-10;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+    > form {
+        height: 100%;
+    }
+}
+
+.umb-split-views {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+}
+
+.umb-split-view {
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: auto;
+	position: relative;
+	background: transparent;
+	// transition: flex-grow 0.4s ease-in-out;
+}
+
+.umb-split-view--collapsed {
+	flex-grow: 0.00001;
+}
+
+.umb-split-view + .umb-split-view {
+	border-left: 2px solid @gray-9;
+}
+
+.umb-split-view__content {
+	//animation: fadein 0.5s ease-in-out;
+}
+
+@keyframes fadein {
+	from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.umb-split-view--left {
+	left: 0;
+	right: auto;
+	border-right: 1px solid @gray-10;
+}
+
+.umb-split-view--right {
+	left: auto;
+	right: 0;
+}
+
+// header
+
+.umb-editor-header {
+    background: @white;
+    position: absolute;
+    padding-left: 20px;
+    z-index: @zIndexEditor;
+    border-bottom: 1px solid @gray-9;
+    width: 100%;
+    box-sizing: border-box;
+    height: @editorHeaderHeight;
+}
+
+.umb-editor-header .umb-button__button[disabled] {
+    // do not dim down the background color of disabled buttons in the header
+    background-color: unset;
+}
+
+.umb-editor-header__back {
+    background: transparent;
+    border: 0;
+    color: @gray-6;
+    margin: 0 0 1px 0;
+    padding: 0;
+	transition: color 0.1s ease-in-out;
+}
+
+.umb-editor-header__name-wrapper {
+	position: relative;
+	display: flex;
+	border: 1px solid @inputBorder;
+    &:focus-within {
+        border-color: @inputBorderFocus;
+    }
+}
+
+.umb-editor-header__name-and-description {
+    margin-right: 20px;
+    .umb-panel-header-description {
+    	padding: 0 10px;
+    }
+}
+
+.-split-view-active .umb-editor-header__name-and-description {
+	margin-right: 0;
+}
+
+.umb-editor-header__name-wrapper ng-form {
+	flex: 1 1 auto;
+}
+
+input.umb-editor-header__name-input {
+	border-color: transparent;
+	background-color: @white;
+	font-size: 15px;
+	color: @black;
+	margin-bottom: 0;
+	font-weight: bold;
+	box-sizing: border-box;
+	height: 32px;
+	line-height: 32px;
+	width: 100%;
+	padding: 0 10px;
+	background: @white;
+    &:focus {
+        border-color: transparent;
+    }
+}
+
+input.umb-editor-header__name-input:disabled {
+	background-color: @gray-10;
+	&:hover{
+		border-color: @gray-8;
+	}
+}
+
+.umb-editor-header__actions-menu {
+	margin-left: auto;
+}
+
+.umb-editor-header__close-split-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 69px;
+    width: 69px;
+    font-size: 20px;
+    color: @gray-6;
+
+    &:hover {
+        color: @black;
+    }
+}
+
+.umb-editor-header {
+	.btn-white {
+        height:69px;
+        border-radius: 0;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+// Tab bar
+.umb-editor-tab-bar {
+	position: sticky;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 90;
+	margin: -20px -20px 20px -20px;
+	padding: 0 20px;
+	background: @white;
+	box-shadow: 1px 1px 0 @gray-9;
+
+	.umb-tabs-nav {
+		border-bottom: none;
+	}
+
+	.umb-tab {
+		button {
+			padding: 15px 20px;
+		}
+	}
+}
+
+// container
+.umb-editor-container {
+	position: absolute;
+	top: @editorHeaderHeight;
+	right: 0;
+	bottom: @editorFooterHeight;
+	left: 0;
+	overflow: auto;
+	background: @brownGrayLight;
+}
+
+.umb-editor-wrapper.-no-footer .umb-editor-container {
+	bottom: 0;
+}
+
+.umb-editor-actions {
+	list-style: none;
+	margin: 0; padding: 0;
+
+    li {
+        display: inline-block;
+    }
+}
+
+// editor footer
+
+.umb-editor-footer {
+	position: absolute;
+	width: 100%;
+	box-sizing: border-box;
+	margin: 0;
+	height: @editorFooterHeight;
+	padding: 10px 20px;
+	background: @white;
+	border-top: 1px solid @gray-9;
+	z-index: 30;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+}
+
+.umb-editor-footer-content {
+	display: flex;
+	align-items: center;
+	flex: 1 1 auto;
+}
+  
+.umb-editor-footer-content__right-side {
+	margin-left: auto;
+	flex: 0 0 auto;
+	padding-left: 10px;
+}
+  
+.umb-editor-footer-content__left-side {
+	margin-right: auto;
+	padding-right: 10px;
+}

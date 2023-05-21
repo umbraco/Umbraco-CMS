@@ -1,0 +1,19 @@
+<div class="umb-property-editor umb-boolean" ng-controller="Umbraco.PropertyEditors.BooleanController">
+
+    <ng-form name="modelValueForm">
+
+        <umb-toggle input-id="{{model.alias}}"
+                    checked="renderModel.value"
+                    disabled="model.readonly"
+                    on-click="toggle()"
+                    show-labels="{{model.config.showLabels}}"
+                    label-position="right"
+                    label-on="{{model.config.labelOn}}"
+                    label-off="{{model.config.labelOff}}"
+                    ng-attr-readonly="{{readonly || undefined}}">
+        </umb-toggle>
+
+        <input type="hidden" name="modelValue" ng-model="renderModel.value" />
+    </ng-form>
+    
+</div>

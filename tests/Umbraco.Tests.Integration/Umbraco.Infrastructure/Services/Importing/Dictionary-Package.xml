@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<umbPackage>
+  <files />
+  <info>
+    <package>
+      <name>Dictionary-Package</name>
+    </package>
+  </info>
+  <DictionaryItems>
+    <DictionaryItem Key="28f2e02a-8c66-4fcd-85e3-8524d551c0d3" Name="Parent">
+      <Value LanguageId="2" LanguageCultureAlias="nb-NO"><![CDATA[ForelderVerdi]]></Value>
+      <Value LanguageId="3" LanguageCultureAlias="en-GB"><![CDATA[ParentValue]]></Value>
+      <DictionaryItem Key="e7dba0a9-d517-4ba4-8e18-2764d392c611" Name="Child">
+        <Value LanguageId="2" LanguageCultureAlias="nb-NO"><![CDATA[BarnVerdi]]></Value>
+        <Value LanguageId="3" LanguageCultureAlias="en-GB"><![CDATA[ChildValue]]></Value>
+      </DictionaryItem>
+    </DictionaryItem>
+  </DictionaryItems>
+  <Languages>
+    <Language Id="2" CultureAlias="nb-NO" FriendlyName="Norwegian Bokmål (Norway)" />
+    <Language Id="3" CultureAlias="en-GB" FriendlyName="English (United Kingdom)" />
+  </Languages>
+</umbPackage>

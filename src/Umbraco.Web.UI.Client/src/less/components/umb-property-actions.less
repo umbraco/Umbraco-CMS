@@ -1,0 +1,74 @@
+.umb-property-actions__toggle {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    padding: 6px 6px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 3px;
+    background-color: @ui-action-hover;
+
+    i {
+        height: 3px !important;
+        width: 3px !important;
+        border-radius: 3px;
+        background: @ui-action-type;
+        display: inline-block;
+        margin: 0 2px 0 0;
+
+        &:last-child {
+            margin: 0;
+        }
+    }
+    &:hover {
+        i {
+            background: @ui-action-type-hover;
+        }
+    }
+}
+
+.umb-property-actions {
+    display: inline;
+
+    &.-open {
+        .umb-property-actions__toggle {
+            background-color: @white;
+            border-radius: 3px 3px 0 0;
+            border: 1px solid @dropdownBorder;
+            border-bottom: 1px solid @gray-9;
+            .box-shadow(0 5px 20px rgba(0,0,0,.3));
+        }
+    }
+}
+.umb-property .umb-property-actions {
+    float: left;
+}
+.umb-property .umb-property-actions__toggle {
+    margin-top: 2px;
+    opacity: 0;
+    transition: opacity 120ms;
+}
+.umb-property:focus-within .umb-property-actions__toggle,
+.umb-property:hover .umb-property-actions__toggle,
+.umb-property .umb-property-actions__toggle:focus {
+    opacity: 1;
+}
+
+// Revert-style-hack that ensures that we only show property-actions on properties that are directly begin hovered.
+.umb-property:hover .umb-property:not(:hover) .umb-property-actions__toggle {
+    opacity: 0;
+}
+
+.umb-property-actions__menu {
+    position: absolute;
+    z-index: 1000;
+    display: block;
+    float: left;
+    min-width: 160px;
+    list-style: none;
+
+    .umb-contextmenu {
+        border-top-left-radius: 0;
+        margin-top: 0;
+    }
+}

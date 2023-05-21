@@ -1,0 +1,229 @@
+// Hacks
+// -------------------------
+
+/* CONTAINS ALL HACKS AND OTHER QUICK-FIXES */
+
+/*wft ms?*/
+*{ -ms-touch-action: none;}
+
+.ace_editor { height: 200px; }
+
+.nounderline {text-decoration: none !important}
+.nounderline:hover {text-decoration: underline !important}
+.nounderline * {text-decoration: none !important; border: none}
+
+.ui-sortable-placeholder {
+     margin-left: 0 !important;
+}
+.controls-row img {
+	max-width: none;
+}
+
+.thumbnail {
+    border-radius: 0;
+    min-width: 150px;
+
+    > a {
+        display: block;
+    }
+
+    img {
+	    max-width: 100% !important;
+        width: 100%;
+    }
+}
+
+#mapCanvas img {
+  max-width: none !important;
+}
+
+.btn-group .dropdown-backdrop {
+    display: none;
+}
+
+/* loading animation for iframes and content pages */
+iframe, .content-column-body {
+    background: center center url(../img/loader.gif) no-repeat;
+    border: none;
+}
+
+/* JQUERY FILEUPLOAD TEMP STYLES */
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  margin-bottom:5px;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  transform: translate(-300px, 0) scale(4);
+  font-size: 23px;
+  direction: ltr;
+  cursor: pointer;
+}
+
+
+/*tree legacy icon*/
+.legacy-custom-file {
+  width: 16px;
+  height: 16px;
+  min-width: 20px; /* this ensure the icon takes up same space as font-icon (20px) */
+  display: inline-block;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/*
+    missing icon names in helveticons that are in font-awesome - used by the datepicker,
+    basically making them equivalent to their helviton icon
+*/
+.icon-chevron-up:before {
+	content: "\e128";
+}
+.icon-chevron-down:before {
+	content: "\e0c9";
+}
+
+
+/* Styling for validation in Public Access */
+
+.pa-umb-overlay {
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.pa-umb-overlay + .pa-umb-overlay {
+    padding-top: 30px;
+    border-top: 1px solid @gray-8;
+}
+
+.pa-select-type {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: flex-start;
+
+    margin-top: 15px;
+}
+
+.pa-select-type label {
+    padding: 0 15px;
+}
+
+.pa-access-header {
+    margin: 0 0 3px 0;
+    padding-bottom: 0;
+}
+
+.pa-access-description {
+    color: @gray-7;
+    margin: 0;
+}
+
+.pa-validation-message {
+    padding: 6px 12px !important;
+    margin: 5px 0 0 0 !important;
+    display: inline-block;
+}
+
+.pa-select-pages label {
+    margin: 0;
+    font-size: 15px;
+}
+
+.pa-select-pages label + .controls-row {
+    padding-top: 0;
+}
+
+.pa-select-pages .umb-detail {
+    font-size: 13px;
+    margin: 2px 0 5px;
+}
+
+.pa-choose-page a {
+    color: @turquoise-d1;
+    font-size: 15px;
+}
+
+.pa-choose-page a:hover, .pa-choose-page a:active, .pa-choose-page a:focus {
+    color: @turquoise-d1;
+    text-decoration: none;
+}
+
+.pa-choose-page a:before {
+    content:"+";
+    margin-right: 3px;
+    font-weight: bold;
+}
+
+.pa-choose-page .treePickerTitle {
+    font-weight: bold;
+    font-size: 13px;
+    font-style: italic;
+    background: @gray-10;
+    padding: 3px 5px;
+    color: @gray-5;
+
+    border-bottom: none;
+}
+
+
+.pa-form + .pa-form {
+    margin-top: 10px;
+}
+
+
+// The below adds a default selector to all pre elements to ensure that styles are applied 
+// without having to add the class ".code" to the element. Styles have been created by 
+// combining the various declarations from the Bootstrap code.less file and fixing some mistakes
+// in Bootstrap 2.
+// This fixes issues with the markdown editor preview and should not cause issues with any other editor. 
+
+// Inline code
+// 1: Revert border radius to match look and feel of 7.4+
+code {
+    .border-radius(@baseBorderRadius); // 1
+}
+
+// Blocks of code
+// 1: Wrapping code is unreadable on small devices.
+pre {
+    display: block;
+    padding: ((@baseLineHeight - 1) / 2);
+    margin: 0 0 (@baseLineHeight / 2);
+    font-family: @sansFontFamily;
+    color: @gray-2;
+    line-height: @baseLineHeight;
+    white-space: pre-wrap; // 1
+    overflow-x: auto; // 1
+    background-color: @brownGrayLight;
+    border: 1px solid @gray-8;
+    .border-radius(@baseBorderRadius);
+
+    // Make prettyprint styles more spaced out for readability
+    &.prettyprint {
+        margin-bottom: @baseLineHeight;
+    }
+
+    // Account for some code outputs that place code tags in pre tags
+    code {
+        padding: 0;
+        white-space: pre; // 1
+        word-wrap: normal; // 1
+        background-color: transparent;
+        border: 0;
+    }
+}
+
+/* Styling for content/media sort order dialog */
+.sort-order {
+    td.tree-icon {
+        font-size:20px;
+        width:20px;
+        padding-right:0;
+    }
+}

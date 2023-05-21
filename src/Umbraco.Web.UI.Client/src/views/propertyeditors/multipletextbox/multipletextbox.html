@@ -1,0 +1,41 @@
+<div class="umb-property-editor umb-multiple-textbox" ng-controller="Umbraco.PropertyEditors.MultipleTextBoxController">
+  <ng-form name="multipleTextboxForm">
+    <div ui-sortable="sortableOptions" ng-model="model.value">
+      <div class="flex flex-wrap textbox-wrapper" ng-repeat="item in model.value track by $index">
+          <input type="text" name="item_{{$index}}" ng-model="item.value"
+                 class="umb-property-editor umb-textstring textstring flx-i"
+                 ng-trim="false"
+                 ng-keyup="addRemoveOnKeyDown($event, $index)"
+                 ng-paste="paste($event, $index)"
+                 focus-when="{{item.hasFocus}}"
+                 ng-readonly="readonly" />
+
+          <div ng-if="!readonly" class="icon-wrapper">
+              <umb-icon icon="icon-navigation" class="icon handle" localize="title" title="@general_move"></umb-icon>
+  
+              <div class="umb-multiple-textbox__confirm" ng-show="model.value.length > model.config.min">
+                  <button type="button" class="umb-multiple-textbox__confirm-action" ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
+                      <umb-icon icon="icon-trash"></umb-icon>
+                  </button>
+  
+                  <umb-confirm-action
+                      ng-if="promptIsVisible === $index"
+                      direction="left"
+                      on-confirm="remove($index)"
+                      on-cancel="hidePrompt()">
+                  </umb-confirm-action>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <button type="button" class="add-link" localize="title" title="@content_addTextBox"
+       ng-show="model.config.max <= 0 || model.value.length < model.config.max"
+       ng-click="add($event)"
+       ng-disabled="readonly">
+        <localize key="general_add">Add</localize>
+    </button>
+
+    <input type="hidden" name="mandatory" ng-model="model.value" />
+  </ng-form>
+</div>

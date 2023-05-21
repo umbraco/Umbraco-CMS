@@ -1,0 +1,63 @@
+.umb-range-slider {
+
+    &.noUi-target {
+        background: linear-gradient(to bottom, @grayLighter 0%, @grayLighter 100%);
+        box-shadow: none;
+        border-radius: 20px;
+        height: 8px;
+        border: 1px solid @inputBorder;
+
+        &:focus, &:focus-within {
+            border-color: @inputBorderFocus;
+        }
+    }
+
+    .noUi-connects {
+        cursor: pointer;
+        height: 20px;
+        top: -6px;
+    }
+
+    .noUi-connect {
+        background-color: @purple-washed;
+        border: 1px solid @purple-l3;
+    }
+
+    .noUi-tooltip {
+        padding: 2px 6px;
+    }
+
+    .noUi-handle {
+        cursor: grab;
+        border-radius: 100px;
+        border: none;
+        box-shadow: none;
+        width: 20px !important;
+        height: 20px !important;
+        right: -10px !important; // half the handle width
+        background-color: @blueExtraDark;
+
+        &::before, &::after {
+            display: none;
+        }
+    }
+
+    .noUi-horizontal .noUi-handle {
+        top: -7px;
+    }
+
+    .noUi-marker-large.noUi-marker-horizontal {
+        height: 10px;
+    }
+
+    .noUi-marker.noUi-marker-horizontal {
+        width: 1px;
+    }
+}
+
+.noUi-value {
+  cursor: pointer;
+  &-active{
+    color: @black;
+  }
+}

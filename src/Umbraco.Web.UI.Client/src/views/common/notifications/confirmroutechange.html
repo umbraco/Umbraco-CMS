@@ -1,0 +1,7 @@
+<div ng-controller="Umbraco.Notifications.ConfirmRouteChangeController">
+	<h4><localize key="prompt_unsavedChanges">You have unsaved changes</localize></h4>
+	<p><localize key="prompt_unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</localize></p>
+
+	<button class="btn" ng-click="discard(notification)"><localize key="prompt_discardChanges">Discard changes</localize></button>
+	<button class="btn btn-success" ng-click="stay(notification)" umb-auto-focus><localize key="prompt_stay">Stay</localize></button>
+</div>

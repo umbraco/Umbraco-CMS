@@ -1,0 +1,79 @@
+<div ng-controller="Umbraco.Editors.Dictionary.ListController as vm">
+
+    <umb-editor-view>
+        <umb-editor-header
+            name="vm.title"
+            hide-alias="true"
+            hide-description="true"
+            hide-icon="true"
+            name-locked="true">
+        </umb-editor-header>
+        <umb-editor-container>
+
+          <umb-editor-sub-header>
+
+            <umb-editor-sub-header-content-left>
+              <umb-button button-style="outline"
+                          type="button"
+                          action="vm.createNewItem()"
+                          label-key="dictionary_createNew">
+              </umb-button>
+            </umb-editor-sub-header-content-left>
+
+            <umb-editor-sub-header-content-right>
+              <umb-search-filter model="vm.filter.searchTerm"
+                                 label-key="placeholders_filter"
+                                 text="Type to filter...">
+              </umb-search-filter>
+            </umb-editor-sub-header-content-right>
+
+          </umb-editor-sub-header>
+
+          <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+          <umb-box ng-if="!vm.loading && vm.items.length === 0">
+            <umb-box-content class="block-form">
+
+              <umb-empty-state size="small">
+                <localize key="dictionary_noItems">There are no dictionary items.</localize>
+              </umb-empty-state>
+
+            </umb-box-content>
+          </umb-box>
+
+          <table class="table table-hover" ng-show="!vm.loading && vm.filtered.length > 0">
+            <caption class="sr-only"><localize key="visuallyHiddenTexts_dictionaryListCaption">Dictionary items</localize></caption>
+            <thead>
+              <tr>
+                <th><localize key="general_name">Name</localize></th>
+                <th ng-repeat="column in vm.items[0].translations | orderBy:'displayName'">{{column.displayName}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm })" class="cursor-pointer">
+                <th>
+                  <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
+                </th>
+                <td ng-repeat="column in item.translations | orderBy:'displayName'">
+                  <button type="button" class="btn-reset" ng-click="vm.clickItem(item.id)">
+                    <umb-icon icon="{{ column.hasTranslation ? 'icon-check' : 'icon-alert' }}"
+                              class="{{ column.hasTranslation ? 'color-green' : 'color-red' }}">
+                    </umb-icon>
+                    <span class="sr-only">
+                      <localize ng-if="column.hasTranslation" key="visuallyHiddenTexts_hasTranslation">Has translation</localize>
+                      <localize ng-if="!column.hasTranslation" key="visuallyHiddenTexts_noTranslation">Missing translation</localize>
+                    </span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <umb-empty-state ng-if="!vm.loading && vm.filtered.length === 0"
+                           position="center">
+            <localize key="dictionary_noItemsFound">There were no dictionary items found.</localize>
+          </umb-empty-state>
+
+        </umb-editor-container>
+    </umb-editor-view>
+</div>

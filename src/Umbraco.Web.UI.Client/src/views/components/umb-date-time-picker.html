@@ -1,0 +1,12 @@
+<div class="datepicker" style="position: relative;">
+
+    <div ng-hide="hasTranscludedContent" class="input-append date">
+        <input type="text" data-format="{{options.format}}" class="datepickerinput" />
+        <span class="add-on" aria-hidden="true">
+            <umb-icon icon="icon-calendar"></umb-icon>
+        </span>
+    </div>
+
+    <div class="js-datePicker__transcluded-content" ng-transclude></div>
+
+</div>

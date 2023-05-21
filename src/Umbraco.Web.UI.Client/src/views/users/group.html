@@ -1,0 +1,185 @@
+<div ng-controller="Umbraco.Editors.Users.GroupController as vm" class="clearfix">
+
+  <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+  <form name="editUserGroupForm" novalidate val-form-manager>
+
+    <umb-editor-view ng-if="!vm.loading">
+
+      <umb-editor-header name="vm.userGroup.name" alias="vm.userGroup.alias"
+        alias-locked="vm.userGroup.isSystemUserGroup" icon="vm.userGroup.icon" hide-description="true"
+        on-back="vm.goToPage(vm.breadcrumbs[0])" show-back-button="vm.showBackButton">
+      </umb-editor-header>
+
+      <umb-editor-container>
+
+        <div class="umb-packages-view-wrapper" style="padding: 0;">
+
+          <div class="umb-package-details">
+
+            <div class="umb-package-details__main-content">
+
+              <umb-box>
+
+                <umb-box-header title-key="user_assignAccess"></umb-box-header>
+
+                <umb-box-content class="block-form">
+
+                  <umb-control-group style="margin-bottom: 20px;" label="@main_sections"
+                    description="@user_sectionsHelp">
+                    <umb-node-preview style="max-width: 100%;" ng-repeat="section in vm.userGroup.sections"
+                      icon="section.icon" name="section.name" allow-remove="true" on-remove="vm.removeSection($index)">
+                    </umb-node-preview>
+
+                    <button type="button" class="umb-node-preview-add" style="max-width: 100%;"
+                      ng-click="vm.openSectionPicker()">
+                      <localize key="general_add">Add</localize>
+                    </button>
+                  </umb-control-group>
+
+                  <umb-control-group style="margin-bottom: 20px;" label="@treeHeaders_languages"
+                    description="@user_languagesHelp">
+                    
+                    <umb-toggle
+                      style="margin-bottom: 10px;"
+                      checked="vm.userGroup.hasAccessToAllLanguages" 
+                      on-click="vm.toggleAllowAllLanguages()"
+                      label-on="{{ vm.labels.allowAccessToAllLanguages }}"
+                      label-off="{{ vm.labels.allowAccessToAllLanguages }}"
+                      label-position="right"
+                      show-labels="true">
+                    </umb-toggle>
+                    
+                    <div ng-if="!vm.userGroup.hasAccessToAllLanguages">
+                      <umb-node-preview style="max-width: 100%;" ng-repeat="language in vm.userGroup.languages"
+                        icon="vm.languageIcon" name="language.name" allow-remove="true"
+                        on-remove="vm.removeLanguage($index)">
+                      </umb-node-preview>
+
+                      <button type="button" class="umb-node-preview-add" style="max-width: 100%;"
+                        ng-click="vm.openLanguagePicker()">
+                        <localize key="general_add">Add</localize>
+                      </button>
+                    </div>
+                  </umb-control-group>
+
+                  <umb-control-group style="margin-bottom: 20px;" label="@user_startnode"
+                    description="@user_startnodehelp">
+                    <umb-node-preview ng-if="vm.userGroup.contentStartNode.id" style="max-width: 100%;"
+                      icon="vm.userGroup.contentStartNode.icon" name="vm.userGroup.contentStartNode.name"
+                      allow-edit="true" allow-remove="true" on-edit="vm.openContentPicker()"
+                      on-remove="vm.clearStartNode('content')">
+                    </umb-node-preview>
+
+
+                    <button type="button" ng-if="!vm.userGroup.contentStartNode" class="umb-node-preview-add"
+                      style="max-width: 100%;" ng-click="vm.openContentPicker()">
+                      <localize key="general_add">Add</localize>
+                    </button>
+
+                  </umb-control-group>
+
+                  <umb-control-group label="@user_mediastartnode" description="@user_mediastartnodehelp">
+
+                    <umb-node-preview ng-if="vm.userGroup.mediaStartNode.id" style="max-width: 100%;"
+                      icon="vm.userGroup.mediaStartNode.icon" name="vm.userGroup.mediaStartNode.name" allow-edit="true"
+                      allow-remove="true" on-edit="vm.openMediaPicker()" on-remove="vm.clearStartNode('media')">
+                    </umb-node-preview>
+
+
+                    <button type="button" ng-if="!vm.userGroup.mediaStartNode" class="umb-node-preview-add"
+                      style="max-width: 100%;" ng-click="vm.openMediaPicker()">
+                      <localize key="general_add">Add</localize>
+                    </button>
+
+                  </umb-control-group>
+
+                </umb-box-content>
+              </umb-box>
+
+              <umb-box>
+                <umb-box-header title-key="user_permissionsDefault"></umb-box-header>
+                <umb-box-content class="block-form">
+                  <umb-control-group ng-repeat="(category, permissions) in vm.userGroup.defaultPermissions"
+                    label="{{ category }}">
+                    <umb-toggle-group items="permissions"></umb-toggle-group>
+                  </umb-control-group>
+                </umb-box-content>
+              </umb-box>
+
+              <umb-box>
+                <umb-box-header title-key="user_permissionsGranular"></umb-box-header>
+                <umb-box-content class="block-form">
+                  <umb-control-group label="Nodes" description="@user_permissionsGranularHelp">
+
+                    <umb-node-preview ng-repeat="node in vm.userGroup.assignedPermissions" style="max-width: 100%;"
+                      icon="node.icon" name="node.name" permissions="node.allowedPermissions" allow-remove="true"
+                      on-remove="vm.removeAssignedPermissions($index)" allow-edit="true"
+                      on-edit="vm.setPermissionsForNode(node)">
+                    </umb-node-preview>
+
+                    <button type="button" class="umb-node-preview-add" style="max-width: 100%;"
+                      ng-click="vm.openGranularPermissionsPicker()">
+                      <localize key="general_add">Add</localize>
+                    </button>
+                  </umb-control-group>
+
+                </umb-box-content>
+              </umb-box>
+
+            </div>
+
+            <div class="umb-package-details__sidebar">
+
+              <umb-box>
+                <umb-box-header title-key="sections_users"></umb-box-header>
+                <umb-box-content>
+
+                  <umb-user-preview ng-repeat="user in vm.userGroup.users" name="user.name" avatars="user.avatars"
+                    allow-remove="true" on-remove="vm.removeUser($index)">
+                  </umb-user-preview>
+
+                  <button type="button" class="umb-node-preview-add" ng-click="vm.openUserPicker()">
+                    <localize key="general_add">Add</localize>
+                  </button>
+
+                </umb-box-content>
+              </umb-box>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </umb-editor-container>
+
+      <umb-editor-footer>
+
+        <umb-editor-footer-content-left>
+
+          <umb-breadcrumbs ancestors="vm.breadcrumbs" allow-on-open="true" on-open="vm.goToPage(ancestor)">
+          </umb-breadcrumbs>
+
+        </umb-editor-footer-content-left>
+
+        <umb-editor-footer-content-right>
+
+          <umb-button ng-if="model.infiniteMode" type="button" button-style="link" label-key="general_close"
+            shortcut="esc" action="model.close(model)">
+          </umb-button>
+
+          <umb-button type="button" action="vm.save()" state="vm.page.saveButtonState" button-style="success"
+            shortcut="ctrl+s" label="Save" label-key="{{vm.page.submitButtonLabelKey}}">
+          </umb-button>
+
+        </umb-editor-footer-content-right>
+
+      </umb-editor-footer>
+
+    </umb-editor-view>
+
+  </form>
+
+</div>

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Umbraco.TestData</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="34.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+  </ItemGroup>
+</Project>

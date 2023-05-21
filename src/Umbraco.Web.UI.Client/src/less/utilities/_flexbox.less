@@ -1,0 +1,100 @@
+/*
+    Flexbox
+*/
+
+.flex { display: flex; }
+.flex-inline { display: inline-flex; }
+
+.flex-column  { flex-direction: column; }
+.flex-wrap    { flex-wrap: wrap; }
+
+.items-start    { align-items: flex-start; }
+.items-end      { align-items: flex-end; }
+.items-center   { align-items: center; }
+.items-baseline { align-items: baseline; }
+.items-stretch  { align-items: stretch; }
+
+.self-start    { align-self: flex-start; }
+.self-end      { align-self: flex-end; }
+.self-center   { align-self: center; }
+.self-baseline { align-self: baseline; }
+.self-stretch  { align-self: stretch; }
+
+.justify-start   { justify-content: flex-start; }
+.justify-end     { justify-content: flex-end; }
+.justify-center  { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around  { justify-content: space-around; }
+
+.content-start   { align-content: flex-start; }
+.content-end     { align-content: flex-end; }
+.content-center  { align-content: center; }
+.content-between { align-content: space-between; }
+.content-around  { align-content: space-around; }
+.content-stretch { align-content: stretch; }
+
+.flx-i {
+  flex: 1;
+}
+
+
+.flx-g0 {
+  flex-grow: 0;
+}
+.flx-g1 {
+  flex-grow: 1;
+}
+
+.flx-s0 {
+  flex-shrink: 0;
+}
+.flx-s1 {
+  flex-shrink: 1;
+}
+
+
+.flx-b0 {
+  flex-basis: 0%;
+}
+.flx-b1 {
+  flex-basis: 10%;
+}
+.flx-b2 {
+  flex-basis: 20%;
+}
+.flx-b3 {
+  flex-basis: 30%;
+}
+.flx-b4 {
+  flex-basis: 40%;
+}
+.flx-b5 {
+  flex-basis: 50%;
+}
+.flx-b6 {
+  flex-basis: 60%;
+}
+.flx-b7 {
+  flex-basis: 70%;
+}
+.flx-b8 {
+  flex-basis: 80%;
+}
+.flx-b9 {
+  flex-basis: 90%;
+}
+.flx-b10 {
+  flex-basis: 100%;
+}
+.flx-ba {
+  flex-basis: auto;
+}
+
+/* 1. Fix for Chrome 44 bug. https://code.google.com/p/chromium/issues/detail?id=506893 */
+.flex-auto {
+  flex: 1 1 auto;
+  min-width: 0; /* 1 */
+  min-height: 0; /* 1 */
+}
+
+.flex-none { flex: none; }

@@ -1,0 +1,79 @@
+<div id="{{model.alias}}" class="umb-nested-content__doctypepicker" ng-controller="Umbraco.PropertyEditors.NestedContent.DocTypePickerController">
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        <localize key="contentTypeEditor_elementType">Element Type</localize>
+                    </th>
+                    <th>
+                        <localize key="general_group">Group</localize>
+                    </th>
+                    <th ng-class="{'w-100':expandTemplate}">
+                        <button type="button" class="pull-right p0 btn btn-link" ng-click="expandTemplate = !expandTemplate"
+                                ng-class="{'fa-flip-horizontal': !expandTemplate}">
+                          <umb-icon icon="icon-tab-key"></umb-icon>
+                        </button>
+                        <localize key="template_template">Template</localize>
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody ui-sortable="sortableOptions" ng-model="model.value">
+                <tr ng-repeat="config in model.value">
+                    <td>
+                        <umb-icon icon="icon-navigation" class="handle"></umb-icon>
+                    </td>
+                    <td>
+                        {{ph = placeholder(config);hasTabsOrFirstRender = (elemTypeTabs[config.ncAlias].length || config.ncAlias=='');""}}
+                        <button type="button" class="btn-reset umb-nested-content__placeholder" ng-class="{'umb-nested-content__placeholder--selected':ph}" ng-click="openElemTypeModal($event, config)">
+                            <umb-node-preview ng-if="ph" icon="ph.icon" name="ph.name"></umb-node-preview>
+                            <localize key="content_nestedContentAddElementType" ng-if="!ph">Add element type</localize>
+                        </button>
+
+                    </td>
+                    <td>
+                        <select ng-show="hasTabsOrFirstRender" id="{{model.alias}}_tab_select"
+                                ng-options="t for t in elemTypeTabs[config.ncAlias]"
+                                ng-model="config.ncTabAlias" required></select>
+                        <span ng-show="!hasTabsOrFirstRender" class="red">
+                            <localize key="content_nestedContentNoGroups">
+                                The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).
+                            </localize>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="config.nameTemplate" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" ng-click="remove($index)">
+                            <localize key="general_delete">Delete</localize>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+            <button type="button" class="btn" ng-click="add()" ng-disabled="!canAdd()">
+                <localize key="general_add">Add</localize>
+            </button>
+            <button type="button" class="btn-reset umb-nested-content__help-action" ng-click="showHelpText = !showHelpText">
+                <umb-icon icon="icon-help-alt" class="medium umb-nested-content__help-icon"></umb-icon>
+            </button>
+        </div>
+    </div>
+    <br />
+    <div class="umb-nested-content__help-text" ng-show="showHelpText">
+        <p>
+            <strong><localize key="general_group">Group</localize>:</strong><br />
+            <localize key="content_nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.</localize>
+        </p>
+        <p>
+            <strong><localize key="template_template">Template</localize>:</strong><br />
+            <localize key="content_nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</localize>
+            <code ng-non-bindable>{{$index}}</code>
+            <localize key="content_nestedContentTemplateHelpTextPart2">to display the item index</localize>
+        </p>
+    </div>
+</div>

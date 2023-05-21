@@ -1,0 +1,109 @@
+.umb-user-cards {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.umb-user-card {
+    box-sizing: border-box;
+    max-width: 100%;
+    display: flex;
+    position: relative;
+    user-select: none;
+}
+
+.umb-user-card:hover,
+.umb-user-card:focus {
+    outline: none;
+    text-decoration: none !important;
+}
+
+.umb-user-card.-selectable {
+    cursor: pointer;
+}
+.umb-user-card.-selected, .umb-user-card.-selectable:hover {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 5px;
+        pointer-events: none;
+        border: 2px solid @ui-selected-border;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+    }
+}
+.umb-user-card.-selectable:hover {
+    &::before {
+        opacity: .33;
+    }
+}
+.umb-user-card.-selected:hover {
+    &::before {
+        opacity: .75;
+    }
+}
+
+.umb-user-card__content {
+    position: relative;
+    padding: 15px;
+    flex: 1 1 auto;
+    background-color: @white;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+.umb-user-card__goToUser {
+    &:hover, &:focus {
+        text-decoration: none;
+
+        .umb-user-card__name {
+            text-decoration: underline;
+            color: @ui-option-type-hover;
+        }
+
+        .umb-avatar {
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, .5);
+        }
+    }
+}
+
+.umb-user-card__avatar {
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.umb-user-card__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+
+.umb-user-card__name {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2px;
+    word-wrap: break-word;
+}
+
+.umb-user-card__group {
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.umb-user-card__last-login {
+    font-size: 13px;
+    text-align: center;
+    margin-top: auto;
+}

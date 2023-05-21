@@ -1,0 +1,93 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/main/containers/dotnet
+{
+	"name": "C# (.NET) Umbraco & SMTP4Dev",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
+	
+	
+	// Set *default* container specific settings.json values on container create.
+	"settings": {		
+		"omnisharp.defaultLaunchSolution": "umbraco.sln",
+		"omnisharp.enableDecompilationSupport": true,
+		"omnisharp.enableRoslynAnalyzers": true
+	},
+
+	"features": {
+		// Workaround until the image is updated to include the latest version of .NET Core - .NET7
+		// https://github.com/devcontainers/templates/issues/38#issuecomment-1310803259		
+		"ghcr.io/devcontainers/features/dotnet:1": {
+			"version": "7"
+		},
+
+		// Adds SSH support to the container
+		// Allowing the Github CLI `gh codespace ssh` to work
+		"ghcr.io/devcontainers/features/sshd:1": {
+			"version": "latest"
+		},
+
+		// Adds SQLite feature from apt install
+		// Also adds the SQLite VSCode extension
+		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-dotnettools.csharp"
+	],
+	
+	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
+	"updateContentCommand": "dotnet build umbraco.sln && dotnet dev-certs https --trust",
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locallAdd	"forwardPorts": [9000, 5000, 25],
+	// Port needed to help discover SMTP4Dev
+	"forwardPorts": [
+		5000
+	],
+
+	"portsAttributes": {
+		"5000": {
+			"label": "SMTP4Dev",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"9000": {
+			"label": "Umbraco HTTP",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"44331": {
+			"label": "Umbraco HTTPS",
+			"protocol": "https",
+			"onAutoForward": "notify"
+		}
+	},
+	"customizations": {
+		"codespaces": {
+		  "openFiles": [
+			".github/codespaces-readme.md"
+		  ]
+		}
+	}
+
+	// [Optional] To reuse of your local HTTPS dev cert:
+	//
+	// 1. Export it locally using this command:
+	//    * Windows PowerShell:
+	//        dotnet dev-certs https --trust; dotnet dev-certs https -ep "$env:USERPROFILE/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
+	//    * macOS/Linux terminal:
+	//        dotnet dev-certs https --trust; dotnet dev-certs https -ep "${HOME}/.aspnet/https/aspnetapp.pfx" -p "SecurePwdGoesHere"
+	// 
+	// 2. Uncomment these 'remoteEnv' lines:
+	//    "remoteEnv": {
+	// 	      "ASPNETCORE_Kestrel__Certificates__Default__Password": "SecurePwdGoesHere",
+	//        "ASPNETCORE_Kestrel__Certificates__Default__Path": "/home/vscode/.aspnet/https/aspnetapp.pfx",
+	//    },
+	//
+	// 3. Next, copy your certificate into the container:
+	//      1. Start the container
+	//      2. Drag ~/.aspnet/https/aspnetapp.pfx into the root of the file explorer
+	//      3. Open a terminal in VS Code and run "mkdir -p /home/vscode/.aspnet/https && mv aspnetapp.pfx /home/vscode/.aspnet/https"
+
+}

@@ -1,0 +1,8 @@
+<div class="umb-video-preview" ng-controller="umbVideoPreviewController as controller">
+    <video ng-if="vm.clientSide" name="{{vm.name}}" controls>
+        <source ng-init="previewUrl = controller.getClientSideUrl(vm.clientSideData)" ng-src="{{previewUrl}}">
+    </video>
+    <video ng-if="!vm.clientSide" name="{{vm.name}}" controls>
+        <source ng-src="{{vm.source}}">
+    </video>
+</div>

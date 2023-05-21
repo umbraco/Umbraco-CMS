@@ -1,0 +1,73 @@
+.umb-list-view-settings__box {
+    background: @gray-10;
+    display: flex;
+    flex: 1;
+    padding: 15px;
+    position: relative;
+    border-radius: @baseBorderRadius;
+
+    .btn-link {
+        font-size: 13px;
+        padding: 0;
+    }
+}
+
+.umb-list-view-settings__trigger {
+    margin-bottom: 20px;
+}
+
+.umb-list-view-settings__list-view-icon {
+    font-size: 20px;
+    color: @gray-7;
+    margin-right: 10px;
+}
+
+.umb-list-view-settings__name {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.umb-list-view-settings__create-new {
+    color: @ui-action-type;
+}
+
+.umb-list-view-settings__remove-new {
+    color: @red;
+}
+
+// display `columns displayed` table as a list-view layout
+.umb-list-view-settings__overlay {
+
+    .btn {
+        vertical-align: top;
+    }
+
+    .btn-icon {
+        padding: 0;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    tbody tr {
+        background: @gray-10;
+        border-bottom: 1px solid @white;
+    }
+
+    th {
+        text-align: left;
+    }
+
+    td {
+        padding: 10px 15px 10px 0;
+
+        &:first-child {
+            padding-left: 15px;
+        }
+
+        input[type="text"] {
+            margin-bottom: 0;
+        }
+    }
+}

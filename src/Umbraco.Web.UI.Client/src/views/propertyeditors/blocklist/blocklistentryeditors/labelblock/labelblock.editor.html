@@ -1,0 +1,11 @@
+<button
+  type="button"
+  class="btn-reset umb-outline blockelement-labelblock-editor blockelement__draggable-element"
+  ng-click="block.edit()"
+  ng-focus="block.focus"
+  ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }"
+  val-server-property-class=""
+>
+  <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
+  <span>{{block.label}}</span>
+</button>

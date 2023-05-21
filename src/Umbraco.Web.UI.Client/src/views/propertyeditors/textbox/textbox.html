@@ -1,0 +1,32 @@
+<div ng-controller="Umbraco.PropertyEditors.textboxController">
+    <ng-form name="textboxFieldForm">
+        <input type="text"
+               id="{{model.alias}}"
+               name="textbox"
+               ng-model="model.value"
+               class="umb-property-editor umb-textstring textstring"
+               val-server="value"
+               ng-required="model.validation.mandatory"
+               aria-required="{{model.validation.mandatory}}"
+               aria-invalid="{{validLength ? false : true}}"
+               ng-trim="false"
+               ng-change="change()"
+               ng-readonly="readonly" />
+
+        <div ng-messages="textboxFieldForm.textbox.$error" show-validation-on-submit>
+            <p class="sr-only" ng-message="valServer" tabindex="0">{{model.label}} {{textboxFieldForm.textbox.errorMsg}}</p>
+            <p class="help-inline" ng-message="valServer" tabindex="0" aria-hidden="true">{{textboxFieldForm.textbox.errorMsg}}</p>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+        </div>
+
+        <div class="help" ng-if="nearMaxLimit">
+            <p class="sr-only" tabindex="0">{{model.label}} <localize key="textbox_characters_left" tokens="[maxChars - charsCount]" watch-tokens="true">%0% characters left.</localize></p>
+            <p aria-hidden="true"><localize key="textbox_characters_left" tokens="[maxChars - charsCount]" watch-tokens="true">%0% characters left.</localize></p>
+        </div>
+        <div class="help text-error" ng-if="validLength === false">
+            <p class="sr-only" tabindex="0">{{model.label}} <localize key="textbox_characters_exceed" tokens="[maxChars, charsCount - maxChars]" watch-tokens="true">Maximum %0% characters, <strong>%1%</strong> too many.</localize></p>
+            <p aria-hidden="true"><localize key="textbox_characters_exceed" tokens="[maxChars, charsCount - maxChars]" watch-tokens="true">Maximum %0% characters, <strong>%1%</strong> too many.</localize></p>
+        </div>
+
+    </ng-form>
+</div>

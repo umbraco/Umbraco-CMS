@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <files />
+  <info>
+    <package>
+      <name>CheckboxListTest</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <NewType key="9c9b55d0-2fbf-4f12-afea-023bd7b2519d" id="1148" parentID="-1" level="1" creatorID="0" sortOrder="9" createDate="2013-07-23T12:06:07" updateDate="2013-07-23T15:56:37" nodeName="DoIt" urlName="doit" path="-1,1148" isDoc="" nodeType="1134" creatorName="admin" writerName="admin" writerID="0" template="1133" nodeTypeAlias="NewType">
+        <testList><![CDATA[test3]]></testList>
+      </NewType>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>NewType</Name>
+        <Key>e52d7dfa-1509-4e49-8f01-c27ed55e791e</Key>
+        <Alias>NewType</Alias>
+        <Icon>.sprTreeFolder</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>
+        </Description>
+        <AllowAtRoot>True</AllowAtRoot>
+        <AllowedTemplates>
+          <Template>NewType</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>NewType</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>testList</Name>
+          <Alias>testList</Alias>
+          <Type>Umbraco.CheckBoxList</Type>
+          <Definition>8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c</Definition>
+          <Tab>
+          </Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs />
+    </DocumentType>
+  </DocumentTypes>
+  <Templates />
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes>
+    <DataType Name="NewCheckBox" Id="Umbraco.CheckBoxList" Definition="8dacee1a-1bbd-46c0-b07f-8ffd49fcca7c" DatabaseType="Nvarchar"
+              Configuration="{&quot;items&quot;:[{&quot;id&quot;:59,&quot;value&quot;:&quot;test&quot;},{&quot;id&quot;:60,&quot;value&quot;:&quot;test3&quot;},{&quot;id&quot;:61,&quot;value&quot;:&quot;test2&quot;}]}">
+      <!-- <PreValues>
+        <PreValue Id="59" Value="test" />
+        <PreValue Id="60" Value="test3" />
+        <PreValue Id="61" Value="test2" />
+      </PreValues> -->
+    </DataType>
+  </DataTypes>
+</umbPackage>

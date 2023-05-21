@@ -1,0 +1,106 @@
+<div class="media-list-grid">
+    <div data-element="media-grid" class="umb-media-grid" ng-show="!showMediaList">
+        <div data-element="media-grid-item-{{$index}}"
+             class="umb-media-grid__item umb-outline umb-outline--surrounding"
+             title="{{item.name}}"
+             ng-click="clickItem(item, $event, $index)"
+             ng-repeat="item in items | filter:filterBy"
+             ng-style="item.flexStyle"
+             ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-folder': item.isFolder, '-svg': item.extension == 'svg', '-selectable': item.selectable, '-unselectable': !item.selectable, '-filtered': item.filtered}">
+
+            <div data-element="media-grid-item-edit"
+                    class="umb-media-grid__item-overlay umb-outline"
+                    ng-class="{'-locked': item.selected || !item.file || !item.thumbnail, '-can-open': (item.isFolder ? allowOpenFolder : allowOpenFile)}"
+                    ng-click="clickItemName(item, $event, $index)"
+                    tabindex="{{item.isFolder && item.selectable ? '0' : '-1'}}">
+                <umb-icon icon="icon-info"
+                          class="umb-media-grid__info"
+                          ng-if="onDetailsHover"
+                          ng-mouseover="hoverItemDetails(item, $event, true)"
+                          ng-mouseleave="hoverItemDetails(item, $event, false)">
+                </umb-icon>
+                <div class="umb-media-grid__item-name">{{item.name}}</div>
+            </div>
+
+            <!-- Select border must be right after .umb-media-grid__item-overlay -->
+            <div class="umb-media-grid__item-select"></div>
+
+            <!-- Checkered background -->
+            <div class="umb-media-grid__image-background" ng-if="item.thumbnail || item.extension === 'svg'"></div>
+
+            <!-- Image thumbnail -->
+            <img umb-image-lazy-load="{{item.thumbnail}}" class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" alt="{{item.name}}" draggable="false" />
+
+            <!-- SVG -->
+            <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension === 'svg'" ng-src="{{item.image}}" alt="{{item.name}}" draggable="false" />
+
+            <!-- Transparent image - fallback - used to keep image proportions on wrapper-->
+            <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension !== 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
+
+            <!-- Icon for files -->
+            <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'"
+                            class="umb-media-grid__item-file-icon"
+                            extension="{{item.extension}}"
+                            icon="{{item.icon}}"
+                            size="s">
+            </umb-file-icon>
+
+
+        </div>
+    </div>
+    <!-- markup for the media list -->
+
+    <div class="umb-media-grid__list-view" ng-show="showMediaList">
+            <div class="umb-table umb-table--condensed">
+                <div class="umb-table-head">
+                    <div class="umb-table-row">
+                        <div class="umb-table-cell">
+                            <input class="umb-table__input" type="checkbox"
+                                   ng-show="vm.allowSelectAll"
+                                   ng-click="vm.selectAll($event)"
+                                   ng-checked="vm.isSelectedAll()">
+                        </div>
+                        <div class="umb-table-cell umb-table__name">
+                            <button type="button"
+                                    class="umb-table-head__link sortable"
+                                    ng-click="setSort('name')">
+                                <localize key="general_name">Name</localize>
+                                <umb-icon ng-attr-icon="{{isSortDirection('name', 'asc') && 'icon-navigation-up' || isSortDirection('name', 'desc') && 'icon-navigation-down'}}" class="umb-table-head__icon"></umb-icon>
+                            </button>
+                        </div>
+                        <div class="umb-table-cell">
+                            <button type="button"
+                                    class="umb-table-head__link sortable"
+                                    ng-click="setSort('updateDate')">
+                                <localize key="general_lastUpdated">Last Updated</localize>
+                                <umb-icon ng-attr-icon="{{isSortDirection('updateDate', 'asc') && 'icon-navigation-up' || isSortDirection('updateDate', 'desc') && 'icon-navigation-down'}}" class="umb-table-head__icon"></umb-icon>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="umb-table-body"> 
+                    <div class="umb-table-row umb-media-grid__list-item -selectable"
+                         ng-click="clickItem(item, $event, $index)"
+                         ng-repeat="item in items | filter:filterBy | orderBy:sortBy:sortReverse"
+                         ng-class="{'-selected': item.selected, '-folder': item.isFolder, '-filtered': item.filtered}">
+                        <div class="umb-table-cell">
+                            <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
+                            <umb-icon icon="{{item.thumbnail ? 'icon-picture' : item.icon}}" class="umb-table-body__icon" ng-if="!item.selected"></umb-icon>
+                        </div>
+                        <div class="umb-table-cell umb-table__name">
+                            <div class="umb-media-grid__list-item-name"
+                                 ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}"
+                                 ng-click="clickItemName(item, $event, $index)">
+                                <umb-icon icon="icon-navigation-right" ng-show="item.isFolder"></umb-icon>
+                                <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
+                            </div>
+                        </div>
+                        <div class="umb-table-cell">
+                            <span class="muted small" style="font-size:0.8em">{{item.updateDate | date:'medium'}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

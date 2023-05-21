@@ -1,0 +1,39 @@
+<div class="umb-child-selector">
+
+    <div class="umb-child-selector__child -parent">
+        <div class="umb-child-selector__child-description">
+            <div class="umb-child-selector__child-icon-holder">
+                <umb-icon icon="{{parentIcon}}" class="umb-child-selector__child-icon"></umb-icon>
+            </div>
+            <span class="umb-child-selector__child-name">
+                <strong>{{parentName}}</strong>
+            </span>
+            <small>
+                (<localize key="general_current">current</localize>)
+            </small>
+        </div>
+    </div>
+
+    <div class="umb-child-selector__children-container" ui-sortable="sortableOptions" ng-model="selectedChildren">
+
+        <div class="umb-child-selector__child" ng-repeat="selectedChild in selectedChildren">
+            <div class="umb-child-selector__child-description">
+                <div class="umb-child-selector__child-icon-holder">
+                    <umb-icon icon="{{selectedChild.icon}}" class="umb-child-selector__child-icon"></umb-icon>
+                </div>
+                <span class="umb-child-selector__child-name">{{selectedChild.name}}</span>
+            </div>
+            <div class="umb-child-selector__child-actions">
+                <button type="button" class="umb-node-preview__action umb-node-preview__action--red umb-child-selector__child-remove" ng-click="removeChild(selectedChild, $index, $event)">
+                    <localize key="general_remove">Remove</localize>
+                </button>
+            </div>
+        </div>
+
+        <button type="button" class="umb-child-selector__child -placeholder unsortable" ng-click="addChild($event)" hotkey="alt+shift+c">
+            <div class="umb-child-selector__child-name -blue"><strong><localize key="shortcuts_addChild">Add Child</localize></strong></div>
+        </button>
+
+    </div>
+
+</div>

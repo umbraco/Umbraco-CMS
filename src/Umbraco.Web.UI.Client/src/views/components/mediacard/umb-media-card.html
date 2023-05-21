@@ -1,0 +1,47 @@
+<ng-form name="vm.mediaCardForm">
+    <div class="__showcase">
+
+        <div ng-if="vm.loading" class="umb-button__progress"></div>
+
+        <p ng-if="vm.media.trashed" class="__status --error">
+            <umb-icon icon="icon-trash"></umb-icon>
+            <localize key="mediaPicker_trashed">Trashed</localize>
+        </p>
+
+        <p ng-if="vm.notAllowed" class="__status --error">
+            <umb-icon icon="icon-block"></umb-icon>
+            <localize key="mediaPicker_notAllowed">Not allowed</localize>
+        </p>
+
+        <!-- IMAGE and SVG-->
+        <img ng-if="vm.loading === false && vm.thumbnail"
+            ng-class="{'trashed': vm.media.trashed}"
+            ng-src="{{vm.thumbnail}}"
+            title="{{vm.media.name}}"
+            alt="{{vm.media.name}}" />
+
+        <umb-file-icon ng-if="vm.loading === false && vm.icon"
+            icon="{{vm.icon}}"
+            size="s"
+            text="{{vm.name}}">
+        </umb-file-icon>
+
+        <!-- FILE -->
+        <umb-file-icon ng-if="vm.loading === false && !vm.thumbnail"
+            ng-class="{'trashed': vm.media.trashed}"
+            title="{{vm.media.name}}"
+            extension="{{vm.fileExtension}}"
+            icon="{{vm.media.icon}}"
+            size="s"
+            text="{{vm.media.name}}">
+        </umb-file-icon>
+
+    </div>
+    <button type="button" ng-click="vm.onNameClicked($event)" class="btn-reset __info" ng-if="vm.media !== null || vm.name">
+        <div class="__name" ng-bind="vm.media.name || vm.name"></div>
+        <div class="__subname" ng-if="vm.media.description" ng-bind="vm.media.description"></div>
+    </button>
+
+    <ng-transclude></ng-transclude>
+
+</ng-form>

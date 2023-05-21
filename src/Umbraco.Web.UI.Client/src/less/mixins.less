@@ -1,0 +1,631 @@
+//
+// Mixins
+// --------------------------------------------------
+
+
+// UTILITY MIXINS
+// --------------------------------------------------
+
+// Clearfix
+// --------
+// For clearing floats like a boss h5bp.com/q
+.clearfix {
+  &:before,
+  &:after {
+    display: table;
+    content: "";
+    // Fixes Opera/contenteditable bug:
+    // http://nicolasgallagher.com/micro-clearfix-hack/#comment-36952
+    line-height: 0;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+// Webkit-style focus
+// ------------------
+.tab-focus() {
+  // Default
+  outline: thin dotted @gray-3;
+  // Webkit
+  outline: 5px auto -webkit-focus-ring-color;
+}
+
+// Center-align a block level element
+// ----------------------------------
+.center-block() {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// Sizing shortcuts
+// -------------------------
+.size(@height, @width) {
+  width: @width;
+  height: @height;
+}
+.square(@size) {
+  .size(@size, @size);
+}
+
+// Placeholder text
+// -------------------------
+.placeholder(@color: @placeholderText) {
+  &:-moz-placeholder {
+    color: @color;
+  }
+  &:-ms-input-placeholder {
+    color: @color;
+  }
+  &::-webkit-input-placeholder {
+    color: @color;
+  }
+}
+
+// Text overflow
+// -------------------------
+// Requires inline-block or block for proper styling
+.text-overflow() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// CSS image replacement
+// -------------------------
+// Source: https://github.com/h5bp/html5-boilerplate/commit/aa0396eae757
+.hide-text {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+
+// FONTS
+// --------------------------------------------------
+
+#font {
+  #family {
+    .serif() {
+      font-family: @serifFontFamily;
+    }
+    .sans-serif() {
+      font-family: @sansFontFamily;
+    }
+    .monospace() {
+      font-family: @monoFontFamily;
+    }
+  }
+  .shorthand(@size: @baseFontSize, @weight: normal, @lineHeight: @baseLineHeight) {
+    font-size: @size;
+    font-weight: @weight;
+    line-height: @lineHeight;
+  }
+  .serif(@size: @baseFontSize, @weight: normal, @lineHeight: @baseLineHeight) {
+    #font > #family > .serif;
+    #font > .shorthand(@size, @weight, @lineHeight);
+  }
+  .sans-serif(@size: @baseFontSize, @weight: normal, @lineHeight: @baseLineHeight) {
+    #font > #family > .sans-serif;
+    #font > .shorthand(@size, @weight, @lineHeight);
+  }
+  .monospace(@size: @baseFontSize, @weight: normal, @lineHeight: @baseLineHeight) {
+    #font > #family > .monospace;
+    #font > .shorthand(@size, @weight, @lineHeight);
+  }
+}
+
+
+// FORMS
+// --------------------------------------------------
+
+// Block level inputs
+.input-block-level {
+  display: block;
+  width: 100%;
+  min-height: @inputHeight; // Make inputs at least the height of their button counterpart (base line-height + padding + border)
+  .box-sizing(border-box); // Makes inputs behave like true block-level elements
+}
+
+
+
+// Mixin for form field states
+//SD: I've had to modify this slightly to work nicely with angular validation , note the
+// additional targetting of the ng-invalid class.
+.formFieldState(@textColor: @gray-4, @borderColor: @gray-7, @backgroundColor: @gray-10) {
+  // Set the text color
+  > .control-label,
+  > .umb-el-wrap > .control-label,
+  > .umb-el-wrap > .control-header > .control-label,
+  .help-block,
+  .help-inline {
+    color: @textColor;
+  }
+  // Style inputs accordingly
+  .checkbox.ng-invalid,
+  .radio.ng-invalid,
+  input.ng-invalid,
+  select.ng-invalid,
+  textarea.ng-invalid {
+    color: @textColor;
+  }
+  input.ng-invalid,
+  select.ng-invalid,
+  textarea.ng-invalid {
+    border-color: @borderColor;
+  }
+  // Give a small background color for input-prepend/-append
+  .input-prepend .add-on,
+  .input-append .add-on {
+    color: @textColor;
+    background-color: @backgroundColor;
+    border-color: @textColor;
+  }
+}
+
+// CSS3 PROPERTIES
+// --------------------------------------------------
+
+// Border Radius
+.border-radius(@radius) {
+    border-radius: @radius;
+}
+
+// Single Corner Border Radius
+.border-top-left-radius(@radius) {
+    border-top-left-radius: @radius;
+}
+.border-top-right-radius(@radius) {
+    border-top-right-radius: @radius;
+}
+.border-bottom-right-radius(@radius) {
+    border-bottom-right-radius: @radius;
+}
+.border-bottom-left-radius(@radius) {
+    border-bottom-left-radius: @radius;
+}
+
+// Single Side Border Radius
+.border-top-radius(@radius) {
+  .border-top-right-radius(@radius);
+  .border-top-left-radius(@radius);
+}
+.border-right-radius(@radius) {
+  .border-top-right-radius(@radius);
+  .border-bottom-right-radius(@radius);
+}
+.border-bottom-radius(@radius) {
+  .border-bottom-right-radius(@radius);
+  .border-bottom-left-radius(@radius);
+}
+.border-left-radius(@radius) {
+  .border-top-left-radius(@radius);
+  .border-bottom-left-radius(@radius);
+}
+
+// Drop shadows
+.box-shadow(@shadow) {
+    box-shadow: @shadow;
+}
+
+// Transitions
+.transition(@transition) {
+    transition: @transition;
+}
+.transition-delay(@transition-delay) {
+    transition-delay: @transition-delay;
+}
+.transition-duration(@transition-duration) {
+    transition-duration: @transition-duration;
+}
+
+// Transformations
+.rotate(@degrees) {
+    transform: rotate(@degrees);
+}
+.scale(@ratio) {
+    transform: scale(@ratio);
+}
+.translate(@x, @y) {
+    transform: translate(@x, @y);
+}
+.skew(@x, @y) {
+    transform: skew(@x, @y);
+    -webkit-backface-visibility: hidden; // See https://github.com/twitter/bootstrap/issues/5319
+}
+.translate3d(@x, @y, @z) {
+    transform: translate3d(@x, @y, @z);
+}
+
+// Backface visibility
+// Prevent browsers from flickering when using CSS 3D transforms.
+// Default value is `visible`, but can be changed to `hidden
+// See git pull https://github.com/dannykeane/bootstrap.git backface-visibility for examples
+.backface-visibility(@visibility){
+	-webkit-backface-visibility: @visibility;
+	   -moz-backface-visibility: @visibility;
+	        backface-visibility: @visibility;
+}
+
+// Background clipping
+// Heads up: FF 3.6 and under need "padding" instead of "padding-box"
+.background-clip(@clip) {
+    background-clip: @clip;
+}
+
+// Background sizing
+.background-size(@size) {
+    background-size: @size;
+}
+
+
+// Box sizing
+.box-sizing(@boxmodel) {
+    box-sizing: @boxmodel;
+}
+
+// User select
+// For selecting text on the page
+.user-select(@select) {
+  -webkit-user-select: @select;
+     -moz-user-select: @select;
+      -ms-user-select: @select;
+       -o-user-select: @select;
+          user-select: @select;
+}
+
+// Resize anything
+.resizable(@direction) {
+  resize: @direction; // Options: horizontal, vertical, both
+  overflow: auto; // Safari fix
+}
+
+// CSS3 Content Columns
+.content-columns(@columnCount, @columnGap: @gridGutterWidth) {
+  -webkit-column-count: @columnCount;
+     -moz-column-count: @columnCount;
+          column-count: @columnCount;
+  -webkit-column-gap: @columnGap;
+     -moz-column-gap: @columnGap;
+          column-gap: @columnGap;
+}
+
+// Optional hyphenation
+.hyphens(@mode: auto) {
+  word-wrap: break-word;
+  -webkit-hyphens: @mode;
+     -moz-hyphens: @mode;
+      -ms-hyphens: @mode;
+       -o-hyphens: @mode;
+          hyphens: @mode;
+}
+
+// Opacity
+.opacity(@opacity) {
+  opacity: (@opacity / 100);
+}
+
+// Position
+.absolute() {
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+}
+
+// BACKGROUNDS
+// --------------------------------------------------
+
+// Add an alphatransparency value to any background or border color (via Elyse Holladay)
+#translucent {
+  .background(@color: @white, @alpha: 1) {
+    background-color: hsla(hue(@color), saturation(@color), lightness(@color), @alpha);
+  }
+  .border(@color: @white, @alpha: 1) {
+    border-color: hsla(hue(@color), saturation(@color), lightness(@color), @alpha);
+    .background-clip(padding-box);
+  }
+}
+
+// Gradient Bar Colors for buttons and alerts
+.gradientBar(@primaryColor, @secondaryColor, @textColor: @white) {
+  color: @textColor;
+  #gradient > .vertical(@primaryColor, @secondaryColor);
+  border-color: @secondaryColor @secondaryColor darken(@secondaryColor, 15%);
+  border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
+}
+
+// Gradients
+#gradient {
+  .horizontal(@startColor: @gray, @endColor: @grayDark) {
+    background-color: @endColor;
+    background-image: -moz-linear-gradient(left, @startColor, @endColor); // FF 3.6+
+    background-image: -webkit-gradient(linear, 0 0, 100% 0, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
+    background-image: -webkit-linear-gradient(left, @startColor, @endColor); // Safari 5.1+, Chrome 10+
+    background-image: -o-linear-gradient(left, @startColor, @endColor); // Opera 11.10
+    background-image: linear-gradient(to right, @startColor, @endColor); // Standard, IE10
+    background-repeat: repeat-x;
+  }
+  .vertical(@startColor: @gray, @endColor: @grayDark) {
+    background-color: mix(@startColor, @endColor, 60%);
+    background-image: -moz-linear-gradient(top, @startColor, @endColor); // FF 3.6+
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
+    background-image: -webkit-linear-gradient(top, @startColor, @endColor); // Safari 5.1+, Chrome 10+
+    background-image: -o-linear-gradient(top, @startColor, @endColor); // Opera 11.10
+    background-image: linear-gradient(to bottom, @startColor, @endColor); // Standard, IE10
+    background-repeat: repeat-x;
+  }
+  .directional(@startColor: @gray, @endColor: @grayDark, @deg: 45deg) {
+    background-color: @endColor;
+    background-repeat: repeat-x;
+    background-image: -moz-linear-gradient(@deg, @startColor, @endColor); // FF 3.6+
+    background-image: -webkit-linear-gradient(@deg, @startColor, @endColor); // Safari 5.1+, Chrome 10+
+    background-image: -o-linear-gradient(@deg, @startColor, @endColor); // Opera 11.10
+    background-image: linear-gradient(@deg, @startColor, @endColor); // Standard, IE10
+  }
+  .horizontal-three-colors(@startColor: @lightBlueIcon, @midColor: @purple-l1, @colorStop: 50%, @endColor: @pink) {
+    background-color: mix(@midColor, @endColor, 80%);
+    background-image: -webkit-gradient(left, linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
+    background-image: -webkit-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
+    background-image: -moz-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
+    background-image: -o-linear-gradient(left, @startColor, @midColor @colorStop, @endColor);
+    background-image: linear-gradient(to right, @startColor, @midColor @colorStop, @endColor);
+    background-repeat: no-repeat;
+  }
+
+  .vertical-three-colors(@startColor: @lightBlueIcon, @midColor: @deepPurpleIcon, @colorStop: 50%, @endColor: @pink) {
+    background-color: mix(@midColor, @endColor, 80%);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), color-stop(@colorStop, @midColor), to(@endColor));
+    background-image: -webkit-linear-gradient(@startColor, @midColor @colorStop, @endColor);
+    background-image: -moz-linear-gradient(top, @startColor, @midColor @colorStop, @endColor);
+    background-image: -o-linear-gradient(@startColor, @midColor @colorStop, @endColor);
+    background-image: linear-gradient(@startColor, @midColor @colorStop, @endColor);
+    background-repeat: no-repeat;
+  }
+  .radial(@innerColor: @gray, @outerColor: @grayDark) {
+    background-color: @outerColor;
+    background-image: -webkit-gradient(radial, center center, 0, center center, 460, from(@innerColor), to(@outerColor));
+    background-image: -webkit-radial-gradient(circle, @innerColor, @outerColor);
+    background-image: -moz-radial-gradient(circle, @innerColor, @outerColor);
+    background-image: -o-radial-gradient(circle, @innerColor, @outerColor);
+    background-repeat: no-repeat;
+  }
+  .striped(@color: @gray, @angle: 45deg) {
+    background-color: @color;
+    background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, rgba(255,255,255,.15)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255,255,255,.15)), color-stop(.75, rgba(255,255,255,.15)), color-stop(.75, transparent), to(transparent));
+    background-image: -webkit-linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+    background-image: -moz-linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+    background-image: -o-linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+    background-image: linear-gradient(@angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+  }
+}
+
+.checkeredBackground(@backgroundColor: @white, @fillColor: @black, @fillOpacity: 0.1) {
+    background-image: url('data:image/svg+xml;charset=utf-8,\
+                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="@{fillColor}" fill-opacity="@{fillOpacity}" >\
+                            <rect x="50" width="50" height="50" />\
+                            <rect y="50" width="50" height="50" />\
+                        </svg>');
+    background-color: @backgroundColor;
+    background-size: 10px 10px;
+    background-repeat: repeat;
+}
+
+// COMPONENT MIXINS
+// --------------------------------------------------
+// Limit width of specific property editors
+.umb-property-editor--limit-width {
+    max-width: @propertyEditorLimitedWidth;
+}
+
+// Horizontal dividers
+// -------------------------
+// Dividers (basically an hr) within dropdowns and nav lists
+.nav-divider(@top: @gray-8, @bottom: @white) {
+  height: 1px;
+  margin: ((@baseLineHeight / 2) - 1) 1px; // 8px 1px
+  overflow: hidden;
+  background-color: @top;
+  border-bottom: 1px solid @bottom;
+}
+
+// Button backgrounds
+// ------------------
+.buttonBackground(@startColor, @hoverColor: @startColor, @textColor: @white, @textColorHover: @textColor, @disabledColor: @sand-1, @disabledTextColor: @white) {
+
+  color: @textColor;
+  border-color: @startColor @startColor darken(@startColor, 15%);
+  border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) fadein(rgba(0,0,0,.1), 15%);
+
+  background-color: @startColor;
+
+  .caret {
+      border-top-color: @textColor;
+      border-bottom-color: @textColor;
+  }
+
+  // in these cases the gradient won't cover the background, so we override
+  &:focus,
+  &:hover {
+    color: @textColorHover;
+    background-color: @hoverColor;
+    text-decoration: none;
+  }
+
+  &.disabled, &[disabled] {
+    background-color: @disabledColor;
+    color: @disabledTextColor;
+  }
+}
+
+// Navbar vertical align
+// -------------------------
+// Vertically center elements in the navbar.
+// Example: an element has a height of 30px, so write out `.navbarVerticalAlign(30px);` to calculate the appropriate top margin.
+.navbarVerticalAlign(@elementHeight) {
+  margin-top: ((@navbarHeight - @elementHeight) / 2);
+}
+
+
+
+// Grid System
+// -----------
+
+// Centered container element
+.container-fixed() {
+  margin-right: auto;
+  margin-left: auto;
+  .clearfix();
+}
+
+// Table columns
+.tableColumns(@columnSpan: 1) {
+  float: none; // undo default grid column styles
+  width: ((@gridColumnWidth * @columnSpan) + (@gridGutterWidth * (@columnSpan - 1)) - 16); // 16 is total padding on left and right of table cells
+  margin-left: 0; // undo default grid column styles
+}
+
+// Make a Grid
+// Use .makeRow and .makeColumn to assign semantic layouts grid system behavior
+.makeRow() {
+  margin-left: (@gridGutterWidth * -1);
+  .clearfix();
+}
+.makeColumn(@columns: 1, @offset: 0) {
+  float: left;
+  margin-left: ((@gridColumnWidth * @offset) + (@gridGutterWidth * (@offset - 1)) + (@gridGutterWidth * 2));
+  width: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1)));
+}
+
+// The Grid
+#grid {
+
+  .core (@gridColumnWidth, @gridGutterWidth) {
+
+    .spanX (@index) when (@index > 0) {
+      .span@{index} { .span(@index); }
+      .spanX((@index - 1));
+    }
+    .spanX (0) {}
+
+    .offsetX (@index) when (@index > 0) {
+      .offset@{index} { .offset(@index); }
+      .offsetX((@index - 1));
+    }
+    .offsetX (0) {}
+
+    .offset (@columns) {
+      margin-left: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns + 1)));
+    }
+
+    .span (@columns) {
+      width: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1)));
+    }
+
+    .row {
+      margin-left: (@gridGutterWidth * -1);
+      .clearfix();
+    }
+
+    [class*="span"] {
+      float: left;
+      min-height: 1px; // prevent collapsing columns
+      margin-left: @gridGutterWidth;
+    }
+
+    // Set the container width, and override it for fixed navbars in media queries
+    .container,
+    .navbar-static-top .container,
+    .navbar-fixed-top .container,
+    .navbar-fixed-bottom .container { .span(@gridColumns); }
+
+    // generate .spanX and .offsetX
+    .spanX (@gridColumns);
+    .offsetX (@gridColumns);
+
+  }
+
+  .fluid (@fluidGridColumnWidth, @fluidGridGutterWidth) {
+
+    .spanX (@index) when (@index > 0) {
+      .span@{index} { .span(@index); }
+      .spanX((@index - 1));
+    }
+    .spanX (0) {}
+
+    .offsetX (@index) when (@index > 0) {
+      .offset@{index} { .offset(@index); }
+      .offset@{index}:first-child { .offsetFirstChild(@index); }
+      .offsetX((@index - 1));
+    }
+    .offsetX (0) {}
+
+    .offset (@columns) {
+      margin-left: ((@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth * 2));
+    }
+
+    .offsetFirstChild (@columns) {
+      margin-left: ((@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth));
+    }
+
+    .span (@columns) {
+      width: ((@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)));
+    }
+
+    .row-fluid {
+      width: 100%;
+      .clearfix();
+      [class*="span"] {
+        .input-block-level();
+        float: left;
+        margin-left: @fluidGridGutterWidth;
+      }
+      [class*="span"]:first-child {
+        margin-left: 0;
+      }
+
+      // Space grid-sized controls properly if multiple per line
+      .controls-row [class*="span"] + [class*="span"] {
+        margin-left: @fluidGridGutterWidth;
+      }
+
+      // generate .spanX and .offsetX
+      .spanX (@gridColumns);
+      .offsetX (@gridColumns);
+    }
+
+  }
+
+  .input(@gridColumnWidth, @gridGutterWidth) {
+
+    .spanX (@index) when (@index > 0) {
+      input.span@{index}, textarea.span@{index}, .uneditable-input.span@{index} { .span(@index); }
+      .spanX((@index - 1));
+    }
+    .spanX (0) {}
+
+    .span(@columns) {
+      width: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1)) - 14);
+    }
+
+    input,
+    textarea,
+    .uneditable-input {
+      margin-left: 0; // override margin-left from core grid system
+    }
+
+    // Space grid-sized controls properly if multiple per line
+    .controls-row [class*="span"] + [class*="span"] {
+      margin-left: @gridGutterWidth;
+    }
+
+    // generate .spanX
+    .spanX (@gridColumns);
+
+  }
+}

@@ -1,0 +1,95 @@
+.umb-mini-list-view__title {
+    display: flex;
+    align-items: center;
+}
+
+.umb-mini-list-view__title-text {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.umb-mini-list-view__title-icon {
+    font-size: 20px; 
+    margin-right: 5px;
+}
+
+.umb-mini-list-view__breadcrumb {
+    .flex;
+    margin-bottom: 10px;
+    min-height: 25px;
+}
+
+.umb-mini-list-view__back {
+    font-size: 13px;
+    margin-right: 5px;
+    color: @gray-4;
+    display: flex;
+    align-items: center;
+}
+
+.umb-mini-list-view__back-icon {
+    margin-right: 4px;
+    height: 11px;
+    line-height: 11px;
+}
+
+.umb-mini-list-view__back-text {
+    text-decoration: underline;
+    margin-right: 5px;
+}
+
+.umb-mini-list-view__back:hover {
+    opacity: 1;
+    text-decoration: none;
+    color: @black;
+}
+
+.umb-minilistview {
+    overflow: hidden;
+}
+
+/* Animations */
+.umb-mini-list-view.ng-animate {
+    transition: 120ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    position: relative;
+    display: block;
+}
+
+/* Forward */ 
+.umb-mini-list-view--forward.ng-enter {
+    left: 100%;
+    opacity: 0;
+}
+
+.umb-mini-list-view--forward.ng-enter.ng-enter-active {
+    left: 0;
+    opacity: 1;
+}
+
+.umb-mini-list-view--forward.ng-leave {
+    left: 0;
+}
+
+.umb-mini-list-view--forward.ng-leave.ng-leave-active {
+    left: -100%;
+    opacity: 0;
+}
+
+/* Backwards */
+.umb-mini-list-view--backwards.ng-enter {
+    right: 100%;
+}
+
+.umb-mini-list-view--backwards.ng-enter.ng-enter-active {
+    right: 0;
+    opacity: 1;
+}
+
+.umb-mini-list-view--backwards.ng-leave {
+    left: 0;
+}
+
+.umb-mini-list-view--backwards.ng-leave.ng-leave-active {
+    right: -100%;
+    opacity: 0;
+}

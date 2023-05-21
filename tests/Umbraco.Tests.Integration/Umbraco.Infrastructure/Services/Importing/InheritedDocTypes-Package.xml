@@ -1,0 +1,434 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <files />
+  <info>
+    <package>
+      <name>DocTypeError</name>
+    </package>
+  </info>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>MR Basisseite</Name>
+        <Key>02e4e119-2eeb-4b92-9880-0c35d66a16b2</Key>
+        <Alias>MRBasePage</Alias>
+        <Icon>folder.gif</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>Basistyp für alle Seiten der MR-Racing Website.</Description>
+        <AllowAtRoot>False</AllowAtRoot>
+        <AllowedTemplates />
+        <DefaultTemplate>
+        </DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Beschreibung</Name>
+          <Alias>description</Alias>
+          <Type>60b7dabf-99cd-41eb-b8e9-4d2e669bbde9</Type>
+          <Definition>1251c96c-185c-4e9b-93f4-b48205573cbd</Definition>
+          <Tab>Metadaten</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Eine kurze Beschreibung der aktuellen Seite für eine bessere Indexierung durch Suchmaschinen (max. 255 Zeichen).]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Keywords</Name>
+          <Alias>keywords</Alias>
+          <Type>60b7dabf-99cd-41eb-b8e9-4d2e669bbde9</Type>
+          <Definition>1251c96c-185c-4e9b-93f4-b48205573cbd</Definition>
+          <Tab>Metadaten</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Komma-separtierte Auflistung von Stichwörter für die Indexierung von Suchmaschinen. Beispiel: MR Racing, Tuning, Chiptuning, Autozubehör.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>In der Navigation ausblenden</Name>
+          <Alias>hideInNavigation</Alias>
+          <Type>38b352c1-e9f8-4fd8-9324-9a2eab06d97a</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab>
+          </Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Selektieren damit dieser Eintrag nicht in der Navigation erscheint.]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>6</Id>
+          <Caption>Metadaten</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>MR Startseite</Name>
+        <Key>4ecde940-89bd-47c2-9c9c-3cfcc32e8e52</Key>
+        <Alias>MRStartPage</Alias>
+        <Icon>folder.gif</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description>Die Startseite des Internetauftritts von MR Racing.</Description>
+        <AllowAtRoot>True</AllowAtRoot>
+        <Master>MRBasePage</Master>
+        <AllowedTemplates>
+          <Template>MRStartPage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>MRStartPage</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>MRContentPage</DocumentType>
+        <DocumentType>MRNewsSummary</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Facebook App ID</Name>
+          <Alias>facebookAppID</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Facebook</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Hier bitte die ID Ihrer Facebook App eingeben damit der "Gefällt mir" Link sowie die Kommentar Felder geladen werden können.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Facebook Like URL</Name>
+          <Alias>facebookLikeUrl</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Facebook</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Hier bitte die URL angeben für welche der "Gefällt mir" Link von Facebook gilt.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Facebook Seite URL</Name>
+          <Alias>facebookSiteUrl</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Facebook</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Hier bitte die URL der Facebook Seite von MR Racing angeben für den Link in den Fussnoten.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Titel der Webseite</Name>
+          <Alias>websiteTitle</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Metadaten</Tab>
+          <Mandatory>True</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Angabe des globalen Webseiten-Titels für die Suchmaschinen.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Autor</Name>
+          <Alias>author</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Metadaten</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Angabe des Besitzers / des Autors der Webseiten-Inhalte.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Generator</Name>
+          <Alias>generator</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Metadaten</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Angabe des Verwaltungssystem welches die Inhaltsausgabe erstellt. zB. Umbraco v6.0.2]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Web-Autor</Name>
+          <Alias>webAuthor</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Metadaten</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Angabe des Erstellers / Programmierers der Webseite.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Titel</Name>
+          <Alias>titleBoxRight</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Angebot Rechts</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Der Titel des Angebots.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Newstitel</Name>
+          <Alias>newsTitle</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>News</Tab>
+          <Mandatory>True</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Titel der Box welche die Neuigkeiten auflistet.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Anzanl News</Name>
+          <Alias>numberOfNews</Alias>
+          <Type>1413afcb-d19a-4173-8e9a-68288d2a73b8</Type>
+          <Definition>2e6d3631-066e-44b8-aec4-96f09099b2b5</Definition>
+          <Tab>News</Tab>
+          <Mandatory>True</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Angabe wieviele News-Einträge inder News-Box visualisiert werden sollen. Standard sind 5.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Link</Name>
+          <Alias>linkBoxRight</Alias>
+          <Type>158aa029-24ed-4948-939e-c3da209e5fba</Type>
+          <Definition>a6857c73-d6e9-480c-b6e6-f15f6ad11125</Definition>
+          <Tab>Angebot Rechts</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Optionale Angabe eines Seite welcher als Link hinter die Box gelegt wird so dass ein Besucher per Klick zur passenden Seite weitergeleitet wird.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Bild</Name>
+          <Alias>imageBoxRight</Alias>
+          <Type>ead69342-f06d-4253-83ac-28000225583b</Type>
+          <Definition>93929b9a-93a2-4e2a-b239-d99334440a59</Definition>
+          <Tab>Angebot Rechts</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Optionales Bild für das Angebot.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Bildbreite</Name>
+          <Alias>imageWidthBoxRight</Alias>
+          <Type>1413afcb-d19a-4173-8e9a-68288d2a73b8</Type>
+          <Definition>2e6d3631-066e-44b8-aec4-96f09099b2b5</Definition>
+          <Tab>Angebot Rechts</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>^([6-9][0-9]|1[0-9]{2}|2[0-7][0-9]|280)$</Validation>
+          <Description><![CDATA[Optionale Angabe der Bildbreite. Das Bild muss mindestens 60 breit sein. Das Maxium ist 280. Standard ist 120.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Inhalt</Name>
+          <Alias>contentBoxRight</Alias>
+          <Type>60b7dabf-99cd-41eb-b8e9-4d2e669bbde9</Type>
+          <Definition>1251c96c-185c-4e9b-93f4-b48205573cbd</Definition>
+          <Tab>Angebot Rechts</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Der Textinhalt des Angebots.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Titel</Name>
+          <Alias>titleBoxMiddle</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Angebot Mitte</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Der Titel des Angebots.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Link</Name>
+          <Alias>linkBoxMiddle</Alias>
+          <Type>158aa029-24ed-4948-939e-c3da209e5fba</Type>
+          <Definition>a6857c73-d6e9-480c-b6e6-f15f6ad11125</Definition>
+          <Tab>Angebot Mitte</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Optionale Angabe eines Seite welcher als Link hinter die Box gelegt wird so dass ein Besucher per Klick zur passenden Seite weitergeleitet wird.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Bild</Name>
+          <Alias>imageBoxMiddle</Alias>
+          <Type>ead69342-f06d-4253-83ac-28000225583b</Type>
+          <Definition>93929b9a-93a2-4e2a-b239-d99334440a59</Definition>
+          <Tab>Angebot Mitte</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Optionales Bild für das Angebot.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Bildbreite</Name>
+          <Alias>imageWidthBoxMiddle</Alias>
+          <Type>1413afcb-d19a-4173-8e9a-68288d2a73b8</Type>
+          <Definition>2e6d3631-066e-44b8-aec4-96f09099b2b5</Definition>
+          <Tab>Angebot Mitte</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>^([6-9][0-9]|1[0-9]{2}|2[0-7][0-9]|280)$</Validation>
+          <Description><![CDATA[Optionale Angabe der Bildbreite. Das Bild muss mindestens 60 breit sein. Das Maxium ist 280. Standard ist 120.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Inhalt</Name>
+          <Alias>contentBoxMiddle</Alias>
+          <Type>60b7dabf-99cd-41eb-b8e9-4d2e669bbde9</Type>
+          <Definition>1251c96c-185c-4e9b-93f4-b48205573cbd</Definition>
+          <Tab>Angebot Mitte</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Der Textinhalt des Angebots.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Titel</Name>
+          <Alias>titleBoxLeft</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Angebot Links</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Der Titel des Angebots.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Link</Name>
+          <Alias>linkBoxLeft</Alias>
+          <Type>158aa029-24ed-4948-939e-c3da209e5fba</Type>
+          <Definition>a6857c73-d6e9-480c-b6e6-f15f6ad11125</Definition>
+          <Tab>Angebot Links</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Optionale Angabe eines Seite welcher als Link hinter die Box gelegt wird so dass ein Besucher per Klick zur passenden Seite weitergeleitet wird.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Bild</Name>
+          <Alias>imageBoxLeft</Alias>
+          <Type>ead69342-f06d-4253-83ac-28000225583b</Type>
+          <Definition>93929b9a-93a2-4e2a-b239-d99334440a59</Definition>
+          <Tab>Angebot Links</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Optionales Bild für das Angebot.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Bildbreite</Name>
+          <Alias>imageWidthBoxLeft</Alias>
+          <Type>1413afcb-d19a-4173-8e9a-68288d2a73b8</Type>
+          <Definition>2e6d3631-066e-44b8-aec4-96f09099b2b5</Definition>
+          <Tab>Angebot Links</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>^([6-9][0-9]|1[0-9]{2}|2[0-7][0-9]|280)$</Validation>
+          <Description><![CDATA[Optionale Angabe der Bildbreite. Das Bild muss mindestens 60 breit sein. Das Maxium ist 280. Standard ist 120.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Inhalt</Name>
+          <Alias>contentBoxLeft</Alias>
+          <Type>60b7dabf-99cd-41eb-b8e9-4d2e669bbde9</Type>
+          <Definition>1251c96c-185c-4e9b-93f4-b48205573cbd</Definition>
+          <Tab>Angebot Links</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Der Textinhalt des Angebots.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Inhaltstitel</Name>
+          <Alias>contentTitle</Alias>
+          <Type>ec15c1e5-9d90-422a-aa52-4f7622c63bea</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Inhalt</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Der Titel des Inhaltsbereichs.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Inhaltstitel verbergen</Name>
+          <Alias>hideContentTitle</Alias>
+          <Type>38b352c1-e9f8-4fd8-9324-9a2eab06d97a</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab>Inhalt</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Selektieren um den Titelbalken für den Inhaltsbereich zu verbergen.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Inhaltspadding weglassen</Name>
+          <Alias>hideContentPadding</Alias>
+          <Type>38b352c1-e9f8-4fd8-9324-9a2eab06d97a</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab>Inhalt</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[Selektieren um das Padding zwischen Inhalt und Rahmen im Inhaltsbereich auszuschalten.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Inhalt</Name>
+          <Alias>content</Alias>
+          <Type>5e9b75ae-face-41c8-b47e-5f4b0fd82f83</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Inhalt</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation>
+          </Validation>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>9</Id>
+          <Caption>Inhalt</Caption>
+        </Tab>
+        <Tab>
+          <Id>10</Id>
+          <Caption>Angebot Links</Caption>
+        </Tab>
+        <Tab>
+          <Id>11</Id>
+          <Caption>Angebot Mitte</Caption>
+        </Tab>
+        <Tab>
+          <Id>12</Id>
+          <Caption>Angebot Rechts</Caption>
+        </Tab>
+        <Tab>
+          <Id>13</Id>
+          <Caption>News</Caption>
+        </Tab>
+        <Tab>
+          <Id>14</Id>
+          <Caption>Facebook</Caption>
+        </Tab>
+        <Tab>
+          <Id>15</Id>
+          <Caption>Metadaten</Caption>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+  </DocumentTypes>
+  <Templates />
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+  <Actions>
+    <Action runat="install" undo="true" alias="AddServiceHostingEnvironment" multipleSiteBindingsEnabled="true" aspNetCompatibilityEnabled="true" />
+  </Actions>
+</umbPackage>

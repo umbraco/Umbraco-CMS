@@ -1,0 +1,50 @@
+.umb-progress-bar {
+    background: @gray-8;
+    width: 100%;
+    display: block;
+    height: 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.umb-progress-bar__progress {
+    background: @green;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    border-radius: 10px;
+
+    &--primary {
+        background: @blue;
+    }
+
+    &--secondary {
+        background: @purple;
+    }
+
+    &--success {
+        background: @green;
+    }
+
+    &--warning {
+        background: @yellow;
+    }
+
+    &--danger {
+        background: @red;
+    }
+}
+
+.umb-progress-bar--s {
+    height: 5px;
+    border-radius: 5px;
+}
+
+.umb-progress-bar--m {
+    height: 10px;
+    border-radius: 10px;
+}

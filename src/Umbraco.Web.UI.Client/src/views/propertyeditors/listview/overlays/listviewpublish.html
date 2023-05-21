@@ -1,0 +1,49 @@
+<div ng-controller="Umbraco.Overlays.ListViewPublishController as vm">
+
+        <!-- Single language -->
+        <div ng-if="!vm.languages">
+            <p><localize key="prompt_confirmListViewPublish">Publishing will make the selected items visible on the site.</localize></p>
+        </div>
+
+        <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+                <umb-load-indicator></umb-load-indicator>
+        </div>
+
+        <!-- Multiple languages -->
+        <div ng-if="vm.languages.length > 1 && !vm.loading">
+
+            <div class="mb3">
+                <p><localize key="content_languagesToPublish">What languages would you like to publish?</localize></p>
+            </div>
+
+            <div class="umb-list umb-list--condensed">
+
+                <div class="bold mb1">
+                    <localize key="treeHeaders_languages">Languages</localize>
+                </div>
+
+                <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
+                    <ng-form name="publishLanguageSelectorForm">
+                        <div>
+
+                            <umb-checkbox name="publishLanguageSelector"
+                                          model="language.publish"
+                                          on-change="vm.changeSelection(language)"
+                                          text="{{language.name}}">
+                            </umb-checkbox>
+
+                            <div>
+                                <span class="db umb-list-item__description umb-list-item__description--checkbox">
+                                    <span ng-if="language.isMandatory"><localize key="languages_mandatoryLanguage">Mandatory language</localize></span>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </ng-form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>

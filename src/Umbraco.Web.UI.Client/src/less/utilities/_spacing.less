@@ -1,0 +1,95 @@
+/*
+    Spacing
+*/
+
+@spacing-none: 0;
+@spacing-extra-small: .25rem;
+@spacing-small: .5rem;
+@spacing-medium: 1rem;
+@spacing-large: 2rem;
+@spacing-extra-large: 4rem;
+@spacing-extra-extra-large: 8rem;
+@spacing-extra-extra-extra-large: 16rem;
+
+/*
+   SPACING
+   An eight step powers of two scale ranging from 0 to 16rem.
+   Namespaces are composable and thus highly grockable - check the legend below
+   Legend:
+   p = padding
+   m = margin
+   a = all
+   h = horizontal
+   v = vertical
+   t = top
+   r = right
+   b = bottom
+   l = left
+   0 = none
+   1 = 1st step in spacing scale
+   2 = 2nd step in spacing scale
+   3 = 3rd step in spacing scale
+   4 = 4th step in spacing scale
+   5 = 5th step in spacing scale
+   6 = 6th step in spacing scale
+   7 = 7th step in spacing scale
+*/
+
+.m-center,
+.mx-auto {
+    margin-left: auto; 
+    margin-right: auto;
+}
+
+.my-auto {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.mt-auto { margin-top: auto; }
+.mb-auto { margin-bottom: auto; }
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
+
+.mt0 { margin-top: @spacing-none; }
+.mt1 { margin-top: @spacing-extra-small; }
+.mt2 { margin-top: @spacing-small; }
+.mt3 { margin-top: @spacing-medium; }
+.mt4 { margin-top: @spacing-large; }
+.mt5 { margin-top: @spacing-extra-large; }
+.mt6 { margin-top: @spacing-extra-extra-large; }
+.mt7 { margin-top: @spacing-extra-extra-extra-large; }
+
+.mb0 { margin-bottom: @spacing-none; }
+.mb1 { margin-bottom: @spacing-extra-small; }
+.mb2 { margin-bottom: @spacing-small; }
+.mb3 { margin-bottom: @spacing-medium; }
+.mb4 { margin-bottom: @spacing-large; }
+.mb5 { margin-bottom: @spacing-extra-large; }
+.mb6 { margin-bottom: @spacing-extra-extra-large; }
+.mb7 { margin-bottom: @spacing-extra-extra-extra-large; }
+
+.ml0 { margin-left: @spacing-none; }
+.ml1 { margin-left: @spacing-extra-small; }
+.ml2 { margin-left: @spacing-small; }
+.ml3 { margin-left: @spacing-medium; }
+.ml4 { margin-left: @spacing-large; }
+.ml5 { margin-left: @spacing-extra-large; }
+.ml6 { margin-left: @spacing-extra-extra-large; }
+.ml7 { margin-left: @spacing-extra-extra-extra-large; }
+
+.mr0 { margin-right: @spacing-none; }
+.mr1 { margin-right: @spacing-extra-small; }
+.mr2 { margin-right: @spacing-small; }
+.mr3 { margin-right: @spacing-medium; }
+.mr4 { margin-right: @spacing-large; }
+.mr5 { margin-right: @spacing-extra-large; }
+.mr6 { margin-right: @spacing-extra-extra-large; }
+.mr7 { margin-right: @spacing-extra-extra-extra-large; }
+
+.p0 { padding: @spacing-none; }
+
+.pt0 { padding-top: @spacing-none; }
+.pb0 { padding-bottom: @spacing-none; }
+.pl0 { padding-left: @spacing-none; }
+.pr0 { padding-right: @spacing-none; }

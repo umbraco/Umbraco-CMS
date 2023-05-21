@@ -1,0 +1,65 @@
+.umb-layout-selector {
+   display: inline-block;
+   position: relative;
+}
+
+.umb-layout-selector__active-layout {
+   background: transparent;
+   box-sizing: border-box;
+   border: 1px solid @ui-action-discreet-border;
+   color: @ui-action-discreet-type;
+   cursor: pointer;
+   height: 30px;
+   width: 30px;
+   font-size: 20px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.umb-layout-selector__active-layout:hover {
+   border-color: @ui-action-discreet-border-hover;
+   color: @ui-action-discreet-type-hover;
+}
+
+.umb-layout-selector__dropdown {
+   position: absolute;
+   padding: 5px;
+   background: @grayDark;
+   z-index: 999;
+   display: flex;
+   background: @white;
+   flex-wrap: wrap;
+   flex-direction: column;
+   transform: translate(-50%,0);
+   left: 50%;
+   border-radius: 3px;
+}
+
+.umb-layout-selector__dropdown-item {
+   background: transparent;
+   padding: 5px;
+   margin: 3px 5px;
+   display: flex;
+   align-content: center;
+   justify-content: center;
+   border: 1px solid transparent;
+   flex-direction: column;
+   cursor: pointer;
+}
+
+.umb-layout-selector__dropdown-item:hover {
+   border: 1px solid @ui-action-discreet-border;
+}
+
+.umb-layout-selector__dropdown-item.-active {
+   border: 1px solid @ui-action-discreet-border-hover;
+}
+
+.umb-layout-selector__dropdown-item-icon,
+.umb-layout-selector__dropdown-item-icon[class^="icon-"],
+.umb-layout-selector__dropdown-item-icon[class*=" icon-"] {
+   font-size: 20px;
+   color: @gray;
+   text-align: center;
+}

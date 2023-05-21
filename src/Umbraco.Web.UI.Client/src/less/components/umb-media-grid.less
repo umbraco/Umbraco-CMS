@@ -1,0 +1,252 @@
+.umb-media-grid {
+   display: flex;
+   flex-wrap: wrap;
+   flex-direction: row;
+   flex-wrap: wrap;
+   align-items: center;
+   width: 100%;
+   margin-bottom: 30px;
+}
+
+.umb-media-grid__item {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    align-content: center;
+    align-items: center;
+    align-self: stretch;
+
+    border-radius: @baseBorderRadius;
+
+    margin: 10px;
+    position: relative;
+    user-select: none;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
+    transition: box-shadow 150ms ease-in-out;
+
+    > div {
+        overflow: hidden;
+        border-radius: @baseBorderRadius;
+    }
+
+}
+
+.umb-media-grid__item.-selectable, 
+.umb-media-grid__item.-folder {// If folders isnt selectable, they opens if clicked, therefor...
+    cursor: pointer;
+}
+
+.umb-media-grid__item.-file {
+    background-color: @white;
+}
+
+.umb-media-grid__item.-folder {
+    &.-selectable {
+        .media-grid-item-edit:hover .umb-media-grid__item-name,
+        .media-grid-item-edit:focus .umb-media-grid__item-name {
+            text-decoration: underline;
+        }
+    }
+}
+
+
+.umb-media-grid__item.-selected {
+    color:@ui-selected-type;
+    .umb-media-grid__item-overlay {
+        color: @ui-selected-type;
+    }
+}
+.umb-media-grid__item.-selected, 
+.umb-media-grid__item.-selectable:hover {
+    .umb-media-grid__item-select {
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid @ui-selected-border;
+        border-radius: 5px;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
+    }
+}
+.umb-media-grid__item.-selectable:hover {
+    .umb-media-grid__item-select {
+        opacity: .33;
+    }
+}
+.umb-media-grid__item.-selected:hover {
+    .umb-media-grid__item-select {
+        opacity: .75;
+    }
+}
+.umb-media-grid__item.-filtered:not(.-folder) {
+    cursor:not-allowed;
+    * {
+        pointer-events: none;
+    }
+}
+
+.umb-media-grid__item-file-icon {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top: 45%;
+    left: 50%;
+}
+
+.umb-media-grid__item:hover {
+   text-decoration: none;
+}
+
+.umb-media-grid__item-image {
+   position: relative;
+   object-fit: contain;
+   height: 100%;
+}
+
+.umb-media-grid__item-image-placeholder {
+    width: 100%;
+    position: relative;
+    object-fit: contain;
+    height: 100%;
+}
+
+.umb-media-grid__image-background {
+    content: "";
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    .checkeredBackground();
+}
+
+.umb-media-grid__item-overlay {
+   display: flex;
+   align-items: center;
+   width: 100%;
+   opacity: 0;
+   position: absolute;
+   right: 0;
+   bottom: 0;
+   left: 0;
+   z-index: 1;
+   padding: 5px 10px;
+   box-sizing: border-box;
+   font-size: 12px;
+   overflow: hidden;
+   color: @black;
+   white-space: nowrap;
+   border-top:1px solid fade(@black, 4%);
+   background: fade(@white, 92%);
+   transition: opacity 150ms;
+
+   &.-can-open:hover {
+       text-decoration: underline;
+   }
+   
+   .tabbing-active &:focus {
+       opacity: 1;
+   }
+}
+
+.umb-media-grid__info {
+    margin-right: 5px;
+}
+
+.umb-media-grid__item-overlay.-locked {
+    opacity: 1;
+}
+
+.umb-media-grid__item:hover .umb-media-grid__item-overlay {
+   opacity: 1;
+   i {
+       text-decoration: none;
+   }
+}
+
+.umb-media-grid__item-overlay {
+    cursor: pointer;
+
+    &:hover .umb-media-grid__item-name{
+        text-decoration: underline;
+    }
+}
+
+.umb-media-grid__item-overlay:not(.-selected) {
+    &:hover + .umb-media-grid__item-select {
+        display: none;
+    }
+}
+
+.umb-media-grid__item-name {
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+
+}
+
+
+.umb-media-grid__edit {
+    position: absolute;
+    opacity: 0;
+    z-index: 2;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    background: @white;
+    border-radius: 50px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: @black;
+    transition: opacity 150ms;
+    
+    &:hover {
+        color: @ui-action-discreet-type-hover;
+    }
+}
+
+.umb-media-grid__item:hover .umb-media-grid__edit {
+    opacity: 1;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+
+/*for the listview*/
+
+.umb-media-grid__list-item.selected, .umb-media-grid__list-item.selected:hover, .umb-media-grid__list-item.selected:focus {
+    border: 2px solid #f5c1bc !important;
+}
+.umb-media-grid__list-item-name:hover {
+    text-decoration:underline;
+} 
+.umb-media-grid__list-item.-filtered:not(.-folder) {
+  cursor: not-allowed;
+
+  * {
+    pointer-events: none;
+  }
+}
+
+
+.umb-media-grid__list-view .umb-table-cell.umb-table__name {
+    flex: 1 1 25%;
+    max-width: none;
+    white-space: normal;
+}
+
+.umb-media-grid__list-view .umb-table-cell.umb-table__name .item-name {
+    white-space:normal;
+}
+.umb-media-grid__list-view .umb-table-cell.umb-table__name ins {
+    text-decoration: none;
+    margin-top: 3px;
+}

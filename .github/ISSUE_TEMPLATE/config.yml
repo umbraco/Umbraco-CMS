@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+    - name: 💡 Features and ideas
+      url: https://github.com/umbraco/Umbraco-CMS/discussions/new?category=features-and-ideas
+      about: Start a new discussion when you have ideas or feature requests, eventually discussions can turn into plans
+    - name: ⁉️ Support Question
+      url: https://our.umbraco.com
+      about: This issue tracker is NOT meant for support questions. If you have a question, please join us on the forum.
+    - name: 📖 Documentation Issue
+      url: https://github.com/umbraco/UmbracoDocs/issues
+      about: Documentation issues should be reported on the Umbraco documentation repository.
+    - name: 🔐 Security Issue
+      url: https://umbraco.com/about-us/trust-center/security-and-umbraco/how-to-report-a-vulnerability-in-umbraco/
+      about: Discovered a Security Issue in Umbraco?

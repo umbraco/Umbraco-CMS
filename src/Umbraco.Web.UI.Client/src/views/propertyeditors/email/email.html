@@ -1,0 +1,19 @@
+<div ng-controller="Umbraco.PropertyEditors.EmailController">
+    <ng-form name="emailFieldForm">
+        <input type="email"
+               name="textbox"
+               ng-model="model.value"
+               id="{{model.alias}}"
+               class="umb-property-editor umb-textstring textstring"
+               val-email
+               ng-required="model.config.IsRequired || model.validation.mandatory"
+               val-server="value"
+               ng-readonly="readonly" />
+
+        <div ng-messages="emailFieldForm.textbox.$error" show-validation-on-submit>
+            <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
+            <p class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></p>
+            <p class="help-inline" ng-message="valServer">{{emailFieldForm.textbox.errorMsg}}</p>
+        </div>
+    </ng-form>
+</div>

@@ -1,0 +1,60 @@
+name: "Code scanning - action"
+
+on:
+  push:
+    branches:
+    - '*/dev'
+    - '*/contrib'
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches:
+    - '*/dev'
+    - '*/contrib'
+
+permissions:
+  contents: read
+
+env:
+  dotnetVersion: 7.x
+  dotnetIncludePreviewVersions: true
+  solution: umbraco.sln
+  buildConfiguration: SkipTests
+  DOTNET_NOLOGO: true
+  DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  CodeQL-Build:
+    permissions:
+      actions: read # for github/codeql-action/init to get workflow details
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/analyze to upload SARIF results
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        config-file: ./.github/config/codeql-config.yml
+
+    - name: Use .NET ${{ env.dotnetVersion }}
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: ${{ env.dotnetVersion }}
+        include-prerelease: ${{ env.dotnetIncludePreviewVersions }}
+
+    - name: Run dotnet restore
+      run: dotnet restore ${{ env.solution }}
+
+    - name: Run dotnet build
+      run: dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-restore -p:ContinuousIntegrationBuild=true
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2

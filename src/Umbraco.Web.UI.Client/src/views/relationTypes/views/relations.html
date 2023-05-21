@@ -1,0 +1,39 @@
+<umb-load-indicator ng-if="model.relationsLoading"></umb-load-indicator>
+
+<umb-box ng-if="model.relationsLoading === false">
+    <umb-box-content class="block-form">
+
+        <umb-empty-state size="small" ng-if="model.relations.totalItems === 0">
+            <localize key="relationType_noRelations">No relations for this relation type.</localize>
+        </umb-empty-state>
+
+        <!-- Relations -->
+        <umb-control-group label="@relationType_relations" ng-if="model.relations.items.length > 0">
+            <div>
+                <table class="table">
+                    <tr>
+                        <th><localize key="relationType_parent">Parent</localize></th>
+                        <th><localize key="relationType_child">Child</localize></th>
+                        <th><localize key="relationType_created">Created</localize></th>
+                        <th><localize key="relationType_comment">Comment</localize></th>
+                    </tr>
+                    <tr ng-repeat="relation in model.relations.items">
+                        <td>{{relation.parentName}}</td>
+                        <td>{{relation.childName}}</td>
+                        <td>{{relation.timestampFormatted}}</td>
+                        <td>{{relation.comment}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center">
+                <umb-pagination ng-if="model.relations.totalPages"
+                                page-number="model.relations.pageNumber"
+                                total-pages="model.relations.totalPages"
+                                on-change="model.changePageNumber(pageNumber)">
+                </umb-pagination>
+            </div>
+        </umb-control-group>
+    </umb-box-content>
+</umb-box>

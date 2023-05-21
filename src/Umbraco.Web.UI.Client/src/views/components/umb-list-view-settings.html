@@ -1,0 +1,51 @@
+<div class="umb-list-view-settings">
+
+  <div class="umb-list-view-settings__trigger">
+        <umb-toggle
+            checked="enableListView"
+            on-click="toggle()"
+            hotkey="alt+shift+l">
+        </umb-toggle>
+  </div>
+
+  <!-- list view enabled -->
+  <div ng-if="enableListView" class="flex">
+    <div class="umb-list-view-settings__box">
+        <div class="flex">
+            <umb-icon icon="icon-list" class="umb-list-view-settings__list-view-icon"></umb-icon>
+            <div>
+                <div class="umb-list-view-settings__name">
+                    {{dataType.name}} 
+                    <em ng-if="!customListViewCreated">(<localize key="general_default">default</localize>)</em>
+                </div>
+                <button type="button"
+                        class="btn-link umb-list-view-settings__create-new"
+                        ng-if="!customListViewCreated"
+                        ng-click="createCustomListViewDataType()">
+                    <localize key="editcontenttype_createListView">Create custom list view</localize>
+                </button>
+                <button type="button"
+                        class="btn-link umb-list-view-settings__remove-new"
+                        ng-if="customListViewCreated"
+                        ng-click="removeCustomListDataType()">
+                    <localize key="editcontenttype_removeListView">Remove custom list view</localize>
+                </button>
+            </div>
+        </div>
+        <umb-load-indicator ng-show="loading"></umb-load-indicator>
+    </div>    
+    <div class="umb-group-builder__property-actions">
+        <div class="umb-group-builder__property-action">
+            <button type="button"
+                    class="btn-icon"
+                    ng-click="showSettingsOverlay()"
+                    aria-label="Edit"
+                    localize="title"
+                    title="@general_edit">
+                <umb-icon icon="icon-settings"></umb-icon>
+            </button>
+        </div>
+    </div>
+  </div>
+
+</div>

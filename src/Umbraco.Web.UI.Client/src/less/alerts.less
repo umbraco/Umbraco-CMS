@@ -1,0 +1,144 @@
+//
+// Alerts
+// --------------------------------------------------
+
+
+// Base styles
+// -------------------------
+
+.alert {
+  position: relative;
+  padding: 8px 35px 8px 14px;
+  margin-bottom: @baseLineHeight;
+  background-color: @warningBackground;
+  border: 1px solid @warningBorder;
+  .border-radius(@alertBorderRadius);
+}
+.alert,
+.alert h4,
+.alert a {
+  // Specified for the h4 to prevent conflicts of changing @headingsColor
+  color: @warningText;
+}
+.alert h4 {
+  margin: 0;
+}
+
+// Adjust close link position
+.alert .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  line-height: @baseLineHeight;
+}
+
+.close.-align-right {
+   right: 0;
+}
+
+
+// Alternate styles
+// -------------------------
+
+.alert-success {
+  background-color: @successBackground;
+  border-color: @successBorder;
+  color: @successText;
+}
+.alert-success h4 {
+  color: @successText;
+}
+.alert-danger,
+.alert-error {
+  background-color: @errorBackground;
+  border-color: @errorBorder;
+  color: @errorText;
+}
+
+.alert-warning() {
+    background-color: @warningBackground;
+    border-color: @warningBorder;
+    color: @warningText;
+}
+.alert-warning {
+    .alert-warning()
+}
+.alert-danger h4,
+.alert-error h4 {
+  color: @errorText;
+}
+.alert-info {
+  background-color: @infoBackground;
+  border-color: @infoBorder;
+  color: @infoText;
+}
+.alert-info h4 {
+  color: @infoText;
+}
+
+.alert-form {
+  background-color: @white;
+  border: 1px solid @gray-3 !important;
+  color: @gray-3;
+  box-shadow: 0 -1px 6px 0 rgba(0,0,0,0.16);
+}
+
+.alert-form.-no-border {
+   border: none !important;
+}
+
+.alert-form h4 {
+  color: @black;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+
+// Block alerts
+// -------------------------
+
+.alert-block {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.alert-block > p,
+.alert-block > ul {
+  margin-bottom: 0;
+}
+.alert-block p + p {
+  margin-top: 5px;
+}
+
+
+// Property error alerts
+// -------------------------
+.alert.property-error {
+
+    display: inline-block;
+    font-size: 14px;
+    padding: 6px 16px 6px 12px;
+    margin-bottom: 6px;
+
+    .show-validation-type-warning & {
+        .alert-warning();
+        font-weight: bold;
+        &.alert-error::after {
+            border-top-color: @warningBackground;
+        }
+    }
+
+    &::after {
+        content:'';
+        position: absolute;
+        bottom:-6px;
+        left: 6px;
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid;
+    }
+    &.alert-error::after {
+        border-top-color: @errorBackground;
+    }
+}

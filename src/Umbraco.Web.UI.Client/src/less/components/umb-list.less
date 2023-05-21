@@ -1,0 +1,56 @@
+.umb-list--condensed {
+    .umb-list-item {
+        padding-top: 7px;
+        padding-bottom: 7px;
+    }
+}
+
+.umb-list-item {
+    border-bottom: 1px solid @gray-11;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    display: flex;
+    &:last-of-type {
+        border-bottom: none;
+    }
+}
+
+a.umb-list-item:hover,
+a.umb-list-item:focus {
+    text-decoration: none;
+}
+
+.umb-list-item--disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.umb-list-item--error {
+    color: @formErrorText;
+}
+.umb-list-item--warning {
+    color: @formWarningText;
+}
+
+.umb-list-item:hover .umb-list-checkbox,
+.umb-list-item--selected .umb-list-checkbox {
+    opacity: 1;
+}
+
+.umb-list-item__description {
+    font-size: 13px;
+    color: @gray-4;
+}
+
+.umb-list-item__description--checkbox{
+    margin: 0 0 0 30px;
+}
+
+.umb-list-checkbox {
+    position: absolute;
+    opacity: 0;
+}
+
+.umb-list-checkbox--visible {
+    opacity: 1;
+}

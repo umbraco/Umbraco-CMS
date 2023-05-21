@@ -1,0 +1,77 @@
+<div ng-controller="Umbraco.Editors.Content.SortController as vm" ng-cloak>
+
+        <div class="umb-dialog-body with-footer sort-order">
+
+            <div class="umb-pane">
+
+                <div ng-if="vm.error" class="alert alert-error">
+                    <p>{{vm.error.errorMsg}}</p>
+                </div>
+
+                <umb-load-indicator
+                    ng-show="vm.loading">
+                </umb-load-indicator>
+
+                <div ng-if="!vm.loading">
+                    <p class="abstract"><localize key="sort_sortHelp">Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items</localize></p>
+                    <table class="table table-condensed table-sortable" ng-if="vm.children">
+                        <thead>
+                            <tr>
+                                <th colspan="2">
+                                    <button type="button" class="btn-reset" ng-click="vm.sort('name')">
+                                        <strong><localize key="general_name">Name</localize></strong>
+                                        <span ng-if="vm.sortOrder.column === 'name'">
+                                            <umb-icon icon="{{vm.sortOrder.reverse ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
+                                        </span>
+                                    </button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn-reset" ng-click="vm.sort('createDate')">
+                                        <strong><localize key="sort_sortCreationDate">Creation date</localize></strong>
+                                        <span ng-if="vm.sortOrder.column === 'createDate'">
+                                            <umb-icon icon="{{vm.sortOrder.reverse ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
+                                        </span>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody ui-sortable="vm.sortableOptions" ng-model="vm.children">
+                            <tr ng-repeat="child in vm.children">
+                                <td class="tree-icon">
+                                    <umb-icon icon="{{child.icon}}"></umb-icon>
+                                </td>
+                                <td>{{child.name}}</td>
+                                <td>{{child.createDate}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <umb-empty-state
+                        ng-if="!vm.children"
+                        position="center">
+                        <localize key="sort_sortEmptyState">This node has no child nodes to sort</localize>
+                    </umb-empty-state>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <umb-button
+                type="button"
+                button-style="link"
+                action="vm.close()"
+                label-key="general_close">
+            </umb-button>
+            <umb-button
+                ng-if="vm.children"
+                type="button"
+                action="vm.save()"
+                state="vm.saveButtonState"
+                button-style="success"
+                label-key="buttons_save">
+            </umb-button>
+        </div>
+
+    </div>

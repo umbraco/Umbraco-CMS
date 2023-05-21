@@ -1,0 +1,57 @@
+<div class="umb-button" ng-class="{'ml0': vm.generalActions, 'umb-button--block': vm.blockElement}" data-element="{{ vm.alias ? 'button-' + vm.alias : '' }}">
+
+    <div ng-if="vm.innerState">
+        <umb-icon icon="icon-check" class="umb-button__success" ng-class="{'-hidden': vm.innerState !== 'success', '-white': vm.isPrimaryButtonStyle, '-black': vm.buttonStyle === 'outline'}"></umb-icon>
+        <umb-icon icon="icon-delete" class="umb-button__error" ng-class="{'-hidden': vm.innerState !== 'error', '-white': vm.isPrimaryButtonStyle, '-black': vm.buttonStyle === 'outline'}"></umb-icon>
+        <div class="umb-button__progress" ng-class="{'-hidden': vm.innerState !== 'busy', '-white': vm.isPrimaryButtonStyle, '-black': vm.buttonStyle === 'outline'}"></div>
+        <div ng-if="vm.innerState !== 'init'" class="umb-button__overlay"></div>
+    </div>
+
+    <a ng-if="vm.type === 'link'"
+        ng-href="{{vm.href}}"
+        ng-attr-target="{{(vm.hrefTarget) ? vm.hrefTarget : undefined}}"
+        class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}} umb-outline"
+        ng-click="vm.clickButton($event)"
+        hotkey="{{vm.shortcut}}"
+        hotkey-when-hidden="{{vm.shortcutWhenHidden}}">
+        <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
+            <umb-icon icon="{{vm.icon}}" class="umb-button__icon" ng-if="vm.icon"></umb-icon>
+            {{vm.buttonLabel}}
+            <span ng-if="vm.showCaret" class="umb-button__caret caret" aria-hidden="true"></span>
+        </span>
+    </a>
+
+    <button
+        ng-if="vm.type === 'button'"
+        type="button"
+        class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}} umb-outline"
+        ng-click="vm.clickButton($event)"
+        hotkey="{{vm.shortcut}}"
+        hotkey-when-hidden="{{vm.shortcutWhenHidden}}"
+        ng-disabled="vm.disabled"
+        umb-auto-focus="{{vm.autoFocus && !vm.disabled ? 'true' : 'false'}}"
+        aria-haspopup="{{vm.hasPopup}}"
+        aria-expanded="{{vm.isExpanded}}">
+        <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
+            <umb-icon icon="{{vm.icon}}" class="umb-button__icon" ng-if="vm.icon"></umb-icon>
+            {{vm.buttonLabel}}
+            <span ng-if="vm.showCaret" class="umb-button__caret caret" aria-hidden="true"></span>
+        </span>
+    </button>
+
+    <button
+        ng-if="vm.type === 'submit'"
+        type="submit"
+        class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}} umb-outline"
+        hotkey="{{vm.shortcut}}"
+        hotkey-when-hidden="{{vm.shortcutWhenHidden}}"
+        ng-disabled="vm.disabled"
+        umb-auto-focus="{{vm.autoFocus && !vm.disabled ? 'true' : 'false'}}">
+        <span class="umb-button__content" ng-class="{'-hidden': vm.innerState !== 'init'}">
+            <umb-icon icon="{{vm.icon}}" class="umb-button__icon" ng-if="vm.icon"></umb-icon>
+            {{vm.buttonLabel}}
+            <span ng-if="vm.showCaret" class="umb-button__caret caret" aria-hidden="true"></span>
+        </span>
+    </button>
+
+</div>

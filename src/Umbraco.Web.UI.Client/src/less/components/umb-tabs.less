@@ -1,0 +1,148 @@
+.umb-tabs-nav {
+    margin-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+    border-bottom: 1px solid @gray-9;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.umb-tabs-nav .badge {
+    background-color: @red;
+    animation-duration: 1.4s;
+    animation-iteration-count: infinite;
+    animation-name: umb-tab--badge-bounce;
+    animation-timing-function: ease;
+    display: none;
+    margin-left: 5px;
+
+    @keyframes umb-tab--badge-bounce {
+        0%   { transform: translateY(0); }
+        20%  { transform: translateY(-6px); }
+        40%  { transform: translateY(0); }
+        55%  { transform: translateY(-3px); }
+        70%  { transform: translateY(0); }
+        100% { transform: translateY(0); }
+    }
+}
+
+.umb-tab {
+    display: inline-flex;
+    position: relative;
+    top: 1px;
+}
+
+.umb-tab-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    cursor: pointer;
+    //border-bottom: 4px solid transparent;
+    color: @ui-light-type;
+    padding: 5px 20px 15px 20px;
+    transition: color 150ms ease-in-out;
+
+    &:focus {
+        color: @ui-light-type-hover;
+
+        body:not(.tabbing-active) &{
+            outline: none;
+        }
+    }
+
+    &:hover {
+        color: @ui-light-type-hover;
+        text-decoration: none;
+    }
+
+    &:disabled {
+        color: @ui-option-disabled-type;
+        text-decoration: none;
+    }
+
+    &::after {
+        content: "";
+        height: 0px;
+        left: 14px;
+        right: 14px;
+        background-color: @ui-light-active-border;
+        position: absolute;
+        bottom: 0;
+        border-radius: 3px 3px 0 0;
+        opacity: 0;
+        transition: all 0.2s linear;
+    }
+
+    &--expand > i {
+        height: 5px;
+        width: 5px;
+        border-radius: 50%;
+        background: @black;
+        display: inline-block;
+        margin: 0 5px 0 0;
+        opacity: 0.6;
+    }
+}
+
+.umb-tab--active > .umb-tab-button {
+    color: @ui-light-active-type;
+    //border-bottom-color: @ui-active;
+    /*
+    &:focus {
+        border-bottom-color: @ui-active;
+    }
+    &:hover {
+        border-bottom-color: @ui-active-type-hover;
+    }
+    */
+    &::after {
+        opacity: 1;
+        height: 4px;
+    }
+}
+
+.show-validation {
+
+    &.show-validation-type-error {
+        .umb-tab--error {
+            .badge {
+                display: block;
+                background-color: @red;
+            }
+
+            .umb-tab-button {
+                &::after {
+                    background-color: @red;
+                }
+            }
+        }
+    }
+
+    &.show-validation-type-warning {
+        .umb-tab--error {
+            .badge {
+                display: block;
+                background-color: @yellow-d2;
+            }
+
+            .umb-tab-button {
+                &::after {
+                    background-color: @yellow-d2;
+                }
+            }
+        }
+    }
+}
+
+// tabs tray
+
+.umb-tabs-tray {
+    right: 0;
+    left: auto;
+}
+
+.umb-tabs-tray > .umb-tab-button {
+    cursor: pointer;
+}

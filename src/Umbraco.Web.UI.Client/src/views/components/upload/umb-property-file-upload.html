@@ -1,0 +1,60 @@
+<div class="umb-property-file-upload">
+  <ng-form name="vm.fileUploadForm" ng-class="{ 'drag-over': vm.dragover }">
+    <input
+      type="hidden"
+      ng-model="mandatoryValidator"
+      ng-required="vm.required && !vm.files.length" />
+
+    <div
+      class="fileinput-button umb-upload-button-big"
+      ng-hide="vm.files.length > 0">
+      <umb-icon icon="icon-page-up" class="icon"></umb-icon>
+      <p><localize key="media_clickToUpload">Click to upload</localize></p>
+      <umb-single-file-upload
+        accept-file-ext="vm.acceptFileExt"
+        ng-attr-readonly="{{ vm.readonly || undefined }}">
+      </umb-single-file-upload>
+    </div>
+
+    <div ng-if="vm.files.length > 0">
+      <div ng-if="!vm.hideSelection">
+        <div class="umb-fileupload clearfix" ng-repeat="file in vm.files">
+          <umb-media-preview
+            extension="file.extension"
+            source="file.fileSrc"
+            name="file.fileName"
+            client-side="file.isClientSide"
+            client-side-data="file.fileData">
+          </umb-media-preview>
+        </div>
+        <div ng-if="!vm.readonly" class="umb-property-file-upload--actions">
+          <button
+            type="button"
+            class="btn btn-link"
+            aria-hidden="true"
+            ng-click="vm.clear()">
+            <umb-icon icon="icon-trash"></umb-icon>
+            <localize key="content_uploadClear">Remove file</localize>
+          </button>
+          <button
+            type="button"
+            class="sr-only"
+            ng-if="file.isImage"
+            ng-click="vm.clear()">
+            <localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize>
+          </button>
+          <button
+            type="button"
+            class="sr-only"
+            ng-if="!file.isImage"
+            ng-click="vm.clear()">
+            <localize key="content_uploadClearFileContext">Click here to remove the file from the media item</localize>
+          </button>
+        </div>
+      </div>
+      <div ng-if="vm.hideSelection">
+        <div ng-transclude></div>
+      </div>
+    </div>
+  </ng-form>
+</div>

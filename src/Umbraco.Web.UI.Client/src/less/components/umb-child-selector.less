@@ -1,0 +1,71 @@
+.umb-child-selector__child {
+  background: @gray-10;
+  padding: 5px 15px;
+  margin-bottom: 5px;
+  min-width: 300px;
+  display: flex;
+  animation: fadeIn 0.5s;
+}
+
+.umb-child-selector__child.-parent {
+  background: @gray-9;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.umb-child-selector__child.-placeholder {
+  border: 1px dashed @gray-8;
+  background: none;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
+  color: @ui-action-type;
+
+  &:hover {
+      color: @ui-action-type-hover;
+      border-color: @ui-action-type-hover;
+      text-decoration: none;
+  }
+}
+
+.umb-child-selector__children-container {
+    margin-left: 30px;
+
+    .umb-child-selector__child.ui-sortable-handle {
+        cursor: move;
+    }
+}
+
+.umb-child-selector__child-description {
+  flex: 1;
+}
+
+.umb-child-selector__child-icon-holder {
+  margin-right: 5px;
+  width: 20px;
+  text-align: center;
+  display: inline-block;
+}
+
+.umb-child-selector__child-icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.umb-child-selector__child-name {
+  font-size: 14px;
+}
+/*
+.umb-child-selector__child-name.-blue {
+  color: @turquoise-d1;
+}
+*/
+.umb-child-selector__child-actions {
+  flex: 0 0 50px;
+  text-align: right;
+}
+
+.umb-child-selector__child-remove {
+  background: none;
+  border: none;
+}

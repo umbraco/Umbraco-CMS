@@ -1,0 +1,239 @@
+.umb-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    z-index: 10;
+    width: @drawerWidth;
+    background: @brownGrayLight;
+    box-shadow: inset 5px 0 20px rgba(0,0,0,.3);
+}
+
+.umb-drawer-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Header */
+
+.umb-drawer-header {
+    flex: 0 0 100px;
+    padding: 20px 30px;
+    box-sizing: border-box;
+}
+
+.umb-drawer-header__title {
+    font-size: @fontSizeLarge;
+    font-weight: bold;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.umb-drawer-header__subtitle {
+    font-size: @fontSizeSmall;
+}
+
+/* Content */
+
+.umb-drawer-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 30px 20px 30px;
+}
+
+/* Footer */
+.umb-drawer-footer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 31px;
+    padding: 15px 30px;
+}
+
+/* Our badge - should be moved */
+
+.umb-help-badge {
+    padding: 10px 20px 10px 55px;
+    background: @white;
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    display: block;
+    margin-bottom:5px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+}
+
+.umb-help-badge:hover,
+.umb-help-badge:active,
+.umb-help-badge:focus {
+    text-decoration: none;
+
+    .umb-help-badge__title  {
+        text-decoration: underline !important;
+    }
+}
+
+.umb-help-badge__icon {
+    font-size: 36px;
+    transform: translate(0,-50%);
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    color: @red-l3;
+}
+
+.umb-help-badge__title {
+    display: block;
+    font-size: 15px;
+    font-weight: bold;
+    color: @black;
+}
+
+/* Help article */
+
+.umb-help-article {
+    background: @white;
+    padding: 20px;
+    line-height: 1.4em;
+}
+
+/* Make sure typography looks good */
+.umb-help-article h1,
+.umb-help-article h2,
+.umb-help-article h3,
+.umb-help-article h4 {
+    line-height: 1.3em;
+    font-weight: bold;
+}
+
+.umb-help-article h1 { font-size: 20px; }
+.umb-help-article h2 { font-size: 16px; margin-top: 20px; }
+.umb-help-article h3 { font-size: 15px; }
+.umb-help-article h4 { font-size: 14px; }
+
+.umb-help-article ol li,
+.umb-help-article ul li {
+    line-height: 1.4em;
+    margin-bottom: 8px;
+}
+
+.umb-help-article code {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.umb-help-article-navigation {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* the outer container for each help type - tours, video etc */
+.umb-help-section + .umb-help-section {
+    margin-top:20px;
+}
+
+.umb-help-section__title {
+    margin:0 0 10px;
+}
+
+/* Help list */
+
+.umb-help-list {
+    list-style: none;
+    margin-left: 0;
+    margin-bottom: 0;
+    background: @white;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+
+    [data-element*="help-tours"] & {
+        margin-bottom:5px;
+    }
+}
+
+.umb-help-list-item {
+    margin-bottom: 1px;
+    border-radius: 0;
+    border-bottom: 1px solid @gray-9;
+    padding: 10px;
+    background: transparent;
+    width:100%;
+    border: 0 none;
+}
+
+
+.umb-help-list-item:last-child {
+    border-bottom: none;
+}
+.umb-help-list-item__title-wrapper {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .umb-help-list-item {
+    flex: 1 0 auto;
+    width: auto;
+  }
+}
+
+.umb-help-list-item__group-title i {
+    margin-right:2px;
+    text-decoration: none;
+}
+
+.umb-help-list-item__content {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px 10px 10px;
+    text-decoration: none;
+}
+
+.umb-help-list-item:hover,
+.umb-help-list-item:focus,
+.umb-help-list-item:active,
+.umb-help-list-item > a:hover,
+.umb-help-list-item > a:focus,
+.umb-help-list-item > a:active {
+    text-decoration: none;
+
+    .umb-help-list-item__title {
+        text-decoration: underline;
+    }
+}
+
+.umb-help-list-item__title {
+    font-size: 14px;
+    display: block;
+}
+
+.umb-help-list-item__description {
+    margin-top: 5px;
+    display: block;
+    font-size: 14px;
+}
+
+.umb-help-list-item__icon {
+    margin-right: 8px;
+    color: @gray-4;
+    font-size: 18px;
+    float: left;
+}
+
+.umb-help-list-item__open-icon {
+    font-size: 14px;
+    color: @gray-6;
+    margin-left: auto;
+}
+
+.umb-help-list-item:hover .umb-help-list-item__group-title {
+    text-decoration: underline;
+}
+
+[data-element*="tour-"].umb-help-list-item:hover .umb-help-list-item__title {
+    text-decoration:none;
+}

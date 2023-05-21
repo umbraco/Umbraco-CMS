@@ -1,0 +1,94 @@
+.umb-grid-selector__items {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.umb-grid-selector__item {
+  width: 125px;
+  height: 150px;
+  padding: 20px;
+  background: @gray-10;
+  border: 1px solid @gray-8;
+  text-align: center;
+  margin: 0 20px 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s;
+  position: relative;
+  border-radius: 3px;
+}
+
+.umb-grid-selector__item.-default {
+  border-width: 2px;
+}
+
+.umb-grid-selector__item.-placeholder {
+  border: 1px dashed @gray-8;
+  background: none;
+  cursor: pointer;
+  
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+      border-color: @ui-option-type-hover;
+      text-decoration: none;
+  }
+}
+
+.umb-grid-selector__item-content {
+  margin-top: 10px;
+}
+
+button.umb-grid-selector__item {
+    width: 169px;
+    height: 194px;
+}
+
+.umb-grid-selector__item-icon {
+    font-size: 50px;
+    color: @gray-8;
+    display: block;
+    line-height: 50px;
+    margin-bottom: 15px;
+}
+
+.umb-grid-selector__item-label {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.umb-grid-selector__item-label.-blue {
+  color: @ui-option-type;
+}
+
+.umb-grid-selector__item-remove {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+  }
+}
+
+.umb-grid-selector__item-default-label {
+  font-size: 13px;
+  color: @gray-3;
+}
+
+.umb-grid-selector__item-default-label.-blue {
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+  }
+}
+
+.umb-grid-selector__item-add {
+  color: @ui-option-type;
+  &:hover {
+      color: @ui-option-type-hover;
+  }
+}

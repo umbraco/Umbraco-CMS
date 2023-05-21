@@ -1,0 +1,68 @@
+.umb-user-group-preview {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+    box-sizing: border-box;
+    border-bottom: 1px solid @gray-9;
+}
+
+.umb-user-group-preview:last-of-type {
+    border-bottom: none;
+    margin-bottom: 10px;
+}
+
+.umb-user-group-preview__icon {
+    display: flex;
+    width: 25px;
+    height: 25px;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    margin-right: 10px;
+    flex: 0 0 auto;
+}
+
+.umb-user-group-preview__content {
+    flex: 1 1 auto;
+    margin-right: 25px;
+}
+
+.umb-user-group-preview__name {
+    font-size: 15px;
+    color: @black;
+    margin-bottom: 3px;
+    margin-top: 2px;
+}
+
+.umb-user-group-preview__permissions {
+    font-size: 13px;
+    color: @gray-3;
+
+    .umb-user-group-preview__permission:not(:last-child):after {
+        content: ', ';
+    }
+}
+
+.umb-user-group-preview__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.umb-user-group-preview__action {
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    color: @gray-5;
+}
+
+.umb-user-group-preview__action:hover {
+    color: @ui-action-type-hover;
+    text-decoration: none;
+    opacity: 1;
+}
+
+.umb-user-group-preview__action--red:hover {
+    color: @red;
+}

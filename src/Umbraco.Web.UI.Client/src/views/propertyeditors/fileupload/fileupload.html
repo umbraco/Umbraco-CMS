@@ -1,0 +1,12 @@
+﻿<div ng-controller="Umbraco.PropertyEditors.FileUploadController">
+    <umb-property-file-upload 
+        culture="{{model.culture}}"
+        segment="{{model.segment}}"
+        property-alias="{{model.alias}}"
+        value="model.value"
+        required="model.validation.mandatory"
+        on-files-selected="fileChanged(value)"
+        accept-file-ext="fileExtensionsString"
+        ng-attr-readonly="{{ readonly || undefined }}">
+    </umb-property-file-upload>
+</div>

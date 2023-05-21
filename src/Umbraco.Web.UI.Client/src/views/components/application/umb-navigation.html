@@ -1,0 +1,69 @@
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)" on-outside-click="onOutsideClick()">
+
+    <!-- navigation container -->
+    <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize
+    ng-class="{'--notInFront': infiniteMode}">
+
+        <div class="navigation-inner-container">
+
+            <div class="umb-language-picker" ng-if="currentSection === 'content' && languages.length > 1" deep-blur="page.languageSelectorIsOpen = false" on-outside-click="page.languageSelectorIsOpen = false">
+                <button type="button" class="umb-language-picker__toggle" ng-click="toggleLanguageSelector()" aria-haspopup="true" aria-expanded="{{page.languageSelectorIsOpen}}">
+                    <span>
+                        <span class="sr-only">
+                            <localize key="visuallyHiddenTexts_currentLanguage">Current language</localize>
+                            <span>: </span>
+                        </span>
+                        <span>{{selectedLanguage.name}}</span>
+                    </span>
+                    <umb-icon icon="{{page.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand"></umb-icon>
+                </button>
+                <div class="umb-language-picker__dropdown" ng-if="page.languageSelectorIsOpen">
+                    <button
+                        type="button"
+                        class="umb-language-picker__dropdown-item"
+                        ng-class="{'umb-language-picker__dropdown-item--current': language.active}"
+                        ng-click="selectLanguage(language)"
+                        ng-repeat="language in languages"
+                    >
+                    <span class="sr-only">
+                        <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>
+                        <span>: </span>
+                    </span>
+                    <span>{{language.name}}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- the tree -->
+            <div id="tree" ng-show="authenticated">
+                <umb-tree
+                    api="treeApi"
+                    on-init="onTreeInit()">
+                </umb-tree>
+            </div>
+        </div>
+
+        <div class="offset6" id="navOffset" style="z-index: 10">
+
+            <umb-context-menu
+                ng-if="showContextMenu"
+                menu-dialog-title="{{menuDialogTitle}}"
+                current-section="{{currentSection}}"
+                current-node="menuNode"
+                menu-actions="menuActions">
+            </umb-context-menu>
+
+            <umb-context-dialog
+                ng-if="showContextMenuDialog"
+                dialog-title="menuDialogTitle"
+                current-node="menuNode"
+                view="dialogTemplateUrl">
+            </umb-context-dialog>
+
+        </div>
+
+        <div class="umb-editor__overlay"></div>
+
+    </div>
+
+</div>

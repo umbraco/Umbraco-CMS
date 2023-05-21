@@ -1,0 +1,38 @@
+<div class="umb-property-editor umb-prevalues-multivalues umb-colors" ng-controller="Umbraco.PrevalueEditors.MultiColorPickerController as vm">
+    <div class="control-group  umb-prevalues-multivalues__add color-picker-preval">
+        <div class="umb-prevalues-multivalues__left">
+
+            <umb-color-picker
+                ng-model="newColor"
+                options="options"
+                on-hide="vm.hide(color)"
+                on-show="vm.show(color)"
+                on-change="vm.change(color)">
+            </umb-color-picker>
+
+            <label val-highlight="{{hasError}}">#{{newColor}}</label>
+            <input type="text" name="newLabel" ng-model="newLabel" focus-when="{{focusOnNew}}" class="umb-property-editor color-label" localize="placeholder" placeholder="@general_label" ng-show="vm.labelEnabled" />
+        </div>
+        <div class="umb-prevalues-multivalues__right">
+            <button type="button" class="btn btn-info add" ng-if="vm.editItem == null" ng-click="vm.add($event)"><localize key="general_add">Add</localize></button>
+            <button type="button" class="btn btn-info add" ng-if="vm.editItem != null" ng-click="vm.add($event)"><localize key="general_update">Update</localize></button>
+            <button type="button" class="btn btn-link" ng-if="vm.editItem != null" ng-click="vm.cancel($event)"><localize key="general_cancel">Cancel</localize></button>
+        </div>
+    </div>
+    <div ui-sortable="sortableOptions" ng-model="model.value">
+        <div class="control-group umb-prevalues-multivalues__listitem color-picker-preval" ng-repeat="item in model.value track by $id(item)">
+            <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
+            <div class="umb-prevalues-multivalues__left">
+                <div class="thumbnail span1" hex-bg-color="{{item.value}}" hex-bg-orig="transparent"></div>
+                <div class="color-picker-prediv">
+                    <pre>#{{item.value}}</pre>
+                    <span ng-bind="item.label" ng-if="vm.labelEnabled"></span>
+                </div>
+            </div>
+            <div class="umb-prevalues-multivalues__right">
+                <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.edit(item, $event)"><localize key="general_edit">Edit</localize></button>
+                <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.remove(item, $event)"><localize key="general_remove">Remove</localize></button>
+            </div>
+        </div>
+    </div>
+</div>

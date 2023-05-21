@@ -1,0 +1,165 @@
+<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController as vm" class="usky-grid usky-grid-configuration">
+    <div class="grid-layout">
+        <div class="control-group uSky-templates">
+
+            <h4>
+                <localize key="grid_gridLayouts">
+                    Grid Layouts
+                </localize>
+            </h4>
+            <p>
+                <localize key="grid_gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</localize>
+            </p>
+
+            <ul class="unstyled"
+                ui-sortable
+                ng-model="model.value.templates">
+
+                <li ng-repeat="template in model.value.templates" class="clearfix">
+
+                    <button type="button" ng-click="vm.configureTemplate(template)" class="btn-reset preview-rows layout">
+
+                        <span class="preview-row">
+                            <span class="preview-col"
+                                 ng-class="{last:$last}"
+                                 ng-repeat="section in template.sections | filter: vm.zeroWidthFilter"
+                                 ng-style="{width: vm.percentage(section.grid) + '%', height: '60px', 'max-width': '100%'}">
+                                <span class="preview-cell"></span>
+                            </span>
+                        </span>
+                    </button>
+
+                    <div>
+                        <p>{{template.name}}</p>
+                        <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate(template, $index, $event)">
+                            <umb-icon icon="icon-delete" class="red"></umb-icon>
+                            <localize key="general_delete">Delete</localize>
+                        </button>
+                    </div>
+
+                </li>
+            </ul>
+
+            <button type="button" class="btn btn-small btn-info" ng-click="vm.configureTemplate()">
+                <umb-icon icon="icon-add"></umb-icon>
+                <localize key="grid_addGridLayout">Add Grid Layout</localize>
+            </button>
+        </div>
+    </div>
+    <div class="grid-layout">
+
+        <div class="control-group uSky-templates">
+
+            <h4>
+                <localize key="grid_rowConfigurations">Row Configurations</localize>
+            </h4>
+            <p>
+                <localize key="grid_rowConfigurationsDetail">Rows are predefined cells arranged horizontally</localize>
+            </p>
+
+            <div class="control-group uSky-templates-rows">
+                <ul class="unstyled"
+                    ui-sortable
+                    ng-model="model.value.layouts">
+
+                    <li ng-repeat="layout in model.value.layouts" class="clearfix">
+
+                        <button type="button" ng-click="vm.configureLayout(layout)" class="btn-reset preview-rows columns">
+
+                            <span class="preview-row">
+                                <span class="preview-col"
+                                     ng-class="{last:$last}"
+                                     ng-repeat="area in layout.areas | filter: vm.zeroWidthFilter"
+                                     ng-style="{width: vm.percentage(area.grid) + '%', 'max-width': '100%'}">
+
+                                    <span class="preview-cell">
+                                        <span ng-show="area.maxItems > 0">{{area.maxItems}}</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
+
+                        <div>
+                            <p>{{layout.label || layout.name}}</p>
+                            <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteLayout(layout, $index, $event)">
+                                <umb-icon icon="icon-delete" class="red"></umb-icon>
+                                <localize key="general_delete">Delete</localize>
+                            </button>
+                        </div>
+
+                    </li>
+                </ul>
+
+                <button type="button" class="btn btn-small btn-info" ng-click="vm.configureLayout()">
+                    <umb-icon icon="icon-add"></umb-icon>
+                    <localize key="grid_addRowConfiguration">Add row configuration</localize>
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="grid-layout">
+
+        <umb-control-group label="@grid_columns"
+                           description="@grid_columnsDetails">
+            <input type="number" min="1" ng-model="model.value.columns" />
+        </umb-control-group>
+
+        <umb-control-group label="@grid_settings"
+                           description="@grid_settingsDetails">
+
+            <ul class="unstyled list-icons umb-contentpicker"
+                ui-sortable
+                ng-model="model.value.config">
+
+                <li ng-repeat="configValue in model.value.config">
+                    <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.config, $index)">
+                        <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+                    </button>
+                    <span>{{configValue.label}}</span>
+                </li>
+            </ul>
+
+            <ul class="unstyled list-icons">
+                <li>
+                    <button type="button" ng-click="vm.editConfig()" class="btn-link">
+                        <umb-icon icon="icon-settings-alt-2" class="icon turquoise"></umb-icon>
+                        <localize key="general_edit">Edit</localize>
+                    </button>
+                </li>
+            </ul>
+        </umb-control-group>
+
+
+        <umb-control-group label="@grid_styles"
+                           description="@grid_stylesDetails">
+
+            <ul class="unstyled list-icons umb-contentpicker"
+                ui-sortable
+                ng-model="model.value.styles">
+
+                <li ng-repeat="style in model.value.styles">
+                    <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.styles, $index)">
+                        <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+                    </button>
+                    <span>{{style.label}}</span>
+                </li>
+            </ul>
+
+            <ul class="unstyled list-icons">
+                <li>
+                    <button type="button" ng-click="vm.editStyles()" class="btn-link">
+                        <umb-icon icon="icon-settings-alt-2" class="icon turquoise"></umb-icon>
+                        <localize key="general_edit">Edit</localize>
+                    </button>
+                </li>
+            </ul>
+        </umb-control-group>
+    </div>
+
+</div>

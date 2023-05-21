@@ -1,0 +1,30 @@
+<div>
+    <umb-empty-state ng-if="results.length === 0" position="{{emptySearchResultPosition}}">
+        <p role="alert"><localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize></p>
+    </umb-empty-state>
+    <p ng-if="results.length === 1" role="alert">1 <localize key="treeSearch_searchResult">item returned</localize></p>
+    <p ng-if="results.length > 1" role="alert">{{results.length}} <localize key="treeSearch_searchResults">items returned</localize></p>
+    <ul class="umb-tree">
+        <li class="root">
+            <ul class="umb-search-group">
+                <li class="umb-search-group-item" ng-repeat="result in results">
+                    <div ng-class="{ 'umb-tree-node-checked': result.selected }">
+                        <button type="button"
+                                class="btn-reset umb-search-group-item-link"
+                                ng-class="{ first: $first }"
+                                ng-click="selectResultCallback($event, result)">
+                            <span class="umb-search-group-item-name">
+                                <umb-icon icon="{{result.selected ? 'icon-check' : result.icon}}" class="icon umb-tree-icon sprTree"></umb-icon>
+                                <span class="umb-search-group-item-name__text">{{ result.name }}</span>
+                            </span>
+                            <small class="search-subtitle" ng-if="result.subTitle">{{ result.subTitle }}</small>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+</div>
+
+

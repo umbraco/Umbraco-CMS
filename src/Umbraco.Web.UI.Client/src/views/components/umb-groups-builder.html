@@ -1,0 +1,190 @@
+<div data-element="groups-builder" class="clearfix">
+
+    <umb-editor-sub-header class="umb-group-builder__toolbar" appearance="white">
+
+        <umb-editor-sub-header-content-left class="left">
+            <div class="umb-group-builder__tabs" ng-if="(sortingMode && tabs.length > 0) || (!sortingMode)">
+                <button ng-show="overflow.left > 0" class="btn-reset umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--left" ng-click="moveTabsOverflowLeft()">
+                    <span class="caret"></span>
+                </button>
+
+                <ul class="umb-group-builder__tabs-list" ui-sortable="sortableOptionsTab" ng-model="tabs" umb-overflow-checker on-overflow="setTabOverflowState(overflowLeft, overflowRight)">
+                    <li ng-if="hasGenericTab" umb-droppable="droppableOptionsTab" data-tab-alias="{{genericTab.alias}}">
+                        <umb-content-type-tab
+                            tab="genericTab"
+                            is-open="genericTab.alias == openTabAlias"
+                            on-click="changeTab(genericTab)"
+                            allow-change-name="false">
+                        </umb-content-type-tab>
+                    </li>
+                    <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}"  data-tab-alias="{{tab.alias}}">
+                        <umb-content-type-tab
+                            tab="tab"
+                            is-open="tab.alias === openTabAlias"
+                            on-click="changeTab(tab)"
+                            on-click-composition="openContentType(contentTypeId)"
+                            sorting="sortingMode"
+                            allow-remove="canRemoveTab(tab) && !sortingMode"
+                            on-remove="removeTab(tab, tabIndex)"
+                            val-server-field-name="{{'Groups[' + tab.serverValidationIndex + '].Name'}}"
+                            on-change-sort-order-value="orderTabs()"
+                            on-change-name="onChangeTabName(tab)">
+                        </umb-content-type-tab>
+                    </li>
+                    <li class="umb-group-builder__tabs-list__add-tab">
+                        <umb-button
+                            ng-if="!sortingMode"
+                            class="umb-group-builder__tabs__add-tab"
+                            type="button"
+                            label-key="contentTypeEditor_addTab"
+                            icon="icon-add"
+                            button-style="white"
+                            action="addTab();">
+                        </umb-button>
+                    </li>
+                </ul>
+                <button ng-if="overflow.right < 0" class="btn-reset umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--right" ng-click="moveTabsOverflowRight()">
+                    <span class="caret"></span>
+                </button>
+            </div>
+
+        </umb-editor-sub-header-content-left>
+
+        <umb-editor-sub-header-content-right class="right">
+            <div
+                ng-if="sortingMode"
+                class="umb-group-builder__convert-dropzone"
+                umb-droppable="droppableOptionsConvert">
+                <localize key="contentTypeEditor_convertToTab">Convert to tab</localize>
+            </div>
+
+            <umb-button
+                style="margin-right: 5px;"
+                alias="compositions"
+                ng-if="compositions !== false"
+                type="button"
+                button-style="outline"
+                label-key="contentTypeEditor_compositions"
+                icon="icon-merge"
+                action="openCompositionsDialog()"
+                size="xs"
+                add-ellipsis="true"
+                state="compositionsButtonState">
+            </umb-button>
+
+            <umb-button
+                alias="reorder"
+                ng-if="sorting !== false"
+                type="button"
+                button-style="outline"
+                label-key="{{sortingButtonKey}}"
+                icon="icon-navigation"
+                action="toggleSortingMode();"
+                size="xs">
+            </umb-button>
+
+        </umb-editor-sub-header-content-right>
+
+    </umb-editor-sub-header>
+
+    <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
+    <a ng-if="!sortingMode" hotkey="alt+shift+g" ng-click="addGroupToActiveTab()"></a>
+
+    <div ng-if="sortingMode && model.groups.length === 0" class="umb-group-builder__no-data-text">
+        <localize key="contentTypeEditor_noGroups">You have not added any groups</localize>
+    </div>
+
+    <!-- Properties added directly to a tab -->
+    <umb-box ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-show="isUngroupedPropertiesVisible(tab)" class="umb-group-builder__ungrouped-properties">
+        <umb-box-content>
+            <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties" ng-show="tab.properties.length > 0 || sortingMode">
+                <li ng-repeat="(propertyIndex, property) in tab.properties track by propertyIndex" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
+                    <umb-content-type-property
+                        ng-if="property.propertyState !== 'init'"
+                        property="property"
+                        sortable="sortingMode"
+                        on-edit="editPropertyTypeSettings(property)"
+                        on-remove="deleteProperty(tab.properties, property)"
+                        on-click-composition="openContentType(contentTypeId)"
+                        val-server-field-alias="{{'Groups[' + tab.serverValidationIndex + '].Properties[' + propertyIndex + '].Alias'}}"
+                        val-server-field-label="{{'Groups[' + tab.serverValidationIndex + '].Properties[' + propertyIndex + '].Label'}}"
+                        on-change-sort-order-value="onChangePropertySortOrderValue(tab)"
+                        val-tab-alias="tab-content-{{tab.alias}}">
+                    </umb-content-type-property>
+                </li>
+            </ul>
+            <button
+                ng-if="!sortingMode"
+                type="button"
+                data-element="property-add"
+                class="umb-group-builder__group-add-property"
+                ng-click="addNewProperty(tab)">
+                <localize key="contentTypeEditor_addProperty">Add property</localize>
+            </button>
+
+            <umb-empty-state
+                ng-if="sortingMode && tab.properties.length === 0"
+                position="center">
+                {{ tabDirectPropertiesDropZoneLabel }}
+            </umb-empty-state>
+        </umb-box-content>
+    </umb-box>
+
+    <!-- Groups -->
+    <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
+        <div
+            ng-repeat="(groupIndex, group) in model.groups track by group.key"
+            ng-show="group.type === 'Group' && group.parentAlias === openTabAlias"
+            ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}"
+            data-group-key="{{group.key}}">
+
+            <umb-content-type-group
+                ng-if="group.tabState !== 'init'"
+                on-focus="activateGroup(group)"
+                allow-name="true"
+                group="group"
+                allow-remove="canRemoveGroup(group) && !sortingMode"
+                on-click-composition="openContentType(contentTypeId)"
+                on-remove="removeGroup(group)"
+                on-update-name="onChangeGroupName(group)"
+                sorting="sortingMode"
+                on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
+                val-server-field-name="{{'Groups[' + group.serverValidationIndex + '].Name'}}"
+                val-tab-alias="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
+
+                <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
+                    <li ng-repeat="(propertyIndex, property) in group.properties track by propertyIndex" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
+                        <umb-content-type-property
+                            ng-if="property.propertyState !== 'init'"
+                            property="property"
+                            sortable="sortingMode"
+                            on-edit="editPropertyTypeSettings(property)"
+                            on-remove="deleteProperty(group.properties, property)"
+                            on-click-composition="openContentType(contentTypeId)"
+                            on-change-sort-order-value="onChangePropertySortOrderValue(group)"
+                            val-server-field-alias="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Alias'}}"
+                            val-server-field-label="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Label'}}"
+                            val-tab-alias="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
+                        </umb-content-type-property>
+                    </li>
+                </ul>
+                <button
+                    ng-if="!sortingMode"
+                    type="button"
+                    data-element="property-add"
+                    class="umb-group-builder__group-add-property"
+                    ng-click="addNewProperty(group)">
+                    <localize key="contentTypeEditor_addProperty">Add property</localize>
+                </button>
+            </umb-content-type-group>
+        </div>
+    </div>
+    <button
+        ng-if="!sortingMode"
+        type="button"
+        class="umb-group-builder__group -placeholder"
+        ng-click="addGroupToActiveTab()"
+        data-element="group-add">
+        <localize key="contentTypeEditor_addGroup">Add group</localize>
+    </button>
+</div>

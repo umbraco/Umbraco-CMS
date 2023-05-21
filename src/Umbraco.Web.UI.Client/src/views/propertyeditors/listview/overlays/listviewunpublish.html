@@ -1,0 +1,59 @@
+<div ng-controller="Umbraco.Overlays.ListViewUnpublishController as vm">
+
+        <!-- Single language -->
+        <div ng-if="!vm.languages">
+            <p><localize key="prompt_confirmListViewUnpublish">Unpublishing will remove the selected items and all their descendants from the site.</localize></p>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <umb-tracked-references-bulk-action selection="vm.selection" on-loading-complete="vm.checkingReferencesComplete()" hide-no-result="true" compact="true" on-warning="vm.onReferencesWarning()"></umb-tracked-references-listview>
+        </div>
+
+        <div class="abstract umb-alert umb-alert--warning" ng-if="vm.warningText">
+            {{vm.warningText}}
+        </div>
+
+        <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+                <umb-load-indicator></umb-load-indicator>
+        </div>
+
+        <!-- Multiple languages -->
+        <div ng-if="vm.languages.length > 1 && !vm.loading">
+
+            <div class="mb3">
+                <p><localize key="content_languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</localize></p>
+            </div>
+
+            <div class="umb-list umb-list--condensed">
+
+                <div class="bold mb1">
+                    <localize key="treeHeaders_languages">Languages</localize>
+                </div>
+
+                <div class="umb-list-item" ng-repeat="language in vm.languages track by language.id">
+                    <ng-form name="unpublishLanguageSelectorForm">
+                        <div>
+
+                            <umb-checkbox name="unpublishLanguageSelector"
+                                          model="language.unpublish"
+                                          on-change="vm.changeSelection(language)"
+                                          text="{{language.name}}"
+                                          disabled="language.disabled">
+                            </umb-checkbox>
+
+                            <div>
+                                <span class="db umb-list-item__description umb-list-item__description--checkbox">
+                                    <span ng-if="language.isMandatory"><localize key="languages_mandatoryLanguage">Mandatory language</localize></span>
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </ng-form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>

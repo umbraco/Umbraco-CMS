@@ -1,0 +1,88 @@
+.umb-getstarted {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.umb-getstartedcards {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    max-width: 100%;
+
+    @media (min-width: 500px) {
+        margin: 0 -10px;
+    }
+}
+
+.umb-getstartedcard {
+    width: 100%;
+    padding: 0.5em;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    border: 1px solid @gray-8;
+    background-color: @white;
+    margin: 0 0 0.5em;
+
+    @media (min-width: 500px) {
+        display: block;
+        align-items: unset;
+        padding: 1em 1em 0 1em;
+        margin: 0 10px 20px;
+        width: auto;
+        flex-basis: 35%;
+        max-width: 35%;
+    }
+
+    @media (min-width: 768px) {
+        width: auto;
+        flex-basis: 14%;
+        max-width: 14%;
+    }
+
+    @media (min-width: 1930px) {
+        width: auto;
+        flex-basis: 7%;
+        max-width: 7%;
+    }
+}
+
+
+.umb-getstartedcard img {
+    height: 3em;
+    max-width: 100%;
+
+    @media (min-width: 500px) {
+        height: auto;
+    }
+}
+
+.umb-getstartedcards {
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.umb-getstartedbody {
+    font-weight: bold;
+    margin: 0.5em;
+
+    @media (min-width: 500px) {
+        padding: 10px;
+        margin: auto;
+    }
+}
+
+.umb-getstartedbody p {
+    margin: 0;
+
+    @media (min-width: 500px) {
+        margin: inherit;
+    }
+}
+
+.umb-getstartedcard:hover {
+    border: 1px solid @turquoise;
+    cursor: pointer;
+}

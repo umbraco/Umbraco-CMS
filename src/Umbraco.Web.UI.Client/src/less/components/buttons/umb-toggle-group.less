@@ -1,0 +1,41 @@
+.umb-toggle-group {
+    .umb-toggle-group-item {
+        display: flex;
+        border-bottom: 1px solid @gray-9;
+        padding: 7px 0;
+    }
+
+    .umb-toggle-group-item:last-of-type {
+        border-bottom: none;
+    }
+
+    .umb-toggle-group-item__toggle {
+        padding-right: 20px;
+        cursor: pointer;
+    }
+
+    .umb-toggle-group-item__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1 1 auto;
+        cursor: pointer;
+
+        label {
+          padding: unset;
+          margin: unset;
+          pointer-events: none;
+        }
+    }
+
+    .umb-toggle-group-item--disabled .umb-toggle-group-item__toggle,
+    .umb-toggle-group-item--disabled .umb-toggle-group-item__content {
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+
+    .umb-toggle-group-item__description {
+        font-size: 13px;
+        color: @gray-4;
+    }
+}

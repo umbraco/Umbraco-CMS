@@ -1,0 +1,24 @@
+﻿
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.ContentTypeContainers.RenameController" ng-cloak>
+
+    <div class="umb-pane">
+        <form novalidate name="renameFolderForm"
+              ng-submit="renameContainer('dataTypeResource', 'dataTypes')"
+              val-form-manager>
+
+            <div ng-show="error">
+                <div class="alert alert-error">
+                    <div><strong>{{error.errorMsg}}</strong></div>
+                    <div>{{error.data.message}}</div>
+                </div>
+            </div>
+
+            <umb-control-group label="@renamecontainer_enterNewFolderName" hide-label="false">
+                <input type="text" name="folderName" ng-model="model.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+            </umb-control-group>
+
+            <button type="submit" class="btn btn-primary"><localize key="general_rename">Rename</localize></button>
+        </form>
+    </div>
+
+</div>

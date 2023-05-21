@@ -1,0 +1,24 @@
+﻿<div class="umb-color-swatches" ng-class="{ 'with-labels': useLabel }">
+
+    <button
+        type="button"
+        class="umb-color-box umb-color-box--{{size}} {{colorClassNamePrefix}}-{{color.value}}"
+        ng-repeat="color in colors"
+        title="{{useLabel || useColorClass ? (color.label || color.value) : ('#' + color.value)}}"
+        hex-bg-inline="{{useColorClass === false}}"
+        hex-bg-color="{{color.value}}"
+        ng-class="{ 'active': isSelectedColor(color) }"
+        ng-click="setColor(color, $index, $event)">
+
+        <div class="umb-color-box-inner">
+            <div class="check_circle">
+                <umb-icon icon="icon-check" class="icon small" ng-show="isSelectedColor(color)"></umb-icon>
+            </div>
+            <div class="umb-color-box__label" ng-if="useLabel">
+                <div class="umb-color-box__name truncate">{{color.label || color.value}}</div>
+                <div class="umb-color-box__description">#{{color.value}}</div>
+            </div>
+        </div>
+    </button>
+
+</div>

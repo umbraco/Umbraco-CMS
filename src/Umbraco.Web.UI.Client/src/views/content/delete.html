@@ -1,0 +1,37 @@
+<div class="umb-dialog" ng-controller="Umbraco.Editors.Content.DeleteController">
+    <div class="umb-dialog-body">
+
+        <div ng-show="success" class="umb-pane">
+            <div class="alert alert-success">
+                <strong>{{currentNode.name}}</strong>
+                <localize key="actions_wasDeleted">was deleted</localize>
+            </div>
+            <button class="btn btn-primary" ng-click="close()">Ok</button>
+        </div>
+
+        <div ng-hide="success" class="umb-pane">
+            <p class="abstract" ng-if="!disableDelete">
+                <localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
+            </p>
+
+            <div class="abstract umb-alert umb-alert--warning" ng-show="currentNode.metaData.variesByCulture && !currentNode.trashed">
+                <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
+            </div>
+
+            <umb-tracked-references id="currentNode.id" on-loading-complete="checkingReferencesComplete()" hide-no-result="true" compact="true" show-descendants="true" hide-none-dependencies="true" on-warning="onReferencesWarning()"></umb-tracked-references>
+
+            <div class="abstract umb-alert umb-alert--warning" ng-if="warningText">
+                {{warningText}}
+            </div>
+
+            <div class="umb-alert umb-alert--warning" ng-show="currentNode.trashed">
+                <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.
+            </div>
+
+            <umb-confirm ng-if="!disableDelete" on-confirm="performDelete" confirm-button-style="danger" on-cancel="cancel" ng-hide="checkingReferences"></umb-confirm>
+
+            <umb-confirm ng-if="disableDelete" confirm-button-style="danger" on-cancel="cancel"></umb-confirm>
+        </div>
+
+    </div>
+</div>

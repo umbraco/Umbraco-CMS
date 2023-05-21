@@ -1,0 +1,57 @@
+<div ng-controller="Umbraco.Overlays.ItemPickerOverlay" class="umb-itempicker">
+
+    <div class="mb3" ng-if="model.filter !== false">
+        <umb-search-filter
+            model="filter.searchTerm"
+            label-key="placeholders_filter"
+            text="Type to filter..."
+            css-class="w-100"
+            auto-focus="true">
+        </umb-search-filter>
+    </div>
+
+    <div class="umb-overlay__section-header" ng-if="(model.pasteItems | filter:filter.searchTerm).length > 0">
+        <h5><localize key="content_createFromClipboard">Paste from clipboard</localize></h5>
+        <button type="button" ng-if="model.clickClearPaste" ng-click="model.clickClearPaste($event)" alt="Clear clipboard for entries accepted in this context.">
+            <umb-icon icon="icon-trash"></umb-icon>
+        </button>
+    </div>
+
+    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
+        <li ng-repeat="pasteItem in model.pasteItems | filter:filter.searchTerm">
+            <button type="button" class="umb-card-grid-item btn-reset" ng-click="model.clickPasteItem(pasteItem)">
+                <span>
+                    <umb-icon icon="{{pasteItem.icon}}"></umb-icon>
+                    {{ pasteItem.name | truncate:true:36 }}
+                </span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="umb-overlay__section-header" ng-if="model.pasteItems.length > 0 && (model.availableItems | filter:filter.searchTerm).length > 0">
+        <h5><localize key="content_createEmpty">Create new</localize></h5>
+    </div>
+
+    <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
+        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:model.orderBy | filter:filter.searchTerm">
+            <button type="button" class="umb-card-grid-item btn-reset" ng-click="selectItem(availableItem)">
+                <span ng-mouseover="showTooltip(availableItem, $event)" ng-mouseleave="hideTooltip()">
+                    <umb-icon icon="{{availableItem.icon}}"></umb-icon>
+                    <span>{{availableItem.name}}</span>
+                </span>
+            </button>
+        </li>
+        <li ng-if="model.createNewItem">
+            <button type="button" class="umb-card-grid-item btn-reset --creator" ng-click="model.createNewItem.action()">
+                <span>
+                    <umb-icon icon="{{model.createNewItem.icon}}"></umb-icon>
+                    {{model.createNewItem.name}}
+                </span>
+            </button>
+        </li>
+    </ul>
+
+    <umb-tooltip ng-if="tooltip.show" event="tooltip.event">
+        {{ tooltip.text }}
+    </umb-tooltip>
+</div>

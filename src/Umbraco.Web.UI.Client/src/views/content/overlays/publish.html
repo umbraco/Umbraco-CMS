@@ -1,0 +1,110 @@
+<div class="umb-variant-selector-overlay" ng-controller="Umbraco.Overlays.PublishController as vm">
+
+  <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+    <umb-load-indicator></umb-load-indicator>
+  </div>
+
+  <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.missingMandatoryVariants.length === 0">
+
+    <div class="mb3">
+      <p>
+        <localize key="content_variantsToPublish">Which variants would you like to publish?</localize>
+      </p>
+    </div>
+
+    <div class="umb-list-item"
+         ng-repeat="variant in vm.availableVariants track by variant.compositeId">
+      <ng-form name="publishVariantSelectorForm">
+        <div class="umb-variant-selector-entry"
+             ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
+
+          <umb-checkbox input-id="{{variant.htmlId}}"
+                        model="variant.publish"
+                        name="publishVariantSelector"
+                        on-change="vm.changeSelection(variant)"
+                        server-validation-field="{{variant.htmlId}}"
+                        disabled="variant.notAllowed">
+
+                        <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
+                            <span ng-bind="variant.displayName"></span>
+                            <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
+                        </span>
+            <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                            <span ng-bind="variant.segment"></span>
+                            <span class="__secondarytitle"> — {{variant.language.name}}</span>
+                            <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
+                        </span>
+            <span class="umb-variant-selector-entry__description"
+                  ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                            <umb-variant-state variant="variant"></umb-variant-state>
+                            <span ng-if="variant.isMandatory"> - </span>
+                            <span ng-class="{'text-error': (variant.publish === false) }" ng-if="variant.isMandatory"><localize
+                              key="general_mandatory">Mandatory</localize></span>
+                            <span ng-if="variant.notAllowed"> - </span>
+                            <span ng-if="variant.notAllowed" class="text-error">
+                              <localize key="content_variantPublishNotAllowed"></localize>
+                            </span>
+                        </span>
+            <span class="umb-variant-selector-entry__description"
+                  ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                            <span class="text-error"
+                                  ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                        </span>
+
+          </umb-checkbox>
+
+          <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+
+        </div>
+
+      </ng-form>
+    </div>
+    <br/>
+    <div class="mb3" ng-if="vm.isNew === true">
+      <p>
+        <localize key="content_variantsWillBeSaved">All new variants will be saved.</localize>
+      </p>
+    </div>
+  </div>
+
+  <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.missingMandatoryVariants.length !== 0">
+    <div class="mb3">
+      <p>
+        <localize key="content_publishRequiresVariants">The following variants is required for publishing to take
+          place:
+        </localize>
+      </p>
+    </div>
+
+    <div class="umb-list-item" ng-repeat="variant in vm.missingMandatoryVariants track by variant.compositeId">
+      <div class="umb-variant-selector-entry"
+           ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
+                <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
+                    <span ng-bind="variant.displayName"></span>
+                    <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
+                </span>
+        <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                    <span ng-bind="variant.segment"></span>
+                    <span class="__secondarytitle"> — {{variant.language.name}}</span>
+                    <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
+                </span>
+        <span class="umb-variant-selector-entry__description"
+              ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                    <umb-variant-state variant="variant"></umb-variant-state>
+                    <span ng-if="variant.isMandatory"> - </span>
+                    <span ng-class="{'text-error': (variant.publish === false) }" ng-if="variant.isMandatory"><localize
+                      key="languages_mandatoryLanguage">Mandatory language</localize></span>
+                </span>
+        <span class="umb-variant-selector-entry__description"
+              ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                    <span class="text-error"
+                          ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
+                </span>
+
+        <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
+
+      </div>
+    </div>
+  </div>
+
+</div>

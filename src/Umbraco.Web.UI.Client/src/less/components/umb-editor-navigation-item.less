@@ -1,0 +1,255 @@
+.umb-sub-views-nav-item {
+    position: relative;
+    display: block;
+
+    &__action,
+    > a {
+        position: relative;
+        background: transparent;
+        text-align: center;
+        cursor: pointer;
+        display: block;
+        padding: 4px 10px 0 10px;
+        min-width: 70px;
+        border: 0 none;
+        border-right: 1px solid @gray-9;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: calc(~'@{editorHeaderHeight}'- ~'1px'); // need to offset the 1px border-bottom on .umb-editor-header - avoids overflowing top of the container
+        color: @ui-active-type;
+        user-select: none;
+
+        &:hover {
+            color: @ui-active-type-hover  !important;
+            text-decoration: none;
+        }
+
+        &:disabled {
+            pointer-events: none;
+            color: @gray-6;
+        }
+
+        &::before {
+            content: "";
+            position: absolute;
+            height: 0px;
+            left: 8px;
+            right: 8px;
+            background-color: @ui-light-active-border;
+            bottom: 0;
+            border-radius: 3px 3px 0 0;
+            opacity: 0;
+            transition: all .2s linear;
+        }
+
+        &.is-active {
+            color: @ui-light-active-type !important;
+
+            &::before {
+                opacity: 1;
+                height: 4px;
+            }
+        }
+
+        // Validation
+        .show-validation &.-has-error {
+            color: @red;
+
+            &:hover {
+                color: @red !important;
+            }
+
+            &::before {
+                background-color: @red;
+            }
+
+            &:not(.is-active) {
+                .badge {
+                    animation-duration: 1.4s;
+                    animation-iteration-count: infinite;
+                    animation-name: umb-sub-views-nav-item--badge-bounce;
+                    animation-timing-function: ease;
+                }
+                .badge.--error-badge {
+                    display: block;
+                }
+            }
+        }
+
+        .show-validation.show-validation-type-warning &.-has-error {
+            color: @yellow-d2;
+            &:hover {
+                color: @yellow-d2 !important;
+            }
+            &::before {
+                background-color: @yellow-d2;
+            }
+        }
+    }
+
+    &__action:active,
+    & > a:active {
+        .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
+    }
+
+    & > &__anchor_dropdown.is-expanded,
+    &:hover > &__anchor_dropdown {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity 20ms 0;
+    }
+
+    .icon {
+        font-size: 24px;
+        display: block;
+        text-align: center;
+        margin-bottom: 7px;
+    }
+
+    .badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        min-width: 16px;
+        color: @white;
+        background-color: @ui-active-type;
+        border: 2px solid @white;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 2px;
+        line-height: 16px;
+        display: block;
+
+        &:empty {
+            height: 12px;
+            min-width: 12px;
+        }
+        &.--error-badge {
+            display: none;
+            font-weight: 900;
+            background-color: @red;
+
+            .show-validation-type-warning & {
+                background-color: @yellow-d2;
+            }
+        }
+    }
+
+    &-text {
+        font-size: 12px;
+        line-height: 1em;
+    }
+
+    &__anchor_dropdown {
+        // inherits from .dropdown-menu
+        margin: 0;
+
+        // center align horizontal
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 250ms 250ms;
+        visibility: hidden;
+
+        li {
+            &.is-active a {
+                border-left-color: @ui-active-border;
+            }
+            
+            a {
+                border-left: 4px solid transparent;
+            }
+        }
+    }
+
+    // Currently Edge 18 does unfortunately not support :focus-within so for now we will use the "old" behavior - Support is coming with the upcoming release of Edge 76
+    // See https://caniuse.com/#search=focus-within
+    @supports (-ms-ime-align:auto) {
+        &:hover &__anchor_dropdown {
+            transition: visibility 0 0, opacity 20ms 0;
+        }
+
+        &__anchor_dropdown {
+            visibility: hidden;
+            transition: visibility 0 500ms, opacity 250ms 250ms;
+        }
+    }
+    
+    // --------------------------------
+    // item__more, appears when there is not enough room for the visible items.
+    // --------------------------------
+
+    &-more__icon {
+        margin-bottom: 10px;
+
+        i {
+            height: 5px;
+            width: 5px;
+            border-radius: 50%;
+            background: @ui-active-type; // fallback if browser doesnt support currentColor
+            background: currentColor;
+            display: inline-block;
+            margin: 0 5px 0 0;
+        }
+
+        i:last-of-type {
+            margin-right: 0;
+        }
+    }
+
+    &-more__dropdown {
+        left: auto;
+        right: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        min-width: auto;
+        margin-top: 10px;
+
+        > li {
+            display: flex;
+        }
+
+        .umb-sub-views-nav-item:first {
+            border-left: none;
+        }
+    }
+}
+
+.umb-sub-views-nav-item-more {
+    .umb-sub-views-nav-item__action {
+        &.-has-error {
+            &.is-active {
+                color: @red !important;
+
+                .badge {
+                    display: block;
+                    animation-duration: 1.4s;
+                    animation-iteration-count: infinite;
+                    animation-name: umb-sub-views-nav-item--badge-bounce;
+                    animation-timing-function: ease;
+                }
+
+                &.-active-has-error {
+                    color: @ui-light-active-type !important;
+
+                    .badge {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes umb-sub-views-nav-item--badge-bounce {
+    0%   { transform: translateY(0); }
+    20%  { transform: translateY(-6px); }
+    40%  { transform: translateY(0); }
+    55%  { transform: translateY(-3px); }
+    70%  { transform: translateY(0); }
+    100% { transform: translateY(0); }
+}

@@ -1,0 +1,23 @@
+<div class="umb-property-editor db">
+
+    <div ng-if="preview && allowUnlock" class="umb-property-editor__lock-overlay-container">
+        <div class="umb-property-editor__lock-overlay">
+
+            <span ng-if="model.variations === 'Nothing' && node.documentType.variations === 'Culture'" ng-bind-html="labels.invariantCulturePropertyUnlockHelp"></span>
+            <span ng-if="model.variations === 'Nothing' && node.documentType.variations === 'Segment'" ng-bind-html="labels.invariantSegmentPropertyUnlockHelp"></span>
+            <span ng-if="model.variations === 'Nothing' && node.documentType.variations === 'CultureAndSegment'" ng-bind-html="labels.invariantPropertyUnlockHelp"></span>
+
+            <span ng-if="model.variations === 'Culture' && node.documentType.variations === 'CultureAndSegment'" ng-bind-html="labels.invariantSegmentPropertyUnlockHelp"></span>
+            <span ng-if="model.variations === 'Segment' && node.documentType.variations === 'CultureAndSegment'" ng-bind-html="labels.invariantCulturePropertyUnlockHelp"></span>
+
+            <umb-button button-style="success" type="button" action="unlock()" label-key="general_edit" size="xxs"></umb-button>
+        </div>
+    </div>
+    
+    <!-- layer to prevent clicks on elements with high z-index-->
+    <div ng-if="preview" class="umb-property-editor__preview-overlay"></div>
+
+    <div ng-class="{'umb-property-editor--preview': preview}" disable-tabindex="preview">
+        <div ng-include="propertyEditorView"></div>
+    </div>
+</div>

@@ -1,0 +1,135 @@
+.umb-loader-wrapper.umb-tour__loader {
+    margin: 0;
+    position: fixed;
+    z-index: @zindexTourModal;
+
+    .umb-loader {
+        background-color: @white;
+        height: 5px;
+    }
+}
+
+.umb-tour__pulse {
+    position: fixed;
+    z-index: @zindexTourModal;
+    display: none;
+    background: transparent;
+    box-shadow: 0 0 0 @green inset;
+    animation: pulse 2s infinite;
+    pointer-events: none;
+}
+  
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 @green inset;
+    }
+    70% {
+        box-shadow: 0 0 0 5px fade(@green, 80%) inset;
+    }
+    100% {
+        box-shadow: 0 0 0 0 @green inset;
+    }
+}
+
+.umb-tour__popover {
+    position: fixed;
+    background: @white;
+    border-radius: @baseBorderRadius;
+    z-index: @zindexTourModal;
+    width: 320px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+
+    h1, h2, h3, h4, h5 {
+        font-weight: bold;
+        color: @black;
+    }
+}
+
+.umb-tour__popover--l {
+    padding: 30px;
+    width: 500px;
+
+    .umb-tour-step__header {
+        margin-bottom: 30px;
+        margin-top: 10px;
+    }
+
+    .umb-tour-step__title {
+        font-size: 20px;
+    }
+
+    .umb-tour-step__content {
+        margin-bottom: 25px;
+        font-size: 15px;
+    }
+}
+
+.umb-tour-step__counter {
+    font-size: 13px;
+    color: @gray-5;
+}
+
+.umb-tour-step__close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 19px;
+    color: @gray-7;
+    cursor: pointer;
+    background: transparent;
+    padding: 0;
+    border: none;
+}
+
+.umb-tour-step__close:hover,
+.umb-tour-step__close:active {
+    color: @gray-4;
+    text-decoration: none;
+}
+
+.umb-tour-step__header {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.umb-tour-step__title {
+    font-weight: bold;
+    color: @black;
+    font-size: 15px;
+    line-height: 1.3em;
+    width: calc(~"100% - 35px");
+}
+
+.umb-tour-step__content {
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.6em;
+}
+
+// we need to make sure the tour is on top of everything else
+.umb-tour-is-visible .umb-backdrop {
+    z-index: @zindexTourBackdrop;
+}
+
+.umb-tour__popover .underline{
+    font-size: 13px;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.umb-tour__popover--promotion {
+    width: 800px;
+    min-height: 400px;
+    padding: 40px;
+    border-radius: (@baseBorderRadius * 2);
+    .umb-tour-step__close {
+        top: 40px;
+        right: 40px;
+    }
+    a {
+        text-decoration: underline;
+    }
+}

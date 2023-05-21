@@ -1,0 +1,21 @@
+.umb-overlay-backdrop {
+   position: fixed;
+   width: 100%;
+   height: 100%;
+   background-color: rgba(255, 255, 255, 0.5);
+   z-index: @zindexOverlayBackdrop;
+   top: @appHeaderHeight;
+   left: 0;
+}
+
+.umb-overlay-backdrop.ng-enter {
+    animation: fadeIn 0.3s;
+}
+  
+.umb-overlay-backdrop.ng-leave {
+    animation: fadeOut 0.3s;
+}
+
+.umb-drawer-is-visible .umb-overlay-backdrop {
+    left: @drawerWidth;
+}

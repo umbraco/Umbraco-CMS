@@ -1,0 +1,72 @@
+<div ng-controller="Umbraco.Editors.Users.UserController as vm" class="clearfix">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <form name="editUserForm" novalidate val-form-manager>
+
+        <umb-editor-view>
+
+            <umb-editor-header name="vm.user.name"
+                               name-locked="vm.denyLocalLogin"
+                               hide-icon="true"
+                               hide-description="true"
+                               hide-alias="true"
+                               navigation="vm.user.navigation"
+                               on-back="vm.goToPage(vm.breadcrumbs[0])"
+                               show-back-button="vm.showBackButton">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <div ng-if="!vm.loading" class="umb-user-details-view-wrapper" style="padding: 0;">
+
+                    <umb-editor-sub-views
+                        ng-if="!vm.loading"
+                        sub-views="vm.user.navigation"
+                        model="vm">
+                    </umb-editor-sub-views>
+
+                </div>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+
+                    <umb-breadcrumbs ancestors="vm.breadcrumbs"
+                                     allow-on-open="true"
+                                     on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button type="button"
+                                action="vm.goToPage(vm.breadcrumbs[0])"
+                                button-style="link"
+                                label="Return to list"
+                                label-key="buttons_returnToList"
+                                disabled="vm.loading">
+                    </umb-button>
+
+                    <umb-button type="button"
+                                action="vm.save()"
+                                state="vm.page.saveButtonState"
+                                button-style="success"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save"
+                                disabled="vm.loading">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

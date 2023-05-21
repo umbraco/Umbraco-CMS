@@ -1,0 +1,151 @@
+// Sections
+// -------------------------
+
+ul.sections {
+    margin: 0;
+    display: flex;
+    margin-left: -20px;
+
+    > li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+
+        > a {
+            color: @white;
+            height: @appHeaderHeight;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 10px;
+            text-decoration: none;
+            outline: none;
+            cursor: pointer;
+
+            &::after {
+                content: "";
+                left: 10px;
+                right: 10px;
+                height: 4px;
+                bottom: 0;
+                transform: translateY(4px);
+                background-color: @pinkLight;
+                position: absolute;
+                border-radius: 3px 3px 0 0;
+                opacity: 0;
+                padding: 0 2px;
+                transition: transform 240ms ease-in-out;
+            }
+
+            &:focus .section__name {
+                .tabbing-active & {
+                    border: 1px solid @gray-9;
+                }
+            }
+        }
+
+        .section__name {
+            border: 1px solid transparent;
+            border-radius: 3px;
+            margin-top: 1px;
+            padding: 3px 10px 4px 10px;
+            opacity: 0.8;
+            transition: opacity .1s linear, box-shadow .1s;
+        }
+
+        &.current > a {
+            color: @pinkLight;
+
+            &::after {
+                opacity: 1;
+                transform: translateY(0px);
+            }
+        }
+
+        &.expand {
+            i {
+                height: 5px;
+                width: 5px;
+                border-radius: 50%;
+                background: @white;
+                display: inline-block;
+                margin: 0 5px 0 0;
+                opacity: 0.6;
+                transition: opacity .1s linear;
+            }
+
+            &.current {
+                i {
+                    opacity: 1;
+                    background: @pinkLight;
+                }
+            }
+
+            &:hover i {
+                opacity: 1;
+            }
+        }
+
+        &.current .section__name,
+        a:hover .section__name {
+            opacity: 1;
+            -webkit-font-smoothing: subpixel-antialiased;
+        }
+    }
+}
+
+/* Sections tray */
+
+ul.sections-tray {
+    position: absolute;
+    top: @appHeaderHeight;
+    left: 0;
+    margin: 0;
+    list-style: none;
+    background: @blueExtraDark;
+    z-index: 10000;
+    border-radius: 0 0 3px 3px;
+
+    li {
+
+        &.current a {
+            color: @ui-active-border;
+            opacity: 1;
+
+            &::after {
+                opacity: 1;
+            }
+        }
+
+        a {
+            padding: 8px 24px;
+            color: @white;
+            text-decoration: none;
+            display: block;
+            position: relative;
+            outline: none;
+
+            &::after {
+                content: "";
+                width: 4px;
+                height: 100%;
+                background-color: @ui-active-border;
+                position: absolute;
+                border-radius: 0 3px 3px 0;
+                opacity: 0;
+                transition: all .2s linear;
+                top: 0;
+                left: 0;
+            }
+
+            &:focus .section__name {
+                .tabbing-active & {
+                    border: 1px solid;
+                    border-color: @gray-9;
+                }
+            }
+        }
+    }
+}

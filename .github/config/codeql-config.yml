@@ -1,0 +1,9 @@
+name: "CodeQL config"
+
+paths:
+  - src
+
+paths-ignore:
+  - '**/node_modules'
+  - 'src/Umbraco.Web.UI/wwwroot'
+  - 'src/Umbraco.Cms.StaticAssets/wwwroot'

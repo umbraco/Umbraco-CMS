@@ -1,0 +1,100 @@
+<div ng-cloak ng-controller="Umbraco.Editors.RelationTypes.CreateController as vm">
+
+  <form name="createRelationTypeForm" ng-submit="vm.createRelationType()"
+        novalidate
+        val-form-manager>
+    <div class="umbracoDialog umb-dialog-body with-footer">
+      <div class="umb-pane">
+        <!-- Name -->
+        <umb-control-group alias="relationTypeName" label="@relationType_name">
+          <input class="umb-textstring textstring input-block-level" id="relationTypeName" name="relationTypeName" ng-model="vm.relationType.name"
+                 required type="text" umb-auto-focus/>
+        </umb-control-group>
+
+        <!-- Direction -->
+        <umb-control-group label="@relationType_direction">
+          <p class="sr-only" tabindex="0">
+            <localize key="relationType_direction"></localize>
+          </p>
+          <ul class="unstyled">
+            <li>
+              <label class="radio" for="parentToChild">
+                <umb-radiobutton input-id="parentToChild"
+                                 label-key="relationType_parentToChild"
+                                 model="vm.relationType.isBidirectional" name="relationType-direction" required="true"
+                                 value="false">
+                </umb-radiobutton>
+              </label>
+            </li>
+            <li>
+              <label class="radio" for="bidirectional">
+                <umb-radiobutton input-id="bidirectional"
+                                 label-key="relationType_bidirectional"
+                                 model="vm.relationType.isBidirectional" name="relationType-direction" required="true"
+                                 value="true">
+                </umb-radiobutton>
+              </label>
+            </li>
+          </ul>
+        </umb-control-group>
+
+        <!-- Parent -->
+        <umb-control-group alias="relationType-parent" label="@relationType_parent">
+          <select class="umb-property-editor umb-dropdown" id="relationType-parent"
+                  name="relationType-parent"
+                  ng-model="vm.relationType.parentObjectType" required>
+            <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
+          </select>
+        </umb-control-group>
+
+        <!-- Child -->
+        <umb-control-group alias="relationType-child" label="@relationType_child">
+          <select class="umb-property-editor umb-dropdown" id="relationType-child"
+                  name="relationType-child"
+                  ng-model="vm.relationType.childObjectType" required>
+            <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
+          </select>
+        </umb-control-group>
+
+        <!-- IsDependency -->
+
+        <umb-control-group label="@relationType_isDependency">
+          <p class="sr-only" tabindex="0">
+            <localize key="relationType_direction"></localize>
+          </p>
+          <ul class="unstyled">
+            <li>
+              <label class="radio" for="dependency">
+                <umb-radiobutton input-id="dependency"
+                                 label-key="relationType_dependency"
+                                 model="vm.relationType.isDependency" name="relationType-isdependency" required="true"
+                                 value="true">
+                </umb-radiobutton>
+              </label>
+            </li>
+            <li>
+              <label class="radio" for="nodependency">
+                <umb-radiobutton input-id="nodependency"
+                                 label-key="relationType_noDependency"
+                                 model="vm.relationType.isDependency" name="relationType-isdependency" required="true"
+                                 value="false">
+                </umb-radiobutton>
+              </label>
+            </li>
+          </ul>
+        </umb-control-group>
+      </div>
+    </div>
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+      <umb-button action="close()"
+                  button-style="link"
+                  label-key="general_close"
+                  type="button">
+      </umb-button>
+      <umb-button button-style="primary"
+                  label-key="general_create"
+                  type="submit">
+      </umb-button>
+    </div>
+  </form>
+</div>

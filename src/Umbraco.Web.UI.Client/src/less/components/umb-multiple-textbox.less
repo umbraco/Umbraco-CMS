@@ -1,0 +1,58 @@
+﻿.umb-multiple-textbox {
+    .umb-property-editor--limit-width();
+
+    &__confirm {
+        position: relative;
+        display: inline-block;
+
+        &-action {
+            margin: -2px 0 0 0;
+            padding: 2px;
+            background: transparent;
+            border: 0 none;
+        }
+    }
+}
+
+.umb-multiple-textbox .textbox-wrapper {
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.umb-multiple-textbox .textbox-wrapper .umb-editor {
+    margin-bottom: 0;
+}
+
+.umb-multiple-textbox .textbox-wrapper i:not(.icon-delete, .icon-check) {
+    margin-right: 5px;
+}
+
+.umb-multiple-textbox .textbox-wrapper i.handle {
+    margin-left: 10px;
+    cursor: move;
+}
+
+.umb-multiple-textbox .add-link {
+    &:extend(.umb-node-preview-add);
+}
+
+.umb-multiple-textbox .add-link:hover {
+    &:extend(.umb-node-preview-add:hover);
+}
+
+.umb-editor-wrapper .umb-multiple-textbox .add-link {
+    &:extend(.umb-editor-wrapper .umb-node-preview);
+}
+
+.umb-multiple-textbox .add-link:disabled {
+    &:extend(.umb-node-preview-add:disabled);
+}
+
+.umb-multiple-textbox .add-link:disabled:hover {
+    &:extend(.umb-node-preview-add:disabled:hover);
+}
+
+.umb-modal .umb-multiple-textbox .textbox-wrapper .umb-editor {
+    flex: 1 1 auto;
+    width: auto;
+}

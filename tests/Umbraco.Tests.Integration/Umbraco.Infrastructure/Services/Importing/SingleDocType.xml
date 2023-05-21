@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DocumentType>
+  <Info>
+    <Name>test</Name>
+    <Key>150ead17-d359-42a2-ac33-6504cc52ced1</Key>
+    <Alias>test</Alias>
+    <Icon>folder.gif</Icon>
+    <Thumbnail>folder.png</Thumbnail>
+    <Description>
+    </Description>
+    <AllowAtRoot>False</AllowAtRoot>
+    <AllowedTemplates>
+      <Template>test</Template>
+    </AllowedTemplates>
+    <DefaultTemplate>test</DefaultTemplate>
+  </Info>
+  <Structure>
+    <DocumentType>test</DocumentType>
+  </Structure>
+  <GenericProperties>
+    <GenericProperty>
+      <Name>test</Name>
+      <Alias>test</Alias>
+      <Type>b4471851-82b6-4c75-afa4-39fa9c6a75e9</Type>
+      <Definition>fbaf13a8-4036-41f2-93a3-974f678c312a</Definition>
+      <Tab>
+      </Tab>
+      <Mandatory>False</Mandatory>
+      <Validation>
+      </Validation>
+      <Description><![CDATA[]]></Description>
+    </GenericProperty>
+  </GenericProperties>
+  <Tabs />
+</DocumentType>

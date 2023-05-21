@@ -1,0 +1,95 @@
+<div
+    data-element="{{name}}"
+    class="umb-overlay umb-overlay-{{position}} umb-overlay--{{size}}"
+    on-outside-click="outSideClick()"
+    umb-focus-lock
+    role="dialog"
+    aria-labelledby="umb-overlay-title"
+    aria-describedby="umb-overlay-description">
+    <ng-form class="umb-overlay__form" name="overlayForm" novalidate val-form-manager>
+        <div data-element="overlay-header" class="umb-overlay-header" ng-show="!model.hideHeader">
+            <h1 class="umb-overlay__title" id="umb-overlay-title">{{model.title}}</h1>
+            <p class="umb-overlay__subtitle" id="umb-overlay-description" ng-if="model.subtitle">{{model.subtitle}}</p>
+        </div>
+
+        <div data-element="overlay-content" class="umb-overlay-container form-horizontal">
+            <ng-transclude></ng-transclude>
+            <div ng-if="view && !parentScope" ng-include="view"></div>
+            <div class="scoped-view"></div>
+        </div>
+
+        <!-- If model contains the property of "itemDetails" we render  the relevant content here -->
+        <div class="umb-overlay__item-details" ng-if="model.itemDetails">
+            <div class="umb-overlay__item-details-title-wrapper" ng-if="model.itemDetails.icon || model.itemDetails.title">
+                <umb-icon
+                    icon="{{model.itemDetails.icon}}"
+                    class="umb-overlay__item-details-icon"
+                    ng-if="model.itemDetails.icon">
+                </umb-icon>
+                <h2 class="umb-overlay__item-details-title" ng-if="model.itemDetails.title">{{model.itemDetails.title}}</h2>
+            </div>
+            <p class="umb-overlay__item-details-description" ng-if="model.itemDetails.description">{{model.itemDetails.description}}</p>
+        </div>
+
+        <div data-element="overlay-footer" class="umb-overlay-drawer" ng-class="{'-auto-height': model.confirmSubmit.show}">
+
+            <div ng-if="model.confirmSubmit.show">
+
+                <h2 class="red" ng-if="model.confirmSubmit.title">
+                    <umb-icon icon="icon-alert"></umb-icon> {{model.confirmSubmit.title}}
+                </h2>
+                <p ng-if="model.confirmSubmit.description">{{model.confirmSubmit.description}}</p>
+
+                <label class="checkbox no-indent">
+                    <input type="checkbox" ng-model="directive.enableConfirmButton" />
+                    <strong>{{model.confirmSubmit.checkboxLabel}}</strong>
+                </label>
+
+                <div class="umb-overlay-drawer__align-right">
+                    <umb-button
+                        alias="overlayCancelSubmit"
+                        action="cancelConfirmSubmit()"
+                        button-style="link"
+                        label="Cancel"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        data-element="overlay-confirm-submit"
+                        button-style="success"
+                        label="Confirm"
+                        type="button"
+                        disabled="!directive.enableConfirmButton"
+                        action="submitForm(model)"
+                        auto-focus="true">
+                    </umb-button>
+                </div>
+            </div>
+
+            <div class="umb-overlay-drawer__align-right" ng-if="!model.confirmSubmit.show">
+                <umb-button
+                    alias="overlayClose"
+                    action="closeOverLay()"
+                    button-style="link"
+                    label-key="{{model.closeButtonLabelKey}}"
+                    label="{{model.closeButtonLabel}}"
+                    type="button">
+                </umb-button>
+
+                <umb-button
+                    alias="overlaySubmit"
+                    button-style="{{model.submitButtonStyle || 'success'}}"
+                    label-key="{{model.submitButtonLabelKey}}"
+                    label="{{model.submitButtonLabel}}"
+                    ng-if="model.submit && model.hideSubmitButton !== true"
+                    type="button"
+                    disabled="model.disableSubmitButton"
+                    action="submitForm(model)"
+                    state="model.submitButtonState"
+                    auto-focus="true">
+                </umb-button>
+            </div>
+
+        </div>
+    </ng-form>
+</div>

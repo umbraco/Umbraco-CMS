@@ -1,0 +1,349 @@
+// Table Styles
+.umb-table {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: @white;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    min-width: auto;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+    border-radius: 3px;
+}
+
+.umb-table.umb-table-inactive {
+
+    &:before {
+        content: "";
+        background: rgba(255, 255, 255, 0.75);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        outline: 1px solid rgba(255, 255, 255, 0.75);
+    }
+
+}
+
+.umb-table__action,
+.umb-table a {
+    background: transparent;
+    border: 0 none;
+    text-decoration: none;
+    padding: 0;
+    margin-left: 1px;
+    body:not(.tabbing-active) & {
+        outline: 0;
+    }
+}
+
+
+input.umb-table__input {
+    margin: 0 auto;
+}
+
+
+
+
+// Table Head Styles
+.umb-table-head {
+    font-size: 14px;
+    font-weight: bold;
+
+    color: @ui-disabled-type;
+}
+
+.umb-table-head__icon {
+    position: relative;
+    top: 2px;
+}
+
+.umb-table-head__link {
+    background: transparent;
+    border: 0 none;
+    position: relative;
+    text-decoration: none;
+    color: @gray-3;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0 1px;
+
+    &:hover {
+        text-decoration: none;
+        cursor: default;
+        color: @gray-3;
+    }
+}
+
+.umb-table-head__link.sortable {
+    cursor: pointer;
+    color: @ui-action-discreet-type;
+    &:hover {
+        color: @ui-action-discreet-type-hover;
+    }
+
+    outline-offset: 1px;
+}
+
+.umb-table-thead__icon {
+    position: absolute;
+    padding-top: 1px;
+    padding-left: 3px;
+    font-size: 13px;
+    cursor: default;
+}
+
+.umb-table-thead .sortable:hover {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
+// Table Body Styles
+.umb-table-body {
+    position: relative;
+}
+
+.umb-table-body .umb-table-row {
+    color: @gray-5;
+    border-top: 1px solid @gray-9;
+    font-size: 14px;
+    position: relative;
+    min-height: 52px;
+}
+.umb-table-body .umb-table-row.-selectable {
+    cursor: pointer;
+}
+.umb-table-row.-selected,
+.umb-table-body .umb-table-row.-selectable:hover {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:1;
+        top: 1px;
+        left: 1px;
+        right: 1px;
+        bottom: 1px;
+        border: 2px solid @ui-selected-border;
+        pointer-events: none;
+    }
+}
+.umb-table-body .umb-table-row.-selectable {
+    &:hover {
+        &::before {
+            opacity:.33;
+        }
+    }
+}
+.umb-table-body .umb-table-row.-selected.-selectable {
+    &:hover {
+        &::before {
+            opacity:.66;
+        }
+        .umb-table-body__checkicon {
+            color: @ui-selected-border;
+        }
+    }
+}
+
+.umb-table-body .umb-table-row.-solid {
+    cursor: default;
+
+    &:hover {
+        background-color: @white;
+    }
+}
+
+.umb-table-body__link {
+    position: relative;
+    color: @ui-option-type;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        color: @ui-option-type-hover;
+        text-decoration: underline;
+    }
+}
+
+.umb-table-body .umb-table-body__icon {
+    margin: 0 auto;
+    font-size: 20px;
+    line-height: 20px;
+    color: @ui-option-type;
+    vertical-align: bottom;
+    text-decoration: none;
+}
+
+.umb-table-body .umb-table-body__icon.umb-table-body__checkicon {
+    display: none;
+    font-size: 18px;
+    line-height: 20px;
+    color: @ui-selected-border;
+}
+
+.umb-table-body .umb-table__name {
+    color: @ui-option-type;
+    font-size: 14px;
+    font-weight: bold;
+    a {
+        color: @ui-option-type;
+        outline-offset: 1px;
+        &:hover {
+            color: @ui-option-type-hover;
+            text-decoration: underline;
+        }
+    }
+}
+.umb-table-body .umb-table-row.-light {
+    .umb-table-body__icon {
+        color: @ui-option-disabled-type;
+    }
+    .umb-table__name {
+        color: @ui-option-disabled-type;
+        a {
+            color: @ui-option-disabled-type;
+            &:hover, &:focus {
+                color: @ui-option-disabled-type-hover;
+            }
+        }
+    }
+}
+
+// Styles of no items in the listview
+.umb-table-body__empty {
+    font-size: 16px;
+    text-align: center;
+    color: @gray-3;
+    padding: 20px 0;
+    height: 100%;
+}
+
+// Show checkmark when checked, hide file icon
+.umb-table-body .umb-table-row.-selected {
+    .umb-table-body__icon {
+        &.umb-table-body__fileicon {
+            display: none;
+        }
+        &.umb-table-body__checkicon {
+            display: inline-block;
+        }
+    }
+}
+
+// Table Row Styles
+.umb-table-row {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    user-select: none;
+}
+
+.umb-table-body .umb-table-row--empty {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    padding: 5px 0;
+    cursor: auto;
+    user-select: auto;
+}
+
+.umb-table-body .umb-table-row--empty:hover {
+    background-color: transparent;
+    cursor: auto;
+}
+
+// Table Cell Styles
+.umb-table-cell {
+    display: flex;
+    flex-flow: row nowrap;
+    flex: 1 1 5%;
+    position: relative;
+    margin: auto 0;
+    padding: 6px 16px;
+    text-align: left;
+    overflow:hidden;
+}
+
+.umb-table-cell > * {
+    overflow: hidden;
+    white-space: nowrap; //NOTE Disable/Enable this to keep textstring on one line
+    text-overflow: ellipsis;
+}
+.umb-table-cell.--noOverflow > * {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: unset;
+}
+
+.umb-table-cell:first-of-type:not(.not-fixed) {
+    flex: 0 0 25px;
+    margin: 0;
+    padding: 15px 0 15px 15px;
+}
+
+.umb-table-cell--auto-width {
+    flex: 0 0 auto !important;
+}
+
+.umb-table-cell--nano {
+    flex: 0 0 50px;
+}
+.umb-table-cell--small {
+    flex: .5 .5 1%;
+    max-width: 12.5%;
+}
+.umb-table-cell--large {
+    flex: 1 1 25%;
+    max-width: 25%;
+}
+
+.umb-table-cell--faded {
+    opacity: 0.4;
+}
+
+
+// Increases the space for the name cell
+.umb-table__name {
+    flex: 1 1 20%;
+    max-width: 300px;
+}
+
+.umb-table__loading-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 1;
+}
+
+.umb-table__row-expand {
+    font-size: 12px;
+    text-decoration: none;
+    color: @gray-4;
+
+    &:hover {
+        color: @black;
+    }
+}
+
+.umb-table__row-expand--hidden {
+    visibility: hidden;
+}
+
+.umb-table--condensed {
+
+    .umb-table-cell:first-of-type:not(.not-fixed) {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .umb-table-body__icon {
+        font-size: 20px;
+    }
+
+}

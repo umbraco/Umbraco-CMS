@@ -1,0 +1,290 @@
+﻿.umb-nested-content {
+    position: relative;
+}
+
+.umb-nested-content-property-container {
+    position: relative;
+
+    &:not(:last-child){
+        margin-bottom: 12px;
+    }
+}
+
+.umb-nested-content--not-supported {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.umb-nested-content-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+.umb-nested-content__item {
+    position: relative;
+    text-align: left;
+    background: @white;
+    border: 1px solid @gray-9;
+    border-radius: @baseBorderRadius;
+    transition: border-color 120ms;
+    margin-bottom: 4px;
+    margin-top: 4px;
+
+    &.--error {
+        border-color: @formErrorBorder !important;
+    }
+    
+    .show-validation-type-warning &.--error {
+        border-color: @formWarningBorder !important;
+    }
+}
+
+.umb-nested-content__item.ui-sortable-placeholder {
+    margin-top: 1px;
+    visibility: visible !important;
+}
+
+.umb-nested-content__item--single {
+    border: 0;
+
+    > .umb-nested-content__content {
+        > .umb-pane {
+            margin: 0;
+        }
+    }
+}
+
+.umb-nested-content__header-bar {
+    cursor: pointer;
+    background-color: @white;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+
+    &:hover {
+        .umb-nested-content__heading .umb-nested-content__item-name {
+            padding-right: 60px;
+        }
+    }
+}
+
+.umb-nested-content__heading {
+    display: flex;
+    padding: 15px;
+    line-height: 20px;
+    color: @ui-option-type;
+
+    &:hover {
+        color: @ui-option-type-hover;
+    }
+
+    .umb-nested-content__item-icon {
+        margin-top: -3px;
+        font-size: 22px;
+    }
+
+    .umb-nested-content__item-name {
+        display: block;
+        max-height: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-left: 5px;
+
+        &.--has-icon {
+            padding-left: 10px;
+        }
+    }
+}
+
+.umb-nested-content__icons {
+    opacity: 0;
+    transition: opacity 120ms ease-in-out;
+    position: absolute;
+    right: 0;
+    top: 5px;
+    padding: 5px;
+    background-color: @white;
+}
+
+.umb-nested-content__item--active > .umb-nested-content__header-bar {
+    .umb-nested-content__heading {
+        background-color: @ui-active;
+
+        &:hover {
+            color: @ui-option-type;
+        }
+
+        .umb-nested-content__item-name {
+            padding-right: 60px;
+        }
+    }
+
+    .umb-nested-content__icons {
+        background-color: @ui-active;
+        &:before {
+            background: linear-gradient(90deg, rgba(255,255,255,0), @ui-active);
+        }
+    }
+}
+
+.umb-nested-content__header-bar:hover .umb-nested-content__icons,
+.umb-nested-content__header-bar:focus .umb-nested-content__icons,
+.umb-nested-content__header-bar:focus-within .umb-nested-content__icons,
+.umb-nested-content__item--active > .umb-nested-content__header-bar .umb-nested-content__icons {
+    opacity: 1;
+}
+
+.umb-nested-content__icon {
+    background: transparent;
+    border: 0 none;
+    display: inline-block;
+    padding: 4px;
+    margin: 2px;
+    cursor: pointer;
+    color: @ui-option-type;
+}
+
+.umb-nested-content__icon:hover {
+    color: @ui-option-type-hover;
+    text-decoration: none;
+}
+
+.umb-nested-content__icon .icon {
+    display: block;
+    font-size: 18px !important;
+}
+
+.umb-nested-content__icon--disabled {
+    opacity: 0.3;
+    cursor: default !important;
+
+    &:hover {
+        color: @ui-option-type;
+    }
+}
+
+.umb-nested-content__footer-bar {
+    margin-top: 20px;
+}
+
+.umb-nested-content__add-content {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed @ui-action-discreet-border;
+    color: @ui-action-discreet-type;
+    font-weight: bold;
+    padding: 5px 15px;
+    box-sizing: border-box;
+}
+
+.umb-nested-content__add-content:hover {
+    color: @ui-action-discreet-type-hover;
+    border-color: @ui-action-discreet-border-hover;
+    text-decoration: none;
+}
+
+.umb-nested-content__add-content.--disabled,
+.umb-nested-content__add-content.--disabled:hover,
+.umb-nested-content__add-content[disabled],
+.umb-nested-content__add-content[disabled]:hover {
+    color: @gray-7;
+    border-color: @gray-7;
+    cursor: not-allowed;
+}
+
+.umb-nested-content__content {
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-radius: 0 0 3px 3px;
+}
+
+.umb-nested-content__item--active:not(.umb-nested-content__item--single) .umb-nested-content__content {
+    background: @brownGrayExtraLight;
+}
+
+.umb-nested-content__content .umb-control-group {
+    padding-bottom: 0;
+}
+
+.umb-nested-content__item.ui-sortable-helper .umb-nested-content__content {
+    display: none !important;
+}
+
+.umb-nested-content__doctypepicker table input,
+.umb-nested-content__doctypepicker table select {
+    width: 100%;
+    padding-right: 0;
+}
+
+.umb-nested-content__doctypepicker table td.icon-navigation,
+.umb-nested-content__doctypepicker .umb-nested-content__help-icon {
+    vertical-align: middle;
+    color: @gray-7;
+}
+
+.umb-nested-content__doctypepicker table td.icon-navigation:hover,
+.umb-nested-content__doctypepicker .umb-nested-content__help-icon:hover {
+    color: @gray-2;
+}
+
+.umb-nested-content__doctypepicker .umb-nested-content__help-action {
+    margin-left: 10px;
+}
+
+.umb-nested-content__placeholder {
+    padding: 4px 6px;
+    border: 1px dashed @gray-8;
+    background: 0 0;
+    cursor: pointer;
+    color: @blueExtraDark;
+    -webkit-animation: fadeIn .5s;
+    animation: fadeIn .5s;
+    text-align: center;
+
+    &--selected {
+        border: none;
+        text-align: left;
+        padding: 0;
+    }
+}
+
+.umb-nested-content__placeholder:hover {
+    color: @blueMid;
+    border-color: @blueMid;
+    text-decoration: none;
+}
+
+.form-horizontal .umb-nested-content--narrow .controls-row {
+    margin-left: 40% !important;
+}
+
+.form-horizontal .umb-nested-content--narrow .controls-row .umb-textstring,
+.form-horizontal .umb-nested-content--narrow .controls-row .umb-textarea
+{
+    width: 95%;
+}
+
+.form-horizontal .umb-nested-content--narrow .controls-row .umb-dropdown {
+    width: 99%;
+}
+
+// this resolves the layout issue introduced in nested content in 7.12 with the addition of the input for link anchors
+// the attribute selector ensures the change only applies to the linkpicker overlay
+.form-horizontal .umb-nested-content--narrow [ng-controller*="Umbraco.Overlays.LinkPickerController"] .controls-row {
+    margin-left:0!important;
+
+    .umb-textarea, .umb-textstring {
+        width:100%;
+    }
+}

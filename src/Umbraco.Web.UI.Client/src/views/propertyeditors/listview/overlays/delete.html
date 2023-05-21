@@ -1,0 +1,21 @@
+<div ng-controller="Umbraco.Overlays.ListViewDeleteController as vm">
+
+    <p class="abstract" ng-if="!vm.disableDelete">
+        <localize key="defaultdialogs_confirmdeleteNumberOfItems" tokens="[model.numberOfItems, model.totalItems]">Are you sure you want to delete</localize>?
+    </p>
+
+    <umb-tracked-references-bulk-action selection="model.selection" on-loading-complete="vm.checkingReferencesComplete()" hide-no-result="true" compact="true" on-warning="vm.onReferencesWarning()"></umb-tracked-references-listview>
+
+    <div class="abstract umb-alert umb-alert--warning" ng-if="vm.warningText">
+        {{vm.warningText}}
+    </div>
+
+    <div class="umb-alert umb-alert--warning" ng-show="model.deletesVariants && !model.isTrashed">
+        <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
+    </div>
+
+    <div class="umb-alert umb-alert--warning" ng-show="model.isTrashed">
+        <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.
+    </div>
+
+</div>

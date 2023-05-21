@@ -1,0 +1,98 @@
+// OVERLAY
+.umb_confirm-action__overlay {
+    position: absolute;
+    z-index: 999999;
+    display: flex;
+}
+
+// positions
+.umb_confirm-action__overlay.-top {
+    top: -50px;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    animation: fadeInUp 0.2s;
+    flex-direction: column;
+}
+
+.umb_confirm-action__overlay.-right {
+    top: 0;
+    right: -50px;
+    bottom: auto;
+    left: auto;
+    animation: fadeInLeft 0.2s;
+    flex-direction: row;
+}
+
+.umb_confirm-action__overlay.-bottom {
+    top: auto;
+    right: auto;
+    bottom: -50px;
+    left: 0;
+    animation: fadeInDown 0.2s;
+    flex-direction: column;
+}
+
+.umb_confirm-action__overlay.-left {
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: -50px;
+    animation: fadeInRight 0.2s;
+    flex-direction: row;
+}
+
+.umb_confirm-action__overlay {
+
+    .umb_confirm-action__overlay-action {
+        margin-right: 5px;
+
+        &.-confirm {
+            order: 1;
+        }
+
+        &.-cancel {
+            order: 2;
+        }
+    }
+
+    // BUTTONS
+    .umb_confirm-action__overlay-action {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: @white;
+        border-radius: 40px;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        font-size: 18px;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover {
+            text-decoration: none;
+            color: @white;
+        }
+
+        // confirm button
+        &.-confirm {
+            background: @white;
+            color: @green !important;
+
+            &:hover {
+                color: @green !important;
+            }
+        }
+
+        // cancel button
+        &.-cancel {
+            background: @white;
+            color: @red !important;
+
+            &:hover {
+                color: @red !important;
+            }
+        }
+    }
+}

@@ -1,0 +1,378 @@
+//
+// Buttons
+// --------------------------------------------------
+
+
+// Base styles
+// --------------------------------------------------
+
+// Core
+.btn {
+  display: inline-block;
+  padding: 6px 14px;
+  margin-bottom: 0; // For input.btn
+  font-size: @baseFontSize;
+  line-height: @baseLineHeight;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background: @btnBackground;
+  color: @black;
+  border: none;
+  box-shadow: none;
+  border-radius: 3px;
+
+    // Hover/focus state
+    &:hover {
+        background: @btnBackgroundHighlight;
+        color: @gray-4;
+        background-position: 0 -15px;
+        text-decoration: none;
+
+        // transition is only when going to hover/focus, otherwise the background
+        // behind the gradient (there for IE<=9 fallback) gets mismatched
+        .transition(background-position .1s linear);
+    }
+
+    // Active state
+    &.active,
+    &:active {
+        background-image: none;
+        outline: 0;
+        .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
+    }
+
+    // Disabled state
+    &.disabled,
+    &[disabled],
+    &:disabled:hover {
+        cursor: default;
+        border-color: @btnBorder;
+        .opacity(80);
+        .box-shadow(none);
+    }
+
+}
+
+.btn-group>.btn+.dropdown-toggle {
+    box-shadow: none;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-color: rgba(0,0,0,0.09);
+}
+
+// Button Reset - remove the default browser styles from the button element
+// --------------------------------------------------
+
+.btn-reset {
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+    color: currentColor;
+    font-family: @baseFontFamily;
+    font-size: @baseFontSize;
+    line-height: @baseLineHeight;
+    cursor: pointer;
+
+    // Disabled state
+    &.disabled,
+    &[disabled],
+    &:disabled:hover {
+        cursor: default;
+    }
+}
+    
+// Button Sizes
+// --------------------------------------------------
+
+// Large
+.btn-large {
+  padding: @paddingLarge;
+  font-size: @fontSizeLarge;
+}
+.btn-large [class^="icon-"],
+.btn-large [class*=" icon-"] {
+  margin-top: 4px;
+  .border-radius(@borderRadiusLarge);
+}
+
+// Small
+.btn-small {
+  padding: @paddingSmall;
+  font-size: @fontSizeSmall;
+  .border-radius(@borderRadiusSmall);
+}
+
+.btn-small [class^="icon-"],
+.btn-small [class*=" icon-"] {
+  margin-top: 0;
+}
+.btn-mini [class^="icon-"],
+.btn-mini [class*=" icon-"] {
+  margin-top: -1px;
+}
+
+// Mini
+.btn-mini {
+  padding: @paddingMini;
+  font-size: @fontSizeMini;
+  .border-radius(@borderRadiusSmall);
+}
+
+
+// Block button
+// -------------------------
+
+.btn-block {
+  display: block;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  .box-sizing(border-box);
+}
+
+// Vertically space out multiple block buttons
+.btn-block + .btn-block {
+  margin-top: 5px;
+}
+
+// Specificity overrides
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  &.btn-block {
+    width: 100%;
+  }
+}
+
+// Round button
+.btn-round{
+  font-size: 24px;
+  color: @gray-3;
+  background: @white;
+
+  line-height: 32px;
+  text-align: center;
+  border-radius: 15px;
+  height: 32px;
+  width: 32px;
+  overflow: hidden;
+  display: inline-block;
+  z-index: 6666;
+}
+
+
+// Alternate buttons
+// --------------------------------------------------
+
+// Provide *some* extra contrast for those who can get it
+.btn-primary.active,
+.btn-warning.active,
+.btn-danger.active,
+.btn-success.active,
+.btn-info.active,
+.btn-inverse.active,
+.btn-neutral.active {
+  color: rgba(255,255,255,.75);
+}
+
+.btn-primary, 
+.btn-warning,
+.btn-danger,
+.btn-success,
+.btn-info,
+.btn-inverse,
+.btn-neutral {
+  font-weight: bold;
+}
+
+// Set the backgrounds
+// -------------------------
+.btn-primary {
+  .buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
+}
+
+// Warning appears are orange
+.btn-warning {
+  .buttonBackground(@btnWarningBackground, @btnWarningBackgroundHighlight);
+}
+// Danger and error appear as red
+.btn-danger {
+  .buttonBackground(@btnDangerBackground, @btnDangerBackgroundHighlight);
+}
+// Success appears as green
+.btn-success {
+  .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight, @btnSuccessType);
+}
+// Info appears as a sand color
+.btn-info {
+  .buttonBackground(@sand-5, @sand-6, @blueExtraDark, @blueMid);
+}
+// Made for Umbraco, 2019
+.btn-action {
+  .buttonBackground(@blueExtraDark, @blueDark, @white, @u-white);
+}
+// Made for Umbraco, 2019
+.btn-selection {
+    @btnSelectionBackgroundHover: darken(@pinkLight, 10%);
+  .buttonBackground(@pinkLight, @btnSelectionBackgroundHover, @blueExtraDark, @blueDark);
+}
+// Made for Umbraco, 2019, used for buttons that has to stand back.
+.btn-white {
+  .buttonBackground(@btnWhiteBackground, @btnWhiteBackgroundHighlight, @btnWhiteType, @btnWhiteTypeHover, @gray-10, @gray-7);
+}
+// Inverse appears as dark gray
+.btn-inverse {
+  .buttonBackground(@btnInverseBackground, @btnInverseBackgroundHighlight);
+}
+// Neutral appears as lighter gray
+.btn-neutral {
+  .buttonBackground(@btnNeutralBackground, @btnNeutralBackgroundHighlight);
+  color: @gray-5;
+  // Hover/focus state
+  &:hover {
+    color: @gray-5;
+  }
+
+  &.disabled,
+  &[disabled] {
+    color: @gray-5;
+    .opacity(65);
+  }
+
+}
+
+.btn-install {
+    margin: 40px auto;
+    display: block;
+    padding: 15px 50px;
+    font-size: 16px;
+    border: none;
+    background: @ui-btn-positive;
+    color: @white;
+    font-weight: bold;
+    &:hover {
+        background: @ui-btn-positive-hover;
+    }
+}
+
+// outlined
+.btn-outline {
+  border: 1px solid;
+  border-color: @gray-7;
+  background: transparent;
+  color: @blueExtraDark;
+  padding: 5px 13px;
+  transition: border-color .12s linear, color .12s linear;
+  font-weight: 600;
+}
+
+.btn-outline:hover {
+  border-color: @ui-light-type-hover;
+  color: @ui-light-type-hover;
+  background: transparent;
+  transition: border-color .12s linear, color .12s linear;
+}
+
+// Cross-browser Jank
+// --------------------------------------------------
+
+button.btn,
+input[type="submit"].btn {
+
+  // Firefox 3.6 only I believe
+  &::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+  }
+
+  // Safari defaults to 1px for input. Ref U4-7721.
+  margin: 0px;
+}
+
+
+// Link buttons
+// --------------------------------------------------
+
+// Make a button look and behave like a link
+.btn-link,
+.btn-link:active,
+.btn-link[disabled] {
+  background-color: transparent;
+  background-image: none;
+  .box-shadow(none);
+}
+.btn-link {
+  border-color: transparent;
+  cursor: pointer;
+  color: @linkColor;
+  .border-radius(0);
+}
+.btn-link:hover {
+  color: @linkColorHover;
+  text-decoration: underline;
+  background-color: transparent;
+}
+.btn-link[disabled]:hover {
+  color: @gray-4;
+  text-decoration: none;
+}
+
+// Make a reverse type of a button link
+.btn-link-reverse{
+    text-decoration:underline;
+  &:hover {
+    text-decoration:none;
+  }
+}
+
+.btn-link.-underline {
+    display: inline-block;
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+// Placeholder buttons
+// ------------------------------
+
+.btn-placeholder {
+  background-color: transparent;
+  color: @ui-action-type;
+  font-weight: bold;
+  border: 1px dashed @gray-7;
+
+  &:hover {
+    color:@ui-action-type-hover;
+    text-decoration: none;
+    border-color: @ui-active-type-hover;
+ }
+}
+
+// Icon buttons
+// ------------------------------
+
+// 31 July 19, Nathan Woulfe says: Reset styles for cases where button shows an icon only (eg edit/remove property on document type)
+// This is lifted from umb-group-builder.less
+
+.btn-icon {
+    border: none;      
+    font-size: 18px;
+    position: relative;
+    cursor: pointer;
+    color: @ui-icon;
+    margin: 0;
+    padding: 3px 5px;
+    width: auto;
+    overflow: visible;
+    background: transparent;
+    line-height: normal;
+    -webkit-appearance: none;
+
+    &:hover {
+        color: @ui-icon-hover;
+    }
+}

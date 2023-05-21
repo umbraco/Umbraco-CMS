@@ -1,0 +1,21 @@
+<div ng-controller="Umbraco.PrevalueEditors.ImageFilePickerController as vm" class="umb-property-editor umb-mediapicker umb-mediapicker-single">
+    <div class="flex flex-wrap error">
+        <ul class="umb-sortable-thumbnails">
+            <li ng-if="vm.model.value" class="umb-sortable-thumbnails__wrapper">
+                <img ng-src="{{vm.model.value}}" alt="">
+
+                <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
+                    <button type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" ng-click="vm.remove()">
+                        <umb-icon icon="icon-delete" class="icon"></umb-icon>
+                    </button>
+                </div>
+            </li>
+
+            <li style="border: none;" class="add-wrapper unsortable" ng-hide="vm.model.value">
+                <button type="button" aria-label="Open media picker" class="add-link add-link-square btn-reset umb-outline umb-outline--surrounding" ng-click="vm.add()">
+                    <umb-icon icon="icon-add" class="icon large"></umb-icon>
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>

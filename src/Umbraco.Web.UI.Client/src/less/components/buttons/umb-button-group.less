@@ -1,0 +1,33 @@
+.umb-button-group__toggle {
+   padding-left: 8px;
+   padding-right: 8px;
+   float: none;
+}
+
+.umb-button-group__sub-buttons.-align-right {
+   right: 0;
+   left: auto;
+}
+
+.umb-button-group__sub-buttons>li>button,
+.umb-button-group__sub-buttons>li>a {
+    display: flex;
+}
+
+.umb-button-group.-with-button-group-toggle {
+
+    .umb-button__button {
+        border-radius: @baseBorderRadius 0 0 @baseBorderRadius;
+
+        &:hover {
+            z-index: 2;
+        }
+    }
+
+    .umb-button-group__toggle {
+        border-radius: 0 @baseBorderRadius @baseBorderRadius 0;
+        margin-left: -1px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}

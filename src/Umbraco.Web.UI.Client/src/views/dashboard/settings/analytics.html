@@ -1,0 +1,60 @@
+﻿<div ng-controller="Umbraco.Dashboard.AnalyticsController as vm">
+  <umb-box>
+    <umb-box-content>
+      <h3 class="bold">
+        <localize key="analytics_consentForAnalytics">Consent for telemetry data</localize>
+      </h3>
+      <div class="umb-healthcheck-help-text">
+        <localize key="analytics_analyticsDescription">
+          In order to improve Umbraco and add new functionality based on as relevant information as possible,
+          <br>we would like to collect system- and usage information from your installation.
+          <br>Aggregate data will be shared on a regular basis as well as learnings from these metrics.
+          <br>Hopefully, you will help us collect some valuable data.
+          <br>
+          <br>We <b>WILL NOT</b> collect any personal data such as content, code, user information, and all data will be fully anonymized.
+        </localize>
+        <div ng-if="!vm.loading" style="padding-left: 12px; padding-top: 50px; padding-bottom: 50px; width: 280px;">
+          <umb-range-slider
+            ng-model="vm.val"
+            on-setup="vm.setup(slider)"
+            options="vm.sliderOptions"
+            on-update="vm.sliderChange(values)">
+          </umb-range-slider>
+        </div>
+
+        <div ng-if="vm.sliderVal === 'Minimal'">
+          <localize key="analytics_minimalLevelDescription">We'll only send an anonymous site ID to let us know that the
+            site exists.
+          </localize>
+        </div>
+        <div ng-if="vm.sliderVal === 'Basic'">
+          <localize key="analytics_basicLevelDescription">We'll send site ID, umbraco version and packages installed
+          </localize>
+        </div>
+        <div ng-if="vm.sliderVal === 'Detailed'">
+          <localize key="analytics_detailedLevelDescription">
+            We will send:
+            <ul>
+              <li>Anonymized site ID, umbraco version, and packages installed.</li>
+              <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+              <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+              <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+            </ul>
+            <i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+            <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>
+          </localize>
+        </div>
+      </div>
+      <div class="umb-panel-group__details-status-actions">
+        <umb-button type="button"
+                    button-style="success"
+                    label="Save"
+                    action="vm.saveConsentLevel()"
+                    ng-model="vm.sliderVal" ng-if="vm.consentLevel">
+        </umb-button>
+      </div>
+    </umb-box-content>
+  </umb-box>
+</div>
+
+

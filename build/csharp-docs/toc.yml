@@ -1,0 +1,9 @@
+- name: Core
+  href: api/Umbraco.Cms.Core.html
+- name: Infrastructure
+  href: api/Umbraco.Cms.Infrastructure.html
+- name: Web
+  href: api/Umbraco.Cms.Web.Common.html
+- name: Extensions
+  href: api/Umbraco.Extensions.html
+

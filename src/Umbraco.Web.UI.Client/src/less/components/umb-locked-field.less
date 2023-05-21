@@ -1,0 +1,64 @@
+.umb-locked-field {
+  font-size: 13px;
+  color: @gray-7;
+  position: relative;
+  display: block;
+}
+
+.umb-locked-field__wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.umb-locked-field__toggle {
+  margin-right: 3px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: inherit;
+  line-height: inherit;
+
+  &:focus {
+    outline: none;
+
+    .tabbing-active & {
+      outline: 2px solid @inputBorderTabFocus;
+    }
+  }
+}
+
+.umb-locked-field__toggle:hover,
+.umb-locked-field__toggle:focus {
+  text-decoration: none;
+}
+
+.umb-locked-field__lock-icon {
+  color: @gray-7;
+  transition: color 0.25s;
+}
+
+.umb-locked-field__lock-icon.-unlocked {
+   color: @gray-3;
+}
+
+input.umb-locked-field__input,
+.umb-locked-field__text {
+  background: rgba(255, 255, 255, 0); // if using transparent it will hide the text in safari
+  border-color: transparent !important;
+  font-size: 13px;
+  margin-bottom: 0;
+  color: @gray-6;
+  transition: color 0.25s;
+  padding: 0;
+  height: auto;
+  max-width: 300px;
+}
+
+input.umb-locked-field__input:focus {
+  box-shadow: none !important;
+}
+
+input.umb-locked-field__input.-unlocked {
+   color: @gray-3;
+}

@@ -1,0 +1,81 @@
+<div ng-controller="Umbraco.PrevalueEditors.TreeSourceController" class="umb-property-editor umb-contentpicker">
+
+	<select ng-model="model.value.type" class="umb-property-editor" ng-change="clear()">
+		<option value="content">Content</option>
+		<option value="media">Media</option>
+		<option value="member">Members</option>
+	</select>
+
+    <umb-node-preview
+		ng-show="node"
+        class="mt1"
+		icon="node.icon"
+		name="node.name"
+		published="node.published"
+		description="node.path"
+		allow-remove="true"
+		allow-edit="true"
+		on-remove="clear()"
+		on-edit="openContentPicker()">
+	</umb-node-preview>
+
+    <div ng-if="!node && model.value.type !== 'member'" class="mt2">
+        <div ng-hide="showSearch || model.value.query">
+            <button type="button" class="umb-node-preview-add"
+                    ng-click="openContentPicker()">
+                <localize key="general_choose">Choose a root node</localize>
+            </button>
+            <div class="mt2" ng-show="model.value.type == 'content'">
+                <umb-icon icon="icon-search" class="icon"></umb-icon>
+                <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with XPath</button>
+            </div>
+        </div>
+
+        <div ng-show="showSearch || model.value.query">
+
+            <input type="text"
+                   ng-model="model.value.query"
+                   class="umb-property-editor umb-textstring"
+                   placeholder="Enter XPath query">
+
+            <ul class="unstyled list-icons mt3">
+                <li style="max-width: 600px">
+                    <umb-icon icon="icon-help-alt" class="icon"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="showHelp = !showHelp">{{showHelp ? 'Hide' : 'Show'}} XPath query help</button>
+
+                    <div class="small" ng-show="showHelp">
+                        <p>
+                            Use an XPath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
+                        </p>
+
+                        <p>
+                            A placeholder finds the nearest published ID and runs its query from there, so for instance:
+                        </p>
+                        
+                        <pre>$parent/newsArticle</pre>
+                        
+                        <p>
+                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news article children there.
+                        </p>
+
+                        <p>
+                            Available placeholders: <br/>
+                            <code>$current</code>: Current page or closest found ancestor<br/>
+                            <code>$parent</code>: Parent page or closest found ancestor<br/>
+                            <code>$root</code>: Root of the content tree<br/>
+                            <code>$site</code>: Ancestor node at level 1<br/>
+                        </p>
+                        <p>
+                            Note: The placeholder can only be used at the beginning of the query.
+                        </p>
+                    </div>
+                </li>
+                <li>
+                    <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

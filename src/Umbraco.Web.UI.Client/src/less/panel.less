@@ -1,0 +1,447 @@
+// Panel
+// -------------------------
+.umb-panel {
+    background: @white;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+.umb-panel-nobody {
+    padding-top: 100px;
+    overflow: auto;
+}
+
+.umb-panel-header {
+    background: @gray-10;
+    border-bottom: 1px solid @purple-l3;
+    position: absolute;
+    height: 99px;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+}
+
+.umb-panel-body {
+    top: 101px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    position: absolute;
+    clear: both;
+    overflow: auto;
+}
+
+.umb-panel-body.no-header {
+    top: 20px;
+}
+
+.umb-panel-body.with-footer {
+    bottom: 90px;
+}
+
+.umb-mediapicker-upload {
+    display: flex;
+
+    .form-search {
+        flex: 1;
+
+        i.icon-search {
+            top: 16px;
+        }
+
+        &__toggle {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+
+            label {
+                display: flex;
+                align-items: center;
+                margin-left: 5px;
+                margin-bottom: 0;
+
+                input[type="checkbox"] {
+                    margin: 0 5px 0 0;
+                }
+            }
+        }
+    }
+
+    .upload-button {
+        margin-left: 16px;
+    }
+}
+
+.umb-panel.editor-breadcrumb .umb-panel-body, .umb-panel.editor-breadcrumb .umb-bottom-bar {
+    bottom: 31px !important;
+}
+
+.umb-panel-header .umb-headline, .umb-panel-header h1 {
+    font-size: 16px;
+    border: none;
+    background: none;
+    margin: 15px 0 0 20px;
+    padding: 3px 5px;
+    line-height: 1.4;
+    height: auto;
+    width: 100%;
+    border: 1px solid @gray-10;
+}
+
+.umb-panel-header .umb-headline:focus, .umb-panel-header .umb-headline:active {
+    border: 1px solid @gray-8;
+    background-color: @white;
+}
+
+.umb-panel-header p {
+    margin: 0px 20px;
+}
+
+.umb-btn-toolbar .dimmed, .umb-dimmed {
+    opacity: 0.6;
+}
+
+.umb-panel-header-meta {
+    height: 50px;
+}
+
+.umb-panel-header .umb-btn-toolbar {
+    float: right;
+    padding: 5px 20px 0 0;
+}
+
+.umb-panel-footer {
+    margin: 0;
+    padding: 20px;
+    z-index: 999;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+
+/* Publish */
+.umb-btn-toolbar .dropdown-menu {
+    right: 0;
+    left: auto;
+    border-radius: @tabsBorderRadius;
+    box-shadow: none;
+    padding: 0;
+    z-index: 6020;
+}
+
+.umb-btn-toolbar .dropdown-menu small {
+    background: @turquoise-l3;
+    display: block;
+    padding: 10px 20px;
+}
+
+.umb-btn-toolbar .dropdown-menu .btn  {
+    margin: 20px 29px;
+    width: 80px;
+}
+
+/* tab buttons */
+.umb-bottom-bar {
+    background: @white;
+    box-shadow: 0 -18px 20px rgba(255, 255, 255, 1);
+    border-top: 1px solid @gray-10;
+    padding: 10px 0 10px 0;
+    position: fixed;
+    bottom: 0;
+    left: 100px;
+    right: 40px;
+    z-index: 6010;
+
+    @media (min-width: 1101px) {
+        left: 460px;
+    }
+
+    @media (max-width: 767px) {
+        left: 80px;
+    }
+
+    @media (max-width: 500px) {
+        left: 60px;
+    }
+}
+
+.umb-tab-buttons {
+    padding-left: 0;
+
+    > .btn-group:not([style*="display:none"]):not([style*="display: none"]) {
+        margin-left: 0;
+    }
+
+    @media (min-width: 768px) {
+        padding-left: 180px;
+    }
+}
+
+.umb-tab-pane {
+    padding-bottom: 90px;
+}
+
+.tab-content {
+    overflow: visible;
+}
+
+.umb-panel-footer-nav {
+    position: absolute;
+    bottom: 0px;
+    height: 30px;
+    left: 0px;
+    right: 0px;
+    background: @gray-10;
+    border-top: @gray-8 1px solid;
+    display: block;
+    margin: 0;
+    overflow: hidden;
+}
+
+.umb-panel-footer-nav li a {
+    border-radius: 0;
+    display: block;
+    float: left;
+    height: 30px;
+    background: @gray-10;
+    text-align: center;
+    padding: 8px 0px 8px 30px;
+    position: relative;
+    margin: 0 1px 0 0;
+    text-decoration: none;
+    color: @gray-3;
+    font-size: 12px;
+}
+
+.umb-panel-footer-nav li a:after {
+    content: "";
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 16px solid @gray-10;
+    position: absolute;
+    right: -16px;
+    top: 0;
+    z-index: 1;
+}
+
+.umb-panel-footer-nav li a:before {
+    content: "";
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 16px solid @gray-8;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.umb-panel-footer-nav li:first-child a {
+    padding-left: 20px;
+}
+
+.umb-panel-footer-nav li:first-child a:before {
+    display: none;
+}
+
+.umb-panel-footer-nav li:last-child a:after {
+    display: none;
+}
+
+// Utility classes
+
+//SD: Had to add these because if we want to use the bootstrap text colors
+// in a panel/editor they'll all show up as white on white - so we need to use the
+// form styles
+.umb-dialog .muted,
+.umb-panel .muted {
+    color: @gray-5;
+}
+
+.umb-dialog a.muted:hover,
+.umb-dialog a.muted:focus,
+.umb-dialog button.muted:hover,
+.umb-dialog button.muted:focus,
+.umb-panel a.muted:hover,
+.umb-panel a.muted:focus,
+.umb-panel button.muted:hover,
+.umb-panel button.muted:focus {
+    color: darken(@gray-5, 10%);
+    text-decoration: underline;
+}
+
+.umb-dialog .text-warning,
+.umb-panel .text-warning {
+    color: @formWarningText;
+}
+
+.umb-dialog a.text-warning:hover,
+.umb-dialog a.text-warning:focus,
+.umb-panel a.text-warning:hover,
+.umb-panel a.text-warning:focus {
+    color: darken(@formWarningText, 10%);
+}
+
+.umb-dialog .text-error,
+.umb-panel .text-error {
+    color: @formErrorText;
+}
+
+.umb-dialog a.text-error:hover,
+.umb-dialog a.text-error:focus,
+.umb-panel a.text-error:hover,
+.umb-panel a.text-error:focus {
+    color: darken(@formErrorText, 10%);
+}
+
+.umb-dialog .text-info,
+.umb-panel .text-info {
+    color: @formInfoText;
+}
+
+.umb-dialog a.text-info:hover,
+.umb-dialog a.text-info:focus,
+.umb-panel a.text-info:hover,
+.umb-panel a.text-info:focus {
+    color: darken(@formInfoText, 10%);
+}
+
+.umb-dialog .text-success,
+.umb-panel .text-success {
+    color: @formSuccessText;
+}
+
+.umb-dialog a.text-success:hover,
+.umb-dialog a.text-success:focus,
+.umb-panel a.text-success:hover,
+.umb-panel a.text-success:focus {
+    color: darken(@formSuccessText, 10%);
+}
+
+.external-logins form {
+    margin:0;
+}
+.external-logins button {
+    margin:5px;
+}
+
+/* --------- UMB PANEL HEADER ---------- */
+
+.umb-panel-header-content-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.umb-panel-header-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.umb-panel-header-left-side {
+   display: flex;
+   flex: 1;
+   flex-direction: row;
+}
+
+.umb-panel-header-icon {
+  cursor: pointer;
+  font-size: 2rem;
+  margin-right: 5px;
+  margin-top: -6px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: @white;
+  border: 1px solid @ui-action-discreet-border;
+  animation: fadeIn 0.5s;
+  border-radius: 3px;
+  width: 50px;
+  &:hover {
+      .icon {
+          opacity: 0.8;
+      }
+      border-color: @ui-action-discreet-border-hover;
+  }
+}
+
+.umb-panel-header-title-wrapper {
+   position: relative;
+   width: 80%;
+}
+
+.umb-panel-header-alias {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
+
+.umb-panel-header-alias .umb-locked-field {
+   display: flex;
+   align-items: center;
+}
+
+.umb-panel-header-alias .umb-locked-field,
+.umb-panel-header-alias .umb-locked-field .umb-locked-field__wrapper {
+   margin-bottom: 0;
+}
+
+.umb-panel-header-alias .umb-locked-field:after {
+   display: none;
+}
+
+.umb-panel-header-icon.-placeholder {
+  border: 1px dashed @gray-8;
+}
+
+.umb-panel-header-icon .icon {
+    font-size: 30px;
+    color: @gray-7;
+    transition: opacity 120ms;
+    line-height: 1;
+}
+
+.umb-panel-header-icon-text {
+  color: @green;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+input.umb-panel-header-name-input.name-is-empty {
+  border: 1px dashed @gray-8;
+  background: @white;
+}
+
+.umb-panel-header-name {
+   font-size: 16px;
+   font-weight: bold;
+   margin: 0;
+   line-height: 1.2;
+}
+
+
+input.umb-panel-header-description {
+  background: transparent;
+  border-color: transparent;
+  margin-bottom: 0;
+  font-size: 13px;
+  box-sizing: border-box;
+  height: 22px;
+  line-height: 22px;
+  width: 100%;
+  &:hover {
+    background: @white;
+    border-color: @gray-8;
+  }
+}
+
+.umb-panel-header-locked-description {
+    font-size: 12px;
+    margin: 2px 0 0 0;
+    height: 22px;
+    line-height: 22px;
+}

@@ -1,0 +1,72 @@
+<div ng-controller="Umbraco.Editors.RichTextRuleController as vm">
+    
+    <form novalidate name="richTextRuleForm" val-form-manager>
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <umb-box>
+
+                    <umb-box-content class="block-form">
+                        
+                        <umb-control-group label="@general_name" description="@stylesheet_nameHelp">
+                            <input type="text" ng-model="model.rule.name" umb-auto-focus required />
+                        </umb-control-group>
+
+                        <umb-control-group label="@stylesheet_selector" description="@stylesheet_selectorHelp">
+                            <input type="text" ng-model="model.rule.selector" required />
+                        </umb-control-group>
+
+                        <umb-control-group label="@stylesheet_styles" description="@stylesheet_stylesHelp">
+                            <textarea class="umb-stylesheet-rule-styles" ng-model="model.rule.styles" ng-required="model.rule.selector.charAt(0) === '.' || model.rule.selector.charAt(0) === '#' "></textarea>
+                        </umb-control-group>
+
+                        <umb-control-group label="@stylesheet_preview" description="@stylesheet_previewHelp">
+                            <div class="umb-stylesheet-rule-preview" style="{{model.rule.styles}}">
+                                a b c d e f g h i j k l m n o p q r s t u v w x t z
+                                <br>
+                                A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+                                <br>
+                                1 2 3 4 5 6 7 8 9 0 € £ $ % & (.,;:'\"!?) 
+                                <br>
+                                Just keep examining every bid quoted for zinc etchings.
+                            </div>
+                        </umb-control-group>
+
+                    </umb-box-content>
+                </umb-box>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="button"
+                        button-style="link"
+                        label-key="general_close"
+                        shortcut="esc"
+                        action="vm.close()">
+                    </umb-button>
+                    <umb-button
+                        type="button"
+                        button-style="success"
+                        label-key="general_submit"
+                        state="vm.saveButtonState"
+                        action="vm.submit(model)">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+            </umb-editor-footer>     
+        </umb-editor-view>
+
+    </form>
+
+</div>

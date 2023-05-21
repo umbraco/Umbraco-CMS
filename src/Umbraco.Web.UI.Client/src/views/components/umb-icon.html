@@ -1,0 +1,8 @@
+<span aria-hidden="true" class="umb-icon">
+    <span class="umb-icon__inner {{icon}}">
+        <ng-transclude>
+            <span ng-if="svgString" ng-bind-html="svgString"></span>
+            <i ng-if="!svgString && icon" class="{{icon}}"></i>
+        </ng-transclude>
+    </span>
+</span>

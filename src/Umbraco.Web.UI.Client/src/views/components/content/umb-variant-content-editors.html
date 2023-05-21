@@ -1,0 +1,21 @@
+﻿<div class="umb-split-views">
+    <div class="umb-split-view"
+         ng-repeat="editor in vm.editors track by editor.compositeId">
+
+        <umb-variant-content
+            page="vm.page"
+            content="vm.content"
+            editor="editor"
+            editor-index="$index"
+            editor-count="vm.editors.length"
+            on-open-split-view="vm.openSplitView(variant)"
+            on-close-split-view="vm.closeSplitView($index)"
+            on-select-variant="vm.selectVariant(variant, $index)"
+            on-select-app="vm.selectApp(app)"
+            on-select-app-anchor="vm.selectAppAnchor(app, anchor)"
+            on-back="vm.onBack()"
+            show-back="vm.showBack">
+        </umb-variant-content>
+
+    </div>
+</div>

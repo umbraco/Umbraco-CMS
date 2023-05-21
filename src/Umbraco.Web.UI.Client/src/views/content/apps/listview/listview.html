@@ -1,0 +1,10 @@
+<div ng-controller="Umbraco.Editors.Content.Apps.ListViewController as vm">
+
+    <umb-property ng-repeat="property in model.viewModel track by property.alias" property="property">
+        <umb-property-editor 
+            model="property"
+            ng-attr-readonly="{{ vm.propertyEditorReadonly() || undefined}}">
+        </umb-property-editor>
+    </umb-property>
+
+</div>

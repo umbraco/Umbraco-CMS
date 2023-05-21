@@ -1,0 +1,59 @@
+.umb-tags-editor {
+    border: @inputBorder solid 1px;
+    padding: 5px;
+    min-height: 54px;
+    font-size: 13px;
+    text-shadow: none;
+    box-sizing: border-box;
+
+    .tag {
+        cursor: default;
+        margin: 10px;
+        padding: 10px 15px;
+        background: @blueExtraDark;
+        position: relative;
+        user-select: all;
+
+        > .btn-icon {
+            color: @white;
+            padding: 0;
+            position: relative;
+            cursor: pointer;
+            padding-left: 2px;
+            font-size: 15px;
+            right: -5px;
+            bottom: -1px;
+            user-select: none;
+        }
+
+        .umb_confirm-action {
+
+            &__overlay {
+                &.-left {
+                  top: 8px;
+                  left: auto;
+                  right: 15px;
+                }
+            }
+        }
+    }
+
+    .twitter-typeahead {
+        margin: 10px;
+        margin-top: 16px;
+        vertical-align: top;
+        max-width: calc(100% - 20px);
+
+        input {
+            border: none;
+            background: @white;
+            padding-left: 0;
+            max-width: 100%;
+        }
+    }
+}
+
+umb-tags-editor[readonly] {
+    border-color: @inputReadonlyBorderColor;
+    display: block;
+}

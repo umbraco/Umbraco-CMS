@@ -1,0 +1,210 @@
+/* Modals
+// -------------------------*/
+
+/* Modalcolumn is used for menu panels */
+.umb-modalcolumn {
+	background: @white;
+}
+
+.umb-modalcolumn-header {
+  border-bottom: 1px solid @gray-9;
+  height: @editorHeaderHeight;
+  box-sizing: border-box;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap
+}
+
+.umb-modalcolumn-header h1,
+.umb-modalcolumn-header h2 {
+  margin: 0;
+  white-space: nowrap;
+  font-size: @fontSizeMedium;
+  font-weight: 400;
+}
+
+.umb-modalcolumn-body {
+	padding: 0;
+	background: @white;
+	top: @editorHeaderHeight;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: auto;
+}
+
+.no-padding .umb-modalcolumn-body {
+	padding: 0;
+}
+
+.umb-modalcolumn .umb-modalcolumn-header .btn {
+	position: absolute;
+	top: 13px;
+	right: 15px
+}
+
+.umb-modalcolumn iframe.auto-expand, .umb-modal iframe.auto-expand {
+	border: none;
+	padding: 0;
+	margin: 0;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	position: absolute;
+}
+
+.--notInFront .umb-modalcolumn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0,0,0,.4);
+}
+
+/* re-align loader */
+.umb-modal .umb-loader-wrapper, .umb-modalcolumn .umb-loader-wrapper, .umb-dialog .umb-loader-wrapper{
+    position:relative;
+    margin: 20px -20px;
+}
+
+.umb-modal-left .umb-panel-header .umb-headline, .umb-modal-left .umb-panel-header h1 {
+  width: auto;
+  padding-left: 0;
+}
+
+/* umb.dialog is used for the dialogs on the conent tree*/
+.umb-dialog {
+	outline: none;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	position: absolute;
+	padding: 0;
+  	background: @white;
+}
+
+.umb-dialog .abstract{
+    margin-bottom:20px;
+}
+
+.umb-dialog .umb-btn-toolbar .umb-control-group {
+    border: none;
+    padding: none;
+}
+
+.umb-dialog-body{
+	position: absolute;
+    overflow:auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 49px;
+}
+.umb-dialog-body .umb-pane{margin-top: 15px;}
+
+.umb-dialog-footer{
+	position: absolute;
+	overflow:auto;
+	text-align: right;
+	height: 32px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+    padding: 8px;
+    margin: 0;
+
+    .btn.umb-outline {
+        position: relative
+    }
+}
+
+/*we will always make sure to wrap iframe dialogs in proper padding*/
+.umbracoDialog{
+	width: auto !Important;
+	height: auto !Important;
+    padding: 20px;
+}
+.umbracoDialog .umb-pane{margin-left: 0; margin-right: 0; margin-top: 0;}
+.umbracoDialog .umb-dialog-body .umb-pane{margin-left: 20px; margin-right: 20px; margin-top: 20px;}
+.umbracoDialog form{height: 100%;}
+
+/*ensures dialogs doesnt have side-by-side labels*/
+.umbracoDialog .controls-row,
+.umb-modal .controls-row{margin-left: 0 !important;}
+
+/* modal and umb-modal are used for right.hand dialogs */
+.modal {
+    border-radius: 0 !important;
+
+    &.fade.in{border: none !important;}
+}
+.umb-modal.fade {
+	outline: none;
+	top: 0 !important;
+	left: -100% !important;
+	width: 0 !important;
+	transition: opacity 0.3s linear, top 0.3s ease-out;
+	height: 100% !important;
+}
+
+.umb-modal.fade.in {
+	top: 0 !important;
+	left: 100% !important;
+	margin-left: -440px;
+	width: 440px !important;
+	height: 100% !important;
+	display: block;
+}
+
+.umb-modal-left.fade {
+	top: 0 !important;
+	left: -100% !important;
+	width: 0 !important;
+	transition: opacity 0.3s linear, top 0.3s ease-out;
+	height: 100% !important;
+}
+.umb-modal-left.fade.in {
+	top: 0 !important;
+	left: 0 !important;
+	margin-left: 80px;
+	width: 440px !important;
+	height: 100% !important;
+	display: block;
+}
+
+/*Modal default panel styles*/
+.umb-modal .umb-panel-header {
+  padding: 20px;
+  background: @white;
+  border: none;
+  height: auto;
+}
+.umb-modal .umb-panel-body{
+	padding: 0 20px 0 20px;
+}
+
+.umb-modal.fade.in.wide {
+    margin-left: -640px;
+	width: 640px !important;
+}
+.umb-modal i {
+  font-size: 20px;
+}
+.umb-modal .breadcrumb {
+	background: none;
+	padding: 0
+}
+
+.umb-modal .breadcrumb input {
+	height: 12px
+}
+
+.umb-modal.ysod {
+    z-index: 10000;
+}

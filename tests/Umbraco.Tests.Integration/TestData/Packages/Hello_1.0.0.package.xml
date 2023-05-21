@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<umbPackage>
+  <info>
+    <package>
+      <name>Hello</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <mySimplePage id="10274" key="baea495a-74c0-4860-b4fe-54d9587e13c5" parentID="-1" level="1" creatorID="-1" sortOrder="1" createDate="2018-12-18T22:14:01" updateDate="2018-12-18T22:14:59" nodeName="Moose" urlName="moose" path="-1,10274" isDoc="" nodeType="6209" nodeTypeAlias="mySimplePage" creatorName="Shannon" writerName="Shannon" writerID="-1" template="6208" isPublished="true">
+        <title><![CDATA[Moose]]></title>
+        <doggies><![CDATA[Sausage]]></doggies>
+        <mySimplePage id="10275" key="5eb5c302-6699-486d-ad32-760de64404d1" parentID="10274" level="2" creatorID="-1" sortOrder="0" createDate="2018-12-18T23:27:46" updateDate="2018-12-20T17:40:15" nodeName="Rover" urlName="rover" path="-1,10274,10275" isDoc="" nodeType="6209" nodeTypeAlias="mySimplePage" creatorName="Shannon" writerName="Shannon" writerID="-1" template="6208" isPublished="false">
+          <title><![CDATA[Rover]]></title>
+          <doggies><![CDATA[Golden Retreiver]]></doggies>
+        </mySimplePage>
+      </mySimplePage>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>Simple Page</Name>
+        <Alias>mySimplePage</Alias>
+        <Icon>icon-umb-content color-deep-orange</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>True</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions />
+        <AllowedTemplates>
+          <Template>SimplePage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>SimplePage</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>mySimplePage</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Title</Name>
+          <Alias>title</Alias>
+          <Type>Umbraco.TextBox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Content</Tab>
+          <SortOrder>0</SortOrder>
+          <Mandatory>False</Mandatory>
+          <Validation></Validation>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Dogs</Name>
+          <Alias>doggies</Alias>
+          <Type>Umbraco.DropDown.Flexible</Type>
+          <Definition>1b145e83-80fd-428b-a859-40f177ff1c1c</Definition>
+          <Tab>Content</Tab>
+          <SortOrder>1</SortOrder>
+          <Mandatory>False</Mandatory>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>2017</Id>
+          <Caption>Content</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+  </DocumentTypes>
+  <Templates>
+    <Template>
+      <Name>Simple Page</Name>
+      <Alias>SimplePage</Alias>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.SimplePage>
+@using ContentModels = Umbraco.Web.PublishedModels;
+@{
+	Layout = null;
+}]]>
+      </Design>
+    </Template>
+  </Templates>
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes>
+    <DataType Name="Dogs" Id="Umbraco.DropDown.Flexible" Definition="1b145e83-80fd-428b-a859-40f177ff1c1c" DatabaseType="Nvarchar" Configuration="{&quot;Multiple&quot;:true,&quot;Items&quot;:[{&quot;id&quot;:1,&quot;value&quot;:&quot;Sausage&quot;},{&quot;id&quot;:3,&quot;value&quot;:&quot;Golden Retreiver&quot;},{&quot;id&quot;:2,&quot;value&quot;:&quot;Lab&quot;}]}" />
+  </DataTypes>
+  <Actions />
+</umbPackage>

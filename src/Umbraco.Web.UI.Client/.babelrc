@@ -1,0 +1,20 @@
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": "last 2 version, not dead, > 0.5%, not ie 11"
+            }
+        ]
+    ],
+    "plugins": [
+        "@babel/plugin-proposal-nullish-coalescing-operator",
+        "@babel/plugin-proposal-optional-chaining",
+        [
+            "@babel/plugin-proposal-object-rest-spread",
+            {
+                "useBuiltIns": true
+            }
+        ]
+    ]
+}

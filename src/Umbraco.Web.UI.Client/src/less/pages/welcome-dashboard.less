@@ -1,0 +1,117 @@
+// Title
+.welcome-dashboard__intro {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.welcome-dashboard__title {
+    font-size: 30px;
+    color: @gray-2;
+    line-height: 1.3em;
+    text-align: center;
+    max-width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.welcome-dashboard__intro-text {
+    font-size: 18px;
+    text-align: center;
+    max-width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6em;
+}
+
+// Info box
+.welcome-dashboard__info-box-boxes {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.welcome-dashboard__info-box {
+    background-color: @turquoise-washed;
+    border-radius: 3px;
+    border: 2px solid transparent;
+    padding: 25px;
+    text-decoration: none;
+    display: block;
+    margin: 10px;
+
+    &:hover {
+        border: 2px solid @turquoise;
+        cursor: pointer;
+        transition: border-color 150ms ease-in-out;
+        text-decoration: none;
+    }
+
+    &:active,
+    &:focus {
+        text-decoration: none;
+    }
+}
+
+.welcome-dashboard__info-box-title {
+    color: @turquoise-d1;
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.welcome-dashboard__info-box-description {
+    text-align: center;
+    line-height: 1.4em;
+}
+
+// Articles
+.welcome-dashboard__cards {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.welcome-dashboard__card {
+    background-color: @grayLighter;
+    border-radius: 3px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.welcome-dashboard__card-image-wrapper {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-bottom: 30px;
+    max-height: 225px;
+    overflow: hidden;
+}
+
+.welcome-dashboard__card-image {
+    cursor: pointer;
+    border-radius: 3px 3px 0 0;
+    width: 100%;
+}
+
+.welcome-dashboard__card-image-wrapper + .welcome-dashboard__card-content {
+    padding-top: 0px;
+}
+
+.welcome-dashboard__card-content {
+    padding: 30px;
+}
+
+.welcome-dashboard__card-title {
+    color: @gray-2;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.6em;
+}
+
+.welcome-dashboard__card-teaser {
+    font-size: 13px;
+    margin-bottom: 15px;
+}

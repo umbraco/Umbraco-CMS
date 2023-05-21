@@ -1,0 +1,102 @@
+.umb-lightbox {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    &__backdrop {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(21, 21, 23, 0.7);
+        width: 100%;
+        height: 100%;
+    }
+
+    &__close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        height: 40px;
+        width: 40px;
+
+        .umb-icon {
+            font-size: 20px;
+            height: inherit;
+            width: inherit;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+
+    &__images {
+        position: relative;
+        z-index: 1000;
+        max-width: calc(~'100%' - 200px); // subtract the width of the two arrow buttons
+    }
+
+    &__image {
+        background: @white;
+        border-radius: 3px;
+        padding: 10px;
+    }
+
+    &__control {
+        background-color: @white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: absolute;
+
+        &:hover {
+            .umb-lightbox__control-icon, &::before {
+                color: @ui-active-type-hover;
+            }
+        }
+    }
+
+    &__control-icon {
+        color: @ui-active-type;
+        font-size: 20px;
+    }
+}
+
+.umb-drawer-is-visible .umb-lightbox {
+    width: calc(~'100%' - ~'@{drawerWidth}');
+    left: @drawerWidth;
+}
+
+.umb-lightbox__control.-next {
+    right: 20px;
+    top: 50%;
+    transform: translate(0, -50%);
+
+    .umb-lightbox__control-icon {
+        margin-right: -4px;
+    }
+}
+
+.umb-lightbox__control.-prev {
+    left: 20px;
+    top: 50%;
+    transform: translate(0, -50%);
+
+    .umb-lightbox__control-icon {
+        margin-left: -4px;
+    }
+}

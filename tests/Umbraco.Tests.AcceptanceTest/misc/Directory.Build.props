@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <!--
+        Keep this empty Directory.Build.props file to prevent inheriting from parent directories,
+        because the Windows E2E test that outputs a new Umbraco project into this directory otherwise won't build.
+    -->
+</Project>

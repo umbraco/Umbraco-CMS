@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<umbPackage>
+  <files />
+  <info>
+    <package>
+      <name>Package With MediaTypes And Media + Folder</name>
+    </package>
+  </info>
+  <DocumentTypes />
+  <MediaTypes>
+    <MediaType>
+      <Info>
+        <Name>Folder</Name>
+        <Key>c3ddc08e-3b5e-42b2-9f0b-6e5c79a2e2e0</Key>
+        <Alias>Folder</Alias>
+        <Icon>icon-folder</Icon>
+        <Thumbnail>icon-folder</Thumbnail>
+        <Description />
+        <AllowAtRoot>True</AllowAtRoot>
+      </Info>
+      <Structure>
+        <MediaType>Folder</MediaType>
+        <MediaType>Image</MediaType>
+        <MediaType>File</MediaType>
+      </Structure>
+      <GenericProperties />
+      <Tabs />
+    </MediaType>
+    <MediaType>
+      <Info>
+        <Name>Image</Name>
+        <Key>ee78bb5b-3734-4b86-bd48-d9ca2e6d6846</Key>
+        <Alias>Image</Alias>
+        <Icon>icon-picture</Icon>
+        <Thumbnail>icon-picture</Thumbnail>
+        <Description />
+        <AllowAtRoot>True</AllowAtRoot>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Upload image</Name>
+          <Alias>umbracoFile</Alias>
+          <Type>Umbraco.ImageCropper</Type>
+          <Definition>1df9f033-e6d4-451f-b8d2-e0cbc50a836f</Definition>
+          <Tab>Image</Tab>
+          <Mandatory>True</Mandatory>
+          <MandatoryMessage />
+          <Validation />
+          <ValidationRegExpMessage />
+          <LabelOnTop>false</LabelOnTop>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Width</Name>
+          <Alias>umbracoWidth</Alias>
+          <Type>Umbraco.Label</Type>
+          <Definition>8e7f995c-bd81-4627-9932-c40e568ec788</Definition>
+          <Tab>Image</Tab>
+          <Mandatory>False</Mandatory>
+          <MandatoryMessage />
+          <Validation />
+          <ValidationRegExpMessage />
+          <LabelOnTop>false</LabelOnTop>
+          <Description><![CDATA[in pixels]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Height</Name>
+          <Alias>umbracoHeight</Alias>
+          <Type>Umbraco.Label</Type>
+          <Definition>8e7f995c-bd81-4627-9932-c40e568ec788</Definition>
+          <Tab>Image</Tab>
+          <Mandatory>False</Mandatory>
+          <MandatoryMessage />
+          <Validation />
+          <ValidationRegExpMessage />
+          <LabelOnTop>false</LabelOnTop>
+          <Description><![CDATA[in pixels]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Size</Name>
+          <Alias>umbracoBytes</Alias>
+          <Type>Umbraco.Label</Type>
+          <Definition>930861bf-e262-4ead-a704-f99453565708</Definition>
+          <Tab>Image</Tab>
+          <Mandatory>False</Mandatory>
+          <MandatoryMessage />
+          <Validation />
+          <ValidationRegExpMessage />
+          <LabelOnTop>false</LabelOnTop>
+          <Description><![CDATA[in bytes]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Type</Name>
+          <Alias>umbracoExtension</Alias>
+          <Type>Umbraco.Label</Type>
+          <Definition>f0bc4bfb-b499-40d6-ba86-058885a5178c</Definition>
+          <Tab>Image</Tab>
+          <Mandatory>False</Mandatory>
+          <MandatoryMessage />
+          <Validation />
+          <ValidationRegExpMessage />
+          <LabelOnTop>false</LabelOnTop>
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>3</Id>
+          <Caption>Image</Caption>
+          <SortOrder>1</SortOrder>
+        </Tab>
+      </Tabs>
+    </MediaType>
+  </MediaTypes>
+  <Templates />
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+  <MediaItems>
+    <MediaSet>
+      <Image id="1145" key="cd4caf13-0705-4e31-9661-48d5a6ce2cc6" parentID="-1" level="1" creatorID="-1" sortOrder="0" createDate="2020-12-15T12:56:46" updateDate="2020-12-15T12:56:46" nodeName="Ledersidetegning Mandag 27 01 20 Rgb (1) (1)" urlName="ledersidetegning-mandag-27-01-20-rgb-1-1" path="-1,1145" isDoc="" nodeType="1032" nodeTypeAlias="Image" writerName="" writerID="0" udi="umb://media/cd4caf1307054e31966148d5a6ce2cc6">
+        <umbracoFile><![CDATA[{"src":"/media/cwxfztif/ledersidetegning-mandag-27-01-20-rgb-1.jpg","crops":null}]]></umbracoFile>
+        <umbracoWidth><![CDATA[940]]></umbracoWidth>
+        <umbracoHeight><![CDATA[564]]></umbracoHeight>
+        <umbracoBytes><![CDATA[20340]]></umbracoBytes>
+        <umbracoExtension><![CDATA[jpg]]></umbracoExtension>
+      </Image>
+    </MediaSet>
+    <MediaSet>
+      <Folder id="1146" key="aef56c09-de35-4d45-b91a-93096dac5e45" parentID="-1" level="1" creatorID="-1" sortOrder="1" createDate="2020-12-15T12:57:26" updateDate="2020-12-15T12:57:26" nodeName="asd" urlName="asd" path="-1,1146" isDoc="" nodeType="1031" nodeTypeAlias="Folder" writerName="" writerID="0" udi="umb://media/aef56c09de354d45b91a93096dac5e45">
+        <Image id="1147" key="4a3172d8-3c68-4c32-890f-051894e50c8e" parentID="1146" level="2" creatorID="-1" sortOrder="0" createDate="2020-12-15T12:58:00" updateDate="2020-12-15T12:58:00" nodeName="Rider" urlName="rider" path="-1,1146,1147" isDoc="" nodeType="1032" nodeTypeAlias="Image" writerName="" writerID="0" udi="umb://media/4a3172d83c684c32890f051894e50c8e">
+          <umbracoFile><![CDATA[{"src":"/media/1zzdcsti/rider.png","crops":null}]]></umbracoFile>
+          <umbracoWidth><![CDATA[839]]></umbracoWidth>
+          <umbracoHeight><![CDATA[551]]></umbracoHeight>
+          <umbracoBytes><![CDATA[37605]]></umbracoBytes>
+          <umbracoExtension><![CDATA[png]]></umbracoExtension>
+        </Image>
+      </Folder>
+    </MediaSet>
+  </MediaItems>
+  <Actions />
+</umbPackage>

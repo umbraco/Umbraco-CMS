@@ -1,0 +1,51 @@
+﻿.umb-property-file-upload {
+    .umb-property-editor--limit-width();
+
+    .umb-upload-button-big {
+        display: block;
+        padding: 20px;
+        opacity: 1;
+        border: 1px dashed @gray-8;
+        background: none;
+        text-align: center;
+        font-size: 14px;
+
+        &, &:hover {
+            color: @gray-8;
+        }
+
+        &:focus-within {
+            .tabbing-active & {
+                box-shadow: 0 0 2px @ui-outline, inset 0 0 2px 1px @ui-outline;
+            }
+        }
+
+        .icon {
+            font-size: 55px;
+            line-height: 70px
+        }
+
+        input {
+            left: 0;
+            bottom: 0;
+            height: 100%;
+            width: 100%;
+        }
+    }
+
+    .drag-over {
+        .umb-upload-button-big {
+            border-color: @gray-1;
+        }
+    }
+
+    .umb-property-file-upload--actions {
+        margin-top: 10px;
+    }
+}
+
+.umb-single-file-upload[readonly] {
+    input {
+        cursor: not-allowed;
+    }
+}

@@ -1,0 +1,38 @@
+<div class="umb-property-editor umb-prevalues-numberrange">
+    <ng-form name="prevalueNumberRangeForm" class="flex">
+        <div>
+            <input name="numberFieldMin" class="__min-input"
+            type="number"
+            ng-model="model.value.min"
+            placeholder="0"
+            min="0"
+            ng-max="model.value.max"
+            fix-number
+            id="{{model.alias}}" />
+            <span ng-messages="prevalueNumberRangeForm.numberFieldMin.$error" show-validation-on-submit >
+                <span class="db mt1 red" ng-message="number" aria-describedby="{{model.alias}}">
+                    <localize key="validation_invalidNumber">Not a number</localize>
+                </span>
+            </span>
+        </div>
+        <span class="__enDash">–</span>
+        <div>
+            <label for="validationLimitMax" class="sr-only">
+                <localize key="maxAmount">Maximum amount</localize>
+            </label>
+            <input name="numberFieldMax" class="__max-input"
+                   type="number"
+                   ng-model="model.value.max"
+                   placeholder="∞"
+                   ng-min="model.value.min || 0"
+                   fix-number
+                   id="validationLimitMax" />
+
+            <span ng-messages="prevalueNumberRangeForm.numberFieldMax.$error" show-validation-on-submit >
+                <span class="db mt1 red" ng-message="number" aria-describedby="amountMax">
+                    <localize key="validation_invalidNumber">Not a number</localize>
+                </span>
+            </span>
+        </div>
+    </ng-form>
+</div>

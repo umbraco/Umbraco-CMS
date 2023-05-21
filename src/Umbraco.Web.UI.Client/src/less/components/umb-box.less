@@ -1,0 +1,47 @@
+@boxUnit: 10px;
+
+.umb-box {
+    background: @white;
+    border-radius: 3px;
+    margin-bottom: (@boxUnit * 2);
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.16);
+}
+
+.umb-box-header {
+    padding: @boxUnit (@boxUnit * 2);
+    border-bottom: 1px solid @gray-9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.umb-box-header-title {
+    font-size: 15px;
+    color: @black;
+    font-weight: bold;
+}
+
+.umb-box-header-description {
+    font-size: 13px;
+    color: @gray-3;
+    line-height: 1.6em;
+    margin-top: 1px;
+}
+
+.umb-box-content {
+    padding: (@boxUnit * 2);
+}
+
+// allow side-by-side boxes
+.umb-box-row {
+    margin-left: (@boxUnit * -1);
+    margin-right: (@boxUnit * -1);
+    display: flex;
+    justify-content: space-around;
+    
+    .umb-box {
+        margin-left: @boxUnit;
+        margin-right: @boxUnit;
+        flex: 1;
+    }
+}

@@ -1,0 +1,78 @@
+.umb-validation-label {
+    position: absolute;
+    z-index: 1;
+    min-width: 80px;
+    max-width: 260px;
+    padding: 2px 6px;
+    background: @red;
+    color: @white;
+    font-size: 12px;
+    line-height: 1.5em;
+    border-radius: @baseBorderRadius;
+    pointer-events: none;
+    user-select: none;
+}
+
+.umb-validation-label:after {
+    bottom: 100%;
+    left: 10px;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: @red;
+    border-width: 4px;
+    margin-left: -4px;
+}
+
+.umb-validation-label.-left {
+    left: 0;
+    right: auto;
+
+    &:after {
+        left: 10px;
+        right: auto;
+    }
+}
+
+.umb-validation-label.-right {
+    right: 0;
+    left: auto;
+    
+    &:after {
+        right: 10px;
+        left: auto;
+    }
+}
+
+.umb-validation-label.-arrow-left {
+    margin-left: 10px;
+}
+
+.umb-validation-label.-arrow-left:after {
+    right: 100%;
+    top: 50%;
+    left: auto;
+    bottom: auto;
+    border-color: transparent;
+    border-right-color: @red;
+    margin-top: -4px;
+}
+
+
+.umb-validation-label.-arrow-bottom {
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+.umb-validation-label.-arrow-bottom:after {
+    right: auto;
+    top: 100%;
+    left: 20px;
+    bottom: auto;
+    border-color: transparent;
+    border-top-color: @red;
+}

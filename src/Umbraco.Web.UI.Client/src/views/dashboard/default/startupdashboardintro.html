@@ -1,0 +1,74 @@
+<div class="umb-dashboard-grid" ng-controller="Umbraco.Dashboard.StartUpDynamicContentController as vm">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <div class="row clearfix" ng-if="vm.dashboard">
+        <!-- Sections -->
+        <div class="grid-section" ng-repeat="section in vm.dashboard.sections">
+            <div class="{{'span' + section.grid + ' column dash-section'}}">
+
+                <!-- rows -->
+                <div class="row clearfix dash-row" ng-repeat="row in section.rows">
+                    <div class="dash-inner-row">
+
+                        <!-- areas -->
+                        <div ng-repeat="area in row.areas"
+                             class="{{'span' + area.grid + ' column dash-area'}}">
+                            <div class="dash-inner-area">
+
+                                <!-- Controls -->
+                                <div ng-repeat="control in area.controls" class="dash-control dash-control-{{control.alias}}">
+                                    <div class="dash-inner-control">
+                                        <div ng-bind-html="control.html | safe_html"></div>
+                                    </div>
+                                </div>
+                                <!-- Controls end -->
+                            </div>
+                        </div>
+                        <!-- Area end -->
+                    </div>
+                </div>
+            </div>
+            <!-- Section end -->
+
+        </div>
+    </div>
+    <!-- grid container end -->
+
+    <!-- Default content in case we cannot fetch content from the outside -->
+    <div style="max-width: 1200px" ng-if="vm.showDefault">
+
+        <div class="welcome-dashboard__intro">
+            <h1 class="welcome-dashboard__title">
+                <localize key="startupDashboard_fallbackHeadline">Welcome to The Friendly CMS</localize>
+            </h1>
+            <p class="welcome-dashboard__intro-text">
+                <localize key="startupDashboard_fallbackDescription">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</localize>
+            </p>
+        </div>
+
+        <div class="welcome-dashboard__info-box-boxes">
+            <a ng-href="{{infoBox.url}}" href="" target="_blank" rel="noreferrer" class="welcome-dashboard__info-box" ng-repeat="infoBox in vm.defaultDashboard.infoBoxes">
+                <div class="welcome-dashboard__info-box-title">{{infoBox.title}}</div>
+                <div class="welcome-dashboard__info-box-description">{{infoBox.description}}</div>
+            </a>
+        </div>
+
+        <div class="welcome-dashboard__cards">
+            <div class="welcome-dashboard__card" ng-repeat="article in vm.defaultDashboard.articles">
+                <div class="welcome-dashboard__card-image-wrapper">
+                    <a ng-href="{{article.url}}" href="" target="_blank" rel="noreferrer">
+                        <img class="welcome-dashboard__card-image" ng-src="{{article.img}}" alt="{{article.altText}}" />
+                    </a>
+                </div>
+                <div class="welcome-dashboard__card-content">
+                    <h2 class="welcome-dashboard__card-title">{{article.title}}</h2>
+                    <div class="welcome-dashboard__card-teaser">{{article.description}}</div>
+                    <a class="button" ng-href="{{article.url}}" href="" target="_blank" rel="noreferrer">{{article.buttonText}}</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

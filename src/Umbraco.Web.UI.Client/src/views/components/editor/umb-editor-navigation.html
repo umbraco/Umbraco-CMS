@@ -1,0 +1,44 @@
+<ul class="umb-sub-views-nav" ng-show="showNavigation">
+
+    <li ng-repeat="navItem in navigation | limitTo: itemsLimit ">
+        <div ng-show="navItem.alias !== 'more'"
+            ng-class="navItem.errorClass">
+            <umb-editor-navigation-item
+                item="navItem"
+                on-open="openNavigationItem(item)"
+                on-open-anchor="openAnchorItem(item, anchor)"
+                hotkey="$index + 1">
+            </umb-editor-navigation-item>
+        </div>
+    </li>
+
+    <li ng-show="showMoreButton">
+        <div class="umb-sub-views-nav-item umb-sub-views-nav-item-more">
+            <umb-button-ellipsis
+                element="sub-view-{{moreButton.alias}}"
+                action="toggleDropdown()"
+                color="{{ moreButton.hasError ? '#d42054' : '#1b264f' }}"
+                text="{{moreButton.name}}"
+                show-text="true"
+                mode="tab"
+                css-class="umb-sub-views-nav-item__action umb-outline umb-outline--thin {{moreButton.active ? 'is-active' : ''}} {{ moreButton.hasError ? '-has-error' : '' }} {{moreButton.activeHasError ? '-active-has-error' : ''}}"
+                >
+                <div class="badge -type-alert --error-badge">!</div>
+            </umb-button-ellipsis>
+        </div>
+    </li>
+
+    <li style="position: relative;">
+        <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" class="umb-sub-views-nav-item-more__dropdown">
+            <umb-dropdown-item ng-repeat="navItem in navigation | limitTo: overflowingItems">
+                <umb-editor-navigation-item
+                    item="navItem"
+                    on-open="openNavigationItem(item)"
+                    on-open-anchor="openAnchorItem(item, anchor)"
+                    index="{{$index}}">
+                </umb-editor-navigation-item>
+            </umb-dropdown-item>
+        </umb-dropdown>
+    </li>
+
+</ul>

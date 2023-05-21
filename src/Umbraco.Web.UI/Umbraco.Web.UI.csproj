@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Razor files are needed for the backoffice to work correctly -->
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+
+  <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
+    <Message Text="Copying appsettings.template.json to appsettings.json because it doesn't exist" Importance="high" />
+    <Copy SourceFiles="appsettings.template.json" DestinationFiles="appsettings.json" />
+  </Target>
+
+  <Target Name="CopyAppsettingsDevelopmentTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.Development.json')">
+    <Message Text="Copying appsettings.Development.template.json to appsettings.Development.json because it doesn't exist" Importance="high" />
+    <Copy SourceFiles="appsettings.Development.template.json" DestinationFiles="appsettings.Development.json" />
+  </Target>
+</Project>

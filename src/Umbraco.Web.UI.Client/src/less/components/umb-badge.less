@@ -1,0 +1,125 @@
+.umb-badge {
+    padding: 6px 8px;
+    color: @gray-4;
+    background-color: @gray-8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100px;
+}
+
+.umb-badge__count {
+    display: flex;
+    width: 1rem;
+    height: 1rem;
+    line-height: 1;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+// Colors
+.umb-badge--primary {
+    background-color: @blueDark;
+    color: @white;
+
+    .umb-badge__count {
+        background-color: darken(@blueDark, 5%);
+    }
+}
+
+.umb-badge--secondary {
+    background-color: @blueExtraDark;
+    color: @white;
+
+    .umb-badge__count {
+        background-color: darken(@blueExtraDark, 8%);
+    }
+}
+
+.umb-badge--gray {
+    background-color: @sand-2;
+    color: @blueDark;
+
+    .umb-badge__count {
+        background-color: darken(@sand-2, 8%);
+    }
+}
+
+.umb-badge--danger {
+    background-color: @red;
+    color: @white;
+
+    .umb-badge__count {
+        background-color: darken(@red, 8%);
+    }
+}
+
+.umb-badge--info {
+    background-color: @blue;
+    color: @white;
+
+    .umb-badge__count {
+        background-color: darken(@blue, 8%);
+    }
+}
+
+.umb-badge--warning {
+    background-color: @orange;
+    color: @white;
+
+    .umb-badge__count {
+        background-color: darken(@orange, 8%);
+    }
+}
+
+.umb-badge--success {
+    background-color: @green;
+    color: @white;
+
+    .umb-badge__count {
+        background-color: darken(@green, 8%);
+    }
+}
+
+.umb-badge--dark {
+    background-color: @grayDark;
+    color: @white;
+
+    .umb-badge__count {
+        background-color: darken(@grayDark, 8%);
+    }
+}
+
+// Size
+.umb-badge--xxs {
+    font-size: 11px;
+    padding: 0 7px;
+}
+
+.umb-badge--xs {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 1px 10px;
+}
+
+.umb-badge--s {
+    font-size: 14px;
+    padding: 3px 10px;
+}
+
+.umb-badge--m {
+    font-size: 16px;
+    padding: 6px 12px;
+}
+
+.umb-badge--l {
+    font-size: 18px;
+    padding: 6px 8px;
+}
+
+.umb-badge--xl {
+    font-size: 20px;
+    padding: 6px 8px;
+}

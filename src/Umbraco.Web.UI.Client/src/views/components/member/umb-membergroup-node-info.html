@@ -1,0 +1,31 @@
+<div class="umb-package-details">
+    <div class="umb-package-details__main-content">
+
+        <umb-box>
+            <umb-box-header title-key="content_membergroup"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-empty-state size="small">
+                    <localize key="member_memberGroupNoProperties">Member groups have no additional properties for editing.</localize>
+                </umb-empty-state>
+
+            </umb-box-content>
+        </umb-box>
+
+    </div>
+
+    <div class="umb-package-details__sidebar">
+        <umb-box data-element="node-info-general">
+            <umb-box-header title-key="general_general"></umb-box-header>
+            <umb-box-content class="block-form">
+
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
+                    <div>{{ node.id }}</div>
+                    <small>{{ node.key }}</small>
+                </umb-control-group>
+
+            </umb-box-content>
+        </umb-box>
+    </div>
+
+</div>

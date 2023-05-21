@@ -1,0 +1,20 @@
+<umb-box>
+  <umb-box-content>
+    <p ng-bind-html="model.description"></p>
+    <umb-property ng-repeat="translation in model.content.translations | orderBy:'displayName'" property="translation.property">
+      <textarea rows="2" class="autogrow w-100"
+                id="{{translation.property.alias}}"
+                ng-model="translation.translation"
+                maxlength="1000"
+                ng-keyup="model.change(translation)"
+                ng-trim="false"
+                ng-readonly="!translation.allowUpdate"></textarea>
+      <div class="help" ng-if="translation.nearMaxLimit">
+        <p tabindex="0">
+          <span class="sr-only">{{ translation.displayName }} </span>
+          <localize key="textbox_characters_left" tokens="[model.maxlength - translation.translation.length]" watch-tokens="true">%0% characters left.</localize>
+        </p>
+      </div>
+    </umb-property>
+  </umb-box-content>
+</umb-box>

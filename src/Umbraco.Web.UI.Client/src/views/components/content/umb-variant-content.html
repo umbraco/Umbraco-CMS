@@ -1,0 +1,53 @@
+﻿<div>
+    <umb-load-indicator
+        ng-if="vm.editor.loading">
+    </umb-load-indicator>
+
+    <div class="umb-split-view__content" ng-show="!vm.editor.loading">
+
+        <ng-form name="contentHeaderForm" ng-if="vm.content.apps.length > 0">
+            <umb-editor-content-header
+                menu="vm.page.menu"
+                hide-actions-menu="vm.page.hideActionsMenu"
+                disable-actions-menu="vm.disableActionsMenu"
+                name="vm.editor.content.name"
+                name-disabled="vm.nameDisabled"
+                name-readonly="vm.nameReadonly"
+                editor="vm.editor"
+                content="vm.content"
+                on-select-navigation-item="vm.selectApp(item)"
+                on-select-anchor-item="vm.selectAppAnchor(item, anchor)"
+                hide-change-variant="vm.page.hideChangeVariant"
+                show-back-button="vm.showBackButton()"
+                on-back="vm.onBack()"
+                split-view-open="vm.editorCount > 1"
+                on-open-in-split-view="vm.openSplitView(variant)"
+                on-close-split-view="vm.onCloseSplitView()"
+                on-select-variant="vm.selectVariant(variant)"
+                server-validation-name-field="{{'Variants[' + vm.editorIndex + '].Name'}}">
+            </umb-editor-content-header>
+        </ng-form>
+
+        <umb-editor-container ng-if="vm.content.apps.length > 0">
+
+            <!-- Deleted Context Message Bar (Displayed when viewing node in recycle bin) -->
+            <div ng-show="vm.content.trashed" class="umb-editor--trashed-message">
+                <umb-icon icon="icon-trash" class="icon"></umb-icon> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
+            </div>
+
+            <div class="umb-editor-sub-views">
+                <div ng-repeat="app in vm.editor.variantApps track by app.alias">
+                    <umb-editor-sub-view model="app" content="vm.content" variant-content="vm.editor.content">
+                    </umb-editor-sub-view>
+                </div>
+            </div>
+        </umb-editor-container>
+
+        <umb-empty-state
+            ng-if="vm.content.apps.length === 0"
+            position="center">
+            <localize key="content_noProperties">No content can be added for this item</localize>
+        </umb-empty-state>
+
+    </div>
+</div>

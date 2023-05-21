@@ -1,0 +1,79 @@
+.umb-checkmark {
+    border: 2px solid @white;
+    width: 25px;
+    height: 25px;
+    border: 1px solid @ui-action-discreet-border;
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: @ui-selected-type;
+    cursor: pointer;
+    font-size: 15px;
+    &:hover {
+        border-color:@ui-action-discreet-border-hover;
+        color: @ui-selected-type-hover;
+    }
+}
+
+.umb-checkmark__action {
+    &:hover,
+    &:focus {
+        .umb-checkmark {
+            border-color:@ui-action-discreet-border-hover;
+            color: @ui-selected-type-hover;
+        }
+    }
+}
+
+.umb-checkmark--checked {
+    background: @ui-selected-border;
+    border-color: @ui-selected-border;
+    color: @white;
+
+    &:hover {
+        background: @ui-selected-border-hover;
+        border-color: @ui-selected-border-hover;
+        color: @white;
+    }
+}
+
+.umb-checkmark__action {
+    &:hover,
+    &:focus {
+        .umb-checkmark--checked {
+            background: @ui-selected-border-hover;
+            border-color: @ui-selected-border-hover;
+            color: @white;
+        }
+    }
+}
+
+.umb-checkmark--xs {
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+}
+
+.umb-checkmark--s {
+    width: 25px;
+    height: 25px;
+}
+
+.umb-checkmark--m {
+    width: 30px;
+    height: 30px;
+}
+
+.umb-checkmark--l {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+}
+
+.umb-checkmark--xl {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+}

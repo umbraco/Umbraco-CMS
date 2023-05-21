@@ -1,0 +1,190 @@
+@checkboxWidth: 18px;
+@checkboxHeight: 18px;
+
+.umb-form-check {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 0;
+    margin: 5px 0;
+    min-height: 20px;
+    cursor: pointer !important;
+
+    .umb-form-check__info {
+        margin-left: 30px;
+        position: relative;
+    }
+
+    &.-small-text {
+        font-size: 13px;
+    }
+
+    &.-bold {
+        font-weight: 700;
+    }
+
+    &__text {
+        position: relative;
+        user-select: none;
+    }
+
+    &__input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+
+        &:hover ~ .umb-form-check__state .umb-form-check__check {
+            border-color: @inputBorderFocus;
+        }
+
+        &:checked ~ .umb-form-check__state .umb-form-check__check {
+            border-color: @ui-option-type;
+        }
+
+        &[type='checkbox']:checked ~ .umb-form-check__state .umb-form-check__check {
+            background-color: @ui-option-type;
+        }
+
+        &:checked:hover ~ .umb-form-check__state .umb-form-check__check {
+            &::before {
+                background: @ui-option-type-hover;
+            }
+        }
+
+        &:checked ~ .umb-form-check__state {
+            .umb-form-check__check {
+                // This only happens if the state has a radiobutton modifier
+                .umb-form-check--radiobutton & {
+                    &:before {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+                // This only happens if state has the checkbox modifier
+                .umb-form-check--checkbox & {
+                    &:before {
+                        width: @checkboxWidth;
+                        height: @checkboxHeight;
+                    }
+                }
+            }
+            // This only happens if state has the checkbox modifier
+            .umb-form-check--checkbox & {
+                .umb-form-check__icon {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .tabbing-active &.umb-form-check--radiobutton &__input:focus ~ .umb-form-check__state .umb-form-check__check {
+        border: 2px solid @inputBorderTabFocus;
+        margin: -1px;
+    }
+
+    .tabbing-active &.umb-form-check--checkbox &__input:focus ~ .umb-form-check__state .umb-form-check__check {
+        outline: 2px solid @inputBorderTabFocus;
+    }
+
+    .tabbing-active &.umb-form-check--checkbox &__input:checked:focus ~ .umb-form-check__state .umb-form-check__check {
+        border-color: @white;
+    }
+    // add spacing between when flexed/inline, equal to the width of the input
+    .flex & + & {
+        margin-left: @checkboxWidth;
+    }
+
+    .icon,
+    .umb-icon {
+        font-size: 0.9rem;
+        line-height: 1;
+    }
+
+    &__state {
+        display: flex;
+        height: 20px;
+        width: 20px;
+        position: absolute;
+        top: 0;
+    }
+
+    &__check {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background: @white;
+        border: 1px solid @inputBorder;
+        border-radius: @baseBorderRadius;
+        width: @checkboxWidth;
+        height: @checkboxHeight;
+
+        &:before {
+            content: "";
+            background: @ui-option-type;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+        }
+        // This only happens if state has the radiobutton modifier
+        .umb-form-check--radiobutton & {
+            border-radius: 100%;
+
+            &:before {
+                width: 10px;
+                height: 10px;
+                border-radius: 100%;
+                opacity: 0;
+                transform: scale(0);
+                transition: .15s ease-out;
+            }
+        }
+        // This only happens if state has the checkbox modifier
+        .umb-form-check--checkbox & {
+            &:before {
+                width: 0;
+                height: 0;
+                transition: .05s ease-out;
+            }
+        }
+    }
+
+    &__icon {
+        color: @white;
+        text-align: center;
+        font-size: 12px;
+        opacity: 0;
+        transition: .2s ease-out;
+        position: relative;
+        z-index: 1;
+
+        &:before {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            margin: auto;
+        }
+    }
+
+    &.umb-form-check--disabled {
+        cursor: not-allowed !important;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}
+
+umb-checkbox[readonly],
+umb-radiobutton[readonly] {
+    .umb-form-check {
+        cursor: not-allowed !important;
+    }
+}

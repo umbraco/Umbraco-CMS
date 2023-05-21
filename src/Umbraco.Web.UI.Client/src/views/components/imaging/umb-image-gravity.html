@@ -1,0 +1,19 @@
+<div class="umb-cropper-gravity">
+
+	<div class="gravity-container" ng-show="vm.loaded">
+        <div class="viewport">
+
+            <img ng-show="vm.isCroppable" ng-src="{{vm.src}}" src="" alt="" draggable="false" />
+            <img ng-show="!vm.isCroppable && !vm.hasDimensions" ng-src="{{vm.src}}" src="" alt="" draggable="false" class="cursor-default" />
+
+        </div>
+        <div class="overlayViewport">
+
+            <div ng-show="vm.isCroppable && vm.disableFocalPoint !== true" class="overlay umb-outline" ng-style="vm.overlayStyle" ng-click="vm.setFocalPoint($event)">
+                <div class="focalPoint" ng-style="vm.style">
+                </div>
+            </div>
+
+        </div>
+	</div>
+</div>

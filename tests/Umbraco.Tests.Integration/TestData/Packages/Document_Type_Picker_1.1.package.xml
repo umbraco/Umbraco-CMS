@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>  
+  <info>
+    <package>
+      <name>Document Type Picker</name>      
+    </package>
+  </info>
+  <DocumentTypes />
+  <Templates />
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes>
+    <DataType Name="Document Type Picker" Id="790aff36-7fed-47fb-8bcd-9c91ce43ba24" Definition="3593d8e7-8b35-47b9-beda-5e830ca8c93c" />
+  </DataTypes>
+</umbPackage>

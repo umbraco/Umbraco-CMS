@@ -1,0 +1,152 @@
+.umb-button {
+   position: relative;
+   display: inline-block;
+   margin-left: 5px;
+}
+
+.umb-button__button {
+    position: relative;
+}
+
+.umb-button__content {
+   opacity: 1;
+   transition: opacity 0.25s ease;
+   display: flex;
+   flex-wrap: wrap;
+   align-items: center;
+   justify-content: center;
+}
+
+.umb-button__icon {
+    margin-right: 5px;
+    line-height: 1em;
+}
+
+.umb-button__content.-hidden {
+   opacity: 0;
+}
+
+.umb-button .umb-button__caret {
+   margin-top: 0;
+   margin-left: 5px;
+}
+
+.umb-button__button[disabled] .umb-button__caret {
+    border-top-color: @gray-7;
+    border-bottom-color: @gray-7;
+}
+
+.umb-button__progress {
+   position: absolute;
+   left: 50%;
+   top: 50%;
+   width: 14px;
+   height: 14px;
+   margin-left: -9px;
+   margin-top: -9px;
+   z-index: 100;
+   border-radius: 40px;
+   border: 2px solid @btnBorder;
+   border-left-color: @green;
+   opacity: 1;
+   animation: rotating 0.4s linear infinite;
+   transition: opacity 0.25s ease;
+}
+
+.umb-button__progress.-hidden {
+   opacity: 0;
+   z-index: 0;
+}
+
+.umb-button__progress.-white {
+   border-color: rgba(255, 255, 255, 0.4);
+   border-left-color: @white;
+}
+
+.umb-button__progress.-black {
+   border-color: rgba(255, 255, 255, 0.4);
+   border-left-color: @black;
+}
+
+.umb-button__success,
+.umb-button__error {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   z-index: 10;
+   transform: translate(-50%, -50%);
+   opacity: 1;
+   font-size: 20px;
+   transition: opacity 0.25s ease;
+}
+
+.umb-button__success.-hidden,
+.umb-button__error.-hidden {
+   opacity: 0;
+   z-index: 0;
+}
+
+.umb-button__success.-white,
+.umb-button__error.-white {
+   color: @white;
+}
+
+.umb-button__success.-black,
+.umb-button__error.-black {
+   color: @black;
+}
+
+.umb-button__overlay {
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   z-index: 10;
+   background: @white;
+   opacity: 0;
+}
+
+@keyframes rotating {
+   from {
+      transform: rotate(0deg);
+   }
+   to {
+      transform: rotate(360deg);
+   }
+}
+
+/* Sizes */
+.umb-button--xxs {
+    padding: 2px 10px;
+    font-size: 13px;
+}
+
+.umb-button--xs {
+    padding: 5px 13px;
+    font-size: 14px;
+}
+
+.umb-button--s {
+    padding: 6px 16px;
+    font-size: 15px;
+}
+
+.umb-button--m {
+    padding: 10px 24px;
+    font-size: 15px;
+}
+
+.umb-button--l {
+    padding: 14px 40px;
+    font-size: 16px;
+}
+
+.umb-button--xl {
+    padding: 18px 52px;
+    font-size: 16px;
+}
+
+/* types */
+.umb-button--block {
+    display: block;
+    width: 100%;
+}

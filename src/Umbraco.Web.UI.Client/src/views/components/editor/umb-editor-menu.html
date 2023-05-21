@@ -1,0 +1,30 @@
+<div class="pull-right" style="position: relative;">
+
+    <umb-button
+        type="button"
+        button-style="white"
+        action="dropdown.isOpen = !dropdown.isOpen"
+        label-key="general_actions"
+        show-caret="true"
+        has-popup="true"
+        is-expanded="dropdown.isOpen"
+        disabled="!actions || !actions.length || isDisabled">
+    </umb-button>
+
+    <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false" deep-blur="dropdown.isOpen = false">
+        <umb-dropdown-item class="umb-action" ng-class="{'sep': action.separator, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
+            <button type="button" ng-click="executeMenuItem(action)">
+                <umb-icon icon="{{action.icon}}" class="icon"></umb-icon>
+                <!-- Render the text that will be visually displayed -->
+                <span class="menu-label" aria-hidden="true">{{action.name}}</span>
+                <!-- Render the textDescription from the language files if it's attached to the action object-->
+                <span class="sr-only" ng-if="action.textDescription">
+                    <localize key="visuallyHiddenTexts_{{action.alias}}Description" tokens="[currentNode.name]"></localize>
+                </span>
+                <!-- Otherwise render a combination of the nodename and the currentNode name-->
+                <span class="sr-only" ng-if="!action.textDescription">{{action.name}} {{currentNode.name}}</span>
+            </button>
+        </umb-dropdown-item>
+    </umb-dropdown>
+
+</div>

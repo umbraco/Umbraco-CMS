@@ -1,0 +1,53 @@
+<div class="umb-block-editor" ng-controller="Umbraco.Editors.BlockEditorController as vm">
+
+    <ng-form name="vm.blockForm" val-form-manager>
+
+        <umb-editor-view umb-tabs ng-if="!page.loading">
+
+            <umb-editor-header
+                name="vm.model.title"
+                name-max-length="255"
+                name-required="false"
+                name-locked="true"
+                navigation="vm.tabs"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <umb-editor-sub-views sub-views="vm.tabs" model="vm.model">
+                </umb-editor-sub-views>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <!-- Missing breadcrumbs -->
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        action="vm.close()"
+                        shortcut="esc"
+                        button-style="link"
+                        label="{{vm.closeLabel}}"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="!vm.model.hideSubmitButton",
+                        action="vm.submitAndClose()"
+                        button-style="primary"
+                        state="vm.saveButtonState"
+                        label="{{vm.submitLabel}}"
+                        type="button">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+        </umb-editor-view>
+    </ng-form>
+</div>

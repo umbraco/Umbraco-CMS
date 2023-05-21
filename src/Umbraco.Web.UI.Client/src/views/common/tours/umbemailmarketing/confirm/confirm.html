@@ -1,0 +1,15 @@
+<div ng-controller="Umbraco.Tours.UmbEmailMarketing.ConfirmController as vm">
+
+    <umb-tour-step-header title="model.currentStep.title"></umb-tour-step-header>
+
+    <umb-tour-step on-close="model.completeTour()">
+        <p>We have sent a welcome email to your email address <strong>{{ vm.userEmailAddress }}</strong></p>
+    </umb-tour-step>
+
+    <umb-tour-step-footer>
+        <div class="flex justify-end">
+            <umb-button type="button" button-style="link" action="model.completeTour()" label-key="general_close" shortcut="esc"></umb-button>
+        </div>
+    </umb-tour-step-footer>
+
+</div>

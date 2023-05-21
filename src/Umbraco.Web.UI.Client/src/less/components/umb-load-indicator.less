@@ -1,0 +1,57 @@
+.umb-load-indicator {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   font-size: 0;
+   margin-left: -6px; // hack to center it
+   margin-top: -6px; // hack to center it
+}
+
+.umb-load-indicator__bubble {
+   height: 0;
+   position: absolute;
+   top: 50%;
+   left: 0;
+   width: 0;
+   margin: 0;
+   height: 6px;
+   width: 6px;
+   border: 2px solid @blueMid;
+   border-radius: 100%;
+   transform: transformZ(0);
+   animation: umbLoadIndicatorAnimation 1.4s infinite;
+}
+
+.umb-load-indicator__bubble:nth-child(1n) {
+   left: -16px;
+   animation-delay: 0s;
+}
+
+.umb-load-indicator__bubble:nth-child(2n) {
+   left: 0;
+   animation-delay: 0.15s;
+}
+
+.umb-load-indicator__bubble:nth-child(3n) {
+   left: 16px;
+   animation-delay: 0.30s;
+}
+
+@keyframes umbLoadIndicatorAnimation {
+  0%   {
+    transform: scale(0.5);
+    background: @blueMid;
+  }
+  50%   {
+    transform: scale(1);
+    background: transparent;
+  }
+  100% {
+    transform: scale(0.5);
+    background: @blueMid;
+  }
+}

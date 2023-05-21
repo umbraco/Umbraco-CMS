@@ -1,0 +1,119 @@
+.umb-user-details-avatar {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid @gray-8;
+}
+
+div.umb-user-details-actions > div {
+    margin-bottom: 20px;
+}
+
+.umb-user-details-actions .umb-button {
+    margin-bottom: 20px;
+}
+
+.umb-user-details-view-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: @black;
+    margin-bottom: 30px;
+}
+
+.umb-user-details-view-wrapper {
+    padding: 20px 60px;
+}
+
+@media (max-width: 768px) {
+
+    .umb-user-details-view-wrapper {
+        padding: 0;
+    }
+}
+
+.umb-user-details-section {
+    margin-bottom: 40px;
+}
+.umb-user-details-details {
+    display: flex;
+}
+
+a.umb-user-details-details__back-link {
+    font-weight: bold;
+    color: @black;
+}
+
+.umb-user-details-details__back-link:hover {
+    color: @gray-4;
+    text-decoration: none;
+}
+
+
+@sidebarwidth: 350px; // Width of sidebar. Ugly hack because of old version of Less
+
+.umb-user-details-details__main-content {
+    flex: 1 1 auto;
+    margin-right: 30px;
+    width: calc(~'100%' - ~'@{sidebarwidth}' - ~'30px'); // Make sure that the main content area doesn't gets affected by inline styling
+}
+
+.umb-user-details-details__main-content .umb-node-preview-add {
+    max-width: 100%;
+}
+
+
+.umb-user-details-details__sidebar {
+    flex: 0 0 @sidebarwidth;
+
+    .umb-button{
+        margin-left:0px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .umb-user-details-details {
+        flex-direction: column;
+    }
+
+    .umb-user-details-details__main-content {
+        flex: 1 1 auto;
+        width: 100%;
+        margin-bottom: 30px;
+        margin-right: 0;
+    }
+
+    .umb-user-details-details__sidebar {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+}
+
+.umb-user-details-details__section-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: @black;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.umb-user-details-details__section-description {
+    font-size: 12px;
+    line-height: 1.6em;
+    margin-bottom: 15px;
+}
+
+.umb-user-details-details__information-item {
+    margin-bottom: 10px;
+    font-size: 13px;
+    margin-top:10px;
+}
+
+.umb-user-details-details__information-item-label {
+    color: @black;
+    font-weight: bold;
+}
+
+.umb-user-details-details__information-item-content {
+    word-break: break-word;
+}
+

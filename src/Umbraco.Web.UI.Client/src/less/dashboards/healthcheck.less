@@ -1,0 +1,131 @@
+
+.umb-healthcheck {
+	display: flex;
+	flex-wrap: wrap;
+	margin-left: -10px;
+	margin-right: -10px;
+}
+
+.umb-healthcheck-help-text {
+	line-height: 1.6em;
+}
+
+.umb-healthcheck-action-bar {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 20px;
+}
+
+
+/* Group and states */
+.umb-healthcheck-group {
+	display: flex;
+	flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    background: @white;
+    border: 0;
+	border-radius: 3px;
+	padding: 20px;
+	box-sizing: border-box;
+	text-align: center;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+	height: 100%;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.umb-healthcheck-group:hover {
+	box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
+	cursor: pointer;
+	transition: box-shadow 150ms ease-in-out;
+}
+
+.umb-healthcheck-group__load-container {
+	position: relative;
+	height: 30px;
+	margin-top: 15px;
+	margin-bottom: 16px;
+}
+
+
+/* Title */
+.umb-healthcheck-title {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+
+/* Messages */
+.umb-healthcheck-messages {
+	margin-top: 15px;
+}
+
+.umb-healthcheck-message {
+	position: relative;
+	background: @gray-10;
+    border-radius: 50px;
+    display: inline-flex;
+	align-items: center;
+	padding-left: 8px;
+	padding-right: 8px;
+    margin-bottom: 5px;
+    color: @black;
+    font-weight: bold;
+	font-size: 13px;
+}
+
+.umb-healthcheck-message .umb-icon {
+	font-size: 15px;
+	margin-right: 3px;
+}
+
+.umb-healthcheck-details-link {
+    color: @turquoise-d1;
+
+    &:hover {
+        color: @turquoise-d1;
+        text-decoration: none;
+    }
+}
+
+/* Spacing for boxes */
+.umb-air {
+	flex: 0 0 auto;
+	flex-basis: 100%;
+    max-width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+
+	@media (min-width: 500px) {
+		flex-basis: 50%;
+		max-width: 50%;
+	}
+
+	@media (min-width: 768px) {
+		flex-basis: 20%;
+		max-width: 20%;
+	}
+}
+
+
+/* DETAILS */
+
+.umb-healthcheck-back-link {
+    background: transparent;
+    border: 0 none;
+    padding: 0;
+    font-weight: bold;
+	color: @black;
+}
+
+.umb-healthcheck-status-icon {
+	margin-top: 2px;
+}
+
+.umb-healthcheck-status-icon.-large {
+	width: 70px;
+	height: 70px;
+	font-size: 30px;
+	background-color: @white;
+}

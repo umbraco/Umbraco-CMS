@@ -1,0 +1,34 @@
+﻿<div ng-controller="Umbraco.Editors.Macros.ParametersController as vm">
+    <umb-box>
+        <umb-box-content>
+            <div class="sub-view-columns">
+                <div class="sub-view-column-left">
+                    <h5><localize key="macro_parameters">Parameters</localize></h5>
+                    <small><localize key="macro_parametersDescription">Define the parameters that should be available when using this macro.</localize></small>
+                </div>
+                <div class="sub-view-column-right">
+                    <div class="umb-property-editor form-horizontal">
+                        <div ui-sortable="sortableOptions" ng-model="model.macro.parameters">
+                            <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="parameter in model.macro.parameters track by $id(parameter)">
+                                <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
+                                <div class="umb-prevalues-multivalues__left">
+                                    <span>{{parameter.label}}</span>&nbsp;<span class="muted">({{parameter.key}})</span>:&nbsp;<small>{{parameter.editor}}</small>
+                                </div>
+                                <div class="umb-prevalues-multivalues__right">
+                                    <button type="button" class="umb-node-preview__action" ng-click="vm.edit(parameter, $event)"><localize key="general_edit">Edit</localize></button>
+                                    <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.remove(parameter, $event)"><localize key="general_remove">Remove</localize></button>
+                                </div>
+                            </div>
+                        </div>
+                        <umb-button type="button"
+                                    button-style="info"
+                                    action="vm.add($event)"
+                                    label-key="general_add">
+                        </umb-button>
+                    </div>
+                </div>
+            </div>
+
+        </umb-box-content>
+    </umb-box>
+</div>

@@ -1,0 +1,95 @@
+<div ng-cloak ng-controller="Umbraco.Editors.PartialViews.CreateController as vm">
+
+  <div ng-if="!vm.creatingFolder">
+    <div class="umbracoDialog umb-dialog-body with-footer">
+
+      <div class="umb-pane">
+
+        <h5>
+          <localize key="create_createUnder">Create an item under</localize>
+          {{currentNode.name}}
+        </h5>
+
+        <!-- Main options -->
+        <div ng-if="!vm.showSnippets">
+          <ul class="umb-actions umb-actions-child">
+            <li class="umb-action">
+              <button class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView()" type="button"
+                      umb-auto-focus>
+                <umb-icon class="icon large" icon="icon-article"></umb-icon>
+                <span class="menu-label"><localize
+                  key="create_newEmptyPartialView">New empty partial view</localize></span>
+              </button>
+            </li>
+            <li class="umb-action">
+              <button class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFromSnippet()" type="button">
+                <umb-icon class="icon large" icon="icon-article"></umb-icon>
+                <span class="menu-label"><localize
+                  key="create_newPartialViewFromSnippet">New partial view from snippet</localize>...</span>
+              </button>
+            </li>
+            <li class="umb-action">
+              <button class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFolder()" type="button">
+                <umb-icon class="icon large" icon="icon-folder"></umb-icon>
+                <span class="menu-label"><localize key="general_folder">Folder</localize>...</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Snippets list -->
+        <div ng-if="vm.showSnippets">
+          <ul class="umb-actions umb-actions-child">
+            <li class="umb-action" ng-repeat="snippet in vm.snippets">
+              <button class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView(snippet)"
+                      style="padding-top: 6px; padding-bottom: 6px;" type="button">
+                <umb-icon class="icon large" icon="icon-article"></umb-icon>
+                <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialog footer -->
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+      <button class="btn btn-info" ng-click="vm.close()" type="button">
+        <localize key="buttons_somethingElse">Do something else</localize>
+      </button>
+    </div>
+  </div>
+
+  <div ng-if="vm.creatingFolder">
+    <form name="createFolderForm" ng-submit="vm.createFolder(createFolderForm)"
+          novalidate
+          val-form-manager>
+      <div class="umbracoDialog umb-dialog-body with-footer">
+        <!-- Create folder -->
+        <div class="umb-pane">
+          <div ng-show="vm.createFolderError">
+            <div class="alert alert-error">
+              <div>{{vm.createFolderError.data.message}}</div>
+            </div>
+          </div>
+
+          <umb-control-group hide-label="false" label="@create_enterFolderName" localize="label">
+            <input class="umb-textstring textstring input-block-level" name="folderName" ng-model="vm.folderName"
+                   required type="text" umb-auto-focus/>
+          </umb-control-group>
+        </div>
+      </div>
+      <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <umb-button action="vm.close()"
+                    button-style="link"
+                    label-key="general_close"
+                    type="button">
+        </umb-button>
+        <umb-button button-style="primary"
+                    label-key="general_create"
+                    type="submit">
+        </umb-button>
+      </div>
+    </form>
+  </div>
+</div>

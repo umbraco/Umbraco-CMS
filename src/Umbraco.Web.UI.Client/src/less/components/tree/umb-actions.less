@@ -1,0 +1,109 @@
+// Tree context menu
+// -------------------------
+.umb-actions {
+    margin: 0;
+    list-style: none;
+    user-select: none;
+
+    .sep {
+        display: block;
+        border-top: 1px solid @gray-9;
+
+        &:first-child {
+            border-top: none;
+        }
+    }
+
+    .menu-label {
+        display: inline-block;
+        vertical-align: middle;
+        padding-left: 15px;
+    }
+
+    .icon {
+        font-size: 18px;
+        vertical-align: middle;
+    }
+}
+
+.umb-action-link {
+    position: relative;
+    font-size: 15px;
+    color: @black;
+    padding: 9px 25px 9px 20px;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    text-align: left;
+
+    body.touch & {
+        padding: 7px 25px 7px 20px;
+        font-size: 110%;
+    }
+}
+
+.umb-action-link:hover,
+.umb-action-link:focus,
+.umb-action.selected {
+    color: @black !important;
+    background: @gray-10 !important;
+    text-decoration: none;
+}
+
+.umb-action {
+    &.-opens-dialog {
+        .menu-label:after {
+            // adds an ellipsis (...) after the menu label for actions that open a dialog
+            content: '\2026';
+        }
+    }
+}
+
+.umb-actions-child {
+
+    .umb-action {
+        display: block;
+
+        &.add {
+            margin-top: 20px;
+            border-top: 1px solid @gray-8;
+            padding-top: 20px;
+
+            i {
+                opacity: 0.4;
+            }
+        }
+    }
+
+    .umb-action-link {
+        clear: both;
+        padding-left: 10px;
+    }
+
+    .icon {
+        font-size: 30px;
+        min-width: 30px;
+        text-align: center;
+        line-height: 24px;
+        /* set line-height to ensure all icons use same line-height */
+    }
+
+    .menu-label {
+        font-size: 14px;
+        color: @black;
+        margin-left: 10px;
+        text-align: left;
+    }
+
+    small {
+        font-size: 12px;
+        display: block;
+        clear: right;
+        line-height: 14px;
+        color: @gray-6;
+        white-space: normal;
+        margin-top: 2px;
+    }
+}

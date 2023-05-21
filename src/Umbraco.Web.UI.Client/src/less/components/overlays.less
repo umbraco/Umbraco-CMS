@@ -1,0 +1,280 @@
+.umb-overlay {
+    position: fixed;
+    overflow: hidden;
+    background: @white;
+    z-index: 7501;
+    animation: fadeIn 0.2s;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.16);
+    text-align: left;
+
+    .scoped-view{
+        display: none;
+    }
+
+    .abstract {
+        margin-bottom : 20px;
+    }
+}
+
+.umb-overlay__form {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    height: 100%;
+}
+
+.umb-overlay .umb-overlay-header {
+    border-bottom: 1px solid @gray-9;
+    margin-top: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+    padding: 30px 30px 0;
+}
+
+.umb-overlay__section-header {
+    width: 100%;
+    margin-top:30px;
+    margin-bottom: 20px;
+
+    h5 {
+        display: inline;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: bold;
+    }
+
+    button {
+        display: inline;
+        float: right;
+        background-color: transparent;
+        border:none;
+        &:hover {
+            color: @ui-option-type-hover;
+        }
+    }
+}
+
+.umb-overlay__title {
+    font-size: 20px;
+    color: @black;
+    line-height: 16px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.umb-overlay__subtitle {
+    font-size: @fontSizeSmall;
+    color: @gray-3;
+    margin: 0;
+}
+
+.umb-overlay-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    position: relative;
+    padding: 20px 30px;
+    background: @white;
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+}
+
+.umb-overlay-drawer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 33px;
+    padding: 8px 20px;
+    margin: 0;
+    background: @white;
+    border-top: 1px solid @gray-9;
+}
+
+.umb-overlay-drawer.-auto-height {
+    flex-basis: auto;
+}
+
+.umb-overlay-drawer .umb-overlay-drawer__align-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.umb-overlay-drawer .umb-overlay-drawer-content .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+/* ---------- OVERLAY CENTER ---------- */
+.umb-overlay.umb-overlay-center {
+    position: absolute;
+    width: 600px;
+    height: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: @baseBorderRadius;
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay-header {
+    border: none;
+    background: transparent;
+    padding: 30px 30px 0;
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay-drawer {
+    border: none;
+    background: transparent;
+    padding: 0 30px 20px;
+}
+
+/* ---------- OVERLAY TARGET ---------- */
+.umb-overlay.umb-overlay-target {
+    width: 400px;
+    max-height: 100vh;
+    box-sizing: border-box;
+    visibility: hidden;
+    border-radius: @baseBorderRadius;
+
+    &.umb-overlay--small {
+        width: 420px;
+    }
+
+    &.umb-overlay--medium {
+        width: 520px;
+    }
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-header {
+    border: none;
+    background: transparent;
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-drawer {
+    border: none;
+    background: transparent;
+}
+
+/* ---------- OVERLAY RIGHT ---------- */
+.umb-overlay.umb-overlay-right {
+    width: 500px;
+    top: @appHeaderHeight;
+    right: 0;
+    bottom: 0;
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
+    
+    .umb-drawer-is-visible & {
+        right:400px;
+    }
+}
+
+.umb-overlay.umb-overlay-right .umb-overlay-header {
+    flex-basis: 70px;
+    box-sizing: border-box;
+}
+
+// reset the top position to 0 because we are in a asbolute container and want to 
+// overlay to go all the way to the top
+.umb-editors .umb-overlay.umb-overlay-right {
+    top: 0;
+}
+
+/* ---------- OVERLAY LEFT ---------- */
+.umb-overlay.umb-overlay-left {
+    width: 500px;
+    top: @appHeaderHeight;
+    left: 0;
+    bottom: 0;
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
+    margin-left: 81px;
+}
+
+// push left overlay when drawer is open
+.umb-drawer-is-visible .umb-overlay.umb-overlay-left {
+    left: @drawerWidth;
+}
+
+.umb-overlay.umb-overlay-left .umb-overlay-header {
+    flex-basis: 100px;
+    padding: 30px 30px 0;
+    box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+    .umb-overlay.umb-overlay-left {
+        margin-left: 61px;
+    }
+}
+
+@media (max-width: 500px) {
+    .umb-overlay.umb-overlay-left {
+        margin-left: 41px;
+        width: calc(100% - 41px);
+    }
+}
+
+/* ---------- OVERLAY ITEM DETAILS ---------- */
+.umb-overlay__item-details {
+    position: absolute;
+    left: 0;
+    bottom: 51px;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background: @gray-10;
+    border-bottom: 1px solid @purple-l3;
+    pointer-events: none;
+}
+
+.umb-overlay__item-details-title-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.umb-overlay__item-details-icon {
+    font-size: 16px;
+    margin-right: 10px;
+    vertical-align: middle;
+    color: @gray-6;
+}
+
+.umb-overlay__item-details-title {
+    margin: 0;
+    font-size: 15px;
+}
+
+.umb-overlay__item-details-description {
+    margin: 10px 0 0;
+    font-size: 12px;
+}
+
+/*ensures dialogs doesnt have side-by-side labels*/
+.umb-overlay .control-label,
+.umb-overlay .form-horizontal .control-label,
+.form-horizontal .umb-overlay .control-label
+ {
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    float: none;
+}
+
+
+.umb-overlay .controls-row,
+.umb-overlay .form-horizontal .controls,
+.form-horizontal .umb-overlay .controls {
+    margin-left: 0 !important;
+}
+
+.umb-overlay .text-error {
+    color: @formErrorText;
+}
+.umb-overlay .text-warning {
+    color: @formWarningText;
+}
+
+.umb-overlay .text-success {
+    color: @formSuccessText;
+}

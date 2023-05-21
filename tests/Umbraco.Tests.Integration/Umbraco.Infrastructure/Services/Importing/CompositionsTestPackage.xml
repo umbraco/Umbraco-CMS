@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <files />
+  <info>
+    <package>
+      <name>Compositions Packaged</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <umbHomePage key="9c9b55d0-2fbf-4f12-afea-023bd7b2519d" id="1068" parentID="-1" level="1" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:35" updateDate="2014-11-26T12:52:36" nodeName="Home" urlName="home" path="-1,1068" isDoc="" nodeType="1056" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1051" nodeTypeAlias="umbHomePage">
+        <umbracoNaviHide>0</umbracoNaviHide>
+        <title><![CDATA[Txt: A responsive starter kit for Umbraco]]></title>
+        <facebookLink><![CDATA[http://facebook.com/Umbraco]]></facebookLink>
+        <twitterLink><![CDATA[http://twitter.com/UmbracoProject]]></twitterLink>
+        <rssLink><![CDATA[http://feeds.feedburner.com/umbracoblog]]></rssLink>
+        <googleLink><![CDATA[https://google.com/+Umbraco]]></googleLink>
+        <hideBanner>0</hideBanner>
+        <bannerHeader><![CDATA[This is some text that needs to pop]]></bannerHeader>
+        <bannerSubheader><![CDATA[It will lead to a call-to-action, just click the button...]]></bannerSubheader>
+        <bannerLinkText><![CDATA[You know you want to click me]]></bannerLinkText>
+        <bannerLink>1054</bannerLink>
+        <bannerBackgroundImage><![CDATA[/media/SampleImages/1008/banner.jpg]]></bannerBackgroundImage>
+        <aboutTitle><![CDATA[What's this about?]]></aboutTitle>
+        <aboutText><![CDATA[<p>This is <a href="http://html5up.net/txt/">TXT</a>, a free site template designed by <a href="http://n33.co">n33</a> for <a href="http://html5up.net/">HTML5 UP</a>. It's built on the <a href="http://skeljs.org">skelJS</a> framework, uses well-thought out HTML5 and CSS3, and is fully responsive making it a great starting point for your own projects. And, like everything else we make, it's also free to use for pretty much any personal or commercial work under the <a href="http://html5up.net/license/">Creative Commons Attribution</a> license, so go ahead and use it – just don't forget to credit us!</p>]]></aboutText>
+        <siteName><![CDATA[Umbraco Txt]]></siteName>
+        <byline><![CDATA[A responsive starter kit for Umbraco]]></byline>
+        <copyright><![CDATA[Umbraco]]></copyright>
+        <umbTextPage key="9c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1069" parentID="1068" level="2" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Getting Started" urlName="getting-started" path="-1,1068,1069" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <featuredPage>1</featuredPage>
+          <image><![CDATA[/media/SampleImages/1063/pic01.jpg]]></image>
+          <bodyText>
+            <![CDATA[<p>You've installed Umbraco and the "Txt" Starter Kit.</p>
+<p>Edit the text on the homepage and create a site structure by adding new texpages to your site. This is all done in the <strong>Content</strong> section.</p>
+<p>If you find the editing options provided by the Txt site too limited for you needs, simply add more properties to the page by going to the <strong>Settings</strong> section, expanding the <strong>Document Types</strong> item and adding new properties on the <strong>Generic Properties</strong> tab. You can find more information about <a href="http://umbraco.org/help-and-support/video-tutorials/introduction-to-umbraco/sitebuilder-introduction/document-types" title="About Umbraco Document Types">document types and properties</a> at the <a href="http://umbraco.com" title="The Umbraco Website">Umbraco website</a>.</p>
+<p>You'll probably want to personalize your site by changing the current design. This is also done in the <strong>Settings</strong> section, by editing the CSS styles and HTML templates. Umbraco uses master templates, so the main, common markup is placed in the <strong>Starterkit Master</strong> template, while the Homeage and Textpage have separate templates for their unique layouts. You can find more information about <a href="http://umbraco.org/help-and-support/video-tutorials/introduction-to-umbraco/sitebuilder-introduction/templates" title="Umbraco Templates and Stylesheets">templates and css</a> in umbraco at the umbraco website.</p>
+<p>Once you're happy with your site's design, you might want to add more functionality, such as maps, image galleries or forms. This is done by <a href="http://umbraco.org/help-and-support/video-tutorials/getting-started" title="Umbraco Modules">installing Umbraco modules</a>.</p>]]>
+          </bodyText>
+        </umbTextPage>
+        <umbTextPage key="9c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1070" parentID="1068" level="2" creatorID="0" sortOrder="1" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Go Further" urlName="go-further" path="-1,1068,1070" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <featuredPage>1</featuredPage>
+          <image><![CDATA[/media/SampleImages/1060/pic02.jpg]]></image>
+          <bodyText>
+            <![CDATA[<p>The Txt Starter Kit only scratches the surface of what's possible with Umbraco. Below the Txt Starter Kit and its modules lies a great architecture that lets you implement whatever you need.</p>
+<p>With Umbraco you've finally got a solid, open and reliable platform for websites as basic as the Txt site, and Umbraco can be rapidly expanded to support multi-language websites, collaboration platforms and intra/extranets, to name just a few.</p>
+<p>Advanced functionality is created with Umbraco macros, built with Umbraco's award-winning .NET integration, including full support for any .NET User or Custom control and ASP.NET MVC. Create and integrate your own .NET macros in mere minutes with point and click simplicity. Simply copy your controls to the Umbraco website, go to the <strong>Developer</strong> section and create a new macro, selecting your control from the list.</p>
+<p>You can also use <a href="http://umbraco.org/help-and-support/video-tutorials/getting-started/working-with-webmatrix" title="Working with Razor">Microsoft's Razor</a> syntax to quickly add dynamic functionality to your site.</p>
+<p>We've also gathered the best community macros into a repository that's also accessed from the <strong>Developer</strong> section, in the <strong>Packages</strong> area. You can find more information <a href="http://umbraco.org/help-and-support/video-tutorials/introduction-to-umbraco/sitebuilder-introduction/what-are-macros" title="About creating Umbraco macros">about creating macros</a>, on the Umbraco website.</p>
+<p>The sky is the limit with Umbraco, and you have the benefit a friendly community, training, and guaranteed support. Find out how to <a href="http://umbraco.org/help-and-support" title="Get Umbraco Support">get help</a>.</p>]]>
+          </bodyText>
+        </umbTextPage>
+        <umbTextPage key="9c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1071" parentID="1068" level="2" creatorID="0" sortOrder="2" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Installing Modules" urlName="installing-modules" path="-1,1068,1071" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <featuredPage>1</featuredPage>
+          <image><![CDATA[/media/SampleImages/1061/pic04.jpg]]></image>
+          <bodyText>
+            <![CDATA[<p>Umbraco modules encapsulate specific bits of advanced functionality that are easily added to your website.</p>
+<p>Once installed, Umbraco modules are open source and easy to customize if you want to modify the behavior for your specific needs.</p>
+<p>Because Umbraco modules are provided under the MIT license you are free to use and modify them any way you want, with no strings attached.</p>
+<p>To add Umbraco modules to your website, go to the <strong>Settings</strong> section, expand the <strong>Templates</strong> item, select the <strong>Starterkit Master</strong> template, then click the <strong>Customize Skin</strong> button on the toolbar.</p>
+<p>Umbraco modules are available for various kinds of navigation, a sitemap, social media feeds, and a contact form. The list of available Umbraco modules is growing rapidly and is automatically updated from a central source, always fresh and current.</p>
+<p><a href="http://umbraco.org/get-started" title="Get Started with Umbraco">Get more information</a> about the umbraco way.</p>]]>
+          </bodyText>
+        </umbTextPage>
+        <umbTextPage  key="9c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1072" parentID="1068" level="2" creatorID="0" sortOrder="3" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="About" urlName="about" path="-1,1068,1072" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <featuredPage>1</featuredPage>
+          <image><![CDATA[/media/SampleImages/1001/pic03.jpg]]></image>
+          <bodyText>
+            <![CDATA[<p>The Txt Starter Kit gives you a small website that introduces you to a set of well-defined conventions for building an Umbraco website.</p>
+<p>Now that you know what the Txt Starter Kit is, it is time to get started using Umbraco.</p>]]>
+          </bodyText>
+        </umbTextPage>
+        <umbNewsOverview key="9c9b55d0-2fbf-4f12-afea-023bd7b25196" id="1073" parentID="1068" level="2" creatorID="0" sortOrder="4" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="News" urlName="news" path="-1,1068,1073" isDoc="" nodeType="1058" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1053" nodeTypeAlias="umbNewsOverview">
+          <umbracoNaviHide>0</umbracoNaviHide>
+          <title><![CDATA[Adventure log]]></title>
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25195" id="1074" parentID="1073" level="3" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="The 10 remarkable features of object" urlName="the-10-remarkable-features-of-object" path="-1,1068,1073,1074" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+            <umbracoNaviHide>0</umbracoNaviHide>
+            <bodyText>
+              <![CDATA[<p>Ita prorsus, inquam; Hanc ergo intuens debet institutum illud quasi signum absolvere. Ergo adhuc, quantum equidem intellego, causa non videtur fuisse mutandi nominis. Quia dolori non voluptas contraria est, sed doloris privatio. Nos autem non solum beatae vitae istam esse oblectationem videmus, sed etiam levamentum miseriarum. Quodsi ipsam honestatem undique pertectam atque absolutam. Nos cum te, M. Quod vestri non item.</p>
+<p>Cum id quoque, ut cupiebat, audivisset, evelli iussit eam, qua erat transfixus, hastam. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Quid iudicant sensus? Quo tandem modo?</p>]]>
+            </bodyText>
+          </umbNewsItem>
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25194" id="1075" parentID="1073" level="3" creatorID="0" sortOrder="1" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="This is a wonderful news item" urlName="this-is-a-wonderful-news-item" path="-1,1068,1073,1075" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+            <umbracoNaviHide>0</umbracoNaviHide>
+            <bodyText>
+              <![CDATA[<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Commoda autem et incommoda in eo genere sunt, quae praeposita et reiecta diximus; Bestiarum vero nullum iudicium puto. Est enim effectrix multarum et magnarum voluptatum. Duo Reges: constructio interrete. Claudii libidini, qui tum erat summo ne imperio, dederetur. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Sed virtutem ipsam inchoavit, nihil amplius.</p>
+<p>Ita redarguitur ipse a sese, convincunturque scripta eius probitate ipsius ac moribus. Istam voluptatem, inquit, Epicurus ignorat? Sed venio ad inconstantiae crimen, ne saepius dicas me aberrare; Sic, et quidem diligentius saepiusque ista loquemur inter nos agemusque communiter. Primum in nostrane potestate est, quid meminerimus? Consequens enim est et post oritur, ut dixi. Hoc mihi cum tuo fratre convenit. Immo videri fortasse. Itaque in rebus minime obscuris non multus est apud eos disserendi labor. Aliud igitur esse censet gaudere, aliud non dolere.</p>]]>
+            </bodyText>
+          </umbNewsItem>
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25193" id="1076" parentID="1073" level="3" creatorID="0" sortOrder="2" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="You really need to read this!" urlName="you-really-need-to-read-this" path="-1,1068,1073,1076" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+            <umbracoNaviHide>0</umbracoNaviHide>
+            <bodyText>
+              <![CDATA[<p><span>Ut aliquid scire se gaudeant? Hanc ergo intuens debet institutum illud quasi signum absolvere. Vestri haec verecundius, illi fortasse constantius. Itaque sensibus rationem adiunxit et ratione effecta sensus non reliquit. Sed ea mala virtuti magnitudine obruebantur. Quasi ego id curem, quid ille aiat aut neget. Verum tamen cum de rebus grandioribus dicas, ipsae res verba rapiunt; Apparet statim, quae sint officia, quae actiones.</span></p>
+<p><span><span>Virtutibus igitur rectissime mihi videris et ad consuetudinem nostrae orationis vitia posuisse contraria. Nonne videmus quanta perturbatio rerum omnium consequatur, quanta confusio? Sed eum qui audiebant, quoad poterant, defendebant sententiam suam. Ut necesse sit omnium rerum, quae natura vigeant, similem esse finem, non eundem.</span></span></p>]]>
+            </bodyText>
+          </umbNewsItem>
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25192" id="1077" parentID="1073" level="3" creatorID="0" sortOrder="3" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Txt Starter Kit For Umbraco Released" urlName="txt-starter-kit-for-umbraco-released" path="-1,1068,1073,1077" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+            <umbracoNaviHide>0</umbracoNaviHide>
+            <publishDate>2021-09-20T00:00:00</publishDate>
+            <image><![CDATA[/media/SampleImages/1077/pic05.jpg]]></image>
+            <subheader><![CDATA[In all it's MVC Views goodness]]></subheader>
+            <bodyText>
+              <![CDATA[<p><span>Sed ad haec, nisi molestum est, habeo quae velim. Neque enim disputari sine reprehensione nec cum iracundia aut pertinacia recte disputari potest. Nec vero alia sunt quaerenda contra Carneadeam illam sententiam. Deinde disputat, quod cuiusque generis animantium statui deceat extremum. Facit igitur Lucius noster prudenter, qui audire de summo bono potissimum velit; Quis non odit sordidos, vanos, leves, futtiles?</span></p>
+<p><span><span>Negat enim summo bono afferre incrementum diem. Haec mihi videtur delicatior, ut ita dicam, molliorque ratio, quam virtutis vis gravitasque postulat. Haec quo modo conveniant, non sane intellego. Quis enim confidit semper sibi illud stabile et firmum permansurum, quod fragile et caducum sit? Multoque hoc melius nos veriusque quam Stoici. Igitur neque stultorum quisquam beatus neque sapientium non beatus. De hominibus dici non necesse est. Non enim iam stirpis bonum quaeret, sed animalis. Nobis Heracleotes ille Dionysius flagitiose descivisse videtur a Stoicis propter oculorum dolorem. At, illa, ut vobis placet, partem quandam tuetur, reliquam deserit.</span></span></p>]]>
+            </bodyText>
+          </umbNewsItem>
+        </umbNewsOverview>
+      </umbHomePage>
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>Master</Name>
+        <Key>111adde6-9741-407e-ab35-b46b53471382</Key>
+        <Alias>umbMaster</Alias>
+        <Icon>folder.gif</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions />
+        <AllowedTemplates />
+        <DefaultTemplate />
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Hide in navigation?</Name>
+          <Alias>umbracoNaviHide</Alias>
+          <Type>Umbraco.TrueFalse</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab />
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[If set to "Yes", this page will be hidden from the navigation menu at the top.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Page title</Name>
+          <Alias>title</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[The page title overrules the name this page was given. So if the page name is "About us" the title could be "About Our Company Name".]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>12</Id>
+          <Caption>Content</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Home</Name>
+        <Key>e2f9e463-904a-4c0d-a7f3-f7c9fa31272b</Key>
+        <Alias>umbHomePage</Alias>
+        <Icon>.sprTreeSettingDomain</Icon>
+        <Thumbnail>docWithImage.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>umbMaster</Master>
+        <Compositions>
+          <Composition>umbMaster</Composition>
+        </Compositions>
+        <AllowedTemplates>
+          <Template>umbHomePage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>umbHomePage</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>umbTextPage</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Facebook link</Name>
+          <Alias>facebookLink</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Social</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Twitter link</Name>
+          <Alias>twitterLink</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Social</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Rss link</Name>
+          <Alias>rssLink</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Social</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Dribbble link</Name>
+          <Alias>dribbbleLink</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Social</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>LinkedIn link</Name>
+          <Alias>linkedInLink</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Social</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Google+ link</Name>
+          <Alias>googleLink</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Social</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Hide banner?</Name>
+          <Alias>hideBanner</Alias>
+          <Type>Umbraco.TrueFalse</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab>Banner</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Banner Header</Name>
+          <Alias>bannerHeader</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Banner</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Banner Subheader</Name>
+          <Alias>bannerSubheader</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Banner</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Banner link text</Name>
+          <Alias>bannerLinkText</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Banner</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Banner link</Name>
+          <Alias>bannerLink</Alias>
+          <Type>Umbraco.ContentPickerAlias</Type>
+          <Definition>a6857c73-d6e9-480c-b6e6-f15f6ad11125</Definition>
+          <Tab>Banner</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Banner background image</Name>
+          <Alias>bannerBackgroundImage</Alias>
+          <Type>Umbraco.UploadField</Type>
+          <Definition>84c6b441-31df-4ffe-b67e-67d5bc3ae65a</Definition>
+          <Tab>Banner</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>About Title</Name>
+          <Alias>aboutTitle</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>About</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>AboutText</Name>
+          <Alias>aboutText</Alias>
+          <Type>Umbraco.TinyMCE</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>About</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Site Name</Name>
+          <Alias>siteName</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Byline</Name>
+          <Alias>byline</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Copyright</Name>
+          <Alias>copyright</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>13</Id>
+          <Caption>Social</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+        <Tab>
+          <Id>14</Id>
+          <Caption>Banner</Caption>
+          <SortOrder>1</SortOrder>
+        </Tab>
+        <Tab>
+          <Id>15</Id>
+          <Caption>About</Caption>
+          <SortOrder>2</SortOrder>
+        </Tab>
+        <Tab>
+          <Id>16</Id>
+          <Caption>Content</Caption>
+          <SortOrder>3</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Meta</Name>
+        <Key>8adeed0a-489e-4e74-be6e-2e2f219a04a9</Key>
+        <Alias>Meta</Alias>
+        <Icon>icon-truck</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions />
+        <AllowedTemplates />
+        <DefaultTemplate />
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Meta Keywords</Name>
+          <Alias>metaKeywords</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Meta</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>19</Id>
+          <Caption>Meta</Caption>
+          <SortOrder>9</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>News Item</Name>
+        <Key>b43c90ef-f0d4-448e-b2aa-7915b743cab1</Key>
+        <Alias>umbNewsItem</Alias>
+        <Icon>.sprTreeDocPic</Icon>
+        <Thumbnail>docWithImage.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>umbMaster</Master>
+        <Compositions>
+          <Composition>umbMaster</Composition>
+        </Compositions>
+        <AllowedTemplates>
+          <Template>umbNewsItem</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>umbNewsItem</DefaultTemplate>
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Publish date</Name>
+          <Alias>publishDate</Alias>
+          <Type>Umbraco.DateTime</Type>
+          <Definition>e4d66c0f-b935-4200-81f0-025f7256b89a</Definition>
+          <Tab />
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[You can overrule the date shown on the site by changing it here. If you don't set a date explicitly here then the news item's create date will be shown.]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Image</Name>
+          <Alias>image</Alias>
+          <Type>Umbraco.UploadField</Type>
+          <Definition>84c6b441-31df-4ffe-b67e-67d5bc3ae65a</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Subheader</Name>
+          <Alias>subheader</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Content</Name>
+          <Alias>bodyText</Alias>
+          <Type>Umbraco.TinyMCE</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>17</Id>
+          <Caption>Content</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>News Overview</Name>
+        <Key>a22ca7e7-bdc4-4c3f-9193-b8773664e61d</Key>
+        <Alias>umbNewsOverview</Alias>
+        <Icon>package.png</Icon>
+        <Thumbnail>folder_media.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>umbMaster</Master>
+        <Compositions>
+          <Composition>umbMaster</Composition>
+        </Compositions>
+        <AllowedTemplates>
+          <Template>umbNewsOverview</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>umbNewsOverview</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>umbNewsItem</DocumentType>
+      </Structure>
+      <GenericProperties />
+      <Tabs />
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Seo</Name>
+        <Key>67f4dfe3-c505-43b9-86a4-6d23481c5e87</Key>
+        <Alias>Seo</Alias>
+        <Icon>icon-wifi</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Compositions />
+        <AllowedTemplates />
+        <DefaultTemplate />
+      </Info>
+      <Structure />
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Seo Pimp Title</Name>
+          <Alias>seoPimpTitle</Alias>
+          <Type>Umbraco.Textbox</Type>
+          <Definition>0cc0eba1-9960-42c9-bf9b-60e150b429ae</Definition>
+          <Tab>Seo</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>20</Id>
+          <Caption>Seo</Caption>
+          <SortOrder>10</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+    <DocumentType>
+      <Info>
+        <Name>Text Page</Name>
+        <Key>d8ab5350-3064-487f-92fe-9735c015f631</Key>
+        <Alias>umbTextyPage</Alias>
+        <Icon>.sprTreeDoc</Icon>
+        <Thumbnail>doc.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>False</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <Master>umbMaster</Master>
+        <Compositions>
+          <Composition>umbMaster</Composition>
+          <Composition>Meta</Composition>
+          <Composition>Seo</Composition>
+        </Compositions>
+        <AllowedTemplates>
+          <Template>umbTextyPage</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>umbTextyPage</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>umbTextyPage</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Featured Page?</Name>
+          <Alias>featuredPage</Alias>
+          <Type>Umbraco.TrueFalse</Type>
+          <Definition>92897bc6-a5f3-4ffe-ae27-f2e7e33dda49</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[Is this a page that should be featured on the home page?]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Image</Name>
+          <Alias>image</Alias>
+          <Type>Umbraco.UploadField</Type>
+          <Definition>84c6b441-31df-4ffe-b67e-67d5bc3ae65a</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+        <GenericProperty>
+          <Name>Content</Name>
+          <Alias>bodyText</Alias>
+          <Type>Umbraco.TinyMCE</Type>
+          <Definition>ca90c950-0aff-4e72-b976-a30b1ac57dad</Definition>
+          <Tab>Content</Tab>
+          <Mandatory>False</Mandatory>
+          <Validation />
+          <Description><![CDATA[]]></Description>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>18</Id>
+          <Caption>Content</Caption>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+  </DocumentTypes>
+  <Templates>
+    <Template>
+      <Name>HomePage</Name>
+      <Alias>umbHomePage</Alias>
+      <Master>umbLayout</Master>
+      <Design>
+        <![CDATA[@inherits UmbracoTemplatePage
+@{
+    Layout = "umbLayout.cshtml";
+}
+@{ Html.RenderPartial("umbHomepageBanner"); }
+<!-- Main -->
+<div id="main-wrapper">
+    <div id="main" class="container">
+        <div class="row">
+            <div class="12u">
+                @{ Html.RenderPartial("umbFeatures"); }
+            </div>
+        </div>
+        <div class="row">
+            <div class="12u">
+                @{   Html.RenderPartial("umbNewsOverviewWidget"); }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Main -->
+]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Layout</Name>
+      <Alias>umbLayout</Alias>
+      <Design>
+        <![CDATA[@inherits UmbracoTemplatePage
+@{
+    Layout = null;
+}<!DOCTYPE html>
+<!--
+    TXT 2.0 by HTML5 UP
+    html5up.net | twitter.com/n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+    <title>@Umbraco.Field("title", altFieldAlias: "pageName") | @Umbraco.Field("siteName", recursive: true)</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700|Open+Sans+Condensed:700" rel="stylesheet" />
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/skel-panels.min.js"></script>
+    <noscript>
+        <link rel="stylesheet" href="/css/skel-noscript.css" />
+        <link rel="stylesheet" href="/css/style.css" />
+        <link rel="stylesheet" href="/css/style-desktop.css" />
+    </noscript>
+    <!--[if lte IE 9]><link rel="stylesheet" href="/css/ie9.css" /><![endif]-->
+    <!--[if lte IE 8]><script src="/js/html5shiv.js"></script><link rel="stylesheet" href="/css/ie8.css" /><![endif]-->
+    <!--[if lte IE 7]><link rel="stylesheet" href="/css/ie7.css" /><![endif]-->
+</head>
+<body class="homepage">
+    <!-- Header -->
+    <header id="header">
+        <div class="logo">
+            <div>
+                <h1><a href="/" id="logo">@Umbraco.Field("siteName", recursive: true)</a></h1>
+                <span class="byline">@Umbraco.Field("byline", recursive: true)</span>
+            </div>
+        </div>
+    </header>
+    <!-- /Header -->
+    @{ Html.RenderPartial("umbTopNavigation"); }
+
+    @RenderBody()
+
+    <!-- Footer -->
+    <footer id="footer" class="container">
+        <div class="row">
+            <div class="12u">
+                @{ Html.RenderPartial("umbAbout"); }
+            </div>
+        </div>
+        <div class="row">
+            <div class="12u">
+                @{ Html.RenderPartial("umbSocial"); }
+            </div>
+        </div>
+        <div class="row">
+            <!-- Copyright -->
+            <div id="copyright">
+                &copy; @DateTime.Now.Year @Umbraco.Field("copyright", recursive: true) | Images: <a href="http://fotogrph.com">fotogrph</a> + <a href="http://iconify.it">Iconify.it</a> | Design: <a href="http://html5up.net/">HTML5 UP</a>
+            </div>
+            <!-- /Copyright -->
+        </div>
+    </footer>
+    <!-- /Footer -->
+</body>
+</html>]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>News Item</Name>
+      <Alias>umbNewsItem</Alias>
+      <Master>umbLayout</Master>
+      <Design>
+        <![CDATA[@inherits UmbracoTemplatePage
+@{
+    Layout = "umbLayout.cshtml";
+
+    // If the editor has not explicitly provided the "Page title" property page
+    // then just show the name of the page otherwise show the provided title
+    var pageTitle = string.IsNullOrWhiteSpace(CurrentPage.Title)
+        ? CurrentPage.Name
+        : CurrentPage.Title;
+}
+<div id="main-wrapper">
+    <div id="main" class="container">
+        <div class="row">
+            <div class="9u skel-cell-mainContent">
+                <div class="content content-left">
+                    <!-- Content -->
+                    <article class="is-page-content">
+                        <header>
+                            <h2>@pageTitle</h2>
+                        </header>
+                        <section>
+                            @if (string.IsNullOrWhiteSpace(CurrentPage.Image) == false)
+                            {
+                                <span class="image image-full"><img src="@CurrentPage.Image" alt="" /></span>
+                            }
+
+                            @CurrentPage.BodyText
+                        </section>
+                    </article>
+                    <!-- /Content -->
+                </div>
+            </div>
+            <div class="3u">
+                <div class="sidebar">
+                    <!-- Sidebar -->
+                    @{ Html.RenderPartial("umbLatestNewsWidget"); }
+                    <!-- /Sidebar -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="12u">
+                @{ Html.RenderPartial("umbFeatures"); }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Main -->]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>News Overview</Name>
+      <Alias>umbNewsOverview</Alias>
+      <Master>umbLayout</Master>
+      <Design>
+        <![CDATA[@inherits UmbracoTemplatePage
+@{
+    Layout = "umbLayout.cshtml";
+
+    // If the editor has not explicitly provided the "Page title" property page
+    // then just show the name of the page otherwise show the provided title
+    var pageTitle = string.IsNullOrWhiteSpace(CurrentPage.Title)
+        ? CurrentPage.Name
+        : CurrentPage.Title;
+
+    // Model.Content is the current page that we're on
+    // AncestorsOrSelf is all of the ancestors this page has in the tree
+    // (1) means: go up to level 1 and stop looking for more ancestors when you get there
+    // First() gets the first ancestor found (the home page, on level 1)
+    var homePage = CurrentPage.AncestorsOrSelf(1).First();
+
+    // Find all pages with document type alias umbNewsOverview
+    // We do that using the plural, umbNewsOverviews (note the extra "s" in the end)
+    // Then take the first one, as we know there will only be on news overview page
+    var newsOverview = homePage.umbNewsOverviews.First();
+
+    // Similar to above: find all pages with document type umbNewsItem under the news overview page
+    // Then order them, first by publishDate (a property the editor can explicitly set on the news item)
+    // and then by createDate, which is set by Umbraco automatically when a page gets created.
+    var newsItems = newsOverview.umbNewsItems.OrderBy("publishDate desc, createDate desc").Take(5);
+
+}
+<!-- Main -->
+<div id="main-wrapper">
+    <div id="main" class="container">
+        <div class="row">
+            <div class="12u skel-cell-mainContent">
+                <div class="content">
+                    <!-- Content -->
+                    <article class="is-page-content">
+                        <header>
+                            <h2>@pageTitle</h2>
+                        </header>
+
+                        @foreach (var item in newsItems)
+                        {
+
+                            // If the editor has not explicitly provided the "Page title" property page
+                            // then just show the name of the page otherwise show the provided title
+                            var title = string.IsNullOrWhiteSpace(item.Title)
+                                ? item.Name
+                                : item.Title;
+
+
+                            // If the editor has not explicitly set the publishDate property then show the create date
+                            var dateTime = item.PublishDate == default(DateTime)
+                                ? item.CreateDate
+                                : item.PublishDate;
+
+                            <section>
+                                <h3><a href="@item.Url">@title</a></h3>
+                                <span class="byline">@item.SubHeader</span>
+                                <ul class="meta">
+                                    <li class="timestamp">@dateTime.ToString("f")</li>
+                                </ul>
+
+                                @if (string.IsNullOrWhiteSpace(item.Image) == false)
+                                {
+                                    <a href="@item.Url" class="image image-full"><img src="@item.Image" alt="" /></a>
+                                }
+
+                                @Umbraco.Truncate(item.BodyText, 200)
+
+                                <a href="@item.Url" class="button">Continue Reading</a>
+                            </section>
+                        }
+                    </article>
+                    <!-- /Content -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="12u">
+                @{ Html.RenderPartial("umbFeatures"); }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Main -->
+]]>
+      </Design>
+    </Template>
+    <Template>
+      <Name>Text Page</Name>
+      <Alias>umbTextyPage</Alias>
+      <Master>umbLayout</Master>
+      <Design>
+        <![CDATA[@inherits UmbracoTemplatePage
+@{
+    Layout = "umbLayout.cshtml";
+
+    // If the editor has not explicitly provided the "Page title" property page
+    // then just show the name of the page otherwise show the provided title
+    var pageTitle = string.IsNullOrWhiteSpace(CurrentPage.Title)
+        ? CurrentPage.Name
+        : CurrentPage.Title;
+}
+<div id="main-wrapper">
+    <div id="main" class="container">
+        <div class="row">
+            <div class="9u skel-cell-mainContent">
+                <div class="content content-left">
+                    <!-- Content -->
+                    <article class="is-page-content">
+                        <header>
+                            <h2>@pageTitle</h2>
+                        </header>
+                        <section>
+                            @if (string.IsNullOrWhiteSpace(CurrentPage.Image) == false)
+                            {
+                                <span class="image image-full"><img src="@CurrentPage.Image" alt="" /></span>
+                            }
+
+                            @CurrentPage.BodyText
+                        </section>
+                    </article>
+                    <!-- /Content -->
+                </div>
+            </div>
+            <div class="3u">
+                <div class="sidebar">
+                    <!-- Sidebar -->
+                    @{ Html.RenderPartial("umbLatestNewsWidget"); }
+                    <!-- /Sidebar -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="12u">
+                @{ Html.RenderPartial("umbFeatures"); }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Main -->]]>
+      </Design>
+    </Template>
+  </Templates>
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+</umbPackage>

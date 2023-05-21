@@ -1,0 +1,36 @@
+.umb-dashboard {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.umb-dashboard__header {
+    flex: 0 0 @editorHeaderHeight;
+    background: @white;
+    border-bottom: 1px solid @gray-9;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+}
+
+.umb-dashboard__content {
+    padding: 20px;
+    overflow: auto;
+}
+
+// we need to do some special styling for tabs inside the dashboard header
+.umb-dashboard__header .umb-tabs-nav {
+    margin-bottom: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: none;
+}
+
+.umb-dashboard__header .umb-tabs-nav .umb-tab > .umb-tab-button {
+    padding-bottom: 25px;
+}

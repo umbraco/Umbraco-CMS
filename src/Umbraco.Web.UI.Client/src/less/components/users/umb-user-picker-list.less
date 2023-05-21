@@ -1,0 +1,44 @@
+.umb-user-picker-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.umb-user-picker-list-item {
+    display: flex;
+    margin-bottom: 5px;
+    padding: 10px;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+}
+
+.umb-user-picker-list-item:active,
+.umb-user-picker-list-item:focus {
+    text-decoration: none;
+}
+
+.umb-user-picker-list-item:hover {
+    background-color: @gray-10;
+    text-decoration: none;
+}
+
+.umb-user-picker-list-item__avatar {
+    margin-right: 15px;
+    position: relative;
+}
+
+.umb-user-picker-list-item__checkmark {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+}
+
+.umb-user-picker-list-item__group {
+    font-size: 14px;
+    color: @gray-5;
+}
+
+.umb-user-picker-list-item__name {
+    font-size: 15px;
+    font-weight: bold;
+}

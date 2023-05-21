@@ -1,0 +1,14 @@
+<div class="umb-toggle-group">
+    <div class="umb-toggle-group-item" ng-repeat="item in items" ng-class="{'umb-toggle-group-item--disabled': item.disabled}">
+        <umb-toggle class="umb-toggle-group-item__toggle"
+                    checked="item.checked"
+                    disabled="item.disabled"
+                    input-id="{{item.inputId}}"
+                    on-click="change(item)">
+        </umb-toggle>
+        <div class="umb-toggle-group-item__content" ng-click="change(item)">
+            <div><label for="{{item.inputId}}">{{ item.name }}</label> </div>
+            <div class="umb-toggle-group-item__description">{{ item.description }}</div>
+        </div>
+    </div>
+</div>

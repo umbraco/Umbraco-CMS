@@ -1,0 +1,193 @@
+<div data-element="editor-packages" ng-controller="Umbraco.Editors.Packages.EditController as vm">
+
+  <form name="editPackageForm" no-validate val-form-manager>
+
+    <umb-editor-view>
+
+      <umb-editor-header name="vm.package.name"
+                         on-back="vm.back()"
+                         show-back-button="vm.showBackButton"
+                         hide-icon="true"
+                         hide-description="true"
+                         hide-alias="true">
+      </umb-editor-header>
+
+      <umb-editor-container class="form-horizontal">
+
+        <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+        <div class="umb-expansion-panel">
+
+          <div class="umb-expansion-panel__header">
+            <span><localize key="packager_packageContent">Package Content</localize></span>
+          </div>
+
+          <div class="umb-expansion-panel__content">
+
+            <umb-control-group label="@general_content">
+
+              <umb-node-preview ng-if="vm.package.contentNodeId"
+                                icon="vm.contentNodeDisplayModel.icon"
+                                name="vm.contentNodeDisplayModel.name"
+                                allow-edit="true"
+                                allow-remove="true"
+                                on-edit="vm.openContentPicker()"
+                                on-remove="vm.removeContentItem()">
+              </umb-node-preview>
+
+              <button type="button"
+                      ng-if="!vm.package.contentNodeId"
+                      style="margin-bottom: 10px;"
+                      class="umb-node-preview-add"
+                      ng-click="vm.openContentPicker()">
+                <localize key="general_add">Add</localize>
+              </button>
+
+              <umb-checkbox model="vm.package.contentLoadChildNodes"
+                            disabled="!vm.package.contentNodeId"
+                            text="{{vm.labels.includeAllChildNodes}}">
+              </umb-checkbox>
+
+            </umb-control-group>
+
+
+
+            <umb-control-group label="@general_media">
+
+
+
+              <umb-property property="vm.mediaPickerModel" ng-if="vm.loading === false">
+                <umb-property-editor model="vm.mediaPickerModel" is-pre-value="true"></umb-property-editor>
+              </umb-property>
+
+              <umb-checkbox model="vm.package.mediaLoadChildNodes"
+                            disabled="vm.mediaPickerModel.value.length === 0"
+                            text="{{vm.labels.includeAllChildNodes}}">
+              </umb-checkbox>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_documentTypes">
+              <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
+                <umb-checkbox model="doctype.selected"
+                              on-change="vm.selectDocumentType(doctype)"
+                              text="{{doctype.name}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_mediaTypes">
+              <div ng-repeat="mediatype in ::vm.mediaTypes | orderBy:'name'">
+                <umb-checkbox model="mediatype.selected"
+                              on-change="vm.selectMediaType(mediatype)"
+                              text="{{mediatype.name}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_macros">
+              <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
+                <umb-checkbox model="macro.selected"
+                              on-change="vm.selectMacro(macro)"
+                              text="{{macro.name}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_languages">
+              <div ng-repeat="language in ::vm.languages | orderBy:'name'">
+                <umb-checkbox model="language.selected"
+                              on-change="vm.selectLanguage(language)"
+                              text="{{language.name}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_dictionary">
+              <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
+                <umb-checkbox model="dictionaryItem.selected"
+                              on-change="vm.selectDictionaryItem(dictionaryItem)"
+                              text="{{dictionaryItem.name}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_dataTypes">
+              <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
+                <umb-checkbox model="dataType.selected"
+                              on-change="vm.selectDataType(dataType)"
+                              text="{{dataType.name}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_templates">
+              <div ng-repeat="template in ::vm.templates | orderBy:'name'">
+                <umb-checkbox model="template.selected"
+                              on-change="vm.selectTemplate(template)"
+                              text="{{template.name}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_stylesheets">
+              <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'path'">
+                <umb-checkbox model="stylesheet.selected"
+                              on-change="vm.selectStyleSheet(stylesheet)"
+                              text="{{stylesheet.path}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_scripts">
+              <div ng-repeat="script in ::vm.scripts | orderBy:'path'">
+                <umb-checkbox model="script.selected"
+                              on-change="vm.selectScript(script)"
+                              text="{{script.path}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+            <umb-control-group label="@treeHeaders_partialViews">
+              <div ng-repeat="partialView in ::vm.partialViews | orderBy:'path'">
+                <umb-checkbox model="partialView.selected"
+                              on-change="vm.selectPartialView(partialView)"
+                              text="{{partialView.path}}">
+                </umb-checkbox>
+              </div>
+            </umb-control-group>
+
+          </div>
+
+        </div>
+
+      </umb-editor-container>
+
+      <umb-editor-footer>
+
+        <umb-editor-footer-content-right>
+
+          <umb-button ng-if="vm.package.packagePath"
+                      type="button"
+                      action="vm.downloadFile(vm.package.id)"
+                      disabled="vm.loading || vm.buttonState=='busy'"
+                      button-style="info"
+                      label-key="general_download">
+          </umb-button>
+
+          <umb-button type="button"
+                      action="vm.createOrUpdatePackage(editPackageForm)"
+                      state="vm.buttonState"
+                      button-style="success"
+                      label="{{vm.labels.button}}"
+                      disabled="vm.loading">
+          </umb-button>
+
+        </umb-editor-footer-content-right>
+
+      </umb-editor-footer>
+
+    </umb-editor-view>
+
+  </form>
+
+</div>

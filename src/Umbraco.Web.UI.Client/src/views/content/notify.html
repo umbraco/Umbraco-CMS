@@ -1,0 +1,45 @@
+<div ng-controller="Umbraco.Editors.Content.CreateNotifyController as vm">
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+    <div class="umb-dialog-body">
+        <div class="umb-pane" ng-show="!vm.loading">
+            <form name="notifyForm"
+                  novalidate
+                  val-form-manager>
+                <div ng-show="vm.saveError" ng-cloak>
+                    <div class="alert alert-error">
+                        <div><strong>{{vm.saveError.errorMsg}}</strong></div>
+                        <div>{{vm.saveError.data.message}}</div>
+                    </div>
+                </div>
+                <div ng-show="vm.saveSuccces" ng-cloak>
+                    <div class="alert alert-success">
+                        <localize key="notifications_notificationsSavedFor">Notification settings saved for</localize> <strong>{{currentNode.name}}</strong>
+                    </div>
+                    <button class="btn btn-primary" ng-click="vm.cancel()"><localize key="general_ok">Ok</localize></button>
+                </div>
+                <div ng-hide="vm.saveSuccces || vm.saveError" ng-cloak>
+                    <div class="block-form" ng-show="!vm.loading">
+                        <span ng-bind-html="vm.labels.headline"></span>
+                        <umb-control-group>
+                            <umb-toggle-group items="vm.notifyOptions" on-click="vm.notificationChanged(item)"></umb-toggle-group>
+                        </umb-control-group>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="vm.saveSuccces || vm.saveError">
+        <umb-button label-key="general_cancel"
+                    action="vm.cancel()"
+                    type="button"
+                    button-style="link">
+        </umb-button>
+        <umb-button label-key="buttons_save"
+                    type="button"
+                    action="vm.save(vm.notifyOptions)"
+                    state="vm.saveState"
+                    button-style="success"
+                    disabled="!vm.canSave">
+        </umb-button>
+    </div>
+</div>

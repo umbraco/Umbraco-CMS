@@ -1,0 +1,1005 @@
+//
+// Container styles
+// --------------------------------------------------
+.umb-property-editor {
+    width: 100%;
+}
+
+.umb-property-editor-tiny {
+    width: 60px;
+
+	&.umb-editor-push {
+		width:30%;
+		min-width:0;
+	}
+}
+
+.umb-property-editor-small {
+  width: 90px;
+}
+
+.umb-modal .umb-property-editor {
+  width: 95%;
+}
+
+.umb-dialog .umb-property-editor {
+  width: 95%;
+}
+.umb-dialog .umb-control-group .help-block {
+  width: 95%;
+}
+
+.umb-codeeditor{
+  width: 99%;
+}
+
+// displays property inline with preceeding
+.umb-property {
+	&--pull {
+		float:left;
+		width:60%;
+	}
+
+	&--push {
+		float:right;
+		width:35%;
+	}
+
+	&--pull, &--push {
+		.umb-editor {
+			min-width:0;
+			width:100%;
+		}
+	}
+}
+
+.umb-property .alert {
+	border-radius: 3px;
+}
+
+
+
+//
+// Content picker
+// --------------------------------------------------
+.umb-contentpicker {
+    .umb-property-editor--limit-width();
+}
+
+.umb-contentpicker li a:hover .hover-hide, .umb-contentpicker li a .hover-show{
+  display: none;
+}
+.umb-contentpicker li a:hover .hover-show{display: inline-block;}
+
+.umb-contentpicker-popover .search-holder {
+  padding: 10px;
+}
+
+.umb-contentpicker__min-max-help {
+    font-size: 13px;
+    margin-top: 5px;
+    color: @gray-4;
+}
+
+.show-validation .umb-contentpicker__min-max-help {
+    display: none;
+}
+
+.umb-contentpicker small {
+
+  &:not(:last-child) {
+    padding-right: 3px;
+    border-right: 1px solid @gray-5;
+  }
+
+  a {
+    color: @gray-3;
+  }
+}
+
+
+
+//
+// Color picker
+// --------------------------------------------------
+
+/* pre-value editor */
+.umb-prevalues-multivalues.umb-colors {
+    max-width: 600px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
+}
+
+.control-group.color-picker-preval {
+    .thumbnail {
+        width: 34px;
+        height: 34px;
+        min-width: auto;
+        border: none;
+        cursor: move;
+        border-radius: 3px;
+        margin-top: auto;
+        margin-bottom: auto;
+        flex: 0 0 auto;
+    }
+
+    .handle {
+        float: left;
+        display: inline-flex;
+        margin: 5px 3px 5px 0;
+    }
+
+    div.color-picker-prediv {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        flex: 1;
+
+        pre {
+            display: inline-flex;
+            font-family: @monoFontFamily;
+            margin-left: 15px;
+            margin-right: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 0;
+            vertical-align: middle;
+            padding: 6px 10px;
+            background: @gray-11;
+            flex: 0 0 auto;
+        }
+
+        span {
+            margin-left: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    input[type="text"] {
+        display: flex;
+        flex: 1 1 100px;
+        margin-top: 1px;
+        margin-right: 15px;
+        min-width: auto;
+        width: auto;
+    }
+
+    label {
+        border: 1px solid @white;
+        padding: 6px 10px;
+        font-family: @monoFontFamily;
+        border: 1px solid @gray-8;
+        background: @gray-11;
+        margin: 0 15px 0 3px;
+        border-radius: 3px;
+    }
+}
+
+//
+// Image Cropper
+// --------------------------------------------------
+
+.umb-prevalues-multivalues.umb-cropsizes{
+
+    max-width: 500px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
+}
+
+.umb-cropsizes {
+
+    &__add {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    &__controls {
+        margin: 24px 0 0;
+        display: flex;
+    }
+
+    &__input {
+        width: 100%;
+        &-wrap{
+            flex: 1 1 auto;
+            margin-right: 10px;
+            &--narrow {
+                flex: 0 1 100px;
+            }
+        }
+   }
+}
+
+
+//
+// Media picker
+// --------------------------------------------------
+
+.umb-mediapicker > div {
+    border: 1px solid @inputBorder;
+}
+.umb-mediapicker-single > div {
+    width:144px;
+}
+.umb-mediapicker-multi > div {
+    width:100%;
+    .umb-property-editor--limit-width();
+}
+
+
+.umb-mediapicker .add-link {
+    position: relative;
+    display: flex;
+    justify-content:center;
+    align-items:center;
+    //width: 120px;
+    text-align: center;
+    color: @gray-9;
+    border: 2px @gray-9 dashed;
+    text-decoration: none;
+
+    transition: all 150ms ease-in-out;
+
+    &:active,
+    &:hover {
+        color: @ui-action-discreet-type-hover;
+        border-color: @ui-action-discreet-type-hover;
+    }
+}
+
+.umb-mediapicker .label {
+    &__trashed {
+        background-color: @red;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 1;
+        transform: translate3d(-50%,-50%,0);
+        margin: 0;
+        pointer-events: none;
+    }
+}
+
+.umb-mediapicker .picked-image {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0.5;
+
+  font-size: 24px;
+  color: @red;
+  background: @white;
+
+  line-height: 36px;
+  text-align: center;
+  border-radius: 15px;
+
+  height: 32px;
+  width: 32px;
+  overflow: hidden;
+  display: none;
+  text-decoration: none;
+}
+
+.umb-mediapicker .add-link-square {
+  height: 100px;
+  width: 100px;
+  margin: 10px;
+}
+
+
+
+.umb-thumbnails {
+    position: relative;
+    display: flex;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.umb-thumbnails > li.icon {
+    width: 14%;
+    text-align: center;
+}
+
+.umb-thumbnails i{margin: auto;}
+.umb-thumbnails a{
+  outline: none;
+  border:none !important;
+  box-shadow:none !important;
+}
+
+.umb-sortable-thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: @white;
+}
+
+.umb-sortable-thumbnails {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+
+.umb-sortable-thumbnails li {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 5px;
+    margin: 5px;
+    background: @white;
+    max-width: 100%;
+}
+.umb-mediapicker {
+
+    .umb-sortable-thumbnails li {
+        border:none;
+    }
+
+}
+
+.umb-mediapicker .umb-sortable-thumbnails li {
+    flex-direction: column;
+}
+
+.umb-sortable-thumbnails li:hover a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.umb-sortable-thumbnails li img {
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    display: block;
+    .checkeredBackground();
+}
+
+.umb-sortable-thumbnails li .trashed {
+    opacity:0.3;
+}
+
+.umb-sortable-thumbnails li img.noScale {
+    max-width: none !important;
+    max-height: none !important;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
+    width: 124px;
+    height: 124px;
+    overflow: hidden;
+    position: relative;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__loading {
+    position: absolute;
+    background-color: rgba(255,255,255,0.8);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__actions {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: row;
+}
+
+.umb-sortable-thumbnails.ui-sortable:not(.ui-sortable-disabled) {
+    > li:not(.unsortable) {
+        cursor: move;
+    }
+}
+
+.umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__action  {
+    opacity: 1;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__action {
+    font-size: 16px;
+    background: @white;
+    height: 25px;
+    width: 25px;
+    border-radius: 15px;
+    color: @gray-1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5px;
+    text-decoration: none;
+    .box-shadow(0 1px 2px rgba(0,0,0,0.25));
+    opacity: 0;
+    transition: opacity .1s ease-in-out;
+
+    .tabbing-active &:focus {
+        opacity: 1;
+    }
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__action.-red {
+    color: @red;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__action:hover {
+    text-decoration: none;
+}
+
+
+//
+// Cropper
+// -------------------------------------------------
+
+.umb-cropper{
+    position: relative;
+    width: 100%;
+}
+
+.umb-cropper .crop-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: (9 / 16 * 100%);
+}
+
+.umb-cropper img {
+    position: relative;
+    max-width: 100%;
+    height: auto;
+    top: 0;
+    left: 0;
+ }
+
+ .umb-cropper img {
+    max-width: none;
+ }
+
+ .umb-cropper .overlay {
+    position: absolute;
+    top: 0 !important;
+    bottom: 0;
+    left: 0 !important;
+    right: 0;
+    cursor: move;
+    z-index: @zindexCropperOverlay;
+    border: 1px solid @inputBorder;
+    outline: none;
+
+    &:focus {
+        border-color: @inputBorderFocus;
+    }
+}
+
+.umb-cropper .viewport {
+    position: absolute;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    .checkeredBackground();
+    contain: strict;
+
+    > img {
+        position: absolute;
+    }
+ }
+
+.umb-cropper .viewport .__mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: (@zindexCropperOverlay - 1);
+    box-shadow: 0 0 0 2000px rgba(255, 255, 255, .8);
+}
+.umb-cropper .viewport .__mask-info {
+    position: absolute;
+    bottom: -20px;
+    height: 20px;
+    min-width: 100px;
+    right: 0;
+    text-align: right;
+    z-index: (@zindexCropperOverlay - 1);
+    font-size: 12px;
+    opacity: 0.7;
+    padding: 0px 6px;
+}
+
+.umb-cropper .crop-controls-wrapper {
+    display: flex;
+    height: 50px;
+    align-items: center;
+    background-color: #fff;
+    .btn:last-of-type {
+        margin-right: 10px;
+    }
+}
+
+.umb-cropper .crop-slider-wrapper {
+    flex: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    i {
+        color: @gray-3;
+        flex: 0 0 25px;
+        padding: 0 5px;
+        box-sizing: border-box;
+
+        &:first-of-type {
+            text-align: right;
+        }
+    }
+
+    .crop-slider {
+        width: calc(100% - 100px);
+    }
+}
+
+.umb-cropper .crop-controls-wrapper__icon-left,
+.umb-cropper .crop-controls-wrapper__icon-right {
+    color: @gray-3;
+}
+
+.umb-cropper .crop-controls-wrapper__icon-left {
+    margin-right: 15px;
+}
+
+.umb-cropper .crop-controls-wrapper__icon-right {
+    margin-left: 15px;
+    font-size: 22px;
+}
+
+.umb-crop-thumbnail-container {
+    img {
+        max-width: unset;
+    }
+}
+
+.cropList {
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+
+.umb-cropper-imageholder-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.media-crop-details-buttons {
+    text-align: right;
+}
+
+.umb-fileupload,
+.umb-cropper-gravity {
+
+    .gravity-container {
+        border: 1px solid @inputBorder;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
+        line-height: 0;
+        contain: content;
+        position: relative;
+        .checkeredBackground();
+
+        &:focus, &:focus-within {
+            border-color: @inputBorderFocus;
+        }
+
+        .viewport {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            > a {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+
+            img {
+                display: block;
+                max-width: 100%;
+                max-height: 100%;
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}
+    
+.umb-cropper-gravity img {
+    position: relative;
+    max-width: 100%;
+    height: auto;
+    top: 0;
+    left: 0;
+}
+    
+.umb-cropper-gravity .overlayViewport {
+    position: absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    contain: strict;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.umb-cropper-gravity .overlay {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    cursor: crosshair;
+}
+.umb-cropper-gravity .overlay .focalPoint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: move;
+    z-index: @zindexCropperOverlay;
+
+    width: 14px;
+    height: 14px;
+    // this element should have no width or height as its preventing the jQuery draggable-plugin to go all the way to the sides:
+    margin-left: -10px;
+    margin-top: -10px;
+    margin-right: -10px;
+    margin-bottom: -10px;
+        
+    text-align: center;
+    border-radius: 20px;
+    background: @pinkLight;
+    border: 3px solid @white;
+    opacity: 0.8;
+}
+
+.umb-cropper-gravity .overlay .focalPoint i {
+    font-size: 26px;
+    line-height: 26px;
+    opacity: 0.8 !important;
+}
+
+.imagecropper {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+        
+}
+
+.imagecropper .umb-cropper__container {
+    position: relative;
+    width: 100%;
+}
+
+.imagecropper .umb-cropper__container .button-drawer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    position: relative;
+
+    button {
+        margin-left: 4px;
+    }
+}
+
+.umb-close-cropper {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    cursor: pointer;
+    z-index: (@zindexCropperOverlay + 1);
+}
+
+.umb-close-cropper:hover {
+    opacity: .9;
+    background: @gray-10;
+}
+
+.imagecropper .umb-sortable-thumbnails {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.imagecropper .umb-sortable-thumbnails li {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px;
+    margin-top: 0;
+}
+
+.imagecropper .umb-sortable-thumbnails li.current {
+    border-color: @gray-8;
+    background: @gray-10;
+    color: @black;
+    cursor: pointer;
+}
+
+.imagecropper .umb-sortable-thumbnails li:hover,
+.imagecropper .umb-sortable-thumbnails li.current:hover {
+    border-color: @gray-8;
+    background: @gray-10;
+    color: @black;
+    cursor: pointer;
+    opacity: .95;
+}
+
+.imagecropper .umb-sortable-thumbnails li[disabled],
+.imagecropper .umb-sortable-thumbnails li[disabled]:hover {
+    cursor: not-allowed;
+}
+
+.imagecropper .umb-sortable-thumbnails li .crop-name,
+.imagecropper .umb-sortable-thumbnails li .crop-size,
+.imagecropper .umb-sortable-thumbnails li .crop-annotation {
+    display: block;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.imagecropper .umb-sortable-thumbnails li .crop-name {
+    font-weight: bold;
+    margin: 10px 0 5px;
+}
+
+.imagecropper .umb-sortable-thumbnails li .crop-size,
+.imagecropper .umb-sortable-thumbnails li .crop-annotation {
+    font-size: 10px;
+    font-style: italic;
+    margin: 0 0 5px;
+}
+
+.imagecropper .umb-sortable-thumbnails li .crop-annotation {
+    color: @gray-6;
+}
+
+.btn-crop-delete {
+    display: block;
+    text-align: left;
+}
+
+.imagecropper .cropList-container {
+    h5 {
+        margin-left: 10px;
+        margin-top: 0;
+    }
+}
+
+//
+// Folder browser
+// --------------------------------------------------
+.umb-folderbrowser .add-link {
+  display: inline-block;
+  height: 120px;
+  width: 120px;
+  text-align: center;
+  border: 1px @gray-10 dashed;
+  line-height: 120px
+}
+
+//
+// File upload
+// --------------------------------------------------
+.umb-fileupload {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid @inputBorder;
+    box-sizing: border-box;
+    width: 100%;
+    .umb-property-editor--limit-width();
+}
+
+.umb-fileupload .preview {
+  border-radius: 5px;
+  padding: 3px;
+  background: @gray-9;
+  float: left;
+  margin-right: 30px;
+  margin-bottom: 30px;
+}
+
+.umb-fileupload ul {
+    list-style: none;
+    vertical-align: middle;
+    margin-bottom: 0;
+
+    img {
+        .checkeredBackground();
+    }
+}
+
+.umb-fileupload label {
+  vertical-align: middle;
+  padding-left: 7px;
+  font-weight: normal;
+}
+
+.umb-fileupload .preview-file {
+  color: @gray-4;
+  height: 45px;
+  width: 55px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 10px;
+  padding-top: 27px;
+}
+
+.umb-fileupload input {
+  font-size: 12px;
+  line-height: 1;
+}
+
+//
+// Related links
+// --------------------------------------------------
+.umb-relatedlinks table > tr > td { word-wrap:break-word; word-break: break-all; border-bottom: 1px solid transparent; }
+.umb-relatedlinks .handle { cursor:move; }
+.umb-relatedlinks table > tbody > tr.unsortable .handle { cursor:default; }
+
+.umb-relatedlinks table td.col-sort { width: 20px; }
+.umb-relatedlinks table td.col-caption { min-width: 200px; }
+.umb-relatedlinks table td.col-link { min-width: 200px;  }
+.umb-relatedlinks table td.col-actions { min-width: 120px; }
+
+.umb-relatedlinks table td.col-caption .control-wrapper,
+.umb-relatedlinks table td.col-link .control-wrapper { display: flex; }
+
+.umb-relatedlinks table td.col-caption .control-wrapper input[type="text"],
+.umb-relatedlinks table td.col-link .control-wrapper input[type="text"] { width: auto; flex: 1; }
+
+/* sortable placeholder */
+.umb-relatedlinks .sortable-placeholder {
+    background-color: @tableBackgroundAccent;
+    display: table-row;
+}
+.umb-relatedlinks .sortable-placeholder > td {
+    display: table-cell;
+    padding: 8px;
+}
+.umb-relatedlinks .ui-sortable-helper {
+    display: table-row;
+    background-color: @white;
+    opacity: 0.7;
+}
+.umb-relatedlinks .ui-sortable-helper > td {
+    display: table-cell;
+    border-bottom: 1px solid @tableBorder;
+}
+
+
+//
+// Slider
+// --------------------------------------------------
+.umb-slider {
+    .umb-property-editor--limit-width();
+}
+
+//
+// Tags
+// --------------------------------------------------
+.umb-tags {
+    .umb-property-editor--limit-width();
+}
+
+//
+// Date/time picker
+// --------------------------------------------------
+.bootstrap-datetimepicker-widget .btn {padding: 0;}
+.bootstrap-datetimepicker-widget .picker-switch .btn { background: none; border: none;}
+.umb-datepicker .input-append .btn-clear {
+    border: none;
+    position: absolute;
+    margin-left: -31px;
+    margin-top: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 4px 6px;
+    font-size: @baseFontSize;
+    font-weight: normal;
+    line-height: @baseLineHeight;
+    text-align: center;
+    background-color: @white;
+    color: @ui-option-type;
+
+    &:hover {
+        color: @ui-option-type-hover;
+    }
+}
+.umb-datepicker p {margin-top:10px;}
+.umb-datepicker p a{color: @gray-3;}
+
+//
+// Link picker
+// --------------------------------------------------
+.umb-linkpicker {
+    .umb-linkpicker__url {
+        width: 50%;
+        padding-right: 5px;
+
+        // when the anchor input is hidden by config
+        // the URL input should be full-width
+        &:only-child {
+            width: 100%;
+        }
+    }
+
+    .umb-linkpicker__anchor {
+        width: 50%;
+        padding-left: 5px;
+    }
+}
+
+//
+// Code mirror - even though this isn't a proprety editor right now, it could be so I'm putting the styles here
+// --------------------------------------------------
+
+.CodeMirror, .CodeMirror-scroll {
+	height: 100%;
+    min-height:200px;
+}
+
+//
+// Custom styles of property editors in property preview in document type editor
+// -----------------------------------------------------------------------------
+.umb-group-builder__property-preview {
+    .umb-property-editor {
+        .slider {
+            .tooltip {
+                display: none;
+            }
+        }
+    }
+}

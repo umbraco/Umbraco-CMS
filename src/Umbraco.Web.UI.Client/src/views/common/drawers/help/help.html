@@ -1,0 +1,212 @@
+<div style="height: 100%" ng-controller="Umbraco.Drawers.Help as vm">
+    <umb-drawer-view>
+
+        <umb-drawer-header
+            title="{{vm.title}}"
+            description="{{vm.subtitle}}">
+        </umb-drawer-header>
+
+        <umb-drawer-content>
+
+            <!-- Doctype Tours -->
+            <div class="umb-help-section" ng-if="vm.showDocTypeTour" data-element="doctype-tour">
+                <h5>Need help editing current item '{{vm.nodeName}}' ?</h5>
+
+                <div class="umb-help-list">
+
+                    <div ng-repeat="tour in vm.docTypeTours | orderBy:'groupOrder'">
+                        <div data-element="tour-{{tour.alias}}" class="umb-help-list-item">
+                            <div class="umb-help-list-item__content justify-between">
+                                <div class="flex items-center">
+                                    <span class="umb-help-list-item__title">{{ tour.name }}</span>
+                                </div>
+                                <div>
+                                    <umb-button button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tours -->
+            <div class="umb-help-section" ng-if="vm.tours.length > 0" data-element="help-tours">
+
+                <h5 class="umb-help-section__title">
+                    <localize key="help_tours">Tours</localize>
+                </h5>
+
+                <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'">
+
+                    <div class="umb-help-list">
+
+                        <button
+                            type="button"
+                            class="umb-help-list-item umb-help-list-item__content flex items-center justify-between"
+                            ng-click="tourGroup.open = !tourGroup.open"
+                            aria-expanded="{{tourGroup.open === undefined ? false : tourGroup.open }}">
+                            <span class="umb-help-list-item__group-title bold">
+                                <umb-icon icon="{{tourGroup.open ? 'icon-navigation-down' : 'icon-navigation-right'}}"></umb-icon>
+                                <span ng-if="tourGroup.group !== 'undefined'">{{tourGroup.group}}</span>
+                                <span ng-if="tourGroup.group === 'undefined'">
+                                    <localize key="general_other">Other</localize>
+                                </span>
+                            </span>
+                            <umb-progress-circle
+                                percentage="{{tourGroup.completedPercentage}}"
+                                size="40">
+                            </umb-progress-circle>
+                        </button>
+
+                        <div ng-if="tourGroup.open">
+                            <div data-element="tour-{{tour.alias}}" class="umb-help-list-item" ng-repeat="tour in tourGroup.tours">
+                                <div class="umb-help-list-item__content justify-between">
+                                    <div class="flex items-center">
+                                        <div ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs umb-help-list-item__icon">{{ $index + 1 }}</div>
+                                        <umb-checkmark ng-if="tour.completed" size="xs" checked="tour.completed" class="umb-help-list-item__icon"></umb-checkmark>
+                                        <span ng-class="{'strike': tour.completed}" class="umb-help-list-item__title">{{ tour.name }}</span>
+                                    </div>
+                                    <div>
+                                        <umb-button ng-if="!tour.completed && vm.showTourButton($index, tourGroup)" button-style="primary" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
+                                        <umb-button ng-if="tour.completed" type="button" label="Rerun" action="vm.startTour(tour)"></umb-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Show in custom help dashboard -->
+            <div class="umb-help-section" data-element="help-custom-dashboard" ng-if="vm.customDashboard.length > 0">
+                <div ng-repeat="dashboard in vm.customDashboard">
+                    <h5 ng-show="dashboard.label">{{dashboard.label}}</h5>
+                    <div ng-repeat="property in dashboard.properties">
+                        <div>
+                            <div ng-include="property.view"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--  Help Content -->
+            <div class="umb-help-section" data-element="help-articles" ng-if="vm.topics.length > 0">
+                <h5 class="umb-help-section__title">
+                    <localize key="general_articles">Articles</localize>
+                </h5>
+                <ul class="umb-help-list">
+                    <li class="umb-help-list-item" ng-repeat="topic in vm.topics track by $index">
+                        <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" href="#" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv" target="_blank" rel="noopener">
+                            <span>
+                                <span class="umb-help-list-item__title">
+                                    <span class="bold">{{topic.name}}</span>
+                                    <umb-icon icon="icon-out" class="umb-help-list-item__open-icon"></umb-icon>
+                                </span>
+                                <span class="umb-help-list-item__description">{{topic.description}}</span>
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Umbraco tv content -->
+            <div class="umb-help-section" data-element="help-videos" ng-if="vm.hasAccessToSettings">
+                <h5 class="umb-help-section__title" ng-if="vm.videos.length > 0">
+                    <localize key="general_videos">Videos</localize>
+                </h5>
+                <ul class="umb-help-list">
+                    <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
+                        <a class="umb-help-list-item__content" data-element="help-article-{{video.title}}" href="#" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv" target="_blank" rel="noopener">
+                            <umb-icon icon="icon-tv-old" class="umb-help-list-item__icon"></umb-icon>
+                            <span class="umb-help-list-item__title">{{video.title}}</span>
+                            <umb-icon icon="icon-out" class="umb-help-list-item__open-icon"></umb-icon>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Links -->
+            <div class="umb-help-section" data-element="help-links" ng-if="vm.hasAccessToSettings">
+                <a data-element="help-link-umbraco-tv" class="umb-help-badge" href="https://umbra.co/ulb" target="_blank" rel="noopener">
+                    <umb-icon icon="icon-tv-old" class="umb-help-badge__icon"></umb-icon>
+                    <div class="umb-help-badge__title">
+                        <localize key="help_umbracoLearningBase">Watch our free tutorial videos</localize>
+                    </div>
+                    <small>
+                        <localize key="help_umbracoLearningBaseDescription">on the Umbraco Learning Base</localize>
+                    </small>
+                </a>
+
+                <a data-element="help-link-our-umbraco" class="umb-help-badge" href="https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our" target="_blank" rel="noopener">
+                    <umb-icon icon="icon-favorite" class="umb-help-badge__icon"></umb-icon>
+                    <div class="umb-help-badge__title">
+                        <localize key="help_umbracoForum">Visit our.umbraco.com</localize>
+                    </div>
+                    <small>
+                        <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
+                    </small>
+                </a>
+            </div>
+
+          <!-- System info -->
+          <div class="umb-help-section">
+
+            <h5 class="umb-help-section__title">System Information</h5>
+              <div class="umb-help-list">
+                <div class="umb-help-list-item__title-wrapper">
+                <button
+                  type="button"
+                  class="umb-help-list-item umb-help-list-item__content"
+                  ng-click="vm.systemInfoDisplay = !vm.systemInfoDisplay"
+                  aria-expanded="{{vm.systemInfoDisplay ===  true}}">
+                  <umb-icon class="mr1" icon="{{vm.systemInfoDisplay ? 'icon-navigation-down' : 'icon-navigation-right'}}"></umb-icon>
+                  <span class="flex-column items-start flex">
+                    <span class="umb-help-list-item__group-title bold">System Information</span>
+                    <span class="umb-help-list-item__description mt0">View your system information</span>
+                  </span>
+                </button>
+                <button
+                  ng-click="vm.copyInformation()"
+                  class="btn-reset"
+                  type="button"
+                  size="30">
+                    <span class="">
+                      <umb-icon icon="icon-documents" class="umb-help-list-item__icon"></umb-icon>
+                    </span>
+                </button>
+                </div>
+                <div ng-if="vm.systemInfoDisplay === true">
+                  <table class="table table-striped">
+                    <tr>
+                      <th>Category</th>
+                      <th>Data</th>
+                    </tr>
+                    <tr ng-repeat="info in vm.systemInfo">
+                      <td>{{info.name}}</td>
+                      <td>{{info.data}}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+          </div>
+        </umb-drawer-content>
+
+        <umb-drawer-footer>
+
+            <div class="flex justify-end">
+                <umb-button
+                    alias="close"
+                    type="button"
+                    shortcut="esc"
+                    button-style="link"
+                    label-key="general_close"
+                    action="vm.closeDrawer()">
+                </umb-button>
+            </div>
+
+        </umb-drawer-footer>
+
+    </umb-drawer-view>
+
+</div>

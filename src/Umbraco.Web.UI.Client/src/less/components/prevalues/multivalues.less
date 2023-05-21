@@ -1,0 +1,67 @@
+﻿.umb-prevalues-multivalues {
+    width: 425px;
+    max-width: 100%;
+
+    .umb-overlay & {
+        width: 500px;
+    }
+
+    p {
+        margin: 7px 0;
+    }
+}
+
+.umb-prevalues-multivalues__left {
+    display: flex;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.umb-prevalues-multivalues__right {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+}
+
+.umb-prevalues-multivalues__add {
+    display: flex;
+
+    input {
+        display: flex;
+        width: 320px;
+    }
+
+    button {
+        margin: 0 6px 0 0;
+        margin-left: auto;
+    }
+}
+
+.umb-prevalues-multivalues__listitem {
+    display: flex;
+    padding: 6px;
+    margin: 10px 0px !important;
+    background: @gray-10;
+
+    &.ui-sortable-handle,
+    .ui-sortable-handle,
+    .handle {
+        cursor: move;
+    }
+
+    .umb-icon,
+    i.icon {
+        display: flex;
+        align-self: center;
+        margin-right: 5px;
+    }
+
+    a {
+        cursor: pointer;
+        margin-left: auto;
+    }
+
+    input {
+        width: 295px;
+    }
+}

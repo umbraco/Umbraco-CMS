@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="/belle/" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title ng-bind="locationTitle">Umbraco</title>
+    <link rel="stylesheet" href="assets/css/umbraco.min.css" />
+</head>
+
+<body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
+    <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+        <umb-navigation></umb-navigation>
+
+        <section id="contentwrapper">
+            <div id="contentcolumn" ng-view>
+            </div>
+        </section>
+    </div>
+
+    <umb-notifications></umb-notifications>
+
+    <script src="lib/lazyload-js/LazyLoad.min.js"></script>
+    <script src="js/loader.dev.js"></script>
+</body>
+</html>

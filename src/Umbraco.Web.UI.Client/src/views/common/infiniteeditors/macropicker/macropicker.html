@@ -1,0 +1,96 @@
+<div ng-controller="Umbraco.Overlays.MacroPickerController">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            <umb-box>
+                <umb-box-content class="block-form">
+                    <div ng-switch="wizardStep">
+
+                        <div ng-switch-when="macroSelect" class="macro-select">
+                            <label for="macro-search" class="sr-only">{{model.title}}</label>
+                            <umb-search-filter input-id="macro-search"
+                                               model="model.searchTerm"
+                                               label-key="placeholders_filter"
+                                               text="Type to filter..."
+                                               css-class="w-100 mb-15"
+                                               on-change="displayA11YMessageForFilter()"
+                                               auto-focus="true">
+                            </umb-search-filter>
+                            <p ng-bind="a11yInfo" role="alert"></p>
+                            <ul class="umb-card-grid -three-in-row">
+                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:model.searchTerm">
+                                  <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
+                                        <span>
+                                            <umb-icon icon="icon-settings-alt"></umb-icon>
+                                            {{availableItem.name}}
+                                        </span>
+                                  </button>
+                                </li>
+                            </ul>
+
+                            <umb-empty-state ng-if="nomacros"
+                                             position="center">
+                                <localize key="defaultdialogs_noMacros">
+                                    There are no macros available to insert
+                                </localize>
+                            </umb-empty-state>
+                        </div>
+
+                        <div ng-switch-when="paramSelect">
+
+                            <h5>{{model.selectedMacro.name}}</h5>
+
+                            <ul class="unstyled">
+                                <li ng-repeat="param in model.macroParams">
+
+                                    <ng-form name="parameterForm">
+                                        <umb-control-group label="{{param.name}}" alias="{{param.alias}}">
+                                            <umb-property-editor model="param"></umb-property-editor>
+                                        </umb-control-group>
+                                    </ng-form>
+
+                                </li>
+                            </ul>
+
+                            <umb-empty-state ng-if="noMacroParams"
+                                                position="center">
+                                <localize key="defaultdialogs_noMacroParams">There are no parameters for this macro</localize>
+                            </umb-empty-state>
+
+                        </div>
+                    </div>
+                </umb-box-content>
+            </umb-box>
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    shortcut="esc"
+                    label-key="general_close"
+                    action="close()">
+                </umb-button>
+
+                <umb-button
+                    type="button"
+                    button-style="success"
+                    label-key="general_submit"
+                    action="selectMacro(model.selectedMacro)">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

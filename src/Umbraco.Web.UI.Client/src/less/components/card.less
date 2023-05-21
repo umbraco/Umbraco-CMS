@@ -1,0 +1,310 @@
+/*
+	Library of card related compoents, like the right-hand icon list on the grid "cards"
+*/
+
+.umb-card {
+	position: relative;
+	padding: 5px 10px 5px 10px;
+    background: @white;
+    width: 100%;
+
+    .title {
+        padding: 12px;
+        color: @gray-3;
+        border-bottom: 1px solid @gray-8;
+        font-weight: 400;
+        font-size: 16px;
+        text-transform: none;
+        margin: 0 -10px 10px -10px;
+    }
+
+}
+
+.umb-card-thumb {
+    text-align: center;
+
+    i {
+        text-align: center;
+        font-size: 20px;
+        line-height: 40px;
+        color: @blue;
+        display: block;
+        padding-top: 5px
+    }
+}
+
+.umb-card-content {
+    .item-title {
+        color: @blackLight;
+        font-weight: 400;
+        border: none;
+        font-size: 16px;
+        text-transform: none;
+        margin-bottom: 3px;
+    }
+    p {
+        color: @gray-3;
+        margin-bottom: 1px;
+    }
+}
+
+.umb-card-actions {
+    padding-top: 10px;
+    border-top: @gray-10 1px solid;
+    clear: both;
+}
+
+.umb-card-icons {
+	text-align: center;
+	vertical-align: middle;
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.umb-card-icons.vertical {
+	position: absolute;
+	top: 7px;
+	right: 7px;
+	text-align: right;
+	width: 1px;
+}
+
+.umb-card-icons li {
+	display: inline-block;
+	margin: 0 2px 0 2px;
+}
+
+.umb-card-icons.vertical li {
+	float: right;
+	display: block;
+	margin-bottom: 3px;
+}
+
+//card iocn list
+.umb-card-list {
+     display: block;
+     padding: 0;
+     margin: 0;
+ }
+
+.umb-card-list li {
+    border-bottom: @gray-10 1px solid;
+    padding-bottom: 3px;
+    display: block;
+}
+
+
+//Card icon grid for picking items off a card
+.umb-card-grid {
+	padding: 0;
+	margin: 0 auto;
+	list-style: none;
+    width: 100%;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+}
+
+.umb-card-grid li {
+	font-size: 12px;
+	text-align: center;
+	box-sizing: border-box;
+	position: relative;
+    width: 100px;
+    margin-bottom: 5px;
+}
+
+.umb-card-grid.-six-in-row li {
+    flex: 0 0 25%;
+    max-width: 117px;
+}
+
+.umb-card-grid.-four-in-row li {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.umb-card-grid.-three-in-row li {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+
+    span > i, // legacy icon
+    .umb-icon {
+        font-size: 36px;
+        line-height: 1;
+    }
+}
+
+.umb-card-grid {
+    .umb-card-grid-item {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 10px 5px;
+        border-radius: (@baseBorderRadius * 2);
+        transition: background-color 120ms;
+        font-size: 13px;
+        line-height: 1.3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+
+        &__loading {
+            position: absolute;
+            background-color: rgba(255,255,255,0.8);
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        a {
+            color: @ui-option-type;
+            text-decoration: none;
+        }
+
+        > span {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-color: transparent;
+            word-break: break-word;
+        }
+
+        &:hover {
+            background-color: @ui-option-hover;
+            color: @ui-option-type-hover;
+        }
+
+        &:focus {
+            color: @ui-option-type-hover;
+        }
+    }
+
+    span > i, // legacy icon
+    .umb-icon {
+        font-size: 30px;
+        line-height: 1;
+        margin-top: 6px;
+        margin-bottom: 10px;
+        display: block;
+    }
+}
+
+.umb-card-grid .umb-card-grid-item.--creator {
+    > span {
+        border: 2px dashed @ui-action-discreet-border;
+        border-radius: @baseBorderRadius;
+        &:hover {
+            border-color: @ui-action-discreet-border-hover;
+        }
+    }
+}
+
+.umb-card-grid .umb-card-grid-item-slot {
+    position: relative;
+	display: block;
+	width: 100%;
+    padding-top: 100%;
+    border-radius: (@baseBorderRadius * 2);
+    box-sizing: border-box;
+    transition: background-color 120ms;
+    
+    &:hover, &:focus {
+	    background-color: @ui-option-hover;
+        > span {
+            color:@ui-action-discreet-type-hover;
+            border-color:@ui-action-discreet-border-hover;
+        }
+    }
+    
+    > span {
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background-color: transparent;
+        border:1.5px dashed @ui-action-discreet-border;
+        border-radius: (@baseBorderRadius * 2);
+    }
+}
+
+//Round icon-like button - this should be somewhere else
+.umb-btn-round {
+	padding: 4px 6px 4px 6px;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 200px;
+    background: @gray-10;
+    border:1px solid @gray-6;
+    margin: 2px;
+}
+
+.umb-btn-round:hover, 
+.umb-btn-round:hover * {
+  background: @blueDark !important;
+  color: @white !important;
+  border-color: @blueDark !important;
+  text-decoration:none;
+ }
+
+ .umb-btn-round a:hover {
+     text-decoration:none;
+     color: @white !important;
+ }
+
+ .umb-btn-round i {
+     font-size:16px !important;
+     color: @gray-8;
+     display:block;
+ }
+
+ .umb-btn-round.alert:hover, .umb-btn-round.alert:hover *{
+ 	background: @red !important;
+  	color: @white !important;
+  	border-color: @red !important;
+  	text-decoration:none;
+ }
+
+.umb-btn-round.no-border{
+    border: none !important;
+    background: none !important;
+}
+
+.umb-training-videos {
+	display: grid;
+	grid-gap: 10px;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.umb-training-video {
+	background: @white;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+	border-radius: @baseBorderRadius;
+	transition: box-shadow 0.1s ease-in-out, border 0.1s ease-in-out;
+	box-sizing: border-box;
+	padding: 20px;
+}
+
+.umb-training-video:hover {
+	box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
+	text-decoration: none;
+}
+
+.umb-training-video__label {
+    font-weight: bold;
+	margin-top: 20px;
+	display: block;
+	text-align: center;
+}

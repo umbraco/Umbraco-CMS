@@ -1,0 +1,62 @@
+﻿<div class="umb-dialog" ng-controller="Umbraco.Editors.DocumentTypes.ImportController as vm">
+
+  <div class="umb-dialog-body with-footer">
+    <div class="umb-pane">
+      <div ng-if="vm.state === 'upload'">
+        <p>
+          <localize key="settings_importDocumentTypeHelp">
+            To import a document type, find the '.udt' file on your computer by clicking the 'Import' button (you'll be
+            asked for confirmation on the next screen)
+          </localize>
+        </p>
+
+        <form name="importDoctype">
+
+          <!-- Select files -->
+          <button accept=".udt"
+                  class="btn btn-action"
+                  name="file"
+                  ng-model="filesHolder"
+                  ngf-change="handleFiles($files, $event, $invalidFiles)"
+                  ngf-multiple="true"
+                  ngf-pattern="*.udt"
+                  ngf-select>
+            <localize key="general_import">Import</localize>
+          </button>
+        </form>
+
+        <div ng-if="importDoctype.file.$error.pattern">Please choose a .udt file to import</div>
+
+      </div>
+      <div ng-if="vm.state === 'confirm'">
+        <strong>
+          <localize key="name">Name</localize>
+          :
+        </strong>
+        {{vm.model.name}}
+        <br/>
+        <strong>
+          <localize key="alias">Alias</localize>
+          :
+        </strong>
+        {{vm.model.alias}}
+        <br/>
+        <br/>
+        <button class="btn btn-primary" ng-click="import()">
+          <localize key="actions_importDocumentType">Import</localize>
+        </button>
+      </div>
+      <div ng-if="vm.state === 'done'">
+        {{vm.model.name}} has been imported!
+      </div>
+    </div>
+  </div>
+
+  <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+    <umb-button action="close()"
+                button-style="link"
+                label-key="{{vm.cancelButtonLabel}}"
+                type="button">
+    </umb-button>
+  </div>
+</div>

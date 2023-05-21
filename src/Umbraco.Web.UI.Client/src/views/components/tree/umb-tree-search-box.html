@@ -1,0 +1,18 @@
+<div class="form-search">
+
+    <umb-search-filter
+        input-id="{{inputId}}"
+        model="term"
+        label-key="general_typeToSearch"
+        text="Type to search..."
+        css-class="w-100"
+        auto-focus="autoFocus"
+        show-back-button="showSearch"
+        on-back="hideSearch()">
+    </umb-search-filter>
+
+    <h4 ng-if="showSearch && searchFromName">
+        <small><localize key="general_search">Search</localize>:&nbsp;</small>
+        {{searchFromName}}
+    </h4>
+</div>

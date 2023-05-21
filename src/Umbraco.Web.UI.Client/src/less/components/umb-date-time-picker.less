@@ -1,0 +1,38 @@
+umb-date-time-picker {
+  &.--disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+.flatpickr-calendar {
+    border-radius: @baseBorderRadius;
+    box-shadow: 0 5px 10px 0 rgba(0,0,0,0.16);
+}
+
+.flatpickr-day {
+    border-radius: @baseBorderRadius;
+    border: none;
+
+    &.today:not(.active) {
+        border: 1px solid;
+    }
+
+    &:hover {
+        background-color: @gray-10;
+    }
+
+    &.selected, &.startRange, &.endRange {
+        background-color: @ui-selected-type !important;
+        border-color: @ui-selected-type !important;
+
+        &:hover {
+            background-color: @ui-selected-type-hover !important;
+        }
+
+        &.startRange + .endRange:not(:nth-child(7n+1)) {
+            box-shadow: -10px 0 0 @ui-selected-type !important;
+        }
+    }
+}

@@ -1,0 +1,60 @@
+<div class="umb-property-editor umb-mediapicker" ng-class="{'umb-mediapicker-multi':isMultiPicker, 'umb-mediapicker-single':!isMultiPicker}" ng-controller="Umbraco.PropertyEditors.MediaPickerController as vm">
+
+    <p ng-if="(vm.mediaItems|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</localize></p>
+    <p ng-if="(vm.mediaItems|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</localize></p>
+
+    <div data-element="sortable-thumbnails" class="umb-sortable-thumbnails-container error">
+        <ul ui-sortable="sortableOptions" ng-model="vm.mediaItems" class="umb-sortable-thumbnails">
+            <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="media in vm.mediaItems track by $index">
+
+                <p class="label label__trashed" ng-if="media.trashed">
+                    <localize key="mediaPicker_trashed">Trashed</localize>
+                    <umb-icon icon="icon-trash"></umb-icon>
+                </p>
+
+                <div ng-if="image.loading" class="umb-sortable-thumbnails__loading">
+                    <div class="umb-button__progress"></div>
+                </div>
+
+                <!-- IMAGE -->
+                <img ng-if="media.thumbnail && media.extension !== 'svg'"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
+                     ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
+                     alt="{{media.name}}" />
+
+                <!-- SVG -->
+                <img ng-if="media.thumbnail && media.extension === 'svg'"
+                     ng-class="{'trashed': media.trashed}" ng-src="{{media.thumbnail}}"
+                     ng-attr-title="{{media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + media.name : media.name}}"
+                     alt="{{media.name}}" />
+
+                <!-- FILE -->
+                <umb-file-icon ng-hide="media.thumbnail" ng-class="{'trashed': media.trashed}"
+                               extension="{{media.extension}}"
+                               icon="{{media.icon}}"
+                               size="s"
+                               text="{{media.name}}">
+                </umb-file-icon>
+
+                <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
+                    <button type="button" aria-label="Edit media" ng-if="allowEditMedia && !media.trashed" class="umb-sortable-thumbnails__action btn-reset" data-element="action-edit" ng-click="vm.editItem(media)">
+                        <umb-icon icon="icon-edit" class="icon"></umb-icon>
+                    </button>
+                    <button ng-if="allowRemoveMedia" type="button" aria-label="Remove" class="umb-sortable-thumbnails__action -red btn-reset" data-element="action-remove" ng-click="vm.remove($index)">
+                        <umb-icon icon="icon-delete" class="icon"></umb-icon>
+                    </button>
+                </div>
+            </li>
+            <li style="border: none;" class="add-wrapper unsortable" ng-if="vm.showAdd() && allowAddMedia">
+                <button type="button" aria-label="Open media picker" data-element="sortable-thumbnails-add" class="add-link btn-reset umb-outline umb-outline--surrounding" ng-click="vm.add()" ng-class="{'add-link-square': (vm.mediaItems.length === 0 || isMultiPicker)}">
+                    <umb-icon icon="icon-add" class="icon large"></umb-icon>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <ng-form name="vm.modelValueForm">
+        <input type="hidden" name="modelValue" ng-model="vm.mediaItems.length" ng-required="model.validation.mandatory && !vm.mediaItems.length" />
+    </ng-form>
+
+</div>

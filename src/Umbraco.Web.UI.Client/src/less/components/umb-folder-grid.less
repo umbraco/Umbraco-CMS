@@ -1,0 +1,90 @@
+.umb-folder-grid {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   width: 100%;
+   margin-bottom: 30px;
+}
+
+.umb-folder-grid__folder {
+   background: @white;
+   margin: 5px;
+   display: flex;
+   align-items: center;
+   padding: 10px 20px;
+   box-sizing: border-box;
+   flex: 1 1 200px;
+   transition: border 0.2s;
+   position: relative;
+   justify-content: space-between;
+   cursor: pointer;
+   user-select: none;
+   box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+   border-radius: 3px;
+   
+   transition: box-shadow 150ms ease-in-out;
+}
+
+.umb-folder-grid__folder.-selected {
+    color:@ui-selected-type;
+    &:hover {
+        color:@ui-selected-type-hover;
+    }
+}
+
+.umb-folder-grid__folder.-selected, .umb-folder-grid__folder:hover {
+    &::before {
+        content: "";
+        position: absolute;
+        z-index:2;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border: 2px solid @ui-selected-border;
+        border-radius: 5px;
+        box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
+        pointer-events: none;
+    }
+}
+.umb-folder-grid__folder:hover {
+    &::before {
+        opacity: .33;
+    }
+}
+.umb-folder-grid__folder.-selected:hover {
+    &::before {
+        opacity: .75;
+    }
+}
+
+
+.umb-folder-grid__folder:focus,
+.umb-folder-grid__folder:active {
+   text-decoration: none;
+}
+
+.umb-folder-grid__folder:hover {
+   text-decoration: none;
+}
+
+.umb-folder-grid__folder-description {
+   display: flex;
+   align-items: center;
+}
+
+.umb-folder-grid__folder-icon,
+.umb-folder-grid__folder-icon[class^="icon-"],
+.umb-folder-grid__folder-icon[class*=" icon-"] {
+   font-size: 20px;
+   margin-right: 15px;
+}
+
+.umb-folder-grid__folder-name {
+   font-size: 13px;
+   font-weight: bold;
+}
+
+.umb-folder-grid__folder-name:hover {
+   text-decoration: underline;
+}

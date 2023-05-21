@@ -1,0 +1,112 @@
+#
+# Umbraco CMS .gitignore
+#
+
+# Common files
+*.obj
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*.orig
+*.suo
+*.vs10x
+*.ndproj
+*.ignorer.*
+
+# Common directories
+.DS_Store
+._.DS_Store
+.vs/
+.idea/
+
+# Build directories
+[Bb]in/
+[Oo]bj/
+[Db]ebug/
+[Rr]elease/
+
+# Tools
+_ReSharper*/
+_NCrunch_*/
+*.ncrunchsolution
+*.ncrunchsolution.user
+*.ncrunchproject
+*.crunchsolution.cache
+tools/NDepend/
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+[Ss]ource
+[Ss]andbox
+node_modules
+lib-bower
+*.psess
+*.vspx
+NDependOut/
+QueryResult.htm
+tools/docfx/
+
+# Ignore rule for clearing out Belle (avoid rebuilding all the time)
+preserve.belle
+
+# Ignore rule for output of generated documentation files from grunt docserve
+/src/Umbraco.Web.UI.Docs/api/
+/src/Umbraco.Web.UI.Docs/package-lock.json
+
+# csharp-docs
+/build/csharp-docs/api/
+/build/csharp-docs/_site/
+
+# Build
+/build.out/
+/build.tmp/
+/build/hooks/
+/build/temp/
+
+# Build output
+/build/docs.zip
+/build/ui-docs.zip
+/build/csharp-docs.zip
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/
+
+# Environment specific data
+/src/Umbraco.Web.UI.Client/[Bb]uild/
+/src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
+/src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
+/src/Umbraco.Web.UI.Client/TESTS-*.xml
+/src/Umbraco.Web.UI/wwwroot/[Mm]edia/
+/src/Umbraco.Web.UI/App_Code/
+/src/Umbraco.Web.UI/App_Plugins/
+/src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/
+/src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs/
+/src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/
+/src/Umbraco.Web.UI/Views/
+!/src/Umbraco.Web.UI/Views/Partials/blocklist/
+!/src/Umbraco.Web.UI/Views/Partials/grid/
+!/src/Umbraco.Web.UI/Views/_ViewImports.cshtml
+/src/Umbraco.Web.UI/appsettings.json
+/src/Umbraco.Web.UI/appsettings.Development.json
+/src/Umbraco.Web.UI/appsettings.Local.json
+
+# Tests
+/tests/Umbraco.Tests.AcceptanceTest/.env
+/tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
+/tests/Umbraco.Tests.Integration.SqlCe/[Uu]mbraco/[Dd]ata/TEMP/
+/tests/Umbraco.Tests.Integration/appsettings.Tests.Local.json
+/tests/Umbraco.Tests.Integration/TEMP/
+/tests/Umbraco.Tests.Integration/[Uu]mbraco/[Dd]ata/
+/tests/Umbraco.Tests.Integration/[Uu]mbraco/[Ll]ogs/
+/tests/Umbraco.Tests.Integration/Views/
+/tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
+
+# Ignore auto-generated schema
+/src/Umbraco.Cms.Targets/tasks/
+/src/Umbraco.Cms.Targets/appsettings-schema.*.json
+/src/Umbraco.Web.UI/appsettings-schema.json
+/src/Umbraco.Web.UI/appsettings-schema.*.json
+/tests/Umbraco.Tests.Integration/appsettings-schema.json
+/tests/Umbraco.Tests.Integration/appsettings-schema.*.json
+/src/Umbraco.Cms/appsettings-schema.json
+playwright-report
+trace.zip

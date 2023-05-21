@@ -1,0 +1,126 @@
+/*
+
+    Install local package
+
+*/
+
+// Helpers
+.faded {
+    color: @gray-5;
+}
+
+.umb-upload-local {
+
+    &__dropzone {
+        position: relative;
+        width: 500px;
+        height: 300px;
+        border: 2px dashed @ui-action-border;
+        border-radius: 3px;
+        background: @white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        transition: 100ms box-shadow ease, 100ms border ease;
+
+        &.drag-over {
+            border-color: @ui-action-border-hover;
+            border-style: solid;
+            box-shadow: 0 3px 8px rgba(0,0,0, .1);
+            transition: 100ms box-shadow ease, 100ms border ease;
+        }
+
+        .umb-icon {
+            display: block;
+            color: @ui-action-type;
+            font-size: 6.75rem;
+            line-height: 1;
+            margin: 0 auto;
+        }
+
+        .umb-info-local-item {
+            margin: 20px;
+        }
+    }
+
+    &__select-file {
+        font-weight: bold;
+        color: @ui-action-type;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+            color: @ui-action-type-hover;
+        }
+    }
+}
+
+// Accept terms
+.umb-accept-terms {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+}
+
+.umb-package-installer-label .label-text {
+    margin-left: 5px;
+}
+
+.umb-package-installer-label input[type="radio"],
+.umb-package-installer-label input[type="checkbox"] {
+    margin-top: 0px;
+}
+
+.umb-package-installer-label {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    user-select: none;
+}
+
+// Info state
+.umb-info-local-items {
+    border-radius: 3px;
+    background: @gray-10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 20px;
+    width: 100%;
+    max-width: 540px;
+    background: @white;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.16);
+}
+
+.umb-info-local-items a {
+    text-decoration: underline;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+
+.umb-info-local-items .umb-package-icon {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 150px;
+    font-size: 60px;
+}
+
+.umb-info-local-items .umb-package-icon img {
+    max-width: 100px;
+}
+
+.umb-info-local-items .umb-package-info {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px 40px;
+}
+
+.umb-info-local-item {
+    margin-bottom: 20px;
+}

@@ -1,0 +1,391 @@
+/* variant switcher */
+.umb-variant-switcher__toggle {
+    position: relative;
+	display: flex;
+	align-items: center;
+	padding: 0 10px; 
+    margin: 1px 1px;
+    right: 0;
+    height: 30px;
+	text-decoration: none !important;
+	font-size: 13px;
+    color: @ui-action-discreet-type;
+    background: transparent;
+    border: none;
+    
+    max-width: 50%;
+    white-space: nowrap;
+    
+    user-select: none;
+    
+    span {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+}
+
+button.umb-variant-switcher__toggle {
+	transition: color 0.2s ease-in-out;
+	&:hover {
+		//background-color: @gray-10;
+        color: @ui-action-discreet-type-hover;
+        .umb-variant-switcher__expand {
+            color: @ui-action-discreet-type-hover;
+        }
+	}
+    
+    &.--error {
+        &::before {
+            content: '!';
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            background-color: @errorBackground;
+            color: @errorText;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+                color: @warningText;
+            }
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-variant-switcher__toggle--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-variant-switcher__toggle--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-6px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-3px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
+        }
+    }
+}
+
+.umb-variant-switcher__expand {
+    color: @ui-action-discreet-type;
+	margin-left: 5px;
+	margin-right: -5px;
+    transition: color 0.2s ease-in-out;
+}
+
+
+.umb-variant-switcher {
+    min-width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    margin-top: 5px;
+    user-select: none;
+}
+
+.umb-variant-switcher__item {
+	display: flex;
+    justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid @gray-9;
+    position: relative;
+
+    .umb-variant-switcher__name-wrapper:hover {
+        .umb-variant-switcher__name {
+            color: @blueMid;
+        }
+        .umb-variant-switcher__state {
+            color: @blueMid;
+        }
+    }
+}
+
+.umb-variant-switcher__item.--not-allowed:not(.--current) .umb-variant-switcher__name-wrapper:hover {
+    cursor: default;
+}
+
+.umb-variant-switcher__name-wrapper {
+    display: flex;
+    align-items: center;
+
+    .umb-variant-switcher__name-content {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.umb-variant-switcher__item.--state-notCreated:not(.--active) {
+    .umb-variant-switcher__name-wrapper::before {
+        content: "+";
+        display: block;
+        float: left;
+        font-size: 15px;
+        font-weight: 900;
+        padding: 8px 12px 8px 0;
+        color: @gray-5;
+    }
+
+    .umb-variant-switcher__item-expand-button + .umb-variant-switcher__name-wrapper::before {
+        padding: 8px 16px 8px 20px;
+    }
+
+    .umb-variant-switcher__name {
+        color: @gray-5;
+    }
+
+    .umb-variant-switcher__state {
+        color: @gray-6;
+    }
+
+    .umb-variant-switcher__name-wrapper::after {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        border: 2px dashed @gray-9;
+        margin: 2px;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+    }
+
+    .umb-variant-switcher__name-wrapper:hover {
+        &::before {
+            color: @blueMid;
+        }
+
+        .umb-variant-switcher__name {
+            color: @blueMid;
+        }
+
+        .umb-variant-switcher__state {
+            color: @blueMid;
+        }
+    }
+}
+/*
+.umb-variant-switcher__item.--state-draft {
+    .umb-variant-switcher__name {
+        color: @gray-5;
+    }
+    &:hover {
+        .umb-variant-switcher__name {
+            color: @blueMid;
+        }
+    }
+}
+*/
+
+.umb-variant-switcher.--has-sub-variants {
+    .umb-variant-switcher__item {
+        
+    }
+}
+
+.umb-variant-switcher__item-expand-button {
+    text-decoration: none;
+    display: inline-block;
+    flex: 0;
+    align-self: stretch;
+
+    padding-left: 22px !important;
+    padding-right: 14px !important;
+
+    font-size: 12px;
+
+    * {
+        pointer-events: none;
+    }
+}
+
+.umb-variant-switcher__item:last-child {
+	border-bottom: none;
+}
+
+.umb-variant-switcher__item.--current {
+    color: @ui-light-active-type;
+    .umb-variant-switcher__name {
+        //color: @ui-light-active-type;
+        font-weight: 700;
+    }
+    &::before {
+        content: '';
+        position: absolute;
+        border-radius: 0 4px 4px 0;
+        background-color: @ui-active-border;
+        width: 4px;
+        top:8px;
+        bottom: 8px;
+        left:0;
+        z-index:1;
+        pointer-events: none;
+    }
+}
+
+.umb-variant-switcher__item:hover {
+	outline: none;
+}
+
+.umb-variant-switcher__item.--active:not(.--current) .umb-variant-switcher__name-wrapper:hover {
+	//background-color: @white !important;
+	cursor: default;
+}
+
+.umb-variant-switcher__item:focus .umb-variant-switcher__split-view,
+.umb-variant-switcher__item:focus-within .umb-variant-switcher__split-view,
+.umb-variant-switcher__item:hover .umb-variant-switcher__split-view,
+.umb-variant-switcher__split-view:focus {
+	display: flex;
+	cursor: pointer;
+}
+
+.umb-variant-switcher__item.--error {
+    .umb-variant-switcher__name {
+        color: @formErrorText;
+        .show-validation-type-warning & {
+            color: @formWarningText;
+        }
+        &::after {
+            content: '!';
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            top: -3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 7px;
+            font-size: 8px;
+            text-align: center;
+            font-weight: bold;
+            background-color: @errorBackground;
+            color: @errorText;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+                color: @warningText;
+            }
+            
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-variant-switcher__name--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-variant-switcher__name--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-6px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-3px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
+        }
+    }
+}
+
+.umb-variant-switcher__name-wrapper {
+    font-size: 14px;
+    text-align: left;
+    flex: 1;
+	cursor: pointer;
+    background-color: transparent;
+    border: none;
+	padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+.dropdown-menu>li {
+    > .umb-variant-switcher__name-wrapper {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    > .umb-variant-switcher__item-expand-button + .umb-variant-switcher__name-wrapper {
+        padding-left: 5px;
+    }
+}
+
+
+.umb-variant-switcher__name {
+    display: block;
+    font-weight: 600;
+    margin-bottom: -2px;
+}
+
+.umb-variant-switcher__state {
+	font-size: 12px;
+	color: @gray-4;
+}
+
+.umb-variant-switcher__split-view {
+    font-size: 12px;
+    display: none;
+    padding: 16px 20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: @white;
+
+    &:hover {
+        background-color: @ui-option-hover;
+        color: @ui-option-type-hover;
+    }
+}
+
+.umb-variant-switcher__sub-variants {
+
+    position: relative;
+    border-bottom: 1px solid @gray-9;
+    background-color: @gray-13;
+    /*
+    &::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 0px;
+        left: 20px;
+        width: 4px;
+        bottom: 14px;
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px;
+        background-color: @gray-8;
+    }
+    */
+    .umb-variant-switcher__item {
+        border-bottom-color: @gray-10;
+    }
+
+    .umb-variant-switcher__item.--state-notCreated:not(.--active) {
+        .umb-variant-switcher__name-wrapper::after {
+            left: 55px;// overwrite left to achieve same indentation on the dashed border as language.
+        }
+    }
+
+    .umb-variant-switcher__name-wrapper {
+
+        margin-left: 48px;
+        padding-left: 20px;
+        
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        &:hover {
+            color: @ui-option-type-hover;
+            background-color: @ui-option-hover;
+        }
+
+        .umb-variant-switcher__name {
+            //margin-right: 20px;
+        }
+        .umb-variant-switcher__state {
+            //flex: 0 0 200px;
+        }
+
+        
+    }
+}

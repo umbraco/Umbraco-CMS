@@ -1,0 +1,53 @@
+<div ng-controller="Umbraco.PrevalueEditors.ListViewLayoutsPreValsController as vm">
+
+   <div class="list-view-layouts-container">
+
+       <div class="list-view-layouts" ui-sortable="vm.layoutsSortableOptions" ng-model="model.value">
+
+           <div class="list-view-layout" ng-repeat="layout in model.value">
+
+               <umb-icon icon="icon-navigation" class="list-view-layout__sort-handle" aria-label="Sort"></umb-icon>
+
+               <div class="list-view-layout__icon-wrapper">
+
+                   <button type="button"
+                           class="btn-reset"
+                           ng-disabled="layout.isSystem === 1"
+                           ng-click="vm.openIconPicker(layout)"
+                           umb-auto-focus="{{layout.isSystem !== 1}}">
+                       <span class="list-view-layout__icon">
+                           <umb-icon icon="{{layout.icon}}"></umb-icon>
+                       </span>
+                   </button>
+
+               </div>
+
+               <div class="list-view-layout__name">
+                   <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
+                   <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{layout.name}}</span>
+                   <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
+               </div>
+
+               <div class="list-view-layout__path">
+                   <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
+               </div>
+
+               <div class="list-view-layout__action">
+                    <umb-checkbox ng-if="layout.isSystem === 1" model="layout.selected"></umb-checkbox>
+
+                    <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
+                        <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.removeLayout(layout, $index, $event)">
+                           <localize key="general_remove">Remove</localize>
+                        </button>
+                    </div>
+               </div>
+
+           </div>
+
+       </div>
+
+      <button type="button" class="list-view-add-layout mt2" ng-click="vm.addLayout()">Add layout</button>
+
+   </div>
+
+</div>

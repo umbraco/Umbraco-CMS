@@ -1,0 +1,31 @@
+<div ng-controller="Umbraco.Editors.Member.ListController">
+
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+   <form novalidate name="contentForm" ng-show="!page.loading" val-form-manager>
+
+       <umb-editor-view umb-tabs>
+
+           <umb-editor-header name="content.name"
+                              name-locked="page.lockedName"
+                              tabs="content.tabs"
+                              menu="page.menu"
+                              hide-icon="true"
+                              hide-description="true"
+                              hide-alias="true">
+           </umb-editor-header>
+
+           <umb-editor-container>
+               <div class="umb-editor-sub-views">
+                   <div id="sub-view-{{$index}}" ng-repeat="app in content.apps track by app.alias">
+                       <umb-editor-sub-view model="app" content="content">
+                       </umb-editor-sub-view>
+                   </div>
+               </div>
+           </umb-editor-container>
+
+       </umb-editor-view>
+
+   </form>
+
+</div>

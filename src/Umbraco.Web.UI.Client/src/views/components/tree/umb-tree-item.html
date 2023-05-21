@@ -1,0 +1,32 @@
+<li class="umb-tree-item" data-element="tree-item-{{::node.dataElement}}" ng-class="getNodeCssClass(node)" on-right-click="altSelect(node, $event)">
+    <div class="umb-tree-item__inner" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" tabindex="-1">
+        <button data-element="tree-item-expand"
+                class="umb-tree-item__arrow umb-outline btn-reset"
+                ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
+                ng-click="load(node)">
+                <umb-icon icon="{{(node.expanded && !node.metaData.isContainer) ? 'icon-navigation-down' : 'icon-navigation-right'}}"></umb-icon>
+            <!-- TODO: Use localization for this text -->
+            <span class="sr-only">Expand child items for {{node.name}}</span>
+        </button>
+
+        <umb-icon icon="{{node.selected ? 'icon-check' : node.icon}}" class="icon umb-tree-icon sprTree" ng-class="node.cssClass" title="{{::node.title}}" ng-click="select(node, $event)" ng-style="::node.style" tabindex="-1"></umb-icon>
+        <span class="umb-tree-item__annotation"></span>
+        <a class="umb-tree-item__label" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)" title="{{::node.title}}">{{node.name}}</a>
+
+        <!-- NOTE: These are the 'option' ellipsis -->
+        <umb-button-ellipsis
+            ng-if="::node.menuUrl"
+            element="tree-item-options"
+            action="options(node, $event)"
+            text="{{optionsText}} {{node.name}}"
+            state="hidden"
+            class="umb-options">
+        </umb-button-ellipsis>
+
+        <umb-loader ng-show="node.loading" position="bottom" class="umb-tree-item__loader"></umb-loader>
+    </div>
+
+    <ul ng-class="{collapsed: !node.expanded}">
+        <umb-tree-item class="umb-animated" ng-repeat="child in node.children track by child.id" enablelistviewexpand="{{enablelistviewexpand}}" tree="tree" current-node="currentNode" node="child" is-dialog="isDialog" section="{{section}}"></umb-tree-item>
+    </ul>
+</li>

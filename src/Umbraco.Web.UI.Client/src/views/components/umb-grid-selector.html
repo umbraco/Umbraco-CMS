@@ -1,0 +1,51 @@
+<div class="umb-grid-selector">
+
+    <div class="umb-grid-selector__items">
+
+        <div class="umb-grid-selector__item -default" ng-if="defaultItem !== null">
+
+            <div class="umb-grid-selector__item-content">
+                <umb-icon icon="{{defaultItem.icon}}" class="umb-grid-selector__item-icon"></umb-icon>
+                <div class="umb-grid-selector__item-label">{{ defaultItem.name }}</div>
+                <div ng-show="defaultItem.id"><button class="umb-grid-selector__item-default-label btn-link -blue" ng-click="openTemplate(defaultItem)"><localize key="general_open">Open</localize></button></div>
+                <span class="umb-grid-selector__item-default-label">(<localize key="general_default">Default</localize> {{itemLabel}})</span>
+            </div>
+
+            <button type="button" class="btn-reset" ng-if="selectedItems.length === 1" ng-click="removeDefaultItem()">
+                <umb-icon icon="icon-trash" class="umb-grid-selector__item-remove"></umb-icon>
+                <span class="sr-only">Remove Template</span>
+            </button>
+
+        </div>
+
+        <div class="umb-grid-selector__item" ng-repeat="selectedItem in selectedItems | filter: { alias:'!'+defaultItem.alias }:true">
+
+            <div class="umb-grid-selector__item-content">
+                <umb-icon icon="{{selectedItem.icon}}" class="umb-grid-selector__item-icon"></umb-icon>
+
+                <div class="umb-grid-selector__item-label">{{ selectedItem.name }}</div>
+                <div><button class="umb-grid-selector__item-default-label btn-link -blue" ng-click="openTemplate(selectedItem)"><localize key="general_open">Open</localize></button></div>
+                <div><button class="umb-grid-selector__item-default-label btn-link -blue" ng-click="setAsDefaultItem(selectedItem)"><localize key="grid_setAsDefault">Set as default</localize></button></div>
+            </div>
+
+            <button type="button" class="btn-reset" ng-click="removeItem(selectedItem)">
+                <umb-icon icon="icon-trash" class="umb-grid-selector__item-remove"></umb-icon>
+                <span class="sr-only">Remove Template</span>
+            </button>
+
+        </div>
+
+        <button type="button" class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+t">
+            <div class="umb-grid-selector__item-content">
+                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem !== null"><localize key="grid_chooseExtra">Choose extra</localize> {{itemLabel}}</div>
+                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem === null"><localize key="grid_chooseDefault">Choose default</localize> {{itemLabel}}</div>
+            </div>
+        </button>
+
+    </div>
+
+    <div class="text-center" ng-if="(availableItems | compareArrays:selectedItems:'alias').length === 0">
+        <small><localize key="general_all">All</localize> {{itemLabel}}s <localize key="grid_areAdded">are added</localize></small>
+    </div>
+
+</div>

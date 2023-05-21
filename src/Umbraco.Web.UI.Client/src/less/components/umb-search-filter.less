@@ -1,0 +1,32 @@
+html .umb-search-filter {
+    position: relative;
+    height: 30px;
+    width: 190px;
+
+    &.w-100 {
+        width: 100%;
+    }
+
+    &.mb-15 {
+        margin-bottom: 15px;
+    }
+
+    &__input {
+        padding-left: 30px;
+        padding-right: 6px;
+        width: inherit;
+        margin: 0;
+    }
+
+    // "icon-search" class it kept for backward compatibility
+    .umb-icon, 
+    i.icon-search {
+        color: @gray-8;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 8px;
+        margin: auto 0;
+        pointer-events: none;
+    }
+}

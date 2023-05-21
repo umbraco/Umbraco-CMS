@@ -1,0 +1,27 @@
+<div ng-controller="Umbraco.PropertyEditors.UserPickerController as vm" class="umb-property-editor umb-userpicker">
+
+    <div>
+        <umb-user-preview 
+            ng-repeat="user in renderModel"
+            name="user.name"
+            avatars="user.avatars"
+            allow-remove="allowRemove"
+            on-remove="remove($index)">
+        </umb-user-preview>
+    </div>
+
+    <button
+        type="button"
+        ng-show="model.config.multiPicker === true || renderModel.length === 0"    
+        class="umb-node-preview-add"
+        ng-click="openUserPicker()"
+        ng-disabled="readonly">
+        
+        <localize key="general_add">Add</localize>
+    </button>
+
+    <ng-form name="modelValueForm">
+        <input type="hidden" name="modelValue" ng-model="renderModel.length" ng-required="model.validation.mandatory && !renderModel.length" />
+    </ng-form>
+
+</div>
