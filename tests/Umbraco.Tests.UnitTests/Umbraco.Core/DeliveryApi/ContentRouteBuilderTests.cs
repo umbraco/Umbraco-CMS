@@ -188,18 +188,36 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         Assert.AreEqual(hideTopLevelNodeFromPath ? "/the-child/the-grandchild" : "/the-root/the-child/the-grandchild", publishedUrlProvider.GetUrl(grandchild));
     }
 
-    private IPublishedContent SetupInvariantPublishedContent(string name, Guid key, IPublishedContent? parent = null)
+    [TestCase(true)]
+    [TestCase(false)]
+    public void CanRouteUnpublishedChild(bool hideTopLevelNodeFromPath)
+    {
+        var rootKey = Guid.NewGuid();
+        var root = SetupInvariantPublishedContent("The Root", rootKey);
+
+        var childKey = Guid.NewGuid();
+        var child = SetupInvariantPublishedContent("The Child", childKey, root, false);
+
+        var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
+        var result = builder.Build(child);
+        Assert.IsNotNull(result);
+        Assert.AreEqual($"/{childKey:D}", result.Path);
+        Assert.AreEqual(rootKey, result.StartItem.Id);
+        Assert.AreEqual("the-root", result.StartItem.Path);
+    }
+
+    private IPublishedContent SetupInvariantPublishedContent(string name, Guid key, IPublishedContent? parent = null, bool published = true)
     {
         var publishedContentType = CreatePublishedContentType();
-        var content = CreatePublishedContentMock(publishedContentType.Object, name, key, parent);
+        var content = CreatePublishedContentMock(publishedContentType.Object, name, key, parent, published);
         return content.Object;
     }
 
-    private IPublishedContent SetupVariantPublishedContent(string name, Guid key, IPublishedContent? parent = null)
+    private IPublishedContent SetupVariantPublishedContent(string name, Guid key, IPublishedContent? parent = null, bool published = true)
     {
         var publishedContentType = CreatePublishedContentType();
         publishedContentType.SetupGet(m => m.Variations).Returns(ContentVariation.Culture);
-        var content = CreatePublishedContentMock(publishedContentType.Object, name, key, parent);
+        var content = CreatePublishedContentMock(publishedContentType.Object, name, key, parent, published);
         var cultures = new[] { "en-us", "da-dk" };
         content
             .SetupGet(m => m.Cultures)
@@ -209,10 +227,11 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         return content.Object;
     }
 
-    private Mock<IPublishedContent> CreatePublishedContentMock(IPublishedContentType publishedContentType, string name, Guid key, IPublishedContent? parent)
+    private Mock<IPublishedContent> CreatePublishedContentMock(IPublishedContentType publishedContentType, string name, Guid key, IPublishedContent? parent, bool published)
     {
         var content = new Mock<IPublishedContent>();
         ConfigurePublishedContentMock(content, key, name, DefaultUrlSegment(name), publishedContentType, Array.Empty<PublishedElementPropertyBase>());
+        content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(published);
         content.SetupGet(c => c.Parent).Returns(parent);
         content.SetupGet(c => c.Level).Returns((parent?.Level ?? 0) + 1);
         return content;
