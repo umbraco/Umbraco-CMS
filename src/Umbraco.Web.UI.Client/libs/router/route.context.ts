@@ -19,6 +19,7 @@ export class UmbRouteContext {
 	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
 	#contextRoutes: UmbRoute[] = [];
 	#routerBasePath?: string;
+	#routerActiveLocalPath?: string;
 	#activeModalPath?: string;
 
 	constructor(host: UmbControllerHostElement, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
@@ -94,6 +95,12 @@ export class UmbRouteContext {
 		this.#generateNewUrlBuilders();
 	}
 
+	public _internal_routerGotActiveLocalPath(routerActiveLocalPath: string) {
+		if (this.#routerActiveLocalPath === routerActiveLocalPath) return;
+		this.#routerActiveLocalPath = routerActiveLocalPath;
+		this.#generateNewUrlBuilders();
+	}
+
 	// Also notice each registration should now hold its handler when its active.
 	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
 		if (this.#activeModalPath === activeModalPath) return;
@@ -117,7 +124,12 @@ export class UmbRouteContext {
 		if (!this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
-		const localPath = routeBasePath + modalRegistration.generateModalPath();
+		const routeActiveLocalPath = this.#routerActiveLocalPath
+			? this.#routerActiveLocalPath.endsWith('/')
+				? this.#routerActiveLocalPath
+				: this.#routerActiveLocalPath + '/'
+			: '';
+		const localPath = routeBasePath + routeActiveLocalPath + modalRegistration.generateModalPath();
 
 		const urlBuilder = generateRoutePathBuilder(localPath);
 

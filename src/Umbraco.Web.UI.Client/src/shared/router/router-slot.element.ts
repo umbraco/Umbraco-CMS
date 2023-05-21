@@ -98,6 +98,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			const newActiveLocalPath = this.#router.match?.route.path;
 			if (this._activeLocalPath !== newActiveLocalPath) {
 				this._activeLocalPath = newActiveLocalPath;
+				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 				this.dispatchEvent(new UmbRouterSlotChangeEvent());
 			}
 		}
@@ -106,6 +107,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	private _onNavigationChanged = (event?: any) => {
 		if (event.detail.slot === this.#router) {
 			this._activeLocalPath = event.detail.match.route.path;
+			this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		} else if (event.detail.slot === this.#modalRouter) {
 			const newActiveModalLocalPath = event.detail.match.route.path;
