@@ -9,6 +9,7 @@ const createModuleDescriptors = (folderName) =>
 	readFolders(`./src/${folderName}`).map((moduleName) => {
 		return {
 			name: moduleName,
+			file: `index.ts`,
 			root: `./src/${folderName}/${moduleName}`,
 			dist: `./dist-cms/${folderName}/${moduleName}`,
 		};
@@ -26,13 +27,23 @@ const packages = createModuleDescriptors('packages');
 const packageSubModules = readFolders('./src/packages').map(async (packageName) => {
 	const { modules } = await import(`./packages/${packageName}/modules.js`);
 
-	return modules.map((module) => {
+	const packageManifest = {
+		name: packageName + '-package-manifest',
+		file: `umbraco-package.ts`,
+		root: `./src/packages/${packageName}`,
+		dist: `./dist-cms/packages/${packageName}`,
+	};
+
+	const subModules = modules.map((module) => {
 		return {
 			name: packageName,
+			file: `index.ts`,
 			root: `./src/packages/${packageName}/${module.src}`,
 			dist: `./dist-cms/packages/${packageName}/${module.src}`,
 		};
 	});
+
+	return [packageManifest, ...subModules];
 });
 
 const something = await Promise.all(packageSubModules);
@@ -44,7 +55,7 @@ export default allowedModules
 		/** @type {import('rollup').RollupOptions[]} */
 		return [
 			{
-				input: `${module.root}/index.ts`,
+				input: `${module.root}/${module.file}`,
 				external: [/^@umbraco-cms\//],
 				output: {
 					dir: `${module.dist}`,
