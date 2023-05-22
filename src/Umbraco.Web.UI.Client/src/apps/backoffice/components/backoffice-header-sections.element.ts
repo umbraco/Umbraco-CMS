@@ -1,4 +1,3 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
@@ -117,7 +116,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			#tabs {
 				color: var(--uui-color-header-contrast);
