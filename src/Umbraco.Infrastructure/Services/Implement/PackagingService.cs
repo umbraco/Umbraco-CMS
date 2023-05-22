@@ -179,6 +179,9 @@ public class PackagingService : IPackagingService
             if (package.PackageId is not null && installedPackages.FirstOrDefault(x => x.PackageId == package.PackageId) is InstalledPackage installedPackageById)
             {
                 installedPackage = installedPackageById;
+
+                // Always use package name from manifest
+                installedPackage.PackageName = package.PackageName;
             }
             else if (installedPackages.FirstOrDefault(x => x.PackageName == package.PackageName) is InstalledPackage installedPackageByName)
             {
@@ -199,12 +202,12 @@ public class PackagingService : IPackagingService
             }
 
             // Set additional values
+            installedPackage.PackageView = package.PackageView;
+
             if (!string.IsNullOrEmpty(package.Version))
             {
                 installedPackage.Version = package.Version;
             }
-
-            installedPackage.PackageView = package.PackageView;
         }
 
         // Return all packages with an ID or name in the package.manifest or package migrations
