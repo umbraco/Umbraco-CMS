@@ -2,15 +2,16 @@ using System.Dynamic;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Web.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
-
+using Umbraco.Cms.Web.Common.Routing;
 namespace Umbraco.Extensions;
 
-public static class LinkGeneratorExtensions
+public static class UmbracoLinkGeneratorExtensions
 {
     /// <summary>
     /// Gets the Umbraco backoffice URL (if Umbraco is installed).
@@ -179,5 +180,80 @@ public static class LinkGeneratorExtensions
         }
 
         return linkGenerator.GetUmbracoApiService<T>(method.Name, methodParams);
+    }
+}
+
+[Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+public static class LinkGeneratorExtensions
+{
+    /// <summary>
+    ///     Return the back office url if the back office is installed
+    /// </summary>
+    [Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+    public static string? GetBackOfficeUrl(this Microsoft.AspNetCore.Routing.LinkGenerator linkGenerator, IHostingEnvironment hostingEnvironment)
+    {
+        LinkGenerator umbracoLinkGenerator = StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>();
+        return umbracoLinkGenerator.GetBackOfficeUrl(hostingEnvironment);
+    }
+
+    /// <summary>
+    ///     Return the Url for a Web Api service
+    /// </summary>
+    /// <typeparam name="T">The <see cref="UmbracoApiControllerBase" /></typeparam>
+    [Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+    public static string? GetUmbracoApiService<T>(this Microsoft.AspNetCore.Routing.LinkGenerator linkGenerator, string actionName, object? id = null)
+        where T : UmbracoApiControllerBase
+    {
+        LinkGenerator umbracoLinkGenerator = StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>();
+        return umbracoLinkGenerator.GetUmbracoApiService<T>(actionName, id);
+    }
+
+    [Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+    public static string? GetUmbracoApiService<T>(this Microsoft.AspNetCore.Routing.LinkGenerator linkGenerator,
+        string actionName, IDictionary<string, object?>? values)
+        where T : UmbracoApiControllerBase
+    {
+        LinkGenerator umbracoLinkGenerator = StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>();
+        return umbracoLinkGenerator.GetUmbracoApiService<T>(actionName, values);
+    }
+
+    [Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+    public static string? GetUmbracoApiServiceBaseUrl<T>(
+        this Microsoft.AspNetCore.Routing.LinkGenerator linkGenerator,
+        Expression<Func<T, object?>> methodSelector)
+        where T : UmbracoApiControllerBase
+    {
+        LinkGenerator umbracoLinkGenerator = StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>();
+        return umbracoLinkGenerator.GetUmbracoApiServiceBaseUrl<T>(methodSelector);
+    }
+
+    /// <summary>
+    ///     Return the Url for an Umbraco controller
+    /// </summary>
+    [Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+    public static string? GetUmbracoControllerUrl(this Microsoft.AspNetCore.Routing.LinkGenerator linkGenerator, string actionName, string controllerName, string? area, IDictionary<string, object?>? dict = null)
+    {
+        LinkGenerator umbracoLinkGenerator = StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>();
+        return umbracoLinkGenerator.GetUmbracoControllerUrl(actionName, controllerName, area, dict);
+    }
+
+    /// <summary>
+    ///     Return the Url for an Umbraco controller
+    /// </summary>
+    [Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+    public static string? GetUmbracoControllerUrl(this Microsoft.AspNetCore.Routing.LinkGenerator linkGenerator, string actionName, Type controllerType, IDictionary<string, object?>? values = null)
+    {
+        LinkGenerator umbracoLinkGenerator = StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>();
+        return umbracoLinkGenerator.GetUmbracoControllerUrl(actionName, controllerType, values);
+    }
+
+    [Obsolete("Please use Umbraco.Cms.Web.Common.Routing.LinkGenerator instead.")]
+    public static string? GetUmbracoApiService<T>(
+        this Microsoft.AspNetCore.Routing.LinkGenerator linkGenerator,
+        Expression<Func<T, object>> methodSelector)
+        where T : UmbracoApiController
+    {
+        LinkGenerator umbracoLinkGenerator = StaticServiceProvider.Instance.GetRequiredService<LinkGenerator>();
+        return umbracoLinkGenerator.GetUmbracoApiService<T>(methodSelector);
     }
 }

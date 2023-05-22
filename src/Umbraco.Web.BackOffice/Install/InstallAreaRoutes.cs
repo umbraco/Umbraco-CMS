@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
+using LinkGenerator = Umbraco.Cms.Web.Common.Routing.LinkGenerator;
 
 namespace Umbraco.Cms.Web.BackOffice.Install;
 

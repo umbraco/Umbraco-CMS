@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -12,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
+using LinkGenerator = Umbraco.Cms.Web.Common.Routing.LinkGenerator;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing;
 

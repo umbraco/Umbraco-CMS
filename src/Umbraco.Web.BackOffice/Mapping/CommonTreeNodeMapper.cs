@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Mapping;
