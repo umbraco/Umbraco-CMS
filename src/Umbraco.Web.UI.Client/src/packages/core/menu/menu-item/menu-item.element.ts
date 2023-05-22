@@ -3,11 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
-
-export interface UmbMenuItemExtensionElement {
-	manifest: ManifestMenuItem;
-}
+import type { ManifestMenuItem, UmbMenuItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-menu-item')
 export class UmbMenuItemElement extends UmbLitElement implements UmbMenuItemExtensionElement {
