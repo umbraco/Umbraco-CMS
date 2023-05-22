@@ -7,8 +7,6 @@ import './auth-layout.element';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
-	
-
 	@state()
 	private _loggingIn = false;
 
@@ -94,14 +92,13 @@ export default class UmbLoginElement extends LitElement {
 								look="primary"
 								color="positive"
 								state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
-							<uui-button type="button" label="Forgot Password?"></uui-button>
 						</form>
 					</uui-form>
 				</div>
 			</umb-auth-layout>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		UUITextStyles,
 		css`
