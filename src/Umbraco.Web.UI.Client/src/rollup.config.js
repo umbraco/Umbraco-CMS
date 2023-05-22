@@ -17,9 +17,9 @@ const createModuleDescriptors = (folderName) =>
 const exclude = ['css'];
 
 const libs = createModuleDescriptors('libs');
-const packages = createModuleDescriptors('packages');
-const apps = createModuleDescriptors('apps');
 const shared = createModuleDescriptors('shared');
+const apps = createModuleDescriptors('apps');
+const packages = createModuleDescriptors('packages');
 
 const modules = [...libs, ...shared, ...apps, ...packages];
 const allowedModules = modules.filter((module) => !exclude.includes(module.name));
