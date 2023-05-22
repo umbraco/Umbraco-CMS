@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
@@ -38,12 +39,12 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
     }
 
-    public Guid[] ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, int skip, int take, out long totalResultCount)
+    public PagedModel<Guid> ExecuteQuery(SelectorOption selectorOption, IList<FilterOption> filterOptions, IList<SortOption> sortOptions, string culture, int skip, int take)
     {
-        totalResultCount = 0;
         if (!_examineManager.TryGetIndex(Constants.UmbracoIndexes.DeliveryApiContentIndexName, out IIndex? index))
         {
-            return Array.Empty<Guid>();
+            _logger.LogError("Could not find the index {IndexName} when attempting to execute a query.", Constants.UmbracoIndexes.DeliveryApiContentIndexName);
+            return new PagedModel<Guid>();
         }
 
         IBooleanOperation queryOperation = BuildSelectorOperation(selectorOption, index, culture);
@@ -58,7 +59,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
         if (results is null)
         {
             // The query yield no results
-            return Array.Empty<Guid>();
+            return new PagedModel<Guid>();
         }
 
         Guid[] items = results
@@ -66,8 +67,7 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             .Select(r => Guid.Parse(r.Values[ItemIdFieldName]))
             .ToArray();
 
-        totalResultCount = results.TotalItemCount;
-        return items;
+        return new PagedModel<Guid>(results.TotalItemCount, items);
     }
 
     public SelectorOption AllContentSelectorOption() => new()

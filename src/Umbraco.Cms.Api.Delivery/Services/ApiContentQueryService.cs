@@ -71,9 +71,9 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         }
 
         var culture = _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
-        Guid[] keys = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, skip, take, out var totalResultCount);
 
-        return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, new PagedModel<Guid>(totalResultCount, keys));
+        PagedModel<Guid> result = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, skip, take);
+        return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, result);
     }
 
     private SelectorOption? GetSelectorOption(string? fetch)
