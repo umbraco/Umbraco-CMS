@@ -759,7 +759,7 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         Attempt<PasswordChangedModel?> passwordChangeResult =
-            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
+            await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager, currentUser);
 
         if (passwordChangeResult.Success)
         {

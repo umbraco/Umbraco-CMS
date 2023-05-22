@@ -122,7 +122,7 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IDeliveryAp
         return source;
     }
 
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMedia>);
 
