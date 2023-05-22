@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { UmbPropertyAction } from '../shared/property-action/property-action.model';
+import type { UmbPropertyAction } from '../../shared/property-action/property-action.model';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
