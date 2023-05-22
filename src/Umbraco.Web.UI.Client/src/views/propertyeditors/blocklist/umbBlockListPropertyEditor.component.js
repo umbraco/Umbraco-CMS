@@ -49,7 +49,7 @@
         $attrs.$observe('readonly', (value) => {
             vm.readonly = value !== undefined;
 
-            vm.sortableOptions.disabled = vm.readonly || vm.validationLimit.max === 1;
+            vm.sortableOptions.disabled = vm.readonly || vm.singleBlockMode;
             vm.blockEditorApi.readonly = vm.readonly;
 
             if (deleteAllBlocksAction) {
@@ -146,7 +146,7 @@
                 distance: 5,
                 tolerance: "pointer",
                 scroll: true,
-                disabled: vm.readonly || vm.validationLimit.max === 1,
+                disabled: vm.readonly || vm.singleBlockMode,
                 update: function (ev, ui) {
                     setDirty();
                 }
