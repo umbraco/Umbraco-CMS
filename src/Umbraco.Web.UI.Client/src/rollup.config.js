@@ -4,7 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { readdirSync, lstatSync } from 'fs';
 
-const readFolders = (path) => readdirSync(path).filter((module) => lstatSync(`${path}/${module}`).isDirectory());
+const readFolders = (path) => readdirSync(path).filter((folder) => lstatSync(`${path}/${folder}`).isDirectory());
 const createModuleDescriptors = (folderName) =>
 	readFolders(`./src/${folderName}`).map((moduleName) => {
 		return {
@@ -17,11 +17,26 @@ const createModuleDescriptors = (folderName) =>
 const exclude = ['css'];
 
 const libs = createModuleDescriptors('libs');
-const shared = createModuleDescriptors('shared');
 const apps = createModuleDescriptors('apps');
+const shared = createModuleDescriptors('shared');
 const packages = createModuleDescriptors('packages');
 
-const modules = [...libs, ...shared, ...apps, ...packages];
+// Packages are special, they can include multiple modules. We need to handle them differently.
+// Modules are exposed as the umbraco-package.ts file in the root of the package. We can look through the exported module const to find the module names and src paths.
+const packageSubModules = readFolders('./src/packages').map(async (packageName) => {
+	const { modules } = await import(`./packages/${packageName}/modules.js`);
+
+	return modules.map((module) => {
+		return {
+			name: packageName,
+			root: `./src/packages/${packageName}/${module.src}`,
+			dist: `./dist-cms/packages/${packageName}/${module.src}`,
+		};
+	});
+});
+
+const something = await Promise.all(packageSubModules);
+const modules = [...libs, ...apps, ...shared, ...packages, ...something].flat();
 const allowedModules = modules.filter((module) => !exclude.includes(module.name));
 
 export default allowedModules
