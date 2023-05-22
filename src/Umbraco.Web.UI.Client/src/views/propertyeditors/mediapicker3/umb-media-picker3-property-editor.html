@@ -38,7 +38,7 @@
                         <div class="__showcase">
 
                             <div ng-if="media.$uploadProgress < 100" class="__upload-progress-container">
-                                <div  class="__upload-progress">
+                                <div class="__upload-progress">
                                     <umb-progress-bar class="__upload-progress-bar" percentage="{{media.$uploadProgress}}"></umb-progress-bar>
                                     <div class="__upload-progress-label" ng-if="media.$uploadProgress === 0">Waiting...</div>
                                     <div class="__upload-progress-label" ng-if="media.$uploadProgress > 0">{{media.$uploadProgress}}%</div>
