@@ -18,7 +18,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
 
         // Replace data directory
         string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
-        if (!string.IsNullOrEmpty(dataDirectory))
+        if (string.IsNullOrEmpty(dataDirectory) is false)
         {
             connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
