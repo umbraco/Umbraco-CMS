@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';

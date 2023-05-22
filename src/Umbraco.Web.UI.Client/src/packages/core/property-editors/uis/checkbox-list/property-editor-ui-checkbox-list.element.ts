@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

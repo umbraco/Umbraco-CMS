@@ -1,5 +1,5 @@
 import { html, css } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';

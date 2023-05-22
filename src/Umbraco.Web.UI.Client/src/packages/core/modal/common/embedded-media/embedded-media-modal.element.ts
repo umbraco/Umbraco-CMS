@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit-html/directives/when.js';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';

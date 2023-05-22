@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, query } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { UmbCreateDictionaryModalData, UmbCreateDictionaryModalResult } from '@umbraco-cms/backoffice/modal';

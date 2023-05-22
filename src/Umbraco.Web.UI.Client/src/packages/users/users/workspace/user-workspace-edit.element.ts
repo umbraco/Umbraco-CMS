@@ -1,6 +1,6 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { css, html, nothing, TemplateResult } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';

@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {

@@ -1,4 +1,5 @@
 import { css, html } from 'lit';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbExtensionInitializer } from './extension.controller';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
@@ -33,6 +34,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	}
 
 	static styles = [
+		UUITextStyles,
 		css`
 			:host {
 				display: flex;

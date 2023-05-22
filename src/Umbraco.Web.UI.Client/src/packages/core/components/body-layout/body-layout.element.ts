@@ -1,5 +1,5 @@
 import { css, html, LitElement, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 
 /**
@@ -16,8 +16,6 @@ import { customElement, property, state } from 'lit/decorators.js';
  */
 @customElement('umb-body-layout')
 export class UmbBodyLayoutElement extends LitElement {
-	
-
 	/**
 	 * Renders a headline in the header.
 	 * @public
@@ -95,7 +93,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			</umb-footer-layout>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

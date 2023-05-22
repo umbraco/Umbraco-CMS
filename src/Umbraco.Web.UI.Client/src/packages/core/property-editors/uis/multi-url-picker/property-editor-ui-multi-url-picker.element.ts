@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { UmbInputMultiUrlPickerElement } from '../../../components/input-multi-url-picker/input-multi-url-picker.element';

@@ -1,11 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-stylesheet-workspace-edit')
 export class UmbStylesheetWorkspaceEditElement extends LitElement {
-
-
 	render() {
 		return html` <umb-workspace-editor alias="Umb.Workspace.Stylesheet">Stylesheet workspace</umb-workspace-editor> `;
 	}

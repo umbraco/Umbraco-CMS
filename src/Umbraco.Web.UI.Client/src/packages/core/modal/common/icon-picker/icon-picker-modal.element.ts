@@ -1,7 +1,7 @@
 import type { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 
 import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 

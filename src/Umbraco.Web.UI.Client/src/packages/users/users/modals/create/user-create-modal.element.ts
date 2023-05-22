@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 // TODO: we need to import this from the user group module when it is ready

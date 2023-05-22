@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element';
 import { UmbUserRepository } from '../../repository/user.repository';

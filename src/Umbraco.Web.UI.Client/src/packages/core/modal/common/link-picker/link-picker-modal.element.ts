@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, query, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbTreeElement } from '../../../tree/tree.element';

@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement } from 'lit/decorators.js';
 import { UmbUserGroupCollectionContext } from './user-group-collection.context';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';

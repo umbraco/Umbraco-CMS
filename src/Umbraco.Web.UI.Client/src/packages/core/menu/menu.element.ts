@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ManifestMenu, ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';

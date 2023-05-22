@@ -1,6 +1,6 @@
-import { css, html, LitElement, PropertyValueMap } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, LitElement } from 'lit';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { customElement } from 'lit/decorators.js';
 
 /**
  * @element umb-footer-layout
@@ -13,15 +13,13 @@ import { customElement, state } from 'lit/decorators.js';
  */
 @customElement('umb-footer-layout')
 export class UmbFooterLayoutElement extends LitElement {
-	
-
 	render() {
 		return html`
 			<slot></slot>
 			<slot id="actions" name="actions"></slot>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

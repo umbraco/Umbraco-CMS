@@ -1,11 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-dashboard-members-welcome')
 export class UmbDashboardMembersWelcomeElement extends LitElement {
-	
-
 	render() {
 		return html`
 			<uui-box>
@@ -17,7 +15,7 @@ export class UmbDashboardMembersWelcomeElement extends LitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

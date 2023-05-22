@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
 import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 

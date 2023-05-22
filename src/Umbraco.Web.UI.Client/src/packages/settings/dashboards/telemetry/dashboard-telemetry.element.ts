@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import {
 	TelemetryResponseModel,
 	TelemetryLevelModel,

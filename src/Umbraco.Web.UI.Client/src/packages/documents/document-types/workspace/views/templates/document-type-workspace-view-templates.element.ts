@@ -1,5 +1,5 @@
 import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element';

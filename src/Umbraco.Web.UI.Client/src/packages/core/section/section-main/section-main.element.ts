@@ -1,11 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-section-main')
 export class UmbSectionMainElement extends LitElement {
-	
-
 	render() {
 		return html`
 			<main>
@@ -13,7 +11,7 @@ export class UmbSectionMainElement extends LitElement {
 			</main>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

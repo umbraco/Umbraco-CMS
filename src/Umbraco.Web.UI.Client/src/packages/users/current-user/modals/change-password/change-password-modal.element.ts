@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbModalHandler, UmbChangePasswordModalData } from '@umbraco-cms/backoffice/modal';

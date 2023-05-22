@@ -1,5 +1,5 @@
 import { html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element';

@@ -1,5 +1,5 @@
 import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context';
 import { UmbTreeItemElement } from '@umbraco-cms/backoffice/tree';
