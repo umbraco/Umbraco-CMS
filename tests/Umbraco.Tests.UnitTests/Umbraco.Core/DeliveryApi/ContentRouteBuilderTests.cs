@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -201,7 +202,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
         var builder = CreateApiContentRouteBuilder(hideTopLevelNodeFromPath);
         var result = builder.Build(child);
         Assert.IsNotNull(result);
-        Assert.AreEqual($"/{childKey:D}", result.Path);
+        Assert.AreEqual($"/{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{childKey:D}", result.Path);
         Assert.AreEqual(rootKey, result.StartItem.Id);
         Assert.AreEqual("the-root", result.StartItem.Path);
     }

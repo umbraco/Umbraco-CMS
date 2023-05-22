@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -13,17 +14,20 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestRedirectService _requestRedirectService;
+    private readonly IRequestPreviewService _requestPreviewService;
 
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
         IPublicAccessService publicAccessService,
         IRequestRoutingService requestRoutingService,
-        IRequestRedirectService requestRedirectService)
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService)
         : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
     {
         _requestRoutingService = requestRoutingService;
         _requestRedirectService = requestRedirectService;
+        _requestPreviewService = requestPreviewService;
     }
 
     /// <summary>
@@ -42,9 +46,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "/")
     {
-        var contentRoute = _requestRoutingService.GetContentRoute(path);
-
-        IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
+        IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
         {
             if (IsProtected(contentItem))
@@ -59,6 +61,35 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         return redirectRoute != null
             ? RedirectTo(redirectRoute)
             : NotFound();
+    }
+
+    private IPublishedContent? GetContent(string path)
+        => path.StartsWith(Constants.DeliveryApi.Routing.PreviewContentPathPrefix)
+            ? GetPreviewContent(path)
+            : GetPublishedContent(path);
+
+    private IPublishedContent? GetPublishedContent(string path)
+    {
+        var contentRoute = _requestRoutingService.GetContentRoute(path);
+
+        IPublishedContent? contentItem = ApiPublishedContentCache.GetByRoute(contentRoute);
+        return contentItem;
+    }
+
+    private IPublishedContent? GetPreviewContent(string path)
+    {
+        if (_requestPreviewService.IsPreview() is false)
+        {
+            return null;
+        }
+
+        if (Guid.TryParse(path.AsSpan(Constants.DeliveryApi.Routing.PreviewContentPathPrefix.Length), out Guid contentId) is false)
+        {
+            return null;
+        }
+
+        IPublishedContent? contentItem = ApiPublishedContentCache.GetById(contentId);
+        return contentItem;
     }
 
     private IActionResult RedirectTo(IApiContentRoute redirectRoute)

@@ -59,7 +59,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         // so we'll use the content key as path.
         if (content.IsPublished() is false)
         {
-            return content.Key.ToString("D");
+            return $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}";
         }
 
         // grab the content path from the URL provider
