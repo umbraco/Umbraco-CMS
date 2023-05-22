@@ -4,9 +4,6 @@ import { customElement } from 'lit/decorators.js';
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from './section-sidebar.context';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../tree/context-menu/tree-context-menu.service';
-import '../section-sidebar-context-menu/section-sidebar-context-menu.element';
-
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
 	#sectionSidebarContext = new UmbSectionSidebarContext(this);
