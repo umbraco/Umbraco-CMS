@@ -1,7 +1,7 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
-import { UmbExtensionInitializer } from '../../packages/packages/repository/server-extension.controller';
+import { UmbExtensionInitializer } from './extension.controller';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
