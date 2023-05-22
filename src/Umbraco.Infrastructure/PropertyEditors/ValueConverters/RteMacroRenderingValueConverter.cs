@@ -86,7 +86,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson
             ? typeof(IRichTextElement)
-            : typeof(string);
+            : typeof(RichTextModel);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
@@ -95,12 +95,12 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         {
             // different return types for the JSON configuration forces us to have different return values for empty properties
             return _deliveryApiSettings.RichTextOutputAsJson is false
-                ? string.Empty
+                ? new RichTextModel { Markup = string.Empty }
                 : null;
         }
 
         return _deliveryApiSettings.RichTextOutputAsJson is false
-            ? _apiRichTextMarkupParser.Parse(sourceString)
+            ? new RichTextModel { Markup = _apiRichTextMarkupParser.Parse(sourceString) }
             : _apiRichTextElementParser.Parse(sourceString);
     }
 
