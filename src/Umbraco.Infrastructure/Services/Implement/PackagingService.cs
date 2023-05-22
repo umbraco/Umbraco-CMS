@@ -141,8 +141,12 @@ public class PackagingService : IPackagingService
                 {
                     PackageId = plan.PackageId,
                     PackageName = plan.PackageName,
-                    Version = "Unknown",
                 };
+
+                if (plan.GetType().Assembly.TryGetInformationalVersion(out string? version))
+                {
+                    installedPackage.Version = version;
+                }
 
                 installedPackages.Add(installedPackage);
             }
@@ -189,14 +193,17 @@ public class PackagingService : IPackagingService
                 {
                     PackageId = package.PackageId,
                     PackageName = package.PackageName,
-                    Version = "Unknown",
                 };
 
                 installedPackages.Add(installedPackage);
             }
 
             // Set additional values
-            installedPackage.Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version;
+            if (!string.IsNullOrEmpty(package.Version))
+            {
+                installedPackage.Version = package.Version;
+            }
+
             installedPackage.PackageView = package.PackageView;
         }
 

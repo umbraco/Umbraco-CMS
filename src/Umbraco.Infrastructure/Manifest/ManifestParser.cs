@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
@@ -10,7 +11,6 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -189,9 +189,9 @@ public class ManifestParser : IManifestParser
             }
 
             if (!string.IsNullOrEmpty(assemblyName) &&
-                GetAssemblyVersion(assemblyName) is string assemblyVersion)
+                TryGetAssemblyInformationalVersion(assemblyName, out string? version))
             {
-                manifest.Version = assemblyVersion;
+                manifest.Version = version;
             }
         }
 
@@ -233,29 +233,20 @@ public class ManifestParser : IManifestParser
         return manifest;
     }
 
-    private string? GetAssemblyVersion(string name)
+    private bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
     {
-        foreach (Assembly assembly in AssemblyLoadContext.All.SelectMany(x => x.Assemblies))
+        foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
         {
             AssemblyName assemblyName = assembly.GetName();
-            if (!string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
+                assembly.TryGetInformationalVersion(out version))
             {
-                continue;
-            }
-
-            AssemblyInformationalVersionAttribute? assemblyInformationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            if (assemblyInformationalVersionAttribute is not null &&
-                SemVersion.TryParse(assemblyInformationalVersionAttribute.InformationalVersion, out SemVersion? semVersion))
-            {
-                return semVersion.ToSemanticStringWithoutBuild();
-            }
-            else
-            {
-                return assemblyName.Version?.ToString(3);
+                return true;
             }
         }
 
-        return null;
+        version = null;
+        return false;
     }
 
     /// <summary>
