@@ -31,6 +31,7 @@ export default allowedModules
 			{
 				input: `${module.root}/index.ts`,
 				external: [/^@umbraco-cms\//],
+				treeshake: false,
 				output: {
 					dir: `${module.dist}`,
 					format: 'es',
