@@ -9,7 +9,7 @@ import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/ba
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  *  @element umb-workspace-property

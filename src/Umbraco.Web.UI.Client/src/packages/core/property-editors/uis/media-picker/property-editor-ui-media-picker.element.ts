@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbInputMediaPickerElement } from '../../../../media/media/components/input-media-picker/input-media-picker.element';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

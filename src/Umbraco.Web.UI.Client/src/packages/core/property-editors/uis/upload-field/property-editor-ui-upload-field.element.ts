@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { UmbInputUploadFieldElement } from '../../../components/input-upload-field/input-upload-field.element';
 import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-upload-field

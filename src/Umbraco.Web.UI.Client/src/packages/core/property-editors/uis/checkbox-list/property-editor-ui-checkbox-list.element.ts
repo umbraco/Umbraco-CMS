@@ -4,8 +4,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-checkbox-list

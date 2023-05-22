@@ -3,7 +3,7 @@ import { html } from 'lit';
 
 import type { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element';
 import './property-editor-ui-date-picker.element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 export default {
 	title: 'Property Editor UIs/Date Picker',

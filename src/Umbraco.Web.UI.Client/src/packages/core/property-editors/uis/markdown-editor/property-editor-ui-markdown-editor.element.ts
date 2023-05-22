@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-markdown-editor

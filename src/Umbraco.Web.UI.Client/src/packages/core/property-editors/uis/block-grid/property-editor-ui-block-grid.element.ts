@@ -7,7 +7,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-block-grid

@@ -2,7 +2,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { UmbDateInputElement } from '../../../components/date-input/date-input.element';
 import { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 describe('UmbPropertyEditorUIDatePickerElement', () => {
 	let element: UmbPropertyEditorUIDatePickerElement;

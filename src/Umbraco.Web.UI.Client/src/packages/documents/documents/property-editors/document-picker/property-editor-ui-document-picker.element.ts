@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbInputDocumentPickerElement } from '../../components/input-document-picker/input-document-picker.element';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIContentPickerElement

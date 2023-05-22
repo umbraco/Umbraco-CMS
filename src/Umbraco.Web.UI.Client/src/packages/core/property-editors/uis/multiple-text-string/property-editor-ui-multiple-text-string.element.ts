@@ -6,7 +6,7 @@ import {
 	UmbInputMultipleTextStringElement,
 	MultipleTextStringValue,
 } from './input-multiple-text-string/input-multiple-text-string.element';
-import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

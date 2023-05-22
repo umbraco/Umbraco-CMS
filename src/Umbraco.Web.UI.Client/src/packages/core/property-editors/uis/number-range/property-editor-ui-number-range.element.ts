@@ -5,7 +5,7 @@ import type { UmbInputNumberRangeElement } from '../../../components/input-numbe
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../components/input-number-range/input-number-range.element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 type ValueType = {
 	min?: number;

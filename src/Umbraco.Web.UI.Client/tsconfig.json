@@ -34,8 +34,6 @@
 			"@umbraco-cms/backoffice/router": ["src/shared/router"],
 			"@umbraco-cms/backoffice/utils": ["src/shared/utils"],
 			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
-				
-			"@umbraco-cms/backoffice/data-type": ["src/packages/core/components/data-type"],
 
 			// CORE
 			"@umbraco-cms/backoffice/action": ["src/packages/core/action"],
