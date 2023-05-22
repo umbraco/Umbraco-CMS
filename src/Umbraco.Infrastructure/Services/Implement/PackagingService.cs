@@ -128,7 +128,6 @@ public class PackagingService : IPackagingService
                 installedPackage = new InstalledPackage
                 {
                     PackageName = plan.PackageName,
-                    Version = "Unknown",
                 };
 
                 if (plan.GetType().Assembly.TryGetInformationalVersion(out string? version))
@@ -167,7 +166,6 @@ public class PackagingService : IPackagingService
                 installedPackage = new InstalledPackage
                 {
                     PackageName = package.PackageName,
-                    Version = "Unknown",
                 };
 
                 installedPackages.Add(package.PackageName, installedPackage);
