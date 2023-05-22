@@ -9,22 +9,21 @@ export class UmbExtensionInitializer extends UmbController {
 	host: UmbControllerHostElement;
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#unobserve = new Subject<void>();
-	#localPackages: Array<Promise<any>>;
+	#localPackages: Array<Promise<any>> = [];
 	#apiBaseUrl = OpenAPI.BASE;
 
-	constructor(
-		host: UmbControllerHostElement,
-		extensionRegistry: UmbBackofficeExtensionRegistry,
-		localPackages: Array<Promise<any>>
-	) {
+	constructor(host: UmbControllerHostElement, extensionRegistry: UmbBackofficeExtensionRegistry) {
 		super(host, UmbExtensionInitializer.name);
 		this.host = host;
 		this.#extensionRegistry = extensionRegistry;
+	}
+
+	setLocalPackages(localPackages: Array<Promise<any>>) {
 		this.#localPackages = localPackages;
+		this.#loadLocalPackages();
 	}
 
 	hostConnected(): void {
-		this.#loadLocalPackages();
 		this.#loadServerPackages();
 	}
 

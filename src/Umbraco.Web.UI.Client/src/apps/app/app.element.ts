@@ -5,10 +5,10 @@ import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
 import type { UmbAppErrorElement } from './app-error.element';
 import { UmbAuthFlow } from './auth';
 import { UMB_APP, UmbAppContext } from './app.context';
+import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -44,6 +44,9 @@ export class UmbAppElement extends UmbLitElement {
 	@property({ type: Boolean })
 	bypassAuth = false;
 
+	@property()
+	localPackages: Array<Promise<any>> = [];
+
 	private _routes: UmbRoute[] = [
 		{
 			path: 'install',
@@ -57,6 +60,9 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element'),
+			setup: (component) => {
+				(component as any).localPackages = this.localPackages;
+			},
 			guards: [this.#isAuthorizedGuard()],
 		},
 	];

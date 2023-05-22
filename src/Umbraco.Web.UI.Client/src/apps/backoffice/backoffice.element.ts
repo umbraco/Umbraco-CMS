@@ -1,6 +1,5 @@
-import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 import { UmbExtensionInitializer } from './extension.controller';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
 import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -9,28 +8,20 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './components';
 
-const CORE_PACKAGES = [
-	import('../../packages/core/umbraco-package'),
-	import('../../packages/settings/umbraco-package'),
-	import('../../packages/documents/umbraco-package'),
-	import('../../packages/media/umbraco-package'),
-	import('../../packages/members/umbraco-package'),
-	import('../../packages/translation/umbraco-package'),
-	import('../../packages/users/umbraco-package'),
-	import('../../packages/packages/umbraco-package'),
-	import('../../packages/search/umbraco-package'),
-	import('../../packages/templating/umbraco-package'),
-	import('../../packages/umbraco-news/umbraco-package'),
-	import('../../packages/tags/umbraco-package'),
-];
-
-@defineElement('umb-backoffice')
+@customElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
+	@property()
+	set localPackages(value: Array<Promise<any>>) {
+		this.#extensionInitializer.setLocalPackages(value);
+	}
+
+	#extensionInitializer = new UmbExtensionInitializer(this, umbExtensionsRegistry);
+
 	constructor() {
 		super();
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbExtensionInitializer(this, umbExtensionsRegistry, CORE_PACKAGES);
+		new UmbExtensionInitializer(this, umbExtensionsRegistry);
 	}
 
 	render() {
@@ -42,7 +33,6 @@ export class UmbBackofficeElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: flex;
