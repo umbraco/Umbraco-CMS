@@ -118,22 +118,36 @@ public class PackagingService : IPackagingService
     {
         IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
-        var installedPackages = new Dictionary<string, InstalledPackage>();
+        var installedPackages = new List<InstalledPackage>();
 
         // Collect the package from the package migration plans
         foreach (PackageMigrationPlan plan in _packageMigrationPlans)
         {
-            if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
+            InstalledPackage installedPackage;
+            if (plan.PackageId is not null && installedPackages.FirstOrDefault(x => x.PackageId == plan.PackageId) is InstalledPackage installedPackageById)
+            {
+                installedPackage = installedPackageById;
+            }
+            else if (installedPackages.FirstOrDefault(x => x.PackageName == plan.PackageName) is InstalledPackage installedPackageByName)
+            {
+                installedPackage = installedPackageByName;
+
+                // Ensure package ID is set
+                installedPackage.PackageId ??= plan.PackageId;
+            }
+            else
             {
                 installedPackage = new InstalledPackage
                 {
+                    PackageId = plan.PackageId,
                     PackageName = plan.PackageName,
                     Version = "Unknown",
                 };
 
-                installedPackages.Add(plan.PackageName, installedPackage);
+                installedPackages.Add(installedPackage);
             }
 
+            // Combine all package migration plans for a package
             var currentPlans = installedPackage.PackageMigrationPlans.ToList();
             if (keyValues is null || keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var currentState) is false)
             {
@@ -152,28 +166,42 @@ public class PackagingService : IPackagingService
         // Collect and merge the packages from the manifests
         foreach (PackageManifest package in _manifestParser.GetManifests())
         {
-            if (package.PackageName is null)
+            if (package.PackageId is null && package.PackageName is null)
             {
                 continue;
             }
 
-            if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
+            InstalledPackage installedPackage;
+            if (package.PackageId is not null && installedPackages.FirstOrDefault(x => x.PackageId == package.PackageId) is InstalledPackage installedPackageById)
+            {
+                installedPackage = installedPackageById;
+            }
+            else if (installedPackages.FirstOrDefault(x => x.PackageName == package.PackageName) is InstalledPackage installedPackageByName)
+            {
+                installedPackage = installedPackageByName;
+
+                // Ensure package ID is set
+                installedPackage.PackageId ??= package.PackageId;
+            }
+            else
             {
                 installedPackage = new InstalledPackage
                 {
+                    PackageId = package.PackageId,
                     PackageName = package.PackageName,
+                    Version = "Unknown",
                 };
 
-                installedPackages.Add(package.PackageName, installedPackage);
+                installedPackages.Add(installedPackage);
             }
 
-            installedPackage.PackageId = package.PackageId;
+            // Set additional values
             installedPackage.Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version;
             installedPackage.PackageView = package.PackageView;
         }
 
-        // Return all packages with a name in the package.manifest or package migrations
-        return installedPackages.Values;
+        // Return all packages with an ID or name in the package.manifest or package migrations
+        return installedPackages;
     }
 
     #endregion
