@@ -7,5 +7,5 @@ export type LoginRequestModel = {
 export interface UmbAuthContext {
 	returnUrl: string;
 	authUrl: string;
-	login(data: LoginRequestModel): Promise<void>;
+	login(data: LoginRequestModel): Promise<{ error?: string }>;
 }

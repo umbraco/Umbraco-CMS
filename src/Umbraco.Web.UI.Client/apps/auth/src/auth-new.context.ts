@@ -9,7 +9,20 @@ export class UmbAuthNewContext implements UmbAuthContext {
 		this.authUrl = authUrl;
 	}
 
-	login(data: LoginRequestModel): Promise<void> {
-		throw new Error('Method not implemented.');
+	async login(data: LoginRequestModel) {
+		//TODO: call authUrl with data
+		const { error } = await UmbMockAPI.login(data, true);
+
+		//TODO Should the redirect be done here? or in the login element?
+
+		return { error };
+	}
+}
+
+class UmbMockAPI {
+	static async login(data: LoginRequestModel, shouldFail = false) {
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+
+		return shouldFail ? { error: 'Invalid credentials' } : {};
 	}
 }

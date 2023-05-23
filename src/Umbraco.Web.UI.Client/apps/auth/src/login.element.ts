@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
 import './auth-layout.element';
+import { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthContext } from './types';
 import { UmbAuthLegacyContext } from './auth-legacy.context';
 import { UmbAuthNewContext } from './auth-new.context';
@@ -21,6 +22,12 @@ export default class UmbLoginElement extends LitElement {
 	@property({ type: Boolean })
 	isLegacy = false;
 
+	@state()
+	private _loginState: UUIButtonState = undefined;
+
+	@state()
+	private _loginError = '';
+
 	constructor() {
 		super();
 		if (this.isLegacy) {
@@ -30,10 +37,7 @@ export default class UmbLoginElement extends LitElement {
 		}
 	}
 
-	@state()
-	private _loggingIn = false;
-
-	private _handleSubmit = (e: SubmitEvent) => {
+	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 
 		const form = e.target as HTMLFormElement;
@@ -48,21 +52,28 @@ export default class UmbLoginElement extends LitElement {
 		const password = formData.get('password') as string;
 		const persist = formData.has('persist');
 
-		this.#authContext.login({ username, password, persist });
+		this._loginState = 'waiting';
+
+		const { error } = await this.#authContext.login({ username, password, persist });
+
+		this._loginError = error || '';
+		this._loginState = error ? 'failed' : 'success';
 	};
 
-	private _greetings: Array<string> = [
-		'Happy super Sunday',
-		'Happy marvelous Monday',
-		'Happy tubular Tuesday',
-		'Happy wonderful Wednesday',
-		'Happy thunderous Thursday',
-		'Happy funky Friday',
-		'Happy Saturday',
-	];
-
 	@state()
-	private _greeting: string = this._greetings[new Date().getDay()];
+	private _greeting: string = this.#greeting;
+
+	get #greeting() {
+		return [
+			'Happy super Sunday',
+			'Happy marvelous Monday',
+			'Happy tubular Tuesday',
+			'Happy wonderful Wednesday',
+			'Happy thunderous Thursday',
+			'Happy funky Friday',
+			'Happy Saturday',
+		][new Date().getDay()];
+	}
 
 	render() {
 		return html`
@@ -70,7 +81,7 @@ export default class UmbLoginElement extends LitElement {
 				<div class="uui-text">
 					<h1 class="uui-h3">${this._greeting}</h1>
 					<uui-form>
-						<form id="LoginForm" name="login" @submit="${this._handleSubmit}">
+						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 							<uui-form-layout-item>
 								<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 								<uui-input
@@ -94,17 +105,25 @@ export default class UmbLoginElement extends LitElement {
 								<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
 							</uui-form-layout-item>
 
+							<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
+
 							<uui-button
 								type="submit"
 								label="Login"
 								look="primary"
 								color="positive"
-								state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
+								state=${this._loginState}></uui-button>
 						</form>
 					</uui-form>
 				</div>
 			</umb-auth-layout>
 		`;
+	}
+
+	#renderErrorMessage() {
+		if (!this._loginError || this._loginState !== 'failed') return;
+
+		return html`<p class="text-danger">${this._loginError}</p>`;
 	}
 
 	static styles: CSSResultGroup = [
@@ -113,6 +132,9 @@ export default class UmbLoginElement extends LitElement {
 			#email,
 			#password {
 				width: 100%;
+			}
+			.text-danger {
+				color: var(--uui-color-danger-standalone);
 			}
 		`,
 	];

@@ -9,7 +9,7 @@ export class UmbAuthLegacyContext implements UmbAuthContext {
 		this.authUrl = authUrl;
 	}
 
-	login(data: LoginRequestModel): Promise<void> {
+	login(data: LoginRequestModel): Promise<{ error?: string | undefined }> {
 		throw new Error('Method not implemented.');
 	}
 }
