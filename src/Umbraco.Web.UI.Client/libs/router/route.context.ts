@@ -1,5 +1,5 @@
 // eslint-disable-next-line local-rules/no-external-imports
-import type { IRoutingInfo } from 'router-slot/model';
+import type { IRoutingInfo, IRouterSlot } from 'router-slot/model';
 import type { UmbRoute } from './route.interface';
 import { generateRoutePathBuilder } from './generate-route-path-builder.function';
 import {
@@ -13,13 +13,18 @@ import { UMB_MODAL_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms
 const EmptyDiv = document.createElement('div');
 
 export class UmbRouteContext {
+	#mainRouter: IRouterSlot;
+	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
 	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
 	#contextRoutes: UmbRoute[] = [];
 	#routerBasePath?: string;
+	#routerActiveLocalPath?: string;
 	#activeModalPath?: string;
 
-	constructor(host: UmbControllerHostElement, private _onGotModals: (contextRoutes: any) => void) {
+	constructor(host: UmbControllerHostElement, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
+		this.#mainRouter = mainRouter;
+		this.#modalRouter = modalRouter;
 		new UmbContextProviderController(host, UMB_ROUTE_CONTEXT_TOKEN, this);
 		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			this.#modalContext = context;
@@ -41,17 +46,13 @@ export class UmbRouteContext {
 		this.#generateContextRoutes();
 	}
 
-	#getModalRoutePath(modalRegistration: UmbModalRouteRegistration) {
-		return `/modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
-	}
-
 	#generateRoute(modalRegistration: UmbModalRouteRegistration): UmbRoute {
 		return {
-			path: this.#getModalRoutePath(modalRegistration),
+			path: '/' + modalRegistration.generateModalPath(),
 			component: EmptyDiv,
 			setup: (component, info) => {
 				if (!this.#modalContext) return;
-				const modalHandler = modalRegistration.routeSetup(this.#modalContext, info.match.params);
+				const modalHandler = modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
 				if (modalHandler) {
 					modalHandler.onSubmit().then(
 						() => {
@@ -84,7 +85,8 @@ export class UmbRouteContext {
 		});
 
 		// TODO: Should we await one frame, to ensure we don't call back too much?.
-		this._onGotModals(this.#contextRoutes);
+		this.#modalRouter.routes = this.#contextRoutes;
+		this.#modalRouter.render();
 	}
 
 	public _internal_routerGotBasePath(routerBasePath: string) {
@@ -93,14 +95,20 @@ export class UmbRouteContext {
 		this.#generateNewUrlBuilders();
 	}
 
+	public _internal_routerGotActiveLocalPath(routerActiveLocalPath: string | undefined) {
+		if (this.#routerActiveLocalPath === routerActiveLocalPath) return;
+		this.#routerActiveLocalPath = routerActiveLocalPath;
+		this.#generateNewUrlBuilders();
+	}
+
 	// Also notice each registration should now hold its handler when its active.
 	public _internal_modalRouterChanged(activeModalPath: string | undefined) {
 		if (this.#activeModalPath === activeModalPath) return;
 		if (this.#activeModalPath) {
 			// If if there is a modal using the old path.
-			const activeModal = this.#modalRegistrations.find(
-				(registration) => this.#getModalRoutePath(registration) === this.#activeModalPath
-			);
+			const activeModal = this.#modalRegistrations.find((registration) => {
+				return '/' + registration.generateModalPath() === this.#activeModalPath;
+			});
 			if (activeModal) {
 				this.#modalContext?.close(activeModal.key);
 			}
@@ -116,7 +124,12 @@ export class UmbRouteContext {
 		if (!this.#routerBasePath) return;
 
 		const routeBasePath = this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
-		const localPath = routeBasePath + `modal/${modalRegistration.alias.toString()}/${modalRegistration.path}`;
+		const routeActiveLocalPath = this.#routerActiveLocalPath
+			? this.#routerActiveLocalPath.endsWith('/')
+				? this.#routerActiveLocalPath
+				: this.#routerActiveLocalPath + '/'
+			: '';
+		const localPath = routeBasePath + routeActiveLocalPath + modalRegistration.generateModalPath();
 
 		const urlBuilder = generateRoutePathBuilder(localPath);
 

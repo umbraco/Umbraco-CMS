@@ -1,11 +1,11 @@
 // eslint-disable-next-line local-rules/no-external-imports
-import { RouterSlot } from 'router-slot/router-slot';
+import 'router-slot';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbLitElement } from '../lit-element';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event';
-import { UmbRouteContext, UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbRouteContext, UmbRoute, IRouterSlot } from '@umbraco-cms/backoffice/router';
 
 /**
  *  @element umb-router-slot
@@ -16,10 +16,8 @@ import { UmbRouteContext, UmbRoute } from '@umbraco-cms/backoffice/router';
  */
 @customElement('umb-router-slot')
 export class UmbRouterSlotElement extends UmbLitElement {
-	
-
-	#router: RouterSlot = new RouterSlot();
-	#modalRouter: RouterSlot = new RouterSlot();
+	#router: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
+	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
 
 	@property()
@@ -28,6 +26,14 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	}
 	public set routes(value: UmbRoute[] | undefined) {
 		this.#router.routes = value || [];
+	}
+
+	@property()
+	public get parent(): IRouterSlot | null | undefined {
+		return this.#router.parent;
+	}
+	public set parent(parent: IRouterSlot | null | undefined) {
+		this.#router.parent = parent;
 	}
 
 	private _routerPath?: string;
@@ -44,18 +50,13 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		return this._routerPath + '/' + this._activeLocalPath;
 	}
 
-	#routeContext = new UmbRouteContext(this, (contextRoutes) => {
-		this.#modalRouter.routes = contextRoutes;
-		// Force a render?
-		this.#modalRouter.render();
-	});
+	#routeContext = new UmbRouteContext(this, this.#router, this.#modalRouter);
 
 	constructor() {
 		super();
 		this.#modalRouter.parent = this.#router;
 		this.#modalRouter.style.display = 'none';
 		this.#router.addEventListener('changestate', this._updateRouterPath.bind(this));
-		//this.#router.appendChild(this.#modalRouter);
 		this.#router.appendChild(document.createElement('slot'));
 	}
 
@@ -97,6 +98,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			const newActiveLocalPath = this.#router.match?.route.path;
 			if (this._activeLocalPath !== newActiveLocalPath) {
 				this._activeLocalPath = newActiveLocalPath;
+				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 				this.dispatchEvent(new UmbRouterSlotChangeEvent());
 			}
 		}
@@ -105,6 +107,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	private _onNavigationChanged = (event?: any) => {
 		if (event.detail.slot === this.#router) {
 			this._activeLocalPath = event.detail.match.route.path;
+			this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		} else if (event.detail.slot === this.#modalRouter) {
 			const newActiveModalLocalPath = event.detail.match.route.path;
@@ -115,7 +118,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	render() {
 		return html`${this.#router}${this.#modalRouter}`;
 	}
-	
+
 	static styles = [
 		css`
 			:host {

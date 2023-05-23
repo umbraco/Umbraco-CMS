@@ -1,7 +1,9 @@
-import { css, html, LitElement } from 'lit';
+import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  *  @element document-type-workspace-view-edit-property
@@ -9,7 +11,8 @@ import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/back
  *  @slot editor - Slot for rendering the Property Editor
  */
 @customElement('document-type-workspace-view-edit-property')
-export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
+export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
+	private _property?: PropertyTypeResponseModelBaseModel | undefined;
 	/**
 	 * Property, the data object for the property.
 	 * @type {PropertyTypeResponseModelBaseModel}
@@ -17,7 +20,15 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 	 * @default undefined
 	 */
 	@property({ type: Object })
-	public property?: PropertyTypeResponseModelBaseModel;
+	public get property(): PropertyTypeResponseModelBaseModel | undefined {
+		return this._property;
+	}
+	public set property(value: PropertyTypeResponseModelBaseModel | undefined) {
+		const oldValue = this._property;
+		this._property = value;
+		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
+		this.requestUpdate('property', oldValue);
+	}
 
 	/**
 	 * Inherited, Determines if the property is part of the main document type thats being edited.
@@ -29,7 +40,32 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 	@property({ type: Boolean })
 	public inherited?: boolean;
 
-	_firePartialUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
+	#modalRegistration;
+
+	@state()
+	protected _modalRoute?: string;
+
+	constructor() {
+		super();
+
+		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+			.addUniquePaths(['propertyId'])
+			.onSetup(() => {
+				return this.property ?? false;
+			})
+			.onSubmit((result) => {
+				this._partialUpdate(result);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._modalRoute = routeBuilder(null);
+			});
+	}
+
+	_partialUpdate(partialObject: PropertyTypeResponseModelBaseModel) {
+		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
+	}
+
+	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
 		const partialObject = {} as any;
 		partialObject[propertyName] = value;
 
@@ -56,23 +92,23 @@ export class UmbDocumentTypeWorkspacePropertyElement extends LitElement {
 						<uui-input
 							.value=${this.property.name}
 							@input=${(e: CustomEvent) => {
-								if (e.target) this._firePartialUpdate('name', (e.target as HTMLInputElement).value);
+								if (e.target) this._singleValueUpdate('name', (e.target as HTMLInputElement).value);
 							}}></uui-input>
 						<uui-input-lock
 							.value=${this.property.alias}
 							@input=${(e: CustomEvent) => {
-								if (e.target) this._firePartialUpdate('alias', (e.target as HTMLInputElement).value);
+								if (e.target) this._singleValueUpdate('alias', (e.target as HTMLInputElement).value);
 							}}></uui-input-lock>
 						<slot name="property-action-menu"></slot>
 						<p>
 							<uui-textarea
 								.value=${this.property.description}
 								@input=${(e: CustomEvent) => {
-									if (e.target) this._firePartialUpdate('description', (e.target as HTMLInputElement).value);
+									if (e.target) this._singleValueUpdate('description', (e.target as HTMLInputElement).value);
 								}}></uui-textarea>
 						</p>
 					</div>
-					<div id="editor"></div>
+					<uui-button id="editor" label="Edit property settings" href=${this._modalRoute}><b></b></uui-button>
 			  `
 			: '';
 	}

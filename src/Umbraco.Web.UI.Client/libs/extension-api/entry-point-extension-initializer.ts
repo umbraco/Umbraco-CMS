@@ -16,6 +16,7 @@ export class UmbEntryPointExtensionInitializer {
 			entryPoints.forEach((entryPoint) => {
 				if (this.#entryPointMap.has(entryPoint.alias)) return;
 				this.#entryPointMap.set(entryPoint.alias, entryPoint);
+				// TODO: Should we unInit a entry point if is removed?
 				this.instantiateEntryPoint(entryPoint);
 			});
 		});

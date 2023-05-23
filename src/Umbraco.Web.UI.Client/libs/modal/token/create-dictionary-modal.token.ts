@@ -1,8 +1,6 @@
 import { Observable } from 'rxjs';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-// TODO: add interface for data
-// PropertyTypeViewModelBaseModel
 export interface UmbCreateDictionaryModalData {
 	unique: string | null;
 	parentName?: Observable<string | undefined>;

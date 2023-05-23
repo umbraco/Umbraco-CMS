@@ -1,8 +1,5 @@
-import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -26,13 +23,10 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 	#init: Promise<unknown>;
 
-	#selection = new UmbArrayState<string>([]);
-	selection = this.#selection.asObservable();
+	#itemManager;
 
-	#selectedItems = new UmbArrayState<ItemType>([]);
-	selectedItems = this.#selectedItems.asObservable();
-
-	#selectedItemsObserver?: UmbObserverController<ItemType[]>;
+	selection;
+	selectedItems;
 
 	max = Infinity;
 	min = 0;
@@ -49,29 +43,13 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		this.modalAlias = modalAlias;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		//TODO: The promise can probably be done in a cleaner way.
-		const repositoryPromise: Promise<void> = new Promise((resolve) => {
-			new UmbObserverController(
-				this.host,
+		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(host, repositoryAlias, this.#getUnique);
 
-				// TODO: this code is reused in multiple places, so it should be extracted to a function
-				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
-				async (repositoryManifest) => {
-					if (!repositoryManifest) return;
-
-					try {
-						const result = await createExtensionClass<UmbItemRepository<ItemType>>(repositoryManifest, [this.host]);
-						this.repository = result;
-						resolve();
-					} catch (error) {
-						throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
-					}
-				}
-			);
-		});
+		this.selection = this.#itemManager.uniques;
+		this.selectedItems = this.#itemManager.items;
 
 		this.#init = Promise.all([
-			repositoryPromise,
+			this.#itemManager.init,
 			new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
 				this.modalContext = instance;
 			}).asPromise(),
@@ -79,14 +57,11 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	}
 
 	getSelection() {
-		return this.#selection.value;
+		return this.#itemManager.getUniques();
 	}
 
 	setSelection(selection: string[]) {
-		this.#selection.next(selection);
-
-		//TODO: Check if it's safe to call requestItems here.
-		this.#requestItems();
+		this.#itemManager.setUniques(selection);
 	}
 
 	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
@@ -112,7 +87,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		if (!this.repository) throw new Error('Repository is not initialized');
 
 		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
-		const item = this.#selectedItems.value.find((item) => this.#getUnique(item) === unique);
+		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
 		const modalHandler = this.modalContext?.open(UMB_CONFIRM_MODAL, {
@@ -126,26 +101,8 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		this.#removeItem(unique);
 	}
 
-	async #requestItems() {
-		await this.#init;
-		if (!this.repository) throw new Error('Repository is not initialized');
-		if (this.#selectedItemsObserver) this.#selectedItemsObserver.destroy();
-
-		const { asObservable } = await this.repository.requestItems(this.getSelection());
-
-		if (asObservable) {
-			this.#selectedItemsObserver = new UmbObserverController(this.host, asObservable(), (data) =>
-				this.#selectedItems.next(data)
-			);
-		}
-	}
-
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
-		this.#selection.next(newSelection);
-		// remove items items from selectedItems array
-		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
-		const newSelectedItems = this.#selectedItems.value.filter((item) => this.#getUnique(item) !== unique);
-		this.#selectedItems.next(newSelectedItems);
+		this.setSelection(newSelection);
 	}
 }

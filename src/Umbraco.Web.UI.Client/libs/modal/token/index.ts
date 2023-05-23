@@ -29,3 +29,4 @@ export * from './folder-modal.token';
 export * from './partial-view-picker-modal.token';
 export * from './dictionary-item-picker-modal.token';
 export * from './data-type-picker-modal.token';
+export * from './data-type-picker-flow-modal.token';
