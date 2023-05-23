@@ -56,7 +56,7 @@ export default allowedModules
 		return [
 			{
 				input: `${module.root}/${module.file}`,
-				external: [/^@umbraco-cms\//],
+				external: [/^@umbraco/],
 				output: {
 					dir: `${module.dist}`,
 					format: 'es',
