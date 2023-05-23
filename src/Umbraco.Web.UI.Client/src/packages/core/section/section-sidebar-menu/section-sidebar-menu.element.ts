@@ -9,8 +9,6 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../menu/menu.element';
-
 // TODO: Move to separate file:
 const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
