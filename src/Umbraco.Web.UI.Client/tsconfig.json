@@ -57,6 +57,13 @@
 			"@umbraco-cms/backoffice/workspace": ["src/packages/core/workspace"],
 			"@umbraco-cms/backoffice/property-editor": ["src/packages/core/property-editor"],
 
+			// DOCUMENT MANAGEMENT
+			// Document
+			"@umbraco-cms/backoffice/document": ["src/packages/documents/documents"],
+
+			// DATA TYPES
+			"@umbraco-cms/backoffice/data-type": ["src/packages/settings/data-types"],
+
 			// USERS
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
 
