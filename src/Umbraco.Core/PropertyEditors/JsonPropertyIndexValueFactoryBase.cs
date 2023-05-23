@@ -63,6 +63,10 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         return result;
     }
 
+    [Obsolete("Use method overload that has availableCultures, scheduled for removal in v14")]
+    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+        => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
+
     /// <summary>
     ///  Method to return a list of resume of the content. By default this returns an empty list
     /// </summary>
