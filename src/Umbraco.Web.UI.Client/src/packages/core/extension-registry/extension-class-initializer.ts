@@ -1,7 +1,12 @@
-import { ManifestTypes, umbExtensionsRegistry } from '../extension-registry';
-import { UmbObserverController } from '../observable-api';
-import { createExtensionClass } from './create-extension-class.function';
-import { ManifestBase, ManifestClass, SpecificManifestTypeOrManifestBase } from './types';
+import type { ManifestTypes } from './models';
+import { umbExtensionsRegistry } from './registry';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import {
+	createExtensionClass,
+	ManifestBase,
+	ManifestClass,
+	SpecificManifestTypeOrManifestBase,
+} from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbExtensionClassInitializer<

@@ -1,7 +1,7 @@
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionClassInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionClassInitializer } from '@umbraco-cms/backoffice/extension-registry';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
