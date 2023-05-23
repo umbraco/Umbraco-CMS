@@ -1,7 +1,7 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 import 'element-internals-polyfill';
 
-import '../../shared/router';
+import '@umbraco-cms/internal/router';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html } from 'lit';
