@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../repository/data-type.repository';
+import { UmbDataTypeRepository } from './data-type.repository';
 import { UmbDataTypeItemStore } from './data-type-item.store';
 import { UmbDataTypeStore } from './data-type.store';
 import { UmbDataTypeTreeStore } from './data-type.tree.store';
