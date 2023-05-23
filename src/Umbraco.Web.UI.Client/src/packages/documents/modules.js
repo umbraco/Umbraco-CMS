@@ -1,1 +1,5 @@
-export const modules = [];
+export const modules = [
+	{
+		src: 'documents',
+	},
+];
