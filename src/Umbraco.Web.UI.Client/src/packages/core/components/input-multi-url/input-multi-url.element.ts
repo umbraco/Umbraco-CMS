@@ -3,6 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbLinkPickerLink,
@@ -10,28 +11,27 @@ import {
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
- * @element umb-input-multi-url-picker
+ * @element umb-input-multi-url
  * @fires change - when the value of the input changes
  * @fires blur - when the input loses focus
  * @fires focus - when the input gains focus
  */
-@customElement('umb-input-multi-url-picker')
-export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-multi-url')
+export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
 
 	@property()
 	public set alias(value: string | undefined) {
-		this.myModalRegistration.setUniqueIdentifier('propertyAlias', value);
+		this.myModalRegistration.setUniquePathValue('propertyAlias', value);
 	}
 
 	@property()
 	public set variantId(value: string | UmbVariantId | undefined) {
-		this.myModalRegistration.setUniqueIdentifier('variantId', value?.toString());
+		this.myModalRegistration.setUniquePathValue('variantId', value?.toString());
 	}
 
 	/**
@@ -122,15 +122,9 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 			() => !!this.max && this.urls.length > this.max
 		);
 
-		this.myModalRegistration = new UmbModalRouteRegistrationController(
-			this,
-			UMB_LINK_PICKER_MODAL,
-			`:index`,
-			new Map([
-				['propertyAlias', undefined],
-				['variantId', undefined],
-			])
-		)
+		this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL)
+			.addAdditionalPath(`:index`)
+			.addUniquePaths(['propertyAlias', 'variantId'])
 			.onSetup((params) => {
 				// Get index:
 				const indexParam = params.index;
@@ -233,6 +227,6 @@ export class UmbInputMultiUrlPickerElement extends FormControlMixin(UmbLitElemen
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-multi-url-picker': UmbInputMultiUrlPickerElement;
+		'umb-input-multi-url': UmbInputMultiUrlElement;
 	}
 }

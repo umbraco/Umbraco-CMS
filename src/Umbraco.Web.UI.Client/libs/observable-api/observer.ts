@@ -1,4 +1,4 @@
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, lastValueFrom } from 'rxjs';
 
 export class UmbObserver<T> {
 	#source!: Observable<T>;
@@ -8,6 +8,10 @@ export class UmbObserver<T> {
 	constructor(source: Observable<T>, callback: (_value: T) => void) {
 		this.#source = source;
 		this.#subscription = source.subscribe(callback);
+	}
+
+	public async asPromise() {
+		return await lastValueFrom(this.#source);
 	}
 
 	hostConnected() {

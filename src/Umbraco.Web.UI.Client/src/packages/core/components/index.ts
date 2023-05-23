@@ -34,7 +34,7 @@ import './date-input/date-input.element';
 
 import './input-color-picker/input-color-picker.element';
 import './input-eye-dropper/input-eye-dropper.element';
-import './input-multi-url-picker/input-multi-url-picker.element';
+import './input-multi-url/input-multi-url.element';
 import './input-slider/input-slider.element';
 import './input-toggle/input-toggle.element';
 import './input-upload-field/input-upload-field.element';
@@ -55,7 +55,6 @@ import './tree/tree-menu-item/tree-menu-item.element';
 import './menu/menu-item-base/menu-item-base.element';
 
 import './variantable-property/variantable-property.element';
-import './property-creator/property-creator.element';
 
 import './header-app/header-app-button.element';
 

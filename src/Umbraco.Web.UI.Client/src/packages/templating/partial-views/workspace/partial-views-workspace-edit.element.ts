@@ -35,7 +35,6 @@ export class UmbPartialViewsWorkspaceEditElement extends UmbLitElement {
 
 			// this.observe(this.#partialViewsWorkspaceContext.isNew, (isNew) => {
 			// 	this.#isNew = !!isNew;
-			// 	console.log(this.#isNew);
 			// });
 		});
 	}

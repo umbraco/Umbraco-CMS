@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
-import { UmbInputMultiUrlPickerElement } from '../../../components/input-multi-url-picker/input-multi-url-picker.element';
+import { UmbInputMultiUrlElement } from '../../../components/input-multi-url/input-multi-url.element';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -64,12 +64,12 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	}
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputMultiUrlPickerElement).urls;
+		this.value = (event.target as UmbInputMultiUrlElement).urls;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
-		return html`<umb-input-multi-url-picker
+		return html`<umb-input-multi-url
 			.alias="${this._alias}"
 			.variantId="${this._propertyVariantId}"
 			@change="${this._onChange}"
@@ -78,7 +78,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 			.ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			.max=${this._maxNumber}
 			.min=${this._minNumber}
-			.urls="${this.value}"></umb-input-multi-url-picker>`;
+			.urls="${this.value}"></umb-input-multi-url>`;
 	}
 
 	static styles = [UUITextStyles];

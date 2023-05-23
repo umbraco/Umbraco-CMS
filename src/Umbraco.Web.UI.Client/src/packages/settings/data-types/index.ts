@@ -1,4 +1,5 @@
 import './components';
+export type * from './models';
 
 export const DATA_TYPE_ROOT_ENTITY_TYPE = 'data-type-root';
 export const DATA_TYPE_ENTITY_TYPE = 'data-type';

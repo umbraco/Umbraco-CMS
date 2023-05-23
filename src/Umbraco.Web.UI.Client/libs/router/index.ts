@@ -5,6 +5,7 @@ export type {
 	IComponentRoute,
 	IRedirectRoute,
 	IResolverRoute,
+	IRouterSlot,
 	Params,
 	Query,
 } from 'router-slot/model';

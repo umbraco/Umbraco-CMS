@@ -1,3 +1,5 @@
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRouterSlot } from 'router-slot/model';
 import type {
 	UUIDialogElement,
 	UUIModalDialogElement,
@@ -5,13 +7,14 @@ import type {
 	UUIModalSidebarSize,
 } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
+import type { UmbRouterSlotElement } from '@umbraco-cms/internal/router';
+import { ManifestModal, umbExtensionsRegistry } from '../extension-registry';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
@@ -37,32 +40,35 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 			submit: (arg: T) => void;
 	  };
 
-//TODO consider splitting this into two separate handlers
-export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> {
+// TODO: consider splitting this into two separate handlers
+// TODO: Rename to become a controller.
+export class UmbModalHandlerClass<ModalData extends object = object, ModalResult = unknown> extends UmbController {
 	private _submitPromise: Promise<ModalResult>;
 	private _submitResolver?: (value: ModalResult) => void;
 	private _submitRejecter?: () => void;
-	#host: UmbControllerHostElement;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
+	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
 
 	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
-
-	#modalElement?: UUIModalSidebarElement | UUIDialogElement;
 
 	public key: string;
 	public type: UmbModalType = 'dialog';
 	public size: UUIModalSidebarSize = 'small';
 
+	private modalAlias: string; //TEMP... TODO: Remove this.
+
 	constructor(
 		host: UmbControllerHostElement,
+		router: IRouterSlot | null,
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig
 	) {
-		this.#host = host;
+		super(host);
 		this.key = config?.key || UmbId.new();
+		this.modalAlias = modalAlias.toString();
 
 		if (modalAlias instanceof UmbModalToken) {
 			this.type = modalAlias.getDefaultConfig()?.type || this.type;
@@ -82,7 +88,33 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 		});
 
 		this.modalElement = this.#createContainerElement();
+		this.modalElement.addEventListener('close', () => {
+			this._submitRejecter?.();
+		});
+
+		/**
+		 *
+		 * Maybe we could just get a Modal Router Slot. But it needs to have the ability to actually inject via slot. so the modal inner element can be within.
+		 *
+		 */
+		if (router) {
+			this.#modalRouterElement.routes = [
+				{
+					path: '',
+					component: document.createElement('slot'),
+				},
+			];
+			this.#modalRouterElement.parent = router;
+		}
+		this.modalElement.appendChild(this.#modalRouterElement);
 		this.#observeModal(modalAlias.toString(), combinedData);
+	}
+
+	public hostConnected() {
+		// Not much to do now..?
+	}
+	public hostDisconnected() {
+		// Not much to do now..?
 	}
 
 	#createContainerElement() {
@@ -91,7 +123,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 
 	#createSidebarElement() {
 		const sidebarElement = document.createElement('uui-modal-sidebar');
-		this.#modalElement = sidebarElement;
 		sidebarElement.size = this.size;
 		return sidebarElement;
 	}
@@ -99,7 +130,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	#createDialogElement() {
 		const modalDialogElement = document.createElement('uui-modal-dialog');
 		const dialogElement: UUIDialogElement = document.createElement('uui-dialog');
-		this.#modalElement = dialogElement;
 		modalDialogElement.appendChild(dialogElement);
 		return modalDialogElement;
 	}
@@ -125,7 +155,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	}
 
 	public reject() {
-		this._submitRejecter?.();
 		this.modalElement.close();
 	}
 
@@ -138,32 +167,46 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	 Now when the element is an observable it makes it more complex because this host needs to subscribe to updates to the element, instead of just having a reference to it.
 	 If we find a better generic solution to communicate between the modal and the implementor, then we can remove the element as part of the modalHandler. */
 	#observeModal(modalAlias: string, data?: ModalData) {
-		new UmbObserverController(
-			this.#host,
-			umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
-			async (manifest) => {
-				if (manifest) {
-					const innerElement = await this.#createInnerElement(manifest, data);
-					if (innerElement) {
-						this.#appendInnerElement(innerElement);
-						return;
+		if (this.host) {
+			new UmbObserverController(
+				this.host,
+				umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
+				async (manifest) => {
+					if (manifest) {
+						const innerElement = await this.#createInnerElement(manifest, data);
+						if (innerElement) {
+							this.#appendInnerElement(innerElement);
+							return;
+						}
 					}
+					this.#removeInnerElement();
 				}
-				this.#removeInnerElement();
-			}
-		);
+			);
+		}
 	}
 
 	#appendInnerElement(element: HTMLElement) {
-		this.#modalElement?.appendChild(element);
+		this.#modalRouterElement.appendChild(element);
+		/*this.#modalRouterElement.routes = [
+			{
+				path: '',
+				component: element,
+			},
+		];
+		this.#modalRouterElement.render();*/
 		this.#innerElement.next(element);
 	}
 
 	#removeInnerElement() {
 		const innerElement = this.#innerElement.getValue();
 		if (innerElement) {
-			this.#modalElement?.removeChild(innerElement);
+			this.#modalRouterElement.removeChild(innerElement);
 			this.#innerElement.next(undefined);
 		}
+	}
+
+	public destroy() {
+		super.destroy();
+		// TODO: Make sure to clean up..
 	}
 }
