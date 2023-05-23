@@ -4,7 +4,7 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { data } from '../../../../shared/mocks/data/data-type.data';
+import { data } from '../../../../mocks/data/data-type.data';
 
 import type { UmbDataTypeWorkspaceElement } from './data-type-workspace.element';
 

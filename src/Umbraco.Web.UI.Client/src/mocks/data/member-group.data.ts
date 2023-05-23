@@ -1,25 +1,26 @@
-import type { MemberTypeDetails } from '../../../packages/members/member-types/types';
-import { UmbData } from './data';
+import type { MemberGroupDetails } from '../../packages/members/member-groups/types';
+import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
 import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<MemberTypeDetails> = [
+export const data: Array<MemberGroupDetails> = [
 	{
 		$type: '',
-		name: 'Member Type 1',
-		type: 'member-type',
-		icon: 'icon-user',
+		name: 'Member Group AAA',
+		type: 'member-group',
+		icon: 'umb:document',
 		hasChildren: false,
-		id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
+		id: '76708ccd-4179-464c-b694-6969149dd9f9',
 		isContainer: false,
 		parentId: null,
-		alias: 'memberType1',
-		properties: [],
 	},
 ];
 
 // Temp mocked database
-class UmbMemberTypeData extends UmbData<MemberTypeDetails> {
+// TODO: all properties are optional in the server schema. I don't think this is correct.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+class UmbMemberGroupData extends UmbEntityData<MemberGroupDetails> {
 	constructor() {
 		super(data);
 	}
@@ -44,4 +45,4 @@ class UmbMemberTypeData extends UmbData<MemberTypeDetails> {
 	}
 }
 
-export const umbMemberTypeData = new UmbMemberTypeData();
+export const umbMemberGroupData = new UmbMemberGroupData();

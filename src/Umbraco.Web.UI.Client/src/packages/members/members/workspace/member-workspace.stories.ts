@@ -3,7 +3,7 @@ import './member-workspace.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import { data } from '../../../../shared/mocks/data/member.data';
+import { data } from '../../../../mocks/data/member.data';
 
 import type { UmbMemberWorkspaceElement } from './member-workspace.element';
 

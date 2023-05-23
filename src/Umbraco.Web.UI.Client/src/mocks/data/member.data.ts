@@ -1,16 +1,19 @@
-import type { MemberGroupDetails } from '../../../packages/members/member-groups/types';
+import type { MemberDetails } from '../../packages/members/members/types';
 import { UmbEntityData } from './entity.data';
 import { createEntityTreeItem } from './utils';
-import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	EntityTreeItemResponseModel,
+	PagedEntityTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<MemberGroupDetails> = [
+export const data: Array<MemberDetails> = [
 	{
 		$type: '',
-		name: 'Member Group AAA',
-		type: 'member-group',
-		icon: 'umb:document',
+		name: 'Member AAA',
+		type: 'member',
+		icon: 'umb:user',
 		hasChildren: false,
-		id: '76708ccd-4179-464c-b694-6969149dd9f9',
+		id: 'aaa08ccd-4179-464c-b634-6969149dd9f9',
 		isContainer: false,
 		parentId: null,
 	},
@@ -20,7 +23,7 @@ export const data: Array<MemberGroupDetails> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbMemberGroupData extends UmbEntityData<MemberGroupDetails> {
+class UmbMemberData extends UmbEntityData<MemberDetails> {
 	constructor() {
 		super(data);
 	}
@@ -45,4 +48,4 @@ class UmbMemberGroupData extends UmbEntityData<MemberGroupDetails> {
 	}
 }
 
-export const umbMemberGroupData = new UmbMemberGroupData();
+export const umbMemberData = new UmbMemberData();

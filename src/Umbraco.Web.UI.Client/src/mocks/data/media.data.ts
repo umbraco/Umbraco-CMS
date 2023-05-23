@@ -1,4 +1,4 @@
-import type { MediaDetails } from '../../../packages/media/media';
+import type { MediaDetails } from '../../packages/media/media';
 import { UmbEntityTreeData } from './entity-tree.data';
 import { UmbEntityData } from './entity.data';
 import { createContentTreeItem } from './utils';
