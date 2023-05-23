@@ -67,9 +67,37 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             }
 
             responseModel.IsEdited &= responseModel.IsPublished;
+
+            responseModel.Variants = MapVariants(documentEntitySlim);
         }
 
         return responseModel;
+    }
+
+    private IEnumerable<VariantTreeItemViewModel> MapVariants(IDocumentEntitySlim entity)
+    {
+        if (entity.Variations.VariesByCulture() is false)
+        {
+            yield return new VariantTreeItemViewModel
+            {
+                Name = entity.Name ?? string.Empty,
+                State = entity.Published ? PublishedState.Published : PublishedState.Unpublished,
+                Culture = null,
+            };
+            yield break;
+        }
+
+        foreach (KeyValuePair<string, string> cultureNamePair in entity.CultureNames)
+        {
+            yield return new VariantTreeItemViewModel
+            {
+                Name = cultureNamePair.Value,
+                Culture = cultureNamePair.Key,
+                State = entity.PublishedCultures.Contains(cultureNamePair.Key)
+                    ? PublishedState.Published
+                    : PublishedState.Unpublished,
+            };
+        }
     }
 
     // TODO: delete these (faking start node setup for unlimited editor)

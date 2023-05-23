@@ -7,4 +7,6 @@ public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
     public bool IsPublished { get; set; }
 
     public bool IsEdited { get; set; }
+
+    public IEnumerable<VariantTreeItemViewModel> Variants { get; set; } = Enumerable.Empty<VariantTreeItemViewModel>();
 }
