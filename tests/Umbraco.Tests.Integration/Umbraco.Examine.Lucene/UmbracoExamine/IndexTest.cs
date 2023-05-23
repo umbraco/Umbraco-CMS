@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Bogus;
 using Examine;
 using Lucene.Net.Util;
@@ -10,7 +7,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
@@ -19,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 ///     Tests the standard indexing capabilities
 /// </summary>
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.None)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class IndexTest : ExamineBaseTest
 {
     [Test]
