@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -9,47 +11,36 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 
+public static class RecurringBackgroundJobHostedService
+{
+    public static Func<IRecurringBackgroundJob, IHostedService> CreateHostedServiceFactory(IServiceProvider serviceProvider) =>
+        (IRecurringBackgroundJob job) =>
+        {
+            Type hostedServiceType = typeof(RecurringBackgroundJobHostedService<>).MakeGenericType(job.GetType());
+            return (IHostedService)ActivatorUtilities.CreateInstance(serviceProvider, hostedServiceType, job);
+        };
+}
+
 /// <summary>
 /// Runs a recurring background job inside a hosted service.
 /// Generic version for DependencyInjection
 /// </summary>
 /// <typeparam name="TJob">Type of the Job</typeparam>
-public class RecurringBackgroundJobHostedService<TJob> : RecurringBackgroundJobHostedService where TJob : IRecurringBackgroundJob
+public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceBase where TJob : IRecurringBackgroundJob
 {
+
+    private readonly ILogger<RecurringBackgroundJobHostedService<TJob>> _logger;
+    private readonly IMainDom _mainDom;
+    private readonly IRuntimeState _runtimeState;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
+    private readonly IRecurringBackgroundJob _job;
+
     public RecurringBackgroundJobHostedService(
         IRuntimeState runtimeState,
         ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
         IMainDom mainDom,
         IServerRoleAccessor serverRoleAccessor,
         TJob job)
-        : base(runtimeState, logger, mainDom, serverRoleAccessor, job)
-    {
-
-    }
-}
-
-/// <summary>
-///    Runs a background job inside a hosted service.
-/// </summary>
-public class RecurringBackgroundJobHostedService : RecurringHostedServiceBase
-{
-    private readonly ILogger<RecurringBackgroundJobHostedService> _logger;
-    private readonly IMainDom _mainDom;
-    private readonly IRuntimeState _runtimeState;
-    private readonly IServerRoleAccessor _serverRoleAccessor;
-    private readonly IRecurringBackgroundJob _job;
-    public string JobName { get => _job.GetType().Name; }
-
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService" /> class.
-    /// </summary>
-    public RecurringBackgroundJobHostedService(
-        IRuntimeState runtimeState,
-        ILogger<RecurringBackgroundJobHostedService> logger,
-        IMainDom mainDom,
-        IServerRoleAccessor serverRoleAccessor,
-        IRecurringBackgroundJob job)
         : base(logger, job.Period, job.Delay)
     {
         _runtimeState = runtimeState;
@@ -72,7 +63,7 @@ public class RecurringBackgroundJobHostedService : RecurringHostedServiceBase
         }
 
         // Don't run on replicas nor unknown role servers
-        if (_job.ServerRoles.Contains(_serverRoleAccessor.CurrentServerRole))
+        if (!_job.ServerRoles.Contains(_serverRoleAccessor.CurrentServerRole))
         {
             _logger.LogDebug("Job not running on this server role");
             return;
