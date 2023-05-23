@@ -30,6 +30,11 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="umbraco\UmbracoInstall\Index.cshtml" />
     <_ContentIncludedByDefault Remove="umbraco\UmbracoLogin\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="umbraco\UmbracoBackOffice\Default.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="umbraco\" />
   </ItemGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">
