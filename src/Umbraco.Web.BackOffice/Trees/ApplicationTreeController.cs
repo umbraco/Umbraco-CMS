@@ -207,7 +207,7 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
         {
             throw new ArgumentNullException(nameof(tree));
         }
-            
+
         // Force tree querystring param
         Dictionary<string, StringValues>? td = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
         td["tree"] = tree.TreeAlias;
