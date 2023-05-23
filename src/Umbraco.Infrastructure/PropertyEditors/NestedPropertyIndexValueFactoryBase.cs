@@ -18,12 +18,22 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         _propertyEditorCollection = propertyEditorCollection;
     }
 
+    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
     protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,
         string? segment,
-        bool published)
+        bool published) =>
+        Handle(deserializedPropertyValue, property, culture, segment, published, Enumerable.Empty<string>());
+
+    protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+        TSerialized deserializedPropertyValue,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures)
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
@@ -65,7 +75,8 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                 segment,
                 published,
                 propertyTypeDictionary,
-                nestedContentRowValue));
+                nestedContentRowValue,
+                availableCultures));
         }
 
         return RenameKeysToEnsureRawSegmentsIsAPrefix(result);
@@ -160,7 +171,8 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         string? segment,
         bool published,
         IDictionary<string, IPropertyType> propertyTypeDictionary,
-        TItem nestedContentRowValue)
+        TItem nestedContentRowValue,
+        IEnumerable<string> availableCultures)
     {
         var blockIndex = 0;
 
@@ -168,22 +180,37 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         {
             if (propertyTypeDictionary.TryGetValue(propertyAlias, out IPropertyType? propertyType))
             {
-                IProperty subProperty = new Property(propertyType);
-                subProperty.SetValue(propertyValue, culture, segment);
-
-                if (published)
-                {
-                    subProperty.PublishValues(culture, segment ?? "*");
-                }
-
                 IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
                 if (editor is null)
                 {
                     continue;
                 }
 
-                IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexValues =
-                    editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published);
+                IProperty subProperty = new Property(propertyType);
+                IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexValues = null!;
+
+                if (propertyType.VariesByCulture())
+                {
+                    foreach (var availableCulture in availableCultures)
+                    {
+                        subProperty.SetValue(propertyValue, availableCulture, segment);
+                        if (published)
+                        {
+                            subProperty.PublishValues(availableCulture, segment ?? "*");
+                        }
+                        indexValues =
+                            editor.PropertyIndexValueFactory.GetIndexValues(subProperty, availableCulture, segment, published, availableCultures);
+                    }
+                }
+                else
+                {
+                    subProperty.SetValue(propertyValue, null, segment);
+                    if (published)
+                    {
+                        subProperty.PublishValues(culture, segment ?? "*");
+                    }
+                    indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published, availableCultures);
+                }
 
                 foreach ((var nestedAlias, IEnumerable<object?> nestedValue) in indexValues)
                 {
