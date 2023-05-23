@@ -1,6 +1,3 @@
-// TODO: remove this import when the search hack is removed
-import '../../search/search-modal/search-modal.element';
-
 import type { UUIModalDialogElement, UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
 import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
