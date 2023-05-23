@@ -1,12 +1,35 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
 import './auth-layout.element';
+import { UmbAuthContext } from './types';
+import { UmbAuthLegacyContext } from './auth-legacy.context';
+import { UmbAuthNewContext } from './auth-new.context';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
+	#authContext: UmbAuthContext;
+
+	@property({ type: String, attribute: 'return-url' })
+	returnUrl = '';
+
+	@property({ type: String, attribute: 'auth-url' })
+	authUrl = '';
+
+	@property({ type: Boolean })
+	isLegacy = false;
+
+	constructor() {
+		super();
+		if (this.isLegacy) {
+			this.#authContext = new UmbAuthLegacyContext(this.authUrl, this.returnUrl);
+		} else {
+			this.#authContext = new UmbAuthNewContext(this.authUrl, this.returnUrl);
+		}
+	}
+
 	@state()
 	private _loggingIn = false;
 
@@ -25,21 +48,8 @@ export default class UmbLoginElement extends LitElement {
 		const password = formData.get('password') as string;
 		const persist = formData.has('persist');
 
-		this._login(username, password, persist);
+		this.#authContext.login({ username, password, persist });
 	};
-
-	private async _login(username: string, password: string, persist: boolean) {
-		// TODO: Move login to new login app
-		this._loggingIn = true;
-
-		try {
-			this._loggingIn = false;
-			console.log('login');
-		} catch (error) {
-			console.log(error);
-			this._loggingIn = false;
-		}
-	}
 
 	private _greetings: Array<string> = [
 		'Happy super Sunday',
@@ -67,7 +77,6 @@ export default class UmbLoginElement extends LitElement {
 									type="email"
 									id="email"
 									name="email"
-									placeholder="Enter your email..."
 									required
 									required-message="Email is required"></uui-input>
 							</uui-form-layout-item>
@@ -77,13 +86,12 @@ export default class UmbLoginElement extends LitElement {
 								<uui-input-password
 									id="password"
 									name="password"
-									placeholder="Enter your password..."
 									required
 									required-message="Password is required"></uui-input-password>
 							</uui-form-layout-item>
 
 							<uui-form-layout-item>
-								<uui-checkbox name="persist" label="Remember me"> Remember me </uui-checkbox>
+								<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
 							</uui-form-layout-item>
 
 							<uui-button
