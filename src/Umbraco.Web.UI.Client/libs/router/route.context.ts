@@ -95,7 +95,7 @@ export class UmbRouteContext {
 		this.#generateNewUrlBuilders();
 	}
 
-	public _internal_routerGotActiveLocalPath(routerActiveLocalPath: string) {
+	public _internal_routerGotActiveLocalPath(routerActiveLocalPath: string | undefined) {
 		if (this.#routerActiveLocalPath === routerActiveLocalPath) return;
 		this.#routerActiveLocalPath = routerActiveLocalPath;
 		this.#generateNewUrlBuilders();
