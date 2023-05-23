@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -15,6 +15,13 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         where T : DbContext
     {
         defaultEFCoreOptionsAction ??= DefaultOptionsAction;
+
+        // Replace data directory
+        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
+        if (string.IsNullOrEmpty(dataDirectory) is false)
+        {
+            connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
+        }
 
         services.AddDbContext<T>(
             options =>

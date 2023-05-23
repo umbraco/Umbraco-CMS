@@ -31,10 +31,6 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
                 .WithTitle("Filter option not found")
                 .WithDetail("One of the attempted 'filter' options does not exist")
                 .Build()),
-            ApiContentQueryOperationStatus.IndexNotFound => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Examine index not found")
-                .WithDetail($"No index found with name {Constants.UmbracoIndexes.DeliveryApiContentIndexName}")
-                .Build()),
             ApiContentQueryOperationStatus.SelectorOptionNotFound => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Selector option not found")
                 .WithDetail("The attempted 'fetch' option does not exist")
