@@ -8,8 +8,8 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.New.Cms.Infrastructure.HostedServices;
-using Umbraco.New.Cms.Infrastructure.Security;
+using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 

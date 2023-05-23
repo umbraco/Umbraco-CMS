@@ -7,8 +7,9 @@ using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Serialization;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Configuration;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
-using Umbraco.New.Cms.Core.Models.Configuration;
 
 namespace Umbraco.Cms.Api.Management;
 
@@ -60,7 +61,7 @@ public class ManagementApiComposer : IComposer
             {
                 // any generic JSON options go here
             })
-            .AddJsonOptions(New.Cms.Core.Constants.JsonOptionsNames.BackOffice, _ => { });
+            .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, _ => { });
 
         services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>( );
         services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>( );

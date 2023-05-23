@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
-using Umbraco.New.Cms.Core.Models.Installer;
+using Umbraco.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Installer;
 

@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.New.Cms.Core.Services.Installer;
+using Umbraco.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Upgrade;
 

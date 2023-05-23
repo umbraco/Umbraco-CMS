@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Core.Models;
 using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.Services.Implement;

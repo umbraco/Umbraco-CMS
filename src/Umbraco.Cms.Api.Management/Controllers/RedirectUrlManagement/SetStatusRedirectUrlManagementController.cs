@@ -1,8 +1,8 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Models.RedirectUrlManagement;
 using Umbraco.Cms.Core.Security;
-using Umbraco.New.Cms.Core.Models.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 

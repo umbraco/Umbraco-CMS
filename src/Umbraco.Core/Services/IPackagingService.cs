@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 

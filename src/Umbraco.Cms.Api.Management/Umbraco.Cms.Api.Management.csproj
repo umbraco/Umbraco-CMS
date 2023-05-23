@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Management API</Title>
     <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
     <AssemblyName>Umbraco.Cms.Api.Management</AssemblyName>
     <RootNamespace>Umbraco.Cms.Api.Management</RootNamespace>
@@ -19,9 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-    <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
-    <ProjectReference Include="..\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj" />
-    <ProjectReference Include="..\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

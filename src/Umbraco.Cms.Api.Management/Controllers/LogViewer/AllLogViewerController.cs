@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.New.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
