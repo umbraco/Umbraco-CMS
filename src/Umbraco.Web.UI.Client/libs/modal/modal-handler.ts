@@ -46,7 +46,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 	private _submitPromise: Promise<ModalResult>;
 	private _submitResolver?: (value: ModalResult) => void;
 	private _submitRejecter?: () => void;
-	private _parentRouter: IRouterSlot | null;
 
 	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
@@ -62,13 +61,11 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 
 	constructor(
 		host: UmbControllerHostElement,
-		router: IRouterSlot | null,
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig
 	) {
 		super(host);
-		this._parentRouter = router;
 		this.key = config?.key || UmbId.new();
 		this.modalAlias = modalAlias.toString();
 

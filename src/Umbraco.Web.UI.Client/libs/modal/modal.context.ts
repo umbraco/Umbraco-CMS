@@ -33,7 +33,7 @@ export class UmbModalContext {
 
 	// TODO: Remove this when the modal system is more flexible
 	public search() {
-		const modalHandler = new UmbModalHandlerClass(this.host, null, 'Umb.Modal.Search') as unknown as UmbModalHandler<
+		const modalHandler = new UmbModalHandlerClass(this.host, 'Umb.Modal.Search') as unknown as UmbModalHandler<
 			any,
 			any
 		>;
@@ -86,13 +86,10 @@ export class UmbModalContext {
 		config?: UmbModalConfig,
 		router: IRouterSlot | null = null
 	) {
-		const modalHandler = new UmbModalHandlerClass(
-			this.host,
-			router,
-			modalAlias,
-			data,
-			config
-		) as unknown as UmbModalHandler<ModalData, ModalResult>;
+		const modalHandler = new UmbModalHandlerClass(this.host, modalAlias, data, config) as unknown as UmbModalHandler<
+			ModalData,
+			ModalResult
+		>;
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
