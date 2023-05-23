@@ -19,6 +19,9 @@ public class InstalledPackage
     [DataMember(Name = "version")]
     public string? Version { get; set; }
 
+    [DataMember(Name = "allowPackageTelemetry")]
+    public bool AllowPackageTelemetry { get; set; } = true;
+
     [DataMember(Name = "plans")]
     public IEnumerable<InstalledPackageMigrationPlans> PackageMigrationPlans { get; set; } = Enumerable.Empty<InstalledPackageMigrationPlans>();
 

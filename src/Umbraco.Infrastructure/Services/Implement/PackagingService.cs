@@ -202,6 +202,7 @@ public class PackagingService : IPackagingService
             }
 
             // Set additional values
+            installedPackage.AllowPackageTelemetry = package.AllowPackageTelemetry;
             installedPackage.PackageView = package.PackageView;
 
             if (!string.IsNullOrEmpty(package.Version))
