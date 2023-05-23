@@ -69,7 +69,6 @@
 
 			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],
 			"@umbraco-cms/internal/modal": ["src/shared/modal"],
-			"@umbraco-cms/internal/router": ["src/shared/router"],
 			"@umbraco-cms/internal/test-utils": ["utils/test-utils.ts"]
 		}
 	},

@@ -7,7 +7,7 @@ import type {
 	UUIModalSidebarSize,
 } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
-import type { UmbRouterSlotElement } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { ManifestModal, umbExtensionsRegistry } from '../extension-registry';
 import { UmbModalConfig, UmbModalType } from './modal.context';
 import { UmbModalToken } from './token/modal-token';

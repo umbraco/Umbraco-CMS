@@ -2,8 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import type { IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { IRoutingInfo, PageComponent, UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './template-workspace-edit.element';

@@ -2,11 +2,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context';
-import { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbRoute, IRoutingInfo, PageComponent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
 import './partial-views-workspace-edit.element';
-import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-partial-views-workspace')
 export class UmbPartialViewsWorkspaceElement extends UmbLitElement {

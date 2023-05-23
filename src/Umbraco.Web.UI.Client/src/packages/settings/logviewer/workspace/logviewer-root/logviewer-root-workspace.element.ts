@@ -12,8 +12,7 @@ import {
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')

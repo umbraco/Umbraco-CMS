@@ -70,7 +70,6 @@ export default {
 						// SHARED
 						'@umbraco-cms/internal/lit-element': './src/shared/lit-element/index.ts',
 						'@umbraco-cms/internal/modal': './src/shared/modal/index.ts',
-						'@umbraco-cms/internal/router': './src/shared/router/index.ts',
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
 				},

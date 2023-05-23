@@ -3,8 +3,7 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { map } from 'rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import type { PageComponent, UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
