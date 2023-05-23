@@ -95,7 +95,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         // uploading a file?
         if (Guid.TryParse(editorStringValue, out Guid temporaryFileKey) == false)
         {
-            return null;
+            return editorStringValue;
         }
 
         TemporaryFileModel? file = TryGetTemporaryFile(temporaryFileKey);
