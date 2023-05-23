@@ -131,7 +131,16 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         ApiMediaWithCrops ToApiMedia(MediaWithCrops media)
         {
             IApiMedia inner = _apiMediaBuilder.Build(media.Content);
-            return new ApiMediaWithCrops(inner, media.LocalCrops.FocalPoint, media.LocalCrops.Crops);
+
+            // make sure we merge crops and focal point defined at media level with the locally defined ones (local ones take precedence in case of a conflict)
+            ImageCropperValue? mediaCrops = media.Content.Value<ImageCropperValue>(_publishedValueFallback, Constants.Conventions.Media.File);
+            ImageCropperValue localCrops = media.LocalCrops;
+            if (mediaCrops != null)
+            {
+                localCrops = localCrops.Merge(mediaCrops);
+            }
+
+            return new ApiMediaWithCrops(inner, localCrops.FocalPoint, localCrops.Crops);
         }
 
         // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,

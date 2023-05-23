@@ -99,6 +99,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
         ExecutedMigrationPlan result = RunMigrationPlan(plan, fromState);
 
+        HandlePostMigrations(result);
+
         // If any completed migration requires us to rebuild cache we'll do that.
         if (_rebuildCache)
         {
@@ -106,6 +108,33 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
         }
 
         return result;
+    }
+
+    [Obsolete]
+    private void HandlePostMigrations(ExecutedMigrationPlan result)
+    {
+        // prepare and de-duplicate post-migrations, only keeping the 1st occurence
+        var executedTypes = new HashSet<Type>();
+
+        foreach (var executedMigrationContext in result.ExecutedMigrationContexts)
+        {
+            if (executedMigrationContext is MigrationContext migrationContext)
+            {
+                foreach (Type migrationContextPostMigration in migrationContext.PostMigrations)
+                {
+                    if (executedTypes.Contains(migrationContextPostMigration))
+                    {
+                        continue;
+                    }
+
+                    _logger.LogInformation($"PostMigration: {migrationContextPostMigration.FullName}.");
+                    MigrationBase postMigration = _migrationBuilder.Build(migrationContextPostMigration, executedMigrationContext);
+                    postMigration.Run();
+
+                    executedTypes.Add(migrationContextPostMigration);
+                }
+            }
+        }
     }
 
     private ExecutedMigrationPlan RunMigrationPlan(MigrationPlan plan, string fromState)
@@ -122,6 +151,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
         List<MigrationPlan.Transition> completedTransitions = new();
 
+        var executedMigrationContexts = new List<IMigrationContext>();
         while (transition is not null)
         {
             _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
@@ -130,11 +160,11 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             {
                 if (transition.MigrationType.IsAssignableTo(typeof(UnscopedMigrationBase)))
                 {
-                    RunUnscopedMigration(transition.MigrationType, plan);
+                    executedMigrationContexts.Add(RunUnscopedMigration(transition.MigrationType, plan));
                 }
                 else
                 {
-                    RunScopedMigration(transition.MigrationType, plan);
+                    executedMigrationContexts.Add(RunScopedMigration(transition.MigrationType, plan));
                 }
             }
             catch (Exception exception)
@@ -150,6 +180,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     FinalState = transition.SourceState,
                     CompletedTransitions = completedTransitions,
                     Plan = plan,
+                    ExecutedMigrationContexts = executedMigrationContexts
                 };
             }
 
@@ -198,18 +229,21 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             FinalState = finalState,
             CompletedTransitions = completedTransitions,
             Plan = plan,
+            ExecutedMigrationContexts = executedMigrationContexts
         };
     }
 
-    private void RunUnscopedMigration(Type migrationType, MigrationPlan plan)
+    private MigrationContext RunUnscopedMigration(Type migrationType, MigrationPlan plan)
     {
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
         var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>());
 
         RunMigration(migrationType, context);
+
+        return context;
     }
 
-    private void RunScopedMigration(Type migrationType, MigrationPlan plan)
+    private MigrationContext RunScopedMigration(Type migrationType, MigrationPlan plan)
     {
         // We want to suppress scope (service, etc...) notifications during a migration plan
         // execution. This is because if a package that doesn't have their migration plan
@@ -226,6 +260,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             RunMigration(migrationType, context);
 
             scope.Complete();
+
+            return context;
         }
     }
 
