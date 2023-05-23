@@ -25,45 +25,6 @@ export class UmbModalContext {
 		this.host = host;
 	}
 
-	// TODO: Remove this when the modal system is more flexible
-	public search() {
-		const modalHandler = new UmbModalHandlerClass(this.host, 'Umb.Modal.Search') as unknown as UmbModalHandler<
-			any,
-			any
-		>;
-
-		//TODO START: This is a hack to get the search modal layout to look like i want it to.
-		//TODO: Remove from here to END when the modal system is more flexible
-		const topDistance = '50%';
-		const margin = '16px';
-		const maxHeight = '600px';
-		const maxWidth = '500px';
-		const dialog = document.createElement('dialog') as HTMLDialogElement;
-		dialog.style.top = `max(${margin}, calc(${topDistance} - ${maxHeight} / 2))`;
-		dialog.style.margin = '0 auto';
-		dialog.style.transform = `translateY(${-maxHeight})`;
-		dialog.style.maxHeight = `min(${maxHeight}, calc(100% - ${margin}px * 2))`;
-		dialog.style.width = `min(${maxWidth}, calc(100vw - ${margin}))`;
-		dialog.style.boxSizing = 'border-box';
-		dialog.style.background = 'none';
-		dialog.style.border = 'none';
-		dialog.style.padding = '0';
-		dialog.style.boxShadow = 'var(--uui-shadow-depth-5)';
-		dialog.style.borderRadius = '9px';
-		const search = document.createElement('umb-search-modal');
-		dialog.appendChild(search);
-		requestAnimationFrame(() => {
-			dialog.showModal();
-		});
-		modalHandler.modalElement = dialog as unknown as UUIModalDialogElement;
-		//TODO END
-
-		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
-
-		this.#modals.next([...this.#modals.getValue(), modalHandler]);
-		return modalHandler;
-	}
-
 	/**
 	 * Opens a modal or sidebar modal
 	 * @public

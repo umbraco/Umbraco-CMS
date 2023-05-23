@@ -17,7 +17,7 @@ export class UmbSearchHeaderAppElement extends UmbLitElement {
 	}
 
 	#onSearchClick() {
-		this._modalContext?.search();
+		alert('implement search search modal');
 	}
 
 	render() {
