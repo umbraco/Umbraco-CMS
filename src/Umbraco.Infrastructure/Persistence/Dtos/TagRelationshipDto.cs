@@ -14,6 +14,7 @@ internal class TagRelationshipDto
     [Column("nodeId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsTagRelationship", OnColumns = "nodeId, propertyTypeId, tagId")]
     [ForeignKey(typeof(ContentDto), Name = "FK_cmsTagRelationship_cmsContent", Column = "nodeId")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_tagId_nodeId", ForColumns = "tagId,nodeId", IncludeColumns = "propertyTypeId")]
     public int NodeId { get; set; }
 
     [Column("tagId")]
