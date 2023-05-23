@@ -66,16 +66,4 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 		if (!data) throw new Error('Invite data is missing');
 		return tryExecuteAndNotify(this.#host, UserResource.postUserInvite({ requestBody: data }));
 	}
-
-	// Enable
-	enable(data: EnableUserRequestModel) {
-		if (!data) throw new Error('enable data is missing');
-		return tryExecuteAndNotify(this.#host, UserResource.postUserEnable({ requestBody: data }));
-	}
-
-	// Disable
-	disable(data: DisableUserRequestModel) {
-		if (!data) throw new Error('disable data is missing');
-		return tryExecuteAndNotify(this.#host, UserResource.postUserDisable({ requestBody: data }));
-	}
 }

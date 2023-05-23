@@ -1,7 +1,10 @@
-import type { UUIModalDialogElement, UUIModalSidebarSize } from '@umbraco-ui/uui';
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRouterSlot } from 'router-slot/model';
+import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
 import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
+import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -36,16 +39,22 @@ export class UmbModalContext {
 	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
-		config?: UmbModalConfig
+		config?: UmbModalConfig,
+		router: IRouterSlot | null = null
 	) {
-		const modalHandler = new UmbModalHandlerClass(this.host, modalAlias, data, config) as unknown as UmbModalHandler<
-			ModalData,
-			ModalResult
-		>;
+		const modalHandler = new UmbModalHandlerClass(
+			this.host,
+			router,
+			modalAlias,
+			data,
+			config
+		) as unknown as UmbModalHandler<ModalData, ModalResult>;
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
-		this.#modals.next([...this.#modals.getValue(), modalHandler]);
+		this.#modals.next(
+			appendToFrozenArray(this.#modals.getValue(), modalHandler, (entry) => entry.key === modalHandler.key)
+		);
 		return modalHandler;
 	}
 
@@ -56,6 +65,7 @@ export class UmbModalContext {
 	 * @memberof UmbModalContext
 	 */
 	public close(key: string) {
+		console.log('close', key, this.#modals);
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
 			modal.reject();

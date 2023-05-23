@@ -1,14 +1,17 @@
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRouterSlot } from 'router-slot/model';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbModalHandler } from './modal-handler';
 import { UmbModalConfig, UmbModalContext } from './modal.context';
 import { UmbModalToken } from './token/modal-token';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Params } from '@umbraco-cms/backoffice/router';
 
-export type UmbModalRouteBuilder = (params: { [key: string]: string | number }) => string;
+export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
 export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenResult = any> {
 	#key: string;
-	#path: string;
+	#path: string | null;
 	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string;
 	#modalConfig?: UmbModalConfig;
 
@@ -23,7 +26,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	// Notice i removed the key in the transferring to this class.
 	constructor(
 		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string,
-		path: string,
+		path: string | null = null,
 		modalConfig?: UmbModalConfig
 	) {
 		this.#key = modalConfig?.key || UmbId.new();
@@ -40,11 +43,15 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		return this.#modalAlias;
 	}
 
+	public generateModalPath() {
+		return `modal/${encodeFolderName(this.alias.toString())}${this.path && this.path !== '' ? `/${this.path}` : ''}`;
+	}
+
 	public get path() {
 		return this.#path;
 	}
 
-	protected _setPath(path: string) {
+	protected _setPath(path: string | null) {
 		this.#path = path;
 	}
 
@@ -103,10 +110,13 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#modalHandler = undefined;
 	};
 
-	routeSetup(modalContext: UmbModalContext, params: Params) {
+	routeSetup(router: IRouterSlot, modalContext: UmbModalContext, params: Params) {
+		// If already open, don't do anything:
+		if (this.active) return;
+
 		const modalData = this.#onSetupCallback ? this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig);
+			this.#modalHandler = modalContext.open(this.#modalAlias, modalData, this.modalConfig, router);
 			this.#modalHandler.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalHandler;
 		}

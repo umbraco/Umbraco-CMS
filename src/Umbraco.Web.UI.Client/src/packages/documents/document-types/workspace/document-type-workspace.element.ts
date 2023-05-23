@@ -14,9 +14,18 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
+			path: 'create/:parentId',
+			component: () => this.#element,
+			setup: (_component, info) => {
+				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
+				this.#workspaceContext.createScaffold(parentId);
+			},
+		},
+		{
 			path: 'edit/:id',
 			component: () => this.#element,
 			setup: (_component, info) => {
+				console.log('Setup for edit/id');
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},

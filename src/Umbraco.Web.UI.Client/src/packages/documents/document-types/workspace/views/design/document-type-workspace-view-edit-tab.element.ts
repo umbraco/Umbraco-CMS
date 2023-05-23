@@ -2,12 +2,13 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import './document-type-workspace-view-edit-properties.element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
+
+import './document-type-workspace-view-edit-properties.element';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {

@@ -8,7 +8,6 @@ export class UmbUnlockUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUs
 	}
 
 	async execute() {
-		//TODO: Implement
-		alert('Bulk unlock is not implemented yet');
+		await this.repository?.unlock(this.selection);
 	}
 }

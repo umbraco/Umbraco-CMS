@@ -5,7 +5,8 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -75,7 +76,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name;
 				routes.push({
-					path: `tab/${encodeURI(tabName || '').toString()}`,
+					path: `tab/${encodeFolderName(tabName || '').toString()}`,
 					component: () => import('./document-type-workspace-view-edit-tab.element'),
 					setup: (component) => {
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName ?? '';
@@ -134,8 +135,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				this._tabs,
 				(tab) => tab.id! + tab.name,
 				(tab) => {
-					// TODO: make better url folder name:
-					const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
+					const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 					return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}>
 						${path === this._activePath && this._tabsStructureHelper.isOwnerContainer(tab.id!)
 							? html` <uui-input
@@ -150,7 +150,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 										});
 
 										// Update the current URL, so we are still on this specific tab:
-										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeURI(newName));
+										window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
 									}}>
 									<uui-button
 										label="Remove tab"

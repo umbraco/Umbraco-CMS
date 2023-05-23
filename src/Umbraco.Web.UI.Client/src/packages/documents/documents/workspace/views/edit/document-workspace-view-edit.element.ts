@@ -4,7 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -74,7 +75,7 @@ export class UmbDocumentWorkspaceViewEditElement
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name;
 				routes.push({
-					path: `tab/${encodeURI(tabName || '').toString()}`,
+					path: `tab/${encodeFolderName(tabName || '').toString()}`,
 					component: () => import('./document-workspace-view-edit-tab.element'),
 					setup: (component) => {
 						(component as any).tabName = tabName;
@@ -121,8 +122,7 @@ export class UmbDocumentWorkspaceViewEditElement
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
-								// TODO: make better url folder name:
-								const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
+								const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 								return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
 									>${tab.name}</uui-tab
 								>`;

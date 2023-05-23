@@ -76,7 +76,6 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				box-sizing: border-box;
 				width: 100%;
 				max-width: 180px;
-				//width: 200px;
 				position: relative;
 				display: flex;
 				flex-direction: column;
@@ -119,6 +118,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				align-items: center;
 				cursor: pointer;
 				flex-grow: 1;
+				font-family: inherit;
 			}
 
 			#open-part,

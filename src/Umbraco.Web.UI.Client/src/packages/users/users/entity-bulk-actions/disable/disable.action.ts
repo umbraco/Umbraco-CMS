@@ -8,7 +8,6 @@ export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbU
 	}
 
 	async execute() {
-		//TODO: Implement
-		alert('Bulk disable is not implemented yet');
+		await this.repository?.disable(this.selection);
 	}
 }

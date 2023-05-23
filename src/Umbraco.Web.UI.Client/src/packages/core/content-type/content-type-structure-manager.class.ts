@@ -27,7 +27,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	#contentTypeRepository: R;
 
-	#rootDocumentTypeId?: string;
+	#ownerDocumentTypeId?: string;
 	#documentTypeObservers = new Array<UmbControllerInterface>();
 	#documentTypes = new UmbArrayState<T>([], (x) => x.id);
 	readonly documentTypes = this.#documentTypes.asObservable();
@@ -58,7 +58,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	public async loadType(id?: string) {
 		this._reset();
 
-		this.#rootDocumentTypeId = id;
+		this.#ownerDocumentTypeId = id;
 
 		const promiseResult = this._loadType(id);
 		this.#init = promiseResult;
@@ -66,19 +66,37 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return promiseResult;
 	}
 
-	public async createScaffold(parentId: string) {
+	public async createScaffold(parentId: string | null) {
 		this._reset();
 
-		if (!parentId) return {};
+		if (parentId === undefined) return {};
 
 		const { data } = await this.#contentTypeRepository.createScaffold(parentId);
 		if (!data) return {};
 
-		this.#rootDocumentTypeId = data.id;
+		this.#ownerDocumentTypeId = data.id;
 
 		this.#init = this._observeDocumentType(data);
 		await this.#init;
 		return { data };
+	}
+
+	public async save() {
+		const documentType = this.getOwnerDocumentType();
+		if (!documentType || !documentType.id) return false;
+
+		await this.#contentTypeRepository.save(documentType.id, documentType);
+
+		return true;
+	}
+
+	public async create() {
+		const documentType = this.getOwnerDocumentType();
+		if (!documentType || !documentType.id) return false;
+
+		//const value = documentType as CreateDocumentTypeRequestModel & { id: string };
+		await this.#contentTypeRepository.create(documentType);
+		return true;
 	}
 
 	private async _ensureType(id?: string) {
@@ -132,14 +150,14 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	/** Public methods for consuming structure: */
 
-	rootDocumentType() {
-		return this.#documentTypes.getObservablePart((x) => x.find((y) => y.id === this.#rootDocumentTypeId));
+	ownerDocumentType() {
+		return this.#documentTypes.getObservablePart((x) => x.find((y) => y.id === this.#ownerDocumentTypeId));
 	}
-	getRootDocumentType() {
-		return this.#documentTypes.getValue().find((y) => y.id === this.#rootDocumentTypeId);
+	getOwnerDocumentType() {
+		return this.#documentTypes.getValue().find((y) => y.id === this.#ownerDocumentTypeId);
 	}
-	updateRootDocumentType(entry: T) {
-		this.#documentTypes.updateOne(this.#rootDocumentTypeId, entry);
+	updateOwnerDocumentType(entry: T) {
+		this.#documentTypes.updateOne(this.#ownerDocumentTypeId, entry);
 	}
 
 	// We could move the actions to another class?
@@ -151,7 +169,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		sortOrder?: number
 	) {
 		await this.#init;
-		contentTypeId = contentTypeId ?? this.#rootDocumentTypeId!;
+		contentTypeId = contentTypeId ?? this.#ownerDocumentTypeId!;
 
 		const container: PropertyTypeContainerResponseModelBaseModel = {
 			id: UmbId.new(),
@@ -175,7 +193,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		partialUpdate: Partial<PropertyTypeContainerResponseModelBaseModel>
 	) {
 		await this.#init;
-		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
 		const frozenContainers = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.containers ?? [];
 
@@ -186,7 +204,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	async removeContainer(documentTypeKey: string | null, containerId: string | null = null) {
 		await this.#init;
-		documentTypeKey = documentTypeKey ?? this.#rootDocumentTypeId!;
+		documentTypeKey = documentTypeKey ?? this.#ownerDocumentTypeId!;
 
 		const frozenContainers = this.#documentTypes.getValue().find((x) => x.id === documentTypeKey)?.containers ?? [];
 		const containers = frozenContainers.filter((x) => x.id !== containerId);
@@ -196,13 +214,28 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	async createProperty(documentTypeId: string | null, containerId: string | null = null, sortOrder?: number) {
 		await this.#init;
-		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
 		const property: PropertyTypeResponseModelBaseModel = {
 			id: UmbId.new(),
 			containerId: containerId,
-			//sortOrder: sortOrder ?? 0,
-		};
+			alias: '',
+			name: '',
+			description: '',
+			dataTypeId: '',
+			variesByCulture: false,
+			variesBySegment: false,
+			validation: {
+				mandatory: false,
+				mandatoryMessage: null,
+				regEx: null,
+				regExMessage: null,
+			},
+			appearance: {
+				labelOnTop: false,
+			},
+			sortOrder: sortOrder ?? 0,
+		} as any; // Sort order was not allowed when this was written.
 
 		const properties = [...(this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [])];
 		properties.push(property);
@@ -214,7 +247,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	async insertProperty(documentTypeId: string | null, property: PropertyTypeResponseModelBaseModel) {
 		await this.#init;
-		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
 		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [];
 
@@ -225,7 +258,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 
 	async removeProperty(documentTypeId: string | null, propertyId: string) {
 		await this.#init;
-		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
 		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [];
 
@@ -240,7 +273,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		partialUpdate: Partial<PropertyTypeResponseModelBaseModel>
 	) {
 		await this.#init;
-		documentTypeId = documentTypeId ?? this.#rootDocumentTypeId!;
+		documentTypeId = documentTypeId ?? this.#ownerDocumentTypeId!;
 
 		const frozenProperties = this.#documentTypes.getValue().find((x) => x.id === documentTypeId)?.properties ?? [];
 
@@ -258,9 +291,9 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	}
 	*/
 
-	rootDocumentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
+	ownerDocumentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
 		return this.#documentTypes.getObservablePart((docTypes) => {
-			const docType = docTypes.find((x) => x.id === this.#rootDocumentTypeId);
+			const docType = docTypes.find((x) => x.id === this.#ownerDocumentTypeId);
 			return docType ? mappingFunction(docType) : undefined;
 		});
 	}
@@ -311,6 +344,10 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		});
 	}
 
+	ownerContainersOf(containerType: PropertyContainerTypes) {
+		return this.ownerDocumentTypeObservablePart((x) => x.containers?.filter((x) => x.type === containerType) ?? []);
+	}
+
 	containersOfParentKey(
 		parentId: PropertyTypeContainerResponseModelBaseModel['parentId'],
 		containerType: PropertyContainerTypes
@@ -320,7 +357,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		});
 	}
 
-	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should nto be merged.
+	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged.
 	containersByNameAndType(name: string, containerType: PropertyContainerTypes) {
 		return this.#containers.getObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
