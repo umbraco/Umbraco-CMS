@@ -61,6 +61,7 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 
 	constructor(
 		host: UmbControllerHostElement,
+		router: IRouterSlot | null,
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
 		config?: UmbModalConfig
