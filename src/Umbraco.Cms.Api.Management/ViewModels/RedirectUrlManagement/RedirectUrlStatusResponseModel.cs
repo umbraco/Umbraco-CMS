@@ -1,4 +1,4 @@
-﻿using Umbraco.New.Cms.Core.Models.RedirectUrlManagement;
+﻿using Umbraco.Cms.Core.Models.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 

@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.New.Cms.Core.Models;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Serialization;
 

@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Installer;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Factories;
+using Umbraco.Cms.Core.Installer;
+using Umbraco.Cms.Core.Installer.Steps;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.New.Cms.Core.Factories;
-using Umbraco.New.Cms.Core.Installer;
-using Umbraco.New.Cms.Core.Installer.Steps;
-using Umbraco.New.Cms.Core.Services.Installer;
-using Umbraco.New.Cms.Infrastructure.Factories.Installer;
-using Umbraco.New.Cms.Infrastructure.Installer.Steps;
-using Umbraco.New.Cms.Web.Common.Installer;
+using Umbraco.Cms.Core.Services.Installer;
+using Umbraco.Cms.Infrastructure.Factories.Installer;
+using Umbraco.Cms.Infrastructure.Installer.Steps;
+using Umbraco.Cms.Web.Common.Installer;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 

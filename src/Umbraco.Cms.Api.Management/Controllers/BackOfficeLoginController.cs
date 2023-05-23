@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.Common.Models;
+using Microsoft.AspNetCore.Routing;
 
-namespace Umbraco.Cms.Web.UI;
+namespace Umbraco.Cms.Api.Management;
 
 [BindProperties]
-public class BackOfficeLoginModel
+public class
+    BackOfficeLoginModel
 {
     [FromQuery(Name = "ReturnUrl")]
     public string? ReturnUrl { get; set; }

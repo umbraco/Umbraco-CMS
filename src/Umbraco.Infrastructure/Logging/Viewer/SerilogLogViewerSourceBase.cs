@@ -3,7 +3,6 @@ using Serilog;
 using Serilog.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
