@@ -18,12 +18,12 @@
 		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"paths": {
-			"@umbraco-cms/backoffice/external/lit": ["external/lit"],
-			"@umbraco-cms/backoffice/external/openid": ["external/openid"],
-			"@umbraco-cms/backoffice/backend-api": ["external/backend-api"],
-			"@umbraco-cms/backoffice/external/rxjs": ["external/rxjs"],
-			"@umbraco-cms/backoffice/external/router-slot": ["external/router-slot"],
-			"@umbraco-cms/backoffice/external/uuid": ["external/uuid"],
+			"@umbraco-cms/backoffice/external/lit": ["src/external/lit"],
+			"@umbraco-cms/backoffice/external/openid": ["src/external/openid"],
+			"@umbraco-cms/backoffice/backend-api": ["src/external/backend-api"],
+			"@umbraco-cms/backoffice/external/rxjs": ["src/external/rxjs"],
+			"@umbraco-cms/backoffice/external/router-slot": ["src/external/router-slot"],
+			"@umbraco-cms/backoffice/external/uuid": ["src/external/uuid"],
 
 			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],
