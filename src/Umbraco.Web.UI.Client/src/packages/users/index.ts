@@ -13,8 +13,8 @@ import { UmbUserGroupItemStore } from './user-groups/repository/user-group-item.
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
-import './users/components';
-import './user-groups/components';
+import './users/components/index.js';
+import './user-groups/components/index.js';
 
 export const manifests = [...userGroupManifests, ...userManifests, ...userSectionManifests, ...currentUserManifests];
 

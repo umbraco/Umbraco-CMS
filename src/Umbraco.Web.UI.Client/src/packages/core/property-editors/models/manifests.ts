@@ -1,6 +1,6 @@
 import { manifest as colorPicker } from './Umbraco.ColorPicker.js';
 import { manifest as eyeDropper } from './Umbraco.ColorPicker.EyeDropper.js';
-import { manifest as json } from './Umbraco.JSON';
+import { manifest as json } from './Umbraco.JSON.js';
 import { manifest as multiUrlPicker } from './Umbraco.MultiUrlPicker.js';
 import { manifest as multiNodeTreePicker } from './Umbraco.MultiNodeTreePicker.js';
 import { manifest as dateTime } from './Umbraco.DateTime.js';

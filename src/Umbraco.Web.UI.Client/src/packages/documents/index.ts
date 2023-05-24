@@ -6,8 +6,8 @@ import { manifests as documentTypeManifests } from './document-types/manifests.j
 import { manifests as documentManifests } from './documents/manifests.js';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
-import './document-types/components';
-import './documents/components';
+import './document-types/components/index.js';
+import './documents/components/index.js';
 
 export const manifests = [
 	...dashboardManifests,

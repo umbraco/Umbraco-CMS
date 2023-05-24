@@ -5,8 +5,8 @@ import { manifests as partialManifests } from './partial-views/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
-import './components';
-import './templates/components';
+import './components/index.js';
+import './templates/components/index.js';
 
 export const manifests = [
 	...menuManifests,

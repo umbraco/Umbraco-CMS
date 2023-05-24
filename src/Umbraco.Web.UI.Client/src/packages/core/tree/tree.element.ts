@@ -1,15 +1,15 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTreeContextBase } from './tree.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-import './tree-item/tree-item.element';
-import './tree-item-base/tree-item-base.element';
-import './context-menu/tree-context-menu-page.service';
-import './context-menu/tree-context-menu.service';
+import './tree-item/tree-item.element.js';
+import './tree-item-base/tree-item-base.element.js';
+import './context-menu/tree-context-menu-page.service.js';
+import './context-menu/tree-context-menu.service.js';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
