@@ -1,4 +1,3 @@
-import { template } from 'lodash-es';
 import type {
 	ContentTreeItemResponseModel,
 	DocumentTreeItemResponseModel,

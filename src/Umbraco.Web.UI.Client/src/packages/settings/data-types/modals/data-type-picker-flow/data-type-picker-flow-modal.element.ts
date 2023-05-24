@@ -2,7 +2,7 @@ import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { repeat } from '@umbraco-cms/backoffice/external/lit';
-import { groupBy } from 'lodash-es';
+import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
 import {
