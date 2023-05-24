@@ -28,6 +28,9 @@ export default class UmbLoginElement extends LitElement {
 	@state()
 	private _loginError = '';
 
+	@state()
+	private _isFormValid = false;
+
 	constructor() {
 		super();
 		if (this.isLegacy) {
@@ -37,14 +40,22 @@ export default class UmbLoginElement extends LitElement {
 		}
 	}
 
+	#checkFormValidity(e: Event) {
+		const form = e.target as HTMLFormElement;
+		if (!form) return;
+
+		this._isFormValid = form.checkValidity();
+	}
+
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
 
-		const isValid = form.checkValidity();
-		if (!isValid) return;
+		this._isFormValid = form.checkValidity();
+
+		if (!this._isFormValid) return;
 
 		const formData = new FormData(form);
 
@@ -80,7 +91,7 @@ export default class UmbLoginElement extends LitElement {
 			<umb-auth-layout>
 				<div class="uui-text">
 					<h1 class="uui-h3">${this._greeting}</h1>
-					<uui-form>
+					<uui-form @input=${this.#checkFormValidity}>
 						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 							<uui-form-layout-item>
 								<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
@@ -108,6 +119,7 @@ export default class UmbLoginElement extends LitElement {
 							<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
 
 							<uui-button
+								?disabled=${!this._isFormValid}
 								type="submit"
 								label="Login"
 								look="primary"
