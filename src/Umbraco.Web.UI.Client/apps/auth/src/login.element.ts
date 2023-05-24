@@ -40,11 +40,16 @@ export default class UmbLoginElement extends LitElement {
 		}
 	}
 
-	#checkFormValidity = (e: Event) => {
-		const form = e.target as HTMLFormElement;
+	//TODO: What is the correct type for this event?
+	#checkFormValidity = (e: any) => {
+		const form = e.target.closest('form') as HTMLFormElement;
+
 		if (!form) return;
 
-		this._isFormValid = form.checkValidity();
+		//TODO: Why do we need to wait one frame for the check to work correctly?
+		requestAnimationFrame(() => {
+			this._isFormValid = form.checkValidity();
+		});
 	};
 
 	#handleSubmit = async (e: SubmitEvent) => {
@@ -54,6 +59,8 @@ export default class UmbLoginElement extends LitElement {
 		if (!form) return;
 
 		this._isFormValid = form.checkValidity();
+
+		console.log('what', this._isFormValid);
 
 		if (!this._isFormValid) return;
 
@@ -73,7 +80,7 @@ export default class UmbLoginElement extends LitElement {
 		if (error) return;
 
 		//TODO: Should redirecting be done here or in the context?
-		location.replace(this.returnUrl);
+		location.href = this.returnUrl;
 	};
 
 	get #greeting() {
@@ -93,8 +100,8 @@ export default class UmbLoginElement extends LitElement {
 			<umb-auth-layout>
 				<div class="uui-text">
 					<h1 class="uui-h3">${this.#greeting}</h1>
-					<uui-form @input=${this.#checkFormValidity}>
-						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
+					<uui-form>
+						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}" @input=${this.#checkFormValidity}>
 							<uui-form-layout-item>
 								<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 								<uui-input
