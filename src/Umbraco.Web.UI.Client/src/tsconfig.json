@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist-cms",
+    "rootDir": ".",
+    "composite": true
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["./**/*.test.ts", "./**/*.stories.ts", "./mocks"],
+}
