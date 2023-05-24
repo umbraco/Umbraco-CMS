@@ -1,16 +1,16 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element';
+import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element.js';
 import './dashboard-examine-management.element';
 
-import type { UmbDashboardExamineOverviewElement } from './views/section-view-examine-overview';
+import type { UmbDashboardExamineOverviewElement } from './views/section-view-examine-overview.js';
 import './views/section-view-examine-overview';
 
-import type { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
+import type { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
 import './views/section-view-examine-indexers';
 
-import type { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
+import type { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
 import './views/section-view-examine-searchers';
 
 export default {
