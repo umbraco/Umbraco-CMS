@@ -73,6 +73,7 @@ preserve.belle
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/js
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/lib
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/login
 
 # Environment specific data
 /src/Umbraco.Web.UI.Client/[Bb]uild/
