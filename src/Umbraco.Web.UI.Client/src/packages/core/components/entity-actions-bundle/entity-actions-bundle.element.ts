@@ -45,7 +45,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 				.pipe(map((actions) => actions.filter((action) => action.conditions.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this._hasActions = actions.length > 0;
-				console.log('umb-entity-actions-bundle — observe', this._entityType, this._hasActions);
 			},
 			'observeEntityAction'
 		);
