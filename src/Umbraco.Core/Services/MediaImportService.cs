@@ -18,7 +18,6 @@ internal sealed class MediaImportService : IMediaImportService
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
     private readonly IUserService _userService;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public MediaImportService(
         IShortStringHelper shortStringHelper,
@@ -28,8 +27,7 @@ internal sealed class MediaImportService : IMediaImportService
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
         IEntityService entityService,
         AppCaches appCaches,
-        IUserService userService,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserService userService)
     {
         _shortStringHelper = shortStringHelper;
         _mediaFileManager = mediaFileManager;
@@ -39,7 +37,6 @@ internal sealed class MediaImportService : IMediaImportService
         _entityService = entityService;
         _appCaches = appCaches;
         _userService = userService;
-        _userIdKeyResolver = userIdKeyResolver;
     }
 
     public async Task<IMedia> ImportAsync(string fileName, Stream fileStream, Guid? parentId, string? mediaTypeAlias, Guid userKey)
@@ -49,8 +46,7 @@ internal sealed class MediaImportService : IMediaImportService
             throw new InvalidOperationException("Could not read from file stream, please ensure it is open and readable");
         }
 
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
-        IUser user = _userService.GetUserById(userId)
+        IUser user = await _userService.GetAsync(userKey)
                      ?? throw new ArgumentException($"Could not find a user with the specified user key ({userKey})", nameof(userKey));
 
         var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
@@ -62,16 +58,16 @@ internal sealed class MediaImportService : IMediaImportService
         {
             int[]? userStartNodes = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
 
-            mediaFile = _mediaService.CreateMedia(mediaItemName, userStartNodes != null && userStartNodes.Any() ? userStartNodes[0] : Constants.System.Root, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, userId);
+            mediaFile = _mediaService.CreateMedia(mediaItemName, userStartNodes != null && userStartNodes.Any() ? userStartNodes[0] : Constants.System.Root, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, user.Id);
         }
         else
         {
-            mediaFile = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, userId);
+            mediaFile = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias ?? Constants.Conventions.MediaTypes.File, user.Id);
         }
 
         mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
 
-        _mediaService.Save(mediaFile, userId);
+        _mediaService.Save(mediaFile, user.Id);
 
         return mediaFile;
     }
