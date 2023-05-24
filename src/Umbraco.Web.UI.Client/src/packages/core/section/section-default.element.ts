@@ -13,8 +13,6 @@ import {
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './section-sidebar-menu/section-sidebar-menu.element';
-
 /**
  * @export
  * @class UmbBaseSectionElement
