@@ -1,9 +1,7 @@
-import { html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 /**
  * @element umb-property-editor-ui-block-grid-inner-test

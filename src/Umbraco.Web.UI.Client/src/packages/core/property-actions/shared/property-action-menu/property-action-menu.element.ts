@@ -1,5 +1,4 @@
-import { css, CSSResultGroup, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
