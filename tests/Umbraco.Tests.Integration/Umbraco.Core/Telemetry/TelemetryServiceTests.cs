@@ -49,7 +49,8 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
             Constants.Telemetry.AspEnvironment,
             Constants.Telemetry.IsDebug,
             Constants.Telemetry.DatabaseProvider,
-            Constants.Telemetry.CurrentServerRole
+            Constants.Telemetry.CurrentServerRole,
+            Constants.Telemetry.BackofficeExternalLoginProviderCount
         };
 
         MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
