@@ -56,7 +56,8 @@
 		"compile": "tsc",
 		"check": "npm run lint && npm run compile && npm run build-storybook",
 		"build2": "rollup -c ./src/rollup.config.js",
-		"copy": "node ./devops/build/copy.mjs"
+		"copy": "node ./devops/build/copy.mjs",
+		"build:external": "rollup -c ./external/rollup.config.js"
 	},
 	"engines": {
 		"node": ">=18.14 <19",
