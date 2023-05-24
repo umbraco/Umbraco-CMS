@@ -47,11 +47,6 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 
 	#repository = new UmbTagRepository(this);
 
-	constructor() {
-		super();
-		console.log('tags-input');
-	}
-
 	public focus() {
 		this._tagInput.focus();
 	}

@@ -1,6 +1,6 @@
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUserRepository } from '../../repository/user.repository';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUnlockUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
@@ -8,7 +8,6 @@ export class UmbUnlockUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUs
 	}
 
 	async execute() {
-		//TODO: Implement
-		alert('Bulk unlock is not implemented yet');
+		await this.repository?.unlock(this.selection);
 	}
 }

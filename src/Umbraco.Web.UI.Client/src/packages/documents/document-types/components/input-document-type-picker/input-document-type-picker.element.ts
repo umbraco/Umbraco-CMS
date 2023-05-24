@@ -11,7 +11,7 @@ import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
-	UMB_DOCUMENT_PICKER_MODAL,
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -27,7 +27,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	}
 	public set selectedIds(ids: Array<string>) {
 		this._selectedIds = ids ?? [];
-		super.value = ids.join(',');
+		super.value = this._selectedIds.join(',');
 		this._observePickedDocuments();
 	}
 
@@ -73,7 +73,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this._selectedIds],
 		});
