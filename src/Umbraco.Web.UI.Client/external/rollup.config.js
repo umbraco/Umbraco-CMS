@@ -38,4 +38,12 @@ export default [
 		},
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
+	{
+		input: './external/uuid/index.ts',
+		output: {
+			dir: `./dist-cms/external/uuid`,
+			format: 'es',
+		},
+		plugins: [nodeResolve(), commonjs(), esbuild()],
+	},
 ];

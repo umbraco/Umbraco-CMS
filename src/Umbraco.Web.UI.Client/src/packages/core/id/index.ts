@@ -1,4 +1,4 @@
-import { v4, validate } from 'uuid';
+import { v4, validate } from '@umbraco-cms/backoffice/external/uuid';
 
 export class UmbId {
 	public static new() {
