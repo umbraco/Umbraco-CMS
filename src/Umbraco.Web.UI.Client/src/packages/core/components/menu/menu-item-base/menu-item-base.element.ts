@@ -63,7 +63,7 @@ export class UmbMenuItemBaseElement extends UmbLitElement {
 		</umb-entity-actions-bundle>`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UUITextStyles];
 }
 
 declare global {
