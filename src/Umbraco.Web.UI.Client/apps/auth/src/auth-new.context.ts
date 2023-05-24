@@ -1,11 +1,9 @@
 import { LoginRequestModel, UmbAuthContext } from './types';
 
 export class UmbAuthNewContext implements UmbAuthContext {
-	returnUrl: string;
 	authUrl: string;
 
-	constructor(authUrl: string, returnUrl: string) {
-		this.returnUrl = returnUrl;
+	constructor(authUrl: string) {
 		this.authUrl = authUrl;
 	}
 

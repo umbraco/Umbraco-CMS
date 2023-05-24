@@ -1,13 +1,13 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
 
-import './auth-layout.element';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbAuthContext } from './types';
 import { UmbAuthLegacyContext } from './auth-legacy.context';
 import { UmbAuthNewContext } from './auth-new.context';
+
+import './auth-layout.element';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
@@ -34,18 +34,18 @@ export default class UmbLoginElement extends LitElement {
 	constructor() {
 		super();
 		if (this.isLegacy) {
-			this.#authContext = new UmbAuthLegacyContext(this.authUrl, this.returnUrl);
+			this.#authContext = new UmbAuthLegacyContext(this.authUrl);
 		} else {
-			this.#authContext = new UmbAuthNewContext(this.authUrl, this.returnUrl);
+			this.#authContext = new UmbAuthNewContext(this.authUrl);
 		}
 	}
 
-	#checkFormValidity(e: Event) {
+	#checkFormValidity = (e: Event) => {
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
 
 		this._isFormValid = form.checkValidity();
-	}
+	};
 
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -76,9 +76,6 @@ export default class UmbLoginElement extends LitElement {
 		location.replace(this.returnUrl);
 	};
 
-	@state()
-	private _greeting: string = this.#greeting;
-
 	get #greeting() {
 		return [
 			'Happy super Sunday',
@@ -95,7 +92,7 @@ export default class UmbLoginElement extends LitElement {
 		return html`
 			<umb-auth-layout>
 				<div class="uui-text">
-					<h1 class="uui-h3">${this._greeting}</h1>
+					<h1 class="uui-h3">${this.#greeting}</h1>
 					<uui-form @input=${this.#checkFormValidity}>
 						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 							<uui-form-layout-item>
