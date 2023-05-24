@@ -1,4 +1,4 @@
-import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,

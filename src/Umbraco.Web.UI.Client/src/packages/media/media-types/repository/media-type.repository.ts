@@ -1,8 +1,8 @@
-import type { MediaTypeDetails } from '../types';
-import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store';
-import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data';
-import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store';
-import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data';
+import type { MediaTypeDetails } from '../types.js';
+import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store.js';
+import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data.js';
+import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store.js';
+import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';

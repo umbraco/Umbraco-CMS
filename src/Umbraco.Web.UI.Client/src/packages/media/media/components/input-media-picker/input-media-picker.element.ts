@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbMediaRepository } from '../../repository/media.repository';
+import { UmbMediaRepository } from '../../repository/media.repository.js';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,

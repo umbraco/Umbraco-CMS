@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import type { MediaDetails } from '../';
+import type { MediaDetails } from '../index.js';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
