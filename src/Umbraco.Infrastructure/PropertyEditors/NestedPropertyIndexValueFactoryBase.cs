@@ -37,6 +37,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
+        var index = 0;
         foreach (TItem nestedContentRowValue in GetDataItems(deserializedPropertyValue))
         {
             IContentType? contentType = GetContentTypeOfNestedItem(nestedContentRowValue);
@@ -70,13 +71,15 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                     .ToDictionary(x => x.Alias);
 
             result.AddRange(GetNestedResults(
-                property.Alias,
+                $"{property.Alias}.items[{index}]",
                 culture,
                 segment,
                 published,
                 propertyTypeDictionary,
                 nestedContentRowValue,
                 availableCultures));
+
+            index++;
         }
 
         return RenameKeysToEnsureRawSegmentsIsAPrefix(result);
@@ -174,8 +177,6 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         TItem nestedContentRowValue,
         IEnumerable<string> availableCultures)
     {
-        var blockIndex = 0;
-
         foreach ((var propertyAlias, var propertyValue) in GetRawProperty(nestedContentRowValue))
         {
             if (propertyTypeDictionary.TryGetValue(propertyAlias, out IPropertyType? propertyType))
@@ -189,7 +190,7 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                 IProperty subProperty = new Property(propertyType);
                 IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexValues = null!;
 
-                if (propertyType.VariesByCulture())
+                if (propertyType.VariesByCulture() && culture is null)
                 {
                     foreach (var availableCulture in availableCultures)
                     {
@@ -204,10 +205,10 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                 }
                 else
                 {
-                    subProperty.SetValue(propertyValue, null, segment);
+                    subProperty.SetValue(propertyValue, culture, segment);
                     if (published)
                     {
-                        subProperty.PublishValues(culture, segment ?? "*");
+                        subProperty.PublishValues(culture ?? "*", segment ?? "*");
                     }
                     indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published, availableCultures);
                 }
@@ -215,11 +216,9 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
                 foreach ((var nestedAlias, IEnumerable<object?> nestedValue) in indexValues)
                 {
                     yield return new KeyValuePair<string, IEnumerable<object?>>(
-                        $"{keyPrefix}.items[{blockIndex}].{nestedAlias}", nestedValue!);
+                        $"{keyPrefix}.{nestedAlias}", nestedValue!);
                 }
             }
-
-            blockIndex++;
         }
     }
 }
