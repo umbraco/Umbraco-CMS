@@ -217,7 +217,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             return mediaWithCropsDtos.Where(m => m.MediaTypeAlias != unknownMediaType).ToList();
         }
 
-        List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPicker3Configuration configuration)
+        private List<MediaWithCropsDto> HandleTemporaryMediaUploads(List<MediaWithCropsDto> mediaWithCropsDtos, MediaPicker3Configuration configuration)
         {
             Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
                          ?? throw new InvalidOperationException("Could not obtain the current backoffice user");
