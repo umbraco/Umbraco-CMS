@@ -1,6 +1,5 @@
 import { css, CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-//import logoImg from '/umbraco_logomark_white.svg';
 
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeaderElement extends UmbLitElement {
@@ -8,7 +7,7 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 		return html`
 			<div id="appHeader">
 				<uui-button id="logo" look="primary" label="Umbraco" compact>
-					<img src="" alt="Umbraco" />
+					<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
 				</uui-button>
 
 				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>

@@ -1,6 +1,4 @@
-import { css, CSSResultGroup, html, LitElement, unsafeCSS, customElement } from '@umbraco-cms/backoffice/external/lit';
-import logoImg from '/umbraco_logomark_white.svg';
-import installerImg from '/installer.jpg';
+import { css, CSSResultGroup, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-installer-layout')
 export class UmbInstallerLayoutElement extends LitElement {
@@ -9,7 +7,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 			<div id="background" aria-hidden="true"></div>
 
 			<div id="logo" aria-hidden="true">
-				<img src="${logoImg}" alt="Umbraco" />
+				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
 			</div>
 
 			<main id="container">
@@ -28,7 +26,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('${unsafeCSS(installerImg)}');
+				background-image: url('/umbraco/backoffice/assets/installer.jpg');
 				width: 100vw;
 				height: 100vh;
 			}
