@@ -11,7 +11,7 @@ export class UmbAuthNewContext implements UmbAuthContext {
 
 	async login(data: LoginRequestModel) {
 		//TODO: call authUrl with data
-		const { error } = await UmbMockAPI.login(data, true);
+		const { error } = await UmbMockAPI.login(data, false);
 
 		//TODO Should the redirect be done here? or in the login element?
 

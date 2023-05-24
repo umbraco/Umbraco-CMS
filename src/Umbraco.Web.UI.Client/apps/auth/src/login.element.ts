@@ -69,6 +69,11 @@ export default class UmbLoginElement extends LitElement {
 
 		this._loginError = error || '';
 		this._loginState = error ? 'failed' : 'success';
+
+		if (error) return;
+
+		//TODO: Should redirecting be done here or in the context?
+		location.replace(this.returnUrl);
 	};
 
 	@state()
