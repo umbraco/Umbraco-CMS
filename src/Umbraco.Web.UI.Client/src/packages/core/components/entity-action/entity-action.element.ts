@@ -1,5 +1,5 @@
 import { html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
@@ -38,16 +38,26 @@ class UmbEntityActionElement extends UmbLitElement {
 		}
 	}
 
-	#createApi() {
+	async #createApi() {
 		if (!this._manifest?.meta.api) return;
+		// TODO: Could we provide the manifest to the api constructor? instead, to enable more flexibility. Mainly cause some actions knows their repository. some does not need a repository?
 		this.#api = new this._manifest.meta.api(this, this._manifest.meta.repositoryAlias, this.unique);
+
+		// TODO: Fix so when we use a HREF it does not refresh the page?
+		this._href = await this.#api.getHref?.();
+		this.requestUpdate('_href');
 	}
 
 	#api: any;
 
+	@state()
+	_href?: string;
+
 	async #onClickLabel(event: UUIMenuItemEvent) {
-		event.stopPropagation();
-		await this.#api.execute();
+		if (!this._href) {
+			event.stopPropagation();
+			await this.#api.execute();
+		}
 		this.dispatchEvent(new UmbExecutedEvent());
 	}
 
@@ -60,7 +70,8 @@ class UmbEntityActionElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-menu-item
-				label="${ifDefined(this._manifest?.meta.label)}"
+				label=${ifDefined(this._manifest?.meta.label)}
+				href=${this._href}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
 				${this._manifest?.meta.icon
