@@ -1,4 +1,4 @@
-import { UmbControllerInterface } from './controller.interface';
+import type { UmbControllerInterface } from './controller.interface.js';
 
 type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;
 
