@@ -4,7 +4,6 @@ public enum ApiContentQueryOperationStatus
 {
     Success,
     FilterOptionNotFound,
-    IndexNotFound,
     SelectorOptionNotFound,
     SortOptionNotFound
 }

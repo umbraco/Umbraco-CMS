@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
-public interface IApiRichTextParser
+public interface IApiRichTextElementParser
 {
     IRichTextElement? Parse(string html);
 }
