@@ -1,15 +1,15 @@
-import { manifests as userGroupManifests } from './user-groups/manifests';
-import { manifests as userManifests } from './users/manifests';
-import { manifests as userSectionManifests } from './user-section/manifests';
-import { manifests as currentUserManifests } from './current-user/manifests';
+import { manifests as userGroupManifests } from './user-groups/manifests.js';
+import { manifests as userManifests } from './users/manifests.js';
+import { manifests as userSectionManifests } from './user-section/manifests.js';
+import { manifests as currentUserManifests } from './current-user/manifests.js';
 
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user/current-user.store';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from './current-user/current-user.store.js';
 import {
 	UmbCurrentUserHistoryStore,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
-} from './current-user/current-user-history.store';
-import { UmbUserItemStore } from './users/repository/user-item.store';
-import { UmbUserGroupItemStore } from './user-groups/repository/user-group-item.store';
+} from './current-user/current-user-history.store.js';
+import { UmbUserItemStore } from './users/repository/user-item.store.js';
+import { UmbUserGroupItemStore } from './user-groups/repository/user-group-item.store.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 

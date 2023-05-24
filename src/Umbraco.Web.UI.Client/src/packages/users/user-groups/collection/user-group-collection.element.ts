@@ -1,7 +1,7 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement } from 'lit/decorators.js';
-import { UmbUserGroupCollectionContext } from './user-group-collection.context';
+import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

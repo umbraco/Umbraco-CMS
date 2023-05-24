@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbUserWorkspaceContext } from '../user-workspace.context';
+import { UmbUserWorkspaceContext } from '../user-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-user-workspace-action-save')

@@ -1,11 +1,11 @@
 import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbUserCollectionContext } from '../../user-collection.context';
+import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
-} from '../../../../user-groups/repository/user-group.store';
+} from '../../../../user-groups/repository/user-group.store.js';
 import {
 	UmbTableElement,
 	UmbTableColumn,

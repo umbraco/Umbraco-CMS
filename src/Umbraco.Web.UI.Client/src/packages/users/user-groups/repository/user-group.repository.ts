@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
-import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from '../types';
-import { UmbUserGroupServerDataSource } from './sources/user-group.server.data';
-import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data';
-import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store';
-import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from './user-group.store';
-import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data';
+import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from '../types.js';
+import { UmbUserGroupServerDataSource } from './sources/user-group.server.data.js';
+import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data.js';
+import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store.js';
+import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from './user-group.store.js';
+import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data.js';
 import {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,

@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbUserGroupPickerContext } from './user-group-input.context';
+import { UmbUserGroupPickerContext } from './user-group-input.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

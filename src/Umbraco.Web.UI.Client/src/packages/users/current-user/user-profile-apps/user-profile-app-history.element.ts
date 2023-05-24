@@ -5,7 +5,7 @@ import {
 	UmbCurrentUserHistoryItem,
 	UmbCurrentUserHistoryStore,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
-} from '../current-user-history.store';
+} from '../current-user-history.store.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-profile-app-history')

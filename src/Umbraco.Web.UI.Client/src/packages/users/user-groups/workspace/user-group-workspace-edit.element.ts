@@ -3,8 +3,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 // TODO: import from package when available
-//import { UmbUserInputElement } from '../../users/components/user-input/user-input.element';
-import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
+//import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
+import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

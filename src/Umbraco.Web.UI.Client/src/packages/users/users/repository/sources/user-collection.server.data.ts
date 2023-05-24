@@ -1,4 +1,4 @@
-import type { UmbUserCollectionFilterModel } from '../../types';
+import type { UmbUserCollectionFilterModel } from '../../types.js';
 import { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import { UserResponseModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

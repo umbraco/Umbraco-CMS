@@ -5,11 +5,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import { getLookAndColorFromUserStatus } from '../../utils';
-import { UmbUserRepository } from '../repository/user.repository';
-import UmbUserGroupInputElement from '../../user-groups/components/input-user-group/user-group-input.element';
-import { UmbUserWorkspaceContext } from './user-workspace.context';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store.js';
+import { getLookAndColorFromUserStatus } from '../../utils.js';
+import { UmbUserRepository } from '../repository/user.repository.js';
+import UmbUserGroupInputElement from '../../user-groups/components/input-user-group/user-group-input.element.js';
+import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

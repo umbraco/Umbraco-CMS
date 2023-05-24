@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
-import { getLookAndColorFromUserStatus } from './utils';
+import { getLookAndColorFromUserStatus } from './utils.js';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 describe('UmbUserExtensions', () => {

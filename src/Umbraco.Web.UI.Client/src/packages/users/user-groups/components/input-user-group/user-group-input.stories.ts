@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import type { UmbUserGroupInputElement } from './user-group-input.element';
+import type { UmbUserGroupInputElement } from './user-group-input.element.js';
 import './user-group-input.element';
 
 const meta: Meta<UmbUserGroupInputElement> = {
