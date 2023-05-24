@@ -23,8 +23,8 @@ export class UmbIconRegistry extends UUIIconRegistry {
 		if (!iconManifest) return false;
 
 		const icon = this.provideIcon(iconName);
-
-		const iconPath = `${import.meta.env.BASE_URL}${iconManifest.path}`;
+		//const iconPath = `${import.meta.env.BASE_URL}${iconManifest.path}`;
+		const iconPath = '';
 
 		import(/* @vite-ignore */ iconPath)
 			.then((iconModule) => {
