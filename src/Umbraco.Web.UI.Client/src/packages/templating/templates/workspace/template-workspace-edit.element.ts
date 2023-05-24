@@ -87,6 +87,8 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		const match = RegexString.exec(this._content ?? '');
 
 		if (match) {
+			if (match[2] === 'null') return null;
+
 			return match[2].replace(/"/g, '');
 		}
 
