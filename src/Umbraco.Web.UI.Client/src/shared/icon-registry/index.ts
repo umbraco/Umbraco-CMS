@@ -1,1 +1,1 @@
-export * from './icon.registry';
+export * from './icon.registry.js';

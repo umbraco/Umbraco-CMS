@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UmbResourceController } from './resource.controller';
+import { UmbResourceController } from './resource.controller.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 

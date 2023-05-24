@@ -1,3 +1,3 @@
-export * from './resource.controller';
-export * from './tryExecute.function';
-export * from './tryExecuteAndNotify.function';
+export * from './resource.controller.js';
+export * from './tryExecute.function.js';
+export * from './tryExecuteAndNotify.function.js';

@@ -1,7 +1,7 @@
-export * from './router-slot.element';
-export * from './router-slot-change.event';
-export * from './router-slot-init.event';
-export * from './variant-router-slot.element';
+export * from './router-slot.element.js';
+export * from './router-slot-change.event.js';
+export * from './router-slot-init.event.js';
+export * from './variant-router-slot.element.js';
 export type {
 	PageComponent,
 	Guard,
@@ -14,7 +14,7 @@ export type {
 	Query,
 } from 'router-slot/model';
 export * from 'router-slot/util';
-export * from './route.context';
-export * from './route.interface';
-export * from './generate-route-path-builder.function';
-export * from './encode-folder-name.function';
+export * from './route.context.js';
+export * from './route.interface.js';
+export * from './generate-route-path-builder.function.js';
+export * from './encode-folder-name.function.js';

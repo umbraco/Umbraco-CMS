@@ -1,4 +1,4 @@
-import { DataSourceResponse } from './data-source-response.interface';
+import { DataSourceResponse } from './data-source-response.interface.js';
 import {
 	CreateFolderRequestModel,
 	FolderReponseModel,

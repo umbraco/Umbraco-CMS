@@ -1,5 +1,5 @@
-import type { UmbPagedData } from '../tree-repository.interface';
-import type { DataSourceResponse } from './data-source-response.interface';
+import type { UmbPagedData } from '../tree-repository.interface.js';
+import type { DataSourceResponse } from './data-source-response.interface.js';
 
 export interface UmbTreeDataSource<ItemType = any, PagedItemType = UmbPagedData<ItemType>> {
 	getRootItems(): Promise<DataSourceResponse<PagedItemType>>;
