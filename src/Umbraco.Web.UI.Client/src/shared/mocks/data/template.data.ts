@@ -72,6 +72,19 @@ export const data: Array<TemplateDBItem> = [
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
 	},
+	{
+		$type: '',
+		id: '9a84c0b3-03b4-4dd4-84ac-706740acwerer0f72',
+		isContainer: false,
+		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		name: 'Has Master Template',
+		type: 'template',
+		icon: 'umb:layout',
+		hasChildren: false,
+		alias: 'hasMasterTemplate',
+		content:
+			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = "some/path/to/a/template.cshtml";\r\n}',
+	},
 ];
 
 export const createTemplateScaffold = (masterTemplateAlias: string) => {
