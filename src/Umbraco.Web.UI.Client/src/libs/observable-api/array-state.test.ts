@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { UmbArrayState } from './array-state';
+import { UmbArrayState } from './array-state.js';
 
 describe('ArrayState', () => {
 	type ObjectType = { key: string; another: string };

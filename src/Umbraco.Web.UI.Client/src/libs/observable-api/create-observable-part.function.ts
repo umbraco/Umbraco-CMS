@@ -1,7 +1,7 @@
 import { distinctUntilChanged, map, Observable, shareReplay } from 'rxjs';
-import { MemoizationFunction } from './memoization-function';
-import { MappingFunction } from './mapping-function';
-import { defaultMemoization } from './default-memoization';
+import { MemoizationFunction } from './memoization-function.js';
+import { MappingFunction } from './mapping-function.js';
+import { defaultMemoization } from './default-memoization.js';
 
 /**
  * @export

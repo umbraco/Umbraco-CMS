@@ -1,4 +1,4 @@
-import { UmbBasicState } from './basic-state';
+import { UmbBasicState } from './basic-state.js';
 
 /**
  * @export

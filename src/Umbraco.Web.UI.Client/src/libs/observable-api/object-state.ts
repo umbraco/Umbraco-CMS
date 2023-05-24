@@ -1,4 +1,4 @@
-import { UmbDeepState } from './deep-state';
+import { UmbDeepState } from './deep-state.js';
 
 /**
  * @export

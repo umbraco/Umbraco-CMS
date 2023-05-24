@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { UmbObserver } from './observer';
+import { UmbObserver } from './observer.js';
 import { UmbControllerInterface, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbObserverController<T = unknown> extends UmbObserver<T> implements UmbControllerInterface {
