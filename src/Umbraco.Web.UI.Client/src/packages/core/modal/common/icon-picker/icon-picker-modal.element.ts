@@ -3,7 +3,7 @@ import type { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
 import { css, html, styleMap, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 
-import icons from '../../../../../../public-assets/icons/icons.json';
+import icons from '../../../../../shared/icon-registry/icons/icons.json';
 import { UmbIconPickerModalData, UmbIconPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
