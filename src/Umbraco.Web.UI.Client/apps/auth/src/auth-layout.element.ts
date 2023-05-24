@@ -1,18 +1,16 @@
 import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import logoImg from '/umbraco_logomark_white.svg';
-import loginImg from '/login.jpeg';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
-	
+
 
 	render() {
 		return html`
 			<div id="background"></div>
 
 			<div id="logo">
-				<img src="${logoImg}" alt="Umbraco" />
+				<img src="umbraco_logomark_white.svg" alt="Umbraco" />
 			</div>
 
 			<div id="container">
@@ -22,7 +20,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			</div>
 		`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		css`
 			#background {
@@ -31,7 +29,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('${unsafeCSS(loginImg)}');
+				background-image: url('login.jpeg');
 				width: 100vw;
 				height: 100vh;
 			}
