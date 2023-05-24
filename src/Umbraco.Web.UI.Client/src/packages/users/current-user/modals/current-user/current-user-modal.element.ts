@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, CSSResultGroup, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store.js';

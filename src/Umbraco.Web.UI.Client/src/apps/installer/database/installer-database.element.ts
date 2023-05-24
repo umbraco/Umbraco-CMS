@@ -1,4 +1,4 @@
-import { UUIButtonElement } from '@umbraco-ui/uui';
+import { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	CSSResultGroup,

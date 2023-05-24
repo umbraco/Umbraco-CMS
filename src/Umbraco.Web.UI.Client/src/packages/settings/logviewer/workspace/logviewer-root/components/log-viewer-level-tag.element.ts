@@ -1,8 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
+import { UUITextStyles, InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, LitElement, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 
 interface LevelMapStyles {

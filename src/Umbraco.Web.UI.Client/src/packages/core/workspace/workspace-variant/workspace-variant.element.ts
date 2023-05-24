@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbWorkspaceVariantContext } from './workspace-variant.context.js';

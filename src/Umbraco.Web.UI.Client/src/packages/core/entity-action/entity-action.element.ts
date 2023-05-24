@@ -1,5 +1,5 @@
 import { html, nothing, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUIMenuItemEvent } from '@umbraco-ui/uui';
+import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';

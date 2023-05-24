@@ -1,5 +1,5 @@
 import { html, LitElement, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbNotificationDefaultData, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 
 export type { UmbNotificationDefaultData };

@@ -1,9 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextareaElement, UUITextareaEvent } from '@umbraco-ui/uui';
+import { UUITextareaElement, UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.context.js';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

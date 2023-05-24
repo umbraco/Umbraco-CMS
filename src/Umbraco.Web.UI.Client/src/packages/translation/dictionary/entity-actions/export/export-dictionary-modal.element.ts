@@ -1,5 +1,5 @@
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';

@@ -1,5 +1,5 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context.js';

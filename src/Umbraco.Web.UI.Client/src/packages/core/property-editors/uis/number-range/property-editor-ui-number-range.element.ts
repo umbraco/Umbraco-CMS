@@ -1,5 +1,5 @@
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbInputNumberRangeElement } from '../../../components/input-number-range/input-number-range.element.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

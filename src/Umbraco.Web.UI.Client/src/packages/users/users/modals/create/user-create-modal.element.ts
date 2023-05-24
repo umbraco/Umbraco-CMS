@@ -1,7 +1,7 @@
 import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputPasswordElement } from '@umbraco-ui/uui';
+import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
 // TODO: we need to import this from the user group module when it is ready
 import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';

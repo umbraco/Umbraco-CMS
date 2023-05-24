@@ -1,5 +1,5 @@
 import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestMenuItem, UmbMenuItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 

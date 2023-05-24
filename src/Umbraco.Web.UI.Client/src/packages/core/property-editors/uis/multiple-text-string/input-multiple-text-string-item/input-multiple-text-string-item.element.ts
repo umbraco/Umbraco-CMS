@@ -1,9 +1,6 @@
 import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles, FormControlMixin, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UUIInputEvent } from '@umbraco-ui/uui-input';
-import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

@@ -1,6 +1,5 @@
 import { css, html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbDocumentTypeTreeStore,

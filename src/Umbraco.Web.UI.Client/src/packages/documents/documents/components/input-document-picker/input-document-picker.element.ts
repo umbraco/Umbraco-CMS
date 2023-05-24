@@ -1,8 +1,5 @@
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../repository/document.tree.store.js';
 import type { UmbDocumentTreeStore } from '../../repository/document.tree.store.js';
 import {

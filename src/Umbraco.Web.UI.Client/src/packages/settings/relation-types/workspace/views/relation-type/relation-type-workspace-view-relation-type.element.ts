@@ -1,7 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIBooleanInputEvent, UUIRadioGroupElement, UUIRadioGroupEvent, UUIToggleElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputEvent, UUIRadioGroupElement, UUIRadioGroupEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

@@ -9,9 +9,8 @@ import {
 	query,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-ui/uui';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './input-upload-field-file.element.js';

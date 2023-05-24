@@ -1,4 +1,4 @@
-import { UUIToastNotificationElement } from '@umbraco-ui/uui';
+import { UUIToastNotificationElement } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbNotificationOptions,
 	UmbNotificationColor,

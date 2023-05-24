@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, LitElement, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 export interface TooltipMenuItem {

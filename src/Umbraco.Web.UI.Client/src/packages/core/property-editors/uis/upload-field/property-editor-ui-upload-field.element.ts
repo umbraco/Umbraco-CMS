@@ -1,5 +1,5 @@
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputUploadFieldElement } from '../../../components/input-upload-field/input-upload-field.element.js';
 import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

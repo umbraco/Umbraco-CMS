@@ -1,6 +1,6 @@
 import { css, html, ifDefined, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UUIInputEvent } from '@umbraco-ui/uui';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCodeEditor } from '../../../components/code-editor/index.js';
 import { UmbTemplateModalData, UmbTemplateModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbInputEvent } from '@umbraco-cms/backoffice/events';

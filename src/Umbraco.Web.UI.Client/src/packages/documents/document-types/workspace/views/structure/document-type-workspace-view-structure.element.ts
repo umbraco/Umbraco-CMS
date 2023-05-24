@@ -1,7 +1,7 @@
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIToggleElement } from '@umbraco-ui/uui';
+import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbInputDocumentTypePickerElement } from '../../../components/input-document-type-picker/input-document-type-picker.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

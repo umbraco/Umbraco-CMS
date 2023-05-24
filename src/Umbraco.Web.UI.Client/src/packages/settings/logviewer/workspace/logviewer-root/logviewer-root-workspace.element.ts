@@ -2,7 +2,7 @@ import './components/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { PropertyValueMap, css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

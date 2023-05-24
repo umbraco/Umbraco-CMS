@@ -25,6 +25,7 @@
 			"@umbraco-cms/backoffice/external/router-slot": ["src/external/router-slot"],
 			"@umbraco-cms/backoffice/external/uuid": ["src/external/uuid"],
 			"@umbraco-cms/backoffice/external/lodash": ["src/external/lodash"],
+			"@umbraco-cms/backoffice/external/uui": ["src/external/uui"],
 
 			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],

@@ -1,5 +1,5 @@
-import { UUICheckboxElement } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/external/lodash';

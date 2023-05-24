@@ -1,5 +1,5 @@
 import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { repeat } from '@umbraco-cms/backoffice/external/lit';

@@ -1,6 +1,6 @@
 // eslint-disable-next-line local-rules/no-external-imports
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
-import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler.js';
 import type { UmbModalToken } from './token/modal-token.js';

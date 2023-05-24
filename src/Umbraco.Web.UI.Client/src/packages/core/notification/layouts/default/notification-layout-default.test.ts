@@ -1,5 +1,5 @@
 import { fixture, expect, html } from '@open-wc/testing';
-import { UUIToastNotificationLayoutElement } from '@umbraco-ui/uui';
+import { UUIToastNotificationLayoutElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbNotificationLayoutDefaultElement,
 	UmbNotificationDefaultData,

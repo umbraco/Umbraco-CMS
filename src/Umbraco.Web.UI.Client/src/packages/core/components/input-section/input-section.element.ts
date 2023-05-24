@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputListBaseElement } from '../input-list-base/input-list-base.js';
 import { UMB_SECTION_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';

@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';

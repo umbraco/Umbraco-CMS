@@ -2,7 +2,7 @@ import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUIPaginationEvent } from '@umbraco-ui/uui';
+import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

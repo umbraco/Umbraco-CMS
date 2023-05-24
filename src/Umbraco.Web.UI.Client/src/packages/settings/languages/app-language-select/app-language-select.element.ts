@@ -1,9 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUIMenuItemEvent } from '@umbraco-ui/uui';
+import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

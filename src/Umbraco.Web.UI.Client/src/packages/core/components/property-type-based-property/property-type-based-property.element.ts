@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';

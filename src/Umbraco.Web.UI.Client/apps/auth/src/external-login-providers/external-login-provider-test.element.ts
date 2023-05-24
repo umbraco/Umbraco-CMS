@@ -1,5 +1,5 @@
 import { css, html, LitElement } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-external-login-provider-test')

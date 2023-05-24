@@ -1,4 +1,4 @@
-import { UUIRefNodeElement } from '@umbraco-ui/uui';
+import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 /**

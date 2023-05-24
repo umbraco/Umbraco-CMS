@@ -1,5 +1,5 @@
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element.js';

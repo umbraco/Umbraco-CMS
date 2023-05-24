@@ -1,6 +1,5 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 function getNumberOrUndefined(value: string) {

@@ -1,7 +1,6 @@
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**

@@ -1,7 +1,5 @@
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDataTypeModel } from '../../models.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalRouteRegistrationController, UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '@umbraco-cms/backoffice/modal';

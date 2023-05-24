@@ -1,7 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
-import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-ui/uui';
+import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
 
 @customElement('umb-insert-section-checkbox')

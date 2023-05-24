@@ -1,7 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputEvent } from '@umbraco-ui/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

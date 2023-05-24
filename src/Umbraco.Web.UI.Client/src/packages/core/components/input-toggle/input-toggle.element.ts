@@ -1,7 +1,5 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UUIBooleanInputEvent } from '@umbraco-ui/uui';
+import { UUITextStyles, FormControlMixin, UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-toggle')

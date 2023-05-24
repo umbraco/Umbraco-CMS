@@ -1,5 +1,5 @@
 import { html, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbModalContext,
 	UmbModalToken,

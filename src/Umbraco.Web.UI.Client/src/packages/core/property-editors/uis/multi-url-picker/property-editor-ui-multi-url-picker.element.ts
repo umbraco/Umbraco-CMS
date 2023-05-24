@@ -1,7 +1,7 @@
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';

@@ -1,6 +1,6 @@
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

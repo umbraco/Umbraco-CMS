@@ -2,7 +2,7 @@ import { html, css } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPackageRepository } from '../../../repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

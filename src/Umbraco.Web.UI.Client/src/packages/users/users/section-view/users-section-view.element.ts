@@ -1,5 +1,5 @@
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 

@@ -1,7 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIComboboxElement, UUIInputElement } from '@umbraco-ui/uui';
+import { UUIComboboxElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { getUmbracoFieldSnippet } from '../utils.js';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 

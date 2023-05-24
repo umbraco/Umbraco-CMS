@@ -1,6 +1,6 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbWorkspaceVariantContext,
 	UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,

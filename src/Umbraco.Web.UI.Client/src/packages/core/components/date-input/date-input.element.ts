@@ -1,7 +1,5 @@
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import type { UUIInputEvent } from '@umbraco-ui/uui';
+import { UUITextStyles, FormControlMixin, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbConfigRepository } from '../../repositories/config/config.repository.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

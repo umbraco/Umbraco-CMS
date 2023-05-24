@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS } from './manifests.js';

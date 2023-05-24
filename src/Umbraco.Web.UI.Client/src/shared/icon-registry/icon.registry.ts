@@ -1,4 +1,4 @@
-import { UUIIconRegistry } from '@umbraco-ui/uui-icon-registry';
+import { UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
 //import icons from '../../../public-assets/icons/icons.json';
 
 interface UmbIconDescriptor {

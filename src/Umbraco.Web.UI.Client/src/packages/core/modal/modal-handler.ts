@@ -5,7 +5,7 @@ import type {
 	UUIModalDialogElement,
 	UUIModalSidebarElement,
 	UUIModalSidebarSize,
-} from '@umbraco-ui/uui';
+} from '@umbraco-cms/backoffice/external/uui';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context.js';
 import { UmbModalToken } from './token/modal-token.js';

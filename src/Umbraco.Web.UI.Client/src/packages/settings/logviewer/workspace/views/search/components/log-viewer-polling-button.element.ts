@@ -1,5 +1,5 @@
-import { UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import {

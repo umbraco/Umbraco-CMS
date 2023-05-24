@@ -1,4 +1,4 @@
-import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLinkPickerModalData {

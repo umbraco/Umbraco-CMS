@@ -1,7 +1,7 @@
 import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIButtonState } from '@umbraco-ui/uui';
+import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';

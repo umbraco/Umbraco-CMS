@@ -18,12 +18,14 @@ const externals = createModuleDescriptors('external');
 const exclude = [];
 const allowed = externals.filter((module) => !exclude.includes(module.name));
 
+// TODO: Minify code
 export default allowed
 	.map((module) => {
 		/** @type {import('rollup').RollupOptions[]} */
 		return [
 			{
 				input: `./src/external/${module.name}/index.ts`,
+				minify: true,
 				output: {
 					dir: `./dist-cms/external/${module.name}`,
 					format: 'es',

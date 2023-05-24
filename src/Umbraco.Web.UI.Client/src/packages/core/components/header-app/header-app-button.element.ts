@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, CSSResultGroup, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestHeaderAppButtonKind,

@@ -1,4 +1,4 @@
-import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
+import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbAppErrorElement } from './app-error.element.js';

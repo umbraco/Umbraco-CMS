@@ -1,7 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { MemberGroupDetails } from '../types.js';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

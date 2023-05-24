@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type { TooltipMenuItem } from '../components/tooltip-menu/index.js';

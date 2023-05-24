@@ -1,7 +1,7 @@
 import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextareaElement } from '@umbraco-ui/uui';
+import { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-empty-state')

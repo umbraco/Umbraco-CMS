@@ -1,4 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map, of } from '@umbraco-cms/backoffice/external/rxjs';
