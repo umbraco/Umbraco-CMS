@@ -1,85 +1,17 @@
 @model Umbraco.Cms.Web.UI.BackOfficeLoginModel
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>Umbraco</title>
+    <head>
+        <base href="/umbraco/login/" />
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Umbraco</title>
+        <script type="module" src="main.js"></script>
+        <link rel="stylesheet" href="style.css" />
+    </head>
 
-    <link rel="stylesheet" href="https://unpkg.com/blocks.css/dist/blocks.min.css"/>
-
-    <style>
-            body {
-                display: grid;
-                place-content: center;
-                justify-content: center;
-                align-items:  center;
-
-                width: 100%;
-                height: 100vh;
-            }
-
-            .card {
-                display:  grid;
-                place-items: center;
-            }
-        </style>
-</head>
-<body>
-<div class="card fixed block">
-    <h1>Umbraco login universe</h1>
-    <p>We have not yet implemented the new login page, so for your pleasure,<br/>we present you a blocky experience that just works™</p>
-    <form id="loginform" method="post">
-        <div>
-            <label>Username: <input class="round block" type="text" name="username" autocomplete="username"></label>
-        </div>
-        <div>
-            <label>Password: <input class="round block" type="password" name="password" autocomplete="current-password"></label>
-        </div>
-        <button id="login" class="accent block">LOGIN</button>
-    </form>
-</div>
-
-<script>
-    !(function () {
-        const authUrlLogin = "@Model.AuthUrl/login"
-        const returnUrl = "@Model.ReturnUrl".replaceAll("&amp;", "&")
-
-        console.log('urls', {authUrlLogin, returnUrl})
-
-        const form = document.getElementById("loginform");
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault()
-
-            try {
-                const formData = new FormData(e.target)
-                const userName = formData.get("username")
-                const password = formData.get("password")
-                console.log('username', userName)
-
-                const res = await fetch(authUrlLogin, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        userName,
-                        password
-                    }),
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                })
-
-                const content = await res.text()
-                console.log('login success', content)
-
-                if (returnUrl) {
-                    location.href = returnUrl
-                }
-            } catch (err) {
-                alert('Could not login: ' + err.message)
-                throw err
-            }
-        });
-    })();
-    </script>
-</body>
+    <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
+        <umb-login return-url="@Model.ReturnUrl"></umb-login>
+    </body>
 </html>
