@@ -46,4 +46,12 @@ export default [
 		},
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
+	{
+		input: './external/lit/index.ts',
+		output: {
+			dir: `./dist-cms/external/lit`,
+			format: 'es',
+		},
+		plugins: [nodeResolve(), commonjs(), esbuild()],
+	},
 ];
