@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import './template-card.element';
-import type { UmbTemplateCardElement } from './template-card.element';
+import type { UmbTemplateCardElement } from './template-card.element.js';
 
 const meta: Meta<UmbTemplateCardElement> = {
 	title: 'Components/Template Card',

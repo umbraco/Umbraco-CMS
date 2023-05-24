@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { serverFilePathFromUrlFriendlyPath } from '../../utils';
-import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element';
-import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context';
+import { serverFilePathFromUrlFriendlyPath } from '../../utils.js';
+import { UmbStylesheetWorkspaceEditElement } from './stylesheet-workspace-edit.element.js';
+import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context';
+import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context.js';
 import { UmbTreeItemElement } from '@umbraco-cms/backoffice/tree';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbBackofficeManifestKind, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

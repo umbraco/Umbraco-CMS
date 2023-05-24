@@ -1,6 +1,6 @@
-import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS } from '../config';
-import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action';
-import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action';
+import { PARTIAL_VIEW_ENTITY_TYPE, PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_REPOSITORY_ALIAS } from '../config.js';
+import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action.js';
+import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 

@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context';
+import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 

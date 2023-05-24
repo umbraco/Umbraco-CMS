@@ -1,4 +1,4 @@
-import { UmbTemplateRepository } from '../repository/template.repository';
+import { UmbTemplateRepository } from '../repository/template.repository.js';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';

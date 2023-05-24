@@ -1,4 +1,4 @@
-import { UmbStylesheetRepository } from '../repository/stylesheet.repository';
+import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
 import { StylesheetDetails } from '..';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

@@ -1,7 +1,7 @@
-import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
-import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data';
-import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
+import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
+import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
+import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
+import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store.js';
 import type {
 	UmbDataSource,
 	UmbDetailRepository,

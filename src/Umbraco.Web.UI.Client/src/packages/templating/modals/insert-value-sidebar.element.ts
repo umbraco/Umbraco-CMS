@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIComboboxElement, UUIInputElement } from '@umbraco-ui/uui';
-import { getUmbracoFieldSnippet } from '../utils';
+import { getUmbracoFieldSnippet } from '../utils.js';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-insert-value-sidebar')

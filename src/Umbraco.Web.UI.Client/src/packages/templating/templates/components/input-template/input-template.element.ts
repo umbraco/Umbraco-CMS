@@ -2,8 +2,8 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbTemplateCardElement } from '../template-card/template-card.element';
-import { UmbTemplateRepository } from '../../repository/template.repository';
+import { UmbTemplateCardElement } from '../template-card/template-card.element.js';
+import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,

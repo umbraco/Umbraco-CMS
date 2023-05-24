@@ -1,4 +1,4 @@
-import { PARTIAL_VIEW_TREE_ALIAS } from '../config';
+import { PARTIAL_VIEW_TREE_ALIAS } from '../config.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {

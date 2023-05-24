@@ -3,7 +3,7 @@ import './stylesheet-workspace.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbStylesheetWorkspaceElement } from './stylesheet-workspace.element';
+import type { UmbStylesheetWorkspaceElement } from './stylesheet-workspace.element.js';
 
 export default {
 	title: 'Workspaces/Stylesheet',
