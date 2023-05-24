@@ -3,7 +3,7 @@ import './dashboard-members-welcome.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbDashboardMembersWelcomeElement } from './dashboard-members-welcome.element';
+import type { UmbDashboardMembersWelcomeElement } from './dashboard-members-welcome.element.js';
 
 export default {
 	title: 'Dashboards/Welcome',

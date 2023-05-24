@@ -3,9 +3,9 @@ import './member-group-workspace.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import { data } from '../../../../mocks/data/member-group.data';
+import { data } from '../../../../mocks/data/member-group.data.js';
 
-import type { UmbMemberGroupWorkspaceElement } from './member-group-workspace.element';
+import type { UmbMemberGroupWorkspaceElement } from './member-group-workspace.element.js';
 
 export default {
 	title: 'Workspaces/Member Group',

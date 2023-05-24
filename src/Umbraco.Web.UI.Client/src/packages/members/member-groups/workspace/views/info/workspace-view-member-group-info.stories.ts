@@ -3,10 +3,10 @@ import './workspace-view-member-group-info.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-//import { data } from '../../../../../core/mocks/data/data-type.data';
-//import { UmbDataTypeContext } from '../../data-type.context';
+//import { data } from '../../../../../core/mocks/data/data-type.data.js';
+//import { UmbDataTypeContext } from '../../data-type.context.js';
 
-import type { UmbWorkspaceViewMemberGroupInfoElement } from './workspace-view-member-group-info.element';
+import type { UmbWorkspaceViewMemberGroupInfoElement } from './workspace-view-member-group-info.element.js';
 
 export default {
 	title: 'Workspaces/Data Type/Views/Info',

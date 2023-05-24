@@ -1,4 +1,4 @@
-import { MEMBER_REPOSITORY_ALIAS } from '../repository/manifests';
+import { MEMBER_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
 const tree: ManifestTree = {
