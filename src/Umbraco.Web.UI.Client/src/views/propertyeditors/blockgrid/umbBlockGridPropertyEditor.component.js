@@ -1011,7 +1011,7 @@
                 blockObject = vm.layout[createIndex].$block;
             }
             // edit block if not `hideContentInOverlay` and there is content properties.
-            if(blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs[0]?.properties.length > 0) {
+            if(blockObject.hideContentInOverlay !== true && blockObject.content.variants[0].tabs.find(tab => tab.properties.length > 0) !== undefined) {
                 vm.options.createFlow = true;
                 blockObject.edit();
                 vm.options.createFlow = false;
