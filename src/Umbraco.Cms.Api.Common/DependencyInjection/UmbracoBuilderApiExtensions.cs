@@ -61,6 +61,9 @@ public static class UmbracoBuilderApiExtensions
                                 {
                                     swaggerUiOptions.SwaggerEndpoint($"{name}/swagger.json", $"{apiInfo.Title}");
                                 }
+
+                                swaggerUiOptions.OAuthClientId(Constants.OauthClientIds.Swagger);
+                                swaggerUiOptions.OAuthUsePkce();
                             });
                     }
                 },
