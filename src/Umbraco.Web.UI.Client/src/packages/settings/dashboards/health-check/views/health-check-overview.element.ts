@@ -9,7 +9,7 @@ import {
 } from '../health-check-dashboard.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './health-check-group-box-overview.element';
+import './health-check-group-box-overview.element.js';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {

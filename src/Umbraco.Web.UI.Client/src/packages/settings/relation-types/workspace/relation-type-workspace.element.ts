@@ -5,7 +5,7 @@ import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.conte
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
-import './relation-type-workspace-edit.element';
+import './relation-type-workspace-edit.element.js';
 
 /**
  * @element umb-relation-type-workspace

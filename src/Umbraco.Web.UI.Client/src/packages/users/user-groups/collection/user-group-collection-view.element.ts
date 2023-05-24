@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './user-group-table-name-column-layout.element';
-import './user-group-table-sections-column-layout.element';
+import './user-group-table-name-column-layout.element.js';
+import './user-group-table-sections-column-layout.element.js';
 import {
 	UmbTableColumn,
 	UmbTableConfig,

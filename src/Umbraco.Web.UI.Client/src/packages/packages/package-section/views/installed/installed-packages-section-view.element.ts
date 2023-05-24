@@ -6,9 +6,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbPackageRepository } from '../../../repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-import './installed-packages-section-view-item.element';
 import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+
+import './installed-packages-section-view-item.element.js';
 
 @customElement('umb-installed-packages-section-view')
 export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {

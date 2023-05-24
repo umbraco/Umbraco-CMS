@@ -5,8 +5,8 @@ import { UmbUserGroupCollectionContext } from './user-group-collection.context.j
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './user-group-collection-view.element';
-import './user-group-collection-header.element';
+import './user-group-collection-view.element.js';
+import './user-group-collection-header.element.js';
 
 @customElement('umb-user-group-collection')
 export class UmbUserCollectionElement extends UmbLitElement {

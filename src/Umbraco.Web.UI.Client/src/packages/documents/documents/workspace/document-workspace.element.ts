@@ -5,7 +5,7 @@ import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './document-workspace-editor.element';
+import './document-workspace-editor.element.js';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement {

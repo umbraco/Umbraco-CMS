@@ -4,8 +4,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { UmbInputNumberRangeElement } from '../../../components/input-number-range/input-number-range.element.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../components/input-number-range/input-number-range.element';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+
+import '../../../components/input-number-range/input-number-range.element.js';
 
 type ValueType = {
 	min?: number;

@@ -6,7 +6,7 @@ import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/r
 import { generateRoutePathBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './language-workspace-edit.element';
+import './language-workspace-edit.element.js';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {

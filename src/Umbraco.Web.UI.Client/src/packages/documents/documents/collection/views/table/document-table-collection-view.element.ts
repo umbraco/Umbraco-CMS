@@ -15,7 +15,7 @@ import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './column-layouts/document-table-actions-column-layout.element';
+import './column-layouts/document-table-actions-column-layout.element.js';
 
 type EntityType = DocumentTreeItemResponseModel;
 

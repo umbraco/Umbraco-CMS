@@ -6,8 +6,8 @@ import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backo
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './components/language-root-table-delete-column-layout.element';
-import './components/language-root-table-name-column-layout.element';
+import './components/language-root-table-delete-column-layout.element.js';
+import './components/language-root-table-name-column-layout.element.js';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {

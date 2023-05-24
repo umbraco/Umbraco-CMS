@@ -14,7 +14,7 @@ import {
 	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 
-import './log-viewer-search-input-modal.element';
+import './log-viewer-search-input-modal.element.js';
 export interface UmbContextSaveSearchModalData {
 	query: string;
 }

@@ -20,8 +20,8 @@ import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './column-layouts/name/user-table-name-column-layout.element';
-import './column-layouts/status/user-table-status-column-layout.element';
+import './column-layouts/name/user-table-name-column-layout.element.js';
+import './column-layouts/status/user-table-status-column-layout.element.js';
 
 @customElement('umb-user-collection-table-view')
 export class UmbUserCollectionTableViewElement extends UmbLitElement {

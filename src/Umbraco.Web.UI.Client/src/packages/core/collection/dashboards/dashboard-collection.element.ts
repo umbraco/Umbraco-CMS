@@ -7,7 +7,7 @@ import type { ManifestDashboardCollection } from '@umbraco-cms/backoffice/extens
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../collection.element';
+import '../collection.element.js';
 
 @customElement('umb-dashboard-collection')
 export class UmbDashboardCollectionElement extends UmbLitElement {

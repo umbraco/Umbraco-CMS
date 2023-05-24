@@ -14,8 +14,8 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-import './modal-views/fields-viewer.element';
-import './modal-views/fields-settings.element';
+import './modal-views/fields-viewer.element.js';
+import './modal-views/fields-settings.element.js';
 
 interface ExposedSearchResultField {
 	name?: string | null;

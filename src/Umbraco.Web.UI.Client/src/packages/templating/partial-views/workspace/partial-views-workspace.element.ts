@@ -5,7 +5,7 @@ import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.conte
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
-import './partial-views-workspace-edit.element';
+import './partial-views-workspace-edit.element.js';
 
 @customElement('umb-partial-views-workspace')
 export class UmbPartialViewsWorkspaceElement extends UmbLitElement {

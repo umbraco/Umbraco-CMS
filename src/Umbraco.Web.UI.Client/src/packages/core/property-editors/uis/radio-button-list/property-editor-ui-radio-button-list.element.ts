@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import '../../../components/input-radio-button-list/input-radio-button-list.element';
+import '../../../components/input-radio-button-list/input-radio-button-list.element.js';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
