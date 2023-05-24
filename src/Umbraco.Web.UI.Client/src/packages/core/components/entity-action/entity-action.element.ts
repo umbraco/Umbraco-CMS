@@ -45,7 +45,6 @@ class UmbEntityActionElement extends UmbLitElement {
 
 		// TODO: Fix so when we use a HREF it does not refresh the page?
 		this._href = await this.#api.getHref?.();
-		this.requestUpdate('_href');
 	}
 
 	#api: any;
