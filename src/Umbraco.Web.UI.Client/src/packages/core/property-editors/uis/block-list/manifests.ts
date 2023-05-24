@@ -5,7 +5,7 @@ const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.BlockList',
 	name: 'Block List Property Editor UI',
-	loader: () => import('./property-editor-ui-block-list.element'),
+	loader: () => import('./property-editor-ui-block-list.element.js'),
 	meta: {
 		label: 'Block List',
 		propertyEditorModel: 'Umbraco.BlockList',

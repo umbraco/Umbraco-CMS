@@ -41,14 +41,14 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 		this._routes = [
 			{
 				path: 'workspace/:entityType',
-				component: () => import('../workspace/workspace.element'),
+				component: () => import('../workspace/workspace.element.js'),
 				setup: (element, info) => {
 					(element as UmbWorkspaceElement).entityType = info.match.params.entityType;
 				},
 			},
 			{
 				path: '**',
-				component: () => import('./section-views/section-views.element'),
+				component: () => import('./section-views/section-views.element.js'),
 				setup: (element) => {
 					(element as UmbSectionViewsElement).sectionAlias = this.manifest?.alias;
 				},

@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.MultiUrlPicker',
 	name: 'Multi URL Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-multi-url-picker.element'),
+	loader: () => import('./property-editor-ui-multi-url-picker.element.js'),
 	meta: {
 		label: 'Multi URL Picker',
 		propertyEditorModel: 'Umbraco.MultiUrlPicker',

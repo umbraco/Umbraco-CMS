@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.CollectionView.OrderBy',
 	name: 'Collection View Column Configuration Property Editor UI',
-	loader: () => import('./property-editor-ui-collection-view-order-by.element'),
+	loader: () => import('./property-editor-ui-collection-view-order-by.element.js'),
 	meta: {
 		label: 'Collection View Order By',
 		propertyEditorModel: '',

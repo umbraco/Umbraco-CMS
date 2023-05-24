@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.Dropdown',
 	name: 'Dropdown Property Editor UI',
-	loader: () => import('./property-editor-ui-dropdown.element'),
+	loader: () => import('./property-editor-ui-dropdown.element.js'),
 	meta: {
 		label: 'Dropdown',
 		propertyEditorModel: 'Umbraco.Dropdown',

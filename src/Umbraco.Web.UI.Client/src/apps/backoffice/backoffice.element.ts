@@ -7,7 +7,7 @@ import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/exten
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './components';
+import './components/index.js';
 
 @customElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {

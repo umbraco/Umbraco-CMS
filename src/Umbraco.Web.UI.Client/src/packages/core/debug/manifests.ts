@@ -5,7 +5,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.ContextDebugger',
 		name: 'Context Debugger Modal',
-		loader: () => import('./modals/debug/debug-modal.element'),
+		loader: () => import('./modals/debug/debug-modal.element.js'),
 	},
 ];
 

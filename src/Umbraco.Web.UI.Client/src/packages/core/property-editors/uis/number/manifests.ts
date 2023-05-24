@@ -12,7 +12,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Integer',
 		name: 'Integer Property Editor UI',
-		loader: () => import('./property-editor-ui-number.element'),
+		loader: () => import('./property-editor-ui-number.element.js'),
 		meta: {
 			label: 'Integer',
 			propertyEditorModel: 'Umbraco.Integer',
@@ -33,7 +33,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Decimal',
 		name: 'Decimal Property Editor UI',
-		loader: () => import('./property-editor-ui-number.element'),
+		loader: () => import('./property-editor-ui-number.element.js'),
 		meta: {
 			label: 'Decimal',
 			propertyEditorModel: 'Umbraco.Decimal',

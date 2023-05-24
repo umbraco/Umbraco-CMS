@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 				{
 					path: 'modal-1',
 					component: () => {
-						return import('./property-editor-ui-block-grid-inner-test.element');
+						return import('./property-editor-ui-block-grid-inner-test.element.js');
 					},
 					setup: (component) => {
 						if (component instanceof HTMLElement) {
@@ -63,7 +63,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 				{
 					path: 'modal-2',
 					component: () => {
-						return import('./property-editor-ui-block-grid-inner-test.element');
+						return import('./property-editor-ui-block-grid-inner-test.element.js');
 					},
 					setup: (component) => {
 						if (component instanceof HTMLElement) {

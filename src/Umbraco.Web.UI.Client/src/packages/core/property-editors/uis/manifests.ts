@@ -69,7 +69,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		type: 'propertyEditorUI',
 		alias: 'Umb.PropertyEditorUI.Number',
 		name: 'Number Property Editor UI',
-		loader: () => import('./number/property-editor-ui-number.element'),
+		loader: () => import('./number/property-editor-ui-number.element.js'),
 		meta: {
 			label: 'Number',
 			icon: 'umb:autofill',

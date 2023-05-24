@@ -50,16 +50,16 @@ export class UmbAppElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: 'install',
-			component: () => import('../installer/installer.element'),
+			component: () => import('../installer/installer.element.js'),
 		},
 		{
 			path: 'upgrade',
-			component: () => import('../upgrader/upgrader.element'),
+			component: () => import('../upgrader/upgrader.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
 			path: '**',
-			component: () => import('../backoffice/backoffice.element'),
+			component: () => import('../backoffice/backoffice.element.js'),
 			setup: (component) => {
 				(component as any).localPackages = this.localPackages;
 			},
