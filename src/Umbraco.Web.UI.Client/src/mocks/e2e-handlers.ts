@@ -1,4 +1,4 @@
-import { handlers as dataTypeHandlers } from './handlers/data-type.js';
+import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
 import { handlers as documentTypeHandlers } from './handlers/document-type.handlers.js';
 import { handlers as installHandlers } from './handlers/install.handlers.js';
 import * as manifestsHandlers from './handlers/manifests.handlers.js';
