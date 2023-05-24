@@ -3,7 +3,7 @@
 		"module": "esnext",
 		"target": "esnext",
 		"lib": ["es2020", "dom", "dom.iterable"],
-		"noEmit": true,
+		"noEmit": false,
 		"outDir": "./types",
 		"strict": true,
 		"noImplicitReturns": true,
@@ -18,7 +18,8 @@
 		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"paths": {
-			"@umbraco-cms/backoffice/backend-api": ["src/libs/backend-api"],
+			"@umbraco-cms/backoffice/backend-api": ["external/backend-api"],
+
 			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],
 			"@umbraco-cms/backoffice/element-api": ["src/libs/element-api"],
