@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbPropertyEditorUIMemberPickerElement } from './property-editor-ui-member-picker.element.js';
 import './property-editor-ui-member-picker.element';

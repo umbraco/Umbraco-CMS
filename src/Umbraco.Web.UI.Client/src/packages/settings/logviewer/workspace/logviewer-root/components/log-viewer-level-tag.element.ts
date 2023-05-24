@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { css, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
 import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -13,8 +13,6 @@ interface LevelMapStyles {
 
 @customElement('umb-log-viewer-level-tag')
 export class UmbLogViewerLevelTagElement extends LitElement {
-	
-
 	@property()
 	level?: LogLevelModel;
 
@@ -41,7 +39,7 @@ export class UmbLogViewerLevelTagElement extends LitElement {
 			>${this.level}<slot></slot
 		></uui-tag>`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

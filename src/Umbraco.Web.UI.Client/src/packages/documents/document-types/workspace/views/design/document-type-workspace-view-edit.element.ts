@@ -1,7 +1,7 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';

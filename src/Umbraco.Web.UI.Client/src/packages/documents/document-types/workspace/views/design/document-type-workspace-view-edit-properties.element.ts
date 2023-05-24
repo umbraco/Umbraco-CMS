@@ -1,8 +1,8 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';

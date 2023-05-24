@@ -1,4 +1,4 @@
-import type { TemplateResult } from 'lit';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbConfirmModalData {

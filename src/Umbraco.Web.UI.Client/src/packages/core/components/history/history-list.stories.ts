@@ -2,7 +2,7 @@ import './history-list.element';
 import './history-item.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbHistoryListElement } from './history-list.element.js';
 import type { UmbHistoryItemElement } from './history-item.element.js';

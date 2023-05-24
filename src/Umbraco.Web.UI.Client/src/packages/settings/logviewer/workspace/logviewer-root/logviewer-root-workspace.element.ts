@@ -1,9 +1,9 @@
 import './components/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { PropertyValueMap, css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { PropertyValueMap, css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { repeat } from 'lit/directives/repeat.js';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';

@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './body-layout.element';
 import type { UmbBodyLayoutElement } from './body-layout.element.js';

@@ -1,7 +1,7 @@
 import './installer-database.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 const { rest } = window.MockServiceWorker;
 
 import { installerContextProvider } from '../shared/utils.story-helpers.js';

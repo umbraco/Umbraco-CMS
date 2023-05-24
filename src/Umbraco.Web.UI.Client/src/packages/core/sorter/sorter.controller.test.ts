@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { customElement } from 'lit/decorators.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSorterConfig, UmbSorterController } from './sorter.controller.js';
 
 type SortEntryType = {

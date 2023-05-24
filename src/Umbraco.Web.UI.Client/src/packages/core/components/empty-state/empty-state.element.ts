@@ -1,11 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-empty-state')
 export class UmbEmptyStateElement extends LitElement {
-	
-
 	/**
 	 * Set the text size
 	 */
@@ -23,7 +20,7 @@ export class UmbEmptyStateElement extends LitElement {
 	render() {
 		return html`<slot></slot>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

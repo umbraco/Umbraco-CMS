@@ -1,5 +1,5 @@
-import { CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { CSSResultGroup, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import type { UmbPropertyAction } from './property-action.model.js';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';

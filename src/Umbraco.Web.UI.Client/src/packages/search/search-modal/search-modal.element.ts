@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
-import { customElement, query, state } from 'lit/decorators.js';
+import { css, html, LitElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 
 export type SearchItem = {
 	name: string;
@@ -16,8 +16,6 @@ export type SearchGroupItem = {
 };
 @customElement('umb-search-modal')
 export class UmbSearchModalElement extends LitElement {
-	
-
 	@query('input')
 	private _input!: HTMLInputElement;
 
@@ -178,7 +176,7 @@ export class UmbSearchModalElement extends LitElement {
 			parent: 'Document Types',
 		},
 	];
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

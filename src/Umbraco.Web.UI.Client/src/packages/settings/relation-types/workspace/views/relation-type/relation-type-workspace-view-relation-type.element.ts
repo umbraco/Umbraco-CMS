@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIBooleanInputEvent, UUIRadioGroupElement, UUIRadioGroupEvent, UUIToggleElement } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';

@@ -1,7 +1,7 @@
-import { html, css, nothing } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIPaginationEvent } from '@umbraco-ui/uui';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

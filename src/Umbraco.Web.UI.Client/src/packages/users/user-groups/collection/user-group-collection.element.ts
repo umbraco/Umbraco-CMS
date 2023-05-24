@@ -1,6 +1,6 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement } from 'lit/decorators.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

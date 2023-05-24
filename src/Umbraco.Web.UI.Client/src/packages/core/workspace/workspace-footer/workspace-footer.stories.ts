@@ -2,7 +2,7 @@ import '../workspace-editor/workspace-editor.element';
 import './workspace-footer.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element.js';
 

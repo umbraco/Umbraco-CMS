@@ -1,9 +1,9 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextareaElement } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { styleMap } from 'lit/directives/style-map.js';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

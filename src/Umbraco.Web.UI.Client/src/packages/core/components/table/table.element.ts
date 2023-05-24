@@ -1,9 +1,15 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { when } from 'lit/directives/when.js';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import {
+	css,
+	html,
+	LitElement,
+	ifDefined,
+	when,
+	customElement,
+	property,
+	state,
+	repeat,
+} from '@umbraco-cms/backoffice/external/lit';
 
 // TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
 export interface UmbTableItem {
@@ -59,8 +65,6 @@ export class UmbTableOrderedEvent extends Event {
  */
 @customElement('umb-table')
 export class UmbTableElement extends LitElement {
-	
-
 	/**
 	 * Table Items
 	 * @type {Array<UmbTableItem>}
@@ -242,7 +246,7 @@ export class UmbTableElement extends LitElement {
 
 		return value;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbDashboardPerformanceProfilingElement } from './dashboard-performance-profiling.element.js';
 import './dashboard-performance-profiling.element';

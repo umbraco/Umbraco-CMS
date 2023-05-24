@@ -1,6 +1,6 @@
-import { html, css, nothing } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';

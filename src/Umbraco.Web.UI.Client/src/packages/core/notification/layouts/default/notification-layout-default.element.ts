@@ -1,6 +1,6 @@
-import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import type { UmbNotificationDefaultData, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 

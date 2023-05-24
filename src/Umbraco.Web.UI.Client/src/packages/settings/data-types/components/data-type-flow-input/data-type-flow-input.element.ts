@@ -1,6 +1,6 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import type { UmbDataTypeModel } from '../../models.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

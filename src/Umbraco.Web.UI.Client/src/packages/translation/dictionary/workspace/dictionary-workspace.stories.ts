@@ -1,7 +1,7 @@
 import './dictionary-workspace.element';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { data } from '../../../../mocks/data/dictionary.data.js';
 import type { UmbWorkspaceDictionaryElement } from './dictionary-workspace.element.js';
 

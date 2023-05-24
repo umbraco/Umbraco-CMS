@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbUserGroupRepository } from '../../repository/user-group.repository.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInstallerContext } from '../installer.context.js';
 
 export const installerContextProvider = (story: any, installerContext = new UmbInstallerContext()) => html`

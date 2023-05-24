@@ -1,8 +1,8 @@
 import { UUIButtonState } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
 import { HealthCheckActionRequestModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

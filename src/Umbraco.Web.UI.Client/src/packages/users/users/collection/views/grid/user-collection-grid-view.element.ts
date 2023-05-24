@@ -1,8 +1,8 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { getLookAndColorFromUserStatus } from '../../../../utils.js';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';

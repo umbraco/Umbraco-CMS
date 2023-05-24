@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element.js';
 
 import './notification-layout-default.element';

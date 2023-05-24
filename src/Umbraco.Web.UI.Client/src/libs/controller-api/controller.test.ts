@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from 'lit/decorators.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElement, UmbControllerHostMixin } from './controller-host.mixin.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 

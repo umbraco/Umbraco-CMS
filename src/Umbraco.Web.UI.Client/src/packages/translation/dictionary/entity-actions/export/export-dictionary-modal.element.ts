@@ -1,6 +1,6 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExportDictionaryModalData, UmbExportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 

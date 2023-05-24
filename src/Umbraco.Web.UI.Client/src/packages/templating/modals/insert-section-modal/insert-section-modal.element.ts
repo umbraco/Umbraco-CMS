@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, queryAll, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests.js';
 import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
 import UmbInsertSectionCheckboxElement from './insert-section-input.element.js';

@@ -1,7 +1,7 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 // TODO: import from package when available
 //import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
 import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';

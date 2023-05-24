@@ -1,7 +1,7 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

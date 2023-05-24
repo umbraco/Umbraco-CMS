@@ -1,6 +1,6 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  *  @element umb-workspace-property-layout

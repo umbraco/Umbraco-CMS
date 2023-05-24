@@ -1,5 +1,4 @@
-import { css, CSSResultGroup, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 //import logoImg from '/umbraco_logomark_white.svg';
 

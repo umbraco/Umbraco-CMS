@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaWorkspaceContext } from './media-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

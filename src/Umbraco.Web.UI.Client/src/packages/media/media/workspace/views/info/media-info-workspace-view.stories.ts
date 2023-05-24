@@ -1,7 +1,7 @@
 import './media-info-workspace-view.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 // import { data } from '../../../../../../core/mocks/data/media.data.js';
 // import { UmbNodeContext } from '../../node.context.js';

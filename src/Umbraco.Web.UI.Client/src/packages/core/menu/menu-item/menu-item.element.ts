@@ -1,7 +1,7 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestMenuItem, UmbMenuItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 

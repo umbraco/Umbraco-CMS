@@ -1,5 +1,5 @@
-import { LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 /**
  * This component is used to display a single slice of a donut chart. It only makes sense insice the donut chart
  *

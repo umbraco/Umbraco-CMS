@@ -1,7 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';

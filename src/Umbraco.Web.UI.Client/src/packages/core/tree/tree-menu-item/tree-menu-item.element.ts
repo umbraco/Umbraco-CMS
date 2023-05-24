@@ -1,5 +1,5 @@
-import { html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	ManifestMenuItemTreeKind,

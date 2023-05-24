@@ -1,6 +1,6 @@
-import { html, css } from 'lit';
+import { html, css } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/backend-api';

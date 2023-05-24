@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-ui/uui';
 import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
 

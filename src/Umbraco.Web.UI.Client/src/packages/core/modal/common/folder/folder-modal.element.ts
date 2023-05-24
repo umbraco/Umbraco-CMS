@@ -1,6 +1,6 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbFolderModalData, UmbFolderModalResult, UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';

@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIButtonState } from '@umbraco-ui/uui-button';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { HealthStatusModel, IndexResponseModel, IndexerResource } from '@umbraco-cms/backoffice/backend-api';

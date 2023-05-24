@@ -1,9 +1,9 @@
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, nothing, TemplateResult } from 'lit';
+import { css, html, nothing, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store.js';
 import { getLookAndColorFromUserStatus } from '../../utils.js';

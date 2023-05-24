@@ -1,6 +1,5 @@
-import { css, html } from 'lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIColorPickerChangeEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

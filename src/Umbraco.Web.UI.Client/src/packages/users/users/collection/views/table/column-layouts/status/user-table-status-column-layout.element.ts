@@ -1,5 +1,5 @@
-import { html, LitElement, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html, LitElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { getLookAndColorFromUserStatus } from '../../../../../../utils.js';
 
 @customElement('umb-user-table-status-column-layout')

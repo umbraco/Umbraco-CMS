@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

@@ -1,7 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { css, CSSResultGroup, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestHeaderAppButtonKind,
 	UmbBackofficeManifestKind,

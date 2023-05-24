@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 //import { data } from '../../../../../core/mocks/data/dictionary.data.js';
 import type { UmbWorkspaceViewDictionaryEditElement } from './workspace-view-dictionary-edit.element.js';
 import './workspace-view-dictionary-edit.element';

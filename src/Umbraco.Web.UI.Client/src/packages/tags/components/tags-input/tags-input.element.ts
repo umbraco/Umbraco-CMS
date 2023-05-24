@@ -1,8 +1,8 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, query, queryAll, state } from 'lit/decorators.js';
+import { customElement, property, query, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { repeat } from 'lit/directives/repeat.js';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-ui/uui';
 import { UmbTagRepository } from '../../repository/tag.repository.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

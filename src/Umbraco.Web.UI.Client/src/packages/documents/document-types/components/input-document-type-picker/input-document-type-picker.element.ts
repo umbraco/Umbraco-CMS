@@ -1,8 +1,7 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbDocumentTypeTreeStore,
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
@@ -14,7 +13,6 @@ import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-type-picker')

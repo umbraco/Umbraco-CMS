@@ -1,6 +1,12 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import {
+	css,
+	CSSResultGroup,
+	html,
+	LitElement,
+	customElement,
+	property,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**

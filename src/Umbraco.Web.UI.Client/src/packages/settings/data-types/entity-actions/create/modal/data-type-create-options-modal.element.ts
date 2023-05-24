@@ -1,6 +1,6 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { DATA_TYPE_REPOSITORY_ALIAS } from '../../../repository/manifests.js';
 import { UmbDataTypeCreateOptionsModalData } from '.';
 import {

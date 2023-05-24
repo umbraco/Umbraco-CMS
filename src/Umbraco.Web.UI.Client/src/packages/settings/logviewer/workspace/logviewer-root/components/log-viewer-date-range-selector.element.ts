@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, property, queryAll, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	LogViewerDateRange,
 	UmbLogViewerWorkspaceContext,

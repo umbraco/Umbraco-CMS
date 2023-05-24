@@ -1,5 +1,4 @@
-import { css, CSSResultGroup, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

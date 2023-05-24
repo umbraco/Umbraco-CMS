@@ -1,7 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { ManifestDashboardCollection } from '@umbraco-cms/backoffice/extension-registry';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

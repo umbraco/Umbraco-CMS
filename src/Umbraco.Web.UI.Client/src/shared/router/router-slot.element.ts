@@ -1,7 +1,7 @@
 // eslint-disable-next-line local-rules/no-external-imports
 import '@umbraco-cms/backoffice/external/router-slot';
-import { css, html, PropertyValueMap } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event.js';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

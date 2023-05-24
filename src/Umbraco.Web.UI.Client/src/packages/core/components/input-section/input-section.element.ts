@@ -1,6 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputListBaseElement } from '../input-list-base/input-list-base.js';
 import { UMB_SECTION_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

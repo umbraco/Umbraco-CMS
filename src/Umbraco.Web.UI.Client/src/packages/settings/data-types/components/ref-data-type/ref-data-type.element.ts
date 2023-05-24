@@ -1,6 +1,6 @@
 import { UUIRefNodeElement } from '@umbraco-ui/uui';
-import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  *  @element umb-ref-data-type

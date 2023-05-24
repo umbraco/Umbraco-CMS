@@ -1,6 +1,5 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement } from 'lit/decorators.js';
 
 /**
  * @element umb-footer-layout

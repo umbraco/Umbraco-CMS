@@ -1,8 +1,5 @@
-import { css, html } from 'lit';
+import { css, html, unsafeHTML, when, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
-import { when } from 'lit-html/directives/when.js';
-import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import {
 	OEmbedResult,
 	OEmbedStatus,

@@ -1,7 +1,7 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, query, state } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
+import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { UmbImportDictionaryModalData, UmbImportDictionaryModalResult } from '@umbraco-cms/backoffice/modal';
 import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';

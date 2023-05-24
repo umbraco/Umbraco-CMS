@@ -1,5 +1,4 @@
-import { html } from 'lit';
-import { property } from 'lit/decorators.js';
+import { html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
 import {
 	UmbModalContext,

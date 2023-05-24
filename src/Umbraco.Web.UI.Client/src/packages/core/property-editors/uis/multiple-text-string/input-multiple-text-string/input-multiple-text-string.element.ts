@@ -1,7 +1,7 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import UmbInputMultipleTextStringItemElement from '../input-multiple-text-string-item/input-multiple-text-string-item.element.js';
 import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/events';

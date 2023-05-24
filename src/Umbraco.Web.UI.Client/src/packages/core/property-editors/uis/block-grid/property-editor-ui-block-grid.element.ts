@@ -1,5 +1,5 @@
-import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../workspace/workspace-variant/workspace-variant.context.js';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../workspace/workspace-property/workspace-property.context.js';

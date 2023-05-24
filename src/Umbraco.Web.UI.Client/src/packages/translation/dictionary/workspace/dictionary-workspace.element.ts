@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context.js';
 import { UmbDictionaryWorkspaceEditElement } from './dictionary-workspace-edit.element.js';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';

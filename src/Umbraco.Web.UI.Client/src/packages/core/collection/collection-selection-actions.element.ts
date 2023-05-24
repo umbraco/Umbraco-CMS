@@ -1,6 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_COLLECTION_CONTEXT_TOKEN, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { ManifestEntityBulkAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

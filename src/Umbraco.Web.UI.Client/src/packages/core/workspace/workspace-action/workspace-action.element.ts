@@ -1,5 +1,5 @@
-import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { UmbWorkspaceAction } from './index.js';

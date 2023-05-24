@@ -1,5 +1,4 @@
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';

@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUIPickerModalElement } from './property-editor-ui-picker-modal.element.js';
 import type { UmbPropertyEditorUIPickerModalData } from '@umbraco-cms/backoffice/modal';
 

@@ -1,6 +1,6 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-ui/uui';
 import { UmbTreeElement } from '../../../tree/tree.element.js';
 import {

@@ -1,7 +1,7 @@
 import './document-type-workspace-editor.element';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { treeData } from '../../../../mocks/data/document-type.data.js';
 import type { UmbDocumentTypeWorkspaceElement } from './document-type-workspace.element.js';
 

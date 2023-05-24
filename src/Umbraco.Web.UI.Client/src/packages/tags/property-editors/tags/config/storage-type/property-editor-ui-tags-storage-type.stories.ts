@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbPropertyEditorUITagsStorageTypeElement } from './property-editor-ui-tags-storage-type.element.js';
 import './property-editor-ui-tags-storage-type.element';

@@ -1,6 +1,6 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputPasswordElement } from '@umbraco-ui/uui';
 // TODO: we need to import this from the user group module when it is ready
 import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';

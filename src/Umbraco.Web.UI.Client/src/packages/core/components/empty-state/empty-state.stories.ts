@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import './empty-state.element';
 import type { UmbEmptyStateElement } from './empty-state.element.js';
 

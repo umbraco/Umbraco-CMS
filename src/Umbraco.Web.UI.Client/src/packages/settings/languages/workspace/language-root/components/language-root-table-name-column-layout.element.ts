@@ -1,11 +1,9 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, LitElement, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-language-root-table-name-column-layout')
 export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
-	
-
 	@property({ attribute: false })
 	value!: { isoCode: string; name: string };
 
@@ -14,7 +12,7 @@ export class UmbLanguageRootTableNameColumnLayoutElement extends LitElement {
 
 		return html`<a href=${'section/settings/workspace/language/edit/' + this.value.isoCode}>${this.value.name}</a>`;
 	}
-	
+
 	static styles = [UUITextStyles, css``];
 }
 

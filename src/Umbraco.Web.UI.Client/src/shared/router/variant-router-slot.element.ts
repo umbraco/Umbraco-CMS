@@ -1,4 +1,4 @@
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRouterSlotElement } from './router-slot.element.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';

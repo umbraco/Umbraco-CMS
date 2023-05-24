@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';

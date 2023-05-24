@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextareaElement, UUITextareaEvent } from '@umbraco-ui/uui';
 import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.context.js';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';

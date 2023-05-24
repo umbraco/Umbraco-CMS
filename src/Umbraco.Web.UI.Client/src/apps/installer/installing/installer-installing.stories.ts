@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import type { UmbInstallerInstallingElement } from './installer-installing.element.js';

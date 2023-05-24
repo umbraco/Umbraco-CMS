@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';

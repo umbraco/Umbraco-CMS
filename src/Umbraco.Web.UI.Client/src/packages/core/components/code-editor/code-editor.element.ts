@@ -1,6 +1,13 @@
-import { css, html, PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { createRef, Ref, ref } from 'lit/directives/ref.js';
+import {
+	css,
+	html,
+	PropertyValues,
+	createRef,
+	Ref,
+	ref,
+	customElement,
+	property,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context.js';
 import { UmbCodeEditorController } from './code-editor.controller.js';
 import { CodeEditorLanguage, CodeEditorTheme, UmbCodeEditorHost } from './code-editor.model.js';

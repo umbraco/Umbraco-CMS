@@ -1,5 +1,5 @@
-import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbInputDocumentPickerElement } from '../../components/input-document-picker/input-document-picker.element.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

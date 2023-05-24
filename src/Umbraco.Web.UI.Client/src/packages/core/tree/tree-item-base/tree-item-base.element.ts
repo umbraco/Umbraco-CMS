@@ -1,8 +1,8 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTreeItemContext } from '../tree-item/index.js';
 import { UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

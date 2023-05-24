@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import type { MemberGroupDetails } from '../types.js';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context.js';

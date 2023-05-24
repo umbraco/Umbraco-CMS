@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbDashboardPublishedStatusElement } from './dashboard-published-status.element.js';
 import './dashboard-published-status.element';

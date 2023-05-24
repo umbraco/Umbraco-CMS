@@ -1,7 +1,7 @@
 import './member-workspace.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import { data } from '../../../../mocks/data/member.data.js';
 

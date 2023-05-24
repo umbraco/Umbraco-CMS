@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement } from '@umbraco-ui/uui';
 import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';

@@ -1,6 +1,6 @@
-import { html, css } from 'lit';
+import { html, css } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCreateDocumentModalResultData, UmbExamineFieldsSettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 

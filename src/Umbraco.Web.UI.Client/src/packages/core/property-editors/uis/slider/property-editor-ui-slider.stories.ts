@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbPropertyEditorUISliderElement } from './property-editor-ui-slider.element.js';
 import './property-editor-ui-slider.element';

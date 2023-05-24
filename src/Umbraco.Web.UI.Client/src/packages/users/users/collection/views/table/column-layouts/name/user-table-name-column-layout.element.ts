@@ -1,5 +1,5 @@
-import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-user-table-name-column-layout')

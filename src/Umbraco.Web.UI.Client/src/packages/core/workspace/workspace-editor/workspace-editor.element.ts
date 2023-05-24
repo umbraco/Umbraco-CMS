@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { repeat } from 'lit/directives/repeat.js';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	PageComponent,
 	UmbRoute,

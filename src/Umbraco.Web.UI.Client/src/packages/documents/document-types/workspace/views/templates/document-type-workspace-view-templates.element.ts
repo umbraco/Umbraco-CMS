@@ -1,6 +1,6 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

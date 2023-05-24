@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, svg } from 'lit';
-import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
+import { css, html, LitElement, svg } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, query, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
 import { clamp } from 'lodash-es';
 import { UmbDonutSliceElement } from './donut-slice.element.js';
 

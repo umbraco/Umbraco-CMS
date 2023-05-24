@@ -1,6 +1,6 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element.js';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

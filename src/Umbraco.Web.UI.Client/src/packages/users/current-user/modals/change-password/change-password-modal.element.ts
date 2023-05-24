@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, CSSResultGroup, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalHandler, UmbChangePasswordModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

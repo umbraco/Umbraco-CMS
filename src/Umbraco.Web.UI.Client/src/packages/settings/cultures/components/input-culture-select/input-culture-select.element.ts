@@ -1,9 +1,9 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-ui/uui';
 import { UmbCultureRepository } from '../../repository/culture.repository.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';

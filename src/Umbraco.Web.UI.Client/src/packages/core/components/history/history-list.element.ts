@@ -1,6 +1,5 @@
-import { css, html } from 'lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement } from 'lit/decorators.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-history-list')

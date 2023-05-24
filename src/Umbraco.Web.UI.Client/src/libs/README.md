@@ -104,8 +104,7 @@ Then go to the element located in `src/my-element.ts` and replace it with the fo
 
 ```typescript
 // src/my-element.ts
-import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { LitElement, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 

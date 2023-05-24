@@ -1,6 +1,6 @@
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import UmbInputSliderElement from '../../../components/input-slider/input-slider.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

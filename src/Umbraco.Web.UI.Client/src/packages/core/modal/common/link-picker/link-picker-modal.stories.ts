@@ -2,7 +2,7 @@ import '../../../components/body-layout/body-layout.element';
 import './link-picker-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
 

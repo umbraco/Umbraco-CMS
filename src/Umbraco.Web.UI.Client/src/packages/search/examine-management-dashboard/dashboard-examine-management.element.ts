@@ -1,5 +1,5 @@
-import { html, css, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';

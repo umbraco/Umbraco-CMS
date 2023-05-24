@@ -1,7 +1,7 @@
 import './workspace-editor.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbWorkspaceEditorElement } from './workspace-editor.element.js';
 

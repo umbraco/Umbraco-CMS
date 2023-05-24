@@ -1,6 +1,6 @@
-import { html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

@@ -1,6 +1,6 @@
-import { html, css } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { html, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbPackageRepository } from '../../../repository/package.repository.js';

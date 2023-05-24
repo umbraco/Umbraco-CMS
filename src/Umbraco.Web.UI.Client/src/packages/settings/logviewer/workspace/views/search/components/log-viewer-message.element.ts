@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, PropertyValueMap } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { css, html, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
 import { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

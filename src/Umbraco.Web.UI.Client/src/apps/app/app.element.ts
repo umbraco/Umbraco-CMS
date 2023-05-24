@@ -2,8 +2,7 @@
 //import 'element-internals-polyfill';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAuthFlow } from './auth/index.js';

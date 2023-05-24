@@ -1,7 +1,7 @@
 import { UUICheckboxElement } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, queryAll, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from 'lodash-es';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
 import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';

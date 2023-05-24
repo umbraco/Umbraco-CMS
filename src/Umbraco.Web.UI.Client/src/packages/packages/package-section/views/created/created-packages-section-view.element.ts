@@ -1,5 +1,5 @@
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestTree,

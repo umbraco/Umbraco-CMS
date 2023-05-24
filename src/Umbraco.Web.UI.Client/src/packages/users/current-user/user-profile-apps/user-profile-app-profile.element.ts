@@ -1,6 +1,6 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../current-user.store.js';
 import type { UmbLoggedInUser } from '../types.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

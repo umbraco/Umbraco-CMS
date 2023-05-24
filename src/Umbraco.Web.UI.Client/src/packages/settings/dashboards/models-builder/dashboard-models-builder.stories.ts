@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbDashboardModelsBuilderElement } from './dashboard-models-builder.element.js';
 import './dashboard-models-builder.element';

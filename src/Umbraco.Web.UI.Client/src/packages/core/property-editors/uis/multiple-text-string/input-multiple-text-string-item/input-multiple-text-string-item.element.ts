@@ -1,6 +1,6 @@
-import { css, html, nothing } from 'lit';
+import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { UUIInputEvent } from '@umbraco-ui/uui-input';
 import { UUIInputElement } from '@umbraco-ui/uui';

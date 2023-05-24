@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing, TemplateResult } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, nothing, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 
 import {
 	contextData,

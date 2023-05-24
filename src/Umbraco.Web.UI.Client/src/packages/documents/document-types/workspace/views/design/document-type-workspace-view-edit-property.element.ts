@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

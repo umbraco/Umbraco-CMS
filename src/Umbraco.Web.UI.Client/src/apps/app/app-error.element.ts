@@ -1,5 +1,4 @@
-import { css, html, nothing, unsafeCSS } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, nothing, unsafeCSS, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 

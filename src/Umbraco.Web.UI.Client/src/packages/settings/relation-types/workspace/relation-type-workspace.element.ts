@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';

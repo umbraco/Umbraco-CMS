@@ -1,7 +1,7 @@
 import './confirm-modal.element';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbConfirmModalElement } from './confirm-modal.element.js';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';

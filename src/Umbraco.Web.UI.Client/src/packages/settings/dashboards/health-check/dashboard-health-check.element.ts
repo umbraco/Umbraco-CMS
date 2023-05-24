@@ -1,5 +1,5 @@
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
 import {

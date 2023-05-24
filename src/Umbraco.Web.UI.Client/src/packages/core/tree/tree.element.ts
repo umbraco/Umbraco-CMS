@@ -1,6 +1,6 @@
-import { html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTreeContextBase } from './tree.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbWorkspacePropertyLayoutElement } from './workspace-property-layout.element.js';
 import './workspace-property-layout.element';

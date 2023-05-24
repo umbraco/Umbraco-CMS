@@ -23,7 +23,7 @@ A modal is a popup that darkens the background and has focus lock. There are two
 The UmbModal context can be used to open modals.
 
 ```ts
-import { LitElement } from 'lit';
+import { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_ALIAS } from '@umbraco-cms/modal';
 
@@ -173,7 +173,7 @@ Notice the Property Editor registration will add the property alias and variant 
 A modal can be opened by calling the open method on the UmbModalContext. The methods will accept a modal token (or extension alias), an optional dataset, and optional modal options. It returns an instance of UmbModalHandler.
 
 ```ts
-import { html, LitElement } from 'lit';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_ALIAS } from '@umbraco-cms/modal';
 class MyElement extends UmbElementMixin(LitElement) {
@@ -241,7 +241,7 @@ const MY_MODAL_TOKEN = new ModalToken<MyModalData, MyModalResult>('My.Modal', {
 The Modal element
 
 ```ts
-import { html, LitElement } from 'lit';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/element';
 import type { UmbModalHandler } from '@umbraco-cms/modal';
 

@@ -1,12 +1,9 @@
-import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, LitElement, unsafeCSS, customElement } from '@umbraco-cms/backoffice/external/lit';
 import logoImg from '/umbraco_logomark_white.svg';
 import installerImg from '/installer.jpg';
 
 @customElement('umb-installer-layout')
 export class UmbInstallerLayoutElement extends LitElement {
-	
-
 	render() {
 		return html`<div>
 			<div id="background" aria-hidden="true"></div>
@@ -22,7 +19,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 			</main>
 		</div>`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		css`
 			#background {

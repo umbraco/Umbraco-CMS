@@ -1,9 +1,16 @@
-import { css, html, nothing } from 'lit';
+import {
+	css,
+	html,
+	nothing,
+	map,
+	ifDefined,
+	customElement,
+	property,
+	query,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, query, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { map } from 'lit/directives/map.js';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

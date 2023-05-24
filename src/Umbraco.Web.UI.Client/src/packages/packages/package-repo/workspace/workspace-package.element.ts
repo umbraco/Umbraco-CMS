@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-workspace-package')
 export class UmbWorkspacePackageElement extends LitElement {

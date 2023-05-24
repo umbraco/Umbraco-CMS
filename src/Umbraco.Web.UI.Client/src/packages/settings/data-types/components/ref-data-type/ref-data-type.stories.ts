@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import './ref-data-type.element';
 import type { UmbRefDataTypeElement } from './ref-data-type.element.js';
 

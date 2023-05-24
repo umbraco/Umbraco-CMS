@@ -1,8 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import {
 	UmbWorkspaceVariantContext,
 	UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,

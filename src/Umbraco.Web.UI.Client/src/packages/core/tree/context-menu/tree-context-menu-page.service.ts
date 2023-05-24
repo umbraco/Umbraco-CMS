@@ -1,6 +1,6 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, nothing, PropertyValueMap } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, nothing, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

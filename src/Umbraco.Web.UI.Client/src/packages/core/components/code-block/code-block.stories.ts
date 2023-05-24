@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import './code-block.element';
 import type { UmbCodeBlockElement } from './code-block.element.js';
 

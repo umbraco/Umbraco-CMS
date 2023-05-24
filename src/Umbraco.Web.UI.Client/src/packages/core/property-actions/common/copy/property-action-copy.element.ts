@@ -1,5 +1,5 @@
-import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyAction } from '../../shared/property-action/property-action.model.js';
 import {
 	UmbNotificationDefaultData,

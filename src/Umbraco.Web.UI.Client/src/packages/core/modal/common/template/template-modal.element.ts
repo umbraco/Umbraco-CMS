@@ -1,7 +1,7 @@
-import { css, html } from 'lit';
+import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, query, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputEvent } from '@umbraco-ui/uui';
 import { UmbCodeEditor } from '../../../components/code-editor/index.js';
 import { UmbTemplateModalData, UmbTemplateModalResult } from '@umbraco-cms/backoffice/modal';
