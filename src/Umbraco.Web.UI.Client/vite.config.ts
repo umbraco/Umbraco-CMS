@@ -13,6 +13,10 @@ export const plugins: PluginOption[] = [
 				src: 'public-assets/App_Plugins/*.js',
 				dest: 'App_Plugins',
 			},
+			{
+				src: 'src/assets/*',
+				dest: 'assets/umbraco/backoffice',
+			},
 		],
 	}),
 	viteTSConfigPaths(),
