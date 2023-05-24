@@ -13,7 +13,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Document',
 	name: 'Document Workspace',
-	loader: () => import('./document-workspace.element'),
+	loader: () => import('./document-workspace.element.js'),
 	meta: {
 		entityType: 'document',
 	},
@@ -24,7 +24,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		loader: () => import('./views/edit/document-workspace-view-edit.element'),
+		loader: () => import('./views/edit/document-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Content',
@@ -39,7 +39,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
-		loader: () => import('./views/info/document-info-workspace-view.element'),
+		loader: () => import('./views/info/document-info-workspace-view.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',

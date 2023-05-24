@@ -11,7 +11,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Media',
 	name: 'Media Workspace',
-	loader: () => import('./media-workspace.element'),
+	loader: () => import('./media-workspace.element.js'),
 	meta: {
 		entityType: 'media',
 	},
@@ -22,7 +22,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
-		loader: () => import('./views/edit/media-edit-workspace-view.element'),
+		loader: () => import('./views/edit/media-edit-workspace-view.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Media',
@@ -37,7 +37,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Media.Info',
 		name: 'Media Workspace Info View',
-		loader: () => import('./views/info/media-info-workspace-view.element'),
+		loader: () => import('./views/info/media-info-workspace-view.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',

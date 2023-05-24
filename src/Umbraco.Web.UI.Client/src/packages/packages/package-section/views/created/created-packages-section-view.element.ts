@@ -31,7 +31,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		const routes: UmbRoute[] = [
 			{
 				path: 'overview',
-				component: () => import('./packages-created-overview.element'),
+				component: () => import('./packages-created-overview.element.js'),
 			},
 		];
 

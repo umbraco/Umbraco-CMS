@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Umbraco News Entry Point',
 		alias: 'Umb.EntryPoint.UmbracoNews',
 		type: 'entryPoint',
-		loader: () => import('./index'),
+		loader: () => import('./index.js'),
 	},
 ];

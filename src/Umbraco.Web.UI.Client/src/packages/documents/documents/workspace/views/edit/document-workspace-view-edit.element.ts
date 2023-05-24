@@ -79,7 +79,7 @@ export class UmbDocumentWorkspaceViewEditElement
 				const tabName = tab.name;
 				routes.push({
 					path: `tab/${encodeFolderName(tabName || '').toString()}`,
-					component: () => import('./document-workspace-view-edit-tab.element'),
+					component: () => import('./document-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as any).tabName = tabName;
 					},
@@ -90,7 +90,7 @@ export class UmbDocumentWorkspaceViewEditElement
 		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				component: () => import('./document-workspace-view-edit-tab.element'),
+				component: () => import('./document-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as any).noTabName = true;
 				},

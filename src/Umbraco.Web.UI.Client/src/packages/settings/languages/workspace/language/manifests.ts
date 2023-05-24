@@ -9,7 +9,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Language',
 	name: 'Language Workspace',
-	loader: () => import('./language-workspace.element'),
+	loader: () => import('./language-workspace.element.js'),
 	meta: {
 		entityType: 'language',
 	},
@@ -20,7 +20,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Language.Details',
 		name: 'Language Workspace Details View',
-		loader: () => import('./views/details/language-details-workspace-view.element'),
+		loader: () => import('./views/details/language-details-workspace-view.element.js'),
 		weight: 90,
 		meta: {
 			label: 'Details',

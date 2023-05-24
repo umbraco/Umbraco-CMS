@@ -13,11 +13,11 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	#routes: UmbRoute[] = [
 		{
 			path: 'collection',
-			component: () => import('../collection/user-collection.element'),
+			component: () => import('../collection/user-collection.element.js'),
 		},
 		{
 			path: 'user',
-			component: () => import('../workspace/user-workspace.element'),
+			component: () => import('../workspace/user-workspace.element.js'),
 		},
 		{
 			path: '**',

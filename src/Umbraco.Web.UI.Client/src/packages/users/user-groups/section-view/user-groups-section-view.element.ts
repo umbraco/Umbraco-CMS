@@ -10,11 +10,11 @@ export class UmbUserGroupsSectionViewElement extends UmbLitElement {
 	#routes: UmbRoute[] = [
 		{
 			path: 'collection',
-			component: () => import('../collection/user-group-collection.element'),
+			component: () => import('../collection/user-group-collection.element.js'),
 		},
 		{
 			path: 'user-group',
-			component: () => import('../workspace/user-group-workspace.element'),
+			component: () => import('../workspace/user-group-workspace.element.js'),
 		},
 		{
 			path: '**',

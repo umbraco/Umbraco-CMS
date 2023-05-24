@@ -107,19 +107,19 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CreateDictionary',
 		name: 'Create Dictionary Modal',
-		loader: () => import('./create/create-dictionary-modal-layout.element'),
+		loader: () => import('./create/create-dictionary-modal-layout.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ExportDictionary',
 		name: 'Export Dictionary Modal',
-		loader: () => import('./export/export-dictionary-modal.element'),
+		loader: () => import('./export/export-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ImportDictionary',
 		name: 'Import Dictionary Modal',
-		loader: () => import('./import/import-dictionary-modal.element'),
+		loader: () => import('./import/import-dictionary-modal.element.js'),
 	},
 ];
 

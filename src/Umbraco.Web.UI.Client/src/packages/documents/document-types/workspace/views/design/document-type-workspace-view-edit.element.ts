@@ -76,7 +76,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				const tabName = tab.name;
 				routes.push({
 					path: `tab/${encodeFolderName(tabName || '').toString()}`,
-					component: () => import('./document-type-workspace-view-edit-tab.element'),
+					component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName ?? '';
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = tab.id;
@@ -88,7 +88,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				component: () => import('./document-type-workspace-view-edit-tab.element'),
+				component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
 				},

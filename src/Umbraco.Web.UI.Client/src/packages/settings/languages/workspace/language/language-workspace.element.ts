@@ -23,7 +23,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 		if (this.#editorElement) {
 			return this.#editorElement;
 		}
-		this.#editorElement = new (await import('./language-workspace-edit.element')).default();
+		this.#editorElement = new (await import('./language-workspace-edit.element.js')).default();
 		return this.#editorElement;
 	};
 
