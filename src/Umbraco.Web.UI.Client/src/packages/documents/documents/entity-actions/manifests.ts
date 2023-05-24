@@ -1,4 +1,5 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
+import { DOCUMENT_ENTITY_TYPE, DOCUMENT_ROOT_ENTITY_TYPE } from '..';
 import { UmbCreateDocumentEntityAction } from './create/create.action';
 import { UmbPublishDocumentEntityAction } from './publish.action';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
@@ -15,8 +16,6 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityType = 'document';
-
 const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
@@ -30,7 +29,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCreateDocumentEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -45,7 +44,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbTrashEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -60,7 +59,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCreateDocumentBlueprintEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -75,7 +74,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbMoveEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -90,7 +89,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbCopyEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -105,7 +104,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbSortChildrenOfEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -120,7 +119,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDocumentCultureAndHostnamesEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -134,7 +133,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDocumentPermissionsEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -148,7 +147,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDocumentPublicAccessEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -162,7 +161,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbPublishDocumentEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -176,7 +175,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbUnpublishDocumentEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -190,7 +189,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbRollbackDocumentEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [DOCUMENT_ENTITY_TYPE],
 		},
 	},
 ];
