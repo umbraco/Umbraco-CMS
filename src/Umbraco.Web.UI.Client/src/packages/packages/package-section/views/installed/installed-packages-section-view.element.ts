@@ -3,8 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { combineLatest } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbPackageRepository } from '../../../repository/package.repository';
-import type { UmbPackageWithMigrationStatus } from '../../../types';
+import { UmbPackageRepository } from '../../../repository/package.repository.js';
+import type { UmbPackageWithMigrationStatus } from '../../../types.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './installed-packages-section-view-item.element';
