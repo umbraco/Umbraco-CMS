@@ -8,13 +8,24 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './components/index.js';
 
+// TODO: temp solution to load core packages
+const CORE_PACKAGES = [
+	import('../../packages/core/umbraco-package.js'),
+	import('../../packages/settings/umbraco-package.js'),
+	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/media/umbraco-package.js'),
+	import('../../packages/members/umbraco-package.js'),
+	import('../../packages/translation/umbraco-package.js'),
+	import('../../packages/users/umbraco-package.js'),
+	import('../../packages/packages/umbraco-package.js'),
+	import('../../packages/search/umbraco-package.js'),
+	import('../../packages/templating/umbraco-package.js'),
+	import('../../packages/umbraco-news/umbraco-package.js'),
+	import('../../packages/tags/umbraco-package.js'),
+];
+
 @customElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
-	@property()
-	set localPackages(value: Array<Promise<any>>) {
-		this.#extensionInitializer.setLocalPackages(value);
-	}
-
 	#extensionInitializer = new UmbExtensionInitializer(this, umbExtensionsRegistry);
 
 	constructor() {
@@ -22,6 +33,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbExtensionInitializer(this, umbExtensionsRegistry);
+		this.#extensionInitializer.setLocalPackages(CORE_PACKAGES);
 	}
 
 	render() {

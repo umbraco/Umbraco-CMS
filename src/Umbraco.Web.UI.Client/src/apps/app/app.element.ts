@@ -40,9 +40,6 @@ export class UmbAppElement extends UmbLitElement {
 	@property({ type: Boolean })
 	bypassAuth = false;
 
-	@property()
-	localPackages: Array<Promise<any>> = [];
-
 	private _routes: UmbRoute[] = [
 		{
 			path: 'install',
@@ -56,9 +53,6 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element.js'),
-			setup: (component) => {
-				(component as any).localPackages = this.localPackages;
-			},
 			guards: [this.#isAuthorizedGuard()],
 		},
 	];
