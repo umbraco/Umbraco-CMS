@@ -1,5 +1,5 @@
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUserUnlockDataSource } from '../../types';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
