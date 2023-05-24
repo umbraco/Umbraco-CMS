@@ -1,1 +1,1 @@
-export * from './element.mixin';
+export * from './element.mixin.js';
