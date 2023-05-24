@@ -112,20 +112,20 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey, _scopeProvider);
 
         // ensure we have the required guids
-        Guid cuid = editorValue.ContentKey;
-        if (cuid == Guid.Empty)
+        Guid contentKey = editorValue.ContentKey;
+        if (contentKey == Guid.Empty)
         {
             throw new Exception("Invalid content key.");
         }
 
-        Guid puid = editorValue.PropertyTypeKey;
-        if (puid == Guid.Empty)
+        Guid propertyTypeKey = editorValue.PropertyTypeKey;
+        if (propertyTypeKey == Guid.Empty)
         {
             throw new Exception("Invalid property type key.");
         }
 
         // process the file
-        var filepath = ProcessFile(file, editorValue.DataTypeConfiguration, cuid, puid);
+        var filepath = ProcessFile(file, editorValue.DataTypeConfiguration, contentKey, propertyTypeKey);
 
         // remove current file if replaced
         if (currentPath != filepath && currentPath.IsNullOrWhiteSpace() is false)
@@ -159,7 +159,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return false;
     }
 
-    private string? ProcessFile(TemporaryFileModel file, object? dataTypeConfiguration, Guid cuid, Guid puid)
+    private string? ProcessFile(TemporaryFileModel file, object? dataTypeConfiguration, Guid contentKey, Guid propertyTypeKey)
     {
         // process the file
         // no file, invalid file, reject change
@@ -174,7 +174,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         // get the filepath
         // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
+        var filepath = _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
 
         using (Stream filestream = file.OpenReadStream())
         {

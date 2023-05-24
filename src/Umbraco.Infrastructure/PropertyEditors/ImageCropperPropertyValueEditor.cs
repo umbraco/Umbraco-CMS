@@ -129,14 +129,14 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         ImageCropperValue? editorImageCropperValue = TryParseImageCropperValue(editorValue.Value);
 
         // ensure we have the required guids
-        Guid cuid = editorValue.ContentKey;
-        if (cuid == Guid.Empty)
+        Guid contentKey = editorValue.ContentKey;
+        if (contentKey == Guid.Empty)
         {
             throw new Exception("Invalid content key.");
         }
 
-        Guid puid = editorValue.PropertyTypeKey;
-        if (puid == Guid.Empty)
+        Guid propertyTypeKey = editorValue.PropertyTypeKey;
+        if (propertyTypeKey == Guid.Empty)
         {
             throw new Exception("Invalid property type key.");
         }
@@ -166,7 +166,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         // process the file
-        var filepath = editorImageCropperValue == null ? null : ProcessFile(file, cuid, puid);
+        var filepath = editorImageCropperValue == null ? null : ProcessFile(file, contentKey, propertyTypeKey);
 
         // remove current file if replaced
         if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
@@ -245,7 +245,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
     private TemporaryFileModel? TryGetTemporaryFile(Guid temporaryFileKey)
         => _temporaryFileService.GetAsync(temporaryFileKey).GetAwaiter().GetResult();
 
-    private string? ProcessFile(TemporaryFileModel file, Guid cuid, Guid puid)
+    private string? ProcessFile(TemporaryFileModel file, Guid contentKey, Guid propertyTypeKey)
     {
         // process the file
         // no file, invalid file, reject change
@@ -259,7 +259,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         // get the filepath
         // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
+        var filepath = _mediaFileManager.GetMediaPath(file.FileName, contentKey, propertyTypeKey); // fs-relative path
 
         using (Stream filestream = file.OpenReadStream())
         {
