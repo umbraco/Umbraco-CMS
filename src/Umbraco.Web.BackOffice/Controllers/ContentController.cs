@@ -832,7 +832,6 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
-    [FileUploadCleanupFilter]
     [ContentSaveValidation]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
@@ -868,7 +867,6 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
-    [FileUploadCleanupFilter]
     [ContentSaveValidation]
     [OutgoingEditorModelEvent]
     public async Task<ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>?>> PostSave(
@@ -888,17 +886,6 @@ public class ContentController : ContentControllerBase
         Func<IContent?, ContentItemDisplay<TVariant>?> mapToDisplay)
         where TVariant : ContentVariantDisplay
     {
-        // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
-        // To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
-        // uploaded files to being *only* the actual file name (as it should be).
-        if (contentItem.UploadedFiles != null && contentItem.UploadedFiles.Any())
-        {
-            foreach (ContentPropertyFile file in contentItem.UploadedFiles)
-            {
-                file.FileName = Path.GetFileName(file.FileName);
-            }
-        }
-
         // If we've reached here it means:
         // * Our model has been bound
         // * and validated
