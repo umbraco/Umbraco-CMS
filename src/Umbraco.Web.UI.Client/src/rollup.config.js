@@ -4,7 +4,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default [
 	{
-		input: './external/backend-api/index.ts',
+		input: './src/external/backend-api/index.ts',
 		external: [],
 		output: {
 			dir: `./dist-cms/external/backend-api`,
@@ -15,7 +15,7 @@ export default [
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
 	{
-		input: './external/openid/index.ts',
+		input: './src/external/openid/index.ts',
 		output: {
 			dir: `./dist-cms/external/openid`,
 			format: 'es',
@@ -23,7 +23,7 @@ export default [
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
 	{
-		input: './external/rxjs/index.ts',
+		input: './src/external/rxjs/index.ts',
 		output: {
 			dir: `./dist-cms/external/rxjs`,
 			format: 'es',
@@ -31,7 +31,7 @@ export default [
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
 	{
-		input: './external/router-slot/index.ts',
+		input: './src/external/router-slot/index.ts',
 		output: {
 			dir: `./dist-cms/external/router-slot`,
 			format: 'es',
@@ -39,7 +39,7 @@ export default [
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
 	{
-		input: './external/uuid/index.ts',
+		input: './src/external/uuid/index.ts',
 		output: {
 			dir: `./dist-cms/external/uuid`,
 			format: 'es',
@@ -47,7 +47,7 @@ export default [
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
 	{
-		input: './external/lit/index.ts',
+		input: './src/external/lit/index.ts',
 		output: {
 			dir: `./dist-cms/external/lit`,
 			format: 'es',
