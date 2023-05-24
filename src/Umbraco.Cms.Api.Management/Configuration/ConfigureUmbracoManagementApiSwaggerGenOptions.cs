@@ -33,7 +33,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
 
         swaggerGenOptions.AddSecurityDefinition(
-             "OAuth",
+             "Backoffice User",
              new OpenApiSecurityScheme
              {
                  In = ParameterLocation.Header,
