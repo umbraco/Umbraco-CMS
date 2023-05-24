@@ -1,6 +1,6 @@
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { map } from 'rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
 import { ManifestPropertyAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

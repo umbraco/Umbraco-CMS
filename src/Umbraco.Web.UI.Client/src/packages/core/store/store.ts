@@ -1,5 +1,5 @@
 // TODO: delete when the last usages are gone
-import type { Observable } from 'rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbDataStoreIdentifiers {
 	key?: string;

@@ -1,4 +1,4 @@
-import { Observable, Subscription, lastValueFrom } from 'rxjs';
+import { Observable, Subscription, lastValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbObserver<T> {
 	#source!: Observable<T>;

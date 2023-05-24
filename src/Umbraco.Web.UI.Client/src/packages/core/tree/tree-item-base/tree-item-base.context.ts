@@ -1,4 +1,4 @@
-import { map } from 'rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface.js';
 import { UmbTreeContextBase } from '../tree.context.js';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';

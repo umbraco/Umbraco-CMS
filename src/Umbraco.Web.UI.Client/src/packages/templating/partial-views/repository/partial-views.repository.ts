@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
 import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
 import { UmbPartialViewsStore, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN } from './partial-views.store.js';

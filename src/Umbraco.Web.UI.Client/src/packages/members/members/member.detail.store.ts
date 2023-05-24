@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbMemberData } from '../../../mocks/data/member.data.js';
 import type { MemberDetails } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

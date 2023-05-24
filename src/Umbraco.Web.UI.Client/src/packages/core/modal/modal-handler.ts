@@ -1,12 +1,12 @@
 // eslint-disable-next-line local-rules/no-external-imports
-import type { IRouterSlot } from 'router-slot/model';
+import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type {
 	UUIDialogElement,
 	UUIModalDialogElement,
 	UUIModalSidebarElement,
 	UUIModalSidebarSize,
 } from '@umbraco-ui/uui';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalConfig, UmbModalType } from './modal.context.js';
 import { UmbModalToken } from './token/modal-token.js';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

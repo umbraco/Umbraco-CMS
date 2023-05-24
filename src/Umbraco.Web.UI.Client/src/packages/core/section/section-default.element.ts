@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { map } from 'rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionViewsElement } from './section-views/section-views.element.js';
 import {

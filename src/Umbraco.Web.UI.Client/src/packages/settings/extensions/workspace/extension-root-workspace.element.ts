@@ -1,6 +1,6 @@
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map } from 'rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { isManifestElementNameType } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

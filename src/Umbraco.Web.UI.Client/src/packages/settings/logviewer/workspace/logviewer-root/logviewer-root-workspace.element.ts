@@ -1,5 +1,5 @@
 import './components';
-import { map } from 'rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';

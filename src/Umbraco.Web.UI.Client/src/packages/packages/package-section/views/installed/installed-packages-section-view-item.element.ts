@@ -2,7 +2,7 @@ import { html, css, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { map } from 'rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPackageView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

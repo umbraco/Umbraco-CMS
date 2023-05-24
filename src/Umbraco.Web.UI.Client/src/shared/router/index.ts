@@ -2,18 +2,7 @@ export * from './router-slot.element.js';
 export * from './router-slot-change.event.js';
 export * from './router-slot-init.event.js';
 export * from './variant-router-slot.element.js';
-export type {
-	PageComponent,
-	Guard,
-	IRoutingInfo,
-	IComponentRoute,
-	IRedirectRoute,
-	IResolverRoute,
-	IRouterSlot,
-	Params,
-	Query,
-} from 'router-slot/model';
-export * from 'router-slot/util';
+export * from '@umbraco-cms/backoffice/external/router-slot';
 export * from './route.context.js';
 export * from './route.interface.js';
 export * from './generate-route-path-builder.function.js';

@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { createObservablePart } from './create-observable-part.function.js';
 import { deepFreeze } from './deep-freeze.function.js';
 import type { MappingFunction } from './mapping-function.js';

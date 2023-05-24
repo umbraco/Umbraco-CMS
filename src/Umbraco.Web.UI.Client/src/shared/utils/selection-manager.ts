@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbSelectionManager {

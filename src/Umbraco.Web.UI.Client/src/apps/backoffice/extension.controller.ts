@@ -1,7 +1,7 @@
-import { Subject } from 'rxjs';
+import { Subject } from '@umbraco-cms/backoffice/external/rxjs';
+import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ManifestBase, isManifestJSType } from '@umbraco-cms/backoffice/extension-api';
 

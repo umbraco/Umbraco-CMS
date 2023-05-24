@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbNotificationHandler } from './notification-handler.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 

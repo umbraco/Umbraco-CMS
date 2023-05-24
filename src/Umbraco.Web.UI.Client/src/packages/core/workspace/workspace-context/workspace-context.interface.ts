@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbWorkspaceContextInterface<DataType = unknown> {

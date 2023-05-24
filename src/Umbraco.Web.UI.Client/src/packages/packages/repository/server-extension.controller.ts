@@ -1,4 +1,4 @@
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPackageRepository } from './package.repository.js';
 import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';

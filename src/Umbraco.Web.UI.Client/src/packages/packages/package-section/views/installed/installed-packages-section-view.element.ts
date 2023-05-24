@@ -1,7 +1,7 @@
 import { html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { combineLatest } from 'rxjs';
+import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { UmbPackageRepository } from '../../../repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';

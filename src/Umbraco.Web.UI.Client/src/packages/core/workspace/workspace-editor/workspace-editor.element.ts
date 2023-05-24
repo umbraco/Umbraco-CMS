@@ -1,9 +1,14 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { map } from 'rxjs';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { repeat } from 'lit/directives/repeat.js';
-import type { PageComponent, UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
+import type {
+	PageComponent,
+	UmbRoute,
+	UmbRouterSlotInitEvent,
+	UmbRouterSlotChangeEvent,
+} from '@umbraco-cms/backoffice/router';
 import {
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,

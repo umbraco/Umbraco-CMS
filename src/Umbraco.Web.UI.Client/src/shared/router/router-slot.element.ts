@@ -1,5 +1,5 @@
 // eslint-disable-next-line local-rules/no-external-imports
-import 'router-slot';
+import '@umbraco-cms/backoffice/external/router-slot';
 import { css, html, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event.js';

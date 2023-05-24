@@ -1,4 +1,4 @@
-import type { Observable } from 'rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbWorkspaceSplitViewManager } from '../workspace-split-view-manager.class.js';
 import type { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';

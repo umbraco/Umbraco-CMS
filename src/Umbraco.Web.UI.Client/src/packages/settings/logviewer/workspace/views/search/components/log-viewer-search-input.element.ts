@@ -2,7 +2,7 @@ import { UUIButtonElement, UUIInputElement, UUIPopoverElement, UUISymbolExpandEl
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
-import { Subject, debounceTime, tap } from 'rxjs';
+import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
 import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

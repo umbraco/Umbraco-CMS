@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { stripSlash } from 'router-slot/util'; // This must only include the util to avoid side effects of registering the route element.
+import { stripSlash } from '@umbraco-cms/backoffice/external/router-slot'; // This must only include the util to avoid side effects of registering the route element.
 
 const PARAM_IDENTIFIER = /:([^\\/]+)/g;
 

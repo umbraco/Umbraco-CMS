@@ -1,4 +1,4 @@
-import type { Observable } from 'rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ProblemDetailsModel, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbPagedData } from '@umbraco-cms/backoffice/repository';

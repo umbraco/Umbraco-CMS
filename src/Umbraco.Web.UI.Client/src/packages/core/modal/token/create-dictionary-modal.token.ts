@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCreateDictionaryModalData {

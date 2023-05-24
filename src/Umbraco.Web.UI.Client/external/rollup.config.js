@@ -14,4 +14,28 @@ export default [
 		},
 		plugins: [nodeResolve(), commonjs(), esbuild()],
 	},
+	{
+		input: './external/openid/index.ts',
+		output: {
+			dir: `./dist-cms/external/openid`,
+			format: 'es',
+		},
+		plugins: [nodeResolve(), commonjs(), esbuild()],
+	},
+	{
+		input: './external/rxjs/index.ts',
+		output: {
+			dir: `./dist-cms/external/rxjs`,
+			format: 'es',
+		},
+		plugins: [nodeResolve(), commonjs(), esbuild()],
+	},
+	{
+		input: './external/router-slot/index.ts',
+		output: {
+			dir: `./dist-cms/external/router-slot`,
+			format: 'es',
+		},
+		plugins: [nodeResolve(), commonjs(), esbuild()],
+	},
 ];

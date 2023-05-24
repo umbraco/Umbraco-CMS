@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @export

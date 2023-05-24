@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbUserGroupCollectionFilterModel, UmbUserGroupDetailDataSource } from '../types.js';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data.js';
 import { UmbUserGroupCollectionServerDataSource } from './sources/user-group-collection.server.data.js';

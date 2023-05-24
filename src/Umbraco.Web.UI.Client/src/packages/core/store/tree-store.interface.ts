@@ -1,4 +1,4 @@
-import type { Observable } from 'rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbStore } from './store.interface.js';
 
