@@ -127,19 +127,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 					.label=${this._item.name}>
 			  </umb-entity-actions-bundle>`
 			: '';
-		/*
-		return html`
-			${this._hasActions
-				? html`
-						<uui-action-bar slot="actions">
-							<uui-button @click=${this._openActions} label="Open actions menu">
-								<uui-symbol-more></uui-symbol-more>
-							</uui-button>
-						</uui-action-bar>
-				  `
-				: nothing}
-		`;
-		*/
 	}
 
 	#renderChildItems() {
