@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
@@ -45,7 +46,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         }
 
         var filterOptions = new List<FilterOption>();
-        foreach (var filter in filters)
+        foreach (var filter in filters.Where(filter => filter.IsNullOrWhiteSpace() is false))
         {
             FilterOption? filterOption = GetFilterOption(filter);
             if (filterOption is null)
@@ -58,7 +59,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         }
 
         var sortOptions = new List<SortOption>();
-        foreach (var sort in sorts)
+        foreach (var sort in sorts.Where(sort => sort.IsNullOrWhiteSpace() is false))
         {
             SortOption? sortOption = GetSortOption(sort);
             if (sortOption is null)
