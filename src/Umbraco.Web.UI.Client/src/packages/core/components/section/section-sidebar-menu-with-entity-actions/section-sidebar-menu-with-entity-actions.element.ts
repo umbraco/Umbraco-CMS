@@ -16,7 +16,7 @@ const manifestWithEntityActions: UmbBackofficeManifestKind = {
 	matchType: 'sectionSidebarApp',
 	manifest: {
 		type: 'sectionSidebarApp',
-		elementName: 'umb-section-sidebar-menu',
+		elementName: 'umb-section-sidebar-menu-with-entity-actions',
 	},
 };
 umbExtensionsRegistry.register(manifestWithEntityActions);
