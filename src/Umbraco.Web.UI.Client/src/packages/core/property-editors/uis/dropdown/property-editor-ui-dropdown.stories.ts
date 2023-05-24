@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element';
+import type { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
 import './property-editor-ui-dropdown.element';
 
 export default {

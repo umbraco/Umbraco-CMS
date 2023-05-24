@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbWorkspacePropertyContext } from './workspace-property.context';
+import { UmbWorkspacePropertyContext } from './workspace-property.context.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

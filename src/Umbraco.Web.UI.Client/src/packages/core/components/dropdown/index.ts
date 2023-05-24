@@ -1,1 +1,1 @@
-export * from './dropdown.element';
+export * from './dropdown.element.js';

@@ -3,7 +3,7 @@ import './footer-layout.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbFooterLayoutElement } from './footer-layout.element';
+import type { UmbFooterLayoutElement } from './footer-layout.element.js';
 
 export default {
 	title: 'Workspaces/Shared/Footer Layout',

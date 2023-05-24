@@ -1,3 +1,3 @@
-export * from './workspace-action-base';
-export * from './workspace-action.element';
-export * from './common';
+export * from './workspace-action-base.js';
+export * from './workspace-action.element.js';
+export * from './common/index.js';

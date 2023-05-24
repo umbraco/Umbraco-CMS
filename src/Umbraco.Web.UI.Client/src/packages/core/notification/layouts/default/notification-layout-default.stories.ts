@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import type { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element';
+import type { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element.js';
 
 import './notification-layout-default.element';
 

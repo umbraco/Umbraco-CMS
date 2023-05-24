@@ -4,7 +4,7 @@ import './icon-picker-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbIconPickerModalElement } from './icon-picker-modal.element';
+import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
 import { UmbIconPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {

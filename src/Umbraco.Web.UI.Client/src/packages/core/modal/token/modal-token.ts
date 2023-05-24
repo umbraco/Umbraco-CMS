@@ -1,4 +1,4 @@
-import { UmbModalConfig } from '../modal.context';
+import { UmbModalConfig } from '../modal.context.js';
 
 export class UmbModalToken<ModalDataType extends object = object, ModalResultType = unknown> {
 	/**

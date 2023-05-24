@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbSectionSidebarMenuElement } from './section-sidebar-menu.element';
+import type { UmbSectionSidebarMenuElement } from './section-sidebar-menu.element.js';
 import './section-sidebar-menu.element';
 
 export default {

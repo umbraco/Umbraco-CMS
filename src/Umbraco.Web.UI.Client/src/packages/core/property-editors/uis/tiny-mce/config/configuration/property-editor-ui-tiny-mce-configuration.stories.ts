@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUITinyMceConfigurationElement } from './property-editor-ui-tiny-mce-configuration.element';
+import type { UmbPropertyEditorUITinyMceConfigurationElement } from './property-editor-ui-tiny-mce-configuration.element.js';
 import './property-editor-ui-tiny-mce-configuration.element';
 
 export default {

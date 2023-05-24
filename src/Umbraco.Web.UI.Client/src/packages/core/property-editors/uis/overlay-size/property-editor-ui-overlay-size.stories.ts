@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-overlay-size.element';
+import type { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-overlay-size.element.js';
 import './property-editor-ui-overlay-size.element';
 
 export default {

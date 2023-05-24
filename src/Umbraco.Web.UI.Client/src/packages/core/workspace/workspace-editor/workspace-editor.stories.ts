@@ -3,7 +3,7 @@ import './workspace-editor.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbWorkspaceEditorElement } from './workspace-editor.element';
+import type { UmbWorkspaceEditorElement } from './workspace-editor.element.js';
 
 export default {
 	title: 'Workspaces/Shared/Workspace Editor',

@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import { UmbButtonWithDropdownElement } from './button-with-dropdown.element';
+import { UmbButtonWithDropdownElement } from './button-with-dropdown.element.js';
 
 export default {
 	title: 'Components/Button with dropdown',

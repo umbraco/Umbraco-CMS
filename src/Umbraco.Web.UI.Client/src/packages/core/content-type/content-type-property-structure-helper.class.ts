@@ -1,5 +1,11 @@
-import { PropertyContainerTypes, UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class';
-import { DocumentTypePropertyTypeResponseModel, PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	PropertyContainerTypes,
+	UmbContentTypePropertyStructureManager,
+} from './content-type-structure-manager.class.js';
+import {
+	DocumentTypePropertyTypeResponseModel,
+	PropertyTypeResponseModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 

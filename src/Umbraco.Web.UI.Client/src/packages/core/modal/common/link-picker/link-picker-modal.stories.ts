@@ -4,7 +4,7 @@ import './link-picker-modal.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbLinkPickerModalElement } from './link-picker-modal.element';
+import type { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
 
 export default {
 	title: 'API/Modals/Layouts/Link Picker',

@@ -1,8 +1,8 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../workspace/workspace-variant/workspace-variant.context';
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../workspace/workspace-property/workspace-property.context';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../workspace/workspace-variant/workspace-variant.context.js';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../workspace/workspace-property/workspace-property.context.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

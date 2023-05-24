@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbEntityBulkAction } from './entity-bulk-action';
+import { UmbEntityBulkAction } from './entity-bulk-action.js';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

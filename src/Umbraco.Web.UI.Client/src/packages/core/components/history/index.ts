@@ -1,2 +1,2 @@
-export * from './history-item.element';
-export * from './history-list.element';
+export * from './history-item.element.js';
+export * from './history-list.element.js';

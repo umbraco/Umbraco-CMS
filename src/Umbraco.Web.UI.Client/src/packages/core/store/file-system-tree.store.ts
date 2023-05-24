@@ -1,5 +1,5 @@
-import { UmbStoreBase } from './store-base';
-import { UmbTreeStore } from './tree-store.interface';
+import { UmbStoreBase } from './store-base.js';
+import { UmbTreeStore } from './tree-store.interface.js';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

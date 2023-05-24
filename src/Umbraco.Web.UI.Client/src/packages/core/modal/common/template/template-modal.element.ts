@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, query, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbCodeEditor } from '../../../components/code-editor';
+import { UmbCodeEditor } from '../../../components/code-editor/index.js';
 import { UmbTemplateModalData, UmbTemplateModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbInputEvent } from '@umbraco-cms/backoffice/events';
 import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';

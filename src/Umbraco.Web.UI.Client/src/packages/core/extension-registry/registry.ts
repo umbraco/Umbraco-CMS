@@ -1,4 +1,4 @@
-import type { ManifestTypes } from './models';
+import type { ManifestTypes } from './models/index.js';
 import { ManifestKind, UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
 
 export type UmbBackofficeManifestKind = ManifestKind<ManifestTypes>;

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUITextareaElement } from './property-editor-ui-textarea.element';
+import type { UmbPropertyEditorUITextareaElement } from './property-editor-ui-textarea.element.js';
 import './property-editor-ui-textarea.element';
 
 export default {

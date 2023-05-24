@@ -1,1 +1,1 @@
-export * from './input-checkbox-list.element';
+export * from './input-checkbox-list.element.js';

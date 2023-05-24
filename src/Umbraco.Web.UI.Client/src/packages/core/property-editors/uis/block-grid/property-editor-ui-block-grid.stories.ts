@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIBlockGridElement } from './property-editor-ui-block-grid.element';
+import type { UmbPropertyEditorUIBlockGridElement } from './property-editor-ui-block-grid.element.js';
 import './property-editor-ui-block-grid.element';
 
 export default {

@@ -1,9 +1,9 @@
-import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components';
-import { manifests as debugManifests } from './debug/manifests';
-import { manifests as propertyActionManifests } from './property-actions/manifests';
-import { manifests as propertyEditorManifests } from './property-editors/manifests';
-import { manifests as modalManifests } from './modal/common/manifests';
-import { UmbStoreExtensionInitializer } from './store';
+import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerElement } from './components/index.js';
+import { manifests as debugManifests } from './debug/manifests.js';
+import { manifests as propertyActionManifests } from './property-actions/manifests.js';
+import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
+import { manifests as modalManifests } from './modal/common/manifests.js';
+import { UmbStoreExtensionInitializer } from './store/index.js';
 
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
@@ -11,27 +11,27 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export * from './action';
-export * from './collection';
-export * from './components';
-export * from './content-type';
-export * from './debug';
-export * from './entity-action';
-export * from './entity-bulk-action';
-export * from './extension-registry';
-export * from './id';
-export * from './menu';
-export * from './modal';
-export * from './notification';
-export * from './picker-input';
-export * from './property-actions';
-export * from './property-editors';
-export * from './section';
-export * from './sorter';
-export * from './store';
-export * from './tree';
-export * from './variant';
-export * from './workspace';
+export * from './action/index.js';
+export * from './collection/index.js';
+export * from './components/index.js';
+export * from './content-type/index.js';
+export * from './debug/index.js';
+export * from './entity-action/index.js';
+export * from './entity-bulk-action/index.js';
+export * from './extension-registry/index.js';
+export * from './id/index.js';
+export * from './menu/index.js';
+export * from './modal/index.js';
+export * from './notification/index.js';
+export * from './picker-input/index.js';
+export * from './property-actions/index.js';
+export * from './property-editors/index.js';
+export * from './section/index.js';
+export * from './sorter/index.js';
+export * from './store/index.js';
+export * from './tree/index.js';
+export * from './variant/index.js';
+export * from './workspace/index.js';
 
 const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...debugManifests,

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUISliderElement } from './property-editor-ui-slider.element';
+import type { UmbPropertyEditorUISliderElement } from './property-editor-ui-slider.element.js';
 import './property-editor-ui-slider.element';
 
 export default {

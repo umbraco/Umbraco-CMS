@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyActionCopyElement } from './property-action-copy.element';
+import type { UmbPropertyActionCopyElement } from './property-action-copy.element.js';
 import './property-action-copy.element';
 
 export default {

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUILabelElement } from './property-editor-ui-label.element';
+import type { UmbPropertyEditorUILabelElement } from './property-editor-ui-label.element.js';
 import './property-editor-ui-label.element';
 
 export default {

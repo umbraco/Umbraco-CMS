@@ -1,1 +1,1 @@
-export * from './input-toggle.element';
+export * from './input-toggle.element.js';

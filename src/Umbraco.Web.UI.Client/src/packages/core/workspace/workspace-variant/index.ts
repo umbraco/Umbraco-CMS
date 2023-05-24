@@ -1,2 +1,2 @@
-export * from './workspace-variant.context';
-export * from './workspace-variant.element';
+export * from './workspace-variant.context.js';
+export * from './workspace-variant.element.js';

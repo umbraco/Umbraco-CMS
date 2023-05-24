@@ -1,1 +1,1 @@
-export * from './property-editor-config.element';
+export * from './property-editor-config.element.js';

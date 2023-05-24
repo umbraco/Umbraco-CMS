@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/blocks';
-import DebugDialogImage from './umb-debug-dialog.jpg';
-import DebugImage from './umb-debug.jpg';
+import DebugDialogImage from './umb-debug-dialog.jpg.js';
+import DebugImage from './umb-debug.jpg.js';
 
 <Meta title="Guides/Debug" />
 
@@ -15,8 +15,10 @@ For example it will help you as a package developer or implementor to know you a
 This can help with the developer experience to quickly see what is available to use and how to use it.
 
 ### Usage
+
 The `<umb-debug>` component can be used in two different ways, either as a button or as a dialog. By default it is rendered as a button and the debug information about available contexts is dissplayed inline to where the element is placed.
-<img src={DebugImage} width="100%"/>
+
+<img src={DebugImage} width="100%" />
 
 ```typescript
 // This will add a Debug button to the UI and once clicked the information about avilable contextes will slide down
@@ -24,8 +26,10 @@ The `<umb-debug>` component can be used in two different ways, either as a butto
 ```
 
 #### Dialog
+
 This example uses an additional property/attribute `dialog` which adds a smaller badge to the UI as opposed to a button and will open the information in a small dialog/modal from the right hand side, this may be more useful to use when space is limited in the UI to add a button and pane of information directly to where the element is placed.
-<img src={DebugDialogImage} width="100%"/>
+
+<img src={DebugDialogImage} width="100%" />
 
 ```typescript
 // This will open the debug information in a small dialog/modal from the right hand side
@@ -33,6 +37,7 @@ This example uses an additional property/attribute `dialog` which adds a smaller
 ```
 
 #### Disable
+
 You may wish to temporarily hide or disable the debug information but return to it later on in the development process.
 
 ```typescript

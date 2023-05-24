@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIColorPickerElement } from './property-editor-ui-color-picker.element';
+import type { UmbPropertyEditorUIColorPickerElement } from './property-editor-ui-color-picker.element.js';
 import './property-editor-ui-color-picker.element';
 
 export default {

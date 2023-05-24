@@ -1,1 +1,1 @@
-export * from './extension-slot.element';
+export * from './extension-slot.element.js';

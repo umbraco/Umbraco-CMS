@@ -1,1 +1,1 @@
-export * from './empty-state.element';
+export * from './empty-state.element.js';

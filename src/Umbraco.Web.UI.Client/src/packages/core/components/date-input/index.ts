@@ -1,1 +1,1 @@
-export * from './date-input.element';
+export * from './date-input.element.js';

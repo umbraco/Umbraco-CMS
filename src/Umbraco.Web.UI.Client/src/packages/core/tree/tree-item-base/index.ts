@@ -1,2 +1,2 @@
-export * from './tree-item-base.context';
-export * from './tree-item-base.element';
+export * from './tree-item-base.context.js';
+export * from './tree-item-base.element.js';

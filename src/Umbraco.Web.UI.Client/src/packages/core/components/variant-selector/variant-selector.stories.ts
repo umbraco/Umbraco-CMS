@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import './variant-selector.element';
-import type { UmbVariantSelectorElement } from './variant-selector.element';
+import type { UmbVariantSelectorElement } from './variant-selector.element.js';
 
 const meta: Meta<UmbVariantSelectorElement> = {
 	title: 'Components/Variant Selector',

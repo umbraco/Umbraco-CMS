@@ -1,9 +1,9 @@
 import * as monaco from 'monaco-editor';
-import { CodeEditorTheme } from '../code-editor.model';
-import { UmbCodeEditorThemeHighContrastLight } from './code-editor.hc-light.theme';
-import { UmbCodeEditorThemeHighContrastDark } from './code-editor.hc-dark.theme';
-import { UmbCodeEditorThemeLight } from './code-editor.light.theme';
-import { UmbCodeEditorThemeDark } from './code-editor.dark.theme';
+import { CodeEditorTheme } from '../code-editor.model.js';
+import { UmbCodeEditorThemeHighContrastLight } from './code-editor.hc-light.theme.js';
+import { UmbCodeEditorThemeHighContrastDark } from './code-editor.hc-dark.theme.js';
+import { UmbCodeEditorThemeLight } from './code-editor.light.theme.js';
+import { UmbCodeEditorThemeDark } from './code-editor.dark.theme.js';
 /**
  * 4 themes for the code editor.
  *

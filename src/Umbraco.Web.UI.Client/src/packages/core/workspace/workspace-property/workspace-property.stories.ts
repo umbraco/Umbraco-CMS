@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbWorkspacePropertyElement } from './workspace-property.element';
+import type { UmbWorkspacePropertyElement } from './workspace-property.element.js';
 import './workspace-property.element';
 
 export default {

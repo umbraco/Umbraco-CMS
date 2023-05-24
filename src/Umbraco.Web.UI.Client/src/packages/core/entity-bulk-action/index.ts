@@ -1,2 +1,2 @@
-export * from './entity-bulk-action';
-export * from './entity-bulk-action.element';
+export * from './entity-bulk-action.js';
+export * from './entity-bulk-action.element.js';

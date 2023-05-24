@@ -1,1 +1,1 @@
-export * from './footer-layout.element';
+export * from './footer-layout.element.js';

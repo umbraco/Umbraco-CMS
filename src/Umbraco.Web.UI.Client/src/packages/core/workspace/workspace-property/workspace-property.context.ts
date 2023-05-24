@@ -1,4 +1,4 @@
-import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
+import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
 import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';

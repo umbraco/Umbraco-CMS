@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIImageCropperElement } from './property-editor-ui-image-cropper.element';
+import type { UmbPropertyEditorUIImageCropperElement } from './property-editor-ui-image-cropper.element.js';
 import './property-editor-ui-image-cropper.element';
 
 export default {

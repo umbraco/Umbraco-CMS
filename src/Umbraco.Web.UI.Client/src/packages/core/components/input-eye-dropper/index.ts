@@ -1,1 +1,1 @@
-export * from './input-eye-dropper.element';
+export * from './input-eye-dropper.element.js';

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIBlockGridStylesheetPickerElement } from './property-editor-ui-block-grid-stylesheet-picker.element';
+import type { UmbPropertyEditorUIBlockGridStylesheetPickerElement } from './property-editor-ui-block-grid-stylesheet-picker.element.js';
 import './property-editor-ui-block-grid-stylesheet-picker.element';
 
 export default {

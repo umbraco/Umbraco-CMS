@@ -1,2 +1,2 @@
-export * from './debug.element';
-export * from './manifests';
+export * from './debug.element.js';
+export * from './manifests.js';

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIRadioButtonListElement } from './property-editor-ui-radio-button-list.element';
+import type { UmbPropertyEditorUIRadioButtonListElement } from './property-editor-ui-radio-button-list.element.js';
 import './property-editor-ui-radio-button-list.element';
 
 export default {

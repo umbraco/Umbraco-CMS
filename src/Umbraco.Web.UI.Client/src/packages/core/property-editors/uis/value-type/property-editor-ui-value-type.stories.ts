@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIValueTypeElement } from './property-editor-ui-value-type.element';
+import type { UmbPropertyEditorUIValueTypeElement } from './property-editor-ui-value-type.element.js';
 import './property-editor-ui-value-type.element';
 
 export default {

@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import './input-multi-url.element';
-import type { UmbInputMultiUrlElement } from './input-multi-url.element';
+import type { UmbInputMultiUrlElement } from './input-multi-url.element.js';
 
 const meta: Meta<UmbInputMultiUrlElement> = {
 	title: 'Components/Inputs/Multi URL',

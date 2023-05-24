@@ -1,1 +1,1 @@
-export * from './section-sidebar-context-menu.element';
+export * from './section-sidebar-context-menu.element.js';

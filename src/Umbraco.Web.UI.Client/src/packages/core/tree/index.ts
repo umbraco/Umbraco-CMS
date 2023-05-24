@@ -1,10 +1,10 @@
-export * from './context-menu';
-export * from './entity-tree-item';
-export * from './tree-item';
-export * from './tree-item-base';
-export * from './tree-menu-item';
-export * from './tree.context';
-export * from './tree.element';
+export * from './context-menu/index.js';
+export * from './entity-tree-item/index.js';
+export * from './tree-item/index.js';
+export * from './tree-item-base/index.js';
+export * from './tree-menu-item/index.js';
+export * from './tree.context.js';
+export * from './tree.element.js';
 
 export interface UmbTreeRootModel {
 	type: string;

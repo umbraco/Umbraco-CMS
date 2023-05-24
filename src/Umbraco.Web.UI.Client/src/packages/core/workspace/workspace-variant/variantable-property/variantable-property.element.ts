@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace-variant.context';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../workspace-variant.context.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { PropertyTypeResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

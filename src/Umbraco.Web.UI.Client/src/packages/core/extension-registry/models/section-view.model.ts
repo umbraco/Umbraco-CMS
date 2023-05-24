@@ -1,4 +1,4 @@
-import type { UmbSectionViewExtensionElement } from '../interfaces/section-view-extension-element.interface';
+import type { UmbSectionViewExtensionElement } from '../interfaces/section-view-extension-element.interface.js';
 import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSectionView

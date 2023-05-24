@@ -1,1 +1,1 @@
-export * from './input-slider.element';
+export * from './input-slider.element.js';

@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbInputUploadFieldElement } from '../../../components/input-upload-field/input-upload-field.element';
+import { UmbInputUploadFieldElement } from '../../../components/input-upload-field/input-upload-field.element.js';
 import type { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

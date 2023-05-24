@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element';
+import type { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
 import './property-editor-ui-checkbox-list.element';
 
 export default {

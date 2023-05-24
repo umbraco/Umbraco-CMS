@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element';
+import type { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element.js';
 import './property-editor-ui-block-list.element';
 
 export default {

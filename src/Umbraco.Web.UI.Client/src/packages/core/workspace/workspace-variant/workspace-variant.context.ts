@@ -1,5 +1,5 @@
-import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
-import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface';
+import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context.js';
+import { UmbWorkspaceVariableEntityContextInterface } from '../workspace-context/workspace-variable-entity-context.interface.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbContextConsumerController,

@@ -7,10 +7,10 @@ import type {
 	UUIModalSidebarSize,
 } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
+import { UmbModalConfig, UmbModalType } from './modal.context.js';
+import { UmbModalToken } from './token/modal-token.js';
+import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
-import { ManifestModal, umbExtensionsRegistry } from '../extension-registry';
-import { UmbModalConfig, UmbModalType } from './modal.context';
-import { UmbModalToken } from './token/modal-token';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';

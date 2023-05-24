@@ -4,7 +4,7 @@ import './workspace-footer.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element';
+import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element.js';
 
 export default {
 	title: 'Workspaces/Shared/Footer Layout',

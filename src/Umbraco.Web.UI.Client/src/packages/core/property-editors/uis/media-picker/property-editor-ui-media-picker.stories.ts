@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIMediaPickerElement } from './property-editor-ui-media-picker.element';
+import type { UmbPropertyEditorUIMediaPickerElement } from './property-editor-ui-media-picker.element.js';
 import './property-editor-ui-media-picker.element';
 
 export default {

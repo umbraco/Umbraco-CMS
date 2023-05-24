@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbSectionMainElement } from './section-main.element';
+import type { UmbSectionMainElement } from './section-main.element.js';
 import './section-main.element';
 
 export default {

@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import './empty-state.element';
-import type { UmbEmptyStateElement } from './empty-state.element';
+import type { UmbEmptyStateElement } from './empty-state.element.js';
 
 const meta: Meta<UmbEmptyStateElement> = {
 	title: 'Components/Empty State',

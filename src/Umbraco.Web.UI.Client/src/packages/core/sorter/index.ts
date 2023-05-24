@@ -1,1 +1,1 @@
-export * from './sorter.controller';
+export * from './sorter.controller.js';

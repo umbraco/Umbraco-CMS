@@ -1,1 +1,1 @@
-export * from './workspace-action-menu.element';
+export * from './workspace-action-menu.element.js';

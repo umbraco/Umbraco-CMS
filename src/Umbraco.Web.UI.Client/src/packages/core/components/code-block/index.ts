@@ -1,1 +1,1 @@
-export * from './code-block.element';
+export * from './code-block.element.js';

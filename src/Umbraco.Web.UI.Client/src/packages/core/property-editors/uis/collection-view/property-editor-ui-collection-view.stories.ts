@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection-view.element';
+import type { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection-view.element.js';
 import './property-editor-ui-collection-view.element';
 
 export default {

@@ -1,1 +1,1 @@
-export * from './section-main.element';
+export * from './section-main.element.js';

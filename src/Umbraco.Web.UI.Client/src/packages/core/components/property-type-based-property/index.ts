@@ -1,1 +1,1 @@
-export * from './property-type-based-property.element';
+export * from './property-type-based-property.element.js';

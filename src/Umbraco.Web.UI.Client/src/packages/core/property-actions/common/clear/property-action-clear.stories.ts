@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyActionClearElement } from './property-action-clear.element';
+import type { UmbPropertyActionClearElement } from './property-action-clear.element.js';
 import './property-action-clear.element';
 
 export default {

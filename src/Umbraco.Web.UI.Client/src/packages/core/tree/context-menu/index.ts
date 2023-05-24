@@ -1,2 +1,2 @@
-export * from './tree-context-menu-page.service';
-export * from './tree-context-menu.service';
+export * from './tree-context-menu-page.service.js';
+export * from './tree-context-menu.service.js';

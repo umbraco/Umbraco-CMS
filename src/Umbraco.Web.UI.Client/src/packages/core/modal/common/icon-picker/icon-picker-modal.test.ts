@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbIconPickerModalElement } from './icon-picker-modal.element';
+import { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('umb-icon-picker-modal', () => {

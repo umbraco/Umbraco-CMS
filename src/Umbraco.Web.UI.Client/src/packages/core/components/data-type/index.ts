@@ -1,1 +1,1 @@
-export * from './data-type-property-collection.class';
+export * from './data-type-property-collection.class.js';

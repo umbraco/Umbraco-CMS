@@ -1,1 +1,1 @@
-export * from './input-color-picker.element';
+export * from './input-color-picker.element.js';

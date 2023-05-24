@@ -1,7 +1,7 @@
 // TODO: Be aware here we import a class from src!
-import { UmbModalRouteRegistration } from './modal-route-registration';
-import { UmbModalToken } from './token';
-import { UmbModalConfig } from './modal.context';
+import { UmbModalRouteRegistration } from './modal-route-registration.js';
+import { UmbModalToken } from './token/index.js';
+import { UmbModalConfig } from './modal.context.js';
 import { UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/router';
 import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';

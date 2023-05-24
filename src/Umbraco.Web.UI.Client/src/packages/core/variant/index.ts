@@ -1,1 +1,1 @@
-export * from './variant-id.class';
+export * from './variant-id.class.js';

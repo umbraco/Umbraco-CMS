@@ -1,4 +1,4 @@
-import type { UmbWorkspaceContextInterface } from './workspace-context.interface';
+import type { UmbWorkspaceContextInterface } from './workspace-context.interface.js';
 
 export interface UmbEntityWorkspaceContextInterface<EntityType = unknown>
 	extends UmbWorkspaceContextInterface<EntityType> {

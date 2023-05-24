@@ -1,1 +1,1 @@
-export * from './workspace-editor.element';
+export * from './workspace-editor.element.js';

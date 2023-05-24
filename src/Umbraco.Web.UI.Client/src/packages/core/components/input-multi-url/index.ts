@@ -1,1 +1,1 @@
-export * from './input-multi-url.element';
+export * from './input-multi-url.element.js';

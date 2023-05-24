@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIUploadFieldElement } from './property-editor-ui-upload-field.element';
+import type { UmbPropertyEditorUIUploadFieldElement } from './property-editor-ui-upload-field.element.js';
 import './property-editor-ui-upload-field.element';
 
 export default {

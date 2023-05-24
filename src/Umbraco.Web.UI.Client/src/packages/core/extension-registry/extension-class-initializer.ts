@@ -1,5 +1,5 @@
-import type { ManifestTypes } from './models';
-import { umbExtensionsRegistry } from './registry';
+import type { ManifestTypes } from './models/index.js';
+import { umbExtensionsRegistry } from './registry.js';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	createExtensionClass,

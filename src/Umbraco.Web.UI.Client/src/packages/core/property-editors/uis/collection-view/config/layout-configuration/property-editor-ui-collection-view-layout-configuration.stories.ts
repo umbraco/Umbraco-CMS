@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUICollectionViewLayoutConfigurationElement } from './property-editor-ui-collection-view-layout-configuration.element';
+import type { UmbPropertyEditorUICollectionViewLayoutConfigurationElement } from './property-editor-ui-collection-view-layout-configuration.element.js';
 import './property-editor-ui-collection-view-layout-configuration.element';
 
 export default {

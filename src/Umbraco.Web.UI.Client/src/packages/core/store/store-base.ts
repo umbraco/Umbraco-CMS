@@ -1,4 +1,4 @@
-import { UmbStore } from './store.interface';
+import { UmbStore } from './store.interface.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';

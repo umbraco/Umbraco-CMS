@@ -1,1 +1,1 @@
-export * from './header-app-button.element';
+export * from './header-app-button.element.js';

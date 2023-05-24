@@ -1,1 +1,1 @@
-export * from './variant-selector.element';
+export * from './variant-selector.element.js';

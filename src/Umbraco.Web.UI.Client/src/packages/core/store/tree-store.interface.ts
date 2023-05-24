@@ -1,6 +1,6 @@
 import type { Observable } from 'rxjs';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbStore } from './store.interface';
+import { UmbStore } from './store.interface.js';
 
 export interface UmbTreeStore<T extends TreeItemPresentationModel = any> extends UmbStore<T> {
 	rootItems: Observable<Array<T>>;

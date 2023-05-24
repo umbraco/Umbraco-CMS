@@ -1,1 +1,1 @@
-export * from './input-list-base';
+export * from './input-list-base.js';

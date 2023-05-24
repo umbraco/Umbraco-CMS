@@ -1,1 +1,1 @@
-export * from './ref-property-editor-ui.element';
+export * from './ref-property-editor-ui.element.js';

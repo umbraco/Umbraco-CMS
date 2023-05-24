@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIToggleElement } from './property-editor-ui-toggle.element';
+import type { UmbPropertyEditorUIToggleElement } from './property-editor-ui-toggle.element.js';
 import './property-editor-ui-toggle.element';
 
 export default {

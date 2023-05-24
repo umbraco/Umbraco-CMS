@@ -1,2 +1,2 @@
-export * from './collection.context';
-export * from './collection-filter-model.interface';
+export * from './collection.context.js';
+export * from './collection-filter-model.interface.js';

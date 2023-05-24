@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbDashboardCollectionElement } from './dashboard-collection.element';
+import type { UmbDashboardCollectionElement } from './dashboard-collection.element.js';
 import './dashboard-collection.element';
 
 export default {

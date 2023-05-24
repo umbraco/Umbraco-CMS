@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIMemberGroupPickerElement } from './property-editor-ui-member-group-picker.element';
+import type { UmbPropertyEditorUIMemberGroupPickerElement } from './property-editor-ui-member-group-picker.element.js';
 import './property-editor-ui-member-group-picker.element';
 
 export default {

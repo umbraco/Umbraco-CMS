@@ -1,11 +1,11 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbPropertyValueChangeEvent } from '../..';
+import { UmbPropertyValueChangeEvent } from '../../index.js';
 import {
 	UmbInputMultipleTextStringElement,
 	MultipleTextStringValue,
-} from './input-multiple-text-string/input-multiple-text-string.element';
+} from './input-multiple-text-string/input-multiple-text-string.element.js';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';

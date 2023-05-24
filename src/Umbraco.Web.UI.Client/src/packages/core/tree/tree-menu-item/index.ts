@@ -1,1 +1,1 @@
-export * from './tree-menu-item.element';
+export * from './tree-menu-item.element.js';
