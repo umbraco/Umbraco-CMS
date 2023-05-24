@@ -4,7 +4,12 @@ export type LoginRequestModel = {
 	persist: boolean;
 };
 
-export interface UmbAuthContext {
-	authUrl: string;
+export interface IUmbAuthContext {
 	login(data: LoginRequestModel): Promise<{ error?: string }>;
 }
+
+export type ProblemDetails = {
+	type: string;
+	title: string;
+	message: string;
+};

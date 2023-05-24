@@ -3,21 +3,18 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui';
-import { UmbAuthContext } from './types';
+import { IUmbAuthContext } from './types';
 import { UmbAuthLegacyContext } from './auth-legacy.context';
-import { UmbAuthNewContext } from './auth-new.context';
+import { UmbAuthContext } from './auth.context';
 
 import './auth-layout.element';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
-	#authContext: UmbAuthContext;
+	#authContext: IUmbAuthContext;
 
 	@property({ type: String, attribute: 'return-url' })
 	returnUrl = '';
-
-	@property({ type: String, attribute: 'auth-url' })
-	authUrl = '';
 
 	@property({ type: Boolean })
 	isLegacy = false;
@@ -34,9 +31,9 @@ export default class UmbLoginElement extends LitElement {
 	constructor() {
 		super();
 		if (this.isLegacy) {
-			this.#authContext = new UmbAuthLegacyContext(this.authUrl);
+			this.#authContext = new UmbAuthLegacyContext();
 		} else {
-			this.#authContext = new UmbAuthNewContext(this.authUrl);
+			this.#authContext = new UmbAuthContext();
 		}
 	}
 
