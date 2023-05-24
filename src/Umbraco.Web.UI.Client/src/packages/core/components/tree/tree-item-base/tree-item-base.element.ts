@@ -28,9 +28,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	private _isSelected = false;
 
 	@state()
-	private _hasActions = false;
-
-	@state()
 	private _hasChildren = false;
 
 	@state()
@@ -50,7 +47,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
 			this.observe(this.#treeItemContext.isSelected, (value) => (this._isSelected = value));
-			this.observe(this.#treeItemContext.hasActions, (value) => (this._hasActions = value));
 			this.observe(this.#treeItemContext.path, (value) => (this._href = value));
 		});
 	}
@@ -80,10 +76,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		this.observe(asObservable(), (childItems) => {
 			this._childItems = childItems;
 		});
-	}
-
-	private _openActions() {
-		this.#treeItemContext?.toggleContextMenu();
 	}
 
 	// TODO: We should rename unselect event to deselect. But this is a breaking change of UI Library.
@@ -128,6 +120,14 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	}
 
 	#renderActions() {
+		return this.#treeItemContext && this._item
+			? html`<umb-entity-actions-bundle
+					slot="actions"
+					entity-type=${this.#treeItemContext.type}
+					.label=${this._item.name}>
+			  </umb-entity-actions-bundle>`
+			: '';
+		/*
 		return html`
 			${this._hasActions
 				? html`
@@ -139,6 +139,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				  `
 				: nothing}
 		`;
+		*/
 	}
 
 	#renderChildItems() {

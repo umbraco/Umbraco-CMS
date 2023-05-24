@@ -59,7 +59,7 @@ export class UmbMenuItemBaseElement extends UmbLitElement {
 	}
 
 	#renderActions() {
-		return html`<umb-entity-actions-bundle slot="actions" entity-type=${this.entityType} .headline=${this.label}>
+		return html`<umb-entity-actions-bundle slot="actions" entity-type=${this.entityType} .label=${this.label}>
 		</umb-entity-actions-bundle>`;
 	}
 

@@ -23,7 +23,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	@property({ type: String })
-	public headline?: string;
+	public label?: string;
 
 	@state()
 	private _hasActions = false;
@@ -53,7 +53,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	private _openActions() {
 		if (!this.entityType) throw new Error('Entity type is not defined');
-		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, undefined, this.headline);
+		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, undefined, this.label);
 	}
 
 	render() {
