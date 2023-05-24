@@ -1,9 +1,9 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import { installerContextProvider } from '../shared/utils.story-helpers';
-import { UmbInstallerContext } from '../installer.context';
-import type { UmbInstallerErrorElement } from './installer-error.element';
+import { installerContextProvider } from '../shared/utils.story-helpers.js';
+import { UmbInstallerContext } from '../installer.context.js';
+import type { UmbInstallerErrorElement } from './installer-error.element.js';
 
 import './installer-error.element';
 

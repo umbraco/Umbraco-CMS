@@ -4,9 +4,9 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 const { rest } = window.MockServiceWorker;
 
-import { installerContextProvider } from '../shared/utils.story-helpers';
+import { installerContextProvider } from '../shared/utils.story-helpers.js';
 
-import type { UmbInstallerDatabaseElement } from './installer-database.element';
+import type { UmbInstallerDatabaseElement } from './installer-database.element.js';
 import type { InstallSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
 export default {
 	title: 'Apps/Installer/Steps',

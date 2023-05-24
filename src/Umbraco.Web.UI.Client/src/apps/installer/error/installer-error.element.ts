@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
 import { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

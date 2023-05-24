@@ -1,8 +1,8 @@
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
-import type { UmbBackofficeContext } from '../backoffice.context';
+import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
+import type { UmbBackofficeContext } from '../backoffice.context.js';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

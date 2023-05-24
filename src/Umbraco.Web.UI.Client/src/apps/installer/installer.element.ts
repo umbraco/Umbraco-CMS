@@ -1,6 +1,6 @@
 import { css, CSSResultGroup, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from './installer.context';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from './installer.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './consent/installer-consent.element';

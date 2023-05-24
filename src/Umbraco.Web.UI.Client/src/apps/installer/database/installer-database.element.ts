@@ -2,7 +2,7 @@ import { UUIButtonElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
 import {
 	ApiError,
 	DatabaseInstallResponseModel,

@@ -3,7 +3,7 @@ import './upgrader-view.element';
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbUpgraderViewElement } from './upgrader-view.element';
+import type { UmbUpgraderViewElement } from './upgrader-view.element.js';
 
 export default {
 	title: 'Apps/Upgrader/States',
