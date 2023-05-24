@@ -1,7 +1,7 @@
-import { hasDefaultExport } from './has-default-export.function';
-import { isManifestClassConstructorType } from './type-guards';
-import { loadExtension } from './load-extension.function';
-import type { ManifestClass, ClassConstructor } from './types';
+import { hasDefaultExport } from './has-default-export.function.js';
+import { isManifestClassConstructorType } from './type-guards/index.js';
+import { loadExtension } from './load-extension.function.js';
+import type { ManifestClass, ClassConstructor } from './types.js';
 
 //TODO: Write tests for this method:
 export async function createExtensionClass<T = unknown>(

@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
-import type { ManifestElementWithElementName, ManifestKind, ManifestWithMeta } from '../types';
-import { UmbExtensionRegistry } from './extension.registry';
+import type { ManifestElementWithElementName, ManifestKind, ManifestWithMeta } from '../types.js';
+import { UmbExtensionRegistry } from './extension.registry.js';
 
 describe('UmbExtensionRegistry', () => {
 	let extensionRegistry: UmbExtensionRegistry<ManifestWithMeta>;

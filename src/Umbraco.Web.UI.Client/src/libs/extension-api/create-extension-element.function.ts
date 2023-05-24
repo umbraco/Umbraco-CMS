@@ -1,7 +1,7 @@
-import { hasDefaultExport } from './has-default-export.function';
-import { isManifestElementNameType } from './type-guards';
-import { loadExtension } from './load-extension.function';
-import type { HTMLElementConstructor, ManifestElement } from './types';
+import { hasDefaultExport } from './has-default-export.function.js';
+import { isManifestElementNameType } from './type-guards/index.js';
+import { loadExtension } from './load-extension.function.js';
+import type { HTMLElementConstructor, ManifestElement } from './types.js';
 
 export async function createExtensionElement<ElementType extends HTMLElement>(
 	manifest: ManifestElement<ElementType>

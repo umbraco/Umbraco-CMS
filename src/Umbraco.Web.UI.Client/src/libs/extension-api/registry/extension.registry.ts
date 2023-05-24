@@ -1,5 +1,5 @@
 import { BehaviorSubject, map, Observable, distinctUntilChanged, combineLatest } from 'rxjs';
-import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types';
+import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types.js';
 
 function extensionArrayMemoization<T extends { alias: string }>(
 	previousValue: Array<T>,

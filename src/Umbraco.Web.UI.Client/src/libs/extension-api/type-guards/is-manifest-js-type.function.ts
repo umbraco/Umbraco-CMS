@@ -1,4 +1,4 @@
-import type { ManifestBase, ManifestWithLoader } from '../types';
+import type { ManifestBase, ManifestWithLoader } from '../types.js';
 
 export type ManifestJSType<T> = ManifestWithLoader<T> & { js: string };
 export function isManifestJSType<T>(manifest: ManifestBase | unknown): manifest is ManifestJSType<T> {

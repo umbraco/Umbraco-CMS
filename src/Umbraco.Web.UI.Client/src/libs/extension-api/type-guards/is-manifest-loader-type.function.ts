@@ -1,4 +1,4 @@
-import type { ManifestBase, ManifestWithLoader } from '../types';
+import type { ManifestBase, ManifestWithLoader } from '../types.js';
 
 export type ManifestLoaderType<T> = ManifestWithLoader<T> & {
 	loader: () => Promise<T>;

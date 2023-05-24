@@ -1,5 +1,5 @@
-import { createExtensionElement } from './create-extension-element.function';
-import { isManifestElementableType } from './type-guards';
+import { createExtensionElement } from './create-extension-element.function.js';
+import { isManifestElementableType } from './type-guards/index.js';
 
 export async function createExtensionElementOrFallback(
 	manifest: any,
