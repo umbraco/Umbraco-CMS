@@ -1,7 +1,11 @@
 import esbuild from 'rollup-plugin-esbuild';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import { readdirSync, lstatSync } from 'fs';
+import { readdirSync, lstatSync, rmSync } from 'fs';
+
+/* TODO Temp solution. I can't find a way for rollup to overwrite the external folder that is already created
+by tsc. So I'm deleting it before the build.*/
+rmSync('./dist-cms/external', { recursive: true, force: true });
 
 const readFolders = (path) => readdirSync(path).filter((folder) => lstatSync(`${path}/${folder}`).isDirectory());
 const createModuleDescriptors = (folderName) =>
@@ -25,7 +29,6 @@ export default allowed
 		return [
 			{
 				input: `./src/external/${module.name}/index.ts`,
-				minify: true,
 				output: {
 					dir: `./dist-cms/external/${module.name}`,
 					format: 'es',
