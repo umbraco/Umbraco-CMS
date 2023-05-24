@@ -61,10 +61,6 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 	static styles = [
 		UUITextStyles,
 		css`
-			:host {
-				--umb-header-layout-height: 70px;
-			}
-
 			uui-box {
 				margin: var(--uui-size-layout-1);
 			}

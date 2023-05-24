@@ -1,5 +1,5 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import '../../shared/css/custom-properties.css';
+import '@umbraco-cms/backoffice/css';
 
 import 'element-internals-polyfill';
 
