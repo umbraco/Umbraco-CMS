@@ -3,7 +3,7 @@
 		"module": "esnext",
 		"target": "esnext",
 		"lib": ["es2020", "dom", "dom.iterable"],
-		"noEmit": false,
+		"noEmit": true,
 		"outDir": "./types",
 		"strict": true,
 		"noImplicitReturns": true,
