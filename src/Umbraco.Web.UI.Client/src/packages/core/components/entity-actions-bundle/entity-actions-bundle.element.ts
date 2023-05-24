@@ -23,6 +23,9 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	}
 
 	@property({ type: String })
+	unique?: string | null;
+
+	@property({ type: String })
 	public label?: string;
 
 	@state()
@@ -52,7 +55,8 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 
 	private _openActions() {
 		if (!this.entityType) throw new Error('Entity type is not defined');
-		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, undefined, this.label);
+		if (this.unique === undefined) throw new Error('Unique is not defined');
+		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, this.unique, this.label);
 	}
 
 	render() {

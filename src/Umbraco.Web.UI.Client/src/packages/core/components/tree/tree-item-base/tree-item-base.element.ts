@@ -124,6 +124,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			? html`<umb-entity-actions-bundle
 					slot="actions"
 					entity-type=${this.#treeItemContext.type}
+					.unique=${this.#treeItemContext.unique}
 					.label=${this._item.name}>
 			  </umb-entity-actions-bundle>`
 			: '';

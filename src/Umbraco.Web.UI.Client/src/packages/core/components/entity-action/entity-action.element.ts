@@ -8,13 +8,12 @@ import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry
 
 @customElement('umb-entity-action')
 class UmbEntityActionElement extends UmbLitElement {
-	private _unique?: string;
+	private _unique?: string | null;
 	@property({ type: String })
 	public get unique() {
 		return this._unique;
 	}
-	public set unique(value: string | undefined) {
-		if (!value) return;
+	public set unique(value: string | undefined | null) {
 		const oldValue = this._unique;
 		this._unique = value;
 		if (oldValue !== this._unique) {
@@ -40,6 +39,7 @@ class UmbEntityActionElement extends UmbLitElement {
 
 	async #createApi() {
 		if (!this._manifest?.meta.api) return;
+		if (this._unique === undefined) return;
 		// TODO: Could we provide the manifest to the api constructor? instead, to enable more flexibility. Mainly cause some actions knows their repository. some does not need a repository?
 		this.#api = new this._manifest.meta.api(this, this._manifest.meta.repositoryAlias, this.unique);
 

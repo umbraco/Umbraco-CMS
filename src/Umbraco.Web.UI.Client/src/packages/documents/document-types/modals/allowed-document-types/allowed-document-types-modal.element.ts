@@ -18,6 +18,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
 	async firstUpdated() {
+		// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
 		// TODO: show error
 		if (!this.data?.id) return;
 
