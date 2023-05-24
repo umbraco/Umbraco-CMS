@@ -3,8 +3,8 @@
   "compilerOptions": {
     "outDir": "../dist-cms",
     "rootDir": ".",
-    "composite": true
+    "composite": true,
   },
   "include": ["./**/*.ts"],
-  "exclude": ["./**/*.test.ts", "./**/*.stories.ts", "./mocks"],
+  "exclude": ["./**/*.test.ts", "./**/*.stories.ts"],
 }
