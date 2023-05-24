@@ -10,6 +10,11 @@ export default defineConfig({
 			fileName: 'main',
 		},
 		sourcemap: true,
+		rollupOptions: {
+			external: [/^@umbraco-cms\/backoffice\//],
+		},
+		outDir: '../../../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login',
+		emptyOutDir: true,
 	},
 	server: {
 		fs: {
