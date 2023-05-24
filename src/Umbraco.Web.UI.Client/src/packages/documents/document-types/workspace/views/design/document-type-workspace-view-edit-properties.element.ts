@@ -105,14 +105,18 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		const property = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!property) return;
 
+		// TODO: Figure out how we from this location can get into the routeable modal..
+		/*
 		// Take id and parse to modal:
-		console.log('property id:', property.id!);
+		console.log('property id:', property.id!, property);
 
+		// TODO: route modal..
 		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
 		modalHandler?.onSubmit().then((result) => {
 			console.log(result);
 		});
+		*/
 	}
 
 	render() {

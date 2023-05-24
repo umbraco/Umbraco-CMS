@@ -125,7 +125,13 @@ export class UmbDocumentTypeRepository
 	async createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-		return this.#detailDataSource.createScaffold(parentId);
+
+		const { data } = await this.#detailDataSource.createScaffold(parentId);
+
+		if (data) {
+			this.#detailStore?.append(data);
+		}
+		return { data };
 	}
 
 	async requestById(id: string) {
@@ -166,7 +172,7 @@ export class UmbDocumentTypeRepository
 			const treeItem = createTreeItem(documentType);
 			this.#treeStore?.appendItems([treeItem]);
 
-			const notification = { data: { message: `Document created` } };
+			const notification = { data: { message: `Document Type created` } };
 			this.#notificationContext?.peek('positive', notification);
 
 			// TODO: we currently don't use the detail store for anything.
@@ -204,13 +210,13 @@ export class UmbDocumentTypeRepository
 	// General:
 
 	async delete(id: string) {
-		if (!id) throw new Error('Document id is missing');
+		if (!id) throw new Error('Document Type id is missing');
 		await this.#init;
 
 		const { error } = await this.#detailDataSource.delete(id);
 
 		if (!error) {
-			const notification = { data: { message: `Document deleted` } };
+			const notification = { data: { message: `Document Type deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 
 			// TODO: we currently don't use the detail store for anything.
@@ -232,7 +238,7 @@ export const createTreeItem = (item: ItemType): FolderTreeItemResponseModel => {
 	// TODO: needs parentID, this is missing in the current model. Should be good when updated to a createModel.
 	return {
 		$type: 'FolderTreeItemResponseModel',
-		type: 'data-type',
+		type: 'document-type',
 		parentId: null,
 		name: item.name,
 		id: item.id,

@@ -195,8 +195,6 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			return this;
 		};
 
-		console.log('containerEl', this.#containerElement.shadowRoot ?? this.#containerElement);
-
 		// TODO: Clean up??
 		this.#observer.disconnect();
 
@@ -470,7 +468,7 @@ export class UmbSorterController<T> implements UmbControllerInterface {
 			}
 		}
 
-		let lastDistance = 99999;
+		let lastDistance = Infinity;
 		let foundEl: Element | null = null;
 		let foundElDragRect!: DOMRect;
 		let placeAfter = false;

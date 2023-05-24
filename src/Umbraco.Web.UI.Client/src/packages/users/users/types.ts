@@ -2,8 +2,6 @@ import type {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	DirectionModel,
-	DisableUserRequestModel,
-	EnableUserRequestModel,
 	InviteUserRequestModel,
 	UpdateUserRequestModel,
 	UserOrderModel,
@@ -11,12 +9,7 @@ import type {
 	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-import {
-	DataSourceResponse,
-	UmbDataSource,
-	UmbDataSourceErrorResponse,
-	UmbDetailRepository,
-} from '@umbraco-cms/backoffice/repository';
+import { UmbDataSource, UmbDataSourceErrorResponse, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbCreateUserResponseModel {
 	user: UserResponseModel;
@@ -36,12 +29,20 @@ export interface UmbUserCollectionFilterModel {
 export interface UmbUserDetailDataSource
 	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UserResponseModel> {
 	invite(data: InviteUserRequestModel): Promise<any>;
-	enable(data: EnableUserRequestModel): Promise<any>;
-	disable(data: DisableUserRequestModel): Promise<any>;
 }
 
 export interface UmbUserSetGroupDataSource {
 	setGroups(userIds: string[], userGroupIds: string[]): Promise<UmbDataSourceErrorResponse>;
+}
+
+export interface UmbUserDisableDataSource {
+	disable(userIds: string[]): Promise<UmbDataSourceErrorResponse>;
+}
+export interface UmbUserEnableDataSource {
+	enable(userIds: string[]): Promise<UmbDataSourceErrorResponse>;
+}
+export interface UmbUserUnlockDataSource {
+	unlock(userIds: string[]): Promise<UmbDataSourceErrorResponse>;
 }
 
 export interface UmbUserDetailRepository

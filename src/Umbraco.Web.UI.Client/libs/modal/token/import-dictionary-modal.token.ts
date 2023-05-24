@@ -1,7 +1,5 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-// TODO: add interface for data
-// PropertyTypeViewModelBaseModel
 export interface UmbImportDictionaryModalData {
 	unique: string | null;
 }

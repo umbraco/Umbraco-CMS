@@ -32,6 +32,8 @@ export class UmbExtensionRegistry<
 	IncomingManifestTypes extends ManifestBase,
 	ManifestTypes extends ManifestBase = IncomingManifestTypes | ManifestBase
 > {
+	readonly MANIFEST_TYPES: ManifestTypes = undefined as never;
+
 	// TODO: Use UniqueBehaviorSubject, as we don't want someone to edit data of extensions.
 	private _extensions = new BehaviorSubject<Array<ManifestTypes>>([]);
 	public readonly extensions = this._extensions.asObservable();

@@ -35,13 +35,11 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 			(defaultTemplateId) => (this._defaultTemplateId = defaultTemplateId)
 		);
 		this.observe(this.#workspaceContext.allowedTemplateIds, (allowedTemplateIds) => {
-			console.log('allowedTemplateIds', allowedTemplateIds);
 			this._allowedTemplateIds = allowedTemplateIds;
 		});
 	}
 
 	#templateInputChange(e: CustomEvent) {
-		console.log('change', e);
 		// save new allowed ids
 		const input = e.target as UmbInputTemplateElement;
 		const idsWithoutRoot = input.selectedIds.filter((id) => id !== null) as Array<string>;

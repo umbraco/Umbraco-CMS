@@ -1,8 +1,11 @@
+// eslint-disable-next-line local-rules/no-external-imports
+import type { IRouterSlot } from 'router-slot/model';
 // TODO: remove this import when the search hack is removed
 import '../../src/packages/search/search-modal/search-modal.element';
 
 import type { UUIModalDialogElement, UUIModalSidebarSize } from '@umbraco-ui/uui';
 import { BehaviorSubject } from 'rxjs';
+import { appendToFrozenArray } from '../observable-api';
 import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler';
 import type { UmbModalToken } from './token/modal-token';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -30,7 +33,7 @@ export class UmbModalContext {
 
 	// TODO: Remove this when the modal system is more flexible
 	public search() {
-		const modalHandler = new UmbModalHandlerClass(this.host, 'Umb.Modal.Search') as unknown as UmbModalHandler<
+		const modalHandler = new UmbModalHandlerClass(this.host, null, 'Umb.Modal.Search') as unknown as UmbModalHandler<
 			any,
 			any
 		>;
@@ -63,7 +66,9 @@ export class UmbModalContext {
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
-		this.#modals.next([...this.#modals.getValue(), modalHandler]);
+		this.#modals.next(
+			appendToFrozenArray(this.#modals.getValue(), modalHandler, (entry) => entry.key === modalHandler.key)
+		);
 		return modalHandler;
 	}
 
@@ -78,16 +83,22 @@ export class UmbModalContext {
 	public open<ModalData extends object = object, ModalResult = unknown>(
 		modalAlias: string | UmbModalToken<ModalData, ModalResult>,
 		data?: ModalData,
-		config?: UmbModalConfig
+		config?: UmbModalConfig,
+		router: IRouterSlot | null = null
 	) {
-		const modalHandler = new UmbModalHandlerClass(this.host, modalAlias, data, config) as unknown as UmbModalHandler<
-			ModalData,
-			ModalResult
-		>;
+		const modalHandler = new UmbModalHandlerClass(
+			this.host,
+			router,
+			modalAlias,
+			data,
+			config
+		) as unknown as UmbModalHandler<ModalData, ModalResult>;
 
 		modalHandler.modalElement.addEventListener('close-end', () => this.#onCloseEnd(modalHandler));
 
-		this.#modals.next([...this.#modals.getValue(), modalHandler]);
+		this.#modals.next(
+			appendToFrozenArray(this.#modals.getValue(), modalHandler, (entry) => entry.key === modalHandler.key)
+		);
 		return modalHandler;
 	}
 
@@ -98,6 +109,7 @@ export class UmbModalContext {
 	 * @memberof UmbModalContext
 	 */
 	public close(key: string) {
+		console.log('close', key, this.#modals);
 		const modal = this.#modals.getValue().find((modal) => modal.key === key);
 		if (modal) {
 			modal.reject();
