@@ -1,5 +1,4 @@
-import { html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbNotificationColor,
 	UmbNotificationOptions,

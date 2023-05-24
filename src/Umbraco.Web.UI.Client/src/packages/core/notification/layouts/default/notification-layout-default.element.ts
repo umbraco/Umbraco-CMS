@@ -1,6 +1,4 @@
-import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, LitElement, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import type { UmbNotificationDefaultData, UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 

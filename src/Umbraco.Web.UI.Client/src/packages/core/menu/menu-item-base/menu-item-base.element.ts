@@ -1,7 +1,5 @@
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	UmbSectionSidebarContext,

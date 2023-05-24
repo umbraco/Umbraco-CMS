@@ -1,6 +1,4 @@
-import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIMenuItemEvent } from '@umbraco-ui/uui';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

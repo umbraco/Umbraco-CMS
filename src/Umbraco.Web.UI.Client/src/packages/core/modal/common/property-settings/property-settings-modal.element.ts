@@ -1,7 +1,6 @@
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { PropertyValueMap, css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbPropertySettingsModalResult, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';

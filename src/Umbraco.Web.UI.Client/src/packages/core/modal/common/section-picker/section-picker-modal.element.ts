@@ -1,6 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
