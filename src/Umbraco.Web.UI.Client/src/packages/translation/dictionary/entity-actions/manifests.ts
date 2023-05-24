@@ -1,8 +1,8 @@
-import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests';
-import UmbReloadDictionaryEntityAction from './reload.action';
-import UmbImportDictionaryEntityAction from './import/import.action';
-import UmbExportDictionaryEntityAction from './export/export.action';
-import UmbCreateDictionaryEntityAction from './create/create.action';
+import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import UmbReloadDictionaryEntityAction from './reload.action.js';
+import UmbImportDictionaryEntityAction from './import/import.action.js';
+import UmbExportDictionaryEntityAction from './export/export.action.js';
+import UmbCreateDictionaryEntityAction from './create/create.action.js';
 import { UmbDeleteEntityAction, UmbMoveEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
