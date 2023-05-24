@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element';
 import {
@@ -24,13 +24,29 @@ umbExtensionsRegistry.register(manifestWithEntityActions);
 @customElement('umb-section-sidebar-menu-with-entity-actions')
 export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSidebarMenuElement<ManifestSectionSidebarAppMenuWithEntityActionsKind> {
 	renderHeader() {
-		return html`<h3>${this.manifest?.meta?.label}</h3>
+		return html`<div id="header">
+			<h3>${this.manifest?.meta?.label}</h3>
 			<umb-entity-actions-bundle
 				slot="actions"
 				entity-type=${this.manifest?.meta.entityType}
 				.label=${this.manifest?.meta.label}>
-			</umb-entity-actions-bundle> `;
+			</umb-entity-actions-bundle>
+		</div> `;
 	}
+
+	static styles = [
+		...UmbSectionSidebarMenuElement.styles,
+		css`
+			#header {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+			#header > :first-child {
+				flex-grow: 1;
+			}
+		`,
+	];
 }
 
 export default UmbSectionSidebarMenuWithEntityActionsElement;
