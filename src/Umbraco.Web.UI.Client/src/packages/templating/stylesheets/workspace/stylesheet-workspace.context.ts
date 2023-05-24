@@ -1,5 +1,5 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
-import { StylesheetDetails } from '..';
+import { StylesheetDetails } from '../index.js';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

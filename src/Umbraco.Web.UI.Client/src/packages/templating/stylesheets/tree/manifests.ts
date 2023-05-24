@@ -1,4 +1,4 @@
-import { STYLESHEET_ENTITY_TYPE } from '..';
+import { STYLESHEET_ENTITY_TYPE } from '../index.js';
 import { STYLESHEET_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 

@@ -1,4 +1,4 @@
-import './components';
+import './components/index.js';
 
 export const DATA_TYPE_ROOT_ENTITY_TYPE = 'data-type-root';
 export const DATA_TYPE_ENTITY_TYPE = 'data-type';

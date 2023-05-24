@@ -1,4 +1,4 @@
-import './components';
+import './components/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';

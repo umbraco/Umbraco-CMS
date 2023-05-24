@@ -1,4 +1,4 @@
-import './components';
+import './components/index.js';
 
 export const DOCUMENT_TYPE_ROOT_ENTITY_TYPE = 'document-type-root';
 export const DOCUMENT_TYPE_ENTITY_TYPE = 'document-type';

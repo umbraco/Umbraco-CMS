@@ -1,4 +1,4 @@
-import { DATA_TYPE_ROOT_ENTITY_TYPE } from '..';
+import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../index.js';
 import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data.js';
 import { UmbDataTypeMoveServerDataSource } from './sources/data-type-move.server.data.js';
 import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store.js';

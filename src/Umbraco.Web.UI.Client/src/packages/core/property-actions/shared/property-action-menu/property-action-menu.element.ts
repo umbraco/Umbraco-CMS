@@ -7,7 +7,7 @@ import { ManifestPropertyAction, umbExtensionsRegistry } from '@umbraco-cms/back
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-import '../property-action/property-action.element';
+import '../property-action/property-action.element.js';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {

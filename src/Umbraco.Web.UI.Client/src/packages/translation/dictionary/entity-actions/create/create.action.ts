@@ -7,7 +7,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
 
 // TODO: temp import
-import './create-dictionary-modal-layout.element';
+import './create-dictionary-modal-layout.element.js';
 
 export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UUITextStyles];

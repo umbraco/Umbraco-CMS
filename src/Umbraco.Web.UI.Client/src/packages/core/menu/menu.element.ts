@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { ManifestMenu, ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './menu-item/menu-item.element';
+import './menu-item/menu-item.element.js';
 
 @customElement('umb-menu')
 export class UmbMenuElement extends UmbLitElement {

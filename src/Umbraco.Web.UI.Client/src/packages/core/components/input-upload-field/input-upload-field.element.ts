@@ -7,7 +7,7 @@ import { map } from 'lit/directives/map.js';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-ui/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './input-upload-field-file.element';
+import './input-upload-field-file.element.js';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
