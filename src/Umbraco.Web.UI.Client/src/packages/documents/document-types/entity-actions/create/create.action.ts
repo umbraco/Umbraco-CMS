@@ -1,5 +1,5 @@
-import { UmbDocumentTypeRepository } from '../../repository/document-type.repository';
-import { UMB_DOCUMENT_TYPE_CREATE_OPTIONS_MODAL } from './modal';
+import { UmbDocumentTypeRepository } from '../../repository/document-type.repository.js';
+import { UMB_DOCUMENT_TYPE_CREATE_OPTIONS_MODAL } from './modal/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';

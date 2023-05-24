@@ -1,5 +1,5 @@
-import { UmbDocumentRepository } from '../repository/document.repository';
-import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository';
+import { UmbDocumentRepository } from '../repository/document.repository.js';
+import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {

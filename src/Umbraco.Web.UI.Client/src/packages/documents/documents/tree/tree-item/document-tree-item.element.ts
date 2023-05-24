@@ -1,7 +1,7 @@
 import { css, html, nothing } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
-import { UmbDocumentTreeItemContext } from './document-tree-item.context';
+import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

@@ -3,10 +3,10 @@ import './document-info-workspace-view.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-// import { data } from '../../../../../../core/mocks/data/document.data';
-// import { UmbNodeContext } from '../../node.context';
+// import { data } from '../../../../../../core/mocks/data/document.data.js';
+// import { UmbNodeContext } from '../../node.context.js';
 
-import type { UmbDocumentInfoWorkspaceViewElement } from './document-info-workspace-view.element';
+import type { UmbDocumentInfoWorkspaceViewElement } from './document-info-workspace-view.element.js';
 
 export default {
 	title: 'Workspaces/Documents/Views/Info',

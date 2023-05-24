@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
+import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import {
 	encodeFolderName,

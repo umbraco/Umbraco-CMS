@@ -1,1 +1,1 @@
-export { UmbDocumentWorkspaceContext } from './document-workspace.context';
+export { UmbDocumentWorkspaceContext } from './document-workspace.context.js';

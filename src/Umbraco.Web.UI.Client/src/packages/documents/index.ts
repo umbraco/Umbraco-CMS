@@ -1,9 +1,9 @@
-import { manifests as dashboardManifests } from './dashboards/manifests';
-import { manifests as contentSectionManifests } from './section.manifests';
-import { manifests as contentMenuManifest } from './menu.manifests';
-import { manifests as documentBlueprintManifests } from './document-blueprints/manifests';
-import { manifests as documentTypeManifests } from './document-types/manifests';
-import { manifests as documentManifests } from './documents/manifests';
+import { manifests as dashboardManifests } from './dashboards/manifests.js';
+import { manifests as contentSectionManifests } from './section.manifests.js';
+import { manifests as contentMenuManifest } from './menu.manifests.js';
+import { manifests as documentBlueprintManifests } from './document-blueprints/manifests.js';
+import { manifests as documentTypeManifests } from './document-types/manifests.js';
+import { manifests as documentManifests } from './documents/manifests.js';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 
 import './document-types/components';

@@ -2,7 +2,7 @@ import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context';
+import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

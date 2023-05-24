@@ -1,6 +1,6 @@
-import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action';
-import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action';
-import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action';
+import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
+import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
+import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,

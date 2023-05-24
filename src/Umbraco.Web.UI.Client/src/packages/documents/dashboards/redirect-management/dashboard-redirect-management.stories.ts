@@ -3,7 +3,7 @@ import './dashboard-redirect-management.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element';
+import type { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element.js';
 
 export default {
 	title: 'Dashboards/Redirect Management',

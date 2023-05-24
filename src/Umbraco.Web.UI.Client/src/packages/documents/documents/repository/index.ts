@@ -1,1 +1,1 @@
-export { UmbDocumentRepository } from './document.repository';
+export { UmbDocumentRepository } from './document.repository.js';

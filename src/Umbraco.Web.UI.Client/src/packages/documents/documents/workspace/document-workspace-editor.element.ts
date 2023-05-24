@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbDocumentWorkspaceContext } from './document-workspace.context';
-import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
+import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
+import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

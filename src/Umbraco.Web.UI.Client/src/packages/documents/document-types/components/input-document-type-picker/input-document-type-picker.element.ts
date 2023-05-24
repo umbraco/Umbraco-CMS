@@ -6,7 +6,7 @@ import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import {
 	UmbDocumentTypeTreeStore,
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
-} from '../../repository/document-type.tree.store';
+} from '../../repository/document-type.tree.store.js';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,

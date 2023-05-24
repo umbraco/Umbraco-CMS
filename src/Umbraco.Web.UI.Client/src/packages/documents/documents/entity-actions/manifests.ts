@@ -1,12 +1,12 @@
-import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbCreateDocumentEntityAction } from './create/create.action';
-import { UmbPublishDocumentEntityAction } from './publish.action';
-import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action';
-import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action';
-import { UmbDocumentPublicAccessEntityAction } from './public-access.action';
-import { UmbDocumentPermissionsEntityAction } from './permissions.action';
-import { UmbUnpublishDocumentEntityAction } from './unpublish.action';
-import { UmbRollbackDocumentEntityAction } from './rollback.action';
+import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UmbCreateDocumentEntityAction } from './create/create.action.js';
+import { UmbPublishDocumentEntityAction } from './publish.action.js';
+import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
+import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
+import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
+import { UmbDocumentPermissionsEntityAction } from './permissions.action.js';
+import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
+import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-document-picker.element';
+import type { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-document-picker.element.js';
 import './property-editor-ui-document-picker.element';
 
 export default {
