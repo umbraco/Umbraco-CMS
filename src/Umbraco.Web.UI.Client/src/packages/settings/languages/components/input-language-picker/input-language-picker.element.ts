@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbLanguagePickerContext } from './input-language-picker.context';
+import { UmbLanguagePickerContext } from './input-language-picker.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

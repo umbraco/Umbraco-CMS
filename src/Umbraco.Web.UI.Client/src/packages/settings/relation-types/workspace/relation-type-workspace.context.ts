@@ -1,4 +1,4 @@
-import { UmbRelationTypeRepository } from '../repository/relation-type.repository';
+import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

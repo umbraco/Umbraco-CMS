@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement, property } from 'lit/decorators.js';
-import { DATA_TYPE_REPOSITORY_ALIAS } from '../../../repository/manifests';
+import { DATA_TYPE_REPOSITORY_ALIAS } from '../../../repository/manifests.js';
 import { UmbDataTypeCreateOptionsModalData } from '.';
 import {
 	UmbModalContext,

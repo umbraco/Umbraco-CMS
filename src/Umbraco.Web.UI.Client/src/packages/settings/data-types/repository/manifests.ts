@@ -1,7 +1,7 @@
-import { UmbDataTypeRepository } from './data-type.repository';
-import { UmbDataTypeItemStore } from './data-type-item.store';
-import { UmbDataTypeStore } from './data-type.store';
-import { UmbDataTypeTreeStore } from './data-type.tree.store';
+import { UmbDataTypeRepository } from './data-type.repository.js';
+import { UmbDataTypeItemStore } from './data-type-item.store.js';
+import { UmbDataTypeStore } from './data-type.store.js';
+import { UmbDataTypeTreeStore } from './data-type.tree.store.js';
 import type {
 	ManifestStore,
 	ManifestTreeStore,

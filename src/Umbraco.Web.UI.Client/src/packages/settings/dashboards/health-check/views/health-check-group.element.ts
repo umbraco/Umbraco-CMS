@@ -4,11 +4,11 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-import { UmbHealthCheckContext } from '../health-check.context';
+import { UmbHealthCheckContext } from '../health-check.context.js';
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-} from '../health-check-dashboard.context';
+} from '../health-check-dashboard.context.js';
 import {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupPresentationModel,

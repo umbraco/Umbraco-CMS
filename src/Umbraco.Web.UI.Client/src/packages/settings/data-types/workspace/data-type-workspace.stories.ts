@@ -4,9 +4,9 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { data } from '../../../../mocks/data/data-type.data';
+import { data } from '../../../../mocks/data/data-type.data.js';
 
-import type { UmbDataTypeWorkspaceElement } from './data-type-workspace.element';
+import type { UmbDataTypeWorkspaceElement } from './data-type-workspace.element.js';
 
 export default {
 	title: 'Workspaces/Data Type',

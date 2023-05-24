@@ -6,7 +6,7 @@ import { UUIButtonState } from '@umbraco-ui/uui';
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-} from '../health-check-dashboard.context';
+} from '../health-check-dashboard.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './health-check-group-box-overview.element';

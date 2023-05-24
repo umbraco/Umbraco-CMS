@@ -1,4 +1,4 @@
-import { UmbCultureRepository } from '../repository/culture.repository';
+import { UmbCultureRepository } from '../repository/culture.repository.js';
 import { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const CULTURE_REPOSITORY_ALIAS = 'Umb.Repository.Culture';

@@ -1,11 +1,11 @@
 import { html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
+import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-} from './health-check-dashboard.context';
-import { UmbHealthCheckContext } from './health-check.context';
+} from './health-check-dashboard.context.js';
+import { UmbHealthCheckContext } from './health-check.context.js';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbDashboardTelemetryElement } from './dashboard-telemetry.element';
+import type { UmbDashboardTelemetryElement } from './dashboard-telemetry.element.js';
 import './dashboard-telemetry.element';
 
 export default {

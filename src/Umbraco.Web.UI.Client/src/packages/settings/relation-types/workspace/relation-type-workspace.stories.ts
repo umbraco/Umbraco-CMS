@@ -4,9 +4,9 @@ import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { data } from '../../../../mocks/data/relation-type.data';
+import { data } from '../../../../mocks/data/relation-type.data.js';
 
-import type { UmbRelationTypeWorkspaceElement } from './relation-type-workspace.element';
+import type { UmbRelationTypeWorkspaceElement } from './relation-type-workspace.element.js';
 
 export default {
 	title: 'Workspaces/Relation Type',

@@ -5,7 +5,7 @@ import {
 	LogViewerDateRange,
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
-} from '../../logviewer.context';
+} from '../../logviewer.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 

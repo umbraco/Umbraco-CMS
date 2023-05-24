@@ -3,10 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbLanguageWorkspaceContext } from '../../language-workspace.context';
+import { UmbLanguageWorkspaceContext } from '../../language-workspace.context.js';
 // TODO: set up import alias for these modules
-import type { UmbInputCultureSelectElement } from '../../../../../cultures/components/input-culture-select/input-culture-select.element';
-import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element';
+import type { UmbInputCultureSelectElement } from '../../../../../cultures/components/input-culture-select/input-culture-select.element.js';
+import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';

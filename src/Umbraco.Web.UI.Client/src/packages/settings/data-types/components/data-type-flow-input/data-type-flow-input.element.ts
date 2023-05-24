@@ -2,7 +2,7 @@ import { css, html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import type { UmbDataTypeModel } from '../../models';
+import type { UmbDataTypeModel } from '../../models.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalRouteRegistrationController, UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';

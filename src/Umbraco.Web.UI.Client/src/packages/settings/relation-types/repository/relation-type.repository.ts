@@ -1,8 +1,8 @@
-import { UmbRelationTypeTreeStore, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN } from './relation-type.tree.store';
-import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.data';
-import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store';
-import { UmbRelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data';
-import { UmbRelationTypeTreeDataSource } from './sources';
+import { UmbRelationTypeTreeStore, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN } from './relation-type.tree.store.js';
+import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.data.js';
+import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store.js';
+import { UmbRelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data.js';
+import { UmbRelationTypeTreeDataSource } from './sources/index.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {

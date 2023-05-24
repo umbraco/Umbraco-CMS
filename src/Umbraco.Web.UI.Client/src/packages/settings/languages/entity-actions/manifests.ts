@@ -1,4 +1,4 @@
-import { LANGUAGE_REPOSITORY_ALIAS } from '../repository/manifests';
+import { LANGUAGE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 

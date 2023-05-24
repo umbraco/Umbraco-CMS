@@ -1,4 +1,4 @@
-import { UmbLanguageRepository } from '../../repository/language.repository';
+import { UmbLanguageRepository } from '../../repository/language.repository.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { ApiError, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbDashboardSettingsWelcomeElement } from './dashboard-settings-welcome.element';
+import type { UmbDashboardSettingsWelcomeElement } from './dashboard-settings-welcome.element.js';
 import './dashboard-settings-welcome.element';
 
 export default {

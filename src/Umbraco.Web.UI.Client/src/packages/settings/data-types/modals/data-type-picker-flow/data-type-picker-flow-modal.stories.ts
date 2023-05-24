@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import type { UmbDataTypePickerFlowModalElement } from './data-type-picker-flow-modal.element';
+import type { UmbDataTypePickerFlowModalElement } from './data-type-picker-flow-modal.element.js';
 import type { UmbPropertyEditorUIPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 import './data-type-picker-flow-modal.element';

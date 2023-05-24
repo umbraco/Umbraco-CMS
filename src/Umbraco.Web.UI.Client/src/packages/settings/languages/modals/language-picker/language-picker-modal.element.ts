@@ -2,7 +2,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbLanguageRepository } from '../../repository/language.repository';
+import { UmbLanguageRepository } from '../../repository/language.repository.js';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';

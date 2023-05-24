@@ -1,11 +1,11 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbHealthCheckContext } from '../health-check.context';
+import { UmbHealthCheckContext } from '../health-check.context.js';
 import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 	UmbHealthCheckDashboardContext,
-} from '../health-check-dashboard.context';
+} from '../health-check-dashboard.context.js';
 import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
 import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';

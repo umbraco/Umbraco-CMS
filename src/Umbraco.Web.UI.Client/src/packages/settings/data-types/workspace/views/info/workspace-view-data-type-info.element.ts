@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';

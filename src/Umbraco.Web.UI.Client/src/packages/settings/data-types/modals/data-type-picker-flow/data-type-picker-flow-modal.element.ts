@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { groupBy } from 'lodash-es';
 import type { UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbDataTypeRepository } from '../../repository/data-type.repository';
+import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult,

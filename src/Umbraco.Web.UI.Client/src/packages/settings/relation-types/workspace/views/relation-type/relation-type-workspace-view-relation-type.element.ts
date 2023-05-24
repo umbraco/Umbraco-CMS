@@ -3,7 +3,7 @@ import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUIRadioGroupElement, UUIRadioGroupEvent, UUIToggleElement } from '@umbraco-ui/uui';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context';
+import { UmbRelationTypeWorkspaceContext } from '../../relation-type-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

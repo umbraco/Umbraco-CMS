@@ -4,7 +4,7 @@ import { PropertyValueMap, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { repeat } from 'lit/directives/repeat.js';
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import {

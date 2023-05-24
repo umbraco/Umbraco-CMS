@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
-import type { UmbPropertyEditorUIPickerModalElement } from './property-editor-ui-picker-modal.element';
+import type { UmbPropertyEditorUIPickerModalElement } from './property-editor-ui-picker-modal.element.js';
 import type { UmbPropertyEditorUIPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 import './property-editor-ui-picker-modal.element';
