@@ -3,7 +3,7 @@ import './umbraco-news-dashboard.element';
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';
 
-import type { UmbUmbracoNewsDashboardElement } from './umbraco-news-dashboard.element';
+import type { UmbUmbracoNewsDashboardElement } from './umbraco-news-dashboard.element.js';
 
 export default {
 	title: 'Dashboards/Umbraco News',
