@@ -1,4 +1,4 @@
-import { UmbEntityData } from './entity.data';
+import { UmbEntityData } from './entity.data.js';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 

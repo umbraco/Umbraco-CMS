@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbMediaTypeData } from '../data/media-type.data';
+import { umbMediaTypeData } from '../data/media-type.data.js';
 
 // TODO: add schema
 export const handlers = [

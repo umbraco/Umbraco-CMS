@@ -1,4 +1,4 @@
-import { UmbData } from './data';
+import { UmbData } from './data.js';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database

@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbDocumentData } from '../data/document.data';
+import { umbDocumentData } from '../data/document.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema

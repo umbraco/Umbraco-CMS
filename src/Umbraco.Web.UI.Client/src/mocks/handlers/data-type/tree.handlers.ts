@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
-import { umbDataTypeData } from '../../data/data-type.data';
-import { slug } from './slug';
+import { umbDataTypeData } from '../../data/data-type.data.js';
+import { slug } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const treeHandlers = [

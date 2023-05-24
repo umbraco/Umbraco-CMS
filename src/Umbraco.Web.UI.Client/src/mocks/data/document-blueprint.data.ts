@@ -1,5 +1,5 @@
-import type { DocumentBlueprintDetails } from '../../packages/documents/document-blueprints/types';
-import { UmbEntityData } from './entity.data';
+import type { DocumentBlueprintDetails } from '../../packages/documents/document-blueprints/types.js';
+import { UmbEntityData } from './entity.data.js';
 
 export const data: Array<DocumentBlueprintDetails> = [
 	{

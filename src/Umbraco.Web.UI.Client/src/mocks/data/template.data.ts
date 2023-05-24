@@ -1,5 +1,5 @@
-import { UmbEntityData } from './entity.data';
-import { createEntityTreeItem } from './utils';
+import { UmbEntityData } from './entity.data.js';
+import { createEntityTreeItem } from './utils.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	EntityTreeItemResponseModel,

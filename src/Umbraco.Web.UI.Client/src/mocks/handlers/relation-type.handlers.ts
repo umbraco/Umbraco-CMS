@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbRelationTypeData } from '../data/relation-type.data';
+import { umbRelationTypeData } from '../data/relation-type.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 // TODO: add schema

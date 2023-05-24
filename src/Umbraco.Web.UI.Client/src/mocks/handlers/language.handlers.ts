@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbLanguagesData } from '../data/languages.data';
+import { umbLanguagesData } from '../data/languages.data.js';
 import { LanguageResponseModel, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

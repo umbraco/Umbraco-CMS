@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbStylesheetData } from '../data/stylesheet.data';
+import { umbStylesheetData } from '../data/stylesheet.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [

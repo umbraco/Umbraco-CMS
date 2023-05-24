@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 
-import { umbUsersData } from '../data/users.data';
+import { umbUsersData } from '../data/users.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 let isAuthenticated = true;

@@ -1,4 +1,4 @@
-import { UmbData } from './data';
+import { UmbData } from './data.js';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database

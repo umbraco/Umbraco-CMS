@@ -1,7 +1,7 @@
-import type { MediaDetails } from '../../packages/media/media';
-import { UmbEntityTreeData } from './entity-tree.data';
-import { UmbEntityData } from './entity.data';
-import { createContentTreeItem } from './utils';
+import type { MediaDetails } from '../../packages/media/media.js';
+import { UmbEntityTreeData } from './entity-tree.data.js';
+import { UmbEntityData } from './entity.data.js';
+import { createContentTreeItem } from './utils.js';
 import { ContentTreeItemResponseModel, PagedContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaDetails> = [

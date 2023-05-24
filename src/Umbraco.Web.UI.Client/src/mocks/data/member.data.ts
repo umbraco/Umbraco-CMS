@@ -1,6 +1,6 @@
-import type { MemberDetails } from '../../packages/members/members/types';
-import { UmbEntityData } from './entity.data';
-import { createEntityTreeItem } from './utils';
+import type { MemberDetails } from '../../packages/members/members/types.js';
+import { UmbEntityData } from './entity.data.js';
+import { createEntityTreeItem } from './utils.js';
 import type {
 	EntityTreeItemResponseModel,
 	PagedEntityTreeItemResponseModel,

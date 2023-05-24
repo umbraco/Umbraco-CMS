@@ -1,5 +1,5 @@
-import { UmbEntityData } from './entity.data';
-import { createEntityTreeItem } from './utils';
+import { UmbEntityData } from './entity.data.js';
+import { createEntityTreeItem } from './utils.js';
 import type { DictionaryItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DictionaryItemResponseModel> = [

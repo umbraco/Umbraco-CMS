@@ -5,7 +5,7 @@ import {
 	getGroupWithResultsByName,
 	healthGroups,
 	healthGroupsWithoutResult,
-} from '../data/health-check.data';
+} from '../data/health-check.data.js';
 
 import {
 	HealthCheckActionRequestModel,

@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 
-import { umbCulturesData } from '../data/culture.data';
+import { umbCulturesData } from '../data/culture.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [

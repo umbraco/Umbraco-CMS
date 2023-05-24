@@ -1,9 +1,9 @@
-import { folderHandlers } from './folder.handlers';
-import { treeHandlers } from './tree.handlers';
-import { detailHandlers } from './detail.handlers';
-import { itemHandlers } from './item.handlers';
-import { moveHandlers } from './move.handlers';
-import { copyHandlers } from './copy.handlers';
+import { folderHandlers } from './folder.handlers.js';
+import { treeHandlers } from './tree.handlers.js';
+import { detailHandlers } from './detail.handlers.js';
+import { itemHandlers } from './item.handlers.js';
+import { moveHandlers } from './move.handlers.js';
+import { copyHandlers } from './copy.handlers.js';
 
 export const handlers = [
 	...treeHandlers,

@@ -1,5 +1,5 @@
-import { UmbEntityData } from './entity.data';
-import { createDocumentTypeTreeItem } from './utils';
+import { UmbEntityData } from './entity.data.js';
+import { createDocumentTypeTreeItem } from './utils.js';
 import {
 	DocumentTypeTreeItemResponseModel,
 	DocumentTypeResponseModel,

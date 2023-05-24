@@ -1,4 +1,4 @@
-import { UmbEntityData } from './entity.data';
+import { UmbEntityData } from './entity.data.js';
 import { PagedUserGroupResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database

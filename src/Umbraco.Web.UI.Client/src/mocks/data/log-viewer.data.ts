@@ -1,5 +1,5 @@
-import { logs } from './logs.data';
-import { UmbData } from './data';
+import { logs } from './logs.data.js';
+import { UmbData } from './data.js';
 import {
 	LogMessageResponseModel,
 	LogTemplateResponseModel,

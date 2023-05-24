@@ -1,6 +1,6 @@
-import { UmbEntityTreeData } from './entity-tree.data';
-import { UmbEntityData } from './entity.data';
-import { createFolderTreeItem } from './utils';
+import { UmbEntityTreeData } from './entity-tree.data.js';
+import { UmbEntityData } from './entity.data.js';
+import { createFolderTreeItem } from './utils.js';
 import type {
 	FolderTreeItemResponseModel,
 	DataTypeResponseModel,

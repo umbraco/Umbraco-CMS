@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbMemberTypeData } from '../data/member-type.data';
+import { umbMemberTypeData } from '../data/member-type.data.js';
 
 // TODO: add schema
 export const handlers = [

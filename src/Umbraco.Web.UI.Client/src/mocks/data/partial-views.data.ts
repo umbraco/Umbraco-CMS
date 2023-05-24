@@ -1,5 +1,5 @@
-import { UmbEntityData } from './entity.data';
-import { createFileSystemTreeItem } from './utils';
+import { UmbEntityData } from './entity.data.js';
+import { createFileSystemTreeItem } from './utils.js';
 import {
 	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
