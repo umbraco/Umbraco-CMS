@@ -4,7 +4,7 @@ import { customElement, property, query, queryAll, state } from 'lit/decorators.
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import { repeat } from 'lit/directives/repeat.js';
 import { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-ui/uui';
-import { UmbTagRepository } from '../../repository/tag.repository';
+import { UmbTagRepository } from '../../repository/tag.repository.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
