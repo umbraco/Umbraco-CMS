@@ -1,6 +1,3 @@
-//import '@umbraco-ui/uui-css/dist/uui-css.css';
-//import 'element-internals-polyfill';
-
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
