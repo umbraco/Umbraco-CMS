@@ -1,4 +1,4 @@
-import { UmbContextConsumer } from './context-consumer';
+import { UmbContextConsumer } from './context-consumer.js';
 
 export function isContextConsumerType(instance: unknown): instance is UmbContextConsumer {
 	return (

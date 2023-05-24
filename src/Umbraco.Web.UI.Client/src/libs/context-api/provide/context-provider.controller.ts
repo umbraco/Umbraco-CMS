@@ -1,5 +1,5 @@
-import { UmbContextToken } from '../token/context-token';
-import { UmbContextProvider } from './context-provider';
+import { UmbContextToken } from '../token/context-token.js';
+import { UmbContextProvider } from './context-provider.js';
 import type { UmbControllerHostElement, UmbControllerInterface } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextProviderController<T = unknown>

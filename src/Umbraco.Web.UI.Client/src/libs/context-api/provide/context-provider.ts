@@ -2,9 +2,9 @@ import {
 	umbContextRequestEventType,
 	isUmbContextRequestEvent,
 	umbDebugContextEventType,
-} from '../consume/context-request.event';
-import { UmbContextToken } from '../token/context-token';
-import { UmbContextProvideEventImplementation } from './context-provide.event';
+} from '../consume/context-request.event.js';
+import { UmbContextToken } from '../token/context-token.js';
+import { UmbContextProvideEventImplementation } from './context-provide.event.js';
 
 /**
  * @export

@@ -1,7 +1,7 @@
 import { expect, fixture, defineCE } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbContextConsumer } from '../consume/context-consumer';
-import { UmbContextProviderController } from './context-provider.controller';
+import { UmbContextConsumer } from '../consume/context-consumer.js';
+import { UmbContextProviderController } from './context-provider.controller.js';
 
 class UmbTestContextProviderControllerClass {
 	prop = 'value from provider';

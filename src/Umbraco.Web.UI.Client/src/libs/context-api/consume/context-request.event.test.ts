@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { UmbContextRequestEventImplementation, UmbContextRequestEvent } from './context-request.event';
+import { UmbContextRequestEventImplementation, UmbContextRequestEvent } from './context-request.event.js';
 
 describe('UmbContextRequestEvent', () => {
 	const contextRequestCallback = () => {
