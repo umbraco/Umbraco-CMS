@@ -1,8 +1,8 @@
 import { html } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

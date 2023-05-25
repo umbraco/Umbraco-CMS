@@ -1,4 +1,3 @@
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbUserCollectionFilterModel,
 	UmbUserDetailDataSource,
@@ -14,6 +13,7 @@ import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.serve
 import { UmbUserEnableServerDataSource } from './sources/user-enable.server.data';
 import { UmbUserDisableServerDataSource } from './sources/user-disable.server.data';
 import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbCollectionDataSource,
 	UmbCollectionRepository,

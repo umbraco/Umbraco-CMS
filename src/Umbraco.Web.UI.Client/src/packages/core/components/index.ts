@@ -18,6 +18,7 @@ import './table/table.element';
 
 import './entity-action/entity-action-list.element';
 import './entity-action/entity-action.element';
+import './entity-actions-bundle/entity-actions-bundle.element';
 
 import './entity-bulk-action/entity-bulk-action.element';
 

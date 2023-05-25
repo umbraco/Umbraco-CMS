@@ -5,11 +5,10 @@ import { repeat } from 'lit/directives/repeat.js';
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import { encodeFolderName } from '@umbraco-cms/backoffice/router';
+import { encodeFolderName , UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-edit')

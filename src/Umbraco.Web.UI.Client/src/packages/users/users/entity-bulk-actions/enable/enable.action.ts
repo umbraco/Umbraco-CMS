@@ -1,5 +1,5 @@
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUserRepository } from '../../repository/user.repository';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
 
 export class UmbEnableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {
