@@ -1,4 +1,4 @@
-import './document-types/components/index.js';
-import './documents/components/index.js';
+import './document-types/index.js';
+import './documents/index.js';
 
 export * from './manifests.js';

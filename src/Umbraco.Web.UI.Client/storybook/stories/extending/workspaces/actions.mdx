@@ -39,7 +39,9 @@ extensionRegistry.register(manifest);
 
 ### The Workspace Action Class
 
-As part of the Extension Manifest you can attach a class that will be instanciated as part of the action. It will have access to the host element and the Workspace Context. When the action is clicked the `execute` method on the api class will be run. When the action is completed, an event on the host element will be dispatched to notify any surrounding elements.
+As part of the Extension Manifest you can attach a class that will be instanciated as part of the action. It will have access to the host element and the Workspace Context.
+When the action is clicked the `execute` method on the api class will be run.
+When the action is completed, an event on the host element will be dispatched to notify any surrounding elements.
 
 ```ts
 import { UmbEntityBulkActionBase } from '@umbraco-cms/entity-action';

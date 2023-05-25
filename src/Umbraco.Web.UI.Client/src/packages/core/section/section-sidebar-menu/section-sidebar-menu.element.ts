@@ -3,6 +3,7 @@ import { css, html } from '@umbraco-cms/backoffice/external/lit';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestMenu,
+	ManifestSectionSidebarAppBaseMenu,
 	ManifestSectionSidebarAppMenuKind,
 	UmbBackofficeManifestKind,
 	umbExtensionsRegistry,
@@ -23,13 +24,19 @@ const manifest: UmbBackofficeManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-section-sidebar-menu')
-export class UmbSectionSidebarMenuElement extends UmbLitElement {
+export class UmbSectionSidebarMenuElement<
+	ManifestType extends ManifestSectionSidebarAppBaseMenu = ManifestSectionSidebarAppMenuKind
+> extends UmbLitElement {
 	@property()
-	manifest?: ManifestSectionSidebarAppMenuKind;
+	manifest?: ManifestType;
+
+	renderHeader() {
+		return html`<h3>${this.manifest?.meta?.label}</h3>`;
+	}
 
 	render() {
 		// TODO: link to dashboards when clicking on the menu item header
-		return html` <h3>${this.manifest?.meta?.label}</h3>
+		return html`${this.renderHeader()}
 			<umb-extension-slot
 				type="menu"
 				.filter=${(menu: ManifestMenu) => menu.alias === this.manifest?.meta?.menu}

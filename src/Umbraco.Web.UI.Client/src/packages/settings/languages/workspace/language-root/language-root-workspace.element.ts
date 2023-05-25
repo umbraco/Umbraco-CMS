@@ -37,7 +37,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		},
 		{
 			name: 'Fallback',
-			alias: 'fallBackLanguage',
+			alias: 'fallbackLanguage',
 		},
 		{
 			name: '',
@@ -91,7 +91,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 						value: language.isMandatory,
 					},
 					{
-						columnAlias: 'fallBackLanguage',
+						columnAlias: 'fallbackLanguage',
 						value: languages.find((x) => x.isoCode === language.fallbackIsoCode)?.name,
 					},
 					{
@@ -103,6 +103,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		});
 	}
 
+	// TODO: Generate the href or retrieve it from something?
 	render() {
 		return html`
 			<umb-body-layout headline="Languages">

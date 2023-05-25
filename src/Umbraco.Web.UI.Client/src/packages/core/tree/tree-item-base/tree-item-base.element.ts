@@ -29,9 +29,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	private _isSelected = false;
 
 	@state()
-	private _hasActions = false;
-
-	@state()
 	private _hasChildren = false;
 
 	@state()
@@ -51,7 +48,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
 			this.observe(this.#treeItemContext.isSelected, (value) => (this._isSelected = value));
-			this.observe(this.#treeItemContext.hasActions, (value) => (this._hasActions = value));
 			this.observe(this.#treeItemContext.path, (value) => (this._href = value));
 		});
 	}
@@ -128,17 +124,14 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	}
 
 	#renderActions() {
-		return html`
-			${this._hasActions
-				? html`
-						<uui-action-bar slot="actions">
-							<uui-button @click=${this._openActions} label="Open actions menu">
-								<uui-symbol-more></uui-symbol-more>
-							</uui-button>
-						</uui-action-bar>
-				  `
-				: nothing}
-		`;
+		return this.#treeItemContext && this._item
+			? html`<umb-entity-actions-bundle
+					slot="actions"
+					entity-type=${this.#treeItemContext.type}
+					.unique=${this.#treeItemContext.unique}
+					.label=${this._item.name}>
+			  </umb-entity-actions-bundle>`
+			: '';
 	}
 
 	#renderChildItems() {

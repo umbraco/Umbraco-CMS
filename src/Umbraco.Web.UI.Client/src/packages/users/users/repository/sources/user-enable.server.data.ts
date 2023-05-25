@@ -1,6 +1,6 @@
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbUserEnableDataSource } from '../../types.js';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbUserEnableDataSource } from '../../types.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**

@@ -1,10 +1,10 @@
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbUserCollectionFilterModel,
 	UmbUserDetailDataSource,
 	UmbUserDetailRepository,
 	UmbUserSetGroupDataSource,
 } from '../types.js';
+
 import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store.js';
 import { UmbUserServerDataSource } from './sources/user.server.data.js';
 import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data.js';
@@ -14,6 +14,8 @@ import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.serve
 import { UmbUserEnableServerDataSource } from './sources/user-enable.server.data.js';
 import { UmbUserDisableServerDataSource } from './sources/user-disable.server.data.js';
 import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data.js';
+
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbCollectionDataSource,
 	UmbCollectionRepository,
