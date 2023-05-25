@@ -154,7 +154,8 @@ public static class BackOfficeAuthBuilderExtensions
 
             // TODO: add BackOfficeAuthorizationInitializationMiddleware before UseAuthorization (to make it run for unauthorized API requests) and remove this
             IBackOfficeApplicationManager backOfficeApplicationManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
-            await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(new Uri("https://localhost:44339/"), cancellationToken);
+            await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(new Uri("https://" +
+                "localhost:44339/"), cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

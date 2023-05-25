@@ -107,6 +107,13 @@
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.New.Cms.Core.Models.PagedModel`1</Target>
+    <Left>lib/net7.0/Umbraco.Core.dll</Left>
+    <Right>lib/net7.0/Umbraco.Core.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Configuration.Grid.GridConfig.#ctor(Umbraco.Cms.Core.Cache.AppCaches,Umbraco.Cms.Core.Manifest.IManifestParser,Umbraco.Cms.Core.Serialization.IJsonSerializer,Umbraco.Cms.Core.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory,Umbraco.Cms.Core.IO.IGridEditorsConfigFileProviderFactory)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>

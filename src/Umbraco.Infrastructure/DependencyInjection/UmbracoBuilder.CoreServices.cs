@@ -443,7 +443,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
         builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
         builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
-        builder.Services.AddSingleton<IApiRichTextParser, ApiRichTextParser>();
+        builder.Services.AddSingleton<IApiRichTextElementParser, ApiRichTextElementParser>();
+        builder.Services.AddSingleton<IApiRichTextMarkupParser, ApiRichTextMarkupParser>();
 
         return builder;
     }
