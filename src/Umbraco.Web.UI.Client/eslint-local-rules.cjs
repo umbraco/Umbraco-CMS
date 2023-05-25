@@ -294,13 +294,9 @@ module.exports = {
 						});
 					}
 				},
-				/*,
+				/*
+				// TODO: This rule does not work, make it work.
 				CallExpression: (node) => {
-					// we only care about the callees that have a name (see below)
-					if (node.callee.type !== AST_NODE_TYPES.Identifier) {
-						return;
-					}
-
 					if (node.callee.name === 'import') {
 						const [source] = node.arguments;
 						const fixedSource = correctImport(source);
@@ -312,7 +308,8 @@ module.exports = {
 							});
 						}
 					}
-				},*/
+				},
+				*/
 			};
 		},
 	},
