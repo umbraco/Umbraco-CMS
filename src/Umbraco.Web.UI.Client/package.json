@@ -38,7 +38,7 @@
 		"auth:test:e2e": "npx playwright test --config apps/auth/",
 		"backoffice:test:e2e": "npx playwright test",
 		"test:e2e": "npm run auth:test:e2e && npm run backoffice:test:e2e",
-		"lint": "eslint src apps libs e2e",
+		"lint": "eslint src apps e2e",
 		"lint:errors": "npm run lint -- --quiet",
 		"lint:fix": "npm run lint -- --fix",
 		"format": "prettier 'src/**/*.ts'",
