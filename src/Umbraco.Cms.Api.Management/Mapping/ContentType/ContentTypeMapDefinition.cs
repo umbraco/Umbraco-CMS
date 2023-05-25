@@ -24,6 +24,7 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeRespon
                 new TPropertyTypeResponseModel
                 {
                     Id = propertyType.Key,
+                    SortOrder = propertyType.SortOrder,
                     ContainerId = groupKeysByPropertyKeys.ContainsKey(propertyType.Key)
                         ? groupKeysByPropertyKeys[propertyType.Key]
                         : null,
