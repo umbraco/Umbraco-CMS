@@ -1,4 +1,5 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { DOCUMENT_ENTITY_TYPE, DOCUMENT_ROOT_ENTITY_TYPE } from '../index.js';
 import { UmbCreateDocumentEntityAction } from './create/create.action.js';
 import { UmbPublishDocumentEntityAction } from './publish.action.js';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';

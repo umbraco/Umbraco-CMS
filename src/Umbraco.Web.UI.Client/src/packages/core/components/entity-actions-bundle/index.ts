@@ -1,1 +1,1 @@
-export * from './entity-action-bundle.element.ts';
+export * from './entity-actions-bundle.element.js';

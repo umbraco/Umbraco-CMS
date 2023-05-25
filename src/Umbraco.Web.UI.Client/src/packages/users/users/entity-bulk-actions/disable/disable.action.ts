@@ -1,6 +1,6 @@
 import { UmbUserRepository } from '../../repository/user.repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
