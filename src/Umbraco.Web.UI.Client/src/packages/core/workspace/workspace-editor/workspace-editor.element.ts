@@ -104,7 +104,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					component: () => {
 						if (manifest.type === 'workspaceViewCollection') {
 							return import(
-								'../workspace-content/views/collection/workspace-view-collection.element'
+								'../workspace-content/views/collection/workspace-view-collection.element.js'
 							) as unknown as Promise<HTMLElement>;
 						}
 						return createExtensionElement(manifest);
