@@ -27,11 +27,11 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc && vite build --mode staging",
+		"build": "tsc --project ./src/tsconfig.json && rollup -c ./src/rollup.config.js",
+		"build:vite": "tsc && vite build --mode staging",
 		"build:libs": "npm run wc-analyze && npm run wc-analyze:vscode && npm run generate:jsonschema && rollup -c rollup-libs.config.js && node utils/move-libs.js",
 		"build:for:static": "tsc && vite build",
-		"build:for:cms": "tsc && npm run build:libs && vite build -c vite.cms.config.ts",
-		"build:for:cms:watch": "tsc && npm run build:libs && vite build -c vite.cms.config.ts --watch",
+		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
 		"preview": "vite preview --open",
 		"test": "web-test-runner --coverage",
 		"test:watch": "web-test-runner --watch",
@@ -54,8 +54,7 @@
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist/libs/vscode-html-custom-data.json",
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
-		"check": "npm run lint && npm run compile && npm run build-storybook",
-		"build:for:cms2": "tsc --project ./src/tsconfig.json && rollup -c ./src/rollup.config.js"
+		"check": "npm run lint && npm run compile && npm run build-storybook"
 	},
 	"engines": {
 		"node": ">=18.14 <19",
