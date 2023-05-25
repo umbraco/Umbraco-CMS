@@ -628,6 +628,8 @@
     </key>
     <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">No results were found</key>
+    <key alias="searchResultsFound">Showing %0% of %1% result(s)</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
