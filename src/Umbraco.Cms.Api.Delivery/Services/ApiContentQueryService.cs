@@ -1,10 +1,10 @@
 using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
