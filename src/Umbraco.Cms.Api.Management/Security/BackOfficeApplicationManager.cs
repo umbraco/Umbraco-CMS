@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
-using Umbraco.New.Cms.Core;
-using Umbraco.New.Cms.Core.Models.Configuration;
-using Umbraco.New.Cms.Infrastructure.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Configuration;
+using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Api.Management.Security;
 

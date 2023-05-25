@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
-using Umbraco.New.Cms.Core.Factories;
-using Umbraco.New.Cms.Core.Models.Installer;
+using Umbraco.Cms.Core.Factories;
+using Umbraco.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Upgrade;
 

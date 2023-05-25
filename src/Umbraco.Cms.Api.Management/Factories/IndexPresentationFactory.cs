@@ -2,7 +2,7 @@
 using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.New.Cms.Infrastructure.Services;
+using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 

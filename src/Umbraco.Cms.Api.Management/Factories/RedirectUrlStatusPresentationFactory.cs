@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.RedirectUrlManagement;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Core.Models.RedirectUrlManagement;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services;
-using Umbraco.New.Cms.Infrastructure.Services;
+using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 

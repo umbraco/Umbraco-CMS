@@ -46,6 +46,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<ContentTr
         {
             responseModel.Icon = mediaEntitySlim.ContentTypeIcon ?? responseModel.Icon;
             responseModel.IsTrashed = entity.Trashed;
+            responseModel.Id = entity.Key;
         }
 
         return responseModel;

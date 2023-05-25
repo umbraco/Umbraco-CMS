@@ -29,9 +29,9 @@ Since the new backoffice API is still very much a work in progress, we've create
 
 * Umbrao.Cms.ManagementApi - The "presentation layer" for the management API
 * "New" versions of existing projects, should be merged with the existing projects when the new API is released:
-    * Umbraco.New.Cms.Core
-    * Umbraco.New.Cms.Infrastructure
-    * Umbraco.New.Cms.Web.Common
+    * Umbraco.Cms.Core
+    * Umbraco.Cms.Infrastructure
+    * Umbraco.Cms.Web.Common
     * Umbraco.Web.UI.New
     * Umbraco.Web.UI.New.Client
 

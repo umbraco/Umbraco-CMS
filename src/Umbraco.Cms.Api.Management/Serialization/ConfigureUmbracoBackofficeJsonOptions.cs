@@ -18,7 +18,7 @@ public class ConfigureUmbracoBackofficeJsonOptions : IConfigureNamedOptions<Json
 
     public void Configure(string? name, JsonOptions options)
     {
-        if (name != New.Cms.Core.Constants.JsonOptionsNames.BackOffice)
+        if (name != Core.Constants.JsonOptionsNames.BackOffice)
         {
             return;
         }

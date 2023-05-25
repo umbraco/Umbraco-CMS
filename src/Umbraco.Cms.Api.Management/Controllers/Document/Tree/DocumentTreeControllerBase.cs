@@ -55,6 +55,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             responseModel.Icon = documentEntitySlim.ContentTypeIcon ?? responseModel.Icon;
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
             responseModel.IsTrashed = entity.Trashed;
+            responseModel.Id = entity.Key;
 
             if (_culture != null && documentEntitySlim.Variations.VariesByCulture())
             {
