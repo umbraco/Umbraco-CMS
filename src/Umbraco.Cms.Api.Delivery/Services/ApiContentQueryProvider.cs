@@ -1,4 +1,6 @@
 ﻿using Examine;
+using Examine.Lucene.Providers;
+using Examine.Lucene.Search;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -77,7 +79,14 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
 
     private IBooleanOperation BuildSelectorOperation(SelectorOption selectorOption, IIndex index, string culture)
     {
-        IQuery query = index.Searcher.CreateQuery();
+        // Needed for enabling leading wildcards searches
+        BaseLuceneSearcher searcher = index.Searcher as BaseLuceneSearcher ?? throw new InvalidOperationException($"Index searcher must be of type {nameof(BaseLuceneSearcher)}.");
+
+        IQuery query = searcher.CreateQuery(
+            IndexTypes.Content,
+            BooleanOperation.And,
+            searcher.LuceneAnalyzer,
+            new LuceneSearchOptions { AllowLeadingWildcard = true });
 
         IBooleanOperation selectorOperation = selectorOption.Values.Length == 1
             ? query.Field(selectorOption.FieldName, selectorOption.Values.First())
@@ -103,6 +112,23 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             }
         }
 
+        void HandleContains(IQuery query, string fieldName, string[] values)
+        {
+            if (values.Length == 1)
+            {
+                // The trailing wildcard is added automatically
+                query.Field(fieldName, (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, $"*{values[0]}"));
+            }
+            else
+            {
+                // The trailing wildcard is added automatically
+                IExamineValue[] examineValues = values
+                    .Select(value => (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, $"*{value}"))
+                    .ToArray();
+                query.GroupedOr(new[] { fieldName }, examineValues);
+            }
+        }
+
         foreach (FilterOption filterOption in filterOptions)
         {
             var values = filterOption.Values.Any()
@@ -112,18 +138,16 @@ internal sealed class ApiContentQueryProvider : IApiContentQueryProvider
             switch (filterOption.Operator)
             {
                 case FilterOperation.Is:
-                    // TODO: test this for explicit word matching
                     HandleExact(queryOperation.And(), filterOption.FieldName, values);
                     break;
                 case FilterOperation.IsNot:
-                    // TODO: test this for explicit word matching
                     HandleExact(queryOperation.Not(), filterOption.FieldName, values);
                     break;
-                // TODO: Fix
                 case FilterOperation.Contains:
+                    HandleContains(queryOperation.And(), filterOption.FieldName, values);
                     break;
-                // TODO: Fix
                 case FilterOperation.DoesNotContain:
+                    HandleContains(queryOperation.Not(), filterOption.FieldName, values);
                     break;
                 default:
                     continue;
