@@ -8,5 +8,7 @@ public class DocumentTreeItemResponseModel : ContentTreeItemResponseModel
 
     public bool IsEdited { get; set; }
 
+    public Guid ContentTypeId { get; set; }
+
     public IEnumerable<VariantTreeItemViewModel> Variants { get; set; } = Enumerable.Empty<VariantTreeItemViewModel>();
 }

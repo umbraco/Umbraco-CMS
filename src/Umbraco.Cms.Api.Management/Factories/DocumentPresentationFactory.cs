@@ -51,6 +51,9 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
             Icon = entity.ContentTypeIcon,
         };
 
+        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
+        responseModel.ContentTypeId = contentType?.Key ?? Guid.Empty;
+
         if (culture == null || !entity.Variations.VariesByCulture())
         {
             return responseModel;

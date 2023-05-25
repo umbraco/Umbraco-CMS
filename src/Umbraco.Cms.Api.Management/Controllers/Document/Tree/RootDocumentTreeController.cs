@@ -19,8 +19,9 @@ public class RootDocumentTreeController : DocumentTreeControllerBase
         IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, publicAccessService, appCaches, backofficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IContentTypeService contentTypeService)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, publicAccessService, appCaches, backofficeSecurityAccessor, contentTypeService)
     {
     }
 
