@@ -1,11 +1,23 @@
 import { LoginRequestModel, IUmbAuthContext } from './types';
 
 export class UmbAuthContext implements IUmbAuthContext {
-	readonly #AUTH_URL = '/umbraco/management/api/v1.0/security/back-office';
+	readonly #AUTH_URL = '/umbraco/management/api/v1/security/back-office';
 
 	async login(data: LoginRequestModel) {
 		//TODO: call authUrl with data
-		return UmbMockAPI.loginSuccess(data);
+		const request = new Request(this.#AUTH_URL + '/login', {
+			method: 'POST',
+			body: JSON.stringify({
+				username: data.username,
+				password: data.password,
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		const response = await fetch(request);
+
+		return { error: response.ok ? undefined : response.statusText };
 	}
 }
 
