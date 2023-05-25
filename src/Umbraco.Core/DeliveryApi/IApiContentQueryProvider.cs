@@ -1,4 +1,4 @@
-﻿using Umbraco.New.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
 
