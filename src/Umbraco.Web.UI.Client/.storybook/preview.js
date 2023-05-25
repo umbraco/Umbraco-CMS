@@ -1,5 +1,5 @@
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import '../src/shared/css/custom-properties.css';
+import '../src/css/umb-css.css';
 
 import 'element-internals-polyfill';
 import '@umbraco-ui/uui';
@@ -15,15 +15,15 @@ import { UmbDocumentTreeStore } from '../src/packages/documents/documents/reposi
 
 import customElementManifests from '../dist/libs/custom-elements.json';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
-import { onUnhandledRequest } from '../src/shared/mocks';
-import { handlers } from '../src/shared/mocks/browser-handlers';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../libs/modal';
+import { onUnhandledRequest } from '../src/mocks';
+import { handlers } from '../src/mocks/browser-handlers';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '../src/packages/core/modal';
 import { UmbLitElement } from '../src/shared/lit-element';
 
-import { umbExtensionsRegistry } from '../libs/extension-registry';
+import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 
-import '../libs/context-api/provide/context-provider.element';
-import '../libs/controller-api/controller-host-initializer.element.ts';
+import '../src/libs/context-api/provide/context-provider.element';
+import '../src/libs/controller-api/controller-host-initializer.element.ts';
 import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
