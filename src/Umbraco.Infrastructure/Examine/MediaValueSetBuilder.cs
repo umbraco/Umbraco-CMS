@@ -65,7 +65,7 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
 
             foreach (IProperty property in m.Properties)
             {
-                AddPropertyValue(property, null, null, values);
+                AddPropertyValue(property, null, null, values, m.AvailableCultures);
             }
 
             var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values);

@@ -1,10 +1,12 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
@@ -24,6 +26,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
+    private readonly ILocalizationService _localizationService;
 
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
@@ -31,13 +34,34 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         IUserService userService,
         IShortStringHelper shortStringHelper,
         IScopeProvider scopeProvider,
-        bool publishedValuesOnly)
+        bool publishedValuesOnly,
+        ILocalizationService localizationService)
         : base(propertyEditors, publishedValuesOnly)
     {
         _urlSegmentProviders = urlSegmentProviders;
         _userService = userService;
         _shortStringHelper = shortStringHelper;
         _scopeProvider = scopeProvider;
+        _localizationService = localizationService;
+    }
+
+    [Obsolete("Use the constructor that takes an ILocalizationService, scheduled for removal in v14")]
+    public ContentValueSetBuilder(
+        PropertyEditorCollection propertyEditors,
+        UrlSegmentProviderCollection urlSegmentProviders,
+        IUserService userService,
+        IShortStringHelper shortStringHelper,
+        IScopeProvider scopeProvider,
+        bool publishedValuesOnly)
+        : this(
+            propertyEditors,
+            urlSegmentProviders,
+            userService,
+            shortStringHelper,
+            scopeProvider,
+            publishedValuesOnly,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+    {
     }
 
     /// <inheritdoc />
@@ -128,17 +152,23 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                 }
             }
 
+            var availableCultures = new List<string>(c.AvailableCultures);
+            if (availableCultures.Any() is false)
+            {
+                availableCultures.Add(_localizationService.GetDefaultLanguageIsoCode());
+            }
+
             foreach (IProperty property in c.Properties)
             {
                 if (!property.PropertyType.VariesByCulture())
                 {
-                    AddPropertyValue(property, null, null, values);
+                    AddPropertyValue(property, null, null, values, availableCultures);
                 }
                 else
                 {
                     foreach (var culture in c.AvailableCultures)
                     {
-                        AddPropertyValue(property, culture.ToLowerInvariant(), null, values);
+                        AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures);
                     }
                 }
             }
