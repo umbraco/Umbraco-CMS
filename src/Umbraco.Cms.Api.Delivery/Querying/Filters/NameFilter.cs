@@ -1,6 +1,6 @@
 using Umbraco.Cms.Api.Delivery.Indexing.Filters;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.Querying.Filters;
 
@@ -16,14 +16,14 @@ public sealed class NameFilter : IFilterHandler
     public FilterOption BuildFilterOption(string filter)
     {
         var value = filter.Substring(NameSpecifier.Length);
+        var negate = value.StartsWith('!');
+        var values = value.TrimStart('!').Split(Constants.CharArrays.Comma);
 
         return new FilterOption
         {
             FieldName = NameFilterIndexer.FieldName,
-            Values = value.IsNullOrWhiteSpace() == false
-                ? new[] { value.TrimStart('!') }
-                : Array.Empty<string>(),
-            Operator = value.StartsWith('!')
+            Values = values,
+            Operator = negate
                 ? FilterOperation.DoesNotContain
                 : FilterOperation.Contains
         };
