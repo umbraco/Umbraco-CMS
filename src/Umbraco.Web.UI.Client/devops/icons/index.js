@@ -8,7 +8,7 @@ const glob = globModule.default;
 
 const moduleDirectory = 'src/shared/icon-registry/';
 const iconsSVGDirectory = `${moduleDirectory}svgs/`;
-const iconsOutputDirectory = `public-assets/icons/`;
+const iconsOutputDirectory = `${moduleDirectory}/icons/`;
 
 const run = async () => {
 	const icons = await collectIcons();
@@ -63,7 +63,7 @@ const generateJSON = (icons) => {
 	const iconDescriptors = icons.map((icon) => {
 		return {
 			name: `umb:${icon.name}`,
-			path: `icons/${icon.iconFileName}.js`,
+			path: `${icon.iconFileName}.js`,
 		};
 	});
 

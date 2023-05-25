@@ -1,12 +1,9 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context.js';
+import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-data-type-workspace-edit-element
  * @description - Element for displaying the Data Type Workspace edit route.

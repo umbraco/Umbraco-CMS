@@ -9,7 +9,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.MemberGroup',
 	name: 'Member Group Workspace',
-	loader: () => import('./member-group-workspace.element'),
+	loader: () => import('./member-group-workspace.element.js'),
 	meta: {
 		entityType: 'member-group',
 	},
@@ -20,7 +20,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.MemberGroup.Info',
 		name: 'Member Group Workspace Info View',
-		loader: () => import('./views/info/workspace-view-member-group-info.element'),
+		loader: () => import('./views/info/workspace-view-member-group-info.element.js'),
 		weight: 90,
 		meta: {
 			label: 'Info',

@@ -1,13 +1,12 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbLanguageRepository } from '../../repository/language.repository';
-import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/core/components';
+import { UmbLanguageRepository } from '../../repository/language.repository.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './components/language-root-table-delete-column-layout.element';
-import './components/language-root-table-name-column-layout.element';
+import './components/language-root-table-delete-column-layout.element.js';
+import './components/language-root-table-name-column-layout.element.js';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {

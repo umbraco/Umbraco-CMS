@@ -1,8 +1,8 @@
-import type { MediaDetails } from '../';
-import { UmbMediaTreeServerDataSource } from './sources/media.tree.server.data';
-import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store';
-import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store';
-import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data';
+import type { MediaDetails } from '../index.js';
+import { UmbMediaTreeServerDataSource } from './sources/media.tree.server.data.js';
+import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store.js';
+import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store.js';
+import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data.js';
 import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';

@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputMediaPickerElement } from './input-media-picker.element';
+import { UmbInputMediaPickerElement } from './input-media-picker.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputMediaPickerElement', () => {
 	let element: UmbInputMediaPickerElement;

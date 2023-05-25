@@ -1,7 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, nothing } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
-import { customElement, property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, LitElement, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 export interface TooltipMenuItem {
 	label: string;
@@ -11,8 +9,6 @@ export interface TooltipMenuItem {
 
 @customElement('umb-tooltip-menu')
 export class UmbTooltipMenuElement extends LitElement {
-	
-
 	@property({ type: Boolean, reflect: true, attribute: 'icon-only' })
 	public iconOnly = false;
 
@@ -55,7 +51,7 @@ export class UmbTooltipMenuElement extends LitElement {
 			(item) => this._renderItem(item)
 		);
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUIMarkdownEditorElement } from './property-editor-ui-markdown-editor.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIMarkdownEditorElement } from './property-editor-ui-markdown-editor.element';
-import './property-editor-ui-markdown-editor.element';
+import './property-editor-ui-markdown-editor.element.js';
 
 export default {
 	title: 'Property Editor UIs/Markdown Editor',

@@ -1,12 +1,12 @@
-import './document-info-workspace-view.element';
+import './document-info-workspace-view.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbDocumentInfoWorkspaceViewElement } from './document-info-workspace-view.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-// import { data } from '../../../../../../core/mocks/data/document.data';
-// import { UmbNodeContext } from '../../node.context';
+// import { data } from '../../../../../../core/mocks/data/document.data.js';
+// import { UmbNodeContext } from '../../node.context.js';
 
-import type { UmbDocumentInfoWorkspaceViewElement } from './document-info-workspace-view.element';
 
 export default {
 	title: 'Workspaces/Documents/Views/Info',

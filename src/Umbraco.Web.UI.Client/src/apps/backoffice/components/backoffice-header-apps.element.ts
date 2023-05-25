@@ -1,17 +1,12 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-backoffice-header-apps')
 export class UmbBackofficeHeaderAppsElement extends LitElement {
-	
-
 	render() {
 		return html` <umb-extension-slot id="apps" type="headerApp"></umb-extension-slot> `;
 	}
-	
+
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			#apps {
 				display: flex;

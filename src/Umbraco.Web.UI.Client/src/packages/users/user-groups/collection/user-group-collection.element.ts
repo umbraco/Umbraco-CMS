@@ -1,12 +1,11 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
-import { UmbUserGroupCollectionContext } from './user-group-collection.context';
+import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
+import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './user-group-collection-view.element';
-import './user-group-collection-header.element';
+import './user-group-collection-view.element.js';
+import './user-group-collection-header.element.js';
 
 @customElement('umb-user-group-collection')
 export class UmbUserCollectionElement extends UmbLitElement {

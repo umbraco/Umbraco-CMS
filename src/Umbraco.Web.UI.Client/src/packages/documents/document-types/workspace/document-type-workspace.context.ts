@@ -1,4 +1,4 @@
-import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
+import { UmbDocumentTypeRepository } from '../repository/document-type.repository.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbWorkspaceContext, UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type {

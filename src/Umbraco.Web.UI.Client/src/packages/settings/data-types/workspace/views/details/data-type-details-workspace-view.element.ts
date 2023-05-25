@@ -1,8 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,

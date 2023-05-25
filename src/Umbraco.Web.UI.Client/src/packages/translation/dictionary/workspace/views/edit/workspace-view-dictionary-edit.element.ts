@@ -1,15 +1,10 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UUITextareaElement, UUITextareaEvent } from '@umbraco-ui/uui';
-import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.context';
-import { UmbDictionaryRepository } from '../../../repository/dictionary.repository';
+import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.context.js';
+import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';
+import { UUITextStyles , UUITextareaElement, UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-view-dictionary-edit')
 export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 	@state()

@@ -1,5 +1,5 @@
-import { UmbMemberRepository } from '../repository/member.repository';
-import type { MemberDetails } from '../types';
+import { UmbMemberRepository } from '../repository/member.repository.js';
+import type { MemberDetails } from '../types.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

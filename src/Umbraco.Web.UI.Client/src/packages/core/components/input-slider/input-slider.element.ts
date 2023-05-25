@@ -1,8 +1,5 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UUISliderEvent } from '@umbraco-ui/uui';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin, UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-slider')

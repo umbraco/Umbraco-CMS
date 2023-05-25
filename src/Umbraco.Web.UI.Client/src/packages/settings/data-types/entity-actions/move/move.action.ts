@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../../repository/data-type.repository';
+import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';

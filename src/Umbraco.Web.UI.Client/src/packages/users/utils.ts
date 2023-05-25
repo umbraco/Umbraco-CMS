@@ -1,4 +1,4 @@
-import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
+import { InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const getLookAndColorFromUserStatus = (

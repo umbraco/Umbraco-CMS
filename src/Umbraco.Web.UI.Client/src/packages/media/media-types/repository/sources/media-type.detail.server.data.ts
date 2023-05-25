@@ -1,5 +1,5 @@
-import type { MediaTypeDetails } from '../../types';
-import { MediaTypeDetailDataSource } from './media-type.details.server.data.interface';
+import type { MediaTypeDetails } from '../../types.js';
+import { MediaTypeDetailDataSource } from './media-type.details.server.data.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

@@ -8,7 +8,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.ExtensionRoot',
 	name: 'Extension Root Workspace',
-	loader: () => import('./extension-root-workspace.element'),
+	loader: () => import('./extension-root-workspace.element.js'),
 	meta: {
 		entityType: 'extension-root',
 	},

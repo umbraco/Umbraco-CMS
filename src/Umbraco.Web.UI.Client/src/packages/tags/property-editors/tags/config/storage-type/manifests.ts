@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.Tags.StorageType',
 	name: 'Tags Storage Type Property Editor UI',
-	loader: () => import('./property-editor-ui-tags-storage-type.element'),
+	loader: () => import('./property-editor-ui-tags-storage-type.element.js'),
 	meta: {
 		label: 'Tags Storage Type',
 		propertyEditorModel: '',

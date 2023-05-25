@@ -1,10 +1,9 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-import '../collection/views/table/user-collection-table-view.element';
-import '../collection/views/grid/user-collection-grid-view.element';
+import '../collection/views/table/user-collection-table-view.element.js';
+import '../collection/views/grid/user-collection-grid-view.element.js';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -13,11 +12,11 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	#routes: UmbRoute[] = [
 		{
 			path: 'collection',
-			component: () => import('../collection/user-collection.element'),
+			component: () => import('../collection/user-collection.element.js'),
 		},
 		{
 			path: 'user',
-			component: () => import('../workspace/user-workspace.element'),
+			component: () => import('../workspace/user-workspace.element.js'),
 		},
 		{
 			path: '**',

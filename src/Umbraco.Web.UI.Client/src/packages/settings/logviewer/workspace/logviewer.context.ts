@@ -1,4 +1,4 @@
-import { UmbLogViewerRepository } from '../repository/log-viewer.repository';
+import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
 import {
 	UmbBasicState,
 	UmbArrayState,

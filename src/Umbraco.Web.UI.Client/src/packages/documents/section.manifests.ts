@@ -1,4 +1,4 @@
-import { DOCUMENT_ROOT_ENTITY_TYPE } from './documents';
+import { DOCUMENT_ROOT_ENTITY_TYPE } from './documents/index.js';
 import type {
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
 	ManifestTypes,

@@ -1,5 +1,5 @@
-import { UmbTagRepository } from './tag.repository';
-import { UmbTagStore } from './tag.store';
+import { UmbTagRepository } from './tag.repository.js';
+import { UmbTagStore } from './tag.store.js';
 import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const TAG_REPOSITORY_ALIAS = 'Umb.Repository.Tags';

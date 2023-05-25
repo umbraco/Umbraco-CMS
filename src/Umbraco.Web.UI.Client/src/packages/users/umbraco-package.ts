@@ -5,6 +5,6 @@ export const extensions = [
 		name: 'User Management Entry Point',
 		alias: 'Umb.EntryPoint.UserManagement',
 		type: 'entryPoint',
-		loader: () => import('./index'),
+		loader: () => import('./index.js'),
 	},
 ];

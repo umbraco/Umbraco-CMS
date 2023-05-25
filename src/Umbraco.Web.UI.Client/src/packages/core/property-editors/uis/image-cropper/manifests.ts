@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.ImageCropper',
 	name: 'Image Cropper Property Editor UI',
-	loader: () => import('./property-editor-ui-image-cropper.element'),
+	loader: () => import('./property-editor-ui-image-cropper.element.js'),
 	meta: {
 		label: 'Image Cropper',
 		icon: 'umb:colorpicker',

@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Settings Entry Point',
 		alias: 'Umb.EntryPoint.Settings',
 		type: 'entryPoint',
-		loader: () => import('./index'),
+		loader: () => import('./package-entry-point.js'),
 	},
 ];

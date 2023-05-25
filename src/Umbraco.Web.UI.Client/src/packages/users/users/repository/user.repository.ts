@@ -3,16 +3,18 @@ import {
 	UmbUserDetailDataSource,
 	UmbUserDetailRepository,
 	UmbUserSetGroupDataSource,
-} from '../types';
-import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store';
-import { UmbUserServerDataSource } from './sources/user.server.data';
-import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data';
-import { UmbUserItemServerDataSource } from './sources/user-item.server.data';
-import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store';
-import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data';
-import { UmbUserEnableServerDataSource } from './sources/user-enable.server.data';
-import { UmbUserDisableServerDataSource } from './sources/user-disable.server.data';
-import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data';
+} from '../types.js';
+
+import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store.js';
+import { UmbUserServerDataSource } from './sources/user.server.data.js';
+import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data.js';
+import { UmbUserItemServerDataSource } from './sources/user-item.server.data.js';
+import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store.js';
+import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
+import { UmbUserEnableServerDataSource } from './sources/user-enable.server.data.js';
+import { UmbUserDisableServerDataSource } from './sources/user-disable.server.data.js';
+import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data.js';
+
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbCollectionDataSource,

@@ -1,5 +1,5 @@
-import { UmbUserRepository } from '../repository/user.repository';
-import { UmbUserStore } from './user.store';
+import { UmbUserRepository } from '../repository/user.repository.js';
+import { UmbUserStore } from './user.store.js';
 import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const USER_REPOSITORY_ALIAS = 'Umb.Repository.User';

@@ -1,7 +1,6 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import type { UmbUserGroupRepository } from '../../repository/user-group.repository';
+import type { UmbUserGroupRepository } from '../../repository/user-group.repository.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -72,7 +71,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 								label=${item.name}
 								selectable
 								@selected=${() => this.#selectionManager.select(item.id!)}
-								@unselected=${() => this.#selectionManager.deselect(item.id!)}
+								@deselected=${() => this.#selectionManager.deselect(item.id!)}
 								?selected=${this.#selectionManager.isSelected(item.id!)}>
 								<uui-icon .name=${item.icon} slot="icon"></uui-icon>
 							</uui-menu-item>

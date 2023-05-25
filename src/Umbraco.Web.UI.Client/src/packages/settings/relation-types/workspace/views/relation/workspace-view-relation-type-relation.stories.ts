@@ -1,12 +1,12 @@
-import './workspace-view-relation-type-relation.element';
+import './workspace-view-relation-type-relation.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbWorkspaceViewRelationTypeRelationElement } from './workspace-view-relation-type-relation.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-//import { data } from '../../../../../core/mocks/data/relation-type.data';
-//import { UmbRelationTypeContext } from '../../relation-type.context';
+//import { data } from '../../../../../core/mocks/data/relation-type.data.js';
+//import { UmbRelationTypeContext } from '../../relation-type.context.js';
 
-import type { UmbWorkspaceViewRelationTypeRelationElement } from './workspace-view-relation-type-relation.element';
 
 export default {
 	title: 'Workspaces/Relation Type/Views/Relation',

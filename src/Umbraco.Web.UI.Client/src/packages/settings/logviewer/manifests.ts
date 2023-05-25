@@ -1,4 +1,4 @@
-import { manifests as treeManifests } from './menu-item/manifests';
-import { manifests as workspaceManifests } from './workspace/manifests';
+import { manifests as treeManifests } from './menu-item/manifests.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
 
 export const manifests = [...treeManifests, ...workspaceManifests];

@@ -1,15 +1,12 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
-import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
+import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import { encodeFolderName } from '@umbraco-cms/backoffice/router';
+import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -77,7 +74,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 				const tabName = tab.name;
 				routes.push({
 					path: `tab/${encodeFolderName(tabName || '').toString()}`,
-					component: () => import('./document-type-workspace-view-edit-tab.element'),
+					component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName ?? '';
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = tab.id;
@@ -89,7 +86,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				component: () => import('./document-type-workspace-view-edit-tab.element'),
+				component: () => import('./document-type-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
 				},

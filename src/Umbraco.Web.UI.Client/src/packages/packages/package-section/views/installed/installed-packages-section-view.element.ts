@@ -1,14 +1,12 @@
-import { html, css } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { combineLatest } from 'rxjs';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbPackageRepository } from '../../../repository/package.repository';
-import type { UmbPackageWithMigrationStatus } from '../../../types';
+import { UmbPackageRepository } from '../../../repository/package.repository.js';
+import type { UmbPackageWithMigrationStatus } from '../../../types.js';
+import { html, css , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-import './installed-packages-section-view-item.element';
 import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+
+import './installed-packages-section-view-item.element.js';
 
 @customElement('umb-installed-packages-section-view')
 export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {

@@ -1,17 +1,17 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element';
-import './dashboard-examine-management.element';
+import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element.js';
+import './dashboard-examine-management.element.js';
 
-import type { UmbDashboardExamineOverviewElement } from './views/section-view-examine-overview';
-import './views/section-view-examine-overview';
+import type { UmbDashboardExamineOverviewElement } from './views/section-view-examine-overview.js';
+import './views/section-view-examine-overview.js';
 
-import type { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
-import './views/section-view-examine-indexers';
+import type { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
+import './views/section-view-examine-indexers.js';
 
-import type { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
-import './views/section-view-examine-searchers';
+import type { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
+import './views/section-view-examine-searchers.js';
 
 export default {
 	title: 'Dashboards/Examine Management',

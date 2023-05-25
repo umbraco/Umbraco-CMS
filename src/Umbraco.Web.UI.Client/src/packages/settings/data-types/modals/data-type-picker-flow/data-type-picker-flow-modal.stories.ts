@@ -1,10 +1,10 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-import type { UmbDataTypePickerFlowModalElement } from './data-type-picker-flow-modal.element';
+import type { UmbDataTypePickerFlowModalElement } from './data-type-picker-flow-modal.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUIPickerModalData } from '@umbraco-cms/backoffice/modal';
 
-import './data-type-picker-flow-modal.element';
-import '../../../../core/components/body-layout/body-layout.element';
+import './data-type-picker-flow-modal.element.js';
+import '../../../../core/components/body-layout/body-layout.element.js';
 
 export default {
 	title: 'API/Modals/Layouts/Data Type Picker Flow',

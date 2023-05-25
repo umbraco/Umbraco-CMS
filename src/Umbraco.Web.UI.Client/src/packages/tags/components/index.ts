@@ -1,1 +1,1 @@
-export * from './tags-input/tags-input.element';
+export * from './tags-input/tags-input.element.js';

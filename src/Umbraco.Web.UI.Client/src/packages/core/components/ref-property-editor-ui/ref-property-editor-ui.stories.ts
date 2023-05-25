@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
-import './ref-property-editor-ui.element';
-import type { UmbRefPropertyEditorUIElement } from './ref-property-editor-ui.element';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import './ref-property-editor-ui.element.js';
+import type { UmbRefPropertyEditorUIElement } from './ref-property-editor-ui.element.js';
 
 const meta: Meta<UmbRefPropertyEditorUIElement> = {
 	title: 'Components/Ref Property Editor UI',

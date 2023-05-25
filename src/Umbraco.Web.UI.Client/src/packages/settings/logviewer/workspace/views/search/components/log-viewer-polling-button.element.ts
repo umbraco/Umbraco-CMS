@@ -1,13 +1,11 @@
-import { UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
 import {
 	PoolingCOnfig,
 	PoolingInterval,
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
-} from '../../../logviewer.context';
+} from '../../../logviewer.context.js';
+import { UUIPopoverElement, UUISymbolExpandElement , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-log-viewer-polling-button')

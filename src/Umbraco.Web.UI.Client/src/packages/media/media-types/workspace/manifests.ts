@@ -9,7 +9,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.MediaType',
 	name: 'Media Type Workspace',
-	loader: () => import('./media-type-workspace.element'),
+	loader: () => import('./media-type-workspace.element.js'),
 	meta: {
 		entityType: 'media-type',
 	},

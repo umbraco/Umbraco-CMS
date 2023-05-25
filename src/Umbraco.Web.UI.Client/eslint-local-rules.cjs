@@ -43,7 +43,7 @@ module.exports = {
 			type: 'suggestion',
 			docs: {
 				description:
-					'Ensures that any API resources from the `@umbraco-cms/backoffice/backend-api` module are not used directly. Instead you should use the `tryExecuteAndNotify` function from the `@umbraco-cms/resources` module.',
+					'Ensures that any API resources from the `@umbraco-cms/backoffice/backend-api` module are not used directly. Instead you should use the `tryExecuteAndNotify` function from the `@umbraco-cms/backoffice/resources` module.',
 				category: 'Best Practices',
 				recommended: true,
 			},
@@ -140,42 +140,8 @@ module.exports = {
 		},
 	},
 
-	// TODO: Its not bullet proof, but it will catch most/some cases.
 	/** @type {import('eslint').Rule.RuleModule} */
-	'prefer-umbraco-cms-imports': {
-		meta: {
-			type: 'suggestion',
-			docs: {
-				description: 'Replace relative imports to libs/... with @umbraco-cms/backoffice/...',
-				category: 'Best Practices',
-				recommended: true,
-			},
-			fixable: 'code',
-			schema: [],
-		},
-		create: function (context) {
-			const libsRegex = /(\.\.\/)*libs\/(.*)/;
-			return {
-				ImportDeclaration: function (node) {
-					const sourceValue = node.source.value;
-					if (sourceValue.startsWith('libs/') || libsRegex.test(sourceValue)) {
-						const importPath = sourceValue.replace(libsRegex, (match, p1, p2) => {
-							return `@umbraco-cms/backoffice/${p2}`;
-						});
-						context.report({
-							node,
-							message: `Use import alias @umbraco-cms/backoffice instead of relative path "${sourceValue}".`,
-							fix: function (fixer) {
-								return fixer.replaceTextRange(node.source.range, `'${importPath}'`);
-							},
-						});
-					}
-				},
-			};
-		},
-	},
-
-	/** @type {import('eslint').Rule.RuleModule} */
+	/*
 	'no-external-imports': {
 		meta: {
 			type: 'problem',
@@ -205,6 +171,7 @@ module.exports = {
 			};
 		},
 	},
+	*/
 
 	/** @type {import('eslint').Rule.RuleModule} */
 	'umb-class-prefix': {
@@ -276,6 +243,73 @@ module.exports = {
 						}
 					}
 				},
+			};
+		},
+	},
+
+	/** @type {import('eslint').RuleModule}*/
+	'ensure-relative-import-use-js-extension': {
+		meta: {
+			type: 'problem',
+			docs: {
+				description: 'Ensures relative imports use the ".js" file extension.',
+				category: 'Best Practices',
+				recommended: true,
+			},
+			fixable: 'code',
+			schema: [],
+		},
+		create: (context) => {
+			return {
+				ImportDeclaration: (node) => {
+					const { source } = node;
+					const { value } = source;
+
+					function correctImport(value) {
+						if (value === '.') {
+							return './index.js';
+						}
+
+						if (
+							value.startsWith('.') &&
+							!value.endsWith('.js') &&
+							!value.endsWith('.css') &&
+							!value.endsWith('.json') &&
+							!value.endsWith('.svg') &&
+							!value.endsWith('.jpg') &&
+							!value.endsWith('.png')
+						) {
+							return (value.endsWith('/') ? value + 'index' : value) + '.js';
+						}
+
+						return null;
+					}
+
+					const fixedValue = correctImport(value);
+					if (fixedValue) {
+						context.report({
+							node,
+							message: 'Relative imports should use the ".js" file extension.',
+							fix: (fixer) => fixer.replaceText(source, `'${fixedValue}'`),
+						});
+					}
+				},
+				/*
+				// TODO: This rule does not work, make it work.
+				CallExpression: (node) => {
+					if (node.callee.name === 'import') {
+						const [source] = node.arguments;
+						const fixedSource = correctImport(source);
+						if (fixedSource) {
+							context.report({
+								node,
+								message: 'Relative imports should use the ".js" file extension.',
+								fix: (fixer) => fixer.replaceText(source, `'${fixedSource}'`),
+							});
+						}
+					}
+				},
+				*/
 			};
 		},
 	},
