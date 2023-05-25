@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { UUIButtonState } from '@umbraco-ui/uui';
@@ -57,8 +57,6 @@ export default class UmbLoginElement extends LitElement {
 
 		this._isFormValid = form.checkValidity();
 
-		console.log('what', this._isFormValid);
-
 		if (!this._isFormValid) return;
 
 		const formData = new FormData(form);
@@ -76,7 +74,6 @@ export default class UmbLoginElement extends LitElement {
 
 		if (error) return;
 
-		//TODO: Should redirecting be done here or in the context?
 		location.href = this.returnUrl;
 	};
 
@@ -139,7 +136,7 @@ export default class UmbLoginElement extends LitElement {
 	}
 
 	#renderErrorMessage() {
-		if (!this._loginError || this._loginState !== 'failed') return;
+		if (!this._loginError || this._loginState !== 'failed') return nothing;
 
 		return html`<p class="text-danger">${this._loginError}</p>`;
 	}
