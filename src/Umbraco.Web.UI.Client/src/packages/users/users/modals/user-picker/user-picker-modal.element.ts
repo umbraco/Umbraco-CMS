@@ -67,7 +67,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 								label=${user.name}
 								selectable
 								@selected=${() => this.#selectionManager.select(user.id!)}
-								@unselected=${() => this.#selectionManager.deselect(user.id!)}
+								@deselected=${() => this.#selectionManager.deselect(user.id!)}
 								?selected=${this.#selectionManager.isSelected(user.id!)}>
 								<uui-avatar slot="icon" name=${user.name}></uui-avatar>
 							</uui-menu-item>

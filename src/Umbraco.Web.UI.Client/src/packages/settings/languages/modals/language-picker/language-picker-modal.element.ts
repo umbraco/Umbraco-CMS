@@ -57,7 +57,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 							label=${item.name ?? ''}
 							selectable
 							@selected=${() => this.#selectionManager.select(item.isoCode!)}
-							@unselected=${() => this.#selectionManager.deselect(item.isoCode!)}
+							@deselected=${() => this.#selectionManager.deselect(item.isoCode!)}
 							?selected=${this.#selectionManager.isSelected(item.isoCode!)}>
 							<uui-icon slot="icon" name="umb:globe"></uui-icon>
 						</uui-menu-item>

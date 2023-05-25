@@ -205,7 +205,7 @@ export class UmbTableElement extends LitElement {
 			?select-only=${this._selectionMode}
 			?selected=${this._isSelected(item.id)}
 			@selected=${() => this._selectRow(item.id)}
-			@unselected=${() => this._deselectRow(item.id)}>
+			@deselected=${() => this._deselectRow(item.id)}>
 			${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
 		</uui-table-row>`;
 	};

@@ -54,7 +54,7 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 				?selected=${this.#collectionContext?.isSelected(user.id ?? '')}
 				@open=${() => this._handleOpenCard(user.id ?? '')}
 				@selected=${() => this.#onSelect(user)}
-				@unselected=${() => this.#onDeselect(user)}>
+				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserLoginDate(user)}
 			</uui-card-user>
 		`;

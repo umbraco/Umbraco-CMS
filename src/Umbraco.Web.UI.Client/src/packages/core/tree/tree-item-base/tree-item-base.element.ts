@@ -87,13 +87,12 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		this.#treeItemContext?.toggleContextMenu();
 	}
 
-	// TODO: We should rename unselect event to deselect. But this is a breaking change of UI Library.
 	render() {
 		return html`
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
 				@selected=${this._handleSelectedItem}
-				@unselected=${this._handleDeselectedItem}
+				@deselected=${this._handleDeselectedItem}
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}

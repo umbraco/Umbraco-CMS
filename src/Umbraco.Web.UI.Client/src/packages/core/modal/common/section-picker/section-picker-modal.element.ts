@@ -49,7 +49,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 								selectable
 								?selected=${this.#selectionManager.isSelected(item.alias)}
 								@selected=${() => this.#selectionManager.select(item.alias)}
-								@unselected=${() => this.#selectionManager.deselect(item.alias)}></uui-menu-item>
+								@deselected=${() => this.#selectionManager.deselect(item.alias)}></uui-menu-item>
 						`
 					)}
 				</uui-box>

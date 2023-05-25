@@ -92,7 +92,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			?selected=${this._isSelected(item)}
 			@open=${() => this._handleOpenItem(item)}
 			@selected=${() => this._handleSelect(item)}
-			@unselected=${() => this._handleDeselect(item)}
+			@deselected=${() => this._handleDeselect(item)}
 			class="media-item"
 			.fileExt=${item.hasChildren ? '' : 'image'}
 			name=${name}></uui-card-media>`;
