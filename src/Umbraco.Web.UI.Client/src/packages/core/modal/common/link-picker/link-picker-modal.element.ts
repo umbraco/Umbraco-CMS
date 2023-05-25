@@ -1,7 +1,6 @@
-import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTreeElement } from '../../../tree/tree.element.js';
+import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles , UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,

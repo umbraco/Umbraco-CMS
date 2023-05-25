@@ -1,9 +1,9 @@
+import icons from '../../../../../shared/icon-registry/icons/icons.json';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import { css, html, styleMap, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
-import icons from '../../../../../shared/icon-registry/icons/icons.json';
 import { UmbIconPickerModalData, UmbIconPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 

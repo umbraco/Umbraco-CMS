@@ -1,5 +1,5 @@
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserRepository } from '../../repository/user.repository.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';

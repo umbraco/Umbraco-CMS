@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-radio-button-list.element';
+import './input-radio-button-list.element.js';
 import type { UmbInputRadioButtonListElement } from './input-radio-button-list.element.js';
 
 const meta: Meta<UmbInputRadioButtonListElement> = {

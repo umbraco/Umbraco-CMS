@@ -1,7 +1,6 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS } from './manifests.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
 	UMB_MODAL_CONTEXT_TOKEN,

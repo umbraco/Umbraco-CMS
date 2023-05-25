@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import './template-card.element';
+import './template-card.element.js';
 import type { UmbTemplateCardElement } from './template-card.element.js';
 
 const meta: Meta<UmbTemplateCardElement> = {

@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import './body-layout.element';
+import './body-layout.element.js';
 import type { UmbBodyLayoutElement } from './body-layout.element.js';
 
 const meta: Meta<UmbBodyLayoutElement> = {

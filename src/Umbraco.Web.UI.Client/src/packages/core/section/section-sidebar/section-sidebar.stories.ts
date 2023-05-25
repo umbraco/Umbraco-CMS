@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbSectionSidebarElement } from './section-sidebar.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbSectionSidebarElement } from './section-sidebar.element.js';
-import './section-sidebar.element';
+import './section-sidebar.element.js';
 
 export default {
 	title: 'Sections/Shared/Section Sidebar',

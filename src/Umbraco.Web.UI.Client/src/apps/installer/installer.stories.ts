@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import '.';
+import './index.js';
 
 export default {
 	title: 'Apps/Installer',

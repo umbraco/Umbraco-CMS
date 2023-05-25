@@ -1,7 +1,6 @@
-import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
 import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
+import { html, css, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

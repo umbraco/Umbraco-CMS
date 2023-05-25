@@ -1,9 +1,5 @@
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { styleMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html , customElement, property, state , ifDefined , styleMap } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles , UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';

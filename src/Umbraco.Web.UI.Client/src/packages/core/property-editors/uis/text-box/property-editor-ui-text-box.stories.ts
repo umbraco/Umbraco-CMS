@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUITextBoxElement } from './property-editor-ui-text-box.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUITextBoxElement } from './property-editor-ui-text-box.element.js';
-import './property-editor-ui-text-box.element';
+import './property-editor-ui-text-box.element.js';
 
 export default {
 	title: 'Property Editor UIs/Text Box',

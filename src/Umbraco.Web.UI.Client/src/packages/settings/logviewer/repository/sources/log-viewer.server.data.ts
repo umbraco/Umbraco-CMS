@@ -1,4 +1,4 @@
-import { LogMessagesDataSource, LogSearchDataSource } from '.';
+import { LogMessagesDataSource, LogSearchDataSource } from './index.js';
 import {
 	DirectionModel,
 	LogLevelModel,

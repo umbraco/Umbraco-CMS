@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './user-input.element';
+import './user-input.element.js';
 import type { UmbUserInputElement } from './user-input.element.js';
 
 const meta: Meta<UmbUserInputElement> = {

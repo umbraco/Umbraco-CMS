@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIUploadFieldElement } from './property-editor-ui-upload-field.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIUploadFieldElement } from './property-editor-ui-upload-field.element.js';
-import './property-editor-ui-upload-field.element';
+import './property-editor-ui-upload-field.element.js';
 
 export default {
 	title: 'Property Editor UIs/Upload Field',

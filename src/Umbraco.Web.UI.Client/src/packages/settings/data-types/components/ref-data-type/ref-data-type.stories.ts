@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import './ref-data-type.element';
+import './ref-data-type.element.js';
 import type { UmbRefDataTypeElement } from './ref-data-type.element.js';
 
 const meta: Meta<UmbRefDataTypeElement> = {

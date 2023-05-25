@@ -1,9 +1,9 @@
-import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAuthFlow } from './auth/index.js';
 import { UMB_APP, UmbAppContext } from './app.context.js';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';

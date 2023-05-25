@@ -1,10 +1,8 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';
+import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 // TODO: import from package when available
 //import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
-import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

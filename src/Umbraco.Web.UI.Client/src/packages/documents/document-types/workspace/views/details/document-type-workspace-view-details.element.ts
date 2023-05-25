@@ -1,8 +1,7 @@
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

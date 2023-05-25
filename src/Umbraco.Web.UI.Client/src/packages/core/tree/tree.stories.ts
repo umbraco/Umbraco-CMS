@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './tree.element';
+import './tree.element.js';
 import type { UmbTreeElement } from './tree.element.js';
 
 const meta: Meta<UmbTreeElement> = {

@@ -1,10 +1,10 @@
-import '../../../components/body-layout/body-layout.element';
-import './icon-picker-modal.element';
+import '../../../components/body-layout/body-layout.element.js';
+import './icon-picker-modal.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbIconPickerModalElement } from './icon-picker-modal.element.js';
 import { UmbIconPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {

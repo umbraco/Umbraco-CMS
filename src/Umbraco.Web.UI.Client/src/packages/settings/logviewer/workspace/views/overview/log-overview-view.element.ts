@@ -1,6 +1,5 @@
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context.js';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

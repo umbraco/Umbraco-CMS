@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyActionClearElement } from './property-action-clear.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyActionClearElement } from './property-action-clear.element.js';
-import './property-action-clear.element';
+import './property-action-clear.element.js';
 
 export default {
 	title: 'Property Actions/Clear',

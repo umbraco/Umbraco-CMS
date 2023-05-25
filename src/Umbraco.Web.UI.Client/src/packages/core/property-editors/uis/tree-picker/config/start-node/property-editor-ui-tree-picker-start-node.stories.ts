@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUITreePickerStartNodeElement } from './property-editor-ui-tree-picker-start-node.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUITreePickerStartNodeElement } from './property-editor-ui-tree-picker-start-node.element.js';
-import './property-editor-ui-tree-picker-start-node.element';
+import './property-editor-ui-tree-picker-start-node.element.js';
 
 export default {
 	title: 'Property Editor UIs/Tree Picker Start Node',

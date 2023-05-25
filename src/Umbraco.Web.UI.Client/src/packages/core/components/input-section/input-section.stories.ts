@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-section.element';
+import './input-section.element.js';
 import type { UmbInputPickerSectionElement } from './input-section.element.js';
 
 const meta: Meta<UmbInputPickerSectionElement> = {

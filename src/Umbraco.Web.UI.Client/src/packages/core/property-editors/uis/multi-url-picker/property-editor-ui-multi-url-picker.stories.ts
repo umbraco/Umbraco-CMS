@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIMultiUrlPickerElement } from './property-editor-ui-multi-url-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIMultiUrlPickerElement } from './property-editor-ui-multi-url-picker.element.js';
-import './property-editor-ui-multi-url-picker.element';
+import './property-editor-ui-multi-url-picker.element.js';
 
 export default {
 	title: 'Property Editor UIs/Multi Url Picker',

@@ -1,13 +1,13 @@
 import { css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element';
+import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element.js';
 import {
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
 	UmbBackofficeManifestKind,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-import '../../menu/menu.element';
+import '../../menu/menu.element.js';
 
 const manifestWithEntityActions: UmbBackofficeManifestKind = {
 	type: 'kind',

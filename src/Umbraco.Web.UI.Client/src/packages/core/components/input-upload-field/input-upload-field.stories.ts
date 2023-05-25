@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-upload-field.element';
+import './input-upload-field.element.js';
 import type { UmbInputUploadFieldElement } from './input-upload-field.element.js';
 
 const meta: Meta<UmbInputUploadFieldElement> = {

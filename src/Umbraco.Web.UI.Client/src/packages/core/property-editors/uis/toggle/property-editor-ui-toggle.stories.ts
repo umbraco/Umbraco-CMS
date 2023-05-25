@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIToggleElement } from './property-editor-ui-toggle.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIToggleElement } from './property-editor-ui-toggle.element.js';
-import './property-editor-ui-toggle.element';
+import './property-editor-ui-toggle.element.js';
 
 export default {
 	title: 'Property Editor UIs/Toggle',

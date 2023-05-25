@@ -1,7 +1,7 @@
+import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
 import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
 import { ManifestPropertyAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';

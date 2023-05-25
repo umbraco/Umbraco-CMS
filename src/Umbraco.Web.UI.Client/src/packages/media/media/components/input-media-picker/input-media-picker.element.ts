@@ -1,6 +1,6 @@
+import { UmbMediaRepository } from '../../repository/media.repository.js';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbMediaRepository } from '../../repository/media.repository.js';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,

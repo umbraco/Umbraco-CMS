@@ -1,7 +1,6 @@
-// eslint-disable-next-line local-rules/no-external-imports
-import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UmbRoute } from './route.interface.js';
 import { generateRoutePathBuilder } from './generate-route-path-builder.function.js';
+import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import {
 	UmbContextConsumerController,
 	UmbContextProviderController,

@@ -1,6 +1,5 @@
-import { html } from '@umbraco-cms/backoffice/external/lit';
+import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
 import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';

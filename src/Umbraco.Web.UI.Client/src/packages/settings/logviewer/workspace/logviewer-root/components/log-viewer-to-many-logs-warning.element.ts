@@ -1,5 +1,4 @@
-import { css, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement , customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-log-viewer-to-many-logs-warning')
 export class UmbLogViewerToManyLogsWarningElement extends LitElement {

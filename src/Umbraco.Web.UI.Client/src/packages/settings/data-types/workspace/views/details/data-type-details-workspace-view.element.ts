@@ -1,7 +1,6 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbModalContext,

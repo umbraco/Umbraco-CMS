@@ -1,8 +1,7 @@
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';
 import { UmbUserRepository } from '../../repository/user.repository.js';
+import { css, html, nothing , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

@@ -1,8 +1,6 @@
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
+import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import {
 	encodeFolderName,

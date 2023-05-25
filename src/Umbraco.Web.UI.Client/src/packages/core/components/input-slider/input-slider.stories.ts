@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-slider.element';
+import './input-slider.element.js';
 import type { UmbInputSliderElement } from './input-slider.element.js';
 
 const meta: Meta<UmbInputSliderElement> = {

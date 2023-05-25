@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 
-import { UmbNotificationHandler, UmbNotificationContext } from '.';
+import { UmbNotificationHandler, UmbNotificationContext } from './index.js';
 
 describe('UmbNotificationContext', () => {
 	let notificationContext: UmbNotificationContext;

@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIMediaPickerElement } from './property-editor-ui-media-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIMediaPickerElement } from './property-editor-ui-media-picker.element.js';
-import './property-editor-ui-media-picker.element';
+import './property-editor-ui-media-picker.element.js';
 
 export default {
 	title: 'Property Editor UIs/Media Picker',

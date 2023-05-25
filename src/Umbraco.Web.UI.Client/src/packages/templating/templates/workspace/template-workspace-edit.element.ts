@@ -1,10 +1,8 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
+import { UUITextStyles , UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 //import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/components';

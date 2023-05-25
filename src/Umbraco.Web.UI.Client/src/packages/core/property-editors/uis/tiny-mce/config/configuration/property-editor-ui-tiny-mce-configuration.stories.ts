@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUITinyMceConfigurationElement } from './property-editor-ui-tiny-mce-configuration.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUITinyMceConfigurationElement } from './property-editor-ui-tiny-mce-configuration.element.js';
-import './property-editor-ui-tiny-mce-configuration.element';
+import './property-editor-ui-tiny-mce-configuration.element.js';
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Configuration',

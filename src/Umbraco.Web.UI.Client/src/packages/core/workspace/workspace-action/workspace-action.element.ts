@@ -1,8 +1,7 @@
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbWorkspaceAction } from './index.js';
+import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbWorkspaceAction } from './index.js';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';

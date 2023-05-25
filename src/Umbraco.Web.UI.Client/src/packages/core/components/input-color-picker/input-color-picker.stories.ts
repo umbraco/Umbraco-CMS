@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-color-picker.element';
+import './input-color-picker.element.js';
 import type { UmbInputColorPickerElement } from './input-color-picker.element.js';
 
 const meta: Meta<UmbInputColorPickerElement> = {

@@ -1,4 +1,4 @@
-import { UmbUserRepository } from '../../repository/user.repository';
+import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 

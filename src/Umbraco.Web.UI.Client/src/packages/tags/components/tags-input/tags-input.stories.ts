@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './tags-input.element';
+import './tags-input.element.js';
 import type { UmbTagsInputElement } from './tags-input.element.js';
 
 const meta: Meta<UmbTagsInputElement> = {

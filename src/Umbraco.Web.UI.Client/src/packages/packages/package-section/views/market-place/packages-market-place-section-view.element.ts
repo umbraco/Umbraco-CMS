@@ -1,5 +1,4 @@
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 

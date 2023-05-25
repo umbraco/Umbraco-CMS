@@ -1,9 +1,9 @@
-import { UUIToastNotificationElement } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbNotificationOptions,
 	UmbNotificationColor,
 	UmbNotificationDefaultData,
 } from './notification.context.js';
+import { UUIToastNotificationElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**

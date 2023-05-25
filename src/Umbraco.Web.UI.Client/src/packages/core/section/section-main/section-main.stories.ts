@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbSectionMainElement } from './section-main.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbSectionMainElement } from './section-main.element.js';
-import './section-main.element';
+import './section-main.element.js';
 
 export default {
 	title: 'Sections/Shared/Section Main',

@@ -1,10 +1,10 @@
-import '../workspace-editor/workspace-editor.element';
-import './workspace-footer.element';
+import '../workspace-editor/workspace-editor.element.js';
+import './workspace-footer.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element.js';
 
 export default {
 	title: 'Workspaces/Shared/Footer Layout',

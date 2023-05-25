@@ -1,8 +1,7 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map, of } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { map, of } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestDashboard,

@@ -1,4 +1,4 @@
-import { PartialViewsTreeDataSource } from '.';
+import { PartialViewsTreeDataSource } from './index.js';
 import { PartialViewResource, ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

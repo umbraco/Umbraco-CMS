@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection-view.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUICollectionViewElement } from './property-editor-ui-collection-view.element.js';
-import './property-editor-ui-collection-view.element';
+import './property-editor-ui-collection-view.element.js';
 
 export default {
 	title: 'Property Editor UIs/Collection View',

@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIImageCropsConfigurationElement } from './property-editor-ui-image-crops-configuration.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIImageCropsConfigurationElement } from './property-editor-ui-image-crops-configuration.element.js';
-import './property-editor-ui-image-crops-configuration.element';
+import './property-editor-ui-image-crops-configuration.element.js';
 
 export default {
 	title: 'Property Editor UIs/Image Crops Configuration',

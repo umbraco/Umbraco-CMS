@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyActionCopyElement } from './property-action-copy.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyActionCopyElement } from './property-action-copy.element.js';
-import './property-action-copy.element';
+import './property-action-copy.element.js';
 
 export default {
 	title: 'Property Actions/Copy',

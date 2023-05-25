@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import './date-input.element';
+import './date-input.element.js';
 import type { UmbDateInputElement } from './date-input.element.js';
 
 const meta: Meta<UmbDateInputElement> = {

@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIEyeDropperElement } from './property-editor-ui-eye-dropper.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIEyeDropperElement } from './property-editor-ui-eye-dropper.element.js';
-import './property-editor-ui-eye-dropper.element';
+import './property-editor-ui-eye-dropper.element.js';
 
 export default {
 	title: 'Property Editor UIs/Eye Dropper',

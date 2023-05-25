@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUICollectionViewLayoutConfigurationElement } from './property-editor-ui-collection-view-layout-configuration.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUICollectionViewLayoutConfigurationElement } from './property-editor-ui-collection-view-layout-configuration.element.js';
-import './property-editor-ui-collection-view-layout-configuration.element';
+import './property-editor-ui-collection-view-layout-configuration.element.js';
 
 export default {
 	title: 'Property Editor UIs/Collection View Layout Configuration',

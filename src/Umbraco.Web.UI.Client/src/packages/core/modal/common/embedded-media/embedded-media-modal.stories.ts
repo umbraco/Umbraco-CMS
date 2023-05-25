@@ -1,5 +1,5 @@
-import '../../../components/body-layout/body-layout.element';
-import './embedded-media-modal.element';
+import '../../../components/body-layout/body-layout.element.js';
+import './embedded-media-modal.element.js';
 
 import { Meta } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';

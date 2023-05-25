@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './variantable-property.element';
+import './variantable-property.element.js';
 import type { UmbVariantablePropertyElement } from './variantable-property.element.js';
 
 const meta: Meta<UmbVariantablePropertyElement> = {

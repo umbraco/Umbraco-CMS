@@ -1,4 +1,4 @@
-import './installer-database.element';
+import './installer-database.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';

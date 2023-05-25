@@ -1,9 +1,9 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import type { UmbInstallerUserElement } from './installer-user.element.js';
-import './installer-user.element';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import './installer-user.element.js';
 
 export default {
 	title: 'Apps/Installer/Steps',

@@ -1,9 +1,9 @@
-import './confirm-modal.element';
+import './confirm-modal.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbConfirmModalElement } from './confirm-modal.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbConfirmModalElement } from './confirm-modal.element.js';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 
 export default {

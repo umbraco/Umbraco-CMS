@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-toggle.element';
+import './input-toggle.element.js';
 import type { UmbInputToggleElement } from './input-toggle.element.js';
 
 const meta: Meta<UmbInputToggleElement> = {

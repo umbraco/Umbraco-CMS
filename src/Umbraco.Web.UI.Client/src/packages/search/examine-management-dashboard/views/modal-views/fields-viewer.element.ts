@@ -1,6 +1,5 @@
-import { html, css, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, nothing , customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import type { SearchResultResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

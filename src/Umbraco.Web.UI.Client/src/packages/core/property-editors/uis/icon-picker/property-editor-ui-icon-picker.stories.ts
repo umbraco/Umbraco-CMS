@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbIconPickerModalElement } from '../../../modal/common/icon-picker/icon-picker-modal.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbIconPickerModalElement } from '../../../modal/common/icon-picker/icon-picker-modal.element.js';
-import './property-editor-ui-icon-picker.element';
+import './property-editor-ui-icon-picker.element.js';
 
 export default {
 	title: 'Property Editor UIs/Icon Picker',

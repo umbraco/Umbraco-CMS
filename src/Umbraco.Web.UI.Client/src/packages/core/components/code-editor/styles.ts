@@ -1,5 +1,5 @@
-import { css, unsafeCSS } from '@umbraco-cms/backoffice/external/lit';
 import styles from 'monaco-editor/min/vs/editor/editor.main.css?inline';
+import { css, unsafeCSS } from '@umbraco-cms/backoffice/external/lit';
 
 export const monacoEditorStyles = css`
 	${unsafeCSS(styles)}

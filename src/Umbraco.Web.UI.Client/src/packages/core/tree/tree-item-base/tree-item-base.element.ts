@@ -1,10 +1,7 @@
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTreeItemContext } from '../tree-item/index.js';
 import { UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context.js';
+import { css, html, nothing , customElement, state , ifDefined , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 

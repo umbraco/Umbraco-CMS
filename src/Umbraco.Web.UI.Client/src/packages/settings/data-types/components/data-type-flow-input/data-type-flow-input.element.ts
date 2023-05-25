@@ -1,6 +1,6 @@
+import type { UmbDataTypeModel } from '../../models.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbDataTypeModel } from '../../models.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalRouteRegistrationController, UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';

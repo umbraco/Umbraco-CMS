@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUITagsElement } from './property-editor-ui-tags.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUITagsElement } from './property-editor-ui-tags.element.js';
-import './property-editor-ui-tags.element';
+import './property-editor-ui-tags.element.js';
 
 export default {
 	title: 'Property Editor UIs/Tags',

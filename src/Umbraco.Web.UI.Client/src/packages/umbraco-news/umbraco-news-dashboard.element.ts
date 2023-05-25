@@ -1,5 +1,4 @@
-import { css, html, LitElement } from '@umbraco-cms/backoffice/external/lit';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement , customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends LitElement {

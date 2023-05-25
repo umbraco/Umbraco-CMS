@@ -1,12 +1,12 @@
-import './media-edit-workspace-view.element';
+import './media-edit-workspace-view.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbMediaEditWorkspaceViewElement } from './media-edit-workspace-view.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 // import { data } from '../../../../../../core/mocks/data/media.data.js';
 // import { UmbNodeContext } from '../../node.context.js';
 
-import type { UmbMediaEditWorkspaceViewElement } from './media-edit-workspace-view.element.js';
 
 export default {
 	title: 'Workspaces/Media/Views/Edit',

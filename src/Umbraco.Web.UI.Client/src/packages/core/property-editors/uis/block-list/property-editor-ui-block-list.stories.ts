@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element.js';
-import './property-editor-ui-block-list.element';
+import './property-editor-ui-block-list.element.js';
 
 export default {
 	title: 'Property Editor UIs/Block List',

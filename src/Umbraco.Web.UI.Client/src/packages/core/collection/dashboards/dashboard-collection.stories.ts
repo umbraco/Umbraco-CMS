@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbDashboardCollectionElement } from './dashboard-collection.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardCollectionElement } from './dashboard-collection.element.js';
-import './dashboard-collection.element';
+import './dashboard-collection.element.js';
 
 export default {
 	title: 'Dashboards/Media Management',

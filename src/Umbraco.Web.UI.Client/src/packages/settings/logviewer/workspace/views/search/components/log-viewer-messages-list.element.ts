@@ -1,8 +1,6 @@
-import { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
+import { UUIScrollContainerElement, UUIPaginationElement , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

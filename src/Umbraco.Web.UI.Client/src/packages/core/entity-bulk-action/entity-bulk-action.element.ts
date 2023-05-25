@@ -1,5 +1,5 @@
-import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityBulkAction } from './entity-bulk-action.js';
+import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExecutedEvent } from '@umbraco-cms/backoffice/events';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

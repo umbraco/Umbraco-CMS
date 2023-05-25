@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUICollectionViewOrderByElement } from './property-editor-ui-collection-view-order-by.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUICollectionViewOrderByElement } from './property-editor-ui-collection-view-order-by.element.js';
-import './property-editor-ui-collection-view-order-by.element';
+import './property-editor-ui-collection-view-order-by.element.js';
 
 export default {
 	title: 'Property Editor UIs/Collection View Order By',

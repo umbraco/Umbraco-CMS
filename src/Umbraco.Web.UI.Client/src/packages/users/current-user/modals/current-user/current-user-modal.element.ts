@@ -1,8 +1,7 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, CSSResultGroup, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user.store.js';
 import type { UmbLoggedInUser } from '../../types.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, CSSResultGroup, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

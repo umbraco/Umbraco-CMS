@@ -1,6 +1,6 @@
-import { css, CSSResultGroup, html, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
+import { css, CSSResultGroup, html, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

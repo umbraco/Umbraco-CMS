@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUITagsStorageTypeElement } from './property-editor-ui-tags-storage-type.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUITagsStorageTypeElement } from './property-editor-ui-tags-storage-type.element.js';
-import './property-editor-ui-tags-storage-type.element';
+import './property-editor-ui-tags-storage-type.element.js';
 
 export default {
 	title: 'Property Editor UIs/Tags Storage Type',

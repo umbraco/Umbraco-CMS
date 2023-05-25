@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-overlay-size.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-overlay-size.element.js';
-import './property-editor-ui-overlay-size.element';
+import './property-editor-ui-overlay-size.element.js';
 
 export default {
 	title: 'Property Editor UIs/Overlay Size',

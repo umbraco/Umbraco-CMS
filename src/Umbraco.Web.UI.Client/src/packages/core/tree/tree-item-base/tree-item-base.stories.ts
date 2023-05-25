@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './tree-item-base.element';
+import './tree-item-base.element.js';
 import type { UmbTreeItemBaseElement } from './tree-item-base.element.js';
 
 // TODO: provide tree item context to make this element render properly

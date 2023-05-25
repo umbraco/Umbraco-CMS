@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbWorkspaceViewDictionaryEditElement } from './workspace-view-dictionary-edit.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 //import { data } from '../../../../../core/mocks/data/dictionary.data.js';
-import type { UmbWorkspaceViewDictionaryEditElement } from './workspace-view-dictionary-edit.element.js';
-import './workspace-view-dictionary-edit.element';
+import './workspace-view-dictionary-edit.element.js';
 //import { UmbWorkspaceDictionaryContext } from '../../workspace-dictionary.context.js';
 
 export default {

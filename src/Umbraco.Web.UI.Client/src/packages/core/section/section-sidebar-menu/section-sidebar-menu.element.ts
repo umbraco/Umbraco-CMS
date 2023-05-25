@@ -1,6 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestMenu,
 	ManifestSectionSidebarAppBaseMenu,

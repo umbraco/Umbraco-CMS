@@ -1,4 +1,4 @@
-import { UmbLanguageRepository } from '../repository/language.repository';
+import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

@@ -1,3 +1,4 @@
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
 import { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
@@ -17,7 +18,6 @@ import {
 	InstallResource,
 	ProblemDetailsModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 

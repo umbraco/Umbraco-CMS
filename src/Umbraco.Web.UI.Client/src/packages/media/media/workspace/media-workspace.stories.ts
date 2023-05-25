@@ -1,9 +1,8 @@
-import './media-workspace.element';
+import './media-workspace.element.js';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from '@umbraco-cms/backoffice/external/lit';
-import { ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { data as mediaNodes } from '../../../../mocks/data/media.data.js';
 import type { UmbMediaWorkspaceElement } from './media-workspace.element.js';
+import { html , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Workspaces/Media',

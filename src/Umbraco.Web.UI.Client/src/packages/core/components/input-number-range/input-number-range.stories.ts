@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-number-range.element';
+import './input-number-range.element.js';
 import type { UmbInputNumberRangeElement } from './input-number-range.element.js';
 
 const meta: Meta<UmbInputNumberRangeElement> = {

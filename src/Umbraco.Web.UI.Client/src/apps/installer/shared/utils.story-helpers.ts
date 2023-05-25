@@ -1,5 +1,5 @@
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInstallerContext } from '../installer.context.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export const installerContextProvider = (story: any, installerContext = new UmbInstallerContext()) => html`
 	<umb-context-provider

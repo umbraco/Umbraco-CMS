@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUINumberRangeElement } from './property-editor-ui-number-range.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUINumberRangeElement } from './property-editor-ui-number-range.element.js';
-import './property-editor-ui-number-range.element';
+import './property-editor-ui-number-range.element.js';
 
 export default {
 	title: 'Property Editor UIs/Number Range',

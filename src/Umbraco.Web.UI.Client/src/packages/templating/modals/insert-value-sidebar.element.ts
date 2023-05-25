@@ -1,8 +1,6 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIComboboxElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { getUmbracoFieldSnippet } from '../utils.js';
+import { UUITextStyles , UUIComboboxElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-insert-value-sidebar')

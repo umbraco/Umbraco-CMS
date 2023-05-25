@@ -1,6 +1,6 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbButtonWithDropdownElement } from './button-with-dropdown.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Components/Button with dropdown',

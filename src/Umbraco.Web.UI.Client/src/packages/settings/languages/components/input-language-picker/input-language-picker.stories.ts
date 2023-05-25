@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-language-picker.element';
+import './input-language-picker.element.js';
 import type { UmbInputLanguagePickerElement } from './input-language-picker.element.js';
 
 const meta: Meta<UmbInputLanguagePickerElement> = {

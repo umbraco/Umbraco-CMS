@@ -1,9 +1,8 @@
-// eslint-disable-next-line local-rules/no-external-imports
+import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler.js';
+import type { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbModalHandler, UmbModalHandlerClass } from './modal-handler.js';
-import type { UmbModalToken } from './token/modal-token.js';
 import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

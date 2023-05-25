@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-eye-dropper.element';
+import './input-eye-dropper.element.js';
 import type { UmbInputEyeDropperElement } from './input-eye-dropper.element.js';
 
 const meta: Meta<UmbInputEyeDropperElement> = {

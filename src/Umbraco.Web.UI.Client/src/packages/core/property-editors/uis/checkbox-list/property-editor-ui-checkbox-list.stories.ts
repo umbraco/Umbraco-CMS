@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
-import './property-editor-ui-checkbox-list.element';
+import './property-editor-ui-checkbox-list.element.js';
 
 export default {
 	title: 'Property Editor UIs/Checkbox List',

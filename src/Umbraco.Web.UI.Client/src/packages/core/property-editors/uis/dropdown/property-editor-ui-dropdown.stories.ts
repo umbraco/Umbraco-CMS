@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIDropdownElement } from './property-editor-ui-dropdown.element.js';
-import './property-editor-ui-dropdown.element';
+import './property-editor-ui-dropdown.element.js';
 
 export default {
 	title: 'Property Editor UIs/Dropdown',

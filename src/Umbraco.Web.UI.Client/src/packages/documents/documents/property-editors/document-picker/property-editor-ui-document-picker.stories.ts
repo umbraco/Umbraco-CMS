@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-document-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIContentPickerElement } from './property-editor-ui-document-picker.element.js';
-import './property-editor-ui-document-picker.element';
+import './property-editor-ui-document-picker.element.js';
 
 export default {
 	title: 'Property Editor UIs/Content Picker',

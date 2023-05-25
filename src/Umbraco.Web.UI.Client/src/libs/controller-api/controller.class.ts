@@ -1,5 +1,5 @@
-import { UmbControllerHostElement } from './controller-host.mixin';
-import type { UmbControllerInterface } from './controller.interface';
+import { UmbControllerHostElement } from './controller-host.mixin.js';
+import type { UmbControllerInterface } from './controller.interface.js';
 
 export abstract class UmbController implements UmbControllerInterface {
 	protected host?: UmbControllerHostElement;

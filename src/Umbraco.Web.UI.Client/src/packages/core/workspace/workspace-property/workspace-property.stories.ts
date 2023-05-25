@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbWorkspacePropertyElement } from './workspace-property.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbWorkspacePropertyElement } from './workspace-property.element.js';
-import './workspace-property.element';
+import './workspace-property.element.js';
 
 export default {
 	title: 'Components/Entity Property',

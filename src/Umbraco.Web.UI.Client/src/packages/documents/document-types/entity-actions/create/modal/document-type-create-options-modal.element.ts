@@ -1,7 +1,7 @@
+import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../../../repository/manifests.js';
+import { UmbDocumentTypeCreateOptionsModalData } from './index.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../../../repository/manifests.js';
-import { UmbDocumentTypeCreateOptionsModalData } from '.';
 import {
 	UmbModalContext,
 	UmbModalHandler,

@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbDataTypeDetailsWorkspaceViewEditElement } from './data-type-details-workspace-view.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 //import { data } from '../../../../../core/mocks/data/data-type.data.js';
 
-import type { UmbDataTypeDetailsWorkspaceViewEditElement } from './data-type-details-workspace-view.element.js';
 
-import './data-type-details-workspace-view.element';
+import './data-type-details-workspace-view.element.js';
 //import { UmbDataTypeWorkspaceContext } from '../../workspace-data-type.context.js';
 
 export default {

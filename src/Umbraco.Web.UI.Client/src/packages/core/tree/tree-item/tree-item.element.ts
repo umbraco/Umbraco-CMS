@@ -1,6 +1,5 @@
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing , customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

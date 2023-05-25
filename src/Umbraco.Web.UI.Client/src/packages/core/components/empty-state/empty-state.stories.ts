@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import './empty-state.element';
+import './empty-state.element.js';
 import type { UmbEmptyStateElement } from './empty-state.element.js';
 
 const meta: Meta<UmbEmptyStateElement> = {

@@ -1,3 +1,4 @@
+import { UmbTagRepository } from '../../repository/tag.repository.js';
 import {
 	css,
 	html,
@@ -16,7 +17,6 @@ import {
 	UUIInputEvent,
 	UUITagElement,
 } from '@umbraco-cms/backoffice/external/uui';
-import { UmbTagRepository } from '../../repository/tag.repository.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

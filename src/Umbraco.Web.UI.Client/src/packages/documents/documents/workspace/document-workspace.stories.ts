@@ -1,7 +1,7 @@
-import './document-workspace-editor.element';
+import './document-workspace-editor.element.js';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDocumentWorkspaceElement } from './document-workspace.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Workspaces/Document',

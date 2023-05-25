@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './variant-selector.element';
+import './variant-selector.element.js';
 import type { UmbVariantSelectorElement } from './variant-selector.element.js';
 
 const meta: Meta<UmbVariantSelectorElement> = {

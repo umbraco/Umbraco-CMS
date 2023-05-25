@@ -1,5 +1,5 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyAction } from '../../shared/property-action/property-action.model.js';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbWorkspacePropertyContext, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

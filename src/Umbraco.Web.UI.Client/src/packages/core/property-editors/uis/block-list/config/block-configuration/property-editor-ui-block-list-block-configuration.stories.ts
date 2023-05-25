@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIBlockListBlockConfigurationElement } from './property-editor-ui-block-list-block-configuration.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIBlockListBlockConfigurationElement } from './property-editor-ui-block-list-block-configuration.element.js';
-import './property-editor-ui-block-list-block-configuration.element';
+import './property-editor-ui-block-list-block-configuration.element.js';
 
 export default {
 	title: 'Property Editor UIs/Block List Block Configuration',

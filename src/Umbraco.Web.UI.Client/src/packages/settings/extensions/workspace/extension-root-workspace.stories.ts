@@ -1,9 +1,9 @@
-import './extension-root-workspace.element';
+import './extension-root-workspace.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbExtensionRootWorkspaceElement } from './extension-root-workspace.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbExtensionRootWorkspaceElement } from './extension-root-workspace.element.js';
 
 export default {
 	title: 'Workspaces/Extensions',

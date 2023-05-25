@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIOrderDirectionElement } from './property-editor-ui-order-direction.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIOrderDirectionElement } from './property-editor-ui-order-direction.element.js';
-import './property-editor-ui-order-direction.element';
+import './property-editor-ui-order-direction.element.js';
 
 export default {
 	title: 'Property Editor UIs/Order Direction',

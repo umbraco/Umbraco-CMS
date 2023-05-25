@@ -1,5 +1,5 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './input-media-picker.element';
+import './input-media-picker.element.js';
 import type { UmbInputMediaPickerElement } from './input-media-picker.element.js';
 
 const meta: Meta<UmbInputMediaPickerElement> = {

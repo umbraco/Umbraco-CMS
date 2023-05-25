@@ -5,7 +5,7 @@ import { HealthStatusModel, IndexResponseModel, IndexerResource } from '@umbraco
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-import './section-view-examine-searchers';
+import './section-view-examine-searchers.js';
 
 @customElement('umb-dashboard-examine-index')
 export class UmbDashboardExamineIndexElement extends UmbLitElement {

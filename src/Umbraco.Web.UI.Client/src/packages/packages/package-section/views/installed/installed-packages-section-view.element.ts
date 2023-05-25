@@ -1,10 +1,8 @@
-import { html, css } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { repeat } from '@umbraco-cms/backoffice/external/lit';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPackageRepository } from '../../../repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
+import { html, css , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 

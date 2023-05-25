@@ -1,7 +1,6 @@
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
+import { css, html, nothing , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

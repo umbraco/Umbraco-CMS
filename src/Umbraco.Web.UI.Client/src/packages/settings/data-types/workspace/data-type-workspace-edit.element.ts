@@ -1,8 +1,6 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context.js';
+import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

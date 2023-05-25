@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbWorkspacePropertyLayoutElement } from './workspace-property-layout.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbWorkspacePropertyLayoutElement } from './workspace-property-layout.element.js';
-import './workspace-property-layout.element';
+import './workspace-property-layout.element.js';
 
 export default {
 	title: 'Workspaces/Shared/Editor Property Layout',

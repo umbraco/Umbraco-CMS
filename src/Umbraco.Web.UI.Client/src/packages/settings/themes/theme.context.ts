@@ -1,5 +1,5 @@
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { manifests } from './manifests.js';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

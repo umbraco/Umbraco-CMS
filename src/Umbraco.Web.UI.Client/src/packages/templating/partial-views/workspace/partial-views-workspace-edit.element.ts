@@ -1,9 +1,7 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCodeEditorElement } from '../../../core/components/code-editor/index.js';
 import { UmbPartialViewsWorkspaceContext } from './partial-views-workspace.context.js';
+import { UUITextStyles , UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-partial-views-workspace-edit')

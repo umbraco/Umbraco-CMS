@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
+import type { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element.js';
-import './property-editor-ui-date-picker.element';
+import './property-editor-ui-date-picker.element.js';
 import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 export default {

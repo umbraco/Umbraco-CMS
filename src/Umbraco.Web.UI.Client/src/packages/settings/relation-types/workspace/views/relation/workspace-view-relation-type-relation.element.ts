@@ -1,6 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTableColumn, UmbTableConfig } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationResponseModel } from '@umbraco-cms/backoffice/backend-api';

@@ -1,8 +1,7 @@
-// eslint-disable-next-line local-rules/no-external-imports
-import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbModalHandler } from './modal-handler.js';
 import { UmbModalConfig, UmbModalContext } from './modal.context.js';
 import { UmbModalToken } from './token/modal-token.js';
+import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Params } from '@umbraco-cms/backoffice/router';

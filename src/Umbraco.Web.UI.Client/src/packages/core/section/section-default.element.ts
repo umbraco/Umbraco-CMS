@@ -1,9 +1,8 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionViewsElement } from './section-views/section-views.element.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	ManifestSection,
 	ManifestSectionSidebarApp,
