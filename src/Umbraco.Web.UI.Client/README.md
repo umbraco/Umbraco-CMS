@@ -1,6 +1,6 @@
 # @umbraco-cms/backoffice
 
-This package contains the types for the libraries for Umbraco 13.
+This package contains the types for the Umbraco Backoffice.
 
 ## Installation
 
