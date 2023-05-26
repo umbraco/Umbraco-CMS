@@ -37,6 +37,6 @@ jobs:
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
           npm whoami
           npm version 1.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
-          npm publish --tag next --access public
+          npm publish --tag latest --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
