@@ -29,11 +29,11 @@
 
   <!-- Package Validation -->
   <PropertyGroup>
-    <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
+    <GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
     <EnablePackageValidation>false</EnablePackageValidation>
     <PackageValidationBaselineVersion>12.0.0-rc1</PackageValidationBaselineVersion>
-    <EnableStrictModeForCompatibleFrameworksInPackage>false</EnableStrictModeForCompatibleFrameworksInPackage>
-    <EnableStrictModeForCompatibleTfms>false</EnableStrictModeForCompatibleTfms>
+    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+    <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
 
   <ItemGroup>
