@@ -410,6 +410,39 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
         Assert.Throws<ArgumentException>(() => outputExpansionStrategy.MapMediaProperties(PublishedContent));
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void OutputExpansionStrategy_ForwardsExpansionStateToPropertyValueConverter(bool expanding)
+    {
+        var accessor = CreateOutputExpansionStrategyAccessor(false, new[] { expanding ? "theAlias" : "noSuchAlias" });
+        var apiContentBuilder = new ApiContentBuilder(new ApiContentNameProvider(), ApiContentRouteBuilder(), accessor);
+
+        var content = new Mock<IPublishedContent>();
+
+        var valueConverterMock = new Mock<IDeliveryApiPropertyValueConverter>();
+        valueConverterMock.Setup(v => v.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
+        valueConverterMock.Setup(v => v.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        valueConverterMock.Setup(v => v.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        valueConverterMock.Setup(v => v.ConvertIntermediateToDeliveryApiObject(
+                It.IsAny<IPublishedElement>(),
+                It.IsAny<IPublishedPropertyType>(),
+                It.IsAny<PropertyCacheLevel>(),
+                It.IsAny<object?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(expanding ? "Expanding" : "Not expanding");
+
+        var propertyType = SetupPublishedPropertyType(valueConverterMock.Object, "theAlias", Constants.PropertyEditors.Aliases.Label);
+        var property = new PublishedElementPropertyBase(propertyType, content.Object, false, PropertyCacheLevel.None, "The Value");
+
+        SetupContentMock(content, property);
+
+        var result = apiContentBuilder.Build(content.Object);
+
+        Assert.AreEqual(1, result.Properties.Count);
+        Assert.AreEqual(expanding ? "Expanding" : "Not expanding", result.Properties["theAlias"] as string);
+    }
+
     private IOutputExpansionStrategyAccessor CreateOutputExpansionStrategyAccessor(bool expandAll = false, string[]? expandPropertyAliases = null)
     {
         var httpContextMock = new Mock<HttpContext>();
