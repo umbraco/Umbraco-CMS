@@ -31,8 +31,8 @@
   <PropertyGroup>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
     <EnablePackageValidation>false</EnablePackageValidation>
-    <PackageValidationBaselineVersion>11.0.0</PackageValidationBaselineVersion>
-    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+    <PackageValidationBaselineVersion>12.0.0-rc1</PackageValidationBaselineVersion>
+    <EnableStrictModeForCompatibleFrameworksInPackage>false</EnableStrictModeForCompatibleFrameworksInPackage>
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
 
