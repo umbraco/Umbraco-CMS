@@ -75,7 +75,7 @@ const generateJSON = (icons) => {
 		console.log(icon);
 		return {
 			name: `umb:${icon.name}`,
-			path: `${icon.iconFileName}.js`,
+			path: `./icons/${icon.iconFileName}.js`,
 		};
 	});
 
