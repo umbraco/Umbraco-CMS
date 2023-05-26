@@ -61,13 +61,29 @@ public class PropertyEditorValueConverterTests
     [TestCase(0, false)]
     [TestCase(false, false)]
     [TestCase("", false)]
+    [TestCase("", true)]
     [TestCase(null, false)]
+    [TestCase(null, true)]
     [TestCase("blah", false)]
+    [TestCase("blah", true)]
     public void CanConvertYesNoPropertyEditor(object value, bool expected)
     {
+        var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
+        mockPublishedContentTypeFactory.Setup(x => x.GetDataType(123))
+            .Returns(new PublishedDataType(123, "test",
+                new Lazy<object>(() => new TrueFalseConfiguration { Default = expected })));
+
+        var publishedPropType = new PublishedPropertyType(
+            new PublishedContentType(Guid.NewGuid(), 1234, "test", PublishedItemType.Content,
+                Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
+            new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
+            new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()),
+            Mock.Of<IPublishedModelFactory>(),
+            mockPublishedContentTypeFactory.Object);
+
         var converter = new YesNoValueConverter();
         var result =
-            converter.ConvertSourceToIntermediate(null, null, value, false); // does not use type for conversion
+            converter.ConvertSourceToIntermediate(null, publishedPropType, value, false); // does not use type for conversion
 
         Assert.AreEqual(expected, result);
     }
