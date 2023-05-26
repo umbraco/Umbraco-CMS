@@ -576,7 +576,8 @@ public class MediaController : ContentControllerBase
         [FromForm] string contentTypeAlias, List<IFormFile> file)
     {
         await _postAddFileSemaphore.WaitOneAsync();
-        try{
+        try
+        {
             var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
             Directory.CreateDirectory(root);
@@ -823,6 +824,7 @@ public class MediaController : ContentControllerBase
 
             _postAddFileSemaphore.Release();
             return Ok(tempFiles);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Something went wrong adding files");
