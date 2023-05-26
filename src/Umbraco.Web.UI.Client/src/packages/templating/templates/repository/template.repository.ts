@@ -2,12 +2,7 @@ import { UmbTemplateDetailServerDataSource } from './sources/template.detail.ser
 import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data';
 import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
 import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
-import type {
-	UmbDataSource,
-	UmbDetailRepository,
-	UmbTreeDataSource,
-	UmbTreeRepository,
-} from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository, UmbTreeDataSource, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -21,13 +16,13 @@ import {
 export class UmbTemplateRepository
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
-		UmbDetailRepository<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>
+		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>
 {
 	#init;
 	#host: UmbControllerHostElement;
 
 	#treeDataSource: UmbTreeDataSource<EntityTreeItemResponseModel>;
-	#detailDataSource: UmbDataSource<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>;
+	#detailDataSource: UmbTemplateDetailServerDataSource;
 
 	#treeStore?: UmbTemplateTreeStore;
 	#store?: UmbTemplateStore;
@@ -37,7 +32,6 @@ export class UmbTemplateRepository
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
-		// TODO: figure out how spin up get the correct data source
 		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this.#host);
 
@@ -56,7 +50,7 @@ export class UmbTemplateRepository
 		]);
 	}
 
-	// TREE:
+	//#region TREE:
 	async requestTreeRoot() {
 		await this.#init;
 
@@ -122,13 +116,13 @@ export class UmbTemplateRepository
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
+	//#endregion
 
-	// DETAILS:
+	//#region DETAILS:
 
-	async createScaffold(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
+	async createScaffold() {
 		await this.#init;
-		return this.#detailDataSource.createScaffold(parentId);
+		return this.#detailDataSource.createScaffold();
 	}
 
 	async requestById(id: string) {
@@ -147,6 +141,17 @@ export class UmbTemplateRepository
 
 		return { data, error };
 	}
+
+	async requestItem(id: string[]) {
+		await this.#init;
+
+		if (!id) {
+			throw new Error('Id is missing');
+		}
+		const { data, error } = await this.#detailDataSource.getItem(id);
+		return { data, error };
+	}
+
 	async byId(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this.#init;

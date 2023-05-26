@@ -43,7 +43,11 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 			this.observe(this.#templateWorkspaceContext.content, (content) => {
 				this._content = content;
-				this._masterTemplateName = this.#getMasterTemplateId();
+			});
+
+			this.observe(this.#templateWorkspaceContext.masterTemplate, (masterTemplate) => {
+				this.#masterTemplateId = masterTemplate?.id ?? null;
+				this._masterTemplateName = masterTemplate?.name ?? null;
 			});
 
 			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
@@ -52,29 +56,27 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		});
 	}
 
-	// TODO: temp code for testing create and save
 	#onNameInput(event: Event) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
 		this.#templateWorkspaceContext?.setName(value);
 	}
 
-	//TODO - debounce that
 	#onCodeEditorInput(event: Event) {
 		const target = event.target as UmbCodeEditorElement;
 		const value = target.code as string;
 		this.#templateWorkspaceContext?.setContent(value);
 	}
 
-	#insertCode(event: Event) {
+	#insertSnippet(event: Event) {
 		const target = event.target as UmbTemplatingInsertMenuElement;
 		const value = target.value as string;
-
 		this._codeEditor?.insert(value);
 	}
 
 	private _modalContext?: UmbModalContext;
 
+	//TODO: fix this
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
 		sectionModal?.onSubmit().then((insertSectionModalResult) => {
@@ -82,32 +84,37 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		});
 	}
 
-	#getMasterTemplateId() {
+	#resetMasterTemplate() {
+		this.#setMasterTemplateId(null);
+	}
+
+	async #setMasterTemplateId(id: string | null) {
+		if (this._content === null || this._content === undefined) return;
 		const RegexString = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
-		const match = RegexString.exec(this._content ?? '');
 
-		if (match) {
-			if (match[2] === 'null') return null;
-
-			return match[2].replace(/"/g, '');
+		if (id === null) {
+			const string = this._content?.replace(RegexString, `$1null$3`);
+			this.#templateWorkspaceContext?.setContent(string);
+			return;
 		}
 
-		return null;
+		const masterTemplate = await this.#templateWorkspaceContext?.setMasterTemplate(id);
+
+		const string = this._content?.replace(RegexString, `$1"${masterTemplate?.name}.cshtml"$3`);
+		this.#templateWorkspaceContext?.setContent(string);
 	}
 
 	#openMasterTemplatePicker() {
-		// TODO: Change experience, so its not multi selectable. But instead already picked templates should be unpickable. (awaiting general picker features for such)
 		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			selection: [this.#masterTemplateId],
+			pickableFilter: (item) => {
+				return item.id !== this.#templateWorkspaceContext?.getEntityId();
+			},
 		});
 
-		const RegexString = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
 		modalHandler?.onSubmit().then((data) => {
 			if (!data.selection) return;
-			console.log(data.selection);
-
-			const string = this._codeEditor?.code.replace(RegexString, `$1"${data.selection[0]}"$3`);
-			debugger;
+			this.#setMasterTemplateId(data.selection[0] ?? '');
 		});
 	}
 
@@ -122,7 +129,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 					>Master template: ${this._masterTemplateName ?? 'No master'}</uui-button
 				>
 				<uui-button look="secondary" id="save-button" label="Remove master template" compact
-					><uui-icon name="umb:delete"></uui-icon
+					><uui-icon name="umb:delete" @click=${this.#resetMasterTemplate}></uui-icon
 				></uui-button>
 			</uui-button-group>
 		`;
@@ -130,13 +137,13 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 	render() {
 		// TODO: add correct UI elements
-		return html`<umb-body-layout alias="Umb.Workspace.Template">
+		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
 			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
 					${this.#renderMasterTemplatePicker()}
 					<div>
-						<umb-templating-insert-menu @insert=${this.#insertCode}></umb-templating-insert-menu>
+						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
 						<uui-button look="secondary" id="query-builder-button" label="Query builder">
 							<uui-icon name="umb:wand"></uui-icon>Query builder
 						</uui-button>
@@ -156,7 +163,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 					.code=${this._content ?? ''}
 					@input=${this.#onCodeEditorInput}></umb-code-editor>
 			</uui-box>
-		</umb-body-layout>`;
+		</umb-workspace-editor>`;
 	}
 
 	static styles = [

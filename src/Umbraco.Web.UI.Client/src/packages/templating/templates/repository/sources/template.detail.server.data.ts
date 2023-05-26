@@ -47,7 +47,7 @@ export class UmbTemplateDetailServerDataSource
 	 */
 	async getItem(id: string[]) {
 		if (!id) throw new Error('Id is missing');
-		return await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateItem({ id }));
+		return await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateItem({ id: id }));
 	}
 
 	/**
@@ -57,7 +57,7 @@ export class UmbTemplateDetailServerDataSource
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async createScaffold() {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateScaffold());
+		return await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateScaffold());
 	}
 
 	/**
@@ -68,7 +68,7 @@ export class UmbTemplateDetailServerDataSource
 	 */
 	async insert(template: CreateTemplateRequestModel) {
 		if (!template) throw new Error('Template is missing');
-		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplate({ requestBody: template }));
+		return await tryExecuteAndNotify(this.#host, TemplateResource.postTemplate({ requestBody: template }));
 	}
 
 	/**
@@ -80,7 +80,7 @@ export class UmbTemplateDetailServerDataSource
 	async update(id: string, template: UpdateTemplateRequestModel) {
 		if (!id) throw new Error('You need to pass template id to update it');
 		if (!template) throw new Error('Template is missing');
-		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById({ id, requestBody: template }));
+		return await tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById({ id, requestBody: template }));
 	}
 
 	/**
