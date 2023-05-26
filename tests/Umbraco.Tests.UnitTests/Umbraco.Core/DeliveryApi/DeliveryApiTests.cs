@@ -27,6 +27,7 @@ public class DeliveryApiTests
             It.IsAny<IPublishedPropertyType>(),
             It.IsAny<PropertyCacheLevel>(),
             It.IsAny<object?>(),
+            It.IsAny<bool>(),
             It.IsAny<bool>())
         ).Returns("Delivery API value");
         deliveryApiPropertyValueConverter.Setup(p => p.ConvertIntermediateToObject(

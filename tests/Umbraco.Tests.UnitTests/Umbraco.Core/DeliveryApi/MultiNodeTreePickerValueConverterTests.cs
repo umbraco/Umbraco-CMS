@@ -52,7 +52,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
@@ -78,7 +78,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key), new GuidUdi(Constants.UdiEntityType.Document, otherContentKey) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.AreEqual(2, result.Count());
 
@@ -123,7 +123,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, key) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual("The page", result.First().Name);
@@ -147,7 +147,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiMedia>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedMedia.Name, result.First().Name);
@@ -172,7 +172,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Media, otherMediaKey) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiMedia>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
         Assert.NotNull(result);
         Assert.AreEqual(2, result.Count());
         Assert.AreEqual(PublishedMedia.Name, result.First().Name);
@@ -197,7 +197,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(IEnumerable<IApiContent>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedContent.Name, result.First().Name);
@@ -218,7 +218,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(IEnumerable<IApiMedia>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiMedia>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         Assert.AreEqual(PublishedMedia.Name, result.First().Name);
@@ -240,7 +240,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         Assert.AreEqual(typeof(string), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as string;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as string;
         Assert.NotNull(result);
         Assert.AreEqual("(unsupported)", result);
     }
@@ -256,7 +256,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
@@ -272,7 +272,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var valueConverter = MultiNodeTreePickerValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
@@ -289,7 +289,7 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
         var valueConverter = MultiNodeTreePickerValueConverter(routeBuilder.Object);
 
         var inter = new Udi[] { new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key) };
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as IEnumerable<IApiContent>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiContent>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }

@@ -123,5 +123,5 @@ public interface IPublishedPropertyType
     /// <param name="inter">The intermediate value.</param>
     /// <param name="preview">A value indicating whether content should be considered draft.</param>
     /// <returns>The object value.</returns>
-    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding);
 }

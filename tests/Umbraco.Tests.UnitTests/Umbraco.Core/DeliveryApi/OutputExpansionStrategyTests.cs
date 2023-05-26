@@ -547,6 +547,7 @@ public class OutputExpansionStrategyTests : PropertyValueConverterTests
                 It.IsAny<IPublishedPropertyType>(),
                 It.IsAny<PropertyCacheLevel>(),
                 It.IsAny<object?>(),
+                It.IsAny<bool>(),
                 It.IsAny<bool>()))
             .Returns(() => apiElementBuilder.Build(element.Object));
         elementValueConverter.Setup(p => p.IsConverter(It.IsAny<IPublishedPropertyType>())).Returns(true);
