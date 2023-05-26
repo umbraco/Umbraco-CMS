@@ -189,7 +189,15 @@ public class MediaController : ContentControllerBase
             return null;
         }
 
-        return _umbracoMapper.Map<MediaItemDisplay>(foundMedia);
+        MediaItemDisplay? mediaItemDisplay = _umbracoMapper.Map<MediaItemDisplay>(foundMedia);
+
+        if(mediaItemDisplay?.ContentType?.Alias == Constants.Conventions.MediaTypes.Folder
+            && (mediaItemDisplay!.Properties == null || !mediaItemDisplay.Properties.Any()))
+        {
+            mediaItemDisplay!.ContentApps = mediaItemDisplay!.ContentApps.Where(x => x.Alias != "umbContent");
+        }
+
+        return mediaItemDisplay;
     }
 
     /// <summary>
