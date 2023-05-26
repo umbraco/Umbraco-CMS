@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../repository/data-type.repository';
+import { UmbDataTypeRepository } from '../repository/data-type.repository.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

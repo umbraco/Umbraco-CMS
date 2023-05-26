@@ -1,10 +1,6 @@
-import { css, html, nothing, unsafeCSS } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ProblemDetailsModel } from '@umbraco-cms/backoffice/backend-api';
-
-import logoImg from '/umbraco_logomark_white.svg';
-import backgroundImg from '/umbraco_background.jpg';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * A full page error element that can be used either solo or for instance as the error 500 page and BootFailed
@@ -61,7 +57,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 		<div id="background"></div>
 
 		<div id="logo">
-			<img src="${logoImg}" alt="Umbraco" />
+			<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg'" alt="Umbraco" />
 		</div>
 
 		<div id="container">
@@ -87,7 +83,7 @@ export class UmbAppErrorElement extends UmbLitElement {
 			background-position: 50%;
 			background-repeat: no-repeat;
 			background-size: cover;
-			background-image: url('${unsafeCSS(backgroundImg)}');
+			background-image: url('/umbraco/backoffice/assets/umbraco_background.jpg');
 			width: 100vw;
 			height: 100vh;
 		}

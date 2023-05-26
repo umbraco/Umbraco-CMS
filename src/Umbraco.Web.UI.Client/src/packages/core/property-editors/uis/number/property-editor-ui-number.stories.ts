@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUINumberElement } from './property-editor-ui-number.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUINumberElement } from './property-editor-ui-number.element';
-import './property-editor-ui-number.element';
+import './property-editor-ui-number.element.js';
 
 export default {
 	title: 'Property Editor UIs/Number',

@@ -1,6 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-type-workspace-edit')

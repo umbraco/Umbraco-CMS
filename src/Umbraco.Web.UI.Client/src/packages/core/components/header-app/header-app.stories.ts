@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import './header-app-button.element';
-import type { UmbHeaderAppButtonElement } from './header-app-button.element';
+import './header-app-button.element.js';
+import type { UmbHeaderAppButtonElement } from './header-app-button.element.js';
 
 const meta: Meta<UmbHeaderAppButtonElement> = {
 	title: 'Components/Header App Button',

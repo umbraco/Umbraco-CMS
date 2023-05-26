@@ -1,9 +1,9 @@
-import './footer-layout.element';
+import './footer-layout.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbFooterLayoutElement } from './footer-layout.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbFooterLayoutElement } from './footer-layout.element';
 
 export default {
 	title: 'Workspaces/Shared/Footer Layout',

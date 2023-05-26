@@ -1,6 +1,4 @@
-import { css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { until } from 'lit/directives/until.js';
+import { css, html, nothing, until, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 type FileItem = {

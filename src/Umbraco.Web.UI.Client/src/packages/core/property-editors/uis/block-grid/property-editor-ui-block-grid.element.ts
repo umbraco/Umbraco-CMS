@@ -1,14 +1,12 @@
-import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../components/workspace/workspace-variant/workspace-variant.context';
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
+import { UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN } from '../../../workspace/workspace-variant/workspace-variant.context.js';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../workspace/workspace-property/workspace-property.context.js';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -53,7 +51,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 				{
 					path: 'modal-1',
 					component: () => {
-						return import('./property-editor-ui-block-grid-inner-test.element');
+						return import('./property-editor-ui-block-grid-inner-test.element.js');
 					},
 					setup: (component) => {
 						if (component instanceof HTMLElement) {
@@ -64,7 +62,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 				{
 					path: 'modal-2',
 					component: () => {
-						return import('./property-editor-ui-block-grid-inner-test.element');
+						return import('./property-editor-ui-block-grid-inner-test.element.js');
 					},
 					setup: (component) => {
 						if (component instanceof HTMLElement) {

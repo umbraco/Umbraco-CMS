@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUIBlockGridGroupConfigurationElement } from './property-editor-ui-block-grid-group-configuration.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIBlockGridGroupConfigurationElement } from './property-editor-ui-block-grid-group-configuration.element';
-import './property-editor-ui-block-grid-group-configuration.element';
+import './property-editor-ui-block-grid-group-configuration.element.js';
 
 export default {
 	title: 'Property Editor UIs/Block Grid Group Configuration',

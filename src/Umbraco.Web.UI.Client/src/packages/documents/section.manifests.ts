@@ -1,5 +1,8 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-import { ManifestSectionSidebarAppMenuKind } from '@umbraco-cms/backoffice/extension-registry';
+import { DOCUMENT_ROOT_ENTITY_TYPE } from './documents/index.js';
+import type {
+	ManifestSectionSidebarAppMenuWithEntityActionsKind,
+	ManifestTypes,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Content';
 
@@ -14,15 +17,16 @@ const section: ManifestTypes = {
 	},
 };
 
-const menuSectionSidebarApp: ManifestSectionSidebarAppMenuKind = {
+const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind = {
 	type: 'sectionSidebarApp',
-	kind: 'menu',
+	kind: 'menuWithEntityActions',
 	alias: 'Umb.SidebarMenu.Content',
 	name: 'Content Sidebar Menu',
 	weight: 100,
 	meta: {
 		label: 'Content',
 		menu: 'Umb.Menu.Content',
+		entityType: DOCUMENT_ROOT_ENTITY_TYPE,
 	},
 	conditions: {
 		sections: [sectionAlias],

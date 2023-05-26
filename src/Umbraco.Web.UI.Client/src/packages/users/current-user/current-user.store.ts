@@ -1,4 +1,4 @@
-import type { UmbLoggedInUser } from './types';
+import type { UmbLoggedInUser } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 

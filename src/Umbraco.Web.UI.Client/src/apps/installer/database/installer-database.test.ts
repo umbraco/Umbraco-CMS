@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { UmbInstallerDatabaseElement } from './installer-database.element';
+import { UmbInstallerDatabaseElement } from './installer-database.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 // TODO: Write tests

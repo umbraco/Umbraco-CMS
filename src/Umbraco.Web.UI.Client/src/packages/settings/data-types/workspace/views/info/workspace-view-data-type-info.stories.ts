@@ -1,12 +1,12 @@
-import './workspace-view-data-type-info.element';
+import './workspace-view-data-type-info.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbWorkspaceViewDataTypeInfoElement } from './workspace-view-data-type-info.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-//import { data } from '../../../../../core/mocks/data/data-type.data';
-//import { UmbDataTypeContext } from '../../data-type.context';
+//import { data } from '../../../../../core/mocks/data/data-type.data.js';
+//import { UmbDataTypeContext } from '../../data-type.context.js';
 
-import type { UmbWorkspaceViewDataTypeInfoElement } from './workspace-view-data-type-info.element';
 
 export default {
 	title: 'Workspaces/Data Type/Views/Info',

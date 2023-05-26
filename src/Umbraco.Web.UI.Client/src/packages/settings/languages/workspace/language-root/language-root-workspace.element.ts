@@ -1,13 +1,12 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbLanguageRepository } from '../../repository/language.repository';
-import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/core/components';
+import { UmbLanguageRepository } from '../../repository/language.repository.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './components/language-root-table-delete-column-layout.element';
-import './components/language-root-table-name-column-layout.element';
+import './components/language-root-table-delete-column-layout.element.js';
+import './components/language-root-table-name-column-layout.element.js';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
@@ -37,7 +36,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		},
 		{
 			name: 'Fallback',
-			alias: 'fallBackLanguage',
+			alias: 'fallbackLanguage',
 		},
 		{
 			name: '',
@@ -91,7 +90,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 						value: language.isMandatory,
 					},
 					{
-						columnAlias: 'fallBackLanguage',
+						columnAlias: 'fallbackLanguage',
 						value: languages.find((x) => x.isoCode === language.fallbackIsoCode)?.name,
 					},
 					{
@@ -103,6 +102,7 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		});
 	}
 
+	// TODO: Generate the href or retrieve it from something?
 	render() {
 		return html`
 			<umb-body-layout headline="Languages">

@@ -8,7 +8,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.StyleSheet',
 	name: 'Stylesheet Workspace',
-	loader: () => import('./stylesheet-workspace.element'),
+	loader: () => import('./stylesheet-workspace.element.js'),
 	meta: {
 		entityType: 'stylesheet',
 	},

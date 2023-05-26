@@ -1,13 +1,11 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
-import { UUIInputElement } from '@umbraco-ui/uui';
-import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element';
-import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element';
-import { UmbTemplateWorkspaceContext } from './template-workspace.context';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/core/components';
+import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
+import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
+import { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+//import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-template-workspace-edit')
 export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
@@ -21,7 +19,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	private _masterTemplateName?: string | null = null;
 
 	@query('umb-code-editor')
-	private _codeEditor?: UmbCodeEditorElement;
+	private _codeEditor?: any;
 
 	#templateWorkspaceContext?: UmbTemplateWorkspaceContext;
 	#isNew = false;
@@ -63,7 +61,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	}
 
 	#onCodeEditorInput(event: Event) {
-		const target = event.target as UmbCodeEditorElement;
+		const target = event.target as any;
 		const value = target.code as string;
 		this.#templateWorkspaceContext?.setContent(value);
 	}

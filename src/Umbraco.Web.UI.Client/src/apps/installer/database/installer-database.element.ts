@@ -1,8 +1,16 @@
-import { UUIButtonElement } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
+import { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import {
+	css,
+	CSSResultGroup,
+	html,
+	nothing,
+	customElement,
+	property,
+	query,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import {
 	ApiError,
 	DatabaseInstallResponseModel,

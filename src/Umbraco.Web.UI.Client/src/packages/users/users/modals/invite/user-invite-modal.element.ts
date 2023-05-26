@@ -1,8 +1,7 @@
-import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, query, state } from 'lit/decorators.js';
-import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element';
-import { UmbUserRepository } from '../../repository/user.repository';
+import { UmbUserGroupInputElement } from '../../../user-groups/components/input-user-group/user-group-input.element.js';
+import { UmbUserRepository } from '../../repository/user.repository.js';
+import { css, html, nothing , customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -40,18 +39,17 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 
 		// TODO: figure out when to use email or username
 		// TODO: invite request gives 500 error.
-		alert('Implement invite');
-		// const { data } = await this.#userRepository.invite({
-		// 	name,
-		// 	email,
-		// 	userName: email,
-		// 	message,
-		// 	userGroupIds,
-		// });
+		const { data } = await this.#userRepository.invite({
+			name,
+			email,
+			userName: email,
+			message,
+			userGroupIds,
+		});
 
-		// if (data) {
-		// 	this._invitedUser = data;
-		// }
+		if (data) {
+			this._invitedUser = data;
+		}
 	}
 
 	private _submitForm() {

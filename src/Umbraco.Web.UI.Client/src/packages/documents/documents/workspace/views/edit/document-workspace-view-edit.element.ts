@@ -1,14 +1,16 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { UmbDocumentWorkspaceContext } from '../../document-workspace.context';
+import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
+import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import {
+	encodeFolderName,
+	UmbRoute,
+	UmbRouterSlotChangeEvent,
+	UmbRouterSlotInitEvent,
+} from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-edit')
@@ -74,8 +76,8 @@ export class UmbDocumentWorkspaceViewEditElement
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name;
 				routes.push({
-					path: `tab/${encodeURI(tabName || '').toString()}`,
-					component: () => import('./document-workspace-view-edit-tab.element'),
+					path: `tab/${encodeFolderName(tabName || '').toString()}`,
+					component: () => import('./document-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as any).tabName = tabName;
 					},
@@ -86,7 +88,7 @@ export class UmbDocumentWorkspaceViewEditElement
 		if (this._hasRootGroups) {
 			routes.push({
 				path: '',
-				component: () => import('./document-workspace-view-edit-tab.element'),
+				component: () => import('./document-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as any).noTabName = true;
 				},
@@ -121,8 +123,7 @@ export class UmbDocumentWorkspaceViewEditElement
 							this._tabs,
 							(tab) => tab.name,
 							(tab) => {
-								// TODO: make better url folder name:
-								const path = this._routerPath + '/tab/' + encodeURI(tab.name || '');
+								const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 								return html`<uui-tab label=${tab.name!} .active=${path === this._activePath} href=${path}
 									>${tab.name}</uui-tab
 								>`;

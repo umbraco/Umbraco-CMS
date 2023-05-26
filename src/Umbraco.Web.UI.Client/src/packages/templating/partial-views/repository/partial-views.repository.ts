@@ -1,8 +1,8 @@
-import { Observable } from 'rxjs';
-import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data';
-import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data';
-import { UmbPartialViewsStore, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN } from './partial-views.store';
-import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store';
+import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
+import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
+import { UmbPartialViewsStore, UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN } from './partial-views.store.js';
+import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';

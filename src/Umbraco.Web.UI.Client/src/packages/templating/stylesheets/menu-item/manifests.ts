@@ -1,4 +1,4 @@
-import { STYLESHEET_TREE_ALIAS } from '../tree/manifests';
+import { STYLESHEET_TREE_ALIAS } from '../tree/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {

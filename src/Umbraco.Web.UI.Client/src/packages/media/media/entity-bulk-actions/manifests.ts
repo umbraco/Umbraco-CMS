@@ -1,7 +1,7 @@
-import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbMediaMoveEntityBulkAction } from './move/move.action';
-import { UmbMediaCopyEntityBulkAction } from './copy/copy.action';
-import { UmbMediaTrashEntityBulkAction } from './trash/trash.action';
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
+import { UmbMediaCopyEntityBulkAction } from './copy/copy.action.js';
+import { UmbMediaTrashEntityBulkAction } from './trash/trash.action.js';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'media';

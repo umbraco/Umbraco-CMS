@@ -1,2 +1,2 @@
-export * from './upgrader.element';
-export * from './upgrader-view.element';
+export * from './upgrader.element.js';
+export * from './upgrader-view.element.js';

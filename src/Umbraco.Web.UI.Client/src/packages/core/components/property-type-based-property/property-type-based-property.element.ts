@@ -1,9 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
-import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type {
 	DataTypeResponseModel,
@@ -12,8 +10,7 @@ import type {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })

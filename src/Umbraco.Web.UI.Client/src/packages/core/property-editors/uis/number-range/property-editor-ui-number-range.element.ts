@@ -1,11 +1,11 @@
-import { html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import type { UmbInputNumberRangeElement } from '../../../components/input-number-range/input-number-range.element';
+import type { UmbInputNumberRangeElement } from '../../../components/input-number-range/input-number-range.element.js';
+import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../components/input-number-range/input-number-range.element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
+
+import '../../../components/input-number-range/input-number-range.element.js';
 
 type ValueType = {
 	min?: number;

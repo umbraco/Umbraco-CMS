@@ -1,10 +1,8 @@
-import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UUIColorPickerChangeEvent } from '@umbraco-ui/uui';
+import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles , UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-eye-dropper

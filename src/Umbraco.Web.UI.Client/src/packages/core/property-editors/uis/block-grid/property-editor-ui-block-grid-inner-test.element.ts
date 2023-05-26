@@ -1,9 +1,7 @@
-import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 /**
  * @element umb-property-editor-ui-block-grid-inner-test
@@ -24,7 +22,7 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 		{
 			path: 'inner-1',
 			component: () => {
-				return import('./property-editor-ui-block-grid-inner-test.element');
+				return import('./property-editor-ui-block-grid-inner-test.element.js');
 			},
 			setup: (component) => {
 				if (component instanceof HTMLElement) {
@@ -35,7 +33,7 @@ export class UmbPropertyEditorUIBlockGridInnerTestElement extends UmbLitElement 
 		{
 			path: 'inner-2',
 			component: () => {
-				return import('./property-editor-ui-block-grid-inner-test.element');
+				return import('./property-editor-ui-block-grid-inner-test.element.js');
 			},
 			setup: (component) => {
 				if (component instanceof HTMLElement) {

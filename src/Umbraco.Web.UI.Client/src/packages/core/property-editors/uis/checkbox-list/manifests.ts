@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.CheckboxList',
 	name: 'Checkbox List Property Editor UI',
-	loader: () => import('./property-editor-ui-checkbox-list.element'),
+	loader: () => import('./property-editor-ui-checkbox-list.element.js'),
 	meta: {
 		label: 'Checkbox List',
 		propertyEditorModel: 'Umbraco.CheckboxList',

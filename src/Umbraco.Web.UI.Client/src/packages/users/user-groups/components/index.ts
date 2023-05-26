@@ -1,1 +1,1 @@
-import './input-user-group/user-group-input.element';
+import './input-user-group/user-group-input.element.js';

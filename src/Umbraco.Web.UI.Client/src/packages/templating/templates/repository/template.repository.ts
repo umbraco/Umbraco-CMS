@@ -1,8 +1,8 @@
-import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
-import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data';
-import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
-import type { UmbDetailRepository, UmbTreeDataSource, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDetailRepository,
+	UmbTreeDataSource,
+	UmbTreeRepository,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
@@ -12,6 +12,10 @@ import {
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store.js';
+import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
+import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
+import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
 
 export class UmbTemplateRepository
 	implements

@@ -1,7 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -92,7 +90,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			?selected=${this._isSelected(item)}
 			@open=${() => this._handleOpenItem(item)}
 			@selected=${() => this._handleSelect(item)}
-			@unselected=${() => this._handleDeselect(item)}
+			@deselected=${() => this._handleDeselect(item)}
 			class="media-item"
 			.fileExt=${item.hasChildren ? '' : 'image'}
 			name=${name}></uui-card-media>`;

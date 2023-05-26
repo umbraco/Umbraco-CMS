@@ -1,6 +1,6 @@
-import { DATA_TYPE_ENTITY_TYPE } from '../..';
-import { DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/manifests';
-import { UmbMoveDataTypeEntityAction } from './move.action';
+import { DATA_TYPE_ENTITY_TYPE } from '../../index.js';
+import { DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { UmbMoveDataTypeEntityAction } from './move.action.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [

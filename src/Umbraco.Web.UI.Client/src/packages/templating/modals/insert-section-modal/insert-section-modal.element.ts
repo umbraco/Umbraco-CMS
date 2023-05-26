@@ -1,13 +1,12 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, queryAll, state } from 'lit/decorators.js';
-import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests';
-import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
-import type { UmbInsertSectionCheckboxElement } from './insert-section-input.element';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests.js';
+import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
+import type {UmbInsertSectionCheckboxElement} from './insert-section-input.element.js';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
-import './insert-section-input.element';
+import './insert-section-input.element.js';
 
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,

@@ -1,6 +1,6 @@
-import { UmbUserRepository } from '../../repository/user.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
@@ -8,7 +8,6 @@ export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbU
 	}
 
 	async execute() {
-		//TODO: Implement
-		alert('Bulk disable is not implemented yet');
+		await this.repository?.disable(this.selection);
 	}
 }

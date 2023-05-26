@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.OverlaySize',
 	name: 'Overlay Size Property Editor UI',
-	loader: () => import('./property-editor-ui-overlay-size.element'),
+	loader: () => import('./property-editor-ui-overlay-size.element.js'),
 	meta: {
 		label: 'Overlay Size',
 		propertyEditorModel: '',

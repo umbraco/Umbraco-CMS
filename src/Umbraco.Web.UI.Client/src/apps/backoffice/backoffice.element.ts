@@ -1,34 +1,39 @@
-import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { UmbExtensionInitializer } from '../../packages/packages/repository/server-extension.controller';
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context';
-import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionInitializer } from './extension.controller.js';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbEntryPointExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
+import './components/index.js';
+
+// TODO: temp solution to load core packages
 const CORE_PACKAGES = [
-	import('../../packages/core/umbraco-package'),
-	import('../../packages/settings/umbraco-package'),
-	import('../../packages/documents/umbraco-package'),
-	import('../../packages/media/umbraco-package'),
-	import('../../packages/members/umbraco-package'),
-	import('../../packages/translation/umbraco-package'),
-	import('../../packages/users/umbraco-package'),
-	import('../../packages/packages/umbraco-package'),
-	import('../../packages/search/umbraco-package'),
-	import('../../packages/templating/umbraco-package'),
-	import('../../packages/umbraco-news/umbraco-package'),
-	import('../../packages/tags/umbraco-package'),
+	import('../../packages/core/umbraco-package.js'),
+	import('../../packages/settings/umbraco-package.js'),
+	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/media/umbraco-package.js'),
+	import('../../packages/members/umbraco-package.js'),
+	import('../../packages/translation/umbraco-package.js'),
+	import('../../packages/users/umbraco-package.js'),
+	import('../../packages/packages/umbraco-package.js'),
+	import('../../packages/search/umbraco-package.js'),
+	import('../../packages/templating/umbraco-package.js'),
+	import('../../packages/umbraco-news/umbraco-package.js'),
+	import('../../packages/tags/umbraco-package.js'),
 ];
 
-@defineElement('umb-backoffice')
+@customElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
+	#extensionInitializer = new UmbExtensionInitializer(this, umbExtensionsRegistry);
+
 	constructor() {
 		super();
 		this.provideContext(UMB_BACKOFFICE_CONTEXT_TOKEN, new UmbBackofficeContext());
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		new UmbExtensionInitializer(this, umbExtensionsRegistry, CORE_PACKAGES);
+		new UmbExtensionInitializer(this, umbExtensionsRegistry);
+		this.#extensionInitializer.setLocalPackages(CORE_PACKAGES);
 	}
 
 	render() {

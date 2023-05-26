@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbDashboardTelemetryElement } from './dashboard-telemetry.element';
+import { UmbDashboardTelemetryElement } from './dashboard-telemetry.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbDashboardTelemetryElement', () => {

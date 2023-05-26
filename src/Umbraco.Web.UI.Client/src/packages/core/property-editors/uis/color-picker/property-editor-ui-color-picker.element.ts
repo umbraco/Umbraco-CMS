@@ -1,11 +1,9 @@
-import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UUIColorSwatchesEvent } from '@umbraco-ui/uui';
+import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles , UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -13,7 +11,7 @@ import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type
 @customElement('umb-property-editor-ui-color-picker')
 export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement implements UmbPropertyEditorExtensionElement {
 	#defaultShowLabels = false;
-	
+
 	@property()
 	value = '';
 

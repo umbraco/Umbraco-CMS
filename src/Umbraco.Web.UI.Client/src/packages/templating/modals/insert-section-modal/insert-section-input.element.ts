@@ -1,7 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-ui/uui';
+import { UUITextStyles , UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-insert-section-checkbox')
 export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {

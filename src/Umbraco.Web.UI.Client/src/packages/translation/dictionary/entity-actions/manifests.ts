@@ -1,8 +1,8 @@
-import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests';
-import UmbReloadDictionaryEntityAction from './reload.action';
-import UmbImportDictionaryEntityAction from './import/import.action';
-import UmbExportDictionaryEntityAction from './export/export.action';
-import UmbCreateDictionaryEntityAction from './create/create.action';
+import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import UmbReloadDictionaryEntityAction from './reload.action.js';
+import UmbImportDictionaryEntityAction from './import/import.action.js';
+import UmbExportDictionaryEntityAction from './export/export.action.js';
+import UmbCreateDictionaryEntityAction from './create/create.action.js';
 import { UmbDeleteEntityAction, UmbMoveEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -107,19 +107,19 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CreateDictionary',
 		name: 'Create Dictionary Modal',
-		loader: () => import('./create/create-dictionary-modal-layout.element'),
+		loader: () => import('./create/create-dictionary-modal-layout.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ExportDictionary',
 		name: 'Export Dictionary Modal',
-		loader: () => import('./export/export-dictionary-modal.element'),
+		loader: () => import('./export/export-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ImportDictionary',
 		name: 'Import Dictionary Modal',
-		loader: () => import('./import/import-dictionary-modal.element'),
+		loader: () => import('./import/import-dictionary-modal.element.js'),
 	},
 ];
 

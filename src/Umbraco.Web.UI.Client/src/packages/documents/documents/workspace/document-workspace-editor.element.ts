@@ -1,16 +1,12 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbDocumentWorkspaceContext } from './document-workspace.context';
-import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element';
+import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
+import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT, ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//private _defaultVariant?: VariantViewModelBaseModel;

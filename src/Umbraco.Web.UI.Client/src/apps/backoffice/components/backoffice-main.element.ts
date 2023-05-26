@@ -1,19 +1,15 @@
-import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { state } from 'lit/decorators.js';
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@defineElement('umb-backoffice-main')
+@customElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {
 	@state()
-	private _routes: Array<UmbRoute> = [];
+	private _routes: Array<UmbRoute & { alias: string }> = [];
 
 	@state()
 	private _sections: Array<ManifestSection> = [];
@@ -47,21 +43,31 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _createRoutes() {
 		if (!this._sections) return;
 
-		this._routes = [];
+		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
+		// TODO: remove section-routes that does not exist anymore.
 		this._routes = this._sections.map((section) => {
-			return {
-				path: this._routePrefix + section.meta.pathname,
-				component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
-				setup: (component) => {
-					(component as UmbSectionExtensionElement).manifest = section;
-				},
-			};
+			const existingRoute = this._routes.find((r) => r.alias === section.alias);
+			if (existingRoute) {
+				return existingRoute;
+			} else {
+				return {
+					alias: section.alias,
+					path: this._routePrefix + section.meta.pathname,
+					component: () => createExtensionElementOrFallback(section, 'umb-section-default'),
+					setup: (component) => {
+						(component as UmbSectionExtensionElement).manifest = section;
+					},
+				};
+			}
 		});
 
-		this._routes.push({
-			path: '**',
-			redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
-		});
+		if (!this._routes.find((r) => r.path === '**')) {
+			this._routes.push({
+				alias: '__redirect',
+				path: '**',
+				redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
+			});
+		}
 	}
 
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
@@ -82,11 +88,12 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`;
+		return this._routes.length > 0
+			? html`<umb-router-slot .routes=${this._routes} @change=${this._onRouteChange}></umb-router-slot>`
+			: '';
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				background-color: var(--uui-color-background);

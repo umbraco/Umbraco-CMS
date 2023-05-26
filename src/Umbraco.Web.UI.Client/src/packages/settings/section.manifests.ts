@@ -7,7 +7,7 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: sectionAlias,
 	name: 'Settings Section',
-	weight: 300,
+	weight: 400,
 	meta: {
 		label: 'Settings',
 		pathname: 'settings',

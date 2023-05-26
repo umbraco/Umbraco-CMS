@@ -1,4 +1,4 @@
-import { UmbDocumentWorkspaceContext } from '../document-workspace.context';
+import { UmbDocumentWorkspaceContext } from '../document-workspace.context.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

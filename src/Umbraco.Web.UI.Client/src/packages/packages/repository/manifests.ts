@@ -1,5 +1,5 @@
-import { UmbPackageRepository } from './package.repository';
-import { UmbPackageStore } from './package.store';
+import { UmbPackageRepository } from './package.repository.js';
+import { UmbPackageStore } from './package.store.js';
 import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const PACKAGE_REPOSITORY_ALIAS = 'Umb.Repository.Package';

@@ -8,7 +8,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.DocumentBlueprint.Root',
 	name: 'Document Blueprint Root Workspace',
-	loader: () => import('./document-blueprint-root-workspace.element'),
+	loader: () => import('./document-blueprint-root-workspace.element.js'),
 	meta: {
 		entityType: 'document-blueprint-root',
 	},

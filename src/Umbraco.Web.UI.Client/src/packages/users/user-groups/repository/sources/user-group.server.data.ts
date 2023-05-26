@@ -1,4 +1,4 @@
-import { UmbUserGroupDetailDataSource } from '../../types';
+import { UmbUserGroupDetailDataSource } from '../../types.js';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import {
 	UserGroupResponseModel,

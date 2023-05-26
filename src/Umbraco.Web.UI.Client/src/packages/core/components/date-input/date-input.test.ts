@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbDateInputElement } from './date-input.element';
+import { UmbDateInputElement } from './date-input.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbDateInputElement', () => {
 	let element: UmbDateInputElement;

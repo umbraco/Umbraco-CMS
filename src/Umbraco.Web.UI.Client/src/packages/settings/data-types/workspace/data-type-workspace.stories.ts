@@ -1,12 +1,11 @@
-import './data-type-workspace.element';
+import './data-type-workspace.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { data } from '../../../../mocks/data/data-type.data.js';
+import type { UmbDataTypeWorkspaceElement } from './data-type-workspace.element.js';
+import { html , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { data } from '../../../../shared/mocks/data/data-type.data';
 
-import type { UmbDataTypeWorkspaceElement } from './data-type-workspace.element';
 
 export default {
 	title: 'Workspaces/Data Type',

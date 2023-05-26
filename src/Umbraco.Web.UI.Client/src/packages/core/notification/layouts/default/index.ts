@@ -1,1 +1,1 @@
-export * from './notification-layout-default.element';
+export * from './notification-layout-default.element.js';

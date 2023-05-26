@@ -1,16 +1,15 @@
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
+import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-} from './health-check-dashboard.context';
-import { UmbHealthCheckContext } from './health-check.context';
+} from './health-check-dashboard.context.js';
+import { UmbHealthCheckContext } from './health-check.context.js';
+import { html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestHealthCheck, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-dashboard-health-check')
 export class UmbDashboardHealthCheckElement extends UmbLitElement {
@@ -18,7 +17,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: `/:groupName`,
-			component: () => import('./views/health-check-group.element'),
+			component: () => import('./views/health-check-group.element.js'),
 			setup: (component, info) => {
 				const element = component as UmbDashboardHealthCheckGroupElement;
 				element.groupName = decodeURI(info.match.params.groupName);
@@ -26,7 +25,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 		},
 		{
 			path: ``,
-			component: () => import('./views/health-check-overview.element'),
+			component: () => import('./views/health-check-overview.element.js'),
 		},
 	];
 
