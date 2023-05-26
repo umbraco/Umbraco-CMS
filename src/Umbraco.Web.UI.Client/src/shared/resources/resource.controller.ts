@@ -66,7 +66,13 @@ export class UmbResourceController extends UmbController {
 				return {};
 			} else {
 				// ApiError - body could hold a ProblemDetailsModel from the server
-				(error as any).body = typeof error.body === 'string' ? JSON.parse(error.body) : error.body;
+				if (typeof error.body !== 'undefined' && !!error.body) {
+					try {
+						(error as any).body = typeof error.body === 'string' ? JSON.parse(error.body) : error.body;
+					} catch (e) {
+						console.error('Error parsing error body (expected JSON)', e);
+					}
+				}
 
 				// Go through the error status codes and act accordingly
 				switch (error.status ?? 0) {
