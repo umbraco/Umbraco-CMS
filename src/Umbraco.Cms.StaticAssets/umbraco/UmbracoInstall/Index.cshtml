@@ -3,47 +3,68 @@
 <head>
     <base href="/umbraco/" />
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="backoffice/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="backoffice/assets/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Umbraco</title>
-    <link rel="stylesheet" href="backoffice/style.css"/>
+    <link rel="stylesheet" href="backoffice/css/umb-css.css"/>
+    <link rel="stylesheet" href="backoffice/css/uui-css.css"/>
     <script type="importmap">
         {
             "imports": {
-                "@@umbraco-cms/backoffice/backend-api": "/umbraco/backoffice/libs/backend-api.js",
-                "@@umbraco-cms/backoffice/collection": "/umbraco/backoffice/libs/collection.js",
-                "@@umbraco-cms/backoffice/content-type": "/umbraco/backoffice/libs/content-type.js",
-                "@@umbraco-cms/backoffice/context-api": "/umbraco/backoffice/libs/context-api.js",
-                "@@umbraco-cms/backoffice/controller-api": "/umbraco/backoffice/libs/controller-api.js",
-                "@@umbraco-cms/backoffice/data-type": "/umbraco/backoffice/libs/data-type.js",
-                "@@umbraco-cms/backoffice/element-api": "/umbraco/backoffice/libs/element-api.js",
-                "@@umbraco-cms/backoffice/entity-action": "/umbraco/backoffice/libs/entity-action.js",
-                "@@umbraco-cms/backoffice/extension-api": "/umbraco/backoffice/libs/extension-api.js",
-                "@@umbraco-cms/backoffice/extension-registry": "/umbraco/backoffice/libs/extension-registry.js",
-                "@@umbraco-cms/backoffice/id": "/umbraco/backoffice/libs/id.js",
-                "@@umbraco-cms/backoffice/modal": "/umbraco/backoffice/libs/modal.js",
-                "@@umbraco-cms/backoffice/models": "/umbraco/backoffice/libs/models.js",
-                "@@umbraco-cms/backoffice/notification": "/umbraco/backoffice/libs/notification.js",
-                "@@umbraco-cms/backoffice/observable-api": "/umbraco/backoffice/libs/observable-api.js",
-                "@@umbraco-cms/backoffice/picker-input": "/umbraco/backoffice/libs/picker-input.js",
-                "@@umbraco-cms/backoffice/repository": "/umbraco/backoffice/libs/repository.js",
-                "@@umbraco-cms/backoffice/resources": "/umbraco/backoffice/libs/resources.js",
-                "@@umbraco-cms/backoffice/router": "/umbraco/backoffice/libs/router.js",
-                "@@umbraco-cms/backoffice/section": "/umbraco/backoffice/libs/section.js",
-                "@@umbraco-cms/backoffice/sorter": "/umbraco/backoffice/libs/sorter.js",
-                "@@umbraco-cms/backoffice/store": "/umbraco/backoffice/libs/store.js",
-                "@@umbraco-cms/backoffice/tree": "/umbraco/backoffice/libs/tree.js",
-                "@@umbraco-cms/backoffice/events": "/umbraco/backoffice/libs/umb-events.js",
-                "@@umbraco-cms/backoffice/utils": "/umbraco/backoffice/libs/utils.js",
-                "@@umbraco-cms/backoffice/variant": "/umbraco/backoffice/libs/variant.js",
-                "@@umbraco-cms/backoffice/workspace": "/umbraco/backoffice/libs/workspace.js"
+                "@@umbraco-cms/backoffice/backend-api": "/umbraco/backoffice/external/backend-api/index.js",
+                "@@umbraco-cms/backoffice/external/uui": "/umbraco/backoffice/external/uui/index.js",
+                "@@umbraco-cms/backoffice/external/lit": "/umbraco/backoffice/external/lit/index.js",
+                "@@umbraco-cms/backoffice/external/openid": "/umbraco/backoffice/external/openid/index.js",
+                "@@umbraco-cms/backoffice/external/rxjs": "/umbraco/backoffice/external/rxjs/index.js",
+                "@@umbraco-cms/backoffice/external/router-slot": "/umbraco/backoffice/external/router-slot/index.js",
+                "@@umbraco-cms/backoffice/external/uuid": "/umbraco/backoffice/external/uuid/index.js",
+                "@@umbraco-cms/backoffice/external/lodash": "/umbraco/backoffice/external/lodash/index.js",
+                "@@umbraco-cms/backoffice/context-api": "/umbraco/backoffice/libs/context-api/index.js",
+                "@@umbraco-cms/backoffice/controller-api": "/umbraco/backoffice/libs/controller-api/index.js",
+                "@@umbraco-cms/backoffice/element-api": "/umbraco/backoffice/libs/element-api/index.js",
+                "@@umbraco-cms/backoffice/extension-api": "/umbraco/backoffice/libs/extension-api/index.js",
+                "@@umbraco-cms/backoffice/observable-api": "/umbraco/backoffice/libs/observable-api/index.js",
+
+                "@@umbraco-cms/backoffice/events": "/umbraco/backoffice/shared/umb-events/index.js",
+                "@@umbraco-cms/backoffice/models": "/umbraco/backoffice/shared/models/index.js",
+                "@@umbraco-cms/backoffice/repository": "/umbraco/backoffice/shared/repository/index.js",
+                "@@umbraco-cms/backoffice/resources": "/umbraco/backoffice/shared/resources/index.js",
+                "@@umbraco-cms/backoffice/router": "/umbraco/backoffice/shared/router/index.js",
+                "@@umbraco-cms/backoffice/utils": "/umbraco/backoffice/shared/utils/index.js",
+                "@@umbraco-cms/backoffice/icon": "/umbraco/backoffice/shared/icon-registry/index.js",
+                "@@umbraco-cms/internal/lit-element": "/umbraco/backoffice/shared/lit-element/index.js",
+                "@@umbraco-cms/internal/modal": "/umbraco/backoffice/shared/modal/index.js",
+
+                "@@umbraco-cms/backoffice/action": "/umbraco/backoffice/packages/core/action/index.js",
+                "@@umbraco-cms/backoffice/collection": "/umbraco/backoffice/packages/core/collection/index.js",
+                "@@umbraco-cms/backoffice/components": "/umbraco/backoffice/packages/core/components/index.js",
+                "@@umbraco-cms/backoffice/content-type": "/umbraco/backoffice/packages/core/content-type/index.js",
+                "@@umbraco-cms/backoffice/debug": "/umbraco/backoffice/packages/core/debug/index.js",
+                "@@umbraco-cms/backoffice/entity-action": "/umbraco/backoffice/packages/core/entity-action/index.js",
+                "@@umbraco-cms/backoffice/entity-bulk-action": "/umbraco/backoffice/packages/core/entity-bulk-action/index.js",
+                "@@umbraco-cms/backoffice/extension-registry": "/umbraco/backoffice/packages/core/extension-registry/index.js",
+                "@@umbraco-cms/backoffice/id": "/umbraco/backoffice/packages/core/id/index.js",
+                "@@umbraco-cms/backoffice/menu": "/umbraco/backoffice/packages/core/menu/index.js",
+                "@@umbraco-cms/backoffice/modal": "/umbraco/backoffice/packages/core/modal/index.js",
+                "@@umbraco-cms/backoffice/notification": "/umbraco/backoffice/packages/core/notification/index.js",
+                "@@umbraco-cms/backoffice/picker-input": "/umbraco/backoffice/packages/core/picker-input/index.js",
+                "@@umbraco-cms/backoffice/section": "/umbraco/backoffice/packages/core/section/index.js",
+                "@@umbraco-cms/backoffice/sorter": "/umbraco/backoffice/packages/core/sorter/index.js",
+                "@@umbraco-cms/backoffice/store": "/umbraco/backoffice/packages/core/store/index.js",
+                "@@umbraco-cms/backoffice/tree": "/umbraco/backoffice/packages/core/tree/index.js",
+                "@@umbraco-cms/backoffice/variant": "/umbraco/backoffice/packages/core/variant/index.js",
+                "@@umbraco-cms/backoffice/workspace": "/umbraco/backoffice/packages/core/workspace/index.js",
+                "@@umbraco-cms/backoffice/property-editor": "/umbraco/backoffice/packages/core/property-editor/index.js",
+
+                "@@umbraco-cms/backoffice/document": "/umbraco/backoffice/packages/documents/documents/index.js",
+                "@@umbraco-cms/backoffice/data-type": "/umbraco/backoffice/packages/settings/data-types/index.js",
+                "@@umbraco-cms/backoffice/user-group": "/umbraco/backoffice/packages/users/user-groups/index.js"
             }
         }
     </script>
-    <script type="module" src="backoffice/main.js"></script>
+    <script type="module" src="backoffice/apps/app/app.element.js"></script>
 </head>
-
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-<umb-app></umb-app>
+    <umb-app></umb-app>
 </body>
 </html>
