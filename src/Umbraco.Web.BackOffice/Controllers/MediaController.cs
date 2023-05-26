@@ -191,6 +191,7 @@ public class MediaController : ContentControllerBase
 
         MediaItemDisplay? mediaItemDisplay = _umbracoMapper.Map<MediaItemDisplay>(foundMedia);
 
+        // if the media item is a folder with no properties, hide the 'Content' content app.
         if(mediaItemDisplay?.ContentType?.Alias == Constants.Conventions.MediaTypes.Folder
             && (mediaItemDisplay!.Properties == null || !mediaItemDisplay.Properties.Any()))
         {
