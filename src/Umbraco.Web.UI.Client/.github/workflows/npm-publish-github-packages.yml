@@ -7,6 +7,13 @@ name: Node.js Package
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'staticwebapp.config.json'
+      - 'README.md'
   workflow_dispatch:
 
 env:
