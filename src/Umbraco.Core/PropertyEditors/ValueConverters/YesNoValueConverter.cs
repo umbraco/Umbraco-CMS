@@ -22,7 +22,12 @@ public class YesNoValueConverter : PropertyValueConverterBase
         // however there are cases where the value passed to the converter could be a non-string object, e.g. int, bool
         if (source is string s)
         {
-            if (s.Length == 0 || s == "0")
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                return GetDefaultValue(propertyType);
+            }
+
+            if (s == "0")
             {
                 return false;
             }
