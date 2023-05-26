@@ -178,6 +178,10 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				--umb-header-layout-height: 70px;
+			}
+
 			#insert-menu {
 				margin: 0;
 				padding: 0;

@@ -3,10 +3,11 @@ import { css, html } from 'lit';
 import { customElement, queryAll, state } from 'lit/decorators.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests';
 import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
-import UmbInsertSectionCheckboxElement from './insert-section-input.element';
+import type { UmbInsertSectionCheckboxElement } from './insert-section-input.element';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
+import './insert-section-input.element';
 
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
@@ -108,6 +109,7 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 			:host {
 				display: block;
 				color: var(--uui-color-text);
+				--umb-header-layout-height: 70px;
 			}
 
 			#main {

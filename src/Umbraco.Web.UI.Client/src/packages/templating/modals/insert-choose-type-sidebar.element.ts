@@ -132,6 +132,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			:host {
 				display: block;
 				color: var(--uui-color-text);
+				--umb-header-layout-height: 70px;
 			}
 
 			#main {
