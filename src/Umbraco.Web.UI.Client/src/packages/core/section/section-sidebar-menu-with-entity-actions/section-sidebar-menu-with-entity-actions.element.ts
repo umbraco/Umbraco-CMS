@@ -1,5 +1,4 @@
-import { css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element.js';
 import {
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
