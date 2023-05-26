@@ -1,68 +1,37 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# This workflow will publish the @umbraco-cms/backoffice package to npmjs.com
 # For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 # The @umbraco-cms scope is owned by Umbraco HQ
 
-name: Node.js Libraries Package
+name: Node.js Package
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'libs/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/npm-publish-github-packages.yml'
-      - './rollup-libs.config.js'
-      - 'src/**/*.element.ts'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'libs/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/npm-publish-github-packages.yml'
-      - './rollup-libs.config.js'
-      - 'src/**/*.element.ts'
+    branches: [main]
   workflow_dispatch:
 
 env:
   NODE_OPTIONS: --max-old-space-size=16384
 
 jobs:
-  build:
-    if: false
+  build_publish:
+    name: Build and publish
     runs-on: ubuntu-latest
+    concurrency:
+      group: npm-publish
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-      - run: npm ci
-      - run: npm run build:libs
-      - uses: actions/upload-artifact@v3
-        with:
-          name: artifact
-          path: ./dist/libs
-
-  publish-npm:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    concurrency:
-      group: npm-publish
-      cancel-in-progress: true
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifact
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
           registry-url: https://registry.npmjs.org/
           scope: '@umbraco-cms'
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - run: npm ci
+      - run: npm run build:for:npm
+      - run: npm run generate:jsonschema
+      - run: npm run wc-analyze
+      - run: npm run wc-analyze:vscode
       - name: Version and publish
         run: |
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)

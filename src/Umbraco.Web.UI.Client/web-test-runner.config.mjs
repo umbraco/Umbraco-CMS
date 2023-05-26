@@ -91,7 +91,7 @@ export default {
 			},
 		}),
 	],
-	browsers: [playwrightLauncher({ product: 'firefox' }), playwrightLauncher({ product: 'webkit' })],
+	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
 	coverageConfig: {
 		reporters: ['lcovonly', 'text-summary'],
 	},

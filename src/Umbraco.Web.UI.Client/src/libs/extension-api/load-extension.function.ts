@@ -8,7 +8,7 @@ export async function loadExtension<T = unknown>(manifest: ManifestWithLoader<T>
 		}
 
 		if (isManifestJSType<T>(manifest) && manifest.js) {
-			return await import(manifest.js);
+			return await import(/* @vite-ignore */ manifest.js);
 		}
 	} catch (err: any) {
 		console.warn('-- Extension failed to load script', manifest, err);
