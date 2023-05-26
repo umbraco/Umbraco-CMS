@@ -5,11 +5,11 @@ export type LoginRequestModel = {
 };
 
 export interface IUmbAuthContext {
-	login(data: LoginRequestModel): Promise<{ error?: string }>;
+	login(data: LoginRequestModel): Promise<LoginResponse>;
 }
 
-export type ProblemDetails = {
-	type: string;
-	title: string;
-	message: string;
+export type LoginResponse = {
+	data?: string;
+	error?: string;
+	status: number;
 };
