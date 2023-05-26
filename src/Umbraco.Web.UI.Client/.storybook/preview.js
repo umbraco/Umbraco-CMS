@@ -13,7 +13,7 @@ import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/r
 import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store.ts';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store.ts';
 
-import customElementManifests from '../dist/libs/custom-elements.json';
+import customElementManifests from '../dist-cms/custom-elements.json';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
 import { onUnhandledRequest } from '../src/mocks';
 import { handlers } from '../src/mocks/browser-handlers';
