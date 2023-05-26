@@ -51,8 +51,11 @@ public class YesNoValueConverter : PropertyValueConverterBase
             return (bool)source;
         }
 
-        // default value is: false
-        return false;
+        // try get config for initial state prevalue
+        var config = propertyType.DataType.ConfigurationAs<TrueFalseConfiguration>();
+
+        // if no config default value is: false
+        return config is null ? false : config.Default;
     }
 
     // default ConvertSourceToObject just returns source ie a boolean value
