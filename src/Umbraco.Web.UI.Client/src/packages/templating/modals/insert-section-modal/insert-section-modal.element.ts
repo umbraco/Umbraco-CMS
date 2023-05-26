@@ -3,10 +3,11 @@ import { css, html , customElement, queryAll, state } from '@umbraco-cms/backoff
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests.js';
 import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
-import type {UmbInsertSectionCheckboxElement} from './insert-section-input.element.js';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 import './insert-section-input.element.js';
+// eslint-disable-next-line local-rules/ensure-relative-import-use-js-extension
+import type { UmbInsertSectionCheckboxElement } from './insert-section-input.element';
 
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
