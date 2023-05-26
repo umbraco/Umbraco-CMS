@@ -13,15 +13,14 @@
   <ItemGroup>
     <PackageReference Include="Examine.Core" Version="3.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-    <PackageReference Include="IPNetwork2" Version="2.6.560" />
     <PackageReference Include="MailKit" Version="4.0.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0-preview.2.*" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0-preview.2.*" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0-preview.2.*" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0-preview.2.*" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0-preview.2.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0-preview.4.*" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0-preview.4.*" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
@@ -43,8 +42,8 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0-preview.2.*" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="8.0.0-preview.2.*" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0-preview.4.*" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="8.0.0-preview.4.*" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="7.0.1" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="7.0.0" />
   </ItemGroup>
