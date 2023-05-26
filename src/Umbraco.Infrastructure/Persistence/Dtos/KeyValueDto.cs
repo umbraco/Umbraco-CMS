@@ -11,12 +11,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class KeyValueDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.KeyValue;
+
     [Column("key")]
     [Length(256)]
     [PrimaryKeyColumn(AutoIncrement = false, Clustered = true)]
     public string Key { get; set; } = null!;
 
     [Column("value")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Value { get; set; }
 

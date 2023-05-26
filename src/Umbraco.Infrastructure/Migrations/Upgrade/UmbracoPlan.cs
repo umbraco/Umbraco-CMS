@@ -1,9 +1,5 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -30,7 +26,10 @@ public class UmbracoPlan : MigrationPlan
     /// <summary>
     /// Defines the plan.
     /// </summary>
-    protected void DefinePlan()
+    /// <remarks>
+    /// This is virtual for testing purposes.
+    /// </remarks>
+    protected virtual void DefinePlan()
     {
         // Please take great care when modifying the plan!
         //
@@ -72,7 +71,11 @@ public class UmbracoPlan : MigrationPlan
         // To 11.3.0
         To<V_11_3_0.AddDomainSortOrder>("{BB3889ED-E2DE-49F2-8F71-5FD8616A2661}");
 
+        // To 11.4.0
+        To<V_11_4_0.AlterKeyValueDataType>("{FFB6B9B0-F1A8-45E9-9CD7-25700577D1CA}");
+
         // To 12.0.0
-        To<UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
+        To<V_12_0_0.UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
+        To<V_12_0_0.ResetCache>("{539F2F83-FBA7-4C48-81A3-75081A56BB9D}");
     }
 }

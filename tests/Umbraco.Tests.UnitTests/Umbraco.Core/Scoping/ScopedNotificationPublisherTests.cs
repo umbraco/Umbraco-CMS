@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -98,7 +97,7 @@ public class ScopedNotificationPublisherTests
             new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
             mediaFileManager,
             loggerFactory,
-            
+
             eventAggregatorMock.Object);
     }
 }

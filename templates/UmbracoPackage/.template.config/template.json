@@ -41,8 +41,15 @@
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "10.0.0-rc1",
+      "defaultValue": "*",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
+    },
+    "SkipRestore": {
+      "displayName": "Skip restore",
+      "description": "If specified, skips the automatic restore of the project on create.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
     },
     "Namespace": {
       "type": "derived",
@@ -82,6 +89,20 @@
   "primaryOutputs": [
     {
       "path": "UmbracoPackage.csproj"
+    }
+  ],
+  "postActions": [
+    {
+      "id": "restore",
+      "condition": "(!SkipRestore)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
     }
   ]
 }

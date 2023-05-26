@@ -389,7 +389,7 @@
     </key>
     <key alias="elementType">Element-type</key>
     <key alias="elementTypeDescription">Definerer skabelonen for et sæt at egenskaber, der kan anvendes som skema i
-      avancerede felter som f.eks. 'Block List' eller 'Nested Content'.
+      avancerede felter som f.eks. 'Block List' eller 'Block Grid'.
     </key>
     <key alias="composition">Komposition</key>
     <key alias="compositionDescription">Definerer et sæt genbrugbare egenskaber, der kan inkluderes i definitionen af
@@ -1647,7 +1647,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowVaryBySegment">Tillad segmentering</key>
     <key alias="elementType">Element-type</key>
     <key alias="elementHeading">Er en Element-type</key>
-    <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.
+    <key alias="elementDescription">En Element-type er tiltænkt brug i andre Dokumenttyper, ikke i indholdstræet.
     </key>
     <key alias="elementCannotToggle">En Dokumenttype kan ikke ændres til en Element-type efter den er blevet brugt til
       at oprette en eller flere indholds elementer.
@@ -2232,7 +2232,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowedBlockColumnsHelp">Vælg de forskellige antal kolonner denne blok må optage i layoutet. Dette forhindre ikke blokken i at optræde i et mindre område.</key>
     <key alias="allowedBlockRows">TIlgængelige række-størrelser</key>
     <key alias="allowedBlockRowsHelp">Vælg hvor mange rækker denne blok på optage i layoutet.</key>
-    <key alias="allowBlockInRoot">Tillad på rodniveay</key>
+    <key alias="allowBlockInRoot">Tillad på rodniveau</key>
     <key alias="allowBlockInRootHelp">Gør denne blok tilgængelig i layoutets rodniveau. Hvis dette ikke er valgt, kan denne blok kun bruges inden for andre blokkes definerede områder.</key>
     <key alias="areas">Blok-områder</key>
     <key alias="areasLayoutColumns">Layout-kolonner</key>
@@ -2240,7 +2240,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areasConfigurations">Opsætning af områder</key>
     <key alias="areasConfigurationsHelp">Hvis det skal være muligt at indsætte nye blokke indeni denne blok, skal der oprettes ét eller flere områder til at indsætte de nye blokke i.</key>
     <key alias="invalidDropPosition">Ikke tilladt placering.</key>
-    <key alias="defaultLayoutStylesheet">Standart layout stylesheet</key>
+    <key alias="defaultLayoutStylesheet">Standardlayout stylesheet</key>
     <key alias="confirmPasteDisallowedNestedBlockHeadline">Ikke tilladt indhold blev afvist</key>
     <key alias="confirmPasteDisallowedNestedBlockMessage">
       <![CDATA[Det indsatte indhold bestod af ikke tilladt del-indhold, disse dele er blevet afvist. Vil du beholde det resterene alligevel?]]></key>

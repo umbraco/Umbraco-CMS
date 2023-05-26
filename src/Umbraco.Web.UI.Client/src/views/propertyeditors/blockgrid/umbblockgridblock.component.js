@@ -51,7 +51,7 @@
             `
                 ${ model.stylesheet ? `
                     <style>
-                        @import "${model.stylesheet}"
+                        @import "${model.stylesheet}?umb__rnd=${Umbraco.Sys.ServerVariables.application.cacheBuster}"
                     </style>`
                     : ''
                 }

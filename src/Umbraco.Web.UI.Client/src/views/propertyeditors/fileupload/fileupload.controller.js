@@ -53,16 +53,8 @@
                 // they contain different data structures so if we need to query against it we need to be aware of this.
                 mediaHelper.registerFileResolver("Umbraco.UploadField", function (property, entity, thumbnail) {
                     if (thumbnail) {
-                        if (mediaHelper.detectIfImageByExtension(property.value)) {
-                            //get default big thumbnail from image processor
-                            var thumbnailUrl = property.value + "?width=500&rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss");
-                            return thumbnailUrl;
-                        }
-                        else {
-                            return null;
-                        }
-                    }
-                    else {
+                        return mediaHelper.getThumbnailFromPath(property.value);
+                    } else {
                         return property.value;
                     }
                 });

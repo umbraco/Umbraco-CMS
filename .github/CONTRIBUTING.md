@@ -208,11 +208,13 @@ There will be times that we really like your proposed changes and we’ll finish
 
 The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan][Sebastiaan], who gets assistance from the following community members who have committed to volunteering their free time:
 
-- [Nathan Woulfe][Nathan Woulfe]
-- [Joe Glombek][Joe Glombek]
-- [Laura Weatherhead][Laura Weatherhead]
+- [Busra Sengul][Busra Sengul]
+- [Emma Garland][Emma Garland]
+- [George Bidder][George Bidder]
+- [Jason Elkin][Jason Elkin]
+- [Laura Neto][Laura Neto]
 - [Michael Latouche][Michael Latouche]
-- [Owain Williams][Owain Williams]
+- [Sebastiaan][Sebastiaan]
 
 
 These wonderful people aim to provide you with a reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. HQ will have final sign-off and will check the work again before it is merged.
@@ -227,12 +229,14 @@ These wonderful people aim to provide you with a reply to your PR, review and te
 
 <!-- External -->
 
-[Nathan Woulfe]: https://github.com/nathanwoulfe	"Nathan's GitHub profile"
-[Joe Glombek]: https://github.com/glombek	"Joe's GitHub profile"
-[Laura Weatherhead]: https://github.com/lssweatherhead	"Laura's GitHub profile"
+[Busra Sengul]: https://github.com/busrasengul "Busra's GitHub profile"
+[Emma Garland]: https://github.com/emmagarland	"Emma's GitHub profile"
+[George Bidder]: https://github.com/georgebid	"George's GitHub profile"
+[Jason Elkin]: https://github.com/jasonelkin "Jason's GitHub profile"
+[Kyle Eck]: https://github.com/teckspeed	"Kyle's GitHub profile"
+[Laura Neto]: https://github.com/lauraneto	"Laura's GitHub profile"
 [Michael Latouche]: https://github.com/mikecp	"Michael's GitHub profile"
-[Owain Williams]: https://github.com/OwainWilliams	"Owain's GitHub profile"
-[Sebastiaan]: https://github.com/nul800sebastiaan	"Senastiaan's GitHub profile"
+[Sebastiaan]: https://github.com/nul800sebastiaan "Sebastiaan's GitHub profile"
 [ Umbrabot ]: https://github.com/umbrabot
 [git flow]: https://jeffkreeftmeijer.com/git-flow/	"An explanation of git flow"
 [sync fork ext]: http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated	"Details on keeping a git fork updated"
