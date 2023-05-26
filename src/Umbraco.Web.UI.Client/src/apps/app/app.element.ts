@@ -1,4 +1,3 @@
-
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAuthFlow } from './auth/index.js';
 import { UMB_APP, UmbAppContext } from './app.context.js';
@@ -217,7 +216,7 @@ export class UmbAppElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: '**',
-				component: () => import('./app-error.element'),
+				component: () => import('./app-error.element.js'),
 				setup: (component) => {
 					(component as UmbAppErrorElement).errorMessage = errorMsg;
 					(component as UmbAppErrorElement).error = error;

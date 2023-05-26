@@ -260,30 +260,31 @@ module.exports = {
 			schema: [],
 		},
 		create: (context) => {
+			function correctImport(value) {
+				if (value === '.') {
+					return './index.js';
+				}
+
+				if (
+					value &&
+					value.startsWith('.') &&
+					!value.endsWith('.js') &&
+					!value.endsWith('.css') &&
+					!value.endsWith('.json') &&
+					!value.endsWith('.svg') &&
+					!value.endsWith('.jpg') &&
+					!value.endsWith('.png')
+				) {
+					return (value.endsWith('/') ? value + 'index' : value) + '.js';
+				}
+
+				return null;
+			}
+
 			return {
 				ImportDeclaration: (node) => {
 					const { source } = node;
 					const { value } = source;
-
-					function correctImport(value) {
-						if (value === '.') {
-							return './index.js';
-						}
-
-						if (
-							value.startsWith('.') &&
-							!value.endsWith('.js') &&
-							!value.endsWith('.css') &&
-							!value.endsWith('.json') &&
-							!value.endsWith('.svg') &&
-							!value.endsWith('.jpg') &&
-							!value.endsWith('.png')
-						) {
-							return (value.endsWith('/') ? value + 'index' : value) + '.js';
-						}
-
-						return null;
-					}
 
 					const fixedValue = correctImport(value);
 					if (fixedValue) {
@@ -294,22 +295,19 @@ module.exports = {
 						});
 					}
 				},
-				/*
-				// TODO: This rule does not work, make it work.
-				CallExpression: (node) => {
-					if (node.callee.name === 'import') {
-						const [source] = node.arguments;
-						const fixedSource = correctImport(source);
-						if (fixedSource) {
-							context.report({
-								node,
-								message: 'Relative imports should use the ".js" file extension.',
-								fix: (fixer) => fixer.replaceText(source, `'${fixedSource}'`),
-							});
-						}
+				ImportExpression: (node) => {
+					const { source } = node;
+					const { value } = source;
+
+					const fixedSource = correctImport(value);
+					if (fixedSource) {
+						context.report({
+							node: source,
+							message: 'Relative imports should use the ".js" file extension.',
+							fix: (fixer) => fixer.replaceText(source, `'${fixedSource}'`),
+						});
 					}
 				},
-				*/
 			};
 		},
 	},
