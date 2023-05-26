@@ -67,12 +67,12 @@ export default class UmbLoginElement extends LitElement {
 
 		this._loginState = 'waiting';
 
-		const { error } = await this.#authContext.login({ username, password, persist });
+		const response = await this.#authContext.login({ username, password, persist });
 
-		this._loginError = error || '';
-		this._loginState = error ? 'failed' : 'success';
+		this._loginError = response.error || '';
+		this._loginState = response.error ? 'failed' : 'success';
 
-		if (error) return;
+		if (response.error) return;
 
 		location.href = this.returnUrl;
 	};
