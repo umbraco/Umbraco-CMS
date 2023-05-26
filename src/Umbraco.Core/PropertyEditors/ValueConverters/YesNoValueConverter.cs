@@ -63,4 +63,14 @@ public class YesNoValueConverter : PropertyValueConverterBase
 
         // source should come from ConvertSource and be a boolean already
         (bool?)inter ?? false ? "1" : "0";
+
+    // get the default value from config if possible
+    private static bool GetDefaultValue(IPublishedPropertyType propertyType)
+    {
+        // try get config for initial state prevalue
+        var config = propertyType.DataType.ConfigurationAs<TrueFalseConfiguration>();
+
+        // if no config default value is: false
+        return config is null ? false : config.Default;
+    }
 }
