@@ -37,7 +37,12 @@ public class YesNoValueConverter : PropertyValueConverterBase
                 return true;
             }
 
-            return bool.TryParse(s, out var result) && result;
+            if (bool.TryParse(s, out var result))
+            {
+                return result;
+            }
+
+            return GetDefaultValue(propertyType);
         }
 
         if (source is int)
