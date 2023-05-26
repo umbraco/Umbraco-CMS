@@ -62,7 +62,7 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc --project ./src/tsconfig.json && rollup -c ./src/rollup.config.js",
+		"build": "tsc --project ./src/tsconfig.json && rollup -c ./src/rollup.config.js && npm run generate:jsonschema",
 		"build:vite": "tsc && vite build --mode staging",
 		"build:for:static": "vite build",
 		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
