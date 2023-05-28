@@ -49,7 +49,6 @@ export const handlers = [
 	}),
 
 	rest.get(umbracoPath('/template/:id'), (req, res, ctx) => {
-		console.log('template/:id', req.params);
 		const id = req.params.id as string;
 		if (!id) return;
 

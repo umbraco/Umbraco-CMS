@@ -3,7 +3,7 @@ import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-s
 import type { UmbCodeEditorElement } from '../../../core/components/code-editor/code-editor.element.js';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 //import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/components';
@@ -15,6 +15,9 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 	@state()
 	private _content?: string | null = '';
+
+	@state()
+	private _ready?: boolean = false;
 
 	@state()
 	private _masterTemplateName?: string | null = null;
@@ -52,6 +55,10 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 			this.observe(this.#templateWorkspaceContext.isNew, (isNew) => {
 				this.#isNew = !!isNew;
 			});
+
+			this.observe(this.#templateWorkspaceContext.isCodeEditorReady, (isReady) => {
+				this._ready = isReady;
+			});
 		});
 	}
 
@@ -62,7 +69,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	}
 
 	#onCodeEditorInput(event: Event) {
-		const target = event.target as any;
+		const target = event.target as UmbCodeEditorElement;
 		const value = target.code as string;
 		this.#templateWorkspaceContext?.setContent(value);
 	}
@@ -75,11 +82,10 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 	private _modalContext?: UmbModalContext;
 
-	//TODO: fix this
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
 		sectionModal?.onSubmit().then((insertSectionModalResult) => {
-			console.log(insertSectionModalResult);
+			if (insertSectionModalResult.value) this._codeEditor?.insert(insertSectionModalResult.value);
 		});
 	}
 
@@ -116,9 +122,9 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 
 		//if no master template in the content insert it at the beginning
 		const string = `@{
-			Layout = "${masterTemplate?.name}.cshtml";
-		}
-		${this._content}`;
+	Layout = "${masterTemplate?.name}.cshtml";
+}
+${this._content}`;
 		this.#templateWorkspaceContext?.setContent(string);
 	}
 
@@ -144,13 +150,25 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 					look="secondary"
 					id="master-template-button"
 					label="Change Master template"
-					>Master template: ${this._masterTemplateName ?? 'No master'}</uui-button
+					>${this._masterTemplateName
+						? `Master template: ${this._masterTemplateName}`
+						: 'Set master template'}</uui-button
 				>
-				<uui-button look="secondary" id="save-button" label="Remove master template" compact
-					><uui-icon name="umb:delete" @click=${this.#resetMasterTemplate}></uui-icon
-				></uui-button>
+				${this._masterTemplateName
+					? html` <uui-button look="secondary" id="save-button" label="Remove master template" compact
+							><uui-icon name="umb:delete" @click=${this.#resetMasterTemplate}></uui-icon
+					  ></uui-button>`
+					: nothing}
 			</uui-button-group>
 		`;
+	}
+
+	#renderCodeEditor() {
+		return html`<umb-code-editor
+			language="razor"
+			id="content"
+			.code=${this._content ?? ''}
+			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
 	render() {
@@ -174,12 +192,11 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 						</uui-button>
 					</div>
 				</div>
-
-				<umb-code-editor
-					language="razor"
-					id="content"
-					.code=${this._content ?? ''}
-					@input=${this.#onCodeEditorInput}></umb-code-editor>
+				${this._ready
+					? this.#renderCodeEditor()
+					: html`<div id="loader-container">
+							<uui-loader></uui-loader>
+					  </div>`}
 			</uui-box>
 		</umb-workspace-editor>`;
 	}
@@ -193,12 +210,19 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 				height: 100%;
 			}
 
+			#loader-container {
+				display: grid;
+				place-items: center;
+				min-height: calc(100dvh - 360px);
+			}
+
 			umb-code-editor {
 				margin-top: var(--uui-size-space-3);
 				--editor-height: calc(100dvh - 300px);
 			}
 
 			uui-box {
+				min-height: calc(100dvh - 300px);
 				margin: var(--uui-size-layout-1);
 				--uui-box-default-padding: 0;
 			}
@@ -208,7 +232,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 				margin: 1em;
 			}
 
-			#code-editor-menu-container uui-icon {
+			#code-editor-menu-container uui-icon:not([name='umb:delete']) {
 				margin-right: var(--uui-size-space-3);
 			}
 

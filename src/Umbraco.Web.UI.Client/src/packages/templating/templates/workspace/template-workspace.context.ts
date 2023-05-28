@@ -1,6 +1,11 @@
 import { UmbTemplateRepository } from '../repository/template.repository.js';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { createObservablePart, UmbDeepState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	createObservablePart,
+	UmbBooleanState,
+	UmbDeepState,
+	UmbObjectState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -13,8 +18,21 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	content = createObservablePart(this.#data, (data) => data?.content);
 	id = createObservablePart(this.#data, (data) => data?.id);
 
+	#isCodeEditorReady = new UmbBooleanState(false);
+	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
+
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbTemplateRepository(host));
+		this.#loadCodeEditor();
+	}
+
+	async #loadCodeEditor() {
+		try {
+			await import('../../../core/components/code-editor/index.js');
+			this.#isCodeEditorReady.next(true);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	getEntityType(): string {
@@ -52,8 +70,12 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		const match = RegexString.exec(content ?? '');
 
 		if (match) {
-			if (match[2] === 'null') return null;
-			this.#masterTemplate.next({ id: match[2].replace(/"/g, '') });
+			if (match[2] === 'null') {
+				this.#masterTemplate.next(null);
+				return null;
+			}
+
+			this.#masterTemplate.next({ name: match[2].replace(/"/g, '').replace('.cshtml', '') });
 			return match[2].replace(/"/g, '');
 		}
 		this.#masterTemplate.next(null);
