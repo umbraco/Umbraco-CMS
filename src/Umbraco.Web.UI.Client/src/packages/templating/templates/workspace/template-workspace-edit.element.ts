@@ -1,5 +1,6 @@
 import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
+import type { UmbCodeEditorElement } from '../../../core/components/code-editor/code-editor.element.js';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
@@ -19,7 +20,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	private _masterTemplateName?: string | null = null;
 
 	@query('umb-code-editor')
-	private _codeEditor?: any;
+	private _codeEditor?: UmbCodeEditorElement;
 
 	#templateWorkspaceContext?: UmbTemplateWorkspaceContext;
 	#isNew = false;
@@ -87,18 +88,37 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	}
 
 	async #setMasterTemplateId(id: string | null) {
-		if (this._content === null || this._content === undefined) return;
-		const RegexString = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
+		//root item selected
+		if (id === '') return;
 
-		if (id === null) {
-			const string = this._content?.replace(RegexString, `$1null$3`);
+		if (this._content === null || this._content === undefined) return;
+		const layoutBlockRegex = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
+		const masterTemplate = await this.#templateWorkspaceContext?.setMasterTemplate(id);
+
+		//root item selected
+
+		//Reset master template or is did not exist and the declaration exists
+		if (masterTemplate === null && layoutBlockRegex.test(this._content)) {
+			const string = this._content?.replace(layoutBlockRegex, `$1null$3`);
 			this.#templateWorkspaceContext?.setContent(string);
 			return;
 		}
 
-		const masterTemplate = await this.#templateWorkspaceContext?.setMasterTemplate(id);
+		//No declaration and no valid id - do nothing
+		if (masterTemplate === null) return;
 
-		const string = this._content?.replace(RegexString, `$1"${masterTemplate?.name}.cshtml"$3`);
+		//if has master template in the content
+		if (layoutBlockRegex.test(this._content)) {
+			const string = this._content?.replace(layoutBlockRegex, `$1"${masterTemplate?.name}.cshtml"$3`);
+			this.#templateWorkspaceContext?.setContent(string);
+			return;
+		}
+
+		//if no master template in the content insert it at the beginning
+		const string = `@{
+			Layout = "${masterTemplate?.name}.cshtml";
+		}
+		${this._content}`;
 		this.#templateWorkspaceContext?.setContent(string);
 	}
 
@@ -106,7 +126,7 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		const modalHandler = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			selection: [this.#masterTemplateId],
 			pickableFilter: (item) => {
-				return item.id !== this.#templateWorkspaceContext?.getEntityId();
+				return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
 			},
 		});
 
