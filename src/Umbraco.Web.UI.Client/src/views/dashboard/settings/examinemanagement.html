@@ -341,10 +341,10 @@
                                                                         No results were found
                                                                       </localize>
                                                                       <localize key="examineManagement_searchResultsFound"
-                                                                                tokens="[vm.searchResults.results.length, vm.searchResults.totalRecords]"
+                                                                                tokens="[(vm.searchResults.pageIndex * vm.searchResults.pageSize) + 1, (vm.searchResults.pageIndex * vm.searchResults.pageSize) + vm.searchResults.results.length, vm.searchResults.totalRecords, vm.searchResults.pageNumber, vm.searchResults.totalPages]"
                                                                                 watch-tokens="true"
                                                                                 ng-if="::vm.searchResults.totalRecords > 0">
-                                                                        Showing %0% of %1% result(s)
+                                                                        Showing %0% - %1% of %2% result(s) - Page %3% of %4%
                                                                       </localize>
                                                                     </td>
                                                                 </tr>
