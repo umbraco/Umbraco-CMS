@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
 
@@ -9,17 +9,20 @@ public interface ILogViewer
     /// <summary>
     ///     Get all saved searches from your chosen data source
     /// </summary>
-    IReadOnlyList<SavedLogSearch>? GetSavedSearches();
+    IReadOnlyList<SavedLogSearch> GetSavedSearches();
 
     /// <summary>
     ///     Adds a new saved search to chosen data source and returns the updated searches
     /// </summary>
-    IReadOnlyList<SavedLogSearch>? AddSavedSearch(string? name, string? query);
+    IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query);
 
     /// <summary>
     ///     Deletes a saved search to chosen data source and returns the remaining searches
     /// </summary>
-    IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string? name, string? query);
+    IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name) => DeleteSavedSearch(name, string.Empty);
+
+    [Obsolete("Use the overload that only takes a 'name' parameter instead. This will be removed in Umbraco 14.")]
+    IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query);
 
     /// <summary>
     ///     A count of number of errors

@@ -103,7 +103,7 @@ Great question! The short version goes like this:
     
 1. **Switch to the correct branch**
 
-    Switch to the `v11/contrib` branch
+    Switch to the `contrib` branch
 
 1. **Build**
 
@@ -111,7 +111,7 @@ Great question! The short version goes like this:
 
 1. **Branch**
 
-    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case issue number `12345`.  Don't commit to `v11/contrib`, create a new branch first.
+    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case issue number `12345`.  Don't commit to `contrib`, create a new branch first.
 
 1. **Change**
 
@@ -121,7 +121,7 @@ Great question! The short version goes like this:
 
     Done? Yay! 🎉
 
-    Remember to commit to your new `temp` branch, and don't commit to `v11/contrib`. Then you can push the changes up to your fork on GitHub.
+    Remember to commit to your new `temp` branch, and don't commit to `contrib`. Then you can push the changes up to your fork on GitHub.
 
 #### Keeping your Umbraco fork in sync with the main repository
 [sync fork]: #keeping-your-umbraco-fork-in-sync-with-the-main-repository
@@ -138,10 +138,10 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/v11/contrib
+git rebase upstream/contrib
 ```
 
-In this command we're syncing with the `v11/contrib` branch, but you can of course choose another one if needed.
+In this command we're syncing with the `contrib` branch, but you can of course choose another one if needed.
 
 [More information on how this works can be found on the thoughtbot blog.][sync fork ext]
 
@@ -169,7 +169,7 @@ We recommend you to [sync with our repository][sync fork] before you submit your
 GitHub will have picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 ![Create a pull request](img/createpullrequest.png)
 
-We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v11/contrib`. If you are working on v9, this is the branch you should be targeting.
+We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to `contrib`. This is the branch you should be targeting.
 
 Please note: we are no longer accepting features for v8 and below but will continue to merge security fixes as and when they arise.
 
@@ -208,11 +208,13 @@ There will be times that we really like your proposed changes and we’ll finish
 
 The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan][Sebastiaan], who gets assistance from the following community members who have committed to volunteering their free time:
 
-- [Nathan Woulfe][Nathan Woulfe]
-- [Joe Glombek][Joe Glombek]
-- [Laura Weatherhead][Laura Weatherhead]
+- [Busra Sengul][Busra Sengul]
+- [Emma Garland][Emma Garland]
+- [George Bidder][George Bidder]
+- [Jason Elkin][Jason Elkin]
+- [Laura Neto][Laura Neto]
 - [Michael Latouche][Michael Latouche]
-- [Owain Williams][Owain Williams]
+- [Sebastiaan][Sebastiaan]
 
 
 These wonderful people aim to provide you with a reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. HQ will have final sign-off and will check the work again before it is merged.
@@ -227,12 +229,14 @@ These wonderful people aim to provide you with a reply to your PR, review and te
 
 <!-- External -->
 
-[Nathan Woulfe]: https://github.com/nathanwoulfe	"Nathan's GitHub profile"
-[Joe Glombek]: https://github.com/glombek	"Joe's GitHub profile"
-[Laura Weatherhead]: https://github.com/lssweatherhead	"Laura's GitHub profile"
+[Busra Sengul]: https://github.com/busrasengul "Busra's GitHub profile"
+[Emma Garland]: https://github.com/emmagarland	"Emma's GitHub profile"
+[George Bidder]: https://github.com/georgebid	"George's GitHub profile"
+[Jason Elkin]: https://github.com/jasonelkin "Jason's GitHub profile"
+[Kyle Eck]: https://github.com/teckspeed	"Kyle's GitHub profile"
+[Laura Neto]: https://github.com/lauraneto	"Laura's GitHub profile"
 [Michael Latouche]: https://github.com/mikecp	"Michael's GitHub profile"
-[Owain Williams]: https://github.com/OwainWilliams	"Owain's GitHub profile"
-[Sebastiaan]: https://github.com/nul800sebastiaan	"Senastiaan's GitHub profile"
+[Sebastiaan]: https://github.com/nul800sebastiaan "Sebastiaan's GitHub profile"
 [ Umbrabot ]: https://github.com/umbrabot
 [git flow]: https://jeffkreeftmeijer.com/git-flow/	"An explanation of git flow"
 [sync fork ext]: http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated	"Details on keeping a git fork updated"

@@ -9,25 +9,52 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
-    <Content Include="$(JsonSchemaPath)" PackagePath="" />
-    <Content Include="$(JsonSchemaCmsPath)" PackagePath="" />
   </ItemGroup>
 
-  <!-- Generate appsettings-schema.json on build (and before copying to project) -->
+  <!-- Add JSON schema references (and include MSBuild task) -->
   <PropertyGroup>
-    <JsonSchemaPath>$(MSBuildThisFileDirectory)appsettings-schema.json</JsonSchemaPath>
-    <JsonSchemaCmsPath>$(MSBuildThisFileDirectory)appsettings-schema.Umbraco.Cms.json</JsonSchemaCmsPath>
-    <JsonSchemaProjectPath>$(MSBuildThisFileDirectory)..\JsonSchema\</JsonSchemaProjectPath>
+    <_UmbracoCmsJsonSchemaReference>appsettings-schema.Umbraco.Cms.json</_UmbracoCmsJsonSchemaReference>
+    <NoWarn>NU5100;NU5128</NoWarn>
   </PropertyGroup>
-  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyAppsettingsSchema" Condition="!Exists('$(JsonSchemaPath)') or !Exists('$(JsonSchemaCmsPath)')">
-    <Message Text="Generating appsettings-schema.json and appsettings-schema.Umbraco.Cms.json because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -- --mainOutputFile &quot;$(JsonSchemaPath)&quot; --cmsOutputFile &quot;$(JsonSchemaCmsPath)&quot;" />
+  <ItemGroup>
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <None Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" Pack="true" PackagePath="tasks\netstandard2.0" Visible="false" />
+    <Content Include="$(_UmbracoCmsJsonSchemaReference)" PackagePath="" Visible="false" />
+  </ItemGroup>
+
+  <!-- We also need physical copies in the right location relative to the Umbraco.Cms.Targets.targets file, as that's directly referenced in projects -->
+  <Target Name="CopyUmbracoJsonSchemaExtensionsFiles" BeforeTargets="Build">
+    <ItemGroup>
+      <_UmbracoJsonSchemaExtensionsFiles Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UmbracoJsonSchemaExtensionsFiles)" DestinationFolder="$(MSBuildThisFileDirectory)tasks\netstandard2.0" SkipUnchangedFiles="true" />
+  </Target>
+  <ItemGroup>
+    <None Remove="tasks\**" />
+  </ItemGroup>
+
+  <!-- Generate JSON schema on build (and before copying to project) -->
+  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsJsonSchemaReference)')">
+    <Message Text="Generating $(_UmbracoCmsJsonSchemaReference) because it doesn't exist" Importance="high" />
+    <Exec WorkingDirectory="$(MSBuildThisFileDirectory)..\..\tools\Umbraco.JsonSchema" Command="dotnet run --configuration $(Configuration) -- --outputFile &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsJsonSchemaReference)&quot;" />
+  </Target>
+
+  <!-- Remove generated JSON schema on clean -->
+  <Target Name="RemoveAppsettingsSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsJsonSchemaReference)')">
+    <Delete Files="$(_UmbracoCmsJsonSchemaReference)" />
+  </Target>
+
+  <!-- Create and pack empty file to add TFM dependency -->
+  <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
+    <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
+    <ItemGroup>
+      <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
+    </ItemGroup>
   </Target>
 </Project>

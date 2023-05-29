@@ -15,9 +15,9 @@
 
             <umb-editor-container>
 
-                <div ng-if="vm.activeTab.alias === 'block'" class="form-vertical umb-block-grid-block-configuration-layout">
+                <div ng-if="vm.activeTab.alias === 'block'" class="form-vertical">
 
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
+                    <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="general_General">General</localize>
@@ -80,124 +80,9 @@
                     </div>
 
 
-                    
-
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
-
-                        <div class="umb-group-panel__header">
-                            <div>
-                                <localize key="blockEditor_sizeOptions">Size options</localize>
-                                <umb-property-info-button button-title-key="general_readMore">
-                                    <localize key="blockEditor_sizeOptionsHelp">Define one or more size options, this enables resizing of the Block</localize>
-                                </umb-property-info-button>
-                            </div>
-                        </div>
-
-                        <div class="umb-group-panel__content">
-
-                            <button ng-if="!vm.showSizeOptions" type="button" class="btn-reset __settings-input --noValue umb-outline" style="height: 80px;" ng-click="vm.showSizeOptions = true">
-                                <localize key="blockEditor_showSizeOptions">Show size options</localize>
-                            </button>
-
-                            <!-- Column span options -->
-                            <div ng-if="vm.showSizeOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_allowedBlockColumns">Available column spans</localize></label>
-                                    <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_allowedBlockColumnsHelp">Define the different number of layout columns this block is allowed to span across.</localize>
-                                    </umb-property-info-button>
-                                    <div class="controls">
-                                        <umb-block-grid-column-editor model="vm.block.columnSpanOptions" block="vm.block" grid-columns="model.gridColumns"></umb-block-grid-column-editor>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- min/max Row span options -->
-                            <div ng-if="vm.showSizeOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_allowedBlockRows">Available row spans</localize></label>
-                                    <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</localize>
-                                    </umb-property-info-button>
-                                    <div class="controls">
-                                        <umb-property-editor name="rowMinMaxModel" model="vm.rowMinMaxModel" is-pre-value="true"></umb-property-editor>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
 
 
-
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
-
-                        <div class="umb-group-panel__header">
-                            <localize key="blockEditor_headlineCatalogueAppearance">Catalogue appearance</localize>
-                        </div>
-
-                        <div class="umb-group-panel__content">
-
-                            <button ng-if="!vm.showAppearanceOptions" type="button" class="btn-reset __settings-input --noValue umb-outline" style="height: 80px;" ng-click="vm.showAppearanceOptions = true">
-                                <localize key="blockEditor_showAppearanceOptions">Show catalogue appearance</localize>
-                            </button>
-
-                            <!-- backgroundColor -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="backgroundColor"><localize key="blockEditor_labelBackgroundColor">Background Color</localize></label>
-                                    <div class="controls">
-                                        <umb-color-picker
-                                            ng-model="vm.block.backgroundColor"
-                                            options="vm.colorPickerOptions"
-                                            on-change="vm.changeBackgroundColor(color)">
-                                        </umb-color-picker>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- iconColor -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="iconColor"><localize key="blockEditor_labelIconColor">Icon Color</localize></label>
-                                    <div class="controls">
-                                        <umb-color-picker
-                                            ng-model="vm.block.iconColor"
-                                            options="vm.colorPickerOptions"
-                                            on-change="vm.changeIconColor(color)">
-                                        </umb-color-picker>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- thumbnail -->
-                            <div ng-if="vm.showAppearanceOptions" class="control-group umb-control-group -no-border">
-                                <div class="umb-el-wrap">
-                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_thumbnail">Thumbnail</localize></label>
-                                    <div class="controls">
-                                        <div class="__settings-input --hasValue" ng-if="vm.block.thumbnail !== null" >
-
-                                            <umb-node-preview icon="'icon-document'" name="vm.block.thumbnail"></umb-node-preview>
-                                            <div class="__control-actions">
-                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.removeThumbnailForBlock(vm.block)">
-                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn-reset __settings-input --noValue --hideText umb-outline" ng-if="vm.block.thumbnail === null" ng-click="vm.addThumbnailForBlock(vm.block)">
-                                            <localize key="blockEditor_addThumbnail">Add thumbnail</localize>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
+                    <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineAllowance">Permissions</localize>
@@ -244,11 +129,62 @@
 
                     </div>
 
+
+
+
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <div>
+                                <localize key="blockEditor_sizeOptions">Size options</localize>
+                                <umb-property-info-button button-title-key="general_readMore">
+                                    <localize key="blockEditor_sizeOptionsHelp">Define one or more size options, this enables resizing of the Block</localize>
+                                </umb-property-info-button>
+                            </div>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <button ng-if="!vm.showSizeOptions" type="button" class="btn-reset __settings-input --noValue umb-outline" style="height: 80px;" ng-click="vm.showSizeOptions = true">
+                                <localize key="blockEditor_showSizeOptions">Show size options</localize>
+                            </button>
+
+                            <!-- Column span options -->
+                            <div ng-if="vm.showSizeOptions" class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_allowedBlockColumns">Available column spans</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_allowedBlockColumnsHelp">Define the different number of layout columns this block is allowed to span across.</localize>
+                                    </umb-property-info-button>
+                                    <div class="controls">
+                                        <umb-block-grid-column-editor model="vm.block.columnSpanOptions" block="vm.block" grid-columns="model.gridColumns"></umb-block-grid-column-editor>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- min/max Row span options -->
+                            <div ng-if="vm.showSizeOptions" class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="label"><localize key="blockEditor_allowedBlockRows">Available row spans</localize></label>
+                                    <umb-property-info-button button-title-key="general_readMore">
+                                        <localize key="blockEditor_allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</localize>
+                                    </umb-property-info-button>
+                                    <div class="controls">
+                                        <umb-property-editor name="rowMinMaxModel" model="vm.rowMinMaxModel" is-pre-value="true"></umb-property-editor>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
                 <div ng-if="vm.activeTab.alias === 'areas'">
 
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel --span-two-cols">
+                    <div class="umb-group-panel">
 
 
                         <div class="umb-group-panel__header">
@@ -275,7 +211,7 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="label"><localize key="blockEditor_areasConfigurations">Area configurations</localize></label>
                                     <umb-property-info-button button-title-key="general_readMore">
-                                        <localize key="blockEditor_areasConfigurationsHelp">To enable nesting of blocks within this block, define one or more areas for blocks to be nested within. Areas follow their own layout witch is defined by the Area Layout Columns. Each Areas column and row span can be adjusted by using the scale-handler in the bottom right.</localize>
+                                      <localize key="blockEditor_areasConfigurationsHelp">To enable the nesting of blocks within this block, define one or more areas. Areas follow the layout defined by their own grid column configuration. The 'column span' and 'row span' for each area can be adjusted by using the scale-handler box in the bottom right hand corner of the selected area.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-block-grid-area-editor model="vm.block.areas" block="vm.block" grid-columns="model.gridColumns" all-block-types="model.allBlockTypes" all-block-groups="model.allBlockGroups" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-editor>
@@ -288,7 +224,7 @@
                 </div>
 
                 <div ng-if="vm.activeTab.alias === 'advance'">
-                    <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel">
+                    <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_headlineAdvanced">Advanced</localize>
@@ -377,6 +313,66 @@
                                     </umb-property-info-button>
                                     <div class="controls">
                                         <umb-toggle checked="vm.block.forceHideContentEditorInOverlay" on-click="vm.block.forceHideContentEditorInOverlay = vm.block.forceHideContentEditorInOverlay != true"></umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineCatalogueAppearance">Catalogue appearance</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- backgroundColor -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="backgroundColor"><localize key="blockEditor_labelBackgroundColor">Background Color</localize></label>
+                                    <div class="controls">
+                                        <umb-color-picker
+                                            ng-model="vm.block.backgroundColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeBackgroundColor(color)">
+                                        </umb-color-picker>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- iconColor -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconColor"><localize key="blockEditor_labelIconColor">Icon Color</localize></label>
+                                    <div class="controls">
+                                        <umb-color-picker
+                                            ng-model="vm.block.iconColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeIconColor(color)">
+                                        </umb-color-picker>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- thumbnail -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_thumbnail">Thumbnail</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.thumbnail !== null" >
+
+                                            <umb-node-preview icon="'icon-document'" name="vm.block.thumbnail"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.removeThumbnailForBlock(vm.block)">
+                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue --hideText umb-outline" ng-if="vm.block.thumbnail === null" ng-click="vm.addThumbnailForBlock(vm.block)">
+                                            <localize key="blockEditor_addThumbnail">Add thumbnail</localize>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

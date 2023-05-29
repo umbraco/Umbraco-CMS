@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.ContentApps;
@@ -25,6 +26,7 @@ using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -50,6 +52,7 @@ public class MemberController : ContentControllerBase
     private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ICoreScopeProvider _scopeProvider;
+    private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
 
@@ -71,6 +74,43 @@ public class MemberController : ContentControllerBase
     /// <param name="jsonSerializer">The JSON serializer</param>
     /// <param name="passwordChanger">The password changer</param>
     /// <param name="scopeProvider">The core scope provider</param>
+    /// <param name="twoFactorLoginService">The two factor login service</param>
+    [ActivatorUtilitiesConstructor]
+    public MemberController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        PropertyEditorCollection propertyEditors,
+        IUmbracoMapper umbracoMapper,
+        IMemberService memberService,
+        IMemberTypeService memberTypeService,
+        IMemberManager memberManager,
+        IDataTypeService dataTypeService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IJsonSerializer jsonSerializer,
+        IPasswordChanger<MemberIdentityUser> passwordChanger,
+        ICoreScopeProvider scopeProvider,
+        ITwoFactorLoginService twoFactorLoginService)
+        : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
+    {
+        _propertyEditors = propertyEditors;
+        _umbracoMapper = umbracoMapper;
+        _memberService = memberService;
+        _memberTypeService = memberTypeService;
+        _memberManager = memberManager;
+        _dataTypeService = dataTypeService;
+        _localizedTextService = localizedTextService;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _jsonSerializer = jsonSerializer;
+        _shortStringHelper = shortStringHelper;
+        _passwordChanger = passwordChanger;
+        _scopeProvider = scopeProvider;
+        _twoFactorLoginService = twoFactorLoginService;
+    }
+
+    [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V13")]
     public MemberController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -87,20 +127,24 @@ public class MemberController : ContentControllerBase
         IJsonSerializer jsonSerializer,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ICoreScopeProvider scopeProvider)
-        : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
+        : this(
+              cultureDictionary,
+              loggerFactory,
+              shortStringHelper,
+              eventMessages,
+              localizedTextService,
+              propertyEditors,
+              umbracoMapper,
+              memberService,
+              memberTypeService,
+              memberManager,
+              dataTypeService,
+              backOfficeSecurityAccessor,
+              jsonSerializer,
+              passwordChanger,
+              scopeProvider,
+              StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
     {
-        _propertyEditors = propertyEditors;
-        _umbracoMapper = umbracoMapper;
-        _memberService = memberService;
-        _memberTypeService = memberTypeService;
-        _memberManager = memberManager;
-        _dataTypeService = dataTypeService;
-        _localizedTextService = localizedTextService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _jsonSerializer = jsonSerializer;
-        _shortStringHelper = shortStringHelper;
-        _passwordChanger = passwordChanger;
-        _scopeProvider = scopeProvider;
     }
 
     /// <summary>
@@ -544,6 +588,16 @@ public class MemberController : ContentControllerBase
             return ValidationProblem("An admin cannot lock a member");
         }
 
+        // Handle disabling of 2FA
+        if (!contentItem.IsTwoFactorEnabled)
+        {
+            IEnumerable<string> providers = await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(contentItem.Key);
+            foreach (var provider in providers)
+            {
+                await _twoFactorLoginService.DisableAsync(contentItem.Key, provider);
+            }
+        }
+
         // If we're changing the password...
         // Handle changing with the member manager & password changer (takes care of other nuances)
         if (contentItem.Password != null)
@@ -569,7 +623,7 @@ public class MemberController : ContentControllerBase
 
             // Change and persist the password
             Attempt<PasswordChangedModel?> passwordChangeResult =
-                await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
+                await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager, _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser);
 
             if (!passwordChangeResult.Success)
             {

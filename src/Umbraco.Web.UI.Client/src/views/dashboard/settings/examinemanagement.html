@@ -321,8 +321,8 @@
                                                                         {{ ::result.values[field] | umbCmsJoinArray:', ' }}
                                                                     </td>
                                                                     <td class="tr nowrap">
-                                                                        <button type="button" 
-                                                                            class="table__action-overlay color-green" 
+                                                                        <button type="button"
+                                                                            class="table__action-overlay color-green"
                                                                             ng-click="vm.showSearchResultDialog(result.values)">({{ ::result.fieldCount }} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                     </td>
                                                                     <td class="tr nowrap umb-avatar--white">
@@ -370,7 +370,7 @@
                                 <div class="umb-panel-group__details-status-content">
 
                                     <table class="table table-bordered table-condensed">
-                                        <caption>&nbsp;</caption>
+                                        <caption class="sr-only"><localize key="examineManagement_contentInIndex">Content In Index</localize></caption>
                                         <tr ng-repeat="(key, val) in vm.selectedIndex.providerProperties track by $index">
                                             <th>{{key}}</th>
                                             <td>{{val}}</td>

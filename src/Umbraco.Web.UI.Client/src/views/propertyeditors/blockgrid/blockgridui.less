@@ -20,18 +20,6 @@
 
 .umb-block-grid__layout-item {
     position: relative;
-    &:hover {
-
-        > ng-form > .umb-block-grid__block--context {
-            z-index: 4;
-        }
-
-        > ng-form > .umb-block-grid__block--inline-create-button, 
-        > ng-form > .umb-block-grid__block--validation-border,
-        > ng-form > .umb-block-grid__block--actions {
-            z-index: 3;
-        }
-    }
 }
 
 .umb-block-grid__block--validation-border {
@@ -95,18 +83,13 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
 
         &::after {
             display: var(--umb-block-grid--block-ui-display, block);
-            animation: umb-block-grid__block__border-pulse 400ms ease-in-out alternate infinite;
-            @keyframes umb-block-grid__block__border-pulse {
-                0%   { border-color: rgba(@blueDark, 1); }
-                100% { border-color: rgba(@blueDark, 0.66); }
-            }
+            border-color: @blueDark;
         }
     }
     &.--active {
         &::after {
             display: block;
             border-color: @pinkLight;
-            animation: none;
         }
         
         > .umb-block-grid__block--context {
@@ -188,13 +171,15 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
     &.--active {
 
         /** Avoid displaying hover when dragging-mode */
-        --umb-block-grid--block-ui-opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+        --umb-block-grid--block-ui-opacity--condition: var(--umb-block-grid--dragging-mode) 0;
+        --umb-block-grid--block-ui-opacity: var(--umb-block-grid--block-ui-opacity--code, 1);
         
         > .umb-block-grid__block--context {
             opacity: var(--umb-block-grid--block-ui-opacity);
         }
         &:not(.--scale-mode) {
             > .umb-block-grid__block--actions {
+                z-index: 4;
                 opacity: var(--umb-block-grid--block-ui-opacity);
             }
     
@@ -222,15 +207,16 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 
 .umb-block-grid__block--context {
     position: absolute;
-    top: -20px;
-    right: 0;
+    bottom: 100%;
+    right: -1px;
+    max-width: 100%;
     font-size: 12px;
     z-index: 4;
     display: var(--umb-block-grid--block-ui-display, flex);
     justify-content: end;
 
     /** prevent interaction with inline-create button just beneath the context-bar: */
-    ::after {
+    &::after {
         content: '';
         position: absolute;
         top: 100%;
@@ -242,31 +228,62 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     .__context-bar {
         padding: 0 9px;
         padding-top: 1px;
-        background-color: #3544B1;
+        background-color: @blueDark;
         color: white;
+        border-top: rgba(255, 255, 255, .7) 1px solid;
+        border-left: rgba(255, 255, 255, .7) 1px solid;
+        border-right: rgba(255, 255, 255, .7) 1px solid;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
-        display: inline-block;
+        display: inline-flex;
+        box-sizing: border-box;
+
+        max-width: 100%;
+        white-space: nowrap;
+
+        /* Ensure that the bar is visually connected with the border **/
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 1px;
+            border-top: 1px solid @blueDark;
+            box-sizing: border-box;
+            background: none;
+        }
+        &::after {
+            content: '';
+            position: absolute;
+            right: 1px;
+            bottom: -2px;
+            height: 2px;
+            width: 2px;
+            border-top: 1px solid @blueDark;
+            border-right: 1px solid @blueDark;
+            box-sizing: border-box;
+            background: none;
+        }
+
         .action {
             color: currentColor;
             font-size: 12px;
+            line-height: inherit;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .__divider {
-            display: inline-block;
             margin: 0 3px;
         }
         .__label {
-            display: inline-flex;
             align-items: center;
             padding: 0;
             font-weight: 700;
             user-select: none;
-    
-            .icon {
-                font-size: 22px;
-                margin-right: 5px;
-                display: inline-block;
-            }
+
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 }
@@ -366,6 +383,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     padding: 0;
     background-color: white;
     border: @blueDark solid 1px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .7);
     opacity: 0;
     transition: opacity 120ms;
 }
@@ -412,15 +430,17 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     z-index: 1; /** overwritten for the first one of an area. */
 
     /** Avoid showing inline-create in dragging-mode */
-    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
+
+    --umb-block-grid__block--inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
+    display: var(--umb-block-grid__block--inline-create-button-display--condition);
 }
 .umb-block-grid__block--inline-create-button.--above {
     left: 0;
-    width: 100%;
+    width: var(--umb-block-grid-editor--inline-create-width, 100%);
 
     top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
 }
-.umb-block-grid__layout-item:first-of-type .umb-block-grid__block--inline-create-button.--above {
+.umb-block-grid__layout-item:first-of-type > .umb-block-grid__block--inline-create-button.--above {
     /* Do not use row-gap if the first one. */
     top: 0;
 }
@@ -428,7 +448,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     /* If at root, and full-width then become 40px wider: */
     --calc: clamp(0, calc(var(--umb-block-grid--item-column-span) - (var(--umb-block-grid--grid-columns)-1)), 1);
     left: calc(-20px * var(--calc));
-    width: calc(100% + 40px * var(--calc));
+    width: calc(var(--umb-block-grid-editor--inline-create-width, 100%) + 40px * var(--calc));
 }
 
 .umb-block-grid__block--inline-create-button.--after {
@@ -454,6 +474,10 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     /* Move inline create button slightly up, to avoid collision with others*/
     margin-bottom: -7px;
     margin-top: -13px;
+
+    /** Avoid showing last-inline-create in dragging-mode */
+    --umb-block-grid__block--last-inline-create-button-display--condition: var(--umb-block-grid--dragging-mode) none;
+    display: var(--umb-block-grid__block--last-inline-create-button-display--condition);
 }
 
 
@@ -553,6 +577,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 
 .umb-block-grid__area-actions {
     grid-column: span var(--umb-block-grid--area-column-span);
+    flex-grow: 1;
     opacity: calc(var(--umb-block-grid--hint-area-ui, 0) * .5 + var(--umb-block-grid--show-area-ui, 0));
     transition: opacity 120ms;
 
@@ -590,10 +615,12 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     }
 }
 
+
 .umb-block-grid__layout-item-placeholder {
     background: transparent;
     border-radius: 3px;
 
+    box-sizing: border-box;
     border: solid 1px;
     border-color: rgba(@blueDark, .5);
     border-radius: 3px;
@@ -601,9 +628,11 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     height: 100%;
 }
 
+
 .umb-block-grid__layout-item-placeholder > * {
     display: none;
 }
+
 .umb-block-grid__layout-item-placeholder::before {
     content: '';
     position:absolute;
@@ -611,6 +640,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     inset: 0;
     border-radius: 3px;
     background-color: white;
+    pointer-events:none;
 }
 .umb-block-grid__layout-item-placeholder::after {
     content: '';
@@ -618,6 +648,7 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     z-index:1;
     inset: 0;
     border-radius: 3px;
+    pointer-events:none;
 
     transition: background-color 240ms ease-in;
     animation: umb-block-grid__placeholder__pulse 400ms ease-in-out alternate infinite;
@@ -630,7 +661,12 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 
 .umb-block-grid__area {
     position: relative;
-    --umb-block-grid--show-area-ui: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    --umb-block-grid__area--show-area-ui--condition: var(--umb-block-grid--dragging-mode) 1;
+    --umb-block-grid--show-area-ui: var(--umb-block-grid__area--show-area-ui--condition, 0);
 }
 .umb-block-grid__area:focus,
 .umb-block-grid__area:focus-within,
@@ -654,10 +690,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     /* Moved slightly in to align with the inline-create button, which is moved slightly in to avoid collision with other create buttons. */
     top:2px;
     bottom: 2px;
-    /** Avoid displaying highlight when in dragging-mode */
-    opacity: calc(1 - var(--umb-block-grid--dragging-mode, 0));
     border-color: @blueDark;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, .7), inset 0 0 0 1px rgba(255, 255, 255, .7);
+
 }
 .umb-block-grid__area:has( .umb-block-grid__layout-item-placeholder )::after {
     opacity: 1;
@@ -673,6 +708,9 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
         0%   { border-color: rgba(@blueDark, 1); }
         100% { border-color: rgba(@blueDark, 0.66); }
     }
+}
+.umb-block-grid__area > ng-form {
+    display: contents;
 }
 
 .umb-block-grid__scalebox-backdrop {

@@ -282,7 +282,6 @@ public static partial class Constants
             ///     Developers should not manually use these relation types since they will all be cleared whenever an entity
             ///     (content, media or member) is saved since they are auto-populated based on property values.
             /// </remarks>
-            [Obsolete("This is no longer used, and will be removed in v12")]
             public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedDocumentAlias };
 
             // TODO: return a list of built in types so we can use that to prevent deletion in the UI

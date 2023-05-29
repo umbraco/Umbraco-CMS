@@ -1319,8 +1319,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   </area>
   <area alias="rollback">
     <key alias="changes">Değişiklikler</key>
-    <key alias="created">Oluşturuldu</key>
-    <key alias="currentVersion">Mevcut sürüm</key>
     <key alias="diffHelp"><![CDATA[Bu, mevcut sürüm ile seçili sürüm arasındaki farkları gösterir <br /> <del> Kırmızı </del> metin seçili sürümde gösterilmeyecektir. , <ins> yeşil eklendi demektir </ins>]]></key>
     <key alias="documentRolledBack">Belge geri alındı ​​</key>
     <key alias="headline">Mevcut sürümle karşılaştırmak için bir sürüm seçin</key>

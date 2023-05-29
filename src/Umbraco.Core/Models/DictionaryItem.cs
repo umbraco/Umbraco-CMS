@@ -34,6 +34,7 @@ public class DictionaryItem : EntityBase, IDictionaryItem
         _translations = new List<IDictionaryTranslation>();
     }
 
+    [Obsolete("This will be removed in V13.")]
     public Func<int, ILanguage?>? GetLanguage { get; set; }
 
     /// <summary>

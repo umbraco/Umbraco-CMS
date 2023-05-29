@@ -3,9 +3,11 @@ using Examine.Lucene;
 using Examine.Lucene.Analyzers;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 
@@ -16,13 +18,24 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
 {
     private readonly IndexCreatorSettings _settings;
     private readonly IUmbracoIndexConfig _umbracoIndexConfig;
+    private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
 
+    [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
     public ConfigureIndexOptions(
         IUmbracoIndexConfig umbracoIndexConfig,
         IOptions<IndexCreatorSettings> settings)
+        : this(umbracoIndexConfig, settings, StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiContentIndexFieldDefinitionBuilder>())
+    {
+    }
+
+    public ConfigureIndexOptions(
+        IUmbracoIndexConfig umbracoIndexConfig,
+        IOptions<IndexCreatorSettings> settings,
+        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder)
     {
         _umbracoIndexConfig = umbracoIndexConfig;
         _settings = settings.Value;
+        _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
     }
 
     public void Configure(string? name, LuceneDirectoryIndexOptions options)
@@ -43,6 +56,11 @@ public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirecto
                 options.Analyzer = new CultureInvariantWhitespaceAnalyzer();
                 options.Validator = _umbracoIndexConfig.GetMemberValueSetValidator();
                 options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
+                break;
+            case Constants.UmbracoIndexes.DeliveryApiContentIndexName:
+                options.Analyzer = new StandardAnalyzer(LuceneInfo.CurrentVersion);
+                // NOTE: we do not use a validator here, because the populator does all the heavy lifting
+                options.FieldDefinitions = _deliveryApiContentIndexFieldDefinitionBuilder.Build();
                 break;
         }
 

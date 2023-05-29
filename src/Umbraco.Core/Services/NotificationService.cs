@@ -76,7 +76,8 @@ public class NotificationService : INotificationService
         Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
         Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
     {
-        var entitiesL = entities.ToList();
+        // sort the entities explicitly by path to handle notification inheritance (see comment below)
+        var entitiesL = entities.OrderBy(entity => entity.Path).ToList();
 
         // exit if there are no entities
         if (entitiesL.Count == 0)
@@ -84,11 +85,11 @@ public class NotificationService : INotificationService
             return;
         }
 
-        // put all entity's paths into a list with the same indices
-        var paths = entitiesL.Select(x =>
-                x.Path.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture))
-                    .ToArray())
-            .ToArray();
+        // create a dictionary of entity paths by entity ID
+        var pathsByEntityId = entitiesL.ToDictionary(
+            entity => entity.Id,
+            entity => entity.Path.Split(Constants.CharArrays.Comma)
+                .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray());
 
         // lazily get versions
         var prevVersionDictionary = new Dictionary<int, IContentBase?>();
@@ -106,47 +107,32 @@ public class NotificationService : INotificationService
                 break;
             }
 
-            var i = 0;
             foreach (IUser user in users)
             {
-                // continue if there's no notification for this user
-                if (notifications[i].UserId != user.Id)
+                Notification[] userNotifications = notifications.Where(n => n.UserId == user.Id).ToArray();
+                foreach (Notification notification in userNotifications)
                 {
-                    continue; // next user
-                }
+                    // notifications are inherited down the tree - find the topmost entity
+                    // relevant to this notification (entity list is sorted by path)
+                    IContent? entityForNotification = entitiesL
+                        .FirstOrDefault(entity =>
+                            pathsByEntityId.TryGetValue(entity.Id, out var path) &&
+                            path.Contains(notification.EntityId));
 
-                for (var j = 0; j < entitiesL.Count; j++)
-                {
-                    IContent content = entitiesL[j];
-                    var path = paths[j];
-
-                    // test if the notification applies to the path ie to this entity
-                    if (path.Contains(notifications[i].EntityId) == false)
+                    if (entityForNotification == null)
                     {
-                        continue; // next entity
+                        continue;
                     }
 
-                    if (prevVersionDictionary.ContainsKey(content.Id) == false)
+                    if (prevVersionDictionary.ContainsKey(entityForNotification.Id) == false)
                     {
-                        prevVersionDictionary[content.Id] = GetPreviousVersion(content.Id);
+                        prevVersionDictionary[entityForNotification.Id] = GetPreviousVersion(entityForNotification.Id);
                     }
 
                     // queue notification
-                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, siteUri, createSubject, createBody);
+                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, entityForNotification, prevVersionDictionary[entityForNotification.Id], actionName, siteUri, createSubject, createBody);
                     Enqueue(req);
-                }
-
-                // skip other notifications for this user, essentially this means moving i to the next index of notifications
-                // for the next user.
-                do
-                {
-                    i++;
-                }
-                while (i < notifications.Count && notifications[i].UserId == user.Id);
-
-                if (i >= notifications.Count)
-                {
-                    break; // break if no more notifications
+                    break;
                 }
             }
 

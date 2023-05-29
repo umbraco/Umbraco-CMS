@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NPoco.SqlServer" Version="5.5.0" />
+    <PackageReference Include="NPoco.SqlServer" Version="5.7.1" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>

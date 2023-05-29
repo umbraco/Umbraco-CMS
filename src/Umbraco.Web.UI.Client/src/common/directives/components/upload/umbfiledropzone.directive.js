@@ -3,21 +3,8 @@
 * @name umbraco.directives.directive:umbFileDropzone
 * @restrict E
 * @function
-* @description
+* @description Show a dropzone that allows the user to drag files and have them be uploaded to the media library
 **/
-
-/*
-TODO
-.directive("umbFileDrop", function ($timeout, $upload, localizationService, umbRequestHelper){
-    return{
-        restrict: "A",
-        link: function(scope, element, attrs){
-            //load in the options model
-        }
-    }
-})
-*/
-
 angular.module("umbraco.directives")
   .directive('umbFileDropzone',
     function ($timeout, Upload, localizationService, umbRequestHelper, overlayService, mediaHelper, mediaTypeHelper) {
@@ -34,11 +21,10 @@ angular.module("umbraco.directives")
 
           compact: '@',
           hideDropzone: '@',
-          acceptedMediatypes: '=',
+          acceptedMediatypes: '<',
 
-          filesQueued: '=',
-          handleFile: '=',
-          filesUploaded: '='
+          filesQueued: '<',
+          filesUploaded: '<'
         },
         link: function (scope, element, attrs) {
           scope.queue = [];
@@ -66,6 +52,14 @@ angular.module("umbraco.directives")
             }
           }
 
+          /**
+           * Initial entrypoint to handle the queued files. It will determine if the files are acceptable
+           * and determine if the user needs to pick a media type
+           * @param files
+           * @param event
+           * @returns void
+           * @private
+           */
           function _filesQueued(files, event) {
             //Push into the queue
             Utilities.forEach(files, file => {
@@ -75,6 +69,10 @@ angular.module("umbraco.directives")
               }
             });
 
+            // Add all of the processing and processed files to account for uploading
+            // files in stages (dragging files X at a time into the dropzone).
+            scope.totalQueued = scope.queue.length + scope.processingCount + scope.processed.length;
+
             // Upload not allowed
             if (!scope.acceptedMediatypes || !scope.acceptedMediatypes.length) {
               files.map(file => {
@@ -82,19 +80,27 @@ angular.module("umbraco.directives")
               });
             }
 
-            // If we have Accepted Media Types, we will ask to choose Media Type, if
-            // Choose Media Type returns false, it only had one choice and therefor no reason to
-            if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
-              scope.contentTypeAlias = "umbracoAutoSelect";
+            // If we have Accepted Media Types, we will ask to choose Media Type
+            if (scope.acceptedMediatypes) {
+
+              // If the media type dialog returns a positive answer, it is safe to assume that the
+              // contentTypeAlias has been chosen and we can return early because the dialog will start processing
+              // the queue automatically
+              if (_requestChooseMediaTypeDialog()) {
+                return;
+              }
             }
 
-            // Add all of the processing and processed files to account for uploading
-            // files in stages (dragging files X at a time into the dropzone).
-            scope.totalQueued = scope.queue.length + scope.processingCount + scope.processed.length;
-
+            // Start the processing of the queue here because the media type dialog was not shown and therefore
+            // did not do it earlier
             _processQueueItems();
           }
 
+          /**
+           * Run through the queue and start processing files
+           * @returns void
+           * @private
+           */
           function _processQueueItems() {
 
             if (scope.processingCount === scope.batchSize) {
@@ -133,10 +139,17 @@ angular.module("umbraco.directives")
             }
           }
 
+          /**
+           * Upload a specific file and use the scope.contentTypeAlias for the type or fall back to letting
+           * the backend auto select a type.
+           * @param file
+           * @returns void
+           * @private
+           */
           function _upload(file) {
 
             scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
-            scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image";
+            scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "umbracoAutoSelect";
 
             scope.processingCount++;
 
@@ -195,6 +208,11 @@ angular.module("umbraco.directives")
               });
           }
 
+          /**
+           * Opens the media type dialog and lets the user choose a media type. If the queue is empty it will not show.
+           * @returns {boolean}
+           * @private
+           */
           function _requestChooseMediaTypeDialog() {
 
             if (scope.queue.length === 0) {
@@ -217,7 +235,6 @@ angular.module("umbraco.directives")
               // if only one  or less accepted types when we have filtered type 'file' out, then we wont ask to choose.
               return false;
             }
-
 
             localizationService.localizeMany(["defaultdialogs_selectMediaType", "mediaType_autoPickMediaType"]).then(function (translations) {
 

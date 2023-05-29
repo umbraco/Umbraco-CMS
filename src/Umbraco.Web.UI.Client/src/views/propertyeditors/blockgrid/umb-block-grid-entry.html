@@ -1,7 +1,7 @@
 <uui-button-inline-create
     ng-if="!vm.blockEditorApi.readonly && !vm.hideInlineCreateAbove"
     class="umb-block-grid__block--inline-create-button --above"
-    style="width: {{vm.inlineCreateAboveWidth}};"
+    style="--umb-block-grid-editor--inline-create-width: {{vm.inlineCreateAboveWidth}};"
     ng-class="{'--at-root': vm.depth === '0'}"
     ng-click="vm.clickInlineCreateAbove()"
     ng-mouseover="vm.mouseOverInlineCreate()"
@@ -76,18 +76,10 @@
                     title="blockEditor_focusParentBlock"
                     ng-click="vm.parentBlock.showBlockUI()"
                     ng-class="{ '--error': false && vm.valFormManager.isShowingValidation() }"
-                >
-                    <span>
-                        {{vm.parentBlock.label}}
-                    </span>
-                    <span class="sr-only">
-                        <localize key="blockEditor_focusParentBlock">Focus parent block</localize>
-                    </span>
-                </button>
+                    ng-bind="vm.parentBlock.label"
+                ></button>
                 <div class="__divider" ng-if="vm.parentBlock">/</div>
-                <div class="__label">
-                    <span>{{vm.layoutEntry.$block.label}}</span>
-                </div>
+                <div class="__label" title="{{vm.layoutEntry.$block.label}}" ng-bind="vm.layoutEntry.$block.label"></div>
             </div>
         </div>
 

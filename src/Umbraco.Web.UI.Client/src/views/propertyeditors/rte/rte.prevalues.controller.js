@@ -47,15 +47,15 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
-            
+
             // if the CSS directory changes, previously assigned stylesheets are retained, but will not be visible
             // and will throw a 404 when loading the RTE. Remove them here. Still needs to be saved...
             let cssPath = Umbraco.Sys.ServerVariables.umbracoSettings.cssPath;
             $scope.model.value.stylesheets = $scope.model.value.stylesheets
                 .filter(sheet => sheet.startsWith(cssPath));
-            
+
             $scope.stylesheets.forEach(stylesheet => {
-                // support both current format (full stylesheet path) and legacy format (stylesheet name only) 
+                // support both current format (full stylesheet path) and legacy format (stylesheet name only)
                 stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.path) >= 0 ||$scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
             });
         });
@@ -96,6 +96,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     icon.isCustom = false;
                     break;
                 case "styleselect":
+                case "styles":
                 case "fontsizeselect":
                     icon.name = "icon-list";
                     icon.isCustom = true;
@@ -112,10 +113,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     icon.name = "icon-settings-alt";
                     icon.isCustom = true;
                     break;
-                case "umbmacro":
-                    icon.name = "icon-settings-alt";
-                    icon.isCustom = true;
-                    break;
                 default:
                     icon.name = alias;
                     icon.isCustom = false;
@@ -124,7 +121,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             return icon;
         }
 
-        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        var unsubscribe = $scope.$on("formSubmitting", function () {
 
             var commands = _.where($scope.tinyMceConfig.commands, {selected: true});
             $scope.model.value.toolbar = _.pluck(commands, "alias");

@@ -64,7 +64,6 @@
         function onInit() {
             vm.variants = $scope.model.variants;
             vm.availableVariants = vm.variants.filter(saveableVariantFilter);
-            vm.isNew = vm.variants.some(variant => variant.state === 'NotCreated');
 
             if (!$scope.model.title) {
                 localizationService.localize("content_readyToSave").then(value => {
@@ -78,7 +77,7 @@
                 variant.save = variant.publish = false;
                 variant.isMandatory = isMandatoryFilter(variant);
 
-                if(vm.isNew && hasAnyData(variant) && allowUpdate(variant)) {
+                if(variant.state === 'NotCreated' && hasAnyData(variant) && allowUpdate(variant)) {
                     variant.save = true;
                 }
             });

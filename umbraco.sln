@@ -14,7 +14,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_3961"
 		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Client\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3961\"
@@ -37,7 +37,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "http://localhost:58896", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
 		Debug.AspNetCompiler.PhysicalPath = "tests\Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
@@ -81,7 +81,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Common", "src\Umbraco.Web.Common\Umbraco.Web.Common.csproj", "{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSchema", "src\JsonSchema\JsonSchema.csproj", "{2A5027D9-F71D-4957-929E-F7A56AA1B95A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.JsonSchema", "tools\Umbraco.JsonSchema\Umbraco.JsonSchema.csproj", "{2A5027D9-F71D-4957-929E-F7A56AA1B95A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Persistence.Sqlite", "src\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj", "{32F6A309-EC1E-4CDB-BA80-C804CF680BEE}"
 EndProject
@@ -94,19 +94,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Templates", "templates\Umbraco.Templates.csproj", "{05C1D0C8-C592-468F-AF8F-A299B9B3A903}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms", "src\Umbraco.Cms\Umbraco.Cms.csproj", "{92EAA57A-CC99-4F5D-9D9C-B865293F6000}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewBackoffice", "NewBackoffice", "{995D9EFA-8BB1-4333-80AD-C525A06FD984}"
-	ProjectSection(SolutionItems) = preProject
-		.github\New BackOffice - README.md = .github\New BackOffice - README.md
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.ManagementApi", "src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj", "{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Core", "src\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj", "{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Infrastructure", "src\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj", "{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.New.Cms.Web.Common", "src\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj", "{5ED13EC6-399E-49D5-9D26-86501729B08D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Targets", "src\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj", "{B51C10FC-FD20-451E-90DD-A117133403DF}"
 EndProject
@@ -154,7 +141,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{EA628A
 		build\csharp-docs\umbracotemplate\styles\main.css = build\csharp-docs\umbracotemplate\styles\main.css
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{C280181E-597B-4AA5-82E7-D7017E928749}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp2", "src\Umbraco.Cms.Imaging.ImageSharp2\Umbraco.Cms.Imaging.ImageSharp2.csproj", "{C280181E-597B-4AA5-82E7-D7017E928749}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{05878304-40EB-4F84-B40B-91BDB70DE094}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Api.Delivery", "src\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj", "{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Api.Common", "src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj", "{D48B5D6B-82FF-4235-986C-CDE646F41DEC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore", "src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj", "{9046F56E-4AC3-4603-A6A3-3ACCF632997E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -278,30 +275,6 @@ Global
 		{92EAA57A-CC99-4F5D-9D9C-B865293F6000}.Release|Any CPU.Build.0 = Release|Any CPU
 		{92EAA57A-CC99-4F5D-9D9C-B865293F6000}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{92EAA57A-CC99-4F5D-9D9C-B865293F6000}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
-		{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{0946531B-F06D-415B-A4E3-6CBFF5DB1C12}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
-		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
-		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
-		{5ED13EC6-399E-49D5-9D26-86501729B08D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5ED13EC6-399E-49D5-9D26-86501729B08D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5ED13EC6-399E-49D5-9D26-86501729B08D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5ED13EC6-399E-49D5-9D26-86501729B08D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5ED13EC6-399E-49D5-9D26-86501729B08D}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{5ED13EC6-399E-49D5-9D26-86501729B08D}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 		{B51C10FC-FD20-451E-90DD-A117133403DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B51C10FC-FD20-451E-90DD-A117133403DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B51C10FC-FD20-451E-90DD-A117133403DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -314,6 +287,30 @@ Global
 		{C280181E-597B-4AA5-82E7-D7017E928749}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{C280181E-597B-4AA5-82E7-D7017E928749}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -325,11 +322,8 @@ Global
 		{D6319409-777A-4BD0-93ED-B2DFD805B32C} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{A499779C-1B3B-48A8-B551-458E582E6E96} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{9102ABDF-E537-4E46-B525-C9ED4833EED0} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{2A5027D9-F71D-4957-929E-F7A56AA1B95A} = {05878304-40EB-4F84-B40B-91BDB70DE094}
 		{05C1D0C8-C592-468F-AF8F-A299B9B3A903} = {6D72A60B-0542-4AA9-A493-DD4179E838A1}
-		{0946531B-F06D-415B-A4E3-6CBFF5DB1C12} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
-		{CBCE0A1E-BF29-49A6-9581-EAB3587D823A} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
-		{2D978DAF-8F48-4D59-8FEA-7EF0F40DBC2C} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
-		{5ED13EC6-399E-49D5-9D26-86501729B08D} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
 		{20CE9C97-9314-4A19-BCF1-D12CF49B7205} = {E5D4B5F9-6CCE-46CE-8985-9A350445F92B}
 		{F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44} = {20CE9C97-9314-4A19-BCF1-D12CF49B7205}
 		{2B47AD9F-FFF1-448A-88F1-D4F568811738} = {F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44}

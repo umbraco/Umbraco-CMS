@@ -147,7 +147,7 @@
 
             vm.layoutColumnsInt = parseInt(vm.layoutColumns, 10);
 
-            vm.relevantColumnSpanOptions = vm.layoutEntry.$block.config.columnSpanOptions.filter(x => x.columnSpan <= vm.layoutColumnsInt).sort((a,b) => (a.columnSpan > b.columnSpan) ? 1 : ((b.columnSpan > a.columnSpan) ? -1 : 0));
+            vm.relevantColumnSpanOptions = vm.layoutEntry.$block.config.columnSpanOptions ? vm.layoutEntry.$block.config.columnSpanOptions.filter(x => x.columnSpan <= vm.layoutColumnsInt).sort((a,b) => (a.columnSpan > b.columnSpan) ? 1 : ((b.columnSpan > a.columnSpan) ? -1 : 0)) : [];
             const hasRelevantColumnSpanOptions = vm.relevantColumnSpanOptions.length > 1;
             const hasRowSpanOptions = vm.layoutEntry.$block.config.rowMinSpan && vm.layoutEntry.$block.config.rowMaxSpan && vm.layoutEntry.$block.config.rowMaxSpan !== vm.layoutEntry.$block.config.rowMinSpan;
             vm.canScale = (hasRelevantColumnSpanOptions || hasRowSpanOptions);
@@ -159,7 +159,7 @@
 
             $scope.$evalAsync();
         }
-        unsubscribe.push($scope.$watch("depth", (newVal, oldVal) => {
+        unsubscribe.push($scope.$watch("depth", () => {
             vm.childDepth = parseInt(vm.depth) + 1;
         }));
 

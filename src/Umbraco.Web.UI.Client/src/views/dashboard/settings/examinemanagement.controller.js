@@ -85,9 +85,11 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
     function nextSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
     }
+
     function prevSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
     }
+
     function goToPageSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
     }
@@ -129,7 +131,7 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
 
         event.stopPropagation();
         event.preventDefault();
-    } 
+    }
 
     function setViewState(state) {
         vm.searchResults = null;
@@ -137,11 +139,13 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
     }
 
     function showIndexInfo(index) {
+        vm.selectedSearcher = null;
         vm.selectedIndex = index;
         setViewState("index-details");
     }
 
     function showSearcherInfo(searcher) {
+        vm.selectedIndex = null;
         vm.selectedSearcher = searcher;
         setViewState("searcher-details");
     }
@@ -212,8 +216,8 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
                     switch (section) {
                         case "content":
                         case "media":
-                            result.editUrl = "/" + section + "/" + section + "/edit/" + result.values["__NodeId"][0];
-                            result.editId = result.values["__NodeId"][0];
+                            result.editUrl = "/" + section + "/" + section + "/edit/" + result.id;
+                            result.editId = result.id;
                             result.editSection = section;
                             break;
                         case "member":

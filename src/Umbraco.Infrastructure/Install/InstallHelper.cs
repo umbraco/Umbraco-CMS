@@ -4,13 +4,13 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         private bool IsBrandNewInstall =>
             _connectionStrings.CurrentValue.IsConnectionStringConfigured() == false ||
             _databaseBuilder.IsDatabaseConfigured == false ||
-            (_databaseBuilder.CanConnectToDatabase == false && _databaseProviderMetadata.CanForceCreateDatabase(_umbracoDatabaseFactory.SqlContext.SqlSyntax.DbProvider)) ||
+            (_databaseBuilder.CanConnectToDatabase == false && _databaseProviderMetadata.CanForceCreateDatabase(_umbracoDatabaseFactory)) ||
             _databaseBuilder.IsUmbracoInstalled() == false;
     }
 }

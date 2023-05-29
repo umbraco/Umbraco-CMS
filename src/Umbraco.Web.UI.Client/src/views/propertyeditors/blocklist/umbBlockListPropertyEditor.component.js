@@ -36,6 +36,7 @@
         // Property actions:
         let copyAllBlocksAction = null;
         let deleteAllBlocksAction = null;
+        let pasteSingleBlockAction = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -43,6 +44,7 @@
         var vm = this;
 
         vm.readonly = false;
+        vm.singleBlockMode = false;
 
         $attrs.$observe('readonly', (value) => {
             vm.readonly = value !== undefined;
@@ -105,6 +107,12 @@
 
             inlineEditing = vm.model.config.useInlineEditingAsDefault;
             liveEditing = vm.model.config.useLiveEditing;
+            vm.singleBlockMode =
+                vm.model.config.validationLimit.min == 1 &&
+                vm.model.config.validationLimit.max == 1 &&
+                vm.model.config.blocks.length == 1 &&
+                vm.model.config.useSingleBlockMode;
+            vm.blockEditorApi.singleBlockMode = vm.singleBlockMode;
 
             vm.validationLimit = vm.model.config.validationLimit;
 
@@ -144,13 +152,25 @@
                 useLegacyIcon: false
             };
 
-            var propertyActions = [
-                copyAllBlocksAction,
-                deleteAllBlocksAction
-            ];
+            pasteSingleBlockAction = {
+                labelKey: "content_createFromClipboard",
+                labelTokens: [],
+                icon: "icon-paste-in",
+                method: requestShowClipboard,
+                isDisabled: false,
+                useLegacyIcon: false
+            };
+
+            var propertyActions = [copyAllBlocksAction, deleteAllBlocksAction];
+
+            var propertyActionsForSingleBlockMode = [pasteSingleBlockAction];
 
             if (vm.umbProperty) {
+                if (vm.singleBlockMode) {
+                vm.umbProperty.setPropertyActions(propertyActionsForSingleBlockMode);
+                } else {
                 vm.umbProperty.setPropertyActions(propertyActions);
+                }
             }
 
             // Create Model Object, to manage our data for this Block Editor.
@@ -217,6 +237,20 @@
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
             updateClipboard(true);
+
+            if (vm.singleBlockMode && vm.layout.length == 0) {
+                var wasAdded = false;
+                var blockType = vm.availableBlockTypes[0];
+
+                wasAdded = addNewBlock(1, blockType.blockConfigModel.contentElementTypeKey);
+
+                if (wasAdded && inlineEditing === true) {
+                    var blockObject = vm.layout[0]?.$block;
+                    if (blockObject) {
+                        blockObject.activate();
+                    }
+                }
+            }
 
             vm.loading = false;
 
@@ -506,7 +540,7 @@
 
         }
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(createIndex, mouseEvent) {
+        function requestShowClipboard(createIndex) {
             showCreateDialog(createIndex, true);
         }
 
@@ -528,6 +562,7 @@
                 availableItems: vm.availableBlockTypes,
                 title: vm.labels.grid_addElement,
                 openClipboard: openClipboard,
+                singleBlockMode: vm.singleBlockMode,
                 orderBy: "$index",
                 view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
@@ -617,10 +652,10 @@
                         pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
                     }
                 }
-                blockPickerModel.clipboardItems.push(pasteEntry);
+                vm.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,
@@ -644,6 +679,8 @@
             if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
                 jumpClipboard();
             }
+
+            pasteSingleBlockAction.isDisabled = vm.clipboardItems.length === 0;
         }
 
         var jumpClipboardTimeout;
@@ -704,6 +741,13 @@
 
             if (pasteEntry === undefined) {
                 return false;
+            }
+
+            if (vm.singleBlockMode) {
+                if (vm.layout.length > 0) {
+                deleteBlock(vm.layout[0].$block);
+                index = 1;
+                }
             }
 
             var layoutEntry;
@@ -787,7 +831,8 @@
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock,
-            readonly: vm.readonly
+            readonly: vm.readonly,
+            singleBlockMode: vm.singleBlockMode
         };
 
         vm.sortableOptions = {
