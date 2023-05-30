@@ -164,10 +164,10 @@ export class UmbTemplateRepository
 
 	// Could potentially be general methods:
 
-	async create(template: TemplateResponseModel) {
+	async create(template: CreateTemplateRequestModel) {
 		await this.#init;
 
-		if (!template || !template.id) {
+		if (!template) {
 			throw new Error('Template is missing');
 		}
 
@@ -180,7 +180,7 @@ export class UmbTemplateRepository
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		this.#store?.append(template);
+		//this.#store?.append(template);
 		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };

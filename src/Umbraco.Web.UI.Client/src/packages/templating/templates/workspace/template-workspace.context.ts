@@ -15,6 +15,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
 	name = createObservablePart(this.#data, (data) => data?.name);
+	alias = createObservablePart(this.#data, (data) => data?.alias);
 	content = createObservablePart(this.#data, (data) => data?.content);
 	id = createObservablePart(this.#data, (data) => data?.id);
 
@@ -49,6 +50,10 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 
 	setName(value: string) {
 		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', name: value });
+	}
+
+	setAlias(value: string) {
+		this.#data.next({ ...this.#data.value, $type: this.#data.value?.$type || '', alias: value });
 	}
 
 	setContent(value: string) {
@@ -97,7 +102,26 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	}
 
 	public async save() {
-		throw new Error('Save method not implemented.');
+		console.log('save');
+
+		const template = this.#data.getValue();
+		const isNew = this.getIsNew();
+
+		if (isNew && template) {
+			await this.repository.create({
+				name: template.name,
+				content: template.content,
+				alias: template.alias,
+			});
+		}
+
+		if (isNew && template?.id) {
+			await this.repository.save(template.id, {
+				name: template.name,
+				content: template.content,
+				alias: template.alias,
+			});
+		}
 	}
 
 	async createScaffold() {

@@ -17,6 +17,9 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
+	private _alias?: string | null = '';
+
+	@state()
 	private _ready?: boolean = false;
 
 	@state()
@@ -43,6 +46,10 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 				this._name = name;
 			});
 
+			this.observe(this.#templateWorkspaceContext.alias, (alias) => {
+				this._alias = alias;
+			});
+
 			this.observe(this.#templateWorkspaceContext.content, (content) => {
 				this._content = content;
 			});
@@ -66,6 +73,12 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
 		this.#templateWorkspaceContext?.setName(value);
+	}
+
+	#onAliasInput(event: Event) {
+		const target = event.target as UUIInputElement;
+		const value = target.value as string;
+		this.#templateWorkspaceContext?.setAlias(value);
 	}
 
 	#onCodeEditorInput(event: Event) {
@@ -171,10 +184,17 @@ ${this._content}`;
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
+	#save() {
+		this.#templateWorkspaceContext?.save();
+	}
+
 	render() {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
-			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}></uui-input>
+			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}
+				><umb-template-alias-input slot="append" .value=${this._alias} @change=${this.#onAliasInput}></umb-template-alias-input
+			></uui-input>
+			<uui-button @click=${this.#save} .color=${'danger'} look="primary">TEMPORARY SAVE BUTTON</uui-button>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
 					${this.#renderMasterTemplatePicker()}
@@ -217,7 +237,6 @@ ${this._content}`;
 			}
 
 			umb-code-editor {
-				margin-top: var(--uui-size-space-3);
 				--editor-height: calc(100dvh - 300px);
 			}
 
