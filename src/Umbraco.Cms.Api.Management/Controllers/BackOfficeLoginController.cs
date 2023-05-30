@@ -9,8 +9,6 @@ public class
 {
     [FromQuery(Name = "ReturnUrl")]
     public string? ReturnUrl { get; set; }
-
-    public string AuthUrl { get; set; } = string.Empty;
 }
 
 [ApiExplorerSettings(IgnoreApi=true)]
