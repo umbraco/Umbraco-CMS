@@ -1,23 +1,51 @@
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+
+import type { UUIButtonState } from '@umbraco-ui/uui';
+import type { IUmbAuthContext } from './types.js';
+import { UmbAuthLegacyContext } from './auth-legacy.context.js';
+import { UmbAuthContext } from './auth.context.js';
 
 import './auth-layout.element.js';
 
 @customElement('umb-login')
 export default class UmbLoginElement extends LitElement {
-	@state()
-	private _loggingIn = false;
+	#authContext: IUmbAuthContext;
 
-	private _handleSubmit = (e: SubmitEvent) => {
+	@property({ type: String, attribute: 'return-url' })
+	returnUrl = '';
+
+	@property({ type: Boolean })
+	isLegacy = false;
+
+	@state()
+	private _loginState: UUIButtonState = undefined;
+
+	@state()
+	private _loginError = '';
+
+	@state()
+	private _isFormValid = false;
+
+	constructor() {
+		super();
+		if (this.isLegacy) {
+			this.#authContext = new UmbAuthLegacyContext();
+		} else {
+			this.#authContext = new UmbAuthContext();
+		}
+	}
+
+	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
 
-		const isValid = form.checkValidity();
-		if (!isValid) return;
+		this._isFormValid = form.checkValidity();
+
+		if (!this._isFormValid) return;
 
 		const formData = new FormData(form);
 
@@ -25,49 +53,44 @@ export default class UmbLoginElement extends LitElement {
 		const password = formData.get('password') as string;
 		const persist = formData.has('persist');
 
-		this._login(username, password, persist);
+		this._loginState = 'waiting';
+
+		const response = await this.#authContext.login({ username, password, persist });
+
+		this._loginError = response.error || '';
+		this._loginState = response.error ? 'failed' : 'success';
+
+		if (response.error) return;
+
+		location.href = this.returnUrl;
 	};
 
-	private async _login(username: string, password: string, persist: boolean) {
-		// TODO: Move login to new login app
-		this._loggingIn = true;
-
-		try {
-			this._loggingIn = false;
-			console.log('login');
-		} catch (error) {
-			console.log(error);
-			this._loggingIn = false;
-		}
+	get #greeting() {
+		return [
+			'Happy super Sunday',
+			'Happy marvelous Monday',
+			'Happy tubular Tuesday',
+			'Happy wonderful Wednesday',
+			'Happy thunderous Thursday',
+			'Happy funky Friday',
+			'Happy Saturday',
+		][new Date().getDay()];
 	}
-
-	private _greetings: Array<string> = [
-		'Happy super Sunday',
-		'Happy marvelous Monday',
-		'Happy tubular Tuesday',
-		'Happy wonderful Wednesday',
-		'Happy thunderous Thursday',
-		'Happy funky Friday',
-		'Happy Saturday',
-	];
-
-	@state()
-	private _greeting: string = this._greetings[new Date().getDay()];
 
 	render() {
 		return html`
 			<umb-auth-layout>
 				<div class="uui-text">
-					<h1 class="uui-h3">${this._greeting}</h1>
+					<h1 class="uui-h3">${this.#greeting}</h1>
 					<uui-form>
-						<form id="LoginForm" name="login" @submit="${this._handleSubmit}">
+						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 							<uui-form-layout-item>
 								<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 								<uui-input
 									type="email"
 									id="email"
 									name="email"
-									placeholder="Enter your email..."
+									label="Email"
 									required
 									required-message="Email is required"></uui-input>
 							</uui-form-layout-item>
@@ -77,26 +100,37 @@ export default class UmbLoginElement extends LitElement {
 								<uui-input-password
 									id="password"
 									name="password"
-									placeholder="Enter your password..."
+									label="Password"
 									required
 									required-message="Password is required"></uui-input-password>
 							</uui-form-layout-item>
 
-							<uui-form-layout-item>
-								<uui-checkbox name="persist" label="Remember me"> Remember me </uui-checkbox>
-							</uui-form-layout-item>
+							${this.#authContext.supportsPersistLogin
+								? html`<uui-form-layout-item>
+										<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
+								  </uui-form-layout-item>`
+								: nothing}
+
+							<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
 
 							<uui-button
+								?disabled=${!this._isFormValid}
 								type="submit"
 								label="Login"
 								look="primary"
 								color="positive"
-								state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
+								state=${this._loginState}></uui-button>
 						</form>
 					</uui-form>
 				</div>
 			</umb-auth-layout>
 		`;
+	}
+
+	#renderErrorMessage() {
+		if (!this._loginError || this._loginState !== 'failed') return nothing;
+
+		return html`<p class="text-danger">${this._loginError}</p>`;
 	}
 
 	static styles: CSSResultGroup = [
@@ -105,6 +139,9 @@ export default class UmbLoginElement extends LitElement {
 			#email,
 			#password {
 				width: 100%;
+			}
+			.text-danger {
+				color: var(--uui-color-danger-standalone);
 			}
 		`,
 	];
