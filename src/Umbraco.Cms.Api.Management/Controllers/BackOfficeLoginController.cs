@@ -10,10 +10,15 @@ public class
     BackOfficeLoginModel
 {
     /// <summary>
-    /// Gets or sets the value of the "ReturnUrl" query parameter or defaults to default Umbraco directory.
+    /// Gets or sets the value of the "ReturnUrl" query parameter or defaults to the configured Umbraco directory.
     /// </summary>
     [FromQuery(Name = "ReturnUrl")]
     public string? ReturnUrl { get; set; }
+
+    /// <summary>
+    /// The configured Umbraco directory.
+    /// </summary>
+    public string? UmbracoUrl { get; set; }
 }
 
 [ApiExplorerSettings(IgnoreApi=true)]
@@ -34,9 +39,14 @@ public class BackOfficeLoginController : Controller
     // GET
     public IActionResult Index(BackOfficeLoginModel model)
     {
+        if (string.IsNullOrEmpty(model.UmbracoUrl))
+        {
+            model.UmbracoUrl = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
+        }
+
         if (string.IsNullOrEmpty(model.ReturnUrl))
         {
-            model.ReturnUrl = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
+            model.ReturnUrl = model.UmbracoUrl;
         }
 
         return View("/umbraco/UmbracoLogin/Index.cshtml", model);
