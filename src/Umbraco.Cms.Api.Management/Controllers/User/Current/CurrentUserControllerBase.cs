@@ -6,7 +6,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 [ApiController]
 [VersionedApiBackOfficeRoute("user/current")]
 [ApiExplorerSettings(GroupName = "User")]
-public class CurrentUserControllerBase : ManagementApiControllerBase
+public abstract class CurrentUserControllerBase : UserControllerBase
 {
 
 }
+
