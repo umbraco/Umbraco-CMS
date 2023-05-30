@@ -82,7 +82,7 @@ public class TelemetryServiceTests
         };
         var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
-        metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
+        metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
             packagingService,
             version,
@@ -119,7 +119,7 @@ public class TelemetryServiceTests
         };
         var packagingService = CreatePackagingService(installedPackages);
         var metricsConsentService = new Mock<IMetricsConsentService>();
-        metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
+        metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
         var sut = new TelemetryService(
             packagingService,
             version,

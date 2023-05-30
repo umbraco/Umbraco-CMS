@@ -1146,6 +1146,8 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
+            // Change state to publishing
+            content.PublishedState = PublishedState.Publishing;
             var savingNotification = new ContentSavingNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {

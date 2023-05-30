@@ -52,6 +52,27 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
     public bool ForceCreateDatabase => true;
 
     /// <inheritdoc />
+    public bool CanRecognizeConnectionString(string? connectionString)
+    {
+        if (connectionString is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var builder = new SqlConnectionStringBuilder(connectionString);
+
+            return !string.IsNullOrEmpty(builder.AttachDBFilename);
+
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
     public string GenerateConnectionString(DatabaseModel databaseModel)
     {
         var builder = new SqlConnectionStringBuilder

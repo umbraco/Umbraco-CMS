@@ -4,7 +4,6 @@ import {ContentBuilder, DocumentTypeBuilder, PartialViewBuilder} from "@umbraco/
 import {BlockListDataTypeBuilder} from "@umbraco/json-models-builders/dist/lib/builders/dataTypes";
 
 test.describe('BlockListEditorContent', () => {
-
   const documentName = 'DocumentTestName';
   const blockListName = 'BlockListTest';
   const elementName = 'TestElement';
@@ -126,6 +125,9 @@ test.describe('BlockListEditorContent', () => {
     // Checks if the content was created
     await expect(page.locator('.umb-block-list__block--view')).toHaveCount(1);
     await expect(page.locator('.umb-block-list__block--view').nth(0)).toHaveText(elementName);
+    // Checks if the content contains the correct value
+    await page.locator('.umb-block-list__block--view').nth(0).click();
+    await expect(page.locator('[id="sub-view-0"]').locator('[id="title"]')).toHaveValue('Testing...');
   });
 
   test('can update content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
@@ -385,7 +387,7 @@ test.describe('BlockListEditorContent', () => {
 
   test('can see rendered content with a block list editor', async ({page, umbracoApi, umbracoUi}) => {
     await umbracoApi.templates.ensureNameNotExists(documentName);
-    await umbracoApi.partialViews.ensureNameNotExists(elementName + '.cshtml');
+    await umbracoApi.partialViews.ensureNameNotExists('blocklist/Components',elementAlias + '.cshtml');
 
     const element = new DocumentTypeBuilder()
       .withName(elementName)
@@ -480,6 +482,6 @@ test.describe('BlockListEditorContent', () => {
     
     // Clean
     await umbracoApi.templates.ensureNameNotExists(documentName);
-    await umbracoApi.partialViews.ensureNameNotExists(elementAlias + '.cshtml');
+    await umbracoApi.partialViews.ensureNameNotExists('blocklist/Components',elementAlias + '.cshtml');
   });
 });
