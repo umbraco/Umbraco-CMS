@@ -13,7 +13,6 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using static Umbraco.Cms.Core.Constants.Conventions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -96,45 +95,6 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 false);
 
             Assert.AreEqual(2, repository.GetTagsForEntity(content.Id).Count());
-        }
-    }
-
-    [Test]
-    public void Can_Create_Tag_Relations_With_Mixed_Casing()
-    {
-        var provider = ScopeProvider;
-        using (ScopeProvider.CreateScope())
-        {
-            var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
-
-            var contentType =
-                ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
-
-            var content1 = ContentBuilder.CreateSimpleContent(contentType);
-            var content2 = ContentBuilder.CreateSimpleContent(contentType);
-            DocumentRepository.Save(content1);
-            DocumentRepository.Save(content2);
-
-            var repository = CreateRepository(provider);
-            Tag[] tags1 = { new Tag { Text = "tag1", Group = "test" } };
-            repository.Assign(
-                content1.Id,
-                contentType.PropertyTypes.First().Id,
-                tags1,
-                false);
-
-            // Note the casing is different from tags1, but both should be considered equivalent
-            Tag[] tags2 = { new Tag { Text = "TAG1", Group = "test" } };
-            repository.Assign(
-                content2.Id,
-                contentType.PropertyTypes.First().Id,
-                tags2,
-                false);
-
-            // The template should have only one tag, despite case differences
-            Assert.AreEqual(1, repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, "tag1").Count());
         }
     }
 

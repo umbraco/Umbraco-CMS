@@ -8,8 +8,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// </summary>
 internal class MigrationContext : IMigrationContext
 {
-    private readonly List<Type> _postMigrations = new();
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="MigrationContext" /> class.
     /// </summary>
@@ -18,12 +16,7 @@ internal class MigrationContext : IMigrationContext
         Plan = plan;
         Database = database ?? throw new ArgumentNullException(nameof(database));
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _postMigrations.AddRange(plan.PostMigrationTypes);
     }
-
-    // this is only internally exposed
-    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase")]
-    public IReadOnlyList<Type> PostMigrations => _postMigrations;
 
     /// <inheritdoc />
     public ILogger<IMigrationContext> Logger { get; }
@@ -41,12 +34,4 @@ internal class MigrationContext : IMigrationContext
 
     /// <inheritdoc />
     public bool BuildingExpression { get; set; }
-
-    /// <inheritdoc />
-    [Obsolete("This will be removed in the V13, and replaced with a RebuildCache flag on the MigrationBase, and a UmbracoPlanExecutedNotification.")]
-    public void AddPostMigration<TMigration>()
-        where TMigration : MigrationBase =>
-
-        // just adding - will be de-duplicated when executing
-        _postMigrations.Add(typeof(TMigration));
 }

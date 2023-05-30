@@ -50,10 +50,7 @@ public class RadioAndCheckboxPropertyEditorsMigration : PropertyEditorsMigration
 
         // if some data types have been updated directly in the database (editing DataTypeDto and/or PropertyDataDto),
         // bypassing the services, then we need to rebuild the cache entirely, including the umbracoContentNu table
-        if (refreshCache)
-        {
-            Context.AddPostMigration<RebuildPublishedSnapshot>();
-        }
+        // This has been removed since this migration should be deleted.
     }
 
     private bool Migrate(IEnumerable<DataTypeDto> dataTypes, bool isMultiple)

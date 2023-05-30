@@ -1,9 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
@@ -11,16 +14,22 @@ using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration>
+    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration>, IDeliveryApiPropertyValueConverter
     {
         private readonly IProfilingLogger _proflog;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IApiElementBuilder _apiElementBuilder;
 
         // Niels, Change: I would love if this could be general, so we don't need a specific one for each block property editor....
-        public BlockGridPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IJsonSerializer jsonSerializer) : base(blockConverter)
+        public BlockGridPropertyValueConverter(
+            IProfilingLogger proflog, BlockEditorConverter blockConverter,
+            IJsonSerializer jsonSerializer,
+            IApiElementBuilder apiElementBuilder)
+            : base(blockConverter)
         {
             _proflog = proflog;
             _jsonSerializer = jsonSerializer;
+            _apiElementBuilder = apiElementBuilder;
         }
 
         /// <inheritdoc />
@@ -28,6 +37,49 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.BlockGrid);
 
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+            => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
+
+        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
+        public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
+            => typeof(ApiBlockGridModel);
+
+        public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        {
+            const int defaultColumns = 12;
+
+            BlockGridModel? blockGridModel = ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
+            if (blockGridModel == null)
+            {
+                return new ApiBlockGridModel(defaultColumns, Array.Empty<ApiBlockGridItem>());
+            }
+
+            ApiBlockGridItem CreateApiBlockGridItem(BlockGridItem item)
+                => new ApiBlockGridItem(
+                    _apiElementBuilder.Build(item.Content),
+                    item.Settings != null
+                        ? _apiElementBuilder.Build(item.Settings)
+                        : null,
+                    item.RowSpan,
+                    item.ColumnSpan,
+                    item.AreaGridColumns ?? blockGridModel.GridColumns ?? defaultColumns,
+                    item.Areas.Select(CreateApiBlockGridArea).ToArray());
+
+            ApiBlockGridArea CreateApiBlockGridArea(BlockGridArea area)
+                => new ApiBlockGridArea(
+                    area.Alias,
+                    area.RowSpan,
+                    area.ColumnSpan,
+                    area.Select(CreateApiBlockGridItem).ToArray());
+
+            var model = new ApiBlockGridModel(
+                blockGridModel.GridColumns ?? defaultColumns,
+                blockGridModel.Select(CreateApiBlockGridItem).ToArray());
+
+            return model;
+        }
+
+        private BlockGridModel? ConvertIntermediateToBlockGridModel(IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             using (_proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
