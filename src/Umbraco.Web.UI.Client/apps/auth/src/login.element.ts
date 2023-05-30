@@ -37,18 +37,6 @@ export default class UmbLoginElement extends LitElement {
 		}
 	}
 
-	//TODO: What is the correct type for this event?
-	#checkFormValidity = (e: any) => {
-		const form = e.target.closest('form') as HTMLFormElement;
-
-		if (!form) return;
-
-		//TODO: Why do we need to wait one frame for the check to work correctly?
-		requestAnimationFrame(() => {
-			this._isFormValid = form.checkValidity();
-		});
-	};
-
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 
@@ -95,7 +83,7 @@ export default class UmbLoginElement extends LitElement {
 				<div class="uui-text">
 					<h1 class="uui-h3">${this.#greeting}</h1>
 					<uui-form>
-						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}" @input=${this.#checkFormValidity}>
+						<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 							<uui-form-layout-item>
 								<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 								<uui-input
