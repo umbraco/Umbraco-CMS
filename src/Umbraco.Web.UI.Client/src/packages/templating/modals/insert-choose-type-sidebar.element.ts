@@ -74,9 +74,10 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	}
 
 	#openInsertDictionaryItemModal() {
-		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
+		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {pickableFilter: item => item.id !== null});
 		this.#openModal?.onSubmit().then((dictionaryItemPickerModalResult) => {
 			if (dictionaryItemPickerModalResult)
+			debugger;
 				this.modalHandler?.submit({ value: dictionaryItemPickerModalResult, type: CodeSnippetType.dictionaryItem });
 		});
 	}
@@ -93,22 +94,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								to alternative values.
 							</p></uui-button
 						>
-						${this.data?.hidePartialViews
-							? ''
-							: html`<uui-button @click=${this.#openInsertPartialViewSidebar} look="placeholder" label="Insert value"
-									><h3>Partial view</h3>
-									<p>
-										A partial view is a separate template file which can be rendered inside another template, it's great
-										for reusing markup or for separating complex templates into separate files.
-									</p></uui-button
-							  >`}
-						<uui-button @click=${this._close} look="placeholder" label="Insert Macro"
-							><h3>Macro</h3>
-							<p>
-								A Macro is a configurable component which is great for reusable parts of your design, where you need the
-								option to provide parameters, such as galleries, forms and lists.
-							</p></uui-button
-						>
+
 						<uui-button @click=${this.#openInsertDictionaryItemModal} look="placeholder" label="Insert Dictionary item"
 							><h3>Dictionary item</h3>
 							<p>
@@ -152,6 +138,17 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		`,
 	];
 }
+
+//TODO: insert this when we have partial views
+// ${this.data?.hidePartialViews
+// 	? ''
+// 	: html`<uui-button @click=${this.#openInsertPartialViewSidebar} look="placeholder" label="Insert value"
+// 			><h3>Partial view</h3>
+// 			<p>
+// 				A partial view is a separate template file which can be rendered inside another template, it's great
+// 				for reusing markup or for separating complex templates into separate files.
+// 			</p></uui-button
+// 	  >`}
 
 declare global {
 	interface HTMLElementTagNameMap {

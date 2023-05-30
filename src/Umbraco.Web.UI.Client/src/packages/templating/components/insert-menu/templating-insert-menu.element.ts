@@ -47,6 +47,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async determineInsertValue(modalResult: ChooseInsertTypeModalResult) {
+		debugger;
 		const { type, value } = modalResult;
 
 		switch (type) {
@@ -59,7 +60,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 				break;
 			}
 			case CodeSnippetType.dictionaryItem: {
-				this.#getDictionaryItemSnippet(value as UmbDictionaryItemPickerModalResult);
+				await this.#getDictionaryItemSnippet(value as UmbDictionaryItemPickerModalResult);
+				this.#dispatchInsertEvent();
+
 				break;
 			}
 			case CodeSnippetType.macro: {
@@ -88,6 +91,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 			hidePartialView: this.hidePartialView,
 		});
 		this.#openModal?.onSubmit().then((closedModal: ChooseInsertTypeModalResult) => {
+			debugger;
 			this.determineInsertValue(closedModal);
 		});
 	};
@@ -100,17 +104,19 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		});
 	}
 
-	#openInsertPartialViewSidebar() {
-		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
-		this.#openModal?.onSubmit().then((value) => {
-			this.#getPartialViewSnippet(value).then(() => {
-				this.#dispatchInsertEvent();
-			});
-		});
-	}
+	// #openInsertPartialViewSidebar() {
+	// 	this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+	// 	this.#openModal?.onSubmit().then((value) => {
+	// 		this.#getPartialViewSnippet(value).then(() => {
+	// 			this.#dispatchInsertEvent();
+	// 		});
+	// 	});
+	// }
 
 	#openInsertDictionaryItemModal() {
-		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
+		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
+			pickableFilter: (item) => item.id !== null,
+		});
 		this.#openModal?.onSubmit().then((value) => {
 			this.#getDictionaryItemSnippet(value).then(() => {
 				this.#dispatchInsertEvent();
@@ -119,7 +125,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#dispatchInsertEvent() {
-		this.dispatchEvent(new CustomEvent('insert', { bubbles: true, cancelable: true, composed: false }));
+		this.dispatchEvent(new CustomEvent('insert', { bubbles: false, cancelable: true, composed: false }));
 	}
 
 	@property()
@@ -147,16 +153,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 								@click=${this.#openInsertValueSidebar}>
 							</uui-menu-item>
 						</li>
-						${this.hidePartialView
-							? ''
-							: html` <li>
-									<uui-menu-item
-										class="insert-menu-item"
-										label="Partial view"
-										title="Partial view"
-										@click=${this.#openInsertPartialViewSidebar}>
-									</uui-menu-item>
-							  </li>`}
+
 						<li>
 							<uui-menu-item
 								class="insert-menu-item"
@@ -165,14 +162,26 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 								@click=${this.#openInsertDictionaryItemModal}>
 							</uui-menu-item>
 						</li>
-						<li>
+						<!-- <li>
 							<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>
-						</li>
+						</li> -->
 					</ul>
 				</umb-button-with-dropdown>
 			</uui-button-group>
 		`;
 	}
+
+	//TODO: put this back in when partial view is implemented
+	// ${this.hidePartialView
+	// 		? ''
+	// 		: html` <li>
+	// 				<uui-menu-item
+	// 					class="insert-menu-item"
+	// 					label="Partial view"
+	// 					title="Partial view"
+	// 					@click=${this.#openInsertPartialViewSidebar}>
+	// 				</uui-menu-item>
+	// 		  </li>`}
 
 	static styles = [
 		UUITextStyles,
