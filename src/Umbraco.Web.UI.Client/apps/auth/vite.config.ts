@@ -13,6 +13,11 @@ export default defineConfig({
 		sourcemap: true,
 		rollupOptions: {
 			external: [/^@umbraco-cms\/backoffice\//],
+			output: {
+				manualChunks: {
+					uui: ['@umbraco-ui/uui'],
+				},
+			},
 		},
 		outDir: '../../../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login',
 		emptyOutDir: true,
