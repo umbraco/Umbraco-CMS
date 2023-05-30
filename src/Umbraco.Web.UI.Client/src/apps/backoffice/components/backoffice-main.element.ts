@@ -60,6 +60,14 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				};
 			}
 		});
+
+		if (this._sections.length > 0) {
+			this._routes.push({
+				alias: '__redirect',
+				path: '',
+				redirectTo: 'section/content',
+			});
+		}
 	}
 
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
