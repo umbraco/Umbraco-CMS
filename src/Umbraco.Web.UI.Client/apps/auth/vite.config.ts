@@ -9,6 +9,7 @@ export default defineConfig({
 			formats: ['es'],
 			fileName: 'main',
 		},
+		target: 'esnext',
 		sourcemap: true,
 		rollupOptions: {
 			external: [/^@umbraco-cms\/backoffice\//],
