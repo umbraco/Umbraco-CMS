@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUIIconPickerElement } from './property-editor-ui-icon-picker.element';
+import { UmbPropertyEditorUIIconPickerElement } from './property-editor-ui-icon-picker.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIIconPickerElement', () => {

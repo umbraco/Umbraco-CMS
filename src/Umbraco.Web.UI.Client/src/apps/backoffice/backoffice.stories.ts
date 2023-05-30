@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbBackofficeElement } from './backoffice.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbBackofficeElement } from './backoffice.element';
-import './backoffice.element';
+import './backoffice.element.js';
 
 export default {
 	title: 'Apps/Backoffice',

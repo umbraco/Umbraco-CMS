@@ -1,10 +1,10 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-import type { UmbPropertyEditorUIPickerModalElement } from './property-editor-ui-picker-modal.element';
+import type { UmbPropertyEditorUIPickerModalElement } from './property-editor-ui-picker-modal.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUIPickerModalData } from '@umbraco-cms/backoffice/modal';
 
-import './property-editor-ui-picker-modal.element';
-import '../../../../core/components/body-layout/body-layout.element';
+import './property-editor-ui-picker-modal.element.js';
+import '../../../../core/components/body-layout/body-layout.element.js';
 
 export default {
 	title: 'API/Modals/Layouts/Property Editor UI Picker',

@@ -1,11 +1,10 @@
-import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
 import {
 	UmbCurrentUserHistoryItem,
 	UmbCurrentUserHistoryStore,
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
-} from '../current-user-history.store';
+} from '../current-user-history.store.js';
+import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-profile-app-history')

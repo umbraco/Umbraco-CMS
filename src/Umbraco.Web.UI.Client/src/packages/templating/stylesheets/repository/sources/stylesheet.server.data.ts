@@ -1,4 +1,4 @@
-import { StylesheetDetails } from '../..';
+import type { StylesheetDetails } from '../../index.js';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

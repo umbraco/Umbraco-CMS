@@ -14,7 +14,7 @@ env:
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    if: false && github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
@@ -32,7 +32,7 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: '/' # App source code path
           api_location: 'api' # Api source code path - optional
-          output_location: 'dist' # Built app content directory - optional
+          output_location: 'dist-cms' # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:

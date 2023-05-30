@@ -7,7 +7,7 @@ export const manifests: Array<ManifestExternalLoginProvider> = [
 		alias: 'Umb.ExternalLoginProvider.Test',
 		name: 'Test External Login Provider',
 		elementName: 'umb-external-login-provider-test',
-		loader: () => import('./external-login-provider-test.element'),
+		loader: () => import('./external-login-provider-test.element.js'),
 		weight: 2,
 		meta: {
 			label: 'Test External Login Provider',
@@ -19,7 +19,7 @@ export const manifests: Array<ManifestExternalLoginProvider> = [
 		alias: 'Umb.ExternalLoginProvider.Test2',
 		name: 'Test External Login Provider 2',
 		elementName: 'umb-external-login-provider-test2',
-		loader: () => import('./external-login-provider-test2.element'),
+		loader: () => import('./external-login-provider-test2.element.js'),
 		weight: 1,
 		meta: {
 			label: 'Test External Login Provider 2',

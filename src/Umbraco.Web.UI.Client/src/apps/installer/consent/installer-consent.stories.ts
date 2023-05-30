@@ -1,9 +1,9 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
 
-import { installerContextProvider } from '../shared/utils.story-helpers';
-import type { UmbInstallerConsentElement } from './installer-consent.element';
-import './installer-consent.element';
+import { installerContextProvider } from '../shared/utils.story-helpers.js';
+import type { UmbInstallerConsentElement } from './installer-consent.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import './installer-consent.element.js';
 
 export default {
 	title: 'Apps/Installer/Steps',

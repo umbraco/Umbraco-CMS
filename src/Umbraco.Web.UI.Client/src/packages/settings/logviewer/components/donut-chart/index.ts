@@ -1,2 +1,2 @@
-export * from './donut-chart.element';
-export * from './donut-slice.element';
+export * from './donut-chart.element.js';
+export * from './donut-slice.element.js';

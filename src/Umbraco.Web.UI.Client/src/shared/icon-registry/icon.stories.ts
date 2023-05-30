@@ -1,7 +1,6 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-import { repeat } from 'lit/directives/repeat.js';
-import icons from '../../../public-assets/icons/icons.json';
+import icons from '../../../src/shared/icon-registry/icons/icons.json';
+import { html , repeat } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'API/Icons',

@@ -1,5 +1,5 @@
-import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
-import { manifests as createManifests } from './create/manifests';
+import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { manifests as createManifests } from './create/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,

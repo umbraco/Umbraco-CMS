@@ -1,9 +1,9 @@
-import './dashboard-members-welcome.element';
+import './dashboard-members-welcome.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbDashboardMembersWelcomeElement } from './dashboard-members-welcome.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardMembersWelcomeElement } from './dashboard-members-welcome.element';
 
 export default {
 	title: 'Dashboards/Welcome',

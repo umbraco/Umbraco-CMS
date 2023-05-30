@@ -1,7 +1,5 @@
-import { html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	PropertyEditorConfigDefaultData,
 	PropertyEditorConfigProperty,

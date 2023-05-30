@@ -18,7 +18,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Packages.Repo',
 		name: 'Packages Repo Section View',
-		loader: () => import('./views/market-place/packages-market-place-section-view.element'),
+		loader: () => import('./views/market-place/packages-market-place-section-view.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Packages',
@@ -33,7 +33,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Packages.Installed',
 		name: 'Installed Packages Section View',
-		loader: () => import('./views/installed/installed-packages-section-view.element'),
+		loader: () => import('./views/installed/installed-packages-section-view.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Installed',
@@ -48,7 +48,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		type: 'sectionView',
 		alias: 'Umb.SectionView.Packages.Builder',
 		name: 'Packages Builder Section View',
-		loader: () => import('./views/created/created-packages-section-view.element'),
+		loader: () => import('./views/created/created-packages-section-view.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Created',

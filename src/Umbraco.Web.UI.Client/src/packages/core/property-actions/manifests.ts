@@ -5,7 +5,7 @@ export const manifests: Array<ManifestPropertyAction> = [
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Copy',
 		name: 'Copy Property Action',
-		loader: () => import('./copy/property-action-copy.element'),
+		loader: () => import('./common/copy/property-action-copy.element.js'),
 		conditions: {
 			propertyEditors: ['Umb.PropertyEditorUI.TextBox'],
 		},
@@ -14,7 +14,7 @@ export const manifests: Array<ManifestPropertyAction> = [
 		type: 'propertyAction',
 		alias: 'Umb.PropertyAction.Clear',
 		name: 'Clear Property Action',
-		loader: () => import('./clear/property-action-clear.element'),
+		loader: () => import('./common/clear/property-action-clear.element.js'),
 		conditions: {
 			propertyEditors: ['Umb.PropertyEditorUI.TextBox'],
 		},

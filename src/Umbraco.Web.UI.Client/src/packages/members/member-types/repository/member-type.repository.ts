@@ -1,8 +1,8 @@
-import type { MemberTypeDetails } from '../types';
-import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data';
-import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store';
-import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store';
-import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data';
+import type { MemberTypeDetails } from '../types.js';
+import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data.js';
+import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store.js';
+import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store.js';
+import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';

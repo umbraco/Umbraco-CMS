@@ -1,5 +1,5 @@
-import { UUIIconRegistry } from '@umbraco-ui/uui-icon-registry';
-import icons from '../../../public-assets/icons/icons.json';
+import icons from './icons/icons.json' assert { type: "json" };
+import { UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbIconDescriptor {
 	name: string;
@@ -23,8 +23,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 		if (!iconManifest) return false;
 
 		const icon = this.provideIcon(iconName);
-
-		const iconPath = `${import.meta.env.BASE_URL}${iconManifest.path}`;
+		const iconPath = iconManifest.path;
 
 		import(/* @vite-ignore */ iconPath)
 			.then((iconModule) => {

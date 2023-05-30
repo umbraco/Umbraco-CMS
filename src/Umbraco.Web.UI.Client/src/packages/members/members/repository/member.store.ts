@@ -1,4 +1,4 @@
-import type { MemberDetails } from '../types';
+import type { MemberDetails } from '../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

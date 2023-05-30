@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUIImageCropperElement } from './property-editor-ui-image-cropper.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIImageCropperElement } from './property-editor-ui-image-cropper.element';
-import './property-editor-ui-image-cropper.element';
+import './property-editor-ui-image-cropper.element.js';
 
 export default {
 	title: 'Property Editor UIs/Image Cropper',

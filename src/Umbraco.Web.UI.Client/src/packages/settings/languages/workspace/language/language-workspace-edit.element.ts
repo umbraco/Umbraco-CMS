@@ -1,13 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbLanguageWorkspaceContext } from './language-workspace.context';
+import { UmbLanguageWorkspaceContext } from './language-workspace.context.js';
+import { UUITextStyles , UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-language-workspace-edit')
 export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	#workspaceContext?: UmbLanguageWorkspaceContext;

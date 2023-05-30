@@ -1,4 +1,4 @@
-import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../repository/manifests';
+import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
 export const DOCUMENT_TYPE_TREE_ALIAS = 'Umb.Tree.DocumentTypes';

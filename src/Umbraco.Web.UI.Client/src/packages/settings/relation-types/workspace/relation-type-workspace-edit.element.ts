@@ -1,12 +1,9 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context';
+import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context.js';
+import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-relation-type-workspace-edit-element
  * @description - Element for displaying a Relation Type Workspace

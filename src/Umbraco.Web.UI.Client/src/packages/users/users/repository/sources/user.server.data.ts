@@ -1,4 +1,4 @@
-import { UmbUserDetailDataSource } from '../../types';
+import { UmbUserDetailDataSource } from '../../types.js';
 import { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,

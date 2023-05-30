@@ -1,9 +1,8 @@
-import './dictionary-workspace.element';
+import './dictionary-workspace.element.js';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { data } from '../../../../shared/mocks/data/dictionary.data';
-import type { UmbWorkspaceDictionaryElement } from './dictionary-workspace.element';
+import { data } from '../../../../mocks/data/dictionary.data.js';
+import type { UmbWorkspaceDictionaryElement } from './dictionary-workspace.element.js';
+import { html , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Workspaces/Dictionary',

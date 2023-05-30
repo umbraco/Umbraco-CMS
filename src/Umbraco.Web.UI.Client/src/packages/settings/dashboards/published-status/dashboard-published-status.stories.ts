@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbDashboardPublishedStatusElement } from './dashboard-published-status.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardPublishedStatusElement } from './dashboard-published-status.element';
-import './dashboard-published-status.element';
+import './dashboard-published-status.element.js';
 
 export default {
 	title: 'Dashboards/Published Status',

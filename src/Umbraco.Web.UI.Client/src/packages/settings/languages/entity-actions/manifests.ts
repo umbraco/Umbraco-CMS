@@ -1,8 +1,8 @@
-import { LANGUAGE_REPOSITORY_ALIAS } from '../repository/manifests';
+import { LANGUAGE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { LANGUAGE_ENTITY_TYPE, LANGUAGE_ROOT_ENTITY_TYPE } from '../index.js';
+import { UmbLanguageCreateEntityAction } from './language-create-entity-action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityType = 'language';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -16,7 +16,22 @@ const entityActions: Array<ManifestEntityAction> = [
 			api: UmbDeleteEntityAction,
 		},
 		conditions: {
-			entityTypes: [entityType],
+			entityTypes: [LANGUAGE_ENTITY_TYPE],
+		},
+	},
+	{
+		type: 'entityAction',
+		alias: 'Umb.EntityAction.Language.Create',
+		name: 'Create Language Entity Action',
+		weight: 900,
+		meta: {
+			icon: 'umb:add',
+			label: 'Create',
+			repositoryAlias: LANGUAGE_REPOSITORY_ALIAS,
+			api: UmbLanguageCreateEntityAction,
+		},
+		conditions: {
+			entityTypes: [LANGUAGE_ENTITY_TYPE, LANGUAGE_ROOT_ENTITY_TYPE],
 		},
 	},
 ];

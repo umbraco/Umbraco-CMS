@@ -1,2 +1,2 @@
-import './template-card/template-card.element';
-import './input-template/input-template.element';
+import './template-card/template-card.element.js';
+import './input-template/input-template.element.js';

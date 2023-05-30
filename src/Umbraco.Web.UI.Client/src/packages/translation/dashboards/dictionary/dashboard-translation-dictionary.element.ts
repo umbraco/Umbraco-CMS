@@ -1,9 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
-import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository';
-import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/core/components';
+import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state , when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';

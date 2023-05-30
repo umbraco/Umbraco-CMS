@@ -1,6 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, CSSResultGroup, html , customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -17,7 +16,7 @@ export class UmbSearchHeaderAppElement extends UmbLitElement {
 	}
 
 	#onSearchClick() {
-		this._modalContext?.search();
+		alert('implement search search modal');
 	}
 
 	render() {

@@ -5,7 +5,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.PartialView',
 	name: 'Partial View Workspace',
-	loader: () => import('./partial-views-workspace.element'),
+	loader: () => import('./partial-views-workspace.element.js'),
 	meta: {
 		entityType: 'partial-view',
 	},

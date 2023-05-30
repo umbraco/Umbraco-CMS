@@ -1,6 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  *  A simple styled box for showing code-based error messages.
@@ -9,8 +8,6 @@ import { customElement } from 'lit/decorators.js';
  */
 @customElement('umb-code-block')
 export class UmbCodeBlockElement extends LitElement {
-	
-
 	render() {
 		return html`<div id="container">
 			<uui-scroll-container>
@@ -22,7 +19,7 @@ export class UmbCodeBlockElement extends LitElement {
 			</uui-scroll-container>
 		</div> `;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

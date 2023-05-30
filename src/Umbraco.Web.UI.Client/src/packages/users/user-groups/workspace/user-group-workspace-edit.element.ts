@@ -1,13 +1,11 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import UmbUserInputElement from '../../users/components/user-input/user-input.element';
-import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context';
+import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js';
+import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+// TODO: import from package when available
+//import { UmbUserInputElement } from '../../users/components/user-input/user-input.element.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../../../core/components/input-section/input-section.element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
@@ -140,8 +138,9 @@ export class UmbUserGroupWorkspaceEditElement extends UmbLitElement {
 	#renderRightColumn() {
 		return html`<uui-box>
 				<div slot="headline">Users</div>
+				<!-- change any to UmbUserInputElement when package is available -->
 				<umb-user-input
-					@change=${(e: Event) => this.#onUsersChange((e.target as UmbUserInputElement).selectedIds)}
+					@change=${(e: Event) => this.#onUsersChange((e.target as any).selectedIds)}
 					.selectedIds=${this._userKeys ?? []}></umb-user-input>
 			</uui-box>
 			<uui-box>

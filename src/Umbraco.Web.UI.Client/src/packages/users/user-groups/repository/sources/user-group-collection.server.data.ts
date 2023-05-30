@@ -1,4 +1,4 @@
-import type { UmbUserGroupCollectionFilterModel } from '../../types';
+import type { UmbUserGroupCollectionFilterModel } from '../../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

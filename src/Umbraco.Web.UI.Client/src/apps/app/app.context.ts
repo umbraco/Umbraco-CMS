@@ -1,4 +1,4 @@
-import { UmbAppContextConfig } from './app-context-config.interface';
+import { UmbAppContextConfig } from './app-context-config.interface.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbAppContext {

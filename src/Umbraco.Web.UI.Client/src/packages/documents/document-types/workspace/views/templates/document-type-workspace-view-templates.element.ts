@@ -1,10 +1,9 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
-import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element.js';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-templates')

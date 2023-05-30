@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { UmbInstallerErrorElement } from './installer-error.element';
+import { UmbInstallerErrorElement } from './installer-error.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 // TODO: Write tests

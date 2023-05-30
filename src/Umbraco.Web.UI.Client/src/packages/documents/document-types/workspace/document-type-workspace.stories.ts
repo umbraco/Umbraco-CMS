@@ -1,9 +1,8 @@
-import './document-type-workspace-editor.element';
+import './document-type-workspace-editor.element.js';
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { treeData } from '../../../../shared/mocks/data/document-type.data';
-import type { UmbDocumentTypeWorkspaceElement } from './document-type-workspace.element';
+import { treeData } from '../../../../mocks/data/document-type.data.js';
+import type { UmbDocumentTypeWorkspaceElement } from './document-type-workspace.element.js';
+import { html , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Workspaces/Document Type',

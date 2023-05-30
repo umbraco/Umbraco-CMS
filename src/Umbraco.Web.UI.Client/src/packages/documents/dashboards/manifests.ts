@@ -5,7 +5,7 @@ const dashboards: Array<ManifestDashboard> = [
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.RedirectManagement',
 		name: 'Redirect Management Dashboard',
-		loader: () => import('./redirect-management/dashboard-redirect-management.element'),
+		loader: () => import('./redirect-management/dashboard-redirect-management.element.js'),
 		weight: 10,
 		meta: {
 			label: 'Redirect Management',

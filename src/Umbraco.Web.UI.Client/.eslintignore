@@ -1,6 +1,7 @@
 .eslintrc.js
 types
 dist
+dist-cms
 schemas
 temp-schema-generator
 APP_PLUGINS

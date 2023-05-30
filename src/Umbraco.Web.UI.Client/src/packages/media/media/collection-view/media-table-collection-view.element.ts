@@ -1,7 +1,6 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import type { MediaDetails } from '../';
+import type { MediaDetails } from '../index.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -10,7 +9,7 @@ import type {
 	UmbTableItem,
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
-} from '@umbraco-cms/backoffice/core/components';
+} from '@umbraco-cms/backoffice/components';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

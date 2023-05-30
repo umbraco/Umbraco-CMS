@@ -1,8 +1,8 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import './body-layout.element';
-import type { UmbBodyLayoutElement } from './body-layout.element';
+import './body-layout.element.js';
+import type { UmbBodyLayoutElement } from './body-layout.element.js';
 
 const meta: Meta<UmbBodyLayoutElement> = {
 	title: 'Components/Workspace Layout',

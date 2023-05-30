@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
 	alias: 'Umb.PropertyEditorUI.MediaPicker',
 	name: 'Markdown Editor Property Editor UI',
-	loader: () => import('./property-editor-ui-media-picker.element'),
+	loader: () => import('./property-editor-ui-media-picker.element.js'),
 	meta: {
 		label: 'Media Picker',
 		propertyEditorModel: 'Umbraco.MediaPicker3',

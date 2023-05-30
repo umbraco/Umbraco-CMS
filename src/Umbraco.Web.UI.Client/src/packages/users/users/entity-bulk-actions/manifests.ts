@@ -1,8 +1,8 @@
-import { USER_REPOSITORY_ALIAS } from '../repository/manifests';
-import { UmbEnableUserEntityBulkAction } from './enable/enable.action';
-import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action';
-import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action';
-import { UmbDisableUserEntityBulkAction } from './disable/disable.action';
+import { USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
+import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
+import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
+import { UmbDisableUserEntityBulkAction } from './disable/disable.action.js';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'user';

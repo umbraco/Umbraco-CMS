@@ -1,10 +1,22 @@
-import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, query, queryAll, state } from 'lit/decorators.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { repeat } from 'lit/directives/repeat.js';
-import { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-ui/uui';
-import { UmbTagRepository } from '../../repository/tag.repository';
+import { UmbTagRepository } from '../../repository/tag.repository.js';
+import {
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	query,
+	queryAll,
+	state,
+	repeat,
+} from '@umbraco-cms/backoffice/external/lit';
+import {
+	UUITextStyles,
+	FormControlMixin,
+	UUIInputElement,
+	UUIInputEvent,
+	UUITagElement,
+} from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
