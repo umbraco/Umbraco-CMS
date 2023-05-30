@@ -243,7 +243,6 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		id: 'dt-datePicker-time',
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.DateTime',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
 		values: [
 			{
 				alias: 'format',

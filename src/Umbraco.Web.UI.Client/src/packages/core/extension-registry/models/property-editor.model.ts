@@ -22,6 +22,7 @@ export interface ManifestPropertyEditorModel extends ManifestBase {
 }
 
 export interface MetaPropertyEditorModel {
+	defaultUI: string;
 	config?: PropertyEditorConfig;
 }
 
