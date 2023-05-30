@@ -5,7 +5,7 @@ This package contains the types for the Umbraco Backoffice.
 ## Installation
 
 ```bash
-npm install -D @umbraco-cms/backoffice@next
+npm install -D @umbraco-cms/backoffice
 ```
 
 ## Usage

@@ -7,6 +7,13 @@ name: Node.js Package
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'staticwebapp.config.json'
+      - 'README.md'
   workflow_dispatch:
 
 env:
@@ -29,7 +36,6 @@ jobs:
           scope: '@umbraco-cms'
       - run: npm ci
       - run: npm run build:for:npm
-      - run: npm run generate:jsonschema
       - run: npm run wc-analyze
       - run: npm run wc-analyze:vscode
       - name: Version and publish
@@ -37,6 +43,6 @@ jobs:
           SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-8)
           npm whoami
           npm version 1.0.0-next.$SHA_SHORT --allow-same-version --no-git-tag-version
-          npm publish --tag next --access public
+          npm publish --tag latest --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

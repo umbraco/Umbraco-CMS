@@ -1,8 +1,8 @@
 import { cpSync } from 'fs';
 
-// TODO: Simplified version of utils/move-libs.js
-// We need to update this to support the same parts as move-libs.js
 const srcDir = './dist-cms';
 const outputDir = '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice';
+const outputWebDir = '../Umbraco.Web.UI.New';
 
 cpSync(srcDir, outputDir, { recursive: true });
+cpSync(`${srcDir}/umbraco-package-schema.json`, `${outputWebDir}/umbraco-package-schema.json`);
