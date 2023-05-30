@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { UUIButtonState } from '@umbraco-ui/uui';
-import { IUmbAuthContext } from './types.js';
+import type { UUIButtonState } from '@umbraco-ui/uui';
+import type { IUmbAuthContext } from './types.js';
 import { UmbAuthLegacyContext } from './auth-legacy.context.js';
 import { UmbAuthContext } from './auth.context.js';
 
@@ -102,6 +102,7 @@ export default class UmbLoginElement extends LitElement {
 									type="email"
 									id="email"
 									name="email"
+									label="Email"
 									required
 									required-message="Email is required"></uui-input>
 							</uui-form-layout-item>
@@ -111,6 +112,7 @@ export default class UmbLoginElement extends LitElement {
 								<uui-input-password
 									id="password"
 									name="password"
+									label="Password"
 									required
 									required-message="Password is required"></uui-input-password>
 							</uui-form-layout-item>
