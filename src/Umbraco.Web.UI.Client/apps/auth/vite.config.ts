@@ -9,7 +9,18 @@ export default defineConfig({
 			formats: ['es'],
 			fileName: 'main',
 		},
+		target: 'esnext',
 		sourcemap: true,
+		rollupOptions: {
+			external: [/^@umbraco-cms\/backoffice\//],
+			output: {
+				manualChunks: {
+					uui: ['@umbraco-ui/uui'],
+				},
+			},
+		},
+		outDir: '../../../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login',
+		emptyOutDir: true,
 	},
 	server: {
 		fs: {

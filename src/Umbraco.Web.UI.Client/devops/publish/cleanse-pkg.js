@@ -1,5 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 
+console.log('[Prepublish] Cleansing package.json');
+
 const packageFile = './package.json';
 const packageJson = JSON.parse(readFileSync(packageFile, 'utf8'));
 
