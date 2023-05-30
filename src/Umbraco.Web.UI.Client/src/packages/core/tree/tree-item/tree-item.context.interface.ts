@@ -10,6 +10,7 @@ export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationMod
 	treeItem: Observable<TreeItemType | undefined>;
 	hasChildren: Observable<boolean>;
 	isLoading: Observable<boolean>;
+	isSelectableContext: Observable<boolean>;
 	isSelectable: Observable<boolean>;
 	isSelected: Observable<boolean>;
 	isActive: Observable<boolean>;
