@@ -29,14 +29,14 @@ public class TinyMceController : UmbracoAuthorizedApiController
     private readonly Dictionary<string, string> _fileContentTypeMappings =
         new()
         {
-            { "image/png", ".png" },
-            { "image/jpeg", ".jpg" },
-            { "image/gif", ".gif" },
-            { "image/bmp", ".bmp" },
-            { "image/x-icon", ".ico" },
-            { "image/svg+xml", ".svg" },
-            { "image/tiff", ".tiff" },
-            { "image/webp", ".webp" },
+            { "image/png", "png" },
+            { "image/jpeg", "jpg" },
+            { "image/gif", "gif" },
+            { "image/bmp", "bmp" },
+            { "image/x-icon", "ico" },
+            { "image/svg+xml", "svg" },
+            { "image/tiff", "tiff" },
+            { "image/webp", "webp" },
         };
 
     public TinyMceController(
@@ -96,7 +96,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
             ext = fileExtension ?? string.Empty;
 
             // safeFileName will not have a file extension, so we need to add it back
-            safeFileName += ext;
+            safeFileName += $".{ext}";
         }
 
         if (_contentSettings.IsFileAllowedForUpload(ext) == false ||
