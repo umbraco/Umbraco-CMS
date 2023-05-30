@@ -6,6 +6,8 @@ public abstract class PropertyTypeResponseModelBase
 
     public Guid? ContainerId { get; set; }
 
+    public int SortOrder { get; set; }
+
     public string Alias { get; set; } = string.Empty;
 
     public string Name { get; set; } = string.Empty;
