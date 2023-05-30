@@ -114,7 +114,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
             await formFile.CopyToAsync(stream);
         }
 
-        return Ok(new {tmpLocation = relativeNewFilePath});
+        return Ok(new { tmpLocation = relativeNewFilePath });
     }
 
     // Use private method istead of _ioHelper.GetRelativePath as that is relative for the webroot and not the content root.
