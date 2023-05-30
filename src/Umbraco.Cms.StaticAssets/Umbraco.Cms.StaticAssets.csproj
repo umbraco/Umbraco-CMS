@@ -50,7 +50,7 @@
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\" Command="npm run build:for:cms" />
   </Target>
 
-  <Target Name="BuildLogin" AfterTargets="BuildBackOffice">
+  <Target Name="BuildLogin" DependsOnTargets="BuildBackOffice">
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\apps\auth" Command="npm run build" />
   </Target>
 
