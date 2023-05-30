@@ -25,11 +25,6 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 	#element = document.createElement('umb-template-workspace-edit');
 	#key = '';
 
-	connectedCallback() {
-		super.connectedCallback();
-		import('../../../core/components/code-editor/index.js');
-	}
-
 	@state()
 	_routes: UmbRoute[] = [
 		{
