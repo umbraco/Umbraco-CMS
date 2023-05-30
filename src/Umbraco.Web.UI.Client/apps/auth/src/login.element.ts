@@ -25,9 +25,6 @@ export default class UmbLoginElement extends LitElement {
 	@state()
 	private _loginError = '';
 
-	@state()
-	private _isFormValid = false;
-
 	constructor() {
 		super();
 		if (this.isLegacy) {
@@ -43,9 +40,7 @@ export default class UmbLoginElement extends LitElement {
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
 
-		this._isFormValid = form.checkValidity();
-
-		if (!this._isFormValid) return;
+		if (!form.checkValidity()) return;
 
 		const formData = new FormData(form);
 
@@ -114,7 +109,6 @@ export default class UmbLoginElement extends LitElement {
 							<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
 
 							<uui-button
-								?disabled=${!this._isFormValid}
 								type="submit"
 								label="Login"
 								look="primary"
