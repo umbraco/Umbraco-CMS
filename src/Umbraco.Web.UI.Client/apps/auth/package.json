@@ -1,5 +1,5 @@
 {
-	"name": "umbraco-backoffice-auth",
+	"name": "@umbraco-cms/login",
 	"version": "0.0.0",
 	"license": "MIT",
 	"author": {
@@ -7,7 +7,6 @@
 		"email": "backoffice@umbraco.com"
 	},
 	"type": "module",
-	"main": "dist/main.js",
 	"module": "dist/main.js",
 	"files": [
 		"dist"
@@ -16,7 +15,6 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"build:watch": "vite build --watch",
-		"build:production": "tsc && vite build --mode production",
 		"preview": "vite preview"
 	}
 }
