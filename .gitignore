@@ -109,6 +109,8 @@ preserve.belle
 /src/Umbraco.Cms.Targets/appsettings-schema.*.json
 /src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Web.UI/appsettings-schema.*.json
+/src/Umbraco.Cms.Targets/umbraco-package-schema.json
+/src/Umbraco.Web.UI/umbraco-package-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.json
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /src/Umbraco.Cms/appsettings-schema.json
