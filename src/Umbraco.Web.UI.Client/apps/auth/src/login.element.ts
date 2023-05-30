@@ -105,9 +105,11 @@ export default class UmbLoginElement extends LitElement {
 									required-message="Password is required"></uui-input-password>
 							</uui-form-layout-item>
 
-							<uui-form-layout-item>
-								<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
-							</uui-form-layout-item>
+							${this.#authContext.supportsPersistLogin
+								? html`<uui-form-layout-item>
+										<uui-checkbox name="persist" label="Remember me">Remember me</uui-checkbox>
+								  </uui-form-layout-item>`
+								: nothing}
 
 							<uui-form-layout-item>${this.#renderErrorMessage()}</uui-form-layout-item>
 

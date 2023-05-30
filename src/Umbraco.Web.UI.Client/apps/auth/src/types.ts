@@ -6,6 +6,7 @@ export type LoginRequestModel = {
 
 export interface IUmbAuthContext {
 	login(data: LoginRequestModel): Promise<LoginResponse>;
+	supportsPersistLogin: boolean;
 }
 
 export type LoginResponse = {
