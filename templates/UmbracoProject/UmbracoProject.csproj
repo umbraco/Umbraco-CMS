@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Targets" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
   </ItemGroup>
 
@@ -26,7 +27,7 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
-  
+
   <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\buildTransitive\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
   <ItemGroup Condition="'$(PackageProjectName)' != ''">
     <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
