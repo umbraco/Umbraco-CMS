@@ -14,8 +14,8 @@
     "lint": "eslint src"
   },
   "engines": {
-    "node": ">=16.17",
-    "npm": ">=8.15"
+    "node": ">=18.16",
+    "npm": ">=9.5"
   },
   "dependencies": {
     "@microsoft/signalr": "7.0.5",

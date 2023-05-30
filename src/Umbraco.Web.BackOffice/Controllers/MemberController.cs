@@ -276,7 +276,6 @@ public class MemberController : ContentControllerBase
     /// </summary>
     /// <param name="contentItem">The content item to save as a member</param>
     /// <returns>The resulting member display object</returns>
-    [FileUploadCleanupFilter]
     [OutgoingEditorModelEvent]
     [MemberSaveValidation]
     public async Task<ActionResult<MemberDisplay?>> PostSave([ModelBinder(typeof(MemberBinder))] MemberSave contentItem)

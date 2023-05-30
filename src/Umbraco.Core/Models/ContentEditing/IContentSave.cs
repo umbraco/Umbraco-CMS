@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 ///     logic
 /// </summary>
 /// <typeparam name="TPersisted"></typeparam>
-public interface IContentSave<TPersisted> : IHaveUploadedFiles
+public interface IContentSave<TPersisted>
     where TPersisted : IContentBase
 {
     /// <summary>

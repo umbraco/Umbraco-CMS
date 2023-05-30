@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Api.Management.ViewModels.ModelsBuilderDashboard;
-using Umbraco.New.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 

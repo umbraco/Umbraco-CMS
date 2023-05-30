@@ -22,6 +22,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     private readonly IPublicAccessService _publicAccessService;
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+    private readonly IContentTypeService _contentTypeService;
     private string? _culture;
 
     protected DocumentTreeControllerBase(
@@ -30,12 +31,14 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IDataTypeService dataTypeService,
         IPublicAccessService publicAccessService,
         AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IContentTypeService contentTypeService)
         : base(entityService, userStartNodeEntitiesService, dataTypeService)
     {
         _publicAccessService = publicAccessService;
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _contentTypeService = contentTypeService;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
@@ -55,6 +58,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             responseModel.Icon = documentEntitySlim.ContentTypeIcon ?? responseModel.Icon;
             responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
             responseModel.IsTrashed = entity.Trashed;
+            responseModel.Id = entity.Key;
 
             if (_culture != null && documentEntitySlim.Variations.VariesByCulture())
             {
@@ -67,9 +71,44 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             }
 
             responseModel.IsEdited &= responseModel.IsPublished;
+
+            responseModel.Variants = MapVariants(documentEntitySlim);
+
+            // TODO: This make this either be part of the IDocumentEntitySlim, or at the very least be more performantly fetched.
+            // This sucks, since it'll cost an extra DB call
+            // but currently there's no really good way to get the content type key from an IDocumentEntitySlim
+            // We have the same issue in DocumentPresentationFactory
+            IContentType? contentType = _contentTypeService.Get(documentEntitySlim.ContentTypeAlias);
+            responseModel.ContentTypeId = contentType?.Key ?? Guid.Empty;
         }
 
         return responseModel;
+    }
+
+    private IEnumerable<VariantTreeItemViewModel> MapVariants(IDocumentEntitySlim entity)
+    {
+        if (entity.Variations.VariesByCulture() is false)
+        {
+            yield return new VariantTreeItemViewModel
+            {
+                Name = entity.Name ?? string.Empty,
+                State = entity.Published ? PublishedState.Published : PublishedState.Unpublished,
+                Culture = null,
+            };
+            yield break;
+        }
+
+        foreach (KeyValuePair<string, string> cultureNamePair in entity.CultureNames)
+        {
+            yield return new VariantTreeItemViewModel
+            {
+                Name = cultureNamePair.Value,
+                Culture = cultureNamePair.Key,
+                State = entity.PublishedCultures.Contains(cultureNamePair.Key)
+                    ? PublishedState.Published
+                    : PublishedState.Unpublished,
+            };
+        }
     }
 
     // TODO: delete these (faking start node setup for unlimited editor)

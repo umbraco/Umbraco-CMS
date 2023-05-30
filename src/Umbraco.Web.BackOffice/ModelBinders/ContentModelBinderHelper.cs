@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
@@ -18,7 +17,7 @@ internal class ContentModelBinderHelper
         IJsonSerializer jsonSerializer,
         IHostingEnvironment hostingEnvironment,
         ModelBindingContext bindingContext)
-        where T : class, IHaveUploadedFiles
+        where T : class
     {
         var modelName = bindingContext.ModelName;
 
@@ -101,15 +100,6 @@ internal class ContentModelBinderHelper
             {
                 await formFile.CopyToAsync(stream);
             }
-
-            model.UploadedFiles.Add(new ContentPropertyFile
-            {
-                TempFilePath = tempFilePath,
-                PropertyAlias = propAlias,
-                Culture = culture,
-                Segment = segment,
-                FileName = fileName
-            });
         }
 
         return model;

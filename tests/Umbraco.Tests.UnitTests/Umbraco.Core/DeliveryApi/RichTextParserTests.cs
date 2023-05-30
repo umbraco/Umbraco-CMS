@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using ApiRichTextParser = Umbraco.Cms.Infrastructure.DeliveryApi.ApiRichTextParser;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.DeliveryApi;
 
@@ -19,9 +19,9 @@ public class RichTextParserTests
     private readonly Guid _mediaKey = Guid.NewGuid();
 
     [Test]
-    public void DocumentElementIsCalledRoot()
+    public void ParseElement_DocumentElementIsCalledRoot()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse("<p>Hello</p>");
         Assert.IsNotNull(element);
@@ -29,9 +29,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void SimpleParagraphHasSingleTextElement()
+    public void ParseElement_SimpleParagraphHasSingleTextElement()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse("<p>Some text paragraph</p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -45,9 +45,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void ParagraphWithLineBreaksWrapsTextInElements()
+    public void ParseElement_ParagraphWithLineBreaksWrapsTextInElements()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse("<p>Some text<br/>More text<br/>Even more text</p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -93,9 +93,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void DataAttributesAreSanitized()
+    public void ParseElement_DataAttributesAreSanitized()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse("<p><span data-something=\"the data-something value\">Text in a data-something SPAN</span></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -111,9 +111,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void DataAttributesDoNotOverwriteExistingAttributes()
+    public void ParseElement_DataAttributesDoNotOverwriteExistingAttributes()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse("<p><span something=\"the original something\" data-something=\"the data something\">Text in a data-something SPAN</span></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -126,9 +126,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void CanParseContentLink()
+    public void ParseElement_CanParseContentLink()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -145,9 +145,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void CanParseMediaLink()
+    public void ParseElement_CanParseMediaLink()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -160,9 +160,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void CanHandleNonLocalLink()
+    public void ParseElement_CanHandleNonLocalLink()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse($"<p><a href=\"https://some.where/else/\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -175,9 +175,9 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void LinkTextIsWrappedInTextElement()
+    public void ParseElement_LinkTextIsWrappedInTextElement()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse($"<p><a href=\"https://some.where/else/\">This is the link text</a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -191,9 +191,9 @@ public class RichTextParserTests
 
     [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
     [TestCase("{localLink:umb://media/03b9a8721c4749a9a7026033ec78d860}")]
-    public void InvalidLocalLinkYieldsEmptyLink(string href)
+    public void ParseElement_InvalidLocalLinkYieldsEmptyLink(string href)
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
         var element = parser.Parse($"<p><a href=\"/{href}\"></a></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
@@ -204,11 +204,11 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void CanParseMediaImage()
+    public void ParseElement_CanParseMediaImage()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></a></p>") as RichTextGenericElement;
+        var element = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -219,11 +219,11 @@ public class RichTextParserTests
     }
 
     [Test]
-    public void CanHandleNonLocalImage()
+    public void ParseElement_CanHandleNonLocalImage()
     {
-        var parser = CreateRichTextParser();
+        var parser = CreateRichTextElementParser();
 
-        var element = parser.Parse($"<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></a></p>") as RichTextGenericElement;
+        var element = parser.Parse($"<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></p>") as RichTextGenericElement;
         Assert.IsNotNull(element);
         var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
         Assert.IsNotNull(link);
@@ -233,7 +233,99 @@ public class RichTextParserTests
         Assert.AreEqual("https://some.where/something.png?rmode=max&amp;width=500", link.Attributes.First().Value);
     }
 
-    private ApiRichTextParser CreateRichTextParser()
+    [Test]
+    public void ParseMarkup_CanParseContentLink()
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><a href=\"/{{localLink:umb://document/{_contentKey:N}}}\"></a></p>");
+        Assert.IsTrue(result.Contains("href=\"/some-content-path\""));
+        Assert.IsTrue(result.Contains("data-start-item-path=\"the-root-path\""));
+        Assert.IsTrue(result.Contains($"data-start-item-id=\"{_contentRootKey:D}\""));
+    }
+
+    [Test]
+    public void ParseMarkup_CanParseMediaLink()
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><a href=\"/{{localLink:umb://media/{_mediaKey:N}}}\"></a></p>");
+        Assert.IsTrue(result.Contains("href=\"/some-media-url\""));
+    }
+
+    [TestCase("{localLink:umb://document/fe5bf80d37db4373adb9b206896b4a3b}")]
+    [TestCase("{localLink:umb://media/03b9a8721c4749a9a7026033ec78d860}")]
+    public void ParseMarkup_InvalidLocalLinkYieldsEmptyLink(string href)
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><a href=\"/{href}\"></a></p>");
+        Assert.AreEqual($"<p><a></a></p>", result);
+    }
+
+    [TestCase("<p><a href=\"https://some.where/else/\"></a></p>")]
+    [TestCase("<p><img src=\"https://some.where/something.png?rmode=max&amp;width=500\"></p>")]
+    public void ParseMarkup_CanHandleNonLocalReferences(string html)
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse(html);
+        Assert.AreEqual(html, result);
+    }
+
+    [Test]
+    public void ParseMarkup_CanParseMediaImage()
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></p>");
+        Assert.IsTrue(result.Contains("src=\"/some-media-url?rmode=max&amp;width=500\""));
+        Assert.IsFalse(result.Contains("data-udi"));
+    }
+
+    [Test]
+    public void ParseMarkup_RemovesMediaDataCaption()
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        var result = parser.Parse($"<p><img src=\"/media/whatever/something.png?rmode=max&amp;width=500\" data-udi=\"umb://media/{_mediaKey:N}\"></p>");
+        Assert.IsTrue(result.Contains("src=\"/some-media-url?rmode=max&amp;width=500\""));
+        Assert.IsFalse(result.Contains("data-udi"));
+    }
+
+    [Test]
+    public void ParseMarkup_DataAttributesAreRetained()
+    {
+        var parser = CreateRichTextMarkupParser();
+
+        const string html = "<p><span data-something=\"the data-something value\">Text in a data-something SPAN</span></p>";
+        var result = parser.Parse(html);
+        Assert.AreEqual(html, result);
+    }
+
+    private ApiRichTextElementParser CreateRichTextElementParser()
+    {
+        SetupTestContent(out var routeBuilder, out var snapshotAccessor, out var urlProvider);
+
+        return new ApiRichTextElementParser(
+            routeBuilder,
+            urlProvider,
+            snapshotAccessor,
+            Mock.Of<ILogger<ApiRichTextElementParser>>());
+    }
+
+    private ApiRichTextMarkupParser CreateRichTextMarkupParser()
+    {
+        SetupTestContent(out var routeBuilder, out var snapshotAccessor, out var urlProvider);
+
+        return new ApiRichTextMarkupParser(
+            routeBuilder,
+            urlProvider,
+            snapshotAccessor,
+            Mock.Of<ILogger<ApiRichTextMarkupParser>>());
+    }
+
+    private void SetupTestContent(out IApiContentRouteBuilder routeBuilder, out IPublishedSnapshotAccessor snapshotAccessor, out IPublishedUrlProvider urlProvider)
     {
         var contentMock = new Mock<IPublishedContent>();
         contentMock.SetupGet(m => m.Key).Returns(_contentKey);
@@ -266,10 +358,8 @@ public class RichTextParserTests
             .Setup(m => m.GetMediaUrl(mediaMock.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string>(), It.IsAny<Uri?>()))
             .Returns("/some-media-url");
 
-        return new ApiRichTextParser(
-            routeBuilderMock.Object,
-            snapshotAccessorMock.Object,
-            urlProviderMock.Object,
-            Mock.Of<ILogger<ApiRichTextParser>>());
+        routeBuilder = routeBuilderMock.Object;
+        snapshotAccessor = snapshotAccessorMock.Object;
+        urlProvider = urlProviderMock.Object;
     }
 }

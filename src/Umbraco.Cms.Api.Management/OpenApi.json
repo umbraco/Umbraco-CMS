@@ -8838,6 +8838,10 @@
           },
           "isTrashed": {
             "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false,
@@ -13808,7 +13812,7 @@
       }
     },
     "securitySchemes": {
-      "OAuth": {
+      "Backoffice User": {
         "type": "oauth2",
         "description": "Umbraco Authentication",
         "flows": {

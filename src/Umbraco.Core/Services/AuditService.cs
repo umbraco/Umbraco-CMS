@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
-using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services.Implement;
 

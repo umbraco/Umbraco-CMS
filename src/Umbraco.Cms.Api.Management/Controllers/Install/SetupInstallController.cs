@@ -6,8 +6,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
-using Umbraco.New.Cms.Core.Models.Installer;
-using Umbraco.New.Cms.Core.Services.Installer;
+using Umbraco.Cms.Core.Models.Installer;
+using Umbraco.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
 

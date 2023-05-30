@@ -1,142 +1,70 @@
-@using Microsoft.Extensions.Options;
-@using System.Globalization
-@using Umbraco.Cms.Core
-@using Umbraco.Cms.Core.Configuration
-@using Umbraco.Cms.Core.Configuration.Models
-@using Umbraco.Cms.Core.Hosting
-@using Umbraco.Cms.Core.Logging
-@using Umbraco.Cms.Core.Routing
-@using Umbraco.Cms.Core.Services
-@using Umbraco.Cms.Core.WebAssets
-@using Umbraco.Cms.Infrastructure.WebAssets
-@using Umbraco.Cms.Web.BackOffice.Controllers
-@using Umbraco.Cms.Web.BackOffice.Security
-@using Umbraco.Extensions
-@inject BackOfficeServerVariables backOfficeServerVariables
-@inject IUmbracoVersion umbracoVersion
-@inject IHostingEnvironment hostingEnvironment
-@inject IOptions<GlobalSettings> globalSettings
-@inject IRuntimeMinifier runtimeMinifier
-@inject IProfilerHtml profilerHtml
-@inject IIconService IconService
-@inject IBackOfficeExternalLoginProviders externalLogins
-@inject IWebProfilerService WebProfilerService
-@{
-    var webProfilingStatus = await WebProfilerService.GetStatus();
-    var isDebug = (webProfilingStatus.Success && webProfilingStatus.Result) ? true : false;
-    var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
-}
-
 <!DOCTYPE html>
-
-<html lang="@CultureInfo.CurrentCulture.Name">
+<html lang="en">
 <head>
-    <base href="@backOfficePath.EnsureEndsWith('/')" />
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="pinterest" content="nopin" />
+    <base href="/umbraco/" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="backoffice/assets/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Umbraco</title>
+    <link rel="stylesheet" href="backoffice/css/umb-css.css"/>
+    <link rel="stylesheet" href="backoffice/css/uui-css.css"/>
+    <script type="importmap">
+        {
+            "imports": {
+                "@@umbraco-cms/backoffice/backend-api": "/umbraco/backoffice/external/backend-api/index.js",
+                "@@umbraco-cms/backoffice/external/uui": "/umbraco/backoffice/external/uui/index.js",
+                "@@umbraco-cms/backoffice/external/lit": "/umbraco/backoffice/external/lit/index.js",
+                "@@umbraco-cms/backoffice/external/openid": "/umbraco/backoffice/external/openid/index.js",
+                "@@umbraco-cms/backoffice/external/rxjs": "/umbraco/backoffice/external/rxjs/index.js",
+                "@@umbraco-cms/backoffice/external/router-slot": "/umbraco/backoffice/external/router-slot/index.js",
+                "@@umbraco-cms/backoffice/external/uuid": "/umbraco/backoffice/external/uuid/index.js",
+                "@@umbraco-cms/backoffice/external/lodash": "/umbraco/backoffice/external/lodash/index.js",
+                "@@umbraco-cms/backoffice/context-api": "/umbraco/backoffice/libs/context-api/index.js",
+                "@@umbraco-cms/backoffice/controller-api": "/umbraco/backoffice/libs/controller-api/index.js",
+                "@@umbraco-cms/backoffice/element-api": "/umbraco/backoffice/libs/element-api/index.js",
+                "@@umbraco-cms/backoffice/extension-api": "/umbraco/backoffice/libs/extension-api/index.js",
+                "@@umbraco-cms/backoffice/observable-api": "/umbraco/backoffice/libs/observable-api/index.js",
 
-    <title ng-bind="$root.locationTitle">Umbraco</title>
+                "@@umbraco-cms/backoffice/events": "/umbraco/backoffice/shared/umb-events/index.js",
+                "@@umbraco-cms/backoffice/models": "/umbraco/backoffice/shared/models/index.js",
+                "@@umbraco-cms/backoffice/repository": "/umbraco/backoffice/shared/repository/index.js",
+                "@@umbraco-cms/backoffice/resources": "/umbraco/backoffice/shared/resources/index.js",
+                "@@umbraco-cms/backoffice/router": "/umbraco/backoffice/shared/router/index.js",
+                "@@umbraco-cms/backoffice/utils": "/umbraco/backoffice/shared/utils/index.js",
+                "@@umbraco-cms/backoffice/icon": "/umbraco/backoffice/shared/icon-registry/index.js",
+                "@@umbraco-cms/internal/lit-element": "/umbraco/backoffice/shared/lit-element/index.js",
+                "@@umbraco-cms/internal/modal": "/umbraco/backoffice/shared/modal/index.js",
 
-    @Html.Raw(await runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoInitCssBundleName))
+                "@@umbraco-cms/backoffice/action": "/umbraco/backoffice/packages/core/action/index.js",
+                "@@umbraco-cms/backoffice/collection": "/umbraco/backoffice/packages/core/collection/index.js",
+                "@@umbraco-cms/backoffice/components": "/umbraco/backoffice/packages/core/components/index.js",
+                "@@umbraco-cms/backoffice/content-type": "/umbraco/backoffice/packages/core/content-type/index.js",
+                "@@umbraco-cms/backoffice/debug": "/umbraco/backoffice/packages/core/debug/index.js",
+                "@@umbraco-cms/backoffice/entity-action": "/umbraco/backoffice/packages/core/entity-action/index.js",
+                "@@umbraco-cms/backoffice/entity-bulk-action": "/umbraco/backoffice/packages/core/entity-bulk-action/index.js",
+                "@@umbraco-cms/backoffice/extension-registry": "/umbraco/backoffice/packages/core/extension-registry/index.js",
+                "@@umbraco-cms/backoffice/id": "/umbraco/backoffice/packages/core/id/index.js",
+                "@@umbraco-cms/backoffice/menu": "/umbraco/backoffice/packages/core/menu/index.js",
+                "@@umbraco-cms/backoffice/modal": "/umbraco/backoffice/packages/core/modal/index.js",
+                "@@umbraco-cms/backoffice/notification": "/umbraco/backoffice/packages/core/notification/index.js",
+                "@@umbraco-cms/backoffice/picker-input": "/umbraco/backoffice/packages/core/picker-input/index.js",
+                "@@umbraco-cms/backoffice/section": "/umbraco/backoffice/packages/core/section/index.js",
+                "@@umbraco-cms/backoffice/sorter": "/umbraco/backoffice/packages/core/sorter/index.js",
+                "@@umbraco-cms/backoffice/store": "/umbraco/backoffice/packages/core/store/index.js",
+                "@@umbraco-cms/backoffice/tree": "/umbraco/backoffice/packages/core/tree/index.js",
+                "@@umbraco-cms/backoffice/variant": "/umbraco/backoffice/packages/core/variant/index.js",
+                "@@umbraco-cms/backoffice/workspace": "/umbraco/backoffice/packages/core/workspace/index.js",
+                "@@umbraco-cms/backoffice/property-editor": "/umbraco/backoffice/packages/core/property-editor/index.js",
 
-</head>
-<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-
-    <noscript>
-        <div class="flex flex-wrap flex-column items-center justify-center" style="height: 100%">
-            <h1 class="h3">
-                <span style="width: 30px; height: 30px; vertical-align: text-bottom" class="flex-inline">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 315.89 315.89" fill="#3544b1">
-                        <path d="M0,157.74A157.95,157.95,0,1,1,158,315.89,157.95,157.95,0,0,1,0,157.74Zm154.74,54.09a155.41,155.41,0,0,1-36.5-3.29,27.92,27.92,0,0,1-19.94-16q-5.35-12.34-5.21-38.1a243,243,0,0,1,1.69-26.84q1.55-13,3.09-21.46l1.07-5.59a2,2,0,0,0,0-.49,3.2,3.2,0,0,0-2.65-3.17L75.92,93.67h-.44a3.19,3.19,0,0,0-3.11,2.48c-.35,1.31-.56,2.27-1.17,5.38-1.16,6-2.24,11.85-3.43,20.38a264.17,264.17,0,0,0-2.3,27.94,145.24,145.24,0,0,0,0,19.57q.72,25.94,8.9,41.42t27.72,22.3q19.53,6.81,54.43,6.66h2.91q34.94.15,54.41-6.66t27.71-22.3q8.17-15.53,8.91-41.42a145.24,145.24,0,0,0,0-19.57,266.84,266.84,0,0,0-2.3-27.94c-1.2-8.44-2.27-14.26-3.44-20.38-.61-3.11-.81-4.07-1.16-5.38a3.21,3.21,0,0,0-3.12-2.48h-.52l-20.38,3.18a3.2,3.2,0,0,0-2.68,3.17,4,4,0,0,0,0,.49l1.08,5.59q1.55,8.48,3.12,21.46a245.68,245.68,0,0,1,1.65,26.84q.27,25.69-5.21,38.07a27.9,27.9,0,0,1-19.76,16.07,155.19,155.19,0,0,1-36.48,3.29Z" />
-                    </svg>
-                </span>
-                Umbraco
-            </h1>
-            <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
-            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
-        </div>
-    </noscript>
-
-    <div ng-hide="!authenticated" ng-cloak>
-
-        <div style="display: none;" id="mainwrapper" class="clearfix">
-
-            <umb-app-header></umb-app-header>
-
-            <div class="umb-app-content">
-
-                <umb-navigation></umb-navigation>
-
-                <section id="contentwrapper">
-
-                    <div id="contentcolumn">
-                        <div class="umb-editor" ng-view></div>
-                    </div>
-
-                </section>
-
-            </div>
-
-        </div>
-
-        <umb-tour ng-if="tour.show"
-                  model="tour">
-        </umb-tour>
-
-        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
-        <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
-
-        <umb-search ng-attr-umb-focus-lock="true" ng-if="search.show" on-close="closeSearch()"></umb-search>
-
-    </div>
-
-    <umb-notifications></umb-notifications>
-
-    <umb-backdrop ng-if="backdrop.show || infiniteMode"
-                  backdrop-opacity="backdrop.opacity"
-                  highlight-element="backdrop.element"
-                  highlight-prevent-click="backdrop.elementPreventClick"
-                  disable-events-on-click="backdrop.disableEventsOnClick">
-    </umb-backdrop>
-
-    <umb-overlay ng-if="overlay.show"
-                 model="overlay"
-                 position="{{overlay.position}}"
-                 size="overlay.size"
-                 view="overlay.view"
-                 name="overlay.name"
-                 parent-scope="overlay.parentScope">
-    </umb-overlay>
-
-    <umb-editors ng-show="infiniteMode"></umb-editors>
-
-    <umb-login ng-if="login.show"
-               on-login="hideLoginScreen()">
-    </umb-login>
-
-    @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
-
-    <script>
-        document.angularReady = function(app) {
-            @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors()!)
-            @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode]!)
-            @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
-            //required for the noscript trick
-            document.getElementById("mainwrapper").style.display = "inherit";
+                "@@umbraco-cms/backoffice/document": "/umbraco/backoffice/packages/documents/documents/index.js",
+                "@@umbraco-cms/backoffice/data-type": "/umbraco/backoffice/packages/settings/data-types/index.js",
+                "@@umbraco-cms/backoffice/user-group": "/umbraco/backoffice/packages/users/user-groups/index.js"
+            }
         }
     </script>
-
-    <script src="@WebPath.Combine(backOfficePath.TrimStart("~"), "/lib/lazyload-js/LazyLoad.min.js")"></script>
-    <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice", null!, hostingEnvironment, umbracoVersion, runtimeMinifier)"></script>
-
-    @if (isDebug)
-    {
-        @Html.Raw(profilerHtml.Render())
-    }
-
+    <script type="module" src="backoffice/apps/app/app.element.js"></script>
+</head>
+<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
+    <umb-app></umb-app>
 </body>
 </html>

@@ -1,80 +1,70 @@
-@using Umbraco.Extensions
-@{
-    Layout = null;
-}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <base href="@ViewData.GetUmbracoBaseFolder()/" />
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="/umbraco/" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="backoffice/assets/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Umbraco</title>
+    <link rel="stylesheet" href="backoffice/css/umb-css.css"/>
+    <link rel="stylesheet" href="backoffice/css/uui-css.css"/>
+    <script type="importmap">
+        {
+            "imports": {
+                "@@umbraco-cms/backoffice/backend-api": "/umbraco/backoffice/external/backend-api/index.js",
+                "@@umbraco-cms/backoffice/external/uui": "/umbraco/backoffice/external/uui/index.js",
+                "@@umbraco-cms/backoffice/external/lit": "/umbraco/backoffice/external/lit/index.js",
+                "@@umbraco-cms/backoffice/external/openid": "/umbraco/backoffice/external/openid/index.js",
+                "@@umbraco-cms/backoffice/external/rxjs": "/umbraco/backoffice/external/rxjs/index.js",
+                "@@umbraco-cms/backoffice/external/router-slot": "/umbraco/backoffice/external/router-slot/index.js",
+                "@@umbraco-cms/backoffice/external/uuid": "/umbraco/backoffice/external/uuid/index.js",
+                "@@umbraco-cms/backoffice/external/lodash": "/umbraco/backoffice/external/lodash/index.js",
+                "@@umbraco-cms/backoffice/context-api": "/umbraco/backoffice/libs/context-api/index.js",
+                "@@umbraco-cms/backoffice/controller-api": "/umbraco/backoffice/libs/controller-api/index.js",
+                "@@umbraco-cms/backoffice/element-api": "/umbraco/backoffice/libs/element-api/index.js",
+                "@@umbraco-cms/backoffice/extension-api": "/umbraco/backoffice/libs/extension-api/index.js",
+                "@@umbraco-cms/backoffice/observable-api": "/umbraco/backoffice/libs/observable-api/index.js",
 
-    <title>Install Umbraco</title>
-    <link rel="stylesheet" href="assets/css/installer.min.css" />
-    <link rel="stylesheet" href="lib/nouislider/nouislider.min.css" />
-</head>
+                "@@umbraco-cms/backoffice/events": "/umbraco/backoffice/shared/umb-events/index.js",
+                "@@umbraco-cms/backoffice/models": "/umbraco/backoffice/shared/models/index.js",
+                "@@umbraco-cms/backoffice/repository": "/umbraco/backoffice/shared/repository/index.js",
+                "@@umbraco-cms/backoffice/resources": "/umbraco/backoffice/shared/resources/index.js",
+                "@@umbraco-cms/backoffice/router": "/umbraco/backoffice/shared/router/index.js",
+                "@@umbraco-cms/backoffice/utils": "/umbraco/backoffice/shared/utils/index.js",
+                "@@umbraco-cms/backoffice/icon": "/umbraco/backoffice/shared/icon-registry/index.js",
+                "@@umbraco-cms/internal/lit-element": "/umbraco/backoffice/shared/lit-element/index.js",
+                "@@umbraco-cms/internal/modal": "/umbraco/backoffice/shared/modal/index.js",
 
-<body ng-class="{loading:installer.loading}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
+                "@@umbraco-cms/backoffice/action": "/umbraco/backoffice/packages/core/action/index.js",
+                "@@umbraco-cms/backoffice/collection": "/umbraco/backoffice/packages/core/collection/index.js",
+                "@@umbraco-cms/backoffice/components": "/umbraco/backoffice/packages/core/components/index.js",
+                "@@umbraco-cms/backoffice/content-type": "/umbraco/backoffice/packages/core/content-type/index.js",
+                "@@umbraco-cms/backoffice/debug": "/umbraco/backoffice/packages/core/debug/index.js",
+                "@@umbraco-cms/backoffice/entity-action": "/umbraco/backoffice/packages/core/entity-action/index.js",
+                "@@umbraco-cms/backoffice/entity-bulk-action": "/umbraco/backoffice/packages/core/entity-bulk-action/index.js",
+                "@@umbraco-cms/backoffice/extension-registry": "/umbraco/backoffice/packages/core/extension-registry/index.js",
+                "@@umbraco-cms/backoffice/id": "/umbraco/backoffice/packages/core/id/index.js",
+                "@@umbraco-cms/backoffice/menu": "/umbraco/backoffice/packages/core/menu/index.js",
+                "@@umbraco-cms/backoffice/modal": "/umbraco/backoffice/packages/core/modal/index.js",
+                "@@umbraco-cms/backoffice/notification": "/umbraco/backoffice/packages/core/notification/index.js",
+                "@@umbraco-cms/backoffice/picker-input": "/umbraco/backoffice/packages/core/picker-input/index.js",
+                "@@umbraco-cms/backoffice/section": "/umbraco/backoffice/packages/core/section/index.js",
+                "@@umbraco-cms/backoffice/sorter": "/umbraco/backoffice/packages/core/sorter/index.js",
+                "@@umbraco-cms/backoffice/store": "/umbraco/backoffice/packages/core/store/index.js",
+                "@@umbraco-cms/backoffice/tree": "/umbraco/backoffice/packages/core/tree/index.js",
+                "@@umbraco-cms/backoffice/variant": "/umbraco/backoffice/packages/core/variant/index.js",
+                "@@umbraco-cms/backoffice/workspace": "/umbraco/backoffice/packages/core/workspace/index.js",
+                "@@umbraco-cms/backoffice/property-editor": "/umbraco/backoffice/packages/core/property-editor/index.js",
 
-    <img src="assets/img/application/umbraco_logomark_white.svg" width="32" height="32" alt="Umbraco" draggable="false" id="logo" />
-
-    <umb-loader position="bottom"
-                class="umb-installer-loader"
-                ng-if="installer.loading"
-                ng-style="{'width': installer.progress}">
-    </umb-loader>
-
-    <div id="overlay" ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
-
-    <div id="installer"
-         ng-cloak
-         ng-animate="'fade'"
-         ng-show="installer.configuring">
-
-        <div id="contentwrapper" ng-if="installer.current" ng-switch on="installer.current.view">
-            <div ng-switch-when="ysod">
-                <h1>A server error occurred</h1>
-                <p>This is most likely due to an error during application startup</p>
-                <iframe id="ysod" title="Error details"></iframe>
-            </div>
-            <div ng-switch-default>
-                <div ng-include="installer.current.view"></div>
-            </div>
-        </div>
-    </div>
-
-
-    <div ng-cloak ng-animate="'fade'" id="fact" class="absolute-center clearfix" ng-show="installer.fact">
-        <h2>Did you know</h2>
-        <p ng-bind-html="installer.fact"></p>
-    </div>
-
-    <h3 ng-cloak ng-animate="'fade'" id="feedback" ng-show="installer.feedback">{{installer.feedback}}</h3>
-
-    <div id="missinglazyload" style="display: none;">
-        <h3>There has been a problem with the build.</h3>
-        <p>This might be because you could be offline or on a slow connection. Please try the following steps</p>
-        <ol>
-            <li>Make sure you have <a href="https://nodejs.org" target="_blank">Node.js</a> installed.</li>
-            <li>Open command prompt and cd to \src\Umbraco.Web.UI.Client.</li>
-            <li>Check to see if \src\Umbraco.Web.UI.Client\node_modules folder exists (this could be hidden); if so, delete it.</li>
-            <li>Run npm ci; if successfull the node_modules folder should be created in the Umbraco.Web.UI.Client directory.</li>
-            <li>Run \build\build.ps1.</li>
-        </ol>
-    </div>
-
-    <script type="text/javascript">
-        var Umbraco = {};
-        Umbraco.Sys = {};
-        Umbraco.Sys.ServerVariables = {
-            "installApiBaseUrl": "@ViewData.GetInstallApiBaseUrl()",
-            "umbracoBaseUrl": "@ViewData.GetUmbracoBaseFolder()",
-            "application": {
-               version: "@ViewData.GetUmbracoVersion()?.Major"
-           }
-        };
+                "@@umbraco-cms/backoffice/document": "/umbraco/backoffice/packages/documents/documents/index.js",
+                "@@umbraco-cms/backoffice/data-type": "/umbraco/backoffice/packages/settings/data-types/index.js",
+                "@@umbraco-cms/backoffice/user-group": "/umbraco/backoffice/packages/users/user-groups/index.js"
+            }
+        }
     </script>
-    <script src="lib/lazyload-js/LazyLoad.min.js"></script>
-    <script src="js/install.loader.min.js"></script>
+    <script type="module" src="backoffice/apps/app/app.element.js"></script>
+</head>
+<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
+    <umb-app></umb-app>
 </body>
 </html>
