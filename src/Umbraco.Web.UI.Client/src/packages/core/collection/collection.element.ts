@@ -78,7 +78,7 @@ export class UmbCollectionElement extends UmbLitElement {
 		}
 
 		this._routes.push({
-			path: '**',
+			path: '',
 			redirectTo: views?.[0]?.meta.pathName ?? '/',
 		});
 	}

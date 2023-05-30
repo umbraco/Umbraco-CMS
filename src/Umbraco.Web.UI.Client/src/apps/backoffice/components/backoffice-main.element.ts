@@ -60,14 +60,6 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				};
 			}
 		});
-
-		if (!this._routes.find((r) => r.path === '**')) {
-			this._routes.push({
-				alias: '__redirect',
-				path: '**',
-				redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
-			});
-		}
 	}
 
 	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {

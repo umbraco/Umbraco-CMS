@@ -1,5 +1,5 @@
 import { UmbDocumentWorkspaceContext } from '../../document-workspace.context.js';
-import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -97,7 +97,7 @@ export class UmbDocumentWorkspaceViewEditElement
 
 		if (routes.length !== 0) {
 			routes.push({
-				path: '**',
+				path: '',
 				redirectTo: routes[0]?.path,
 			});
 		}

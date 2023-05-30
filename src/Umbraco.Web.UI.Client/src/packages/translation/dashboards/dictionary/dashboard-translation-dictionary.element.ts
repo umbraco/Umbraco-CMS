@@ -1,6 +1,6 @@
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state , when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -80,13 +80,16 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	#setTableItems() {
 		this.#tableItems = this.#dictionaryItems.map((dictionary) => {
 			// id is set to name to allow filtering on the displayed value
+			// TODO: Generate URL for editing the dictionary item
 			const tableItem: UmbTableItem = {
 				id: dictionary.name ?? '',
 				icon: 'umb:book-alt',
 				data: [
 					{
 						columnAlias: 'name',
-						value: html`<a style="font-weight:bold" href="/section/translation/dictionary-item/edit/${dictionary.id}">
+						value: html`<a
+							style="font-weight:bold"
+							href="/section/translation/workspace/dictionary-item/edit/${dictionary.id}">
 							${dictionary.name}</a
 						> `,
 					},
