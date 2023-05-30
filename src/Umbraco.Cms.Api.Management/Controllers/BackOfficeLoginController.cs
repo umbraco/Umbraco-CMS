@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Api.Management;
 
@@ -7,6 +9,9 @@ namespace Umbraco.Cms.Api.Management;
 public class
     BackOfficeLoginModel
 {
+    /// <summary>
+    /// Gets or sets the value of the "ReturnUrl" query parameter or defaults to default Umbraco directory.
+    /// </summary>
     [FromQuery(Name = "ReturnUrl")]
     public string? ReturnUrl { get; set; }
 }
@@ -15,17 +20,24 @@ public class
 [Route("/umbraco/login")]
 public class BackOfficeLoginController : Controller
 {
-    private readonly LinkGenerator _linkGenerator;
+    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly GlobalSettings _globalSettings;
 
-    public BackOfficeLoginController(LinkGenerator linkGenerator)
+    public BackOfficeLoginController(
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment)
     {
-        _linkGenerator = linkGenerator;
+        _hostingEnvironment = hostingEnvironment;
+        _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
     }
 
     // GET
     public IActionResult Index(BackOfficeLoginModel model)
     {
-        model.AuthUrl = "/umbraco/management/api/v1.0/security/back-office";
+        if (string.IsNullOrEmpty(model.ReturnUrl))
+        {
+            model.ReturnUrl = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoPath);
+        }
 
         return View("/umbraco/UmbracoLogin/Index.cshtml", model);
     }
