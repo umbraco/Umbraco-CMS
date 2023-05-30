@@ -201,6 +201,14 @@ public interface IUserService : IMembershipUserService
     void DeleteSectionFromAllUserGroups(string sectionAlias);
 
     /// <summary>
+    /// Get explicitly assigned permissions for a user and node keys.
+    /// </summary>
+    /// <param name="userKey">Key of user to retrieve permissions for. </param>
+    /// <param name="nodeKeys">The keys of the nodes to get permissions for.</param>
+    /// <returns>An enumerable list of <see cref="NodePermissions"/>.</returns>
+    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, IEnumerable<Guid> nodeKeys);
+
+    /// <summary>
     ///     Get explicitly assigned permissions for a user and optional node ids
     /// </summary>
     /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>

@@ -1900,6 +1900,39 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    /// <inheritdoc />
+    public async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, IEnumerable<Guid> nodeKeys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? user = await GetAsync(userKey);
+
+        if (user is null)
+        {
+            throw new InvalidOperationException("No user with that ID");
+        }
+
+        Guid[] keys = nodeKeys.ToArray();
+        if (keys.Length == 0)
+        {
+            return Enumerable.Empty<NodePermissions>();
+        }
+
+        // We don't know what the entity type may be, so we have to get the entire entity :(
+        var idKeyMap = keys.ToDictionary(key => _entityService.Get(key)!.Id);
+
+        EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
+
+        var results = new List<NodePermissions>();
+        foreach (int nodeId in idKeyMap.Keys)
+        {
+            var permissions = permissionCollection.GetAllPermissions(nodeId).ToArray();
+            results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
+        }
+
+        return results;
+    }
+
     /// <summary>
     ///     Get explicitly assigned permissions for a user and optional node ids
     /// </summary>

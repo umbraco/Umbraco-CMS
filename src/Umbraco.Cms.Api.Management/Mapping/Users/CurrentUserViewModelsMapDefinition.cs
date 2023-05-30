@@ -9,6 +9,13 @@ public class CurrentUserViewModelsMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<UserData, UserDataViewModel>((_, _) => new UserDataViewModel {Data = string.Empty, Name = string.Empty }, Map);
+        mapper.Define<NodePermissions, UserPermissionViewModel>((_, _) => new UserPermissionViewModel(), Map);
+    }
+
+    private void Map(NodePermissions source, UserPermissionViewModel target, MapperContext context)
+    {
+        target.NodeKey = source.NodeKey;
+        target.Permissions = source.Permissions;
     }
 
     private void Map(UserData source, UserDataViewModel target, MapperContext context)
