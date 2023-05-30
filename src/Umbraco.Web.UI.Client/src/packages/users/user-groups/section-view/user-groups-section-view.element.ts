@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -16,7 +16,7 @@ export class UmbUserGroupsSectionViewElement extends UmbLitElement {
 			component: () => import('../workspace/user-group-workspace.element.js'),
 		},
 		{
-			path: '**',
+			path: '',
 			redirectTo: 'collection',
 		},
 	];

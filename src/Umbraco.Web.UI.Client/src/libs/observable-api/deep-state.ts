@@ -1,9 +1,9 @@
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { createObservablePart } from './create-observable-part.function.js';
 import { deepFreeze } from './deep-freeze.function.js';
 import type { MappingFunction } from './mapping-function.js';
 import type { MemoizationFunction } from './memoization-function.js';
 import { naiveObjectComparison } from './naive-object-comparison.js';
+import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @export

@@ -97,7 +97,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		if (routes.length !== 0) {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
-				path: '**',
+				path: '',
 				redirectTo: routes[this._availableVariants.length * this._availableVariants.length]?.path,
 			});
 		}

@@ -1,6 +1,6 @@
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '../section.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map, of } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import {
@@ -71,7 +71,7 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		});
 
 		const routes = [...dashboardRoutes, ...viewRoutes];
-		this._routes = routes?.length > 0 ? [...routes, { path: '**', redirectTo: routes?.[0]?.path }] : [];
+		this._routes = routes?.length > 0 ? [...routes, { path: '', redirectTo: routes?.[0]?.path }] : [];
 	}
 
 	private _observeSectionAlias() {
