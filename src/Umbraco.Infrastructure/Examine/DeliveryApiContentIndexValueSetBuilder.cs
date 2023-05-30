@@ -51,7 +51,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                     [UmbracoExamineFieldNames.DeliveryApiContentIndex.Id] = new object[] { content.Id.ToString() }, // required for correct publishing handling and also needed for backoffice index browsing
                     [UmbracoExamineFieldNames.DeliveryApiContentIndex.ContentTypeId] = new object[] { content.ContentTypeId.ToString() }, // required for correct content type change handling
                     [UmbracoExamineFieldNames.DeliveryApiContentIndex.Culture] = new object[] { indexCulture }, // required for culture variant querying
-                    [UmbracoExamineFieldNames.DeliveryApiContentIndex.Published] = new object[] { isPublished ? "y" : "n" }, // required for culture variant querying
+                    [UmbracoExamineFieldNames.DeliveryApiContentIndex.Published] = new object[] { isPublished ? "y" : "n" }, // required for querying draft content
                     [UmbracoExamineFieldNames.IndexPathFieldName] = new object[] { content.Path }, // required for unpublishing/deletion handling
                     [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? content.GetCultureName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
                 };
