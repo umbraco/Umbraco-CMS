@@ -21,12 +21,14 @@
   <!-- Add JSON schema references (and include MSBuild task) -->
   <PropertyGroup>
     <_UmbracoCmsJsonSchemaReference>appsettings-schema.Umbraco.Cms.json</_UmbracoCmsJsonSchemaReference>
+    <_UmbracoCmsPackageSchemaReference>umbraco-package-schema.json</_UmbracoCmsPackageSchemaReference>
     <NoWarn>NU5100;NU5128</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" GeneratePathProperty="true" />
     <None Include="$(PkgUmbraco_JsonSchema_Extensions)\tasks\netstandard2.0\**" Pack="true" PackagePath="tasks\netstandard2.0" Visible="false" />
     <Content Include="$(_UmbracoCmsJsonSchemaReference)" PackagePath="" Visible="false" />
+    <Content Include="$(_UmbracoCmsPackageSchemaReference)" PackagePath="" Visible="false" />
   </ItemGroup>
 
   <!-- We also need physical copies in the right location relative to the Umbraco.Cms.Targets.targets file, as that's directly referenced in projects -->
@@ -57,5 +59,10 @@
     <ItemGroup>
       <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
     </ItemGroup>
+  </Target>
+
+  <Target Name="GenerateUmbracoPackageSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')">
+    <Message Text="Generating $(_UmbracoCmsPackageSchemaReference) because it doesn't exist" Importance="high" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Umbraco.Web.UI.New.Client\dist-cms\umbraco-package-schema.json" DestinationFiles="$(_UmbracoCmsPackageSchemaReference)" />
   </Target>
 </Project>
