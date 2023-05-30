@@ -25,9 +25,7 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
         var fieldValue = selector[AncestorsSpecifier.Length..];
         Guid? id = GetGuidFromQuery(fieldValue);
 
-        if (id is null ||
-            !_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) ||
-            publishedSnapshot?.Content is null)
+        if (id is null)
         {
             // Setting the Value to "" since that would yield no results.
             // It won't be appropriate to return null here since if we reached this,
@@ -39,8 +37,11 @@ public sealed class AncestorsSelector : QueryOptionBase, ISelectorHandler
             };
         }
 
-        // With the previous check we made sure that if we reach this, we already made sure that there is a valid content item
-        IPublishedContent contentItem = publishedSnapshot.Content.GetById((Guid)id)!; // so it can't be null
+        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+
+        IPublishedContent contentItem = publishedSnapshot.Content?.GetById((Guid)id)
+                                        ?? throw new InvalidOperationException("Could not obtain the content cache");
+
         var ancestorKeys = contentItem.Ancestors().Select(a => a.Key.ToString("D")).ToArray();
 
         return new SelectorOption

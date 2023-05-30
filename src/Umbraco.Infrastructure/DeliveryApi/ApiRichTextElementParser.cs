@@ -1,34 +1,28 @@
-﻿using System.Text.RegularExpressions;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
-internal sealed partial class ApiRichTextParser : IApiRichTextParser
+internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRichTextElementParser
 {
-    private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly ILogger<ApiRichTextParser> _logger;
+    private readonly ILogger<ApiRichTextElementParser> _logger;
 
     private const string TextNodeName = "#text";
 
-    public ApiRichTextParser(
+    public ApiRichTextElementParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedUrlProvider publishedUrlProvider,
-        ILogger<ApiRichTextParser> logger)
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        ILogger<ApiRichTextElementParser> logger)
+        : base(apiContentRouteBuilder, publishedUrlProvider)
     {
-        _apiContentRouteBuilder = apiContentRouteBuilder;
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _publishedUrlProvider = publishedUrlProvider;
         _logger = logger;
     }
 
@@ -100,67 +94,30 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
             return;
         }
 
-        Match match = LocalLinkRegex().Match(href);
-        if (match.Success is false)
-        {
-            return;
-        }
-
-        attributes.Remove("href");
-
-        if (UdiParser.TryParse(match.Groups["udi"].Value, out Udi? udi) is false)
-        {
-            return;
-        }
-
-        switch (udi.EntityType)
-        {
-            case Constants.UdiEntityType.Document:
-                IPublishedContent? content = publishedSnapshot.Content?.GetById(udi);
-                if (content != null)
-                {
-                    attributes["route"] = _apiContentRouteBuilder.Build(content);
-                }
-
-                break;
-            case Constants.UdiEntityType.Media:
-                IPublishedContent? media = publishedSnapshot.Media?.GetById(udi);
-                if (media != null)
-                {
-                    attributes["href"] = _publishedUrlProvider.GetMediaUrl(media, UrlMode.Absolute);
-                }
-
-                break;
-        }
+        ReplaceLocalLinks(
+            publishedSnapshot,
+            href,
+            route =>
+            {
+                attributes["route"] = route;
+                attributes.Remove("href");
+            },
+            url => attributes["href"] = url,
+            () => attributes.Remove("href"));
     }
 
     private void ReplaceLocalImages(IPublishedSnapshot publishedSnapshot, string tag, Dictionary<string, object> attributes)
     {
-        if (tag is not "img" || attributes.ContainsKey("data-udi") is false)
+        if (tag is not "img" || attributes.ContainsKey("data-udi") is false || attributes["data-udi"] is not string dataUdi)
         {
             return;
         }
 
-        var dataUdiValue = attributes["data-udi"];
-        attributes.Remove("data-udi");
-
-        if (dataUdiValue is not string dataUdi || UdiParser.TryParse(dataUdi, out Udi? udi) is false)
+        ReplaceLocalImages(publishedSnapshot, dataUdi, mediaUrl =>
         {
-            return;
-        }
-
-        IPublishedContent? media = publishedSnapshot.Media?.GetById(udi);
-        if (media is not null)
-        {
-            attributes["src"] = _publishedUrlProvider.GetMediaUrl(media, UrlMode.Absolute);
-
-            // this may be relevant if we can't find width and height in the attributes ... for now we seem quite able to, though
-            // if (currentSrc != null)
-            // {
-            //     NameValueCollection queryString = HttpUtility.ParseQueryString(HttpUtility.HtmlDecode(currentSrc));
-            //     attributes["params"] = queryString.AllKeys.WhereNotNull().ToDictionary(key => key, key => queryString[key]);
-            // }
-        }
+            attributes["src"] = mediaUrl;
+            attributes.Remove("data-udi");
+        });
     }
 
     private static void SanitizeAttributes(Dictionary<string, object> attributes)
@@ -177,7 +134,4 @@ internal sealed partial class ApiRichTextParser : IApiRichTextParser
             attributes.Remove(dataAttribute.Key);
         }
     }
-
-    [GeneratedRegex("{localLink:(?<udi>umb:.+)}")]
-    private static partial Regex LocalLinkRegex();
 }

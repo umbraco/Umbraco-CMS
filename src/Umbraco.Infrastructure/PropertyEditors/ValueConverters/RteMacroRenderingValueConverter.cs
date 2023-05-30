@@ -33,7 +33,8 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly IMacroRenderer _macroRenderer;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly HtmlUrlParser _urlParser;
-    private readonly IApiRichTextParser _apiRichTextParser;
+    private readonly IApiRichTextElementParser _apiRichTextElementParser;
+    private readonly IApiRichTextMarkupParser _apiRichTextMarkupParser;
     private DeliveryApiSettings _deliveryApiSettings;
 
     [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
@@ -45,20 +46,23 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             linkParser,
             urlParser,
             imageSourceParser,
-            StaticServiceProvider.Instance.GetRequiredService<IApiRichTextParser>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiRichTextElementParser>(),
+            StaticServiceProvider.Instance.GetRequiredService<IApiRichTextMarkupParser>(),
             StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<DeliveryApiSettings>>())
     {
     }
 
     public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
-        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser, IApiRichTextParser apiRichTextParser, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
+        IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
         _macroRenderer = macroRenderer;
         _linkParser = linkParser;
         _urlParser = urlParser;
         _imageSourceParser = imageSourceParser;
-        _apiRichTextParser = apiRichTextParser;
+        _apiRichTextElementParser = apiRichTextElementParser;
+        _apiRichTextMarkupParser = apiRichTextMarkupParser;
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
@@ -82,19 +86,22 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson
             ? typeof(IRichTextElement)
-            : typeof(string);
+            : typeof(RichTextModel);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        if (_deliveryApiSettings.RichTextOutputAsJson is false)
+        var sourceString = inter?.ToString();
+        if (sourceString.IsNullOrWhiteSpace())
         {
-            return Convert(inter, preview) ?? string.Empty;
+            // different return types for the JSON configuration forces us to have different return values for empty properties
+            return _deliveryApiSettings.RichTextOutputAsJson is false
+                ? new RichTextModel { Markup = string.Empty }
+                : null;
         }
 
-        var sourceString = inter?.ToString();
-        return sourceString != null
-            ? _apiRichTextParser.Parse(sourceString)
-            : null;
+        return _deliveryApiSettings.RichTextOutputAsJson is false
+            ? new RichTextModel { Markup = _apiRichTextMarkupParser.Parse(sourceString) }
+            : _apiRichTextElementParser.Parse(sourceString);
     }
 
     // NOT thread-safe over a request because it modifies the

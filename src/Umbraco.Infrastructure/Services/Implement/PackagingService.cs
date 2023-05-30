@@ -143,12 +143,13 @@ public class PackagingService : IPackagingService
                     PackageName = plan.PackageName,
                 };
 
-                if (plan.GetType().Assembly.TryGetInformationalVersion(out string? version))
-                {
-                    installedPackage.Version = version;
-                }
-
                 installedPackages.Add(installedPackage);
+            }
+            
+            if (installedPackage.Version is null &&
+                plan.GetType().Assembly.TryGetInformationalVersion(out string? version))
+            {
+                installedPackage.Version = version;
             }
 
             // Combine all package migration plans for a package
