@@ -1,4 +1,4 @@
-import { LoginRequestModel, IUmbAuthContext, LoginResponse } from './types';
+import { LoginRequestModel, IUmbAuthContext, LoginResponse } from './types.js';
 
 export class UmbAuthLegacyContext implements IUmbAuthContext {
 	readonly #AUTH_URL = '/umbraco/backoffice/umbracoapi/authentication/postlogin';

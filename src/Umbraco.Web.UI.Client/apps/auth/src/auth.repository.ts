@@ -1,4 +1,4 @@
-import { LoginRequestModel } from './types';
+import { LoginRequestModel } from './types.js';
 
 export class UmbAuthRepository {
 	#authURL = '';

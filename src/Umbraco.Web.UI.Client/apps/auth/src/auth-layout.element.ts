@@ -1,10 +1,8 @@
-import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
-
-
 	render() {
 		return html`
 			<div id="background"></div>
