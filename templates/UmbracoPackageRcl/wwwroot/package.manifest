@@ -1,5 +1,5 @@
 {
     "name": "UmbracoPackage",
-    "version": "",
+    "versionAssemblyName": "UmbracoPackage",
     "allowPackageTelemetry": true
 }

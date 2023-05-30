@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -17,7 +20,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Manifest;
 
 /// <summary>
-///     Parses the Main.js file and replaces all tokens accordingly.
+/// Parses the Main.js file and replaces all tokens accordingly.
 /// </summary>
 public class ManifestParser : IManifestParser
 {
@@ -39,7 +42,7 @@ public class ManifestParser : IManifestParser
     private string _path = null!;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ManifestParser" /> class.
+    /// Initializes a new instance of the <see cref="ManifestParser" /> class.
     /// </summary>
     public ManifestParser(
         AppCaches appCaches,
@@ -163,31 +166,35 @@ public class ManifestParser : IManifestParser
     /// </summary>
     public PackageManifest ParseManifest(string text)
     {
-        if (text == null)
-        {
-            throw new ArgumentNullException(nameof(text));
-        }
+        ArgumentNullException.ThrowIfNull(text);
 
         if (string.IsNullOrWhiteSpace(text))
         {
             throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
         }
 
-        PackageManifest? manifest = JsonConvert.DeserializeObject<PackageManifest>(
+        PackageManifest manifest = JsonConvert.DeserializeObject<PackageManifest>(
             text,
             new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
             new ValueValidatorConverter(_validators),
-            new DashboardAccessRuleConverter());
+            new DashboardAccessRuleConverter())!;
+
+        if (string.IsNullOrEmpty(manifest.Version) &&
+            !string.IsNullOrEmpty(manifest.VersionAssemblyName) &&
+            TryGetAssemblyInformationalVersion(manifest.VersionAssemblyName, out string? version))
+        {
+            manifest.Version = version;
+        }
 
         // scripts and stylesheets are raw string, must process here
-        for (var i = 0; i < manifest!.Scripts.Length; i++)
+        for (var i = 0; i < manifest.Scripts.Length; i++)
         {
-            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i])!;
+            manifest.Scripts[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Scripts[i]);
         }
 
         for (var i = 0; i < manifest.Stylesheets.Length; i++)
         {
-            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i])!;
+            manifest.Stylesheets[i] = _ioHelper.ResolveRelativeOrVirtualUrl(manifest.Stylesheets[i]);
         }
 
         foreach (ManifestContentAppDefinition contentApp in manifest.ContentApps)
@@ -197,7 +204,7 @@ public class ManifestParser : IManifestParser
 
         foreach (ManifestDashboard dashboard in manifest.Dashboards)
         {
-            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View)!;
+            dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
         }
 
         foreach (GridEditor gridEditor in manifest.GridEditors)
@@ -215,6 +222,22 @@ public class ManifestParser : IManifestParser
         }
 
         return manifest;
+    }
+
+    private bool TryGetAssemblyInformationalVersion(string name, [NotNullWhen(true)] out string? version)
+    {
+        foreach (Assembly assembly in AssemblyLoadContext.Default.Assemblies)
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase) &&
+                assembly.TryGetInformationalVersion(out version))
+            {
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 
     /// <summary>
