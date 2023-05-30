@@ -47,7 +47,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async determineInsertValue(modalResult: ChooseInsertTypeModalResult) {
-		debugger;
 		const { type, value } = modalResult;
 
 		switch (type) {
@@ -92,7 +91,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 			hidePartialView: this.hidePartialView,
 		});
 		this.#openModal?.onSubmit().then((closedModal: ChooseInsertTypeModalResult) => {
-			debugger;
 			this.determineInsertValue(closedModal);
 		});
 	};

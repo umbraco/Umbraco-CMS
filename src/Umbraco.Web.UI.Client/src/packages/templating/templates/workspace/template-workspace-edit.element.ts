@@ -75,7 +75,6 @@ export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
 	}
 
 	#insertSnippet(event: Event) {
-		debugger;
 		const target = event.target as UmbTemplatingInsertMenuElement;
 		const value = target.value as string;
 		this._codeEditor?.insert(value);

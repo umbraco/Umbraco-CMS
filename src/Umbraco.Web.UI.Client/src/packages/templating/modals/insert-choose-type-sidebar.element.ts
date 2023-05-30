@@ -77,7 +77,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {pickableFilter: item => item.id !== null});
 		this.#openModal?.onSubmit().then((dictionaryItemPickerModalResult) => {
 			if (dictionaryItemPickerModalResult)
-			debugger;
 				this.modalHandler?.submit({ value: dictionaryItemPickerModalResult, type: CodeSnippetType.dictionaryItem });
 		});
 	}
