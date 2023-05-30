@@ -80,6 +80,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	#getUmbracoFieldValueSnippet = async (value: string) => {
 		this.value = value;
+		this.#dispatchInsertEvent();
 	};
 
 	#getPartialViewSnippet = async (modalResult: UmbPartialViewPickerModalResult) => {
