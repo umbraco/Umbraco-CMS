@@ -2238,8 +2238,8 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     <key alias="stateInactive">Neaktivan</key>
     <key alias="sortNameAscending">Ime (A-Z)</key>
     <key alias="sortNameDescending">Ime (Z-A)</key>
-    <key alias="sortCreateDateAscending">Najnovije</key>
-    <key alias="sortCreateDateDescending">Najstarije</key>
+    <key alias="sortCreateDateAscending">Najstarije</key>
+    <key alias="sortCreateDateDescending">Najnovije</key>
     <key alias="sortLastLoginDateDescending">Zadnja prijava</key>
     <key alias="noUserGroupsAdded">Nijedna korisnička grupa nije dodana</key>
     <key alias="2faDisableText">Ako želite da onemogućite ovog dvofaktorskog provajdera, onda morate uneti kod prikazan na vašem uređaju za autentifikaciju:</key>
