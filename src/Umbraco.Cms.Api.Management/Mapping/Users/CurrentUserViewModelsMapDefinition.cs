@@ -12,12 +12,14 @@ public class CurrentUserViewModelsMapDefinition : IMapDefinition
         mapper.Define<NodePermissions, UserPermissionViewModel>((_, _) => new UserPermissionViewModel(), Map);
     }
 
+    // Umbraco.Code.MapAll
     private void Map(NodePermissions source, UserPermissionViewModel target, MapperContext context)
     {
         target.NodeKey = source.NodeKey;
         target.Permissions = source.Permissions;
     }
 
+    // Umbraco.Code.MapAll
     private void Map(UserData source, UserDataViewModel target, MapperContext context)
     {
         target.Name = source.Name;

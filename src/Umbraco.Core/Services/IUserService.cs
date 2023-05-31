@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -73,6 +74,8 @@ public interface IUserService : IMembershipUserService
     Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model);
 
     Task<UserOperationStatus> ClearAvatarAsync(Guid userKey);
+
+    Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey);
 
     /// <summary>
     /// Gets all users that the requesting user is allowed to see.

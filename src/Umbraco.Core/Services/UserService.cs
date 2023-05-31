@@ -1642,6 +1642,26 @@ internal class UserService : RepositoryService, IUserService
         return backOfficeUserStore.GetUsersAsync(keys.ToArray());
     }
 
+    public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey)
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? user = await backOfficeUserStore.GetAsync(userKey);
+        if (user is null)
+        {
+            return Attempt.FailWithStatus<ICollection<IIdentityUserLogin>, UserOperationStatus>(UserOperationStatus.UserNotFound, Array.Empty<IIdentityUserLogin>());
+        }
+
+        ICoreBackOfficeUserManager manager = scope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+
+        Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus> loginsAttempt = await manager.GetLoginsAsync(user);
+
+        return loginsAttempt.Success is false
+            ? Attempt.FailWithStatus<ICollection<IIdentityUserLogin>, UserOperationStatus>(loginsAttempt.Status, Array.Empty<IIdentityUserLogin>())
+            : Attempt.SucceedWithStatus(UserOperationStatus.Success, loginsAttempt.Result);
+    }
+
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
