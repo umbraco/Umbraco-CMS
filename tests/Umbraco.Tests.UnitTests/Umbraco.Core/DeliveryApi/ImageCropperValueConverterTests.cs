@@ -48,7 +48,7 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
             }
         );
         var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, source, false);
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false) as ApiImageCropperValue;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType.Object, PropertyCacheLevel.Element, inter, false, false) as ApiImageCropperValue;
         Assert.NotNull(result);
         Assert.AreEqual("/some/file.jpg", result.Url);
         Assert.NotNull(result.FocalPoint);

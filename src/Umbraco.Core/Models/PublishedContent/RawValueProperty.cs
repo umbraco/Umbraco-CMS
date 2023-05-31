@@ -41,7 +41,7 @@ public class RawValueProperty : PublishedPropertyBase
         _xpathValue = new Lazy<object?>(() =>
             PropertyType.ConvertInterToXPath(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
         _deliveryApiValue = new Lazy<object?>(() =>
-            PropertyType.ConvertInterToDeliveryApiObject(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
+            PropertyType.ConvertInterToDeliveryApiObject(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing, false));
     }
 
     // RawValueProperty does not (yet?) support variants,

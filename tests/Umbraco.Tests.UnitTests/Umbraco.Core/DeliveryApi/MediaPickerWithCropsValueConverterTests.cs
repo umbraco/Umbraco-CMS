@@ -59,7 +59,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var first = result.Single();
@@ -117,7 +117,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(2, result.Count());
         var first = result.First();
@@ -184,7 +184,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var mediaWithCrops = result.Single();
@@ -246,7 +246,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
             }
         });
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.AreEqual(1, result.Count());
         var mediaWithCrops = result.Single();
@@ -273,7 +273,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var valueConverter = MediaPickerWithCropsValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
@@ -288,7 +288,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var valueConverter = MediaPickerWithCropsValueConverter();
 
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<ApiMediaWithCrops>;
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<ApiMediaWithCrops>;
         Assert.NotNull(result);
         Assert.IsEmpty(result);
     }
