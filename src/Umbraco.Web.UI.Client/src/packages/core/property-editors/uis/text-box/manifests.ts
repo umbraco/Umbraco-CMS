@@ -5,13 +5,13 @@ const inputTypeConfig = {
 	alias: 'inputType',
 	label: 'Input type',
 	description: 'Select input type',
-	propertyEditorUI: 'Umb.PropertyEditorUI.Dropdown',
+	propertyEditorUI: 'Umb.PropertyEditorUi.Dropdown',
 };
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.TextBox',
+		alias: 'Umb.PropertyEditorUi.TextBox',
 		name: 'Text Box Property Editor UI',
 		loader: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
@@ -32,7 +32,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	},
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Email',
+		alias: 'Umb.PropertyEditorUi.Email',
 		name: 'Email Property Editor UI',
 		loader: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {

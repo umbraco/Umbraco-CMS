@@ -5,14 +5,14 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Text Box',
 	alias: 'Umbraco.TextBox',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.TextBox',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		settings: {
 			properties: [
 				{
 					alias: 'maxChars',
 					label: 'Maximum allowed characters',
 					description: 'If empty, 512 character limit',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Number',
 				},
 			],
 			defaultData: [

@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.NumberRange',
+	alias: 'Umb.PropertyEditorUi.NumberRange',
 	name: 'Number Range Property Editor UI',
 	loader: () => import('./property-editor-ui-number-range.element.js'),
 	meta: {

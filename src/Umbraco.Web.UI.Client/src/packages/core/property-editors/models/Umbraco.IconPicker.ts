@@ -5,6 +5,6 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Icon Picker',
 	alias: 'Umbraco.IconPicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.IconPicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
 	},
 };

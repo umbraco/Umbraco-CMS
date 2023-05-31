@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.MultiUrlPicker',
+	alias: 'Umb.PropertyEditorUi.MultiUrlPicker',
 	name: 'Multi URL Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-multi-url-picker.element.js'),
 	meta: {
@@ -16,13 +16,13 @@ export const manifest: ManifestPropertyEditorUI = {
 					alias: 'overlaySize',
 					label: 'Overlay Size',
 					description: 'Select the width of the overlay.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.OverlaySize',
+					propertyEditorUI: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 				{
 					alias: 'hideAnchor',
 					label: 'Hide anchor/query string input',
 					description: 'Selecting this hides the anchor/query string input field in the link picker overlay.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

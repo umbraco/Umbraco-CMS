@@ -5,20 +5,20 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Multiple Text String',
 	alias: 'Umbraco.MultipleTextString',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.MultipleTextString',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		settings: {
 			properties: [
 				{
 					alias: 'min',
 					label: 'Minimum',
 					description: 'Enter the minimum amount of text boxes to be displayed',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'max',
 					label: 'Maximum',
 					description: 'Enter the maximum amount of text boxes to be displayed, enter 0 for unlimited',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Number',
 				},
 			],
 			defaultData: [

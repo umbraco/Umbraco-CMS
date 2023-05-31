@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.OrderDirection',
+	alias: 'Umb.PropertyEditorUi.OrderDirection',
 	name: 'Order Direction Property Editor UI',
 	loader: () => import('./property-editor-ui-order-direction.element.js'),
 	meta: {

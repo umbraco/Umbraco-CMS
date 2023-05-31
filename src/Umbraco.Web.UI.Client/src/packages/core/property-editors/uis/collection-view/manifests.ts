@@ -6,7 +6,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.CollectionView',
+	alias: 'Umb.PropertyEditorUi.CollectionView',
 	name: 'Collection View Property Editor UI',
 	loader: () => import('./property-editor-ui-collection-view.element.js'),
 	meta: {
@@ -20,31 +20,31 @@ const manifest: ManifestPropertyEditorUI = {
 					alias: 'layouts',
 					label: 'Layouts',
 					description: 'The properties that will be displayed for each column',
-					propertyEditorUI: 'Umb.PropertyEditorUI.CollectionView.LayoutConfiguration',
+					propertyEditorUI: 'Umb.PropertyEditorUi.CollectionView.LayoutConfiguration',
 				},
 				{
 					alias: 'icon',
 					label: 'Content app icon',
 					description: 'The icon of the listview content app',
-					propertyEditorUI: 'Umb.PropertyEditorUI.IconPicker',
+					propertyEditorUI: 'Umb.PropertyEditorUi.IconPicker',
 				},
 				{
 					alias: 'tabName',
 					label: 'Content app name',
 					description: 'The name of the listview content app (default if empty: Child Items)',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextBox',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'showContentFirst',
 					label: 'Show Content App First',
 					description: 'Enable this to show the content app by default instead of the list view app',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'useInfiniteEditor',
 					label: 'Edit in Infinite Editor',
 					description: 'Enable this to use infinite editing to edit the content of the list view',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

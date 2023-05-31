@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.CheckboxList',
+	alias: 'Umb.PropertyEditorUi.CheckboxList',
 	name: 'Checkbox List Property Editor UI',
 	loader: () => import('./property-editor-ui-checkbox-list.element.js'),
 	meta: {
@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorUI = {
 					alias: 'items',
 					label: 'Add option',
 					description: 'Add, remove or sort options for the list.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.MultipleTextString',
+					propertyEditorUI: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

@@ -5,6 +5,6 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Checkbox List',
 	alias: 'Umbraco.CheckboxList',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.CheckboxList',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.CheckboxList',
 	},
 };

@@ -5,6 +5,6 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Markdown Editor',
 	alias: 'Umbraco.MarkdownEditor',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.MarkdownEditor',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MarkdownEditor',
 	},
 };

@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.MediaPicker',
+	alias: 'Umb.PropertyEditorUi.MediaPicker',
 	name: 'Markdown Editor Property Editor UI',
 	loader: () => import('./property-editor-ui-media-picker.element.js'),
 	meta: {

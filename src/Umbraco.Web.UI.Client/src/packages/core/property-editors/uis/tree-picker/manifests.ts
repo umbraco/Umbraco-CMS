@@ -3,7 +3,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.TreePicker',
+	alias: 'Umb.PropertyEditorUi.TreePicker',
 	name: 'Tree Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-tree-picker.element.js'),
 	meta: {
@@ -17,19 +17,19 @@ const manifest: ManifestPropertyEditorUI = {
 					alias: 'startNode',
 					label: 'Start node',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TreePicker.StartNode',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TreePicker.StartNode',
 				},
 				{
 					alias: 'filter',
 					label: 'Allow items of type',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TreePicker',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{
 					alias: 'showOpenButton',
 					label: 'Show open button',
 					description: 'Opens the node in a dialog',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

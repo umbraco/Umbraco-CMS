@@ -4,13 +4,13 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 const allowDecimalsConfig = {
 	alias: 'allowDecimals',
 	label: 'Allow decimals',
-	propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+	propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 };
 
 export const manifests: Array<ManifestPropertyEditorUI> = [
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Integer',
+		alias: 'Umb.PropertyEditorUi.Integer',
 		name: 'Integer Property Editor UI',
 		loader: () => import('./property-editor-ui-number.element.js'),
 		meta: {
@@ -31,7 +31,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	},
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Decimal',
+		alias: 'Umb.PropertyEditorUi.Decimal',
 		name: 'Decimal Property Editor UI',
 		loader: () => import('./property-editor-ui-number.element.js'),
 		meta: {

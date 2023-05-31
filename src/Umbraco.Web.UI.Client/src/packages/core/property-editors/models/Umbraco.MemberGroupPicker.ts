@@ -5,6 +5,6 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Member Group Picker',
 	alias: 'Umbraco.MemberGroupPicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.MemberGroupPicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 	},
 };

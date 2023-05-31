@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.Dropdown',
+	alias: 'Umb.PropertyEditorUi.Dropdown',
 	name: 'Dropdown Property Editor UI',
 	loader: () => import('./property-editor-ui-dropdown.element.js'),
 	meta: {
@@ -15,12 +15,12 @@ export const manifest: ManifestPropertyEditorUI = {
 				{
 					alias: 'multiple',
 					label: 'Enable multiple choice',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'items',
 					label: 'Add options',
-					propertyEditorUI: 'Umb.PropertyEditorUI.MultipleTextString',
+					propertyEditorUI: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

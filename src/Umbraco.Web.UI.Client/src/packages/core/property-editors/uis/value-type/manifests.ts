@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.ValueType',
+	alias: 'Umb.PropertyEditorUi.ValueType',
 	name: 'Value Type Property Editor UI',
 	loader: () => import('./property-editor-ui-value-type.element.js'),
 	meta: {

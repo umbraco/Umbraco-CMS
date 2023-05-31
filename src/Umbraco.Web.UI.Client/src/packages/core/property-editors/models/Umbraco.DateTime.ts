@@ -6,7 +6,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Date/Time',
 	alias: 'Umbraco.DateTime',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		settings: {
 			properties: [
 				{
@@ -14,7 +14,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					label: 'Offset time',
 					description:
 						'When enabled the time displayed will be offset with the servers timezone, this is useful for scenarios like scheduled publishing when an editor is in a different timezone than the hosted server',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 					config: [
 						{
 							alias: 'labelOff',

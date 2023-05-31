@@ -3,7 +3,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.TinyMCE',
+	alias: 'Umb.PropertyEditorUi.TinyMCE',
 	name: 'Rich Text Editor Property Editor UI',
 	loader: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
@@ -16,17 +16,17 @@ const manifest: ManifestPropertyEditorUI = {
 				{
 					alias: 'editor',
 					label: 'Editor',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.Configuration',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
-					propertyEditorUI: 'Umb.PropertyEditorUI.OverlaySize',
+					propertyEditorUI: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 				{
 					alias: 'hideLabel',
 					label: 'Hide Label',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

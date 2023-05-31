@@ -5,7 +5,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.BlockGrid',
+	alias: 'Umb.PropertyEditorUi.BlockGrid',
 	name: 'Block Grid Property Editor UI',
 	loader: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
@@ -19,19 +19,19 @@ const manifest: ManifestPropertyEditorUI = {
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
 					description: 'Live update content when editing in overlay',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'maxPropertyWidth',
 					label: 'Editor width',
 					description: 'Optional css overwrite. (example: 1200px or 100%)',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextBox',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'createLabel',
 					label: 'Create Button Label',
 					description: 'Override the label text for adding a new block, Example Add Widget',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextBox',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
 				},
 			],
 		},

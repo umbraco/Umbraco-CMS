@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.MarkdownEditor',
+	alias: 'Umb.PropertyEditorUi.MarkdownEditor',
 	name: 'Markdown Editor Property Editor UI',
 	loader: () => import('./property-editor-ui-markdown-editor.element.js'),
 	meta: {
@@ -16,19 +16,19 @@ export const manifest: ManifestPropertyEditorUI = {
 					alias: 'preview',
 					label: 'Preview',
 					description: 'Display a live preview',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'defaultValue',
 					label: 'Default value',
 					description: 'If value is blank, the editor will show this',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextArea',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TextArea',
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
 					description: 'Select the width of the overlay.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.OverlaySize',
+					propertyEditorUI: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 			],
 		},

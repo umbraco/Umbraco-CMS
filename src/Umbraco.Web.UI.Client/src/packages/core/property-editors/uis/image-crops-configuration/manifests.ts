@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.ImageCropsConfiguration',
+	alias: 'Umb.PropertyEditorUi.ImageCropsConfiguration',
 	name: 'Image Crops Configuration Property Editor UI',
 	loader: () => import('./property-editor-ui-image-crops-configuration.element.js'),
 	meta: {

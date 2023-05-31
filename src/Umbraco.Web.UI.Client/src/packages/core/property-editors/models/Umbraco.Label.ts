@@ -5,14 +5,14 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Label',
 	alias: 'Umbraco.Label',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.Label',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Label',
 		settings: {
 			properties: [
 				{
 					alias: 'umbracoDataValueType',
 					label: 'Value type',
 					description: 'The type of value to store',
-					propertyEditorUI: 'Umb.PropertyEditorUI.ValueType',
+					propertyEditorUI: 'Umb.PropertyEditorUi.ValueType',
 				},
 			],
 		},

@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.BlockGrid.StylesheetPicker',
+	alias: 'Umb.PropertyEditorUi.BlockGrid.StylesheetPicker',
 	name: 'Block Grid Stylesheet Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-block-grid-stylesheet-picker.element.js'),
 	meta: {

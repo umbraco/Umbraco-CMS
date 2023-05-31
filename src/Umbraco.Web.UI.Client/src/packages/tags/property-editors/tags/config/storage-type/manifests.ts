@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.Tags.StorageType',
+	alias: 'Umb.PropertyEditorUi.Tags.StorageType',
 	name: 'Tags Storage Type Property Editor UI',
 	loader: () => import('./property-editor-ui-tags-storage-type.element.js'),
 	meta: {

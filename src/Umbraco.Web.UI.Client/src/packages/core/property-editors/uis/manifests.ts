@@ -67,7 +67,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	...tinyMCE,
 	{
 		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Number',
+		alias: 'Umb.PropertyEditorUi.Number',
 		name: 'Number Property Editor UI',
 		loader: () => import('./number/property-editor-ui-number.element.js'),
 		meta: {

@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.DocumentPicker',
+	alias: 'Umb.PropertyEditorUi.DocumentPicker',
 	name: 'Document Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-document-picker.element.js'),
 	meta: {
@@ -16,19 +16,19 @@ export const manifest: ManifestPropertyEditorUI = {
 					alias: 'showOpenButton',
 					label: 'Show open button',
 					description: 'Opens the node in a dialog',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'validationLimit',
 					label: 'Amount of Documents',
 					description: 'Require a certain amount of documents',
-					propertyEditorUI: 'Umb.PropertyEditorUI.NumberRange',
+					propertyEditorUI: 'Umb.PropertyEditorUi.NumberRange',
 				},
 				{
 					alias: 'ignoreUserStartNodes',
 					label: 'Ignore User Start Nodes',
 					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

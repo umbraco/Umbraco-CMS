@@ -5,20 +5,20 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Slider',
 	alias: 'Umbraco.Slider',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.Slider',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Slider',
 		settings: {
 			properties: [
 				{
 					alias: 'minVal',
 					label: 'Minimum value',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'maxVal',
 					label: 'Maximum value',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Number',
 				},
 			],
 			defaultData: [

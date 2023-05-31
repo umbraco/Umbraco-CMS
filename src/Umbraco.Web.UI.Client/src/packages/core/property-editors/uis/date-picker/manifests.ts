@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.DatePicker',
+	alias: 'Umb.PropertyEditorUi.DatePicker',
 	name: 'Date Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-date-picker.element.js'),
 	meta: {
@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorUI = {
 					alias: 'format',
 					label: 'Date format',
 					description: 'If left empty then the format is YYYY-MM-DD',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextBox',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
 				},
 			],
 			defaultData: [

@@ -14,7 +14,7 @@ type Story = StoryObj<UmbRefPropertyEditorUIElement>;
 export const Overview: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
-		alias: 'Umb.PropertyEditorUI.CustomUI',
+		alias: 'Umb.PropertyEditorUi.CustomUI',
 		propertyEditorModelAlias: 'Umbraco.JSON',
 	},
 };
@@ -22,7 +22,7 @@ export const Overview: Story = {
 export const WithDetail: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
-		alias: 'Umb.PropertyEditorUI.CustomUI',
+		alias: 'Umb.PropertyEditorUi.CustomUI',
 		propertyEditorModelAlias: 'Umbraco.JSON',
 		detail: 'With some custom details',
 	},
@@ -31,7 +31,7 @@ export const WithDetail: Story = {
 export const WithSlots: Story = {
 	args: {
 		name: 'Custom Property Editor UI',
-		alias: 'Umb.PropertyEditorUI.CustomUI',
+		alias: 'Umb.PropertyEditorUi.CustomUI',
 		propertyEditorModelAlias: 'Umbraco.JSON',
 		detail: 'With some custom details',
 	},

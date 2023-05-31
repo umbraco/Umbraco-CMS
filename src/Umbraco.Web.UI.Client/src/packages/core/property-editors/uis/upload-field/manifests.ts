@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.UploadField',
+	alias: 'Umb.PropertyEditorUi.UploadField',
 	name: 'Upload Field Property Editor UI',
 	loader: () => import('./property-editor-ui-upload-field.element.js'),
 	meta: {

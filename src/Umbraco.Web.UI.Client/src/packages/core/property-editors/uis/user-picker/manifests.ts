@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.UserPicker',
+	alias: 'Umb.PropertyEditorUi.UserPicker',
 	name: 'User Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-user-picker.element.js'),
 	meta: {

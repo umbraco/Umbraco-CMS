@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUI = {
 	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.OverlaySize',
+	alias: 'Umb.PropertyEditorUi.OverlaySize',
 	name: 'Overlay Size Property Editor UI',
 	loader: () => import('./property-editor-ui-overlay-size.element.js'),
 	meta: {

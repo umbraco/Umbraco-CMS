@@ -5,20 +5,20 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Tags',
 	alias: 'Umbraco.Tags',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.Tags',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Tags',
 		settings: {
 			properties: [
 				{
 					alias: 'group',
 					label: 'Define a tag group',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextBox',
+					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'storageType',
 					label: 'Storage Type',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Tags.StorageType',
+					propertyEditorUI: 'Umb.PropertyEditorUi.Tags.StorageType',
 				},
 			],
 			defaultData: [
