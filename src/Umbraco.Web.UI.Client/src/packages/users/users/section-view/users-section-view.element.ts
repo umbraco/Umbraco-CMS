@@ -1,4 +1,4 @@
-import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
@@ -19,7 +19,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 			component: () => import('../workspace/user-workspace.element.js'),
 		},
 		{
-			path: '**',
+			path: '',
 			redirectTo: 'collection',
 		},
 	];

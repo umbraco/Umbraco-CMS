@@ -1,4 +1,4 @@
-import { html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestTree,
@@ -52,7 +52,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		});
 
 		routes.push({
-			path: '**',
+			path: '',
 			redirectTo: 'overview',
 		});
 		this._routes = routes;

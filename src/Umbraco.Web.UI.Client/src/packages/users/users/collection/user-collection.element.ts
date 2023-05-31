@@ -1,5 +1,5 @@
 import { UmbUserCollectionContext } from './user-collection.context.js';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -23,7 +23,7 @@ export class UmbUserCollectionElement extends UmbLitElement {
 			component: () => import('./views/table/user-collection-table-view.element.js'),
 		},
 		{
-			path: '**',
+			path: '',
 			redirectTo: 'grid',
 		},
 	];

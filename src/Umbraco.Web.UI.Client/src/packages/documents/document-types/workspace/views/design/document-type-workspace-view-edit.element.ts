@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
-import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
@@ -95,7 +95,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 		if (routes.length !== 0) {
 			routes.push({
-				path: '**',
+				path: '',
 				redirectTo: routes[0]?.path,
 			});
 		}

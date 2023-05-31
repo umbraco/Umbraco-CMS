@@ -1,7 +1,15 @@
 import './components/index.js';
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../logviewer.context.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { PropertyValueMap, css, html, nothing , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import {
+	PropertyValueMap,
+	css,
+	html,
+	nothing,
+	customElement,
+	state,
+	repeat,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -90,7 +98,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 			});
 
 			this._routes.push({
-				path: '**',
+				path: '',
 				redirectTo: `${this._workspaceViews[0].meta.pathname}`,
 			});
 		}
