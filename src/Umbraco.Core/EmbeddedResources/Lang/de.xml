@@ -2179,8 +2179,8 @@
     <key alias="stateInactive">Nicht aktiv</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
     <key alias="sortNameDescending">Name (Z-A)</key>
-    <key alias="sortCreateDateAscending">Newest</key>
-    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortCreateDateAscending">Oldest</key>
+    <key alias="sortCreateDateDescending">Newest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
   </area>
   <area alias="validation">

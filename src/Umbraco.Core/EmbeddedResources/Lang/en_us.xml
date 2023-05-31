@@ -2340,8 +2340,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="stateInactive">Inactive</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
     <key alias="sortNameDescending">Name (Z-A)</key>
-    <key alias="sortCreateDateAscending">Newest</key>
-    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortCreateDateAscending">Oldest</key>
+    <key alias="sortCreateDateDescending">Newest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
     <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
