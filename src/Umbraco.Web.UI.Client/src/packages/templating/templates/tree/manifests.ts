@@ -1,3 +1,4 @@
+import { TEMPLATE_ENTITY_TYPE, TEMPLATE_ROOT_ENTITY_TYPE } from '../index.js';
 import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -16,7 +17,10 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.Template',
 	name: 'Template Tree Item',
 	conditions: {
-		entityTypes: ['template-root', 'template'],
+		entityTypes: [TEMPLATE_ROOT_ENTITY_TYPE, TEMPLATE_ENTITY_TYPE],
+	},
+	meta: {
+		icon: 'icon-layout',
 	},
 };
 

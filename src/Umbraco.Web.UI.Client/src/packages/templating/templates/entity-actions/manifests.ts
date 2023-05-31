@@ -1,4 +1,5 @@
 import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { TEMPLATE_ENTITY_TYPE, TEMPLATE_ROOT_ENTITY_TYPE } from '../index.js';
 import { UmbCreateEntityAction } from './create/create.action.js';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
@@ -15,7 +16,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityTypes: ['template'],
+			entityTypes: [TEMPLATE_ENTITY_TYPE, TEMPLATE_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -29,7 +30,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 		},
 		conditions: {
-			entityTypes: ['template'],
+			entityTypes: [TEMPLATE_ENTITY_TYPE],
 		},
 	},
 ];
