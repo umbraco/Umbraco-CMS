@@ -5,20 +5,21 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Color Picker',
 	alias: 'Umbraco.ColorPicker',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorPicker',
+		settings: {
 			properties: [
 				{
 					alias: 'useLabel',
 					label: 'Include labels?',
 					description:
 						'Stores colors as a Json object containing both the color hex string and label, rather than just the hex string.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'items',
 					label: 'Colors',
 					description: 'Add, remove or sort colors',
-					propertyEditorUI: 'Umb.PropertyEditorUI.ColorPicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorPicker',
 				},
 			],
 		},

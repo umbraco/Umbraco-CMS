@@ -5,36 +5,37 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Block Grid',
 	alias: 'Umbraco.BlockGrid',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
+		settings: {
 			properties: [
 				{
 					alias: 'blocks',
 					label: 'Blocks',
 					description:
 						'Define Blocks based on Element Types. Use Groups to help organise their selection. Example Groups: Layout and Content',
-					propertyEditorUI: 'Umb.PropertyEditorUI.BlockGrid.BlockConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.BlockConfiguration',
 				},
 				{
 					alias: 'blockGroups',
 					label: 'Block Groups',
-					propertyEditorUI: 'Umb.PropertyEditorUI.BlockGrid.GroupConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.GroupConfiguration',
 				},
 				{
 					alias: 'validationLimit',
 					label: 'Amount',
-					propertyEditorUI: 'Umb.PropertyEditorUI.NumberRange',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 				},
 				{
 					alias: 'gridColumns',
 					label: 'Grid Columns',
 					description: 'Set the number of columns for the layout. (defaults to 12)',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'layoutStylesheet',
 					label: 'Layout Stylesheet',
 					description: 'Override default stylesheet for backoffice layout.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.BlockGrid.StylesheetPicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.StylesheetPicker',
 				},
 			],
 			defaultData: [
