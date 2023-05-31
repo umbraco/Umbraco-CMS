@@ -62,7 +62,7 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc --project ./src/tsconfig.json && rollup -c ./src/rollup.config.js && npm run generate:jsonschema",
+		"build": "tsc --project ./src/tsconfig.json && rollup -c ./src/rollup.config.js",
 		"build:vite": "tsc && vite build --mode staging",
 		"build:for:static": "vite build",
 		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
@@ -80,7 +80,8 @@
 		"format:fix": "npm run format -- --write",
 		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v13/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
 		"generate:api-dev": "openapi --input http://localhost:11000/umbraco/swagger/v1/swagger.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
-		"generate:jsonschema": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/*.ts\" --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
+		"generate:jsonschema": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/*.ts\"",
+		"generate:jsonschema:dist": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/umbraco-package.ts\" --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"storybook": "npm run wc-analyze && storybook dev -p 6006",
 		"storybook:build": "npm run wc-analyze && storybook build",
 		"build-storybook": "npm run wc-analyze && storybook build",
