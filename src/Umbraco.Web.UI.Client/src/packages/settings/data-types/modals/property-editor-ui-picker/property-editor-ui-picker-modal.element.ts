@@ -49,7 +49,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	}
 
 	private _handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		this._select(propertyEditorUI.alias);
+		this._select(propertyEditorUi.alias);
 	}
 
 	private _select(alias: string) {
