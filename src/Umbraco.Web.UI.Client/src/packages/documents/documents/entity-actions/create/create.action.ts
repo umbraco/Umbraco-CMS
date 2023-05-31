@@ -29,23 +29,32 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 
 	private async _executeWithParent() {
 		// TODO: what to do if modal service is not available?
-		if (!this.#modalContext) return;
 		if (!this.repository) return;
 
 		const { data } = await this.repository.requestById(this.unique);
 
 		if (data && data.contentTypeId) {
-			const modalHandler = this.#modalContext?.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
-				id: data.contentTypeId,
-			});
-
-			const { documentTypeKey } = await modalHandler.onSubmit();
-			// TODO: how do we want to generate these urls?
-			history.pushState(null, '', `section/content/workspace/document/create/${this.unique}/${documentTypeKey}`);
+			this._openModal(data.contentTypeId);
 		}
 	}
 
 	private async _executeAtRoot() {
-		alert('At root.');
+		this._openModal(null);
+	}
+
+	private async _openModal(documentId: string | null) {
+		if (!this.#modalContext) return;
+		const modalHandler = this.#modalContext.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
+			id: documentId,
+		});
+
+		const { documentTypeKey } = await modalHandler.onSubmit();
+
+		if (this.unique) {
+			// TODO: how do we want to generate these urls?
+			history.pushState(null, '', `section/content/workspace/document/create/${this.unique}/${documentTypeKey}`);
+		} else {
+			history.pushState(null, '', `section/content/workspace/document/create/null/${documentTypeKey}`);
+		}
 	}
 }
