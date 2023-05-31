@@ -9,6 +9,6 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Image Crops Configuration',
 		icon: 'umb:autofill',
 		group: 'common',
-		propertyEditorModel: '',
+		propertyEditorAlias: '',
 	},
 };

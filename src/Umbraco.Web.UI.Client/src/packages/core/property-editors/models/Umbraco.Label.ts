@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'umbracoDataValueType',
 					label: 'Value type',
 					description: 'The type of value to store',
-					propertyEditorUi: 'Umb.PropertyEditorUi.ValueType',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ValueType',
 				},
 			],
 		},

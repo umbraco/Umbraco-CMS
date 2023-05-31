@@ -12,19 +12,19 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'minNumber',
 					label: 'Minimum number of items',
 					description: '',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'maxNumber',
 					label: 'Maximum number of items',
 					description: '',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'ignoreUserStartNodes',
 					label: 'Ignore user start nodes',
 					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 			defaultData: [

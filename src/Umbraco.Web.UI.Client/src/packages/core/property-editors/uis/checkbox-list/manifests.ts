@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-checkbox-list.element.js'),
 	meta: {
 		label: 'Checkbox List',
-		propertyEditorModel: 'Umbraco.CheckboxList',
+		propertyEditorAlias: 'Umbraco.CheckboxList',
 		icon: 'umb:bulleted-list',
 		group: 'lists',
 		settings: {
@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'items',
 					label: 'Add option',
 					description: 'Add, remove or sort options for the list.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.MultipleTextString',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

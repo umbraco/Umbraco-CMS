@@ -74,7 +74,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 			label: 'Number',
 			icon: 'umb:autofill',
 			group: 'common',
-			propertyEditorModel: 'Umbraco.Integer',
+			propertyEditorAlias: 'Umbraco.Integer',
 		},
 	},
 ];

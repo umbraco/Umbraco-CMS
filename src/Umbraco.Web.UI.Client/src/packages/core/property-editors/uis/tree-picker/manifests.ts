@@ -10,26 +10,26 @@ const manifest: ManifestPropertyEditorUi = {
 		label: 'Tree Picker',
 		icon: 'umb:page-add',
 		group: 'pickers',
-		propertyEditorModel: 'Umbraco.MultiNodeTreePicker',
+		propertyEditorAlias: 'Umbraco.MultiNodeTreePicker',
 		settings: {
 			properties: [
 				{
 					alias: 'startNode',
 					label: 'Start node',
 					description: '',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TreePicker.StartNode',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.StartNode',
 				},
 				{
 					alias: 'filter',
 					label: 'Allow items of type',
 					description: '',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TreePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{
 					alias: 'showOpenButton',
 					label: 'Show open button',
 					description: 'Opens the node in a dialog',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

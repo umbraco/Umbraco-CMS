@@ -13,29 +13,29 @@ export const manifest: ManifestPropertyEditorModel = {
 					label: 'Blocks',
 					description:
 						'Define Blocks based on Element Types. Use Groups to help organise their selection. Example Groups: Layout and Content',
-					propertyEditorUi: 'Umb.PropertyEditorUi.BlockGrid.BlockConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.BlockConfiguration',
 				},
 				{
 					alias: 'blockGroups',
 					label: 'Block Groups',
-					propertyEditorUi: 'Umb.PropertyEditorUi.BlockGrid.GroupConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.GroupConfiguration',
 				},
 				{
 					alias: 'validationLimit',
 					label: 'Amount',
-					propertyEditorUi: 'Umb.PropertyEditorUi.NumberRange',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 				},
 				{
 					alias: 'gridColumns',
 					label: 'Grid Columns',
 					description: 'Set the number of columns for the layout. (defaults to 12)',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'layoutStylesheet',
 					label: 'Layout Stylesheet',
 					description: 'Override default stylesheet for backoffice layout.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.BlockGrid.StylesheetPicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.StylesheetPicker',
 				},
 			],
 			defaultData: [

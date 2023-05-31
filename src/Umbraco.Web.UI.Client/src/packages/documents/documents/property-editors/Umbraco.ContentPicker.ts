@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'startNodeId',
 					label: 'Start node',
 					description: '',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TreePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 			],
 		},

@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-block-grid-stylesheet-picker.element.js'),
 	meta: {
 		label: 'Block Grid Stylesheet Picker',
-		propertyEditorModel: '',
+		propertyEditorAlias: '',
 		icon: 'umb:autofill',
 		group: 'blocks',
 	},

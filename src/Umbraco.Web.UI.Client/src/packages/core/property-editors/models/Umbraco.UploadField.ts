@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorModel = {
 				{
 					alias: 'fileExtensions',
 					label: 'Accepted file extensions',
-					propertyEditorUi: 'Umb.PropertyEditorUi.MultipleTextString',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

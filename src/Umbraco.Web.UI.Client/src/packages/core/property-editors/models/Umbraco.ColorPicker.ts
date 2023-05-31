@@ -13,13 +13,13 @@ export const manifest: ManifestPropertyEditorModel = {
 					label: 'Include labels?',
 					description:
 						'Stores colors as a Json object containing both the color hex string and label, rather than just the hex string.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'items',
 					label: 'Colors',
 					description: 'Add, remove or sort colors',
-					propertyEditorUi: 'Umb.PropertyEditorUi.ColorPicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorPicker',
 				},
 			],
 		},

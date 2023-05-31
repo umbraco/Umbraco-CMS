@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-date-picker.element.js'),
 	meta: {
 		label: 'Date Picker',
-		propertyEditorModel: 'Umbraco.DateTime',
+		propertyEditorAlias: 'Umbraco.DateTime',
 		icon: 'umb:time',
 		group: 'pickers',
 		settings: {
@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'format',
 					label: 'Date format',
 					description: 'If left empty then the format is YYYY-MM-DD',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TextBox',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 			],
 			defaultData: [

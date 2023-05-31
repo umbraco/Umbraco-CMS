@@ -9,6 +9,6 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Image Cropper',
 		icon: 'umb:colorpicker',
 		group: 'pickers',
-		propertyEditorModel: 'Umbraco.ImageCropper',
+		propertyEditorAlias: 'Umbraco.ImageCropper',
 	},
 };

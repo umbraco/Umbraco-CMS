@@ -9,6 +9,6 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Tree Picker Start Node',
 		icon: 'umb:page-add',
 		group: 'pickers',
-		propertyEditorModel: '',
+		propertyEditorAlias: '',
 	},
 };

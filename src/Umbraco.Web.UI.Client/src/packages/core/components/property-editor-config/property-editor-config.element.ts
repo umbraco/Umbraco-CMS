@@ -59,7 +59,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this.propertyEditorUiAlias),
 			(manifest) => {
-				this._observePropertyEditorModelConfig(manifest?.meta.propertyEditorModel);
+				this._observePropertyEditorModelConfig(manifest?.meta.propertyEditorAlias);
 				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
 				this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
 				this._mergeConfigProperties();
@@ -110,7 +110,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 									label="${property.label}"
 									description="${ifDefined(property.description)}"
 									alias="${property.alias}"
-									property-editor-ui-alias="${property.propertyEditorUi}"
+									property-editor-ui-alias="${property.propertyEditorUiAlias}"
 									.value=${this._getValue(property)}
 									.config=${property.config}></umb-workspace-property>
 							`

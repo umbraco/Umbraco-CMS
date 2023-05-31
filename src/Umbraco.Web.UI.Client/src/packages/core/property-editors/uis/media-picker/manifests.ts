@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-media-picker.element.js'),
 	meta: {
 		label: 'Media Picker',
-		propertyEditorModel: 'Umbraco.MediaPicker3',
+		propertyEditorAlias: 'Umbraco.MediaPicker3',
 		icon: 'umb:picture',
 		group: 'pickers',
 	},

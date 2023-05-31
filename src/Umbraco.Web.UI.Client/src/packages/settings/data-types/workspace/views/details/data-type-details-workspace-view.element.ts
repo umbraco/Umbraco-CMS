@@ -117,7 +117,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 				this._propertyEditorUiName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
 				this._propertyEditorUiIcon = propertyEditorUI?.meta.icon ?? '';
-				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
+				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorAlias ?? '';
 
 				this._workspaceContext?.setPropertyEditorAlias(this._propertyEditorAlias);
 			},

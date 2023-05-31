@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-radio-button-list.element.js'),
 	meta: {
 		label: 'Radio Button List',
-		propertyEditorModel: 'Umbraco.RadioButtonList',
+		propertyEditorAlias: 'Umbraco.RadioButtonList',
 		icon: 'umb:target',
 		group: 'lists',
 		settings: {
@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'items',
 					label: 'Add option',
 					description: 'Add, remove or sort options for the list.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.MultipleTextString',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

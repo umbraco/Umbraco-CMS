@@ -8,7 +8,7 @@ const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
-		propertyEditorModel: 'Umbraco.TinyMCE',
+		propertyEditorAlias: 'Umbraco.TinyMCE',
 		icon: 'umb:browser-window',
 		group: 'richText',
 		settings: {
@@ -16,17 +16,17 @@ const manifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'editor',
 					label: 'Editor',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
-					propertyEditorUi: 'Umb.PropertyEditorUi.OverlaySize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 				{
 					alias: 'hideLabel',
 					label: 'Hide Label',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

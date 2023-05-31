@@ -9,20 +9,20 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Eye Dropper Color Picker',
 		icon: 'umb:colorpicker',
 		group: 'pickers',
-		propertyEditorModel: 'Umbraco.ColorPicker.EyeDropper',
+		propertyEditorAlias: 'Umbraco.ColorPicker.EyeDropper',
 		settings: {
 			properties: [
 				{
 					alias: 'showAlpha',
 					label: 'Show alpha',
 					description: 'Allow alpha transparency selection.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'showPalette',
 					label: 'Show palette',
 					description: 'Show a palette next to the color picker.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

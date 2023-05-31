@@ -9,6 +9,6 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Label',
 		icon: 'umb:readonly',
 		group: 'pickers',
-		propertyEditorModel: 'Umbraco.Label',
+		propertyEditorAlias: 'Umbraco.Label',
 	},
 };

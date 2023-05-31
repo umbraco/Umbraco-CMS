@@ -10,7 +10,7 @@ const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
 		label: 'Block Grid',
-		propertyEditorModel: 'Umbraco.BlockGrid',
+		propertyEditorAlias: 'Umbraco.BlockGrid',
 		icon: 'umb:icon-layout',
 		group: 'richContent',
 		settings: {
@@ -19,19 +19,19 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
 					description: 'Live update content when editing in overlay',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'maxPropertyWidth',
 					label: 'Editor width',
 					description: 'Optional css overwrite. (example: 1200px or 100%)',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TextBox',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'createLabel',
 					label: 'Create Button Label',
 					description: 'Override the label text for adding a new block, Example Add Widget',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TextBox',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 			],
 		},

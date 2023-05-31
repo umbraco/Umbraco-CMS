@@ -11,12 +11,12 @@ export const manifest: ManifestPropertyEditorModel = {
 				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TreePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{
 					alias: 'ignoreUserStartNodes',
 					label: 'Ignore User Start Nodes',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

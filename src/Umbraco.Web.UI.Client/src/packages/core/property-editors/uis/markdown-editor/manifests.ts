@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-markdown-editor.element.js'),
 	meta: {
 		label: 'Markdown Editor',
-		propertyEditorModel: 'Umbraco.MarkdownEditor',
+		propertyEditorAlias: 'Umbraco.MarkdownEditor',
 		icon: 'umb:code',
 		group: 'pickers',
 		settings: {
@@ -16,19 +16,19 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'preview',
 					label: 'Preview',
 					description: 'Display a live preview',
-					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'defaultValue',
 					label: 'Default value',
 					description: 'If value is blank, the editor will show this',
-					propertyEditorUi: 'Umb.PropertyEditorUi.TextArea',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextArea',
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
 					description: 'Select the width of the overlay.',
-					propertyEditorUi: 'Umb.PropertyEditorUi.OverlaySize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 			],
 		},
