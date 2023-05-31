@@ -1,7 +1,8 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbAllowedDocumentTypesModalData {
-	id: string | null;
+	parentId: string | null;
+	parentName?: string;
 }
 
 export interface UmbAllowedDocumentTypesModalResult {

@@ -15,12 +15,23 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	@state()
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
+	@state()
+	private _headline?: string;
+
 	public connectedCallback() {
 		super.connectedCallback();
-		// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
-		// TODO: show error
-		if (this.data?.id) {
-			this._retrieveAllowedChildrenOf(this.data.id);
+
+		const parentName = this.data?.parentName;
+		if (parentName) {
+			this._headline = `Create at '${parentName}'`;
+		} else {
+			this._headline = `Create`;
+		}
+		if (this.data?.parentId) {
+			// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
+			// TODO: show error
+
+			this._retrieveAllowedChildrenOf(this.data.parentId);
 		}
 	}
 
@@ -46,7 +57,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 
 	render() {
 		return html`
-			<umb-body-layout headline="Create">
+			<umb-body-layout headline=${this._headline}>
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(

@@ -34,7 +34,8 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		const { data } = await this.repository.requestById(this.unique);
 
 		if (data && data.contentTypeId) {
-			this._openModal(data.contentTypeId);
+			// TODO: We need to get the APP language context, use its VariantId to retrieve the right variant. The variant of which we get the name from.
+			this._openModal(data.contentTypeId, data.variants?.[0]?.name);
 		}
 	}
 
@@ -42,10 +43,11 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		this._openModal(null);
 	}
 
-	private async _openModal(documentId: string | null) {
+	private async _openModal(parentId: string | null, parentName?: string) {
 		if (!this.#modalContext) return;
 		const modalHandler = this.#modalContext.open(UMB_ALLOWED_DOCUMENT_TYPES_MODAL, {
-			id: documentId,
+			parentId: parentId,
+			parentName: parentName,
 		});
 
 		const { documentTypeKey } = await modalHandler.onSubmit();
