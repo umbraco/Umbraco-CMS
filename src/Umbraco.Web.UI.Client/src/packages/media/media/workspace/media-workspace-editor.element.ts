@@ -1,10 +1,10 @@
 import { UmbMediaWorkspaceContext } from './media-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-@customElement('umb-media-workspace-edit')
-export class UmbMediaWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-media-workspace-editor')
+export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	_id?: string;
 
@@ -56,10 +56,10 @@ export class UmbMediaWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbMediaWorkspaceEditElement;
+export default UmbMediaWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-workspace-edit': UmbMediaWorkspaceEditElement;
+		'umb-media-workspace-editor': UmbMediaWorkspaceEditorElement;
 	}
 }
