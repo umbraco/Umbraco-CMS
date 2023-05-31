@@ -53,6 +53,11 @@
     <Delete Files="$(_UmbracoCmsJsonSchemaReference)" />
   </Target>
 
+  <!-- Remove generated JSON package schema on clean -->
+  <Target Name="RemovePackageSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsPackageSchemaReference)')">
+    <Delete Files="$(_UmbracoCmsPackageSchemaReference)" />
+  </Target>
+
   <!-- Create and pack empty file to add TFM dependency -->
   <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
     <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
