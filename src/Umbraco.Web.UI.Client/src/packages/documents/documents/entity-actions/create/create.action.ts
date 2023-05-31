@@ -1,4 +1,4 @@
-import type { UmbDocumentRepository } from '../../repository/document.repository';
+import type { UmbDocumentRepository } from '../../repository/document.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -20,6 +20,14 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 	}
 
 	async execute() {
+		if (this.unique) {
+			await this._executeWithParent();
+		} else {
+			await this._executeAtRoot();
+		}
+	}
+
+	private async _executeWithParent() {
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 		if (!this.repository) return;
@@ -35,5 +43,9 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 			// TODO: how do we want to generate these urls?
 			history.pushState(null, '', `section/content/workspace/document/create/${this.unique}/${documentTypeKey}`);
 		}
+	}
+
+	private async _executeAtRoot() {
+		alert('At root.');
 	}
 }

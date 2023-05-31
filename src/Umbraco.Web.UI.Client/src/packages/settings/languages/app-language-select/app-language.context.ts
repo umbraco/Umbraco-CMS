@@ -1,4 +1,4 @@
-import { UmbLanguageRepository } from '../repository/language.repository';
+import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

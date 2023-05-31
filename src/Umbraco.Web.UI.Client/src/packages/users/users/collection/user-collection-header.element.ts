@@ -1,9 +1,13 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UUIBooleanInputEvent, UUICheckboxElement, UUIRadioGroupElement, UUIRadioGroupEvent } from '@umbraco-ui/uui';
-import { UmbDropdownElement } from '../../../core/components/dropdown/dropdown.element';
-import { UmbUserCollectionContext } from './user-collection.context';
+import { UmbUserCollectionContext } from './user-collection.context.js';
+import { UUITextStyles ,
+	UUIBooleanInputEvent,
+	UUICheckboxElement,
+	UUIRadioGroupElement,
+	UUIRadioGroupEvent,
+} from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_USER_MODAL,
@@ -11,13 +15,12 @@ import {
 	UMB_MODAL_CONTEXT_TOKEN,
 	UmbModalContext,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
-	private _isCloud = true; //NOTE: Used to show either invite or create user buttons and views.
+	private _isCloud = false; //NOTE: Used to show either invite or create user buttons and views.
 
 	@state()
 	private _stateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);

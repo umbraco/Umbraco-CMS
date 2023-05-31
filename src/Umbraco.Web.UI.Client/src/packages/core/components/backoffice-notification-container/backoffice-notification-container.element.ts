@@ -1,7 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, CSSResultGroup, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbNotificationHandler,
 	UmbNotificationContext,

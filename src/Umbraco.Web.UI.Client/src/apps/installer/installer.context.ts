@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	InstallVResponseModel,
 	InstallResource,

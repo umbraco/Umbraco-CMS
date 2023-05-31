@@ -1,13 +1,13 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.TinyMCE.Config',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.TinyMCE.Config',
 	name: 'Tiny MCE Configuration Property Editor UI',
-	loader: () => import('./property-editor-ui-tiny-mce-configuration.element'),
+	loader: () => import('./property-editor-ui-tiny-mce-configuration.element.js'),
 	meta: {
 		label: 'Rich Text Editor Configuration',
-		propertyEditorModel: 'Umbraco.TinyMCE.Configuration',
+		propertyEditorAlias: 'Umbraco.TinyMCE.Configuration',
 		icon: 'umb:autofill',
 		group: 'common',
 	},

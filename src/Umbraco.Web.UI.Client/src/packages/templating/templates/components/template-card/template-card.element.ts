@@ -1,7 +1,5 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
+import { css, html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -76,7 +74,6 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				box-sizing: border-box;
 				width: 100%;
 				max-width: 180px;
-				//width: 200px;
 				position: relative;
 				display: flex;
 				flex-direction: column;
@@ -119,6 +116,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				align-items: center;
 				cursor: pointer;
 				flex-grow: 1;
+				font-family: inherit;
 			}
 
 			#open-part,

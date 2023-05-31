@@ -19,7 +19,7 @@ Stays on the screen until dismissed by the user or custom code. Stay notificatio
 The UmbNotification context can be used to open notifications.
 
 ```ts
-import { html, LitElement } from 'lit';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_ALIAS } from '@umbraco-cms/notification';
 
@@ -42,8 +42,8 @@ class MyElement extends UmbLitElement {
 A notification is opened by calling one of the helper methods on the UmbNotificationContext. The methods will return an instance of UmbNotificationHandler.
 
 ```ts
-import { html, LitElement } from 'lit';
-import { state } from 'lit/decorators.js';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/element';
 import type {
 	UmbNotificationContext,
@@ -85,9 +85,9 @@ The default layout will cover most cases, but there might be situations where we
 ### Custom layout element
 
 ```ts
-import { html, LitElement } from 'lit';
-import { property } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { property } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbNotificationHandler } from '@umbraco-cms/notification';
 
 export interface UmbNotificationCustomData {
@@ -124,14 +124,14 @@ export class UmbNotificationLayoutCustom extends LitElement {
 ### Open notification with custom layout
 
 ```ts
-import { html, LitElement } from 'lit';
+import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbContextInjectMixin } from '@umbraco-cms/context-api';
 import type {
 	UmbNotificationContext,
 	UmbNotificationOptions,
 	UMB_NOTIFICATION_CONTEXT_ALIAS,
 } from '@umbraco-cms/notification';
-import type { UmbNotificationCustomData } from './custom-notification-layout';
+import type { UmbNotificationCustomData } from './custom-notification-layout.js';
 
 class MyElement extends LitElement {
 	private _notificationContext?: UmbNotificationContext;

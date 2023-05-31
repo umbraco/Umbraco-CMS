@@ -1,4 +1,4 @@
-import { UmbDocumentTypeRepository } from '../repository/document-type.repository';
+import { UmbDocumentTypeRepository } from '../repository/document-type.repository.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbWorkspaceContext, UmbEntityWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type {
@@ -42,26 +42,26 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
 		// General for content types:
-		this.data = this.structure.rootDocumentType;
-		this.name = this.structure.rootDocumentTypeObservablePart((data) => data?.name);
-		this.alias = this.structure.rootDocumentTypeObservablePart((data) => data?.alias);
-		this.description = this.structure.rootDocumentTypeObservablePart((data) => data?.description);
-		this.icon = this.structure.rootDocumentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedAsRoot);
-		this.variesByCulture = this.structure.rootDocumentTypeObservablePart((data) => data?.variesByCulture);
-		this.variesBySegment = this.structure.rootDocumentTypeObservablePart((data) => data?.variesBySegment);
-		this.isElement = this.structure.rootDocumentTypeObservablePart((data) => data?.isElement);
-		this.allowedContentTypes = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedContentTypes);
-		this.compositions = this.structure.rootDocumentTypeObservablePart((data) => data?.compositions);
+		this.data = this.structure.ownerDocumentType;
+		this.name = this.structure.ownerDocumentTypeObservablePart((data) => data?.name);
+		this.alias = this.structure.ownerDocumentTypeObservablePart((data) => data?.alias);
+		this.description = this.structure.ownerDocumentTypeObservablePart((data) => data?.description);
+		this.icon = this.structure.ownerDocumentTypeObservablePart((data) => data?.icon);
+		this.allowedAsRoot = this.structure.ownerDocumentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.variesByCulture = this.structure.ownerDocumentTypeObservablePart((data) => data?.variesByCulture);
+		this.variesBySegment = this.structure.ownerDocumentTypeObservablePart((data) => data?.variesBySegment);
+		this.isElement = this.structure.ownerDocumentTypeObservablePart((data) => data?.isElement);
+		this.allowedContentTypes = this.structure.ownerDocumentTypeObservablePart((data) => data?.allowedContentTypes);
+		this.compositions = this.structure.ownerDocumentTypeObservablePart((data) => data?.compositions);
 
 		// Document type specific:
-		this.allowedTemplateIds = this.structure.rootDocumentTypeObservablePart((data) => data?.allowedTemplateIds);
-		this.defaultTemplateId = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
-		this.cleanup = this.structure.rootDocumentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.allowedTemplateIds = this.structure.ownerDocumentTypeObservablePart((data) => data?.allowedTemplateIds);
+		this.defaultTemplateId = this.structure.ownerDocumentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.cleanup = this.structure.ownerDocumentTypeObservablePart((data) => data?.defaultTemplateId);
 	}
 
 	getData() {
-		return this.structure.getRootDocumentType() || {};
+		return this.structure.getOwnerDocumentType() || {};
 	}
 
 	getEntityId() {
@@ -73,54 +73,55 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	setName(name: string) {
-		this.structure.updateRootDocumentType({ name });
+		this.structure.updateOwnerDocumentType({ name });
 	}
 	setAlias(alias: string) {
-		this.structure.updateRootDocumentType({ alias });
+		this.structure.updateOwnerDocumentType({ alias });
 	}
 	setDescription(description: string) {
-		this.structure.updateRootDocumentType({ description });
+		this.structure.updateOwnerDocumentType({ description });
 	}
 
 	// TODO: manage setting icon color alias?
 	setIcon(icon: string) {
-		this.structure.updateRootDocumentType({ icon });
+		this.structure.updateOwnerDocumentType({ icon });
 	}
 
 	setAllowedAsRoot(allowedAsRoot: boolean) {
-		this.structure.updateRootDocumentType({ allowedAsRoot });
+		this.structure.updateOwnerDocumentType({ allowedAsRoot });
 	}
 	setVariesByCulture(variesByCulture: boolean) {
-		this.structure.updateRootDocumentType({ variesByCulture });
+		this.structure.updateOwnerDocumentType({ variesByCulture });
 	}
 	setVariesBySegment(variesBySegment: boolean) {
-		this.structure.updateRootDocumentType({ variesBySegment });
+		this.structure.updateOwnerDocumentType({ variesBySegment });
 	}
 	setIsElement(isElement: boolean) {
-		this.structure.updateRootDocumentType({ isElement });
+		this.structure.updateOwnerDocumentType({ isElement });
 	}
 	setAllowedContentTypes(allowedContentTypes: Array<ContentTypeSortModel>) {
-		this.structure.updateRootDocumentType({ allowedContentTypes });
+		this.structure.updateOwnerDocumentType({ allowedContentTypes });
 	}
 	setCompositions(compositions: Array<ContentTypeCompositionModel>) {
-		this.structure.updateRootDocumentType({ compositions });
+		this.structure.updateOwnerDocumentType({ compositions });
 	}
 
 	// Document type specific:
 	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
-		this.structure.updateRootDocumentType({ allowedTemplateIds });
+		this.structure.updateOwnerDocumentType({ allowedTemplateIds });
 	}
 	setDefaultTemplateId(defaultTemplateId: string) {
-		this.structure.updateRootDocumentType({ defaultTemplateId });
+		this.structure.updateOwnerDocumentType({ defaultTemplateId });
 	}
 
-	async createScaffold(parentId: string) {
+	async createScaffold(parentId: string | null) {
 		const { data } = await this.structure.createScaffold(parentId);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
 		//this.#draft.next(data);
 		return data || undefined;
+		// TODO: Is this wrong? should we return { data }??
 	}
 
 	async load(entityId: string) {
@@ -130,12 +131,20 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsNew(false);
 		//this.#draft.next(data);
 		return data || undefined;
+		// TODO: Is this wrong? should we return { data }??
 	}
 
+	/**
+	 * Save or creates the document type, based on wether its a new one or existing.
+	 */
 	async save() {
-		const id = this.getEntityId();
-		if (!id) throw new Error('Cannot save entity without id');
-		this.repository.save(id, this.getData());
+		if (this.getIsNew()) {
+			if ((await this.structure.create()) === true) {
+				this.setIsNew(false);
+			}
+		} else {
+			await this.structure.save();
+		}
 	}
 
 	public destroy(): void {

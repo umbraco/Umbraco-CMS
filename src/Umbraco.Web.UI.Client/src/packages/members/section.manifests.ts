@@ -6,7 +6,7 @@ const section: ManifestSection = {
 	type: 'section',
 	alias: sectionAlias,
 	name: 'Members Section',
-	weight: 400,
+	weight: 300,
 	meta: {
 		label: 'Members',
 		pathname: 'members',
@@ -19,7 +19,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.Members',
 		name: 'Members Dashboard',
 		weight: 10,
-		loader: () => import('./dashboards/welcome/dashboard-members-welcome.element'),
+		loader: () => import('./dashboards/welcome/dashboard-members-welcome.element.js'),
 		meta: {
 			label: 'Members',
 			pathname: 'members',

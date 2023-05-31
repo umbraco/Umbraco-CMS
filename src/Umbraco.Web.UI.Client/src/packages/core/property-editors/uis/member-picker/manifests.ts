@@ -1,13 +1,13 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.MemberPicker',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.MemberPicker',
 	name: 'Member Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-member-picker.element'),
+	loader: () => import('./property-editor-ui-member-picker.element.js'),
 	meta: {
 		label: 'Member Picker',
-		propertyEditorModel: 'Umbraco.MemberPicker',
+		propertyEditorAlias: 'Umbraco.MemberPicker',
 		icon: 'umb:user',
 		group: 'people',
 	},

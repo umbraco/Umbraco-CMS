@@ -1,11 +1,10 @@
-import '../installer/shared/layout/installer-layout.element';
-import './upgrader-view.element';
-
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UpgradeResource, UpgradeSettingsResponseModel, ApiError } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
+import '../installer/shared/layout/installer-layout.element.js';
+import './upgrader-view.element.js';
 
 /**
  * @element umb-upgrader

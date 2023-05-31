@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbDashboardPerformanceProfilingElement } from './dashboard-performance-profiling.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardPerformanceProfilingElement } from './dashboard-performance-profiling.element';
-import './dashboard-performance-profiling.element';
+import './dashboard-performance-profiling.element.js';
 
 export default {
 	title: 'Dashboards/Performance Profiling',

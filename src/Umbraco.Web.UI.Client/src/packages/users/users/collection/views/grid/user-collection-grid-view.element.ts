@@ -1,10 +1,7 @@
-import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { getLookAndColorFromUserStatus } from '../../../../utils';
-import { UmbUserCollectionContext } from '../../user-collection.context';
+import { getLookAndColorFromUserStatus } from '../../../../utils.js';
+import { UmbUserCollectionContext } from '../../user-collection.context.js';
+import { css, html, nothing , customElement, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
@@ -54,7 +51,7 @@ export class UmbUserCollectionGridViewElement extends UmbLitElement {
 				?selected=${this.#collectionContext?.isSelected(user.id ?? '')}
 				@open=${() => this._handleOpenCard(user.id ?? '')}
 				@selected=${() => this.#onSelect(user)}
-				@unselected=${() => this.#onDeselect(user)}>
+				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserLoginDate(user)}
 			</uui-card-user>
 		`;

@@ -1,43 +1,43 @@
-import { manifest as blockConfiguration } from './config/block-configuration/manifests';
-import { manifest as groupConfiguration } from './config/group-configuration/manifests';
-import { manifest as stylesheetPicker } from './config/stylesheet-picker/manifests';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as blockConfiguration } from './config/block-configuration/manifests.js';
+import { manifest as groupConfiguration } from './config/group-configuration/manifests.js';
+import { manifest as stylesheetPicker } from './config/stylesheet-picker/manifests.js';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.BlockGrid',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.BlockGrid',
 	name: 'Block Grid Property Editor UI',
-	loader: () => import('./property-editor-ui-block-grid.element'),
+	loader: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
 		label: 'Block Grid',
-		propertyEditorModel: 'Umbraco.BlockGrid',
+		propertyEditorAlias: 'Umbraco.BlockGrid',
 		icon: 'umb:icon-layout',
 		group: 'richContent',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
 					description: 'Live update content when editing in overlay',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'maxPropertyWidth',
 					label: 'Editor width',
 					description: 'Optional css overwrite. (example: 1200px or 100%)',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextBox',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'createLabel',
 					label: 'Create Button Label',
 					description: 'Override the label text for adding a new block, Example Add Widget',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextBox',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 			],
 		},
 	},
 };
 
-const config: Array<ManifestPropertyEditorUI> = [blockConfiguration, groupConfiguration, stylesheetPicker];
+const config: Array<ManifestPropertyEditorUi> = [blockConfiguration, groupConfiguration, stylesheetPicker];
 
 export const manifests = [manifest, ...config];

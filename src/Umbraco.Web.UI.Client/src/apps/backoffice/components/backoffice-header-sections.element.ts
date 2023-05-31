@@ -1,9 +1,6 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
-import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
-import type { UmbBackofficeContext } from '../backoffice.context';
+import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
+import type { UmbBackofficeContext } from '../backoffice.context.js';
+import { css, CSSResultGroup, html, when, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -117,7 +114,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			#tabs {
 				color: var(--uui-color-header-contrast);

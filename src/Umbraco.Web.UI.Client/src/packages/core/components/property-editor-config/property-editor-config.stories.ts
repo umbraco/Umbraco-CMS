@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorConfigElement } from './property-editor-config.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorConfigElement } from './property-editor-config.element';
-import './property-editor-config.element';
+import './property-editor-config.element.js';
 
 export default {
 	title: 'Property Editors/Shared/Property Editor Config',
@@ -19,6 +19,6 @@ const data = [
 
 export const AAAOverview: Story<UmbPropertyEditorConfigElement> = () =>
 	html`<umb-property-editor-config
-		property-editor-ui-alias="Umb.PropertyEditorUI.TextBox"
+		property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 		.data="${data}"></umb-property-editor-config>`;
 AAAOverview.storyName = 'Overview';

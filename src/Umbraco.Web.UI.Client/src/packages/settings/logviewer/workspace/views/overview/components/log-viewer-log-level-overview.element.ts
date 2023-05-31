@@ -1,6 +1,5 @@
-import { html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
+import { html, nothing , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LoggerResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

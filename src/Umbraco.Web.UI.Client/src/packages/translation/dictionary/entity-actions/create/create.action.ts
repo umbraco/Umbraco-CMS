@@ -1,5 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { UmbDictionaryRepository } from '../../repository/dictionary.repository';
+import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -7,7 +7,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
 
 // TODO: temp import
-import './create-dictionary-modal-layout.element';
+import './create-dictionary-modal-layout.element.js';
 
 export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UUITextStyles];

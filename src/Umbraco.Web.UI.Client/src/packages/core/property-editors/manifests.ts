@@ -1,5 +1,4 @@
-import { manifests as propertyEditorModelManifests } from './models/manifests';
-import { manifests as propertyEditorUIManifests } from './uis/manifests';
-import { manifests as modalManifests } from './modals/manifests';
+import { manifests as propertyEditorModelManifests } from './models/manifests.js';
+import { manifests as propertyEditorUIManifests } from './uis/manifests.js';
 
-export const manifests = [...propertyEditorModelManifests, ...propertyEditorUIManifests, ...modalManifests];
+export const manifests = [...propertyEditorModelManifests, ...propertyEditorUIManifests];

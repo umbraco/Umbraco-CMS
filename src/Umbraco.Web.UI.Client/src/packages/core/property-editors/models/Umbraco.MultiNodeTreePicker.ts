@@ -5,25 +5,26 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Multi Node Tree Picker',
 	alias: 'Umbraco.MultiNodeTreePicker',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultiNodeTreePicker',
+		settings: {
 			properties: [
 				{
 					alias: 'minNumber',
 					label: 'Minimum number of items',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'maxNumber',
 					label: 'Maximum number of items',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'ignoreUserStartNodes',
 					label: 'Ignore user start nodes',
 					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 			defaultData: [

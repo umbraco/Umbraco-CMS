@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Package Management Entry Point',
 		alias: 'Umb.EntryPoint.PackageManagement',
 		type: 'entryPoint',
-		loader: () => import('./index'),
+		loader: () => import('./index.js'),
 	},
 ];

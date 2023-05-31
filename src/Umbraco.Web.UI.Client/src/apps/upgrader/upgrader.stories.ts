@@ -1,9 +1,9 @@
-import './upgrader-view.element';
+import './upgrader-view.element.js';
 
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbUpgraderViewElement } from './upgrader-view.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbUpgraderViewElement } from './upgrader-view.element';
 
 export default {
 	title: 'Apps/Upgrader/States',

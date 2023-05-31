@@ -1,4 +1,4 @@
-import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests';
+import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/entity-action';
 

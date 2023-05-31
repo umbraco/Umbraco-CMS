@@ -1,1 +1,1 @@
-import './user-input/user-input.element';
+import './user-input/user-input.element.js';

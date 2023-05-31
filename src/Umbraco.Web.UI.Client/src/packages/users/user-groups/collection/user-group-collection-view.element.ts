@@ -1,13 +1,12 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbUserGroupCollectionContext } from './user-group-collection.context';
+import { UmbUserGroupCollectionContext } from './user-group-collection.context.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './user-group-table-name-column-layout.element';
-import './user-group-table-sections-column-layout.element';
+import './user-group-table-name-column-layout.element.js';
+import './user-group-table-sections-column-layout.element.js';
 import {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -15,7 +14,7 @@ import {
 	UmbTableElement,
 	UmbTableItem,
 	UmbTableSelectedEvent,
-} from '@umbraco-cms/backoffice/core/components';
+} from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-user-group-collection-view')
 export class UmbUserGroupCollectionViewElement extends UmbLitElement {

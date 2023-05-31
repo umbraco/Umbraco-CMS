@@ -1,1 +1,1 @@
-export * from './modal-element.element';
+export * from './modal-element.element.js';

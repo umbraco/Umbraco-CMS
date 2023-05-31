@@ -1,11 +1,9 @@
 import { css, html, LitElement } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-external-login-provider-test2')
 export class UmbExternalLoginProviderTest2Element extends LitElement {
-	
-
 	render() {
 		return html`
 			<b>Another Custom External Login Provider</b>
@@ -23,7 +21,7 @@ export class UmbExternalLoginProviderTest2Element extends LitElement {
 			<uui-button label="Custom login" look="primary"></uui-button>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -1,20 +1,12 @@
-import '@umbraco-ui/uui-css/dist/uui-css.css';
-import 'element-internals-polyfill';
-
-import '../../shared/router/router-slot.element';
-import '../../shared/router/variant-router-slot.element';
-
-import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-
-import { UmbIconRegistry } from '../../shared/icon-registry/icon.registry';
-import type { UmbAppErrorElement } from './app-error.element';
-import { UmbAuthFlow } from './auth/auth-flow';
-import { UMB_APP, UmbAppContext } from './app.context';
+import type { UmbAppErrorElement } from './app-error.element.js';
+import { UmbAuthFlow } from './auth/index.js';
+import { UMB_APP, UmbAppContext } from './app.context.js';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
+import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
@@ -50,16 +42,16 @@ export class UmbAppElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: 'install',
-			component: () => import('../installer/installer.element'),
+			component: () => import('../installer/installer.element.js'),
 		},
 		{
 			path: 'upgrade',
-			component: () => import('../upgrader/upgrader.element'),
+			component: () => import('../upgrader/upgrader.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 		{
 			path: '**',
-			component: () => import('../backoffice/backoffice.element'),
+			component: () => import('../backoffice/backoffice.element.js'),
 			guards: [this.#isAuthorizedGuard()],
 		},
 	];
@@ -224,7 +216,7 @@ export class UmbAppElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: '**',
-				component: () => import('./app-error.element'),
+				component: () => import('./app-error.element.js'),
 				setup: (component) => {
 					(component as UmbAppErrorElement).errorMessage = errorMsg;
 					(component as UmbAppErrorElement).error = error;

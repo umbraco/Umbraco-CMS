@@ -10,25 +10,25 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
 		name: 'Choose insert type sidebar',
-		loader: () => import('./insert-choose-type-sidebar.element'),
+		loader: () => import('./insert-choose-type-sidebar.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS,
 		name: 'Insert value type sidebar',
-		loader: () => import('./insert-value-sidebar.element'),
+		loader: () => import('./insert-value-sidebar.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: UMB_PARTIAL_VIEW_PICKER_MODAL_ALIAS,
 		name: 'Partial View Picker Modal',
-		loader: () => import('../../templating/modals/partial-view-picker-modal.element'),
+		loader: () => import('../../templating/modals/partial-view-picker-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
 		name: 'Partial Insert Section Picker Modal',
-		loader: () => import('./insert-section-modal/insert-section-modal.element'),
+		loader: () => import('./insert-section-modal/insert-section-modal.element.js'),
 	},
 ];
 

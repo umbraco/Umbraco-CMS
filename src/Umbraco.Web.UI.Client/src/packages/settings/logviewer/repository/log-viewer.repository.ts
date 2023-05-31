@@ -1,4 +1,4 @@
-import { UmbLogMessagesServerDataSource, UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data';
+import { UmbLogMessagesServerDataSource, UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';

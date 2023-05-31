@@ -1,12 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, nothing } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import type { UmbInputDocumentPickerElement } from '../../../documents/documents/components/input-document-picker/input-document-picker.element.js';
+import type { UmbInputMediaPickerElement } from '../../../media/media/components/input-media-picker/input-media-picker.element.js';
+import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
+import { UUITextStyles , UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, property, query, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 // TODO: update to module imports when ready
-import type { UmbInputDocumentPickerElement } from '../../../documents/documents/components/input-document-picker/input-document-picker.element';
-import type { UmbInputMediaPickerElement } from '../../../media/media/components/input-media-picker/input-media-picker.element';
-import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

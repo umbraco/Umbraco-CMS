@@ -1,10 +1,7 @@
-import { html, css, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-
-import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers';
-import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/internal/router';
+import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
+import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
+import { html, css, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -14,7 +11,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 	private _routes: UmbRoute[] = [
 		{
 			path: `/index/:indexerName`,
-			component: () => import('./views/section-view-examine-indexers'),
+			component: () => import('./views/section-view-examine-indexers.js'),
 			setup: (component, info) => {
 				const element = component as UmbDashboardExamineIndexElement;
 				element.indexName = info.match.params.indexerName;
@@ -22,7 +19,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		},
 		{
 			path: `/searcher/:searcherName`,
-			component: () => import('./views/section-view-examine-searchers'),
+			component: () => import('./views/section-view-examine-searchers.js'),
 			setup: (component, info) => {
 				const element = component as UmbDashboardExamineSearcherElement;
 				element.searcherName = info.match.params.searcherName;
@@ -30,7 +27,7 @@ export class UmbDashboardExamineManagementElement extends UmbLitElement {
 		},
 		{
 			path: ``,
-			component: () => import('./views/section-view-examine-overview'),
+			component: () => import('./views/section-view-examine-overview.js'),
 		},
 	];
 

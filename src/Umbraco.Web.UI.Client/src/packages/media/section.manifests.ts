@@ -1,4 +1,4 @@
-import { MEDIA_REPOSITORY_ALIAS } from './media/repository/manifests';
+import { MEDIA_REPOSITORY_ALIAS } from './media/repository/manifests.js';
 import type {
 	ManifestDashboardCollection,
 	ManifestSection,

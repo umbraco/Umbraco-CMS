@@ -1,15 +1,14 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context';
-import { UmbDictionaryWorkspaceEditElement } from './dictionary-workspace-edit.element';
+import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context.js';
+import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dictionary-workspace')
 export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 	#workspaceContext = new UmbDictionaryWorkspaceContext(this);
-	#element = new UmbDictionaryWorkspaceEditElement();
+	#element = new UmbDictionaryWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [

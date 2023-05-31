@@ -1,20 +1,17 @@
-import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit-html/directives/if-defined.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import {
 	UmbDocumentTypeTreeStore,
 	UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN,
-} from '../../repository/document-type.tree.store';
+} from '../../repository/document-type.tree.store.js';
+import { css, html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
-	UMB_DOCUMENT_PICKER_MODAL,
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-document-type-picker')
@@ -27,7 +24,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	}
 	public set selectedIds(ids: Array<string>) {
 		this._selectedIds = ids ?? [];
-		super.value = ids.join(',');
+		super.value = this._selectedIds.join(',');
 		this._observePickedDocuments();
 	}
 
@@ -73,7 +70,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 
 	private _openPicker() {
 		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
-		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
+		const modalHandler = this._modalContext?.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			multiple: true,
 			selection: [...this._selectedIds],
 		});

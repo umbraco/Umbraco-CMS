@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUIValueTypeElement } from './property-editor-ui-value-type.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIValueTypeElement } from './property-editor-ui-value-type.element';
-import './property-editor-ui-value-type.element';
+import './property-editor-ui-value-type.element.js';
 
 export default {
 	title: 'Property Editor UIs/Value Type',

@@ -1,4 +1,4 @@
-import { UmbMediaTypeRepository } from '../repository/media-type.repository';
+import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

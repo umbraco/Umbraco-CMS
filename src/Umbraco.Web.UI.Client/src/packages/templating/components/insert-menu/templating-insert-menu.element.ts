@@ -1,14 +1,13 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests';
-import { UmbDictionaryRepository } from '../../../translation/dictionary/repository/dictionary.repository';
-import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils';
+import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests.js';
+import { UmbDictionaryRepository } from '../../../translation/dictionary/repository/dictionary.repository.js';
+import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils.js';
 import {
 	ChooseInsertTypeModalResult,
 	CodeSnippetType,
 	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL,
-} from '../../modals/insert-choose-type-sidebar.element';
+} from '../../modals/insert-choose-type-sidebar.element.js';
+import { customElement, property , css, html } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UMB_MODAL_CONTEXT_TOKEN,

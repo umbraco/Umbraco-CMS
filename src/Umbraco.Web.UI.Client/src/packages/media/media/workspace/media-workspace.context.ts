@@ -1,5 +1,5 @@
-import { UmbMediaRepository } from '../repository/media.repository';
-import type { MediaDetails } from '../';
+import { UmbMediaRepository } from '../repository/media.repository.js';
+import type { MediaDetails } from '../index.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

@@ -1,11 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, CSSResultGroup, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import logoImg from '/umbraco_logomark_white.svg';
-
-import './backoffice-header-sections.element';
-import './backoffice-header-apps.element';
 
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeaderElement extends UmbLitElement {
@@ -13,7 +7,7 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 		return html`
 			<div id="appHeader">
 				<uui-button id="logo" look="primary" label="Umbraco" compact>
-					<img src=${logoImg} alt="Umbraco" />
+					<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
 				</uui-button>
 
 				<umb-backoffice-header-sections id="sections"></umb-backoffice-header-sections>
@@ -23,7 +17,6 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 	}
 
 	static styles: CSSResultGroup = [
-		UUITextStyles,
 		css`
 			:host {
 				width: 100%;

@@ -1,6 +1,6 @@
-import { UmbLanguageRepository } from '../repository/language.repository';
-import { UmbLanguageStore } from './language.store';
-import { UmbLanguageItemStore } from './language-item.store';
+import { UmbLanguageRepository } from '../repository/language.repository.js';
+import { UmbLanguageStore } from './language.store.js';
+import { UmbLanguageItemStore } from './language-item.store.js';
 import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const LANGUAGE_REPOSITORY_ALIAS = 'Umb.Repository.Language';

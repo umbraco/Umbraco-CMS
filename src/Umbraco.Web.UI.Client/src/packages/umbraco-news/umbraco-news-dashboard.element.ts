@@ -1,6 +1,4 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { css, html, LitElement , customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends LitElement {
@@ -14,7 +12,6 @@ export class UmbUmbracoNewsDashboardElement extends LitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				display: block;

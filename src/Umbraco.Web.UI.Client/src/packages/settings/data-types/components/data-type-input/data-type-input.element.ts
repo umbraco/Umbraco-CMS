@@ -1,10 +1,8 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbDataTypePickerContext } from './data-type-input.context';
+import { UmbDataTypePickerContext } from './data-type-input.context.js';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypeItemResponseModel, FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-data-type-input')
 export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {

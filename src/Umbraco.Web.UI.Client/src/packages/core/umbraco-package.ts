@@ -5,6 +5,6 @@ export const extensions = [
 		name: 'Core Entry Point',
 		alias: 'Umb.EntryPoint.Core',
 		type: 'entryPoint',
-		loader: () => import('./index'),
+		loader: () => import('./index.js'),
 	},
 ];

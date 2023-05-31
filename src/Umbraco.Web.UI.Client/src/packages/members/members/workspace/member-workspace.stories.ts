@@ -1,11 +1,11 @@
-import './member-workspace.element';
+import './member-workspace.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
 
-import { data } from '../../../../shared/mocks/data/member.data';
+import { data } from '../../../../mocks/data/member.data.js';
 
-import type { UmbMemberWorkspaceElement } from './member-workspace.element';
+import type { UmbMemberWorkspaceElement } from './member-workspace.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Workspaces/Member',
