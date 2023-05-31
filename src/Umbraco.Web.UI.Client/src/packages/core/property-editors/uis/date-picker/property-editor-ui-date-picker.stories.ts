@@ -10,12 +10,12 @@ export default {
 	component: 'umb-property-editor-ui-date-picker',
 	id: 'umb-property-editor-ui-date-picker',
 	args: {
-		config: [
+		config: new UmbDataTypePropertyCollection([
 			{
 				alias: 'format',
 				value: 'YYYY-MM-DD HH:mm:ss',
 			},
-		],
+		]),
 	},
 } as Meta<UmbPropertyEditorUIDatePickerElement>;
 
