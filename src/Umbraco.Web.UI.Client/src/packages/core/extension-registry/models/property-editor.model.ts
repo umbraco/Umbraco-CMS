@@ -44,5 +44,5 @@ export interface PropertyEditorConfigProperty {
 
 export interface PropertyEditorConfigDefaultData {
 	alias: string;
-	value: any;
+	value: unknown;
 }
