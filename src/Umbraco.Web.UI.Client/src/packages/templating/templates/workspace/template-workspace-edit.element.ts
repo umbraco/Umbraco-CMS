@@ -191,8 +191,11 @@ ${this._content}`;
 	render() {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
-			<uui-input slot="header" .value=${this._name} @input=${this.#onNameInput}
-				><umb-template-alias-input slot="append" .value=${this._alias} @change=${this.#onAliasInput}></umb-template-alias-input
+			<uui-input placeholder="Enter name..." slot="header" .value=${this._name} @input=${this.#onNameInput}
+				><umb-template-alias-input
+					slot="append"
+					.value=${this._alias}
+					@change=${this.#onAliasInput}></umb-template-alias-input
 			></uui-input>
 			<uui-button @click=${this.#save} .color=${'danger'} look="primary">TEMPORARY SAVE BUTTON</uui-button>
 			<uui-box>
