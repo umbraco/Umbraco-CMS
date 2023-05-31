@@ -1,8 +1,8 @@
-import './donut-slice.element';
-import './donut-chart.element';
+import './donut-slice.element.js';
+import './donut-chart.element.js';
 
 import { Meta } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Components/Donut chart',

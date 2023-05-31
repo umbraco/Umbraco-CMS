@@ -1,41 +1,41 @@
-import { manifest as startNode } from './config/start-node/manifests';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import { manifest as startNode } from './config/start-node/manifests.js';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.TreePicker',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.TreePicker',
 	name: 'Tree Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-tree-picker.element'),
+	loader: () => import('./property-editor-ui-tree-picker.element.js'),
 	meta: {
 		label: 'Tree Picker',
 		icon: 'umb:page-add',
 		group: 'pickers',
-		propertyEditorModel: 'Umbraco.MultiNodeTreePicker',
-		config: {
+		propertyEditorAlias: 'Umbraco.MultiNodeTreePicker',
+		settings: {
 			properties: [
 				{
 					alias: 'startNode',
 					label: 'Start node',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TreePicker.StartNode',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.StartNode',
 				},
 				{
 					alias: 'filter',
 					label: 'Allow items of type',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TreePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{
 					alias: 'showOpenButton',
 					label: 'Show open button',
 					description: 'Opens the node in a dialog',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},
 	},
 };
 
-const config: Array<ManifestPropertyEditorUI> = [startNode];
+const config: Array<ManifestPropertyEditorUi> = [startNode];
 
 export const manifests = [manifest, ...config];

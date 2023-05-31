@@ -1,7 +1,7 @@
-import { UmbDocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data';
-import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data';
-import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store';
-import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store';
+import { UmbDocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data.js';
+import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data.js';
+import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store.js';
+import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store.js';
 import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';

@@ -1,5 +1,4 @@
-import { html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestTree,
@@ -31,7 +30,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		const routes: UmbRoute[] = [
 			{
 				path: 'overview',
-				component: () => import('./packages-created-overview.element'),
+				component: () => import('./packages-created-overview.element.js'),
 			},
 		];
 
@@ -53,7 +52,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		});
 
 		routes.push({
-			path: '**',
+			path: '',
 			redirectTo: 'overview',
 		});
 		this._routes = routes;

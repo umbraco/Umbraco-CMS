@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUITextareaElement } from './property-editor-ui-textarea.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUITextareaElement } from './property-editor-ui-textarea.element';
-import './property-editor-ui-textarea.element';
+import './property-editor-ui-textarea.element.js';
 
 export default {
 	title: 'Property Editor UIs/Textarea',

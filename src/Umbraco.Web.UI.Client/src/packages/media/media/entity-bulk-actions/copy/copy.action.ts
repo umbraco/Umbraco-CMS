@@ -1,5 +1,5 @@
-import type { UmbMediaRepository } from '../../repository/media.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbMediaRepository } from '../../repository/media.repository.js';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbMediaCopyEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {

@@ -5,7 +5,7 @@ const menuItem: ManifestMenuItem = {
 	alias: 'Umb.MenuItem.Media',
 	name: 'Media Menu Item',
 	weight: 100,
-	loader: () => import('./media-menu-item.element'),
+	loader: () => import('./media-menu-item.element.js'),
 	meta: {
 		label: 'Media',
 		icon: 'umb:folder',

@@ -1,8 +1,5 @@
-import { html, css, nothing } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { UUIPaginationEvent } from '@umbraco-ui/uui';
+import { html, css, nothing , ifDefined , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

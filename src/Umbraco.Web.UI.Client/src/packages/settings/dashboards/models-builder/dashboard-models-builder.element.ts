@@ -1,7 +1,5 @@
-import { UUIButtonState } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, nothing } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { UUIButtonState , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import {
 	ModelsBuilderResponseModel,

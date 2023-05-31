@@ -5,36 +5,37 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'List View',
 	alias: 'Umbraco.ListView',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.ListView',
+		settings: {
 			properties: [
 				{
 					alias: 'pageSize',
 					label: 'Page Size',
 					description: 'Number of items per page.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'orderDirection',
 					label: 'Order Direction',
-					propertyEditorUI: 'Umb.PropertyEditorUI.OrderDirection',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OrderDirection',
 				},
 				{
 					alias: 'includeProperties',
 					label: 'Columns Displayed',
 					description: 'The properties that will be displayed for each column',
-					propertyEditorUI: 'Umb.PropertyEditorUI.CollectionView.ColumnConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.ColumnConfiguration',
 				},
 				{
 					alias: 'orderBy',
 					label: 'Order By',
 					description: 'The properties that will be displayed for each column',
-					propertyEditorUI: 'Umb.PropertyEditorUI.CollectionView.OrderBy',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.OrderBy',
 				},
 				{
 					alias: 'bulkActionPermissions',
 					label: 'Bulk Action Permissions',
 					description: 'The properties that will be displayed for each column',
-					propertyEditorUI: 'Umb.PropertyEditorUI.CollectionView.BulkActionPermissions',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.BulkActionPermissions',
 				},
 			],
 		},

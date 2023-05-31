@@ -1,15 +1,13 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UUIButtonState } from '@umbraco-ui/uui';
-
 import {
 	UmbHealthCheckDashboardContext,
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-} from '../health-check-dashboard.context';
+} from '../health-check-dashboard.context.js';
+import { UUITextStyles , UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './health-check-group-box-overview.element';
+import './health-check-group-box-overview.element.js';
 
 @customElement('umb-dashboard-health-check-overview')
 export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {

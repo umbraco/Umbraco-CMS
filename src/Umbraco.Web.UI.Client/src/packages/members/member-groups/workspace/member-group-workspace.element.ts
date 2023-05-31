@@ -1,8 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context';
-import { UmbMemberGroupWorkspaceEditElement } from './member-group-workspace-edit.element';
+import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context.js';
+import { UmbMemberGroupWorkspaceEditElement } from './member-group-workspace-edit.element.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUIMultipleTextStringElement } from './property-editor-ui-multiple-text-string.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUIMultipleTextStringElement } from './property-editor-ui-multiple-text-string.element';
-import './property-editor-ui-multiple-text-string.element';
+import './property-editor-ui-multiple-text-string.element.js';
 
 export default {
 	title: 'Property Editor UIs/Multiple Text String',

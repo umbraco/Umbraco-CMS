@@ -5,17 +5,18 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Tiny MCE',
 	alias: 'Umbraco.TinyMCE',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
+		settings: {
 			properties: [
 				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TreePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{
 					alias: 'ignoreUserStartNodes',
 					label: 'Ignore User Start Nodes',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

@@ -1,16 +1,14 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { groupBy } from 'lodash-es';
-import type { UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbDataTypeRepository } from '../../repository/data-type.repository';
+import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
+import { css, html, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult,
 	UmbModalHandler,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -37,7 +35,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
 
 	@state()
-	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUI> = {};
+	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
 
 	@state()
 	private _selection: Array<string> = [];
@@ -47,7 +45,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	#repository;
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
-	#propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
+	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
 	constructor() {
@@ -68,13 +66,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			'_repositoryItemsObserver'
 		);
 
-		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUI'), (propertyEditorUIs) => {
+		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
 			this.#propertyEditorUIs = propertyEditorUIs;
 			this._performFiltering();
 		});
 	}
 
-	private _handleUIClick(propertyEditorUI: ManifestPropertyEditorUI) {
+	private _handleUIClick(propertyEditorUi: ManifestPropertyEditorUi) {
 		alert('To BE DONE.');
 	}
 
@@ -191,7 +189,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		)}`;
 	}
 
-	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUI>) {
+	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
 		return html` <ul id="item-grid">
 			${repeat(
 				uis,

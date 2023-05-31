@@ -1,13 +1,12 @@
-import { html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
-import { UmbInputMultiUrlElement } from '../../../components/input-multi-url/input-multi-url.element';
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
+import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -26,7 +25,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 		this._hideAnchor = config.getValueByAlias('hideAnchor');
 		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
 		this._minNumber = config.getValueByAlias('minNumber');
-		this._maxNumber = config.getValueByAlias('maxNumber');	
+		this._maxNumber = config.getValueByAlias('maxNumber');
 	}
 
 	@state()

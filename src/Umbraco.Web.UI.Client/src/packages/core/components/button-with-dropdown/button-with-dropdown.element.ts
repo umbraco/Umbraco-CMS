@@ -1,14 +1,17 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { PopoverPlacement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-ui/uui';
-import { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui-base/lib/types';
+import {
+	UUITextStyles,
+	InterfaceColor,
+	InterfaceLook,
+	PopoverPlacement,
+	UUIPopoverElement,
+	UUISymbolExpandElement,
+} from '@umbraco-cms/backoffice/external/uui';
+import { css, html, LitElement, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 
 // TODO: maybe this should go to UI library? It's a common pattern
 // TODO: consider not using this, but instead use dropdown, which is more generic shared component of backoffice. (this is at the movement only used in Log Viewer)
 @customElement('umb-button-with-dropdown')
 export class UmbButtonWithDropdownElement extends LitElement {
-	
 	@property()
 	label = '';
 
@@ -69,7 +72,7 @@ export class UmbButtonWithDropdownElement extends LitElement {
 			</uui-popover>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

@@ -1,8 +1,6 @@
-import { css, CSSResultGroup, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
+import { css, CSSResultGroup, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context';
 import {
 	ConsentLevelPresentationModel,
 	TelemetryResponseModel,

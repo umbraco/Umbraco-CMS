@@ -1,9 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UmbDataTypeRepository } from '../../../settings/data-types/repository/data-type.repository';
-import { UmbDocumentWorkspaceContext } from '../../../documents/documents/workspace/document-workspace.context';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type {
 	DataTypeResponseModel,
@@ -12,8 +10,8 @@ import type {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
@@ -95,8 +93,21 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 				(dataType) => {
 					this._dataTypeData = dataType?.values || [];
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
+					// If there is no UI, we will look up the Property editor model to find the default UI alias:
+					if (!this._propertyEditorUiAlias && dataType?.propertyEditorAlias) {
+						//use 'dataType.propertyEditorAlias' to look up the extension in the registry:
+						this.observe(
+							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', dataType.propertyEditorAlias),
+							(extension) => {
+								if (!extension) return;
+								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
+								this.removeControllerByUnique('_observePropertyEditorModel');
+							},
+							'_observePropertyEditorModel'
+						);
+					}
 				},
-				'observeDataType'
+				'_observeDataType'
 			);
 		}
 	}

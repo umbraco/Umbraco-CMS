@@ -1,11 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UUIMenuItemEvent } from '@umbraco-ui/uui';
-import { UmbLanguageRepository } from '../repository/language.repository';
-import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context';
+import { UmbLanguageRepository } from '../repository/language.repository.js';
+import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context.js';
+import { UUITextStyles , UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

@@ -5,7 +5,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CurrentUser',
 		name: 'Current User Modal',
-		loader: () => import('./current-user/current-user-modal.element'),
+		loader: () => import('./current-user/current-user-modal.element.js'),
 	},
 ];
 

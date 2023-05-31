@@ -1,8 +1,6 @@
-import { html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbDocumentTypeRepository } from '../../repository/document-type.repository';
+import { UmbDocumentTypeRepository } from '../../repository/document-type.repository.js';
+import { html, nothing , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -18,6 +16,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
 	async firstUpdated() {
+		// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
 		// TODO: show error
 		if (!this.data?.id) return;
 

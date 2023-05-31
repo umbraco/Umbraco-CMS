@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbDashboardTelemetryElement } from './dashboard-telemetry.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardTelemetryElement } from './dashboard-telemetry.element';
-import './dashboard-telemetry.element';
+import './dashboard-telemetry.element.js';
 
 export default {
 	title: 'Dashboards/Telemetry',

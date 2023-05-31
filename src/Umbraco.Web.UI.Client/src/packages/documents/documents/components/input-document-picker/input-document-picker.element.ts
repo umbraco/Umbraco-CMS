@@ -1,10 +1,7 @@
-import { css, html, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../repository/document.tree.store';
-import type { UmbDocumentTreeStore } from '../../repository/document.tree.store';
+import { UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from '../../repository/document.tree.store.js';
+import type { UmbDocumentTreeStore } from '../../repository/document.tree.store.js';
+import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,

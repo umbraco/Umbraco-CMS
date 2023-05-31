@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputEyeDropperElement } from './input-eye-dropper.element';
+import { UmbInputEyeDropperElement } from './input-eye-dropper.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputEyeDropperElement', () => {
 	let element: UmbInputEyeDropperElement;

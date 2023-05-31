@@ -1,4 +1,4 @@
-import { PartialViewDetails } from '../../config';
+import { PartialViewDetails } from '../../config.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 

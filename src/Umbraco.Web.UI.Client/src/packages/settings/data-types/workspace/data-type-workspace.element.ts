@@ -1,11 +1,10 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context';
+import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './data-type-workspace-edit.element';
+import './data-type-workspace-edit.element.js';
 
 @customElement('umb-data-type-workspace')
 export class UmbDataTypeWorkspaceElement extends UmbLitElement {

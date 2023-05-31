@@ -1,9 +1,7 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import { UmbTemplateCardElement } from '../template-card/template-card.element';
-import { UmbTemplateRepository } from '../../repository/template.repository';
+import { UmbTemplateCardElement } from '../template-card/template-card.element.js';
+import { UmbTemplateRepository } from '../../repository/template.repository.js';
+import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,

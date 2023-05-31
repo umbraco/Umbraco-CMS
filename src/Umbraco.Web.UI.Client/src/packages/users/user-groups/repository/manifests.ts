@@ -1,5 +1,5 @@
-import { UmbUserGroupRepository } from '../repository/user-group.repository';
-import { UmbUserGroupStore } from './user-group.store';
+import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
+import { UmbUserGroupStore } from './user-group.store.js';
 import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const USER_GROUP_REPOSITORY_ALIAS = 'Umb.Repository.UserGroup';

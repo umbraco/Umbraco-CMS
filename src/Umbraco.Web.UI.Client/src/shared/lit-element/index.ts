@@ -1,1 +1,1 @@
-export * from './lit-element.element';
+export * from './lit-element.element.js';

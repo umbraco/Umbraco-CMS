@@ -6,12 +6,13 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'File upload',
 	alias: 'Umbraco.UploadField',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		settings: {
 			properties: [
 				{
 					alias: 'fileExtensions',
 					label: 'Accepted file extensions',
-					propertyEditorUI: 'Umb.PropertyEditorUI.MultipleTextString',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

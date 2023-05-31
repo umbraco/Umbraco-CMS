@@ -1,20 +1,25 @@
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { css, html, nothing, TemplateResult } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store.js';
+import { getLookAndColorFromUserStatus } from '../../utils.js';
+import { UmbUserRepository } from '../repository/user.repository.js';
+import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
+import { UmbUserWorkspaceContext } from './user-workspace.context.js';
+import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import {
+	css,
+	html,
+	nothing,
+	TemplateResult,
+	customElement,
+	state,
+	ifDefined,
+	repeat,
+} from '@umbraco-cms/backoffice/external/lit';
 
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store';
-import { getLookAndColorFromUserStatus } from '../../utils';
-import { UmbUserRepository } from '../repository/user.repository';
-import UmbUserGroupInputElement from '../../user-groups/components/input-user-group/user-group-input.element';
-import { UmbUserWorkspaceContext } from './user-workspace.context';
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

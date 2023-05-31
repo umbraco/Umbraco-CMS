@@ -1,10 +1,13 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UUIBooleanInputEvent, UUICheckboxElement, UUIRadioGroupElement, UUIRadioGroupEvent } from '@umbraco-ui/uui';
+import { UmbUserCollectionContext } from './user-collection.context.js';
+import { UUITextStyles ,
+	UUIBooleanInputEvent,
+	UUICheckboxElement,
+	UUIRadioGroupElement,
+	UUIRadioGroupEvent,
+} from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDropdownElement } from '../../../core/components/dropdown/dropdown.element';
-import { UmbUserCollectionContext } from './user-collection.context';
+import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import {
 	UMB_CREATE_USER_MODAL,

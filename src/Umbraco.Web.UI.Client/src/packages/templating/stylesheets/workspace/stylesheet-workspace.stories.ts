@@ -1,9 +1,9 @@
-import './stylesheet-workspace.element';
+import './stylesheet-workspace.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbStylesheetWorkspaceElement } from './stylesheet-workspace.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbStylesheetWorkspaceElement } from './stylesheet-workspace.element';
 
 export default {
 	title: 'Workspaces/Stylesheet',

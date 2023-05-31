@@ -1,16 +1,12 @@
-import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { state } from 'lit/decorators.js';
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import type { UmbRouterSlotChangeEvent } from '@umbraco-cms/internal/router';
+import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { createExtensionElementOrFallback } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@defineElement('umb-backoffice-main')
+@customElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {
 	@state()
 	private _routes: Array<UmbRoute & { alias: string }> = [];
@@ -65,11 +61,11 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 			}
 		});
 
-		if (!this._routes.find((r) => r.path === '**')) {
+		if (this._sections.length > 0) {
 			this._routes.push({
 				alias: '__redirect',
-				path: '**',
-				redirectTo: this._routePrefix + this._sections?.[0]?.meta.pathname,
+				path: '/',
+				redirectTo: 'section/content',
 			});
 		}
 	}
@@ -98,7 +94,6 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
 		css`
 			:host {
 				background-color: var(--uui-color-background);

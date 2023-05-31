@@ -1,18 +1,13 @@
-import { css, CSSResultGroup, html, LitElement, unsafeCSS } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import logoImg from '/umbraco_logomark_white.svg';
-import installerImg from '/installer.jpg';
+import { css, CSSResultGroup, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-installer-layout')
 export class UmbInstallerLayoutElement extends LitElement {
-	
-
 	render() {
 		return html`<div>
 			<div id="background" aria-hidden="true"></div>
 
 			<div id="logo" aria-hidden="true">
-				<img src="${logoImg}" alt="Umbraco" />
+				<img src="/umbraco/backoffice/assets/umbraco_logomark_white.svg" alt="Umbraco" />
 			</div>
 
 			<main id="container">
@@ -22,7 +17,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 			</main>
 		</div>`;
 	}
-	
+
 	static styles: CSSResultGroup = [
 		css`
 			#background {
@@ -31,7 +26,7 @@ export class UmbInstallerLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('${unsafeCSS(installerImg)}');
+				background-image: url('/umbraco/backoffice/assets/installer.jpg');
 				width: 100vw;
 				height: 100vh;
 			}

@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
-import './code-block.element';
-import type { UmbCodeBlockElement } from './code-block.element';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+import './code-block.element.js';
+import type { UmbCodeBlockElement } from './code-block.element.js';
 
 const meta: Meta<UmbCodeBlockElement> = {
 	title: 'Components/Code Block',

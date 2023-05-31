@@ -1,19 +1,17 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { groupBy } from 'lodash-es';
-import type { UUIInputEvent } from '@umbraco-ui/uui';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalResult,
 	UmbModalHandler,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 interface GroupedPropertyEditorUIs {
-	[key: string]: Array<ManifestPropertyEditorUI>;
+	[key: string]: Array<ManifestPropertyEditorUi>;
 }
 @customElement('umb-property-editor-ui-picker-modal')
 export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
@@ -24,7 +22,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};
 
 	@state()
-	private _propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
+	private _propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
 	@state()
 	private _selection: Array<string> = [];
@@ -44,14 +42,14 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	private _usePropertyEditorUIs() {
 		if (!this.data) return;
 
-		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUI'), (propertyEditorUIs) => {
+		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
 			this._propertyEditorUIs = propertyEditorUIs;
 			this._groupedPropertyEditorUIs = groupBy(propertyEditorUIs, 'meta.group');
 		});
 	}
 
-	private _handleClick(propertyEditorUI: ManifestPropertyEditorUI) {
-		this._select(propertyEditorUI.alias);
+	private _handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
+		this._select(propertyEditorUi.alias);
 	}
 
 	private _select(alias: string) {
@@ -114,7 +112,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		)}`;
 	}
 
-	private _renderGroupItems(groupItems: Array<ManifestPropertyEditorUI>) {
+	private _renderGroupItems(groupItems: Array<ManifestPropertyEditorUi>) {
 		return html` <ul id="item-grid">
 			${repeat(
 				groupItems,

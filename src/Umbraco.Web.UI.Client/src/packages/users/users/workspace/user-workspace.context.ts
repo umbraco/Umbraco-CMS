@@ -1,4 +1,4 @@
-import { UmbUserRepository } from '../repository/user.repository';
+import { UmbUserRepository } from '../repository/user.repository.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UpdateUserRequestModel, UserResponseModel } from '@umbraco-cms/backoffice/backend-api';

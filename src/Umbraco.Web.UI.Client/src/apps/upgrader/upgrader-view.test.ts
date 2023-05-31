@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { UmbUpgraderViewElement } from './upgrader-view.element';
+import { UmbUpgraderViewElement } from './upgrader-view.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbUpgraderView', () => {
