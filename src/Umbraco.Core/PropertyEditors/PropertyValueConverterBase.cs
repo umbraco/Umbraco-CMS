@@ -50,12 +50,27 @@ public abstract class PropertyValueConverterBase : IPropertyValueConverter
     /// <inheritdoc />
     public virtual object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
+        var d = new XmlDocument();
+        XmlElement e = d.CreateElement("values");
+        d.AppendChild(e);
+
         if (inter is IEnumerable<string> collection)
         {
-            return string.Join(",", collection);
+            foreach (var value in collection)
+            {
+                XmlElement ee = d.CreateElement("value");
+                ee.InnerText = value;
+                e.AppendChild(ee);
+            }
+        }
+        else
+        {
+            XmlElement ee = d.CreateElement("value");
+            ee.InnerText = inter?.ToString() ?? string.Empty;
+            e.AppendChild(ee);
         }
 
-        return inter?.ToString() ?? string.Empty;
+        return d.CreateNavigator();
     }
 
     [Obsolete(
