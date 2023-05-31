@@ -13,7 +13,16 @@ public class PackageManifest
     private string? _packageName;
 
     /// <summary>
-    /// Gets or sets the name of the package. If not specified, uses the directory name instead.
+    /// Gets or sets the package identifier.
+    /// </summary>
+    /// <value>
+    /// The package identifier.
+    /// </value>
+    [DataMember(Name = "id")]
+    public string? PackageId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the package. If not specified, uses the package identifier or directory name instead.
     /// </summary>
     /// <value>
     /// The name of the package.
@@ -26,6 +35,11 @@ public class PackageManifest
             if (!_packageName.IsNullOrWhiteSpace())
             {
                 return _packageName;
+            }
+          
+            if (!PackageId.IsNullOrWhiteSpace())
+            {
+                _packageName = PackageId;
             }
 
             if (!Source.IsNullOrWhiteSpace())
