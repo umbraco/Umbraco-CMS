@@ -95,8 +95,9 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	 */
 	private _getValue(property: PropertyEditorConfigProperty) {
 		const value = this.data.find((data) => data.alias === property.alias)?.value;
+		if (value) return value;
 		const defaultValue = this._configDefaultData?.find((data) => data.alias === property.alias)?.value;
-		return value ?? defaultValue ?? null;
+		return defaultValue ?? null;
 	}
 
 	render() {
