@@ -5,7 +5,8 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Block List',
 	alias: 'Umbraco.BlockList',
 	meta: {
-		config: {
+		defaultUI: 'Umb.PropertyEditorUI.BlockList',
+		settings: {
 			properties: [
 				{
 					alias: 'blocks',

@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.CheckboxList',
 		icon: 'umb:bulleted-list',
 		group: 'lists',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'items',

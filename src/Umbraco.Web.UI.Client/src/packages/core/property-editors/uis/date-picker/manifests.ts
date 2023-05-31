@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.DateTime',
 		icon: 'umb:time',
 		group: 'pickers',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'format',

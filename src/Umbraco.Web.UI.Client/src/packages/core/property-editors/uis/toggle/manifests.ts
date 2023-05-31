@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.TrueFalse',
 		icon: 'umb:checkbox',
 		group: 'common',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'default',

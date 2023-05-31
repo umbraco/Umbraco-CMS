@@ -12,7 +12,7 @@ export interface MetaPropertyEditorUI {
 	propertyEditorModel: string;
 	icon: string;
 	group: string;
-	config?: PropertyEditorConfig;
+	settings?: PropertyEditorSettings;
 	supportsReadOnly?: boolean;
 }
 
@@ -24,11 +24,11 @@ export interface ManifestPropertyEditorModel extends ManifestBase {
 
 export interface MetaPropertyEditorModel {
 	defaultUI: string;
-	config?: PropertyEditorConfig;
+	settings?: PropertyEditorSettings;
 }
 
 // Config
-export interface PropertyEditorConfig {
+export interface PropertyEditorSettings {
 	properties: PropertyEditorConfigProperty[];
 	defaultData?: PropertyEditorConfigDefaultData[];
 }

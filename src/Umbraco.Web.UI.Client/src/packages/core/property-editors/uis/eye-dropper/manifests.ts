@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		icon: 'umb:colorpicker',
 		group: 'pickers',
 		propertyEditorModel: 'Umbraco.ColorPicker.EyeDropper',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'showAlpha',

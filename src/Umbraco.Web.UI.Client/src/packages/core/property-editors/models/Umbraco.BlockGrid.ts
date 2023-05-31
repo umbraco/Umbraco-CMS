@@ -5,7 +5,8 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Block Grid',
 	alias: 'Umbraco.BlockGrid',
 	meta: {
-		config: {
+		defaultUI: 'Umb.PropertyEditorUI.BlockGrid',
+		settings: {
 			properties: [
 				{
 					alias: 'blocks',
@@ -29,6 +30,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					label: 'Grid Columns',
 					description: 'Set the number of columns for the layout. (defaults to 12)',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					defaultValue: 12,
 				},
 				{
 					alias: 'layoutStylesheet',

@@ -5,7 +5,8 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'List View',
 	alias: 'Umbraco.ListView',
 	meta: {
-		config: {
+		defaultUI: 'Umb.PropertyEditorUI.ListView',
+		settings: {
 			properties: [
 				{
 					alias: 'pageSize',

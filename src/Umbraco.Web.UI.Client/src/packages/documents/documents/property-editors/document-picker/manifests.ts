@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.ContentPicker',
 		icon: 'umb:document',
 		group: 'common',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'showOpenButton',

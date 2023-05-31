@@ -19,7 +19,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			propertyEditorModel: 'Umbraco.TextBox',
 			icon: 'umb:autofill',
 			group: 'common',
-			config: {
+			settings: {
 				properties: [inputTypeConfig],
 				defaultData: [
 					{
@@ -40,7 +40,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 			propertyEditorModel: 'Umbraco.EmailAddress',
 			icon: 'umb:message',
 			group: 'common',
-			config: {
+			settings: {
 				properties: [inputTypeConfig],
 				defaultData: [
 					{

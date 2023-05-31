@@ -5,7 +5,8 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Email Address',
 	alias: 'Umbraco.ImageCropper',
 	meta: {
-		config: {
+		defaultUI: 'Umb.PropertyEditorUI.ImageCropper',
+		settings: {
 			properties: [
 				{
 					alias: 'crops',

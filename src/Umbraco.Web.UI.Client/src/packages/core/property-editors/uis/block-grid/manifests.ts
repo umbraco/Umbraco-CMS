@@ -13,7 +13,7 @@ const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.BlockGrid',
 		icon: 'umb:icon-layout',
 		group: 'richContent',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'useLiveEditing',

@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Tags',
 	alias: 'Umbraco.Tags',
 	meta: {
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'startNodeId',

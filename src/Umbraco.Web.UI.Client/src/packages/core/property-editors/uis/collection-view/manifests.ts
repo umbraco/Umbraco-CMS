@@ -14,7 +14,7 @@ const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.ListView',
 		icon: 'umb:bulleted-list',
 		group: 'lists',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'layouts',

@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.Slider',
 		icon: 'umb:navigation-horizontal',
 		group: 'common',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'enableRange',

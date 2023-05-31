@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.TextArea',
 		icon: 'umb:edit',
 		group: 'common',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'rows',

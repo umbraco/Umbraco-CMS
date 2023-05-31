@@ -5,7 +5,8 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Slider',
 	alias: 'Umbraco.Slider',
 	meta: {
-		config: {
+		defaultUI: 'Umb.PropertyEditorUI.Slider',
+		settings: {
 			properties: [
 				{
 					alias: 'minVal',

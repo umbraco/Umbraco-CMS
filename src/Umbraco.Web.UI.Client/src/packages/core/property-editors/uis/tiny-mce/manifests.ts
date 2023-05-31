@@ -11,7 +11,7 @@ const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.TinyMCE',
 		icon: 'umb:browser-window',
 		group: 'richText',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'editor',

@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.RadioButtonList',
 		icon: 'umb:target',
 		group: 'lists',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'items',

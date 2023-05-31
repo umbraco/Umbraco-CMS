@@ -5,7 +5,8 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Media Picker 3',
 	alias: 'Umbraco.MediaPicker3',
 	meta: {
-		config: {
+		defaultUI: 'Umb.PropertyEditorUI.MediaPicker3',
+		settings: {
 			properties: [
 				{
 					alias: 'filter',

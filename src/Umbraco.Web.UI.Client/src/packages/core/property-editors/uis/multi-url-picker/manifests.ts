@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.MultiUrlPicker',
 		icon: 'umb:link',
 		group: 'pickers',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'overlaySize',

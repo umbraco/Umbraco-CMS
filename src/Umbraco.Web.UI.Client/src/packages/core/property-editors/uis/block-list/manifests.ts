@@ -11,7 +11,7 @@ const manifest: ManifestPropertyEditorUI = {
 		propertyEditorModel: 'Umbraco.BlockList',
 		icon: 'umb:thumbnail-list',
 		group: 'lists',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'useSingleBlockMode',
