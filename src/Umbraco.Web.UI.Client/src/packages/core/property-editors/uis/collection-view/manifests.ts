@@ -2,10 +2,10 @@ import { manifest as bulkActionPermissions } from './config/bulk-action-permissi
 import { manifest as columnConfiguration } from './config/column-configuration/manifests.js';
 import { manifest as layoutConfiguration } from './config/layout-configuration/manifests.js';
 import { manifest as orderBy } from './config/order-by/manifests.js';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.CollectionView',
 	name: 'Collection View Property Editor UI',
 	loader: () => import('./property-editor-ui-collection-view.element.js'),
@@ -51,7 +51,7 @@ const manifest: ManifestPropertyEditorUI = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUI> = [
+const config: Array<ManifestPropertyEditorUi> = [
 	bulkActionPermissions,
 	columnConfiguration,
 	layoutConfiguration,

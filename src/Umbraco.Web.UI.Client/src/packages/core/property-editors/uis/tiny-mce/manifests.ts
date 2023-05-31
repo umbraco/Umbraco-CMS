@@ -1,8 +1,8 @@
 import { manifest as configuration } from './config/configuration/manifests.js';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TinyMCE',
 	name: 'Rich Text Editor Property Editor UI',
 	loader: () => import('./property-editor-ui-tiny-mce.element.js'),

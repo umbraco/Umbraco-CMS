@@ -2,12 +2,12 @@ import type { UmbPropertyEditorExtensionElement } from '../interfaces/index.js';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestElement, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestPropertyEditorUI extends ManifestElement<UmbPropertyEditorExtensionElement> {
-	type: 'propertyEditorUI';
-	meta: MetaPropertyEditorUI;
+export interface ManifestPropertyEditorUi extends ManifestElement<UmbPropertyEditorExtensionElement> {
+	type: 'propertyEditorUi';
+	meta: MetaPropertyEditorUi;
 }
 
-export interface MetaPropertyEditorUI {
+export interface MetaPropertyEditorUi {
 	label: string;
 	propertyEditorModel: string;
 	icon: string;

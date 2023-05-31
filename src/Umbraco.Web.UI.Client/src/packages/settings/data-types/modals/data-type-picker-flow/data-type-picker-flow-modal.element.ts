@@ -8,7 +8,7 @@ import {
 	UmbPropertyEditorUIPickerModalResult,
 	UmbModalHandler,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -35,7 +35,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
 
 	@state()
-	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUI> = {};
+	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
 
 	@state()
 	private _selection: Array<string> = [];
@@ -45,7 +45,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	#repository;
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
-	#propertyEditorUIs: Array<ManifestPropertyEditorUI> = [];
+	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
 	constructor() {
@@ -66,13 +66,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			'_repositoryItemsObserver'
 		);
 
-		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUI'), (propertyEditorUIs) => {
+		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
 			this.#propertyEditorUIs = propertyEditorUIs;
 			this._performFiltering();
 		});
 	}
 
-	private _handleUIClick(propertyEditorUI: ManifestPropertyEditorUI) {
+	private _handleUIClick(propertyEditorUI: ManifestPropertyEditorUi) {
 		alert('To BE DONE.');
 	}
 
@@ -189,7 +189,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		)}`;
 	}
 
-	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUI>) {
+	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
 		return html` <ul id="item-grid">
 			${repeat(
 				uis,

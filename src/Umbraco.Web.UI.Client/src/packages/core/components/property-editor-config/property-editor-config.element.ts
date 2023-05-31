@@ -57,7 +57,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 		if (!this._propertyEditorUiAlias) return;
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this.propertyEditorUiAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this.propertyEditorUiAlias),
 			(manifest) => {
 				this._observePropertyEditorModelConfig(manifest?.meta.propertyEditorModel);
 				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];

@@ -1,7 +1,7 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TinyMCE.Config',
 	name: 'Tiny MCE Configuration Property Editor UI',
 	loader: () => import('./property-editor-ui-tiny-mce-configuration.element.js'),

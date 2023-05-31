@@ -1,8 +1,8 @@
 import { manifest as storageType } from './config/storage-type/manifests.js';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Tags',
 	name: 'Tags Property Editor UI',
 	loader: () => import('./property-editor-ui-tags.element.js'),
@@ -14,6 +14,6 @@ const manifest: ManifestPropertyEditorUI = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUI> = [storageType];
+const config: Array<ManifestPropertyEditorUi> = [storageType];
 
 export const manifests = [manifest, ...config];

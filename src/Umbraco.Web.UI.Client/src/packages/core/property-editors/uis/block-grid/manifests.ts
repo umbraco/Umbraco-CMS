@@ -1,10 +1,10 @@
 import { manifest as blockConfiguration } from './config/block-configuration/manifests.js';
 import { manifest as groupConfiguration } from './config/group-configuration/manifests.js';
 import { manifest as stylesheetPicker } from './config/stylesheet-picker/manifests.js';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.BlockGrid',
 	name: 'Block Grid Property Editor UI',
 	loader: () => import('./property-editor-ui-block-grid.element.js'),
@@ -38,6 +38,6 @@ const manifest: ManifestPropertyEditorUI = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUI> = [blockConfiguration, groupConfiguration, stylesheetPicker];
+const config: Array<ManifestPropertyEditorUi> = [blockConfiguration, groupConfiguration, stylesheetPicker];
 
 export const manifests = [manifest, ...config];

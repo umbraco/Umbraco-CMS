@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestPropertyEditorUI, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -107,7 +107,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	private _variantDifference?: string;
 
 	@state()
-	private _element?: ManifestPropertyEditorUI['ELEMENT_TYPE'];
+	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
 	@state()
 	private _value?: unknown;
@@ -123,7 +123,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 	private _propertyContext = new UmbWorkspacePropertyContext(this);
 
-	private propertyEditorUIObserver?: UmbObserverController<ManifestPropertyEditorUI | undefined>;
+	private propertyEditorUIObserver?: UmbObserverController<ManifestPropertyEditorUi | undefined>;
 
 	private _valueObserver?: UmbObserverController<unknown>;
 	private _configObserver?: UmbObserverController<DataTypePropertyPresentationModel[] | undefined>;
@@ -156,14 +156,14 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	private _observePropertyEditorUI() {
 		this.propertyEditorUIObserver?.destroy();
 		this.propertyEditorUIObserver = this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', this._propertyEditorUiAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
 			(manifest) => {
 				this._gotEditorUI(manifest);
 			}
 		);
 	}
 
-	private _gotEditorUI(manifest?: ManifestPropertyEditorUI | null) {
+	private _gotEditorUI(manifest?: ManifestPropertyEditorUi | null) {
 		if (!manifest) {
 			// TODO: if propertyEditorUiAlias didn't exist in store, we should do some nice fail UI.
 			return;
@@ -175,7 +175,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 				oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
-				this._element = el as ManifestPropertyEditorUI['ELEMENT_TYPE'];
+				this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
 				this._valueObserver?.destroy();
 				this._configObserver?.destroy();

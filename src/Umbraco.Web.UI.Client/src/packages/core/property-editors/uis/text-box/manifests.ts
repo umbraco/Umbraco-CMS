@@ -1,4 +1,4 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: we don't really want this config value to be changed from the UI. We need a way to handle hidden config properties.
 const inputTypeConfig = {
@@ -8,9 +8,9 @@ const inputTypeConfig = {
 	propertyEditorUI: 'Umb.PropertyEditorUi.Dropdown',
 };
 
-export const manifests: Array<ManifestPropertyEditorUI> = [
+export const manifests: Array<ManifestPropertyEditorUi> = [
 	{
-		type: 'propertyEditorUI',
+		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.TextBox',
 		name: 'Text Box Property Editor UI',
 		loader: () => import('./property-editor-ui-text-box.element.js'),
@@ -31,7 +31,7 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		},
 	},
 	{
-		type: 'propertyEditorUI',
+		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Email',
 		name: 'Email Property Editor UI',
 		loader: () => import('./property-editor-ui-text-box.element.js'),

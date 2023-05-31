@@ -1,8 +1,8 @@
 import { manifest as blockConfiguration } from './config/block-configuration/manifests.js';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.BlockList',
 	name: 'Block List Property Editor UI',
 	loader: () => import('./property-editor-ui-block-list.element.js'),

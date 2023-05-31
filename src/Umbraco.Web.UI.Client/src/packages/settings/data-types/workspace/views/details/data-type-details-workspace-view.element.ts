@@ -109,7 +109,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		this.removeControllerByUnique('_observePropertyEditorModelForDefaultUI');
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', propertyEditorUiAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUiAlias),
 			(propertyEditorUI) => {
 				// TODO: show error. We have stored a PropertyEditorUIAlias and can't find the PropertyEditorUI in the registry.
 				if (!propertyEditorUI) return;
