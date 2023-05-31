@@ -3,8 +3,17 @@ import { getLookAndColorFromUserStatus } from '../../utils.js';
 import { UmbUserRepository } from '../repository/user.repository.js';
 import UmbUserGroupInputElement from '../../user-groups/components/input-user-group/user-group-input.element.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
-import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, TemplateResult , customElement, state , ifDefined , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import {
+	css,
+	html,
+	nothing,
+	TemplateResult,
+	customElement,
+	state,
+	ifDefined,
+	repeat,
+} from '@umbraco-cms/backoffice/external/lit';
 
 import { UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -16,8 +25,8 @@ import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-@customElement('umb-user-workspace-edit')
-export class UmbUserWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-user-workspace-editor')
+export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _currentUser?: any;
 
@@ -370,10 +379,10 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserWorkspaceEditElement;
+export default UmbUserWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-workspace-edit': UmbUserWorkspaceEditElement;
+		'umb-user-workspace-editor': UmbUserWorkspaceEditorElement;
 	}
 }
