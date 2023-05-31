@@ -1,14 +1,14 @@
 import { UmbMediaWorkspaceContext } from './media-workspace.context.js';
-import { UmbMediaWorkspaceEditElement } from './media-workspace-edit.element.js';
+import { UmbMediaWorkspaceEditorElement } from './media-workspace-editor.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-media-workspace')
 export class UmbMediaWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbMediaWorkspaceContext(this);
-	#element = new UmbMediaWorkspaceEditElement();
+	#element = new UmbMediaWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [

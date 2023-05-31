@@ -1,10 +1,10 @@
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
-import './relation-type-workspace-edit.element.js';
+import './relation-type-workspace-editor.element.js';
 
 /**
  * @element umb-relation-type-workspace
@@ -16,7 +16,7 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 
 	#routerPath? = '';
 
-	#element = document.createElement('umb-relation-type-workspace-edit-element');
+	#element = document.createElement('umb-relation-type-workspace-editor');
 	#key = '';
 
 	@state()

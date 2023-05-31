@@ -1,7 +1,7 @@
 import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../current-user/current-user.store.js';
 import { getLookAndColorFromUserStatus } from '../../utils.js';
 import { UmbUserRepository } from '../repository/user.repository.js';
-import UmbUserGroupInputElement from '../../user-groups/components/input-user-group/user-group-input.element.js';
+import { UmbUserGroupInputElement } from '../../user-groups/components/input-user-group/user-group-input.element.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {

@@ -1,9 +1,9 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('umb-member-type-workspace-edit')
-export class UmbMemberTypeWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-member-type-workspace-editor')
+export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MemberType"> Member Type Workspace </umb-workspace-editor>
@@ -28,10 +28,10 @@ export class UmbMemberTypeWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbMemberTypeWorkspaceEditElement;
+export default UmbMemberTypeWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-member-type-workspace-edit': UmbMemberTypeWorkspaceEditElement;
+		'umb-member-type-workspace-editor': UmbMemberTypeWorkspaceEditorElement;
 	}
 }
