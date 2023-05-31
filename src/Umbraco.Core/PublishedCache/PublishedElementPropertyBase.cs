@@ -228,7 +228,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         {
             CacheValues cacheValues = GetCacheValues(cacheLevel);
 
-            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing);
+            object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(Element, referenceCacheLevel, GetInterValue(), IsPreviewing, expanding);
             return expanding
                 ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
                 : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);

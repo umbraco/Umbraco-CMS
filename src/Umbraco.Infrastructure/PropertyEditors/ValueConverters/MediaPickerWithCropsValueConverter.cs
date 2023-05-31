@@ -124,7 +124,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMediaWithCrops>);
 
-    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 

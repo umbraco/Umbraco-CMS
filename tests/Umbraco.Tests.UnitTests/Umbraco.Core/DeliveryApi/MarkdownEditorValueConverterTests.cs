@@ -29,7 +29,7 @@ public class MarkdownEditorValueConverterTests : PropertyValueConverterTests
         var valueConverter = new MarkdownEditorValueConverter(linkParser, urlParser);
 
         Assert.AreEqual(typeof(string), valueConverter.GetDeliveryApiPropertyValueType(Mock.Of<IPublishedPropertyType>()));
-        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), Mock.Of<IPublishedPropertyType>(), PropertyCacheLevel.Element, inter, false);
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), Mock.Of<IPublishedPropertyType>(), PropertyCacheLevel.Element, inter, false, false);
         Assert.AreEqual(expected, result);
     }
 }
