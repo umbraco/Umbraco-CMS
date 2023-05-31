@@ -120,8 +120,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	static styles = [
 		css`
 			:host {
-				display: flex;
-				flex-direction: column;
+				position: relative;
 				height: 100%;
 			}
 

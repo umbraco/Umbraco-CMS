@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, LitElement , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-dashboard-settings-welcome')
 export class UmbDashboardSettingsWelcomeElement extends LitElement {
@@ -93,7 +93,7 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 				display: grid;
 				grid-gap: var(--uui-size-7);
 				grid-template-columns: repeat(3, 1fr);
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 
 			@media (max-width: 1200px) {
