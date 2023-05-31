@@ -4,5 +4,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	type: 'propertyEditorModel',
 	name: 'Email Address',
 	alias: 'Umbraco.EmailAddress',
-	meta: {},
+	meta: {
+		defaultUI: 'Umb.PropertyEditorUI.EmailAddress',
+	},
 };

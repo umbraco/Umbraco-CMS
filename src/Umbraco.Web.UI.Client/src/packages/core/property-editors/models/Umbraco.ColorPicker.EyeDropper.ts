@@ -4,5 +4,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	type: 'propertyEditorModel',
 	name: 'Eye Dropper Color Picker',
 	alias: 'Umbraco.ColorPicker.EyeDropper',
-	meta: {},
+	meta: {
+		defaultUI: 'Umb.PropertyEditorUI.EyeDropper',
+	},
 };

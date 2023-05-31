@@ -30,7 +30,6 @@ export const manifest: ManifestPropertyEditorModel = {
 					label: 'Grid Columns',
 					description: 'Set the number of columns for the layout. (defaults to 12)',
 					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
-					defaultValue: 12,
 				},
 				{
 					alias: 'layoutStylesheet',

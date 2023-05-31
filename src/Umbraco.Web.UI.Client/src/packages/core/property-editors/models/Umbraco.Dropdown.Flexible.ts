@@ -5,5 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	type: 'propertyEditorModel',
 	name: 'Dropdown',
 	alias: 'Umbraco.DropDown.Flexible',
-	meta: {},
+	meta: {
+		defaultUI: 'Umb.PropertyEditorUI.DropDown.Flexible',
+	},
 };

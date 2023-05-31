@@ -4,5 +4,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	type: 'propertyEditorModel',
 	name: 'Member Picker',
 	alias: 'Umbraco.MemberPicker',
-	meta: {},
+	meta: {
+		defaultUI: 'Umb.PropertyEditorUI.MemberPicker',
+	},
 };
