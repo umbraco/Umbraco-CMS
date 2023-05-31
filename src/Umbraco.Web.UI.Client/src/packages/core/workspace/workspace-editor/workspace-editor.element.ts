@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, property, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	PageComponent,
@@ -139,8 +139,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 				${this.enforceNoFooter
 					? ''
 					: html`
-							<umb-workspace-footer alias=${this.alias}>
-								<slot name="footer"></slot>
+							<umb-workspace-footer slot="footer" alias=${this.alias}>
+								<slot name="footer-info"></slot>
 								<slot name="actions" slot="actions"></slot>
 							</umb-workspace-footer>
 					  `}

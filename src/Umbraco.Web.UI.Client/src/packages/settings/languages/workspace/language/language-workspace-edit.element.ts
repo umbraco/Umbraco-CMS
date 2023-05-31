@@ -1,6 +1,6 @@
 import { UmbLanguageWorkspaceContext } from './language-workspace.context.js';
-import { UUITextStyles , UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -56,7 +56,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 							value=${ifDefined(this._language?.name)}
 							@input="${this.#handleInput}"></uui-input>`}
 			</div>
-			<div slot="footer" id="footer">
+			<div slot="footer-info" id="footer-into">
 				<a href="section/settings/workspace/language-root">Languages</a> /
 				${this._isNew ? 'Create' : this._language?.name}
 			</div>
@@ -82,7 +82,7 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#footer {
+			#footer-into {
 				padding: 0 var(--uui-size-layout-1);
 			}
 

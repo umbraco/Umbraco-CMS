@@ -89,7 +89,7 @@ export class UmbCollectionElement extends UmbLitElement {
 				<umb-collection-toolbar slot="header"></umb-collection-toolbar>
 				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
 				${this._selection && this._selection.length > 0
-					? html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`
+					? html`<umb-collection-selection-actions slot="footer-info"></umb-collection-selection-actions>`
 					: nothing}
 			</umb-body-layout>
 		`;
