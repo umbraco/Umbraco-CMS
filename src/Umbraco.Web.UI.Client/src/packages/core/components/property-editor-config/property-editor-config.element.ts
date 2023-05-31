@@ -110,7 +110,8 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 									description="${ifDefined(property.description)}"
 									alias="${property.alias}"
 									property-editor-ui-alias="${property.propertyEditorUI}"
-									.value=${this._getValue(property)}></umb-workspace-property>
+									.value=${this._getValue(property)}
+									.config=${property.config}></umb-workspace-property>
 							`
 						)}
 				  `
