@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
-public class ModelsGenerator
+public class ModelsGenerator : IModelsGenerator
 {
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly OutOfDateModelsStatus _outOfDateModels;

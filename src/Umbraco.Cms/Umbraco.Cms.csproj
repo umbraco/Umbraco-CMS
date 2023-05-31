@@ -7,25 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Targets\Umbraco.Cms.Targets.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
-    <Content Include="$(JsonSchemaPath)" PackagePath="." />
-  </ItemGroup>
-
-  <!-- Generate appsettings.json schema on build (and before copying to project) -->
-  <PropertyGroup>
-    <JsonSchemaPath>$(MSBuildThisFileDirectory)appsettings-schema.json</JsonSchemaPath>
-    <JsonSchemaProjectPath>$(MSBuildThisFileDirectory)..\JsonSchema\</JsonSchemaProjectPath>
-  </PropertyGroup>
-  <Target Name="GenerateAppsettingsSchema" BeforeTargets="Build" Condition="!Exists('$(JsonSchemaPath)')">
-    <Message Text="Generating appsettings-schema.json because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -o &quot;$(JsonSchemaPath)&quot;" />
+  <!-- Create and pack empty file to add TFM dependency -->
+  <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
+    <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
+    <ItemGroup>
+      <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
+    </ItemGroup>
   </Target>
 </Project>

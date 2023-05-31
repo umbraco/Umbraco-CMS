@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenIddict.Abstractions" Version="4.3.0" />
+  </ItemGroup>
 </Project>

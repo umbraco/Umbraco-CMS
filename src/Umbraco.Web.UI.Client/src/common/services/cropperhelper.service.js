@@ -98,9 +98,8 @@ function cropperHelper(umbRequestHelper, $http) {
 		},
 
 		pixelsToCoordinates : function(image, width, height, offset){
-
-			var x1_px = Math.abs(image.left-offset);
-			var y1_px = Math.abs(image.top-offset);
+			var x1_px = Math.abs((image.left || 0)-offset);
+			var y1_px = Math.abs((image.top || 0)-offset);
 
 			var x2_px = image.width - (x1_px + width);
 			var y2_px = image.height - (y1_px + height);

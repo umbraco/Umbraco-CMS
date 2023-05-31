@@ -7,10 +7,8 @@ test.describe('Packages', () => {
   const packageName = "TestPackage";
   const rootDocTypeName = "Test document type";
   const nodeName = "1) Home";
-  test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
 
@@ -39,8 +37,8 @@ test.describe('Packages', () => {
       .withContentTypeAlias(rootDocTypeAlias)
       .withAction("saveNew")
       .addVariant()
-      .withName(nodeName)
-      .withSave(true)
+        .withName(nodeName)
+        .withSave(true)
       .done()
       .build();
     const generatedContent = await umbracoApi.content.save(rootContentNode);
@@ -81,6 +79,7 @@ test.describe('Packages', () => {
     // Fill out package creation form
     // Waits until the element package Content is visible
     await page.locator('[key="packager_packageContent"]').isVisible();
+    await expect(page.locator('[label="@treeHeaders_documentTypes"]').locator('[text="' + rootDocTypeName + '"]')).toBeVisible();
     await page.locator("#headerName").type(packageName);
     await page.locator('.controls > .umb-node-preview-add').click();
     await page.locator('.umb-tree-item__label').first().click();
@@ -88,10 +87,19 @@ test.describe('Packages', () => {
     
     // Navigate pack to packages and Assert the file is created
     // Waits until the button download is visible
-    await page.locator('[label-key="general_download"]').isVisible();
+    await expect(await page.locator('[label-key="general_download"]')).toBeVisible({timeout: 60000});
+    
+    // Checks if the packages was created
+    const doesExist = await umbracoApi.packages.doesNameExist(packageName);
+    await expect(doesExist).toBe(true);
     await umbracoUi.goToSection(ConstantHelper.sections.packages);
+    
+    // Needs to wait until the page has loaded and the button is clickable
+    await page.locator('[data-element="sub-view-umbCreatedPackages"]').isVisible();
     await page.locator('[data-element="sub-view-umbCreatedPackages"]').click();
-    await expect(await page.locator("body", {hasText: packageName})).toBeVisible();
+    // Asserts that the package can be found in the table
+    await expect(await page.locator('.table-hover')).toHaveCount(1);
+    await expect(await page.locator('.table-hover').first()).toContainText(packageName);
 
     // Cleanup
     await umbracoApi.packages.ensureNameNotExists(packageName);
@@ -109,8 +117,12 @@ test.describe('Packages', () => {
     // Navigate to create package section
     await umbracoUi.goToSection(ConstantHelper.sections.packages);
     await page.locator('[data-element="sub-view-umbCreatedPackages"]').click()
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.delete));
-    await page.waitForTimeout(100);
+
+    // Selects the correct package
+    await page.locator('text=' + packageName + ' Delete >> button').click();
+
+    // Waits until the selector is visible
+    await expect(page.locator('[label-key="contentTypeEditor_yesDelete"]')).toBeVisible();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('contentTypeEditor_yesDelete'));
 
     // Assert
@@ -119,7 +131,6 @@ test.describe('Packages', () => {
     // Cleanup
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
-    await umbracoApi.packages.ensureNameNotExists(packageName);
   });
 
   test('Download package', async ({page, umbracoApi, umbracoUi}) => {

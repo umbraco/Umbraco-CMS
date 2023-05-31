@@ -7,6 +7,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 
+[Obsolete("This is not used anymore and will be removed in Umbraco 13")]
 public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
 {
     internal static readonly IEnumerable<LogViewerQueryDto> _defaultLogQueries = new LogViewerQueryDto[]
@@ -100,7 +101,5 @@ public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
         }
 
         Database.InsertBulk(logQueriesInFile!);
-
-        Context.AddPostMigration<DeleteLogViewerQueryFile>();
     }
 }

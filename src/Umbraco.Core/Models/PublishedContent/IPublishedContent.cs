@@ -23,7 +23,7 @@ public interface IPublishedContent : IPublishedElement
     /// <summary>
     ///     Gets the name of the content item for the current culture.
     /// </summary>
-    string? Name { get; }
+    string Name { get; }
 
     /// <summary>
     ///     Gets the URL segment of the content item for the current culture.
@@ -141,10 +141,10 @@ public interface IPublishedContent : IPublishedElement
     /// <summary>
     ///     Gets the children of the content item that are available for the current culture.
     /// </summary>
-    IEnumerable<IPublishedContent>? Children { get; }
+    IEnumerable<IPublishedContent> Children { get; }
 
     /// <summary>
     ///     Gets all the children of the content item, regardless of whether they are available for the current culture.
     /// </summary>
-    IEnumerable<IPublishedContent>? ChildrenForAllCultures { get; }
+    IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
 }

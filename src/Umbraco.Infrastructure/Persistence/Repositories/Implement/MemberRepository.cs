@@ -202,13 +202,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         return Database.ExecuteScalar<int>(fullSql);
     }
 
-    /// <inheritdoc />
-    [Obsolete(
-        "This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
-    public void SetLastLogin(string username, DateTime date)
-    {
-    }
-
     /// <summary>
     ///     Gets paged member results.
     /// </summary>
@@ -285,6 +278,36 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         if (ordering.OrderBy.InvariantEquals("contentTypeAlias"))
         {
             return SqlSyntax.GetFieldName<ContentTypeDto>(x => x.Alias);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("failedPasswordAttempts"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.FailedPasswordAttempts);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("approved"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.IsApproved);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lockedOut"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.IsLockedOut);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lastLockoutDate"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.LastLockoutDate);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lastLoginDate"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.LastLoginDate);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lastPasswordChangeDate"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.LastPasswordChangeDate);
         }
 
         return base.ApplySystemOrdering(ref sql, ordering);

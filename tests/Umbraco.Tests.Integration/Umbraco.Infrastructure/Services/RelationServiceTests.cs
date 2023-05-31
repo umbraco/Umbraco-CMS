@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -121,7 +120,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
     {
         var rs = RelationService;
         IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Media);
+            Constants.ObjectTypes.Media, false);
 
         Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -139,7 +138,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
     public void Create_Relation_Type_Without_Object_Types()
     {
         var rs = RelationService;
-        IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null);
+        IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null, false);
 
         Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -216,7 +215,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
     private IRelation CreateAndSaveRelation(string name, string alias)
     {
         var rs = RelationService;
-        var rt = new RelationType(name, alias, false, null, null);
+        var rt = new RelationType(name, alias, false, null, null, false);
         rs.Save(rt);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
@@ -245,7 +244,7 @@ public class RelationServiceTests : UmbracoIntegrationTest
     {
         var rs = RelationService;
         var rtName = Guid.NewGuid().ToString();
-        var rt = new RelationType(rtName, rtName, false, null, null);
+        var rt = new RelationType(rtName, rtName, false, null, null, false);
         rs.Save(rt);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();

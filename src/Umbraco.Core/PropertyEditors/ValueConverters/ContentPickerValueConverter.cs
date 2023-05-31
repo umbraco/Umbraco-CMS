@@ -1,11 +1,16 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class ContentPickerValueConverter : PropertyValueConverterBase
+public class ContentPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private static readonly List<string> PropertiesToExclude = new()
     {
@@ -14,9 +19,23 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
     };
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IApiContentBuilder _apiContentBuilder;
 
-    public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor) =>
+    [Obsolete("Use constructor that takes all parameters, scheduled for removal in V14")]
+    public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        : this(
+            publishedSnapshotAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IApiContentBuilder>())
+    {
+    }
+
+    public ContentPickerValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IApiContentBuilder apiContentBuilder)
+    {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _apiContentBuilder = apiContentBuilder;
+    }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
@@ -63,6 +82,37 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
+        IPublishedContent? content = GetContent(propertyType, inter);
+        return content ?? inter;
+    }
+
+    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        if (inter == null)
+        {
+            return null;
+        }
+
+        return inter.ToString();
+    }
+
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
+
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    {
+        IPublishedContent? content = GetContent(propertyType, inter);
+        if (content == null)
+        {
+            return null;
+        }
+
+        return _apiContentBuilder.Build(content);
+    }
+
+    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)
+    {
         if (inter == null)
         {
             return null;
@@ -96,16 +146,6 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
             }
         }
 
-        return inter;
-    }
-
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-    {
-        if (inter == null)
-        {
-            return null;
-        }
-
-        return inter.ToString();
+        return null;
     }
 }

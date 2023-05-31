@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 env:
-  dotnetVersion: 6.x
-  dotnetIncludePreviewVersions: false
+  dotnetVersion: 7.x
+  dotnetIncludePreviewVersions: true
   solution: umbraco.sln
   buildConfiguration: SkipTests
   DOTNET_NOLOGO: true

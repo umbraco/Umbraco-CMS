@@ -2,7 +2,7 @@
 <language alias="it" intName="Italian" localName="italiano" lcid="16" culture="it-IT">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Gestisci hostnames</key>
@@ -280,7 +280,7 @@
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">Questo si traduce nella seguente ora sul server:</key>
     <key alias="scheduledPublishDocumentation">
-      <![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Cosa significa questo?</a>]]></key>
+      <![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Cosa significa questo?</a>]]></key>
     <key alias="nestedContentDeleteItem">Sei sicuro di voler eliminare questo oggetto?</key>
     <key alias="nestedContentDeleteAllItems">Sei sicuro di voler eliminare tutti gli oggetti?</key>
     <key alias="nestedContentEditorNotSupported">
@@ -1530,9 +1530,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
   </area>
   <area alias="rollback">
     <key alias="changes">Modifiche</key>
-    <key alias="created">Creato</key>
     <key alias="headline">Seleziona una versione da confrontare con la versione corrente</key>
-    <key alias="currentVersion"><![CDATA[Versione corrente]]></key>
     <key alias="diffHelp">
       <![CDATA[Qui vengono mostrate le differenze tra la versione corrente e la versione selezionata<br />Il testo <del>in rosso</del> non verrà mostrato nella versione selezionata, <ins>quello in verde verrà aggiunto</ins>]]></key>
     <key alias="documentRolledBack"><![CDATA[Il documento è stato riportato alla versione scelta.]]></key>
@@ -2321,8 +2319,8 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="stateInactive">Inattivi</key>
     <key alias="sortNameAscending">Nome (A-Z)</key>
     <key alias="sortNameDescending">Nome (Z-A)</key>
-    <key alias="sortCreateDateAscending"><![CDATA[Più nuovi]]></key>
-    <key alias="sortCreateDateDescending"><![CDATA[Più vecchi]]></key>
+    <key alias="sortCreateDateAscending"><![CDATA[Più vecchi]]></key>
+    <key alias="sortCreateDateDescending"><![CDATA[Più nuovi]]></key>
     <key alias="sortLastLoginDateDescending">Ultimo login</key>
     <key alias="noUserGroupsAdded">Non sono stati aggiunti gruppi di utenti</key>
   </area>
@@ -2528,7 +2526,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="helpText">
       <![CDATA[
         <p>L'health checker valuta varie aree del tuo sito per le impostazioni delle migliori pratiche, la configurazione, i potenziali problemi, ecc. Puoi facilmente risolvere i problemi premendo un pulsante.
-        Puoi aggiungere i tuoi health check personalizzati, guarda sulla <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">documentazione per più informazioni</a> riguardo i custom health checks.</p>
+        Puoi aggiungere i tuoi health check personalizzati, guarda sulla <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">documentazione per più informazioni</a> riguardo i custom health checks.</p>
         ]]>
     </key>
   </area>
@@ -2662,6 +2660,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="labelUsedByMemberTypes">Usato nei tipi di membro</key>
     <key alias="noMemberTypes">Non ci sono riferimenti a tipi di membro.</key>
     <key alias="usedByProperties">Usato da</key>
+    <key alias="labelUsedByItems">Correlato ai seguenti elementi</key>
     <key alias="labelUsedByDocuments">Usato nei documenti</key>
     <key alias="labelUsedByMembers">Usato nei membri</key>
     <key alias="labelUsedByMedia">Usato nei media</key>
@@ -2812,7 +2811,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="more"><![CDATA[Scopri di più]]></key>
     <key alias="bulletPointOne">
       <![CDATA[
-            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">nella documentazione</a> di Our Umbraco
+            Maggiori informazioni su come lavorare con gli elementi in Impostazioni <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">nella documentazione</a> di Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">

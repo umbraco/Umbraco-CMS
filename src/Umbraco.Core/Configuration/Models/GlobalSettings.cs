@@ -33,6 +33,7 @@ public class GlobalSettings
     internal const bool StaticSanitizeTinyMce = false;
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
     private const bool StaticForceCombineUrlPathLeftToRight = true;
+    private const bool StaticShowMaintenancePageWhenInUpgradeState = true;
 
     /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
@@ -82,8 +83,8 @@ public class GlobalSettings
     public string UmbracoPath
     {
         get => Constants.System.DefaultUmbracoPath;
-        [Obsolete($"{nameof(UmbracoPath)}  is no longer configurable, property setter is scheduled for removal in V12")]
-        // NOTE: when removing this, also clean up the hardcoded removal of UmbracoPath in UmbracoJsonSchemaGenerator
+        [Obsolete($"{nameof(UmbracoPath)} is no longer configurable, this property setter is scheduled for removal in V12.")]
+        // NOTE: When removing this, also clean up the hardcoded removal of UmbracoPath in Umbraco.JsonSchema
         set { }
     }
 
@@ -252,4 +253,7 @@ public class GlobalSettings
     /// </example>
     [DefaultValue(StaticForceCombineUrlPathLeftToRight)]
     public bool ForceCombineUrlPathLeftToRight { get; set; }  = StaticForceCombineUrlPathLeftToRight;
+
+    [DefaultValue(StaticShowMaintenancePageWhenInUpgradeState)]
+    public bool ShowMaintenancePageWhenInUpgradeState { get; set; } = StaticShowMaintenancePageWhenInUpgradeState;
 }

@@ -3,23 +3,26 @@
     <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
     <Title>Umbraco CMS - Integration tests</Title>
     <Description>Contains helper classes for integration tests with Umbraco CMS, including all internal integration tests.</Description>
+    <IsPackable>true</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
+    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="Moq" Version="4.18.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" PrivateAssets="all" />
   </ItemGroup>
 
-  <Import Project="..\..\src\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
-  <Import Project="..\..\src\Umbraco.Cms\buildTransitive\Umbraco.Cms.targets" />
+  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
+  <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
+
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 

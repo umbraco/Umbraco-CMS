@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Persistence.SqlServer;
 
 // ReSharper disable ConvertToUsingDeclaration
 namespace Umbraco.Cms.Tests.Integration.Testing;
@@ -89,7 +89,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
 
                 var sql = $@"
                         ALTER DATABASE {LocalDb.QuotedName(meta.Name)}
-                        SET SINGLE_USER 
+                        SET SINGLE_USER
                         WITH ROLLBACK IMMEDIATE";
                 SetCommand(command, sql);
                 command.ExecuteNonQuery();

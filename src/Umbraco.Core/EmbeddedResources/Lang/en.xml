@@ -2,7 +2,7 @@
 <language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Culture and Hostnames</key>
@@ -90,7 +90,8 @@
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
-    <key alias="addNew">Add new Domain</key>
+    <key alias="addNew">Add new domain</key>
+    <key alias="addCurrent">Add current domain</key>
     <key alias="remove">remove</key>
     <key alias="invalidNode">Invalid node.</key>
     <key alias="invalidDomain">One or more domains have an invalid format.</key>
@@ -273,7 +274,7 @@
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
     <key alias="scheduledPublishDocumentation">
-      <![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
+      <![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested
       Content.
@@ -345,6 +346,7 @@
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
+    <key alias="2fa">Two-Factor Authentication</key>
   </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>
@@ -392,7 +394,7 @@
     </key>
     <key alias="elementType">Element Type</key>
     <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block
-      List' or 'Nested Content' property editor.
+      List' or 'Block Grid' property editor.
     </key>
     <key alias="composition">Composition</key>
     <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of
@@ -602,6 +604,7 @@
     <key alias="healthStatusDescription">The health status of the index and if it can be read</key>
     <key alias="indexers">Indexers</key>
     <key alias="indexInfo">Index info</key>
+    <key alias="contentInIndex">Content in index</key>
     <key alias="indexInfoDescription">Lists the properties of the index</key>
     <key alias="manageIndexes">Manage Examine's indexes</key>
     <key alias="manageIndexesDescription">Allows you to view the details of each index and provides some tools for
@@ -625,6 +628,8 @@
     </key>
     <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">No results were found</key>
+    <key alias="searchResultsFound">Showing %0% - %1% of %2% result(s) - Page %3% of %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -827,6 +832,7 @@
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="scheduledPublishing">Scheduled Publishing</key>
+    <key alias="umbracoInfo">Umbraco info</key>
     <key alias="search">Search</key>
     <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
@@ -874,6 +880,8 @@
     <key alias="header">Header</key>
     <key alias="systemField">system field</key>
     <key alias="lastUpdated">Last Updated</key>
+    <key alias="skipToMenu">Skip to menu</key>
+    <key alias="skipToContent">Skip to content</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1300,9 +1308,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="installInstructions">Install instructions</key>
     <key alias="noConfigurationView">This package has no configuration view</key>
     <key alias="noPackagesCreated">No packages have been created yet</key>
-    <key alias="noPackages">You don’t have any packages installed</key>
+    <key alias="noPackages">No packages have been installed</key>
     <key alias="noPackagesDescription">
-      <![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
+      <![CDATA[Browse through the available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
     <key alias="packageContent">Package Content</key>
     <key alias="packageLicense">License</key>
     <key alias="packageSearch">Search for packages</key>
@@ -1325,7 +1333,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageLikes">Likes</key>
     <key alias="packageCompatibility">Compatibility</key>
     <key alias="packageCompatibilityDescription">This package is compatible with the following versions of Umbraco, as
-      reported by community members. Full compatability cannot be guaranteed for versions reported below 100%
+      reported by community members. Full compatibility cannot be guaranteed for versions reported below 100%
     </key>
     <key alias="packageExternalSources">External sources</key>
     <key alias="packageAuthor">Author</key>
@@ -1452,7 +1460,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="created">Created</key>
     <key alias="currentVersion">Current version</key>
     <key alias="diffHelp">
-      <![CDATA[This shows the differences between the current version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
+      <![CDATA[This shows the differences between the current (draft) version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
+    <key alias="noDiff">There are no differences between the current (draft) version and the selected version</key>
     <key alias="documentRolledBack">Document has been rolled back</key>
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2
@@ -1477,6 +1486,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="member">Members</key>
     <key alias="newsletters">Newsletters</key>
     <key alias="packages">Packages</key>
+    <key alias="marketplace">Marketplace</key>
     <key alias="settings">Settings</key>
     <key alias="statistics">Statistics</key>
     <key alias="translation">Translation</key>
@@ -1534,7 +1544,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>
-    <key alias="contentTypePropertyTypeDeleted">Propertytype deleted</key>
+    <key alias="contentTypePropertyTypeDeleted">Property type deleted</key>
     <key alias="contentTypeSavedHeader">Document Type saved</key>
     <key alias="contentTypeTabCreated">Tab created</key>
     <key alias="contentTypeTabDeleted">Tab deleted</key>
@@ -1853,9 +1863,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowVaryBySegment">Allow segmentation</key>
     <key alias="elementType">Element Type</key>
     <key alias="elementHeading">Is an Element Type</key>
-    <key alias="elementDescription">An Element Type is meant to be used for instance in Nested Content, and not in the
-      tree.
-    </key>
+    <key alias="elementDescription">An Element Type is meant to be used within other Document Types, and not in the Content
+      tree.</key>
     <key alias="elementCannotToggle">A document Type cannot be changed to an Element Type once it has been used to
       create one or more content items.
     </key>
@@ -2049,6 +2058,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="disabled">Disable User</key>
     <key alias="documentType">Document Type</key>
     <key alias="editors">Editor</key>
+    <key alias="emailRequired">Required - enter an email address for this user</key>
     <key alias="excerptField">Excerpt field</key>
     <key alias="failedPasswordAttempts">Failed login attempts</key>
     <key alias="goToProfile">Go to user profile</key>
@@ -2068,6 +2078,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="mediastartnodes">Media start nodes</key>
     <key alias="mediastartnodeshelp">Limit the media library to specific start nodes</key>
     <key alias="modules">Sections</key>
+    <key alias="nameRequired">Required - enter a name for this user</key>
     <key alias="noConsole">Disable Umbraco Access</key>
     <key alias="noLogin">has not logged in yet</key>
     <key alias="oldPassword">Old password</key>
@@ -2237,8 +2248,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="stateInactive">Inactive</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
     <key alias="sortNameDescending">Name (Z-A)</key>
-    <key alias="sortCreateDateAscending">Newest</key>
-    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortCreateDateAscending">Oldest</key>
+    <key alias="sortCreateDateDescending">Newest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
     <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
@@ -2275,6 +2286,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="customValidation">Custom validation</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
+    <key alias="entriesAreasMismatch">The content amount requirements are not met for one or more areas.</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
@@ -2343,9 +2355,19 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       <![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
     <key alias="hSTSCheckHeaderNotFound">
       <![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
-    <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
+    <key alias="hSTSCheckHeaderFoundOnLocalhost">
+      <![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found. <strong>This header should not be present on localhost.</strong>]]>
+    </key>
+    <key alias="hSTSCheckHeaderNotFoundOnLocalhost">
+      <![CDATA[The header <strong>Strict-Transport-Security</strong> was not found. This header should not be present on localhost.]]>
+    </key>
+    <key alias="xssProtectionCheckHeaderFound">
+      <![CDATA[The header <strong>X-XSS-Protection</strong> was found. <strong>It is recommended not to add this header to your website</strong>.<br />
+    You can read about this on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection" target="_blank" rel="noopener" class="btn-link -underline">Mozilla</a> website ]]>
+    </key>
     <key alias="xssProtectionCheckHeaderNotFound">
-      <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
+      <![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]>
+    </key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
@@ -2374,7 +2396,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="helpText">
       <![CDATA[
         <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-        You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        You can add your own health checks, have a look at <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
         ]]>
     </key>
   </area>
@@ -2663,7 +2685,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="more">Find out more</key>
     <key alias="bulletPointOne">
       <![CDATA[
-        Read more about working with the items in Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">in the Documentation section</a> of Our Umbraco
+        Read more about working with the items in Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">in the Documentation section</a> of Our Umbraco
     ]]>
     </key>
     <key alias="bulletPointTwo">
@@ -2709,7 +2731,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelcreateNewElementType">Create new Element Type</key>
     <key alias="labelCustomStylesheet">Custom stylesheet</key>
     <key alias="addCustomStylesheet">Add stylesheet</key>
-    <key alias="headlineEditorAppearance">Editor appearance</key>
+    <key alias="headlineEditorAppearance">Block appearance</key>
     <key alias="headlineDataModels">Data models</key>
     <key alias="headlineCatalogueAppearance">Catalogue appearance</key>
     <key alias="labelBackgroundColor">Background color</key>
@@ -2732,6 +2754,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmDeleteBlockTypeNotice">The content of this block will still be present, editing of this content
       will no longer be available and will be shown as unsupported content.
     </key>
+    <key alias="confirmDeleteBlockGroupMessage">
+      <![CDATA[Are you sure you want to delete group <strong>%0%</strong> and all the Block configurations of this?]]></key>
+    <key alias="confirmDeleteBlockGroupNotice">The content of these Blocks will still be present, editing of this content
+      will no longer be available and will be shown as unsupported content.
+    </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
     <key alias="elementTypeDoesNotExist">Cannot be edited cause ElementType does not exist.</key>
     <key alias="thumbnail">Thumbnail</key>
@@ -2740,7 +2767,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabClipboard">Clipboard</key>
     <key alias="tabBlockSettings">Settings</key>
     <key alias="headlineAdvanced">Advanced</key>
-    <key alias="forceHideContentEditor">Force hide content editor</key>
+    <key alias="forceHideContentEditor">Hide content editor</key>
+    <key alias="forceHideContentEditorHelp">Hide the content edit button and the content editor from the Block Editor overlay.</key>
+    <key alias="girdInlineEditing">Inline editing</key>
+    <key alias="girdInlineEditingHelp">Enables inline editing for the first Property. Additional properties can be edited in the overlay.</key>
     <key alias="blockHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
     <key alias="confirmCancelBlockCreationHeadline">Discard creation?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
@@ -2749,6 +2779,66 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addBlock">Add content</key>
     <key alias="addThis">Add %0%</key>
     <key alias="propertyEditorNotSupported">Property '%0%' uses editor '%1%' which is not supported in blocks.</key>
+    <key alias="focusParentBlock">Set focus on the container block</key>
+    <key alias="areaIdentification">Identification</key>
+    <key alias="areaValidation">Validation</key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> must be present at least <strong>%2%</strong> time(s).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> must maximum be present <strong>%3%</strong> time(s).]]></key>
+    <key alias="areaNumberOfBlocks">Number of blocks</key>
+    <key alias="areaDisallowAllBlocks">Only allow specific block types</key>
+    <key alias="areaAllowedBlocks">Allowed block types</key>
+    <key alias="areaAllowedBlocksHelp">Define the types of blocks that are allowed in this area, and optionally how many of each type that should be present.</key>
+    <key alias="confirmDeleteBlockAreaMessage">Are you sure you want to delete this area?</key>
+    <key alias="confirmDeleteBlockAreaNotice">Any blocks currently created within this area will be deleted.</key>
+    <key alias="layoutOptions">Layout options</key>
+    <key alias="structuralOptions">Structural</key>
+    <key alias="sizeOptions">Size options</key>
+    <key alias="sizeOptionsHelp">Define one or more size options, this enables resizing of the Block</key>
+    <key alias="allowedBlockColumns">Available column spans</key>
+    <key alias="allowedBlockColumnsHelp">Define the different number of columns this block is allowed to span across. This does not prevent Blocks from being placed in Areas with a smaller column span.</key>
+    <key alias="allowedBlockRows">Available row spans</key>
+    <key alias="allowedBlockRowsHelp">Define the range of layout rows this block is allowed to span across.</key>
+    <key alias="allowBlockInRoot">Allow in root</key>
+    <key alias="allowBlockInRootHelp">Make this block available in the root of the layout.</key>
+    <key alias="allowBlockInAreas">Allow in areas</key>
+    <key alias="allowBlockInAreasHelp">Make this block available by default within the areas of other Blocks (unless explicit permissions are set for these areas).</key>
+    <key alias="areaAllowedBlocksEmpty">By default, all block types are allowed in an Area, Use this option to allow only selected types.</key>
+    <key alias="areas">Areas</key>
+    <key alias="areasLayoutColumns">Grid Columns for Areas</key>
+    <key alias="areasLayoutColumnsHelp">Define how many columns that will be available for areas. If not defined, the number of columns defined for the entire layout will be used.</key>
+    <key alias="areasConfigurations">Areas</key>
+    <key alias="areasConfigurationsHelp">To enable the nesting of blocks within this block, define one or more areas. Areas follow the layout defined by their own grid column configuration. The 'column span' and 'row span' for each area can be adjusted by using the scale-handler box in the bottom right hand corner of the selected area.</key>
+    <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is not allowed at this spot.]]></key>
+    <key alias="defaultLayoutStylesheet">Default layout stylesheet</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Disallowed content was rejected</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[The inserted content contained disallowed content, which has not been created. Would you like to keep the rest of this content anyway?]]></key>
+    <key alias="areaAliasHelp">
+      <![CDATA[When using GetBlockGridHTML() to render the Block Grid, the alias will be rendered in the markup as a 'data-area-alias' attribute. Use the alias attribute to target the element for the area. Example. .umb-block-grid__area[data-area-alias="MyAreaAlias"] { ... }]]></key>
+    <key alias="scaleHandlerButtonTitle">Drag to scale</key>
+    <key alias="areaCreateLabelTitle">Create Button Label</key>
+    <key alias="areaCreateLabelHelp">Override the label text for adding a new Block to this Area, Example: 'Add Widget'</key>
+    <key alias="showSizeOptions">Show resize options</key>
+    <key alias="addBlockType">Add Block</key>
+    <key alias="addBlockGroup">Add group</key>
+    <key alias="pickSpecificAllowance">Pick group or Block</key>
+    <key alias="allowanceMinimum">Set a minimum requirement</key>
+    <key alias="allowanceMaximum">Set a maximum requirement</key>
+    <key alias="block">Block</key>
+    <key alias="tabBlock">Block</key>
+    <key alias="tabBlockTypeSettings">Settings</key>
+    <key alias="tabAreas">Areas</key>
+    <key alias="tabAdvanced">Advanced</key>
+    <key alias="headlineAllowance">Permissions</key>
+    <key alias="getSampleHeadline">Install Sample Configuration</key>
+    <key alias="getSampleDescription"><![CDATA[This will add basic Blocks and help you get started with the Block Grid Editor. You'll get Blocks for Headline, Rich Text, Image, as well as a Two Column Layout. ]]></key>
+    <key alias="getSampleButton">Install</key>
+    <key alias="actionEnterSortMode">Sort mode</key>
+    <key alias="actionExitSortMode">End sort mode</key>
+    <key alias="areaAliasIsNotUnique">This Areas Alias must be unique compared to the other Areas of this Block.</key>
+    <key alias="configureArea">Configure area</key>
+    <key alias="deleteArea">Delete area</key>
+    <key alias="addColumnSpanOption">Add spanning %0% columns option</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

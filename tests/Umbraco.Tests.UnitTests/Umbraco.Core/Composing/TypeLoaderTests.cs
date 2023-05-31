@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -174,7 +173,7 @@ public class TypeLoaderTests
     public void GetDataEditors()
     {
         var types = _typeLoader.GetDataEditors();
-        Assert.AreEqual(41, types.Count());
+        Assert.AreEqual(42, types.Count());
     }
 
     /// <summary>

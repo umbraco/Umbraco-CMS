@@ -4,11 +4,10 @@
     <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
-  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.props" />
-  <Import Project="..\Umbraco.Cms\buildTransitive\Umbraco.Cms.targets" />
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
+  <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms\Umbraco.Cms.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

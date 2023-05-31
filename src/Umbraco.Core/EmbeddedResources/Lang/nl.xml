@@ -2,7 +2,7 @@
 <language alias="nl" intName="Dutch" localName="Nederlands" lcid="19" culture="nl-NL">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Beheer domeinnamen</key>
@@ -274,7 +274,7 @@
     <key alias="target" version="7.0">Doel</key>
     <key alias="scheduledPublishServerTime">Dit betekend de volgende tijd op de server:</key>
     <key alias="scheduledPublishDocumentation">
-      <![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Wat houd dit in?</a>]]></key>
+      <![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Wat houd dit in?</a>]]></key>
     <key alias="nestedContentDeleteItem">Ben je er zeker van dat je dit item wilt verwijderen?</key>
     <key alias="nestedContentDeleteAllItems">Ben je zeker dat je alle items wilt verwijderen?</key>
     <key alias="nestedContentEditorNotSupported">Eigenschap %0% gebruikt editor %1% welke niet wordt ondersteund door
@@ -2059,8 +2059,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="stateInactive">Inactief</key>
     <key alias="sortNameAscending">Naam (A-Z)</key>
     <key alias="sortNameDescending">Naam (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nieuwste</key>
-    <key alias="sortCreateDateDescending">Oudste</key>
+    <key alias="sortCreateDateAscending">Oudste</key>
+    <key alias="sortCreateDateDescending">Nieuwste</key>
     <key alias="sortLastLoginDateDescending">Laatste login</key>
     <key alias="noUserGroupsAdded">Er zijn geen gebruikersgroepen toegevoegd</key>
   </area>
@@ -2177,7 +2177,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="helpText">
       <![CDATA[
     <p>De health checker evalueert verschillende delen van de website voor best practice instellingen, configuratie, mogelijke problemen, enzovoort. U kunt problemen eenvoudig oplossen met een druk op de knop.
-    U kunt uw eigen health checks toevoegen, kijk even naar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">de documentatie voor meer informatie</a> over aangepaste health checks.</p>
+    U kunt uw eigen health checks toevoegen, kijk even naar <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">de documentatie voor meer informatie</a> over aangepaste health checks.</p>
     ]]>
     </key>
   </area>
@@ -2432,7 +2432,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="more">Meer te weten komen</key>
     <key alias="bulletPointOne">
       <![CDATA[
-            Lees meer over het werken met de items in de sectie Instellingen <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">in het Documentatiegedeelte</a> van Our Umbraco
+            Lees meer over het werken met de items in de sectie Instellingen <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">in het Documentatiegedeelte</a> van Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
@@ -2520,6 +2520,61 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in
       blokken.
     </key>
+    <key alias="focusParentBlock">Geef focus aan het container blok</key>
+    <key alias="areaIdentification">Identificatie</key>
+    <key alias="areaValidation">Validatie</key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> moet minimaal <strong>%2%</strong> keer aanwezig zijn.]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong>mag maximaal <strong>%3%</strong> keer aanwezig zijn.]]></key>
+    <key alias="areaNumberOfBlocks">Hoeveelheid blokken</key>
+    <key alias="areaDisallowAllBlocks">Sta alleen specifiek bloktype toe</key>
+    <key alias="areaAllowedBlocks">Toegestane bloktypes</key>
+    <key alias="areaAllowedBlocksHelp">Definieer de type blokken die zijn toegestaan in dit gebied, en optioneel hoeveel van ieder type aanwezig moet zijn.</key>
+    <key alias="confirmDeleteBlockAreaMessage">Weet je zeker dat je dit gebied wilt verwijderen?</key>
+    <key alias="confirmDeleteBlockAreaNotice">Alle blokken op dit moment aangemaakt binnen dit gebied zullen worden verwijderd.</key>
+    <key alias="layoutOptions">Lay-out opties</key>
+    <key alias="structuralOptions">Structuur</key>
+    <key alias="sizeOptions">Afmetingen</key>
+    <key alias="sizeOptionsHelp">Definiëer een of meer afmetingen, dit maakt het mogelijk blokken te vergroten/verkleinen</key>
+    <key alias="allowedBlockColumns">Beschikbare kolommen</key>
+    <key alias="allowedBlockColumnsHelp">Definieer de verschillende aantal kolombreedtes dat dit blok mag in nemen. Dit voorkomt niet dat blokken in gebieden met kleine kolombreedtes kan worden geplaatst.</key>
+    <key alias="allowedBlockRows">Beschikbare rijen</key>
+    <key alias="allowedBlockRowsHelp">Definiëer de verschillende aantal rijen dat dit blok mag innemen.</key>
+    <key alias="allowBlockInRoot">Sta toe in root</key>
+    <key alias="allowBlockInRootHelp">Maak dit blok beschikbaar in de root van de lay-out</key>
+    <key alias="allowBlockInAreas">Sta toe in gebieden</key>
+    <key alias="block">Blok</key>
+    <key alias="tabBlock">Blokken</key>
+    <key alias="tabBlockTypeSettings">Instellingen</key>
+    <key alias="allowBlockInAreasHelp">Maak dit blok standaard beschikbaar binnen de gebieden van andere blokken (behalve wanneer expliciete rechten zijn gezet voor deze gebieden).</key>
+    <key alias="areaAllowedBlocksEmpty">Indien leeg kunnen alle blokken toegestaand in gebieden worden toegevoegd. </key>
+    <key alias="areasLayoutColumns">Grid Kolommen voor Gebieden.</key>
+    <key alias="areasLayoutColumnsHelp">Definiëer hoeveel kolommen beschikbaar zijn in gebiede. Indien niet gedefinieerd wordt het aantal kolommen gedefinieerd voor de gehele lay-out gebruikt.</key>
+    <key alias="areasConfigurations">Gebieden</key>
+    <key alias="areasConfigurationsHelp">Om het nesten van blokken binnen-in dit blok toe te staan, definieer een of meer gebieden voor blokken om binnenin te nesten. Gebieden volgen hun eigen lay-out welke gedefinieerd is bij de Grid Kolommen voor Gebieden. Elk Gebied kolombreedte can worden gewijzigd door het gebruik van de schaal in de hoek rechtsonderin </key>
+    <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is niet toegestaan op deze locatie.]]></key>
+    <key alias="defaultLayoutStylesheet">Standaard lay-out stylesheet</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Niet-toegestane content is geweigerd</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[De toegevoegde content bevat niet-toegestaande content, welke niet is aangemaakt. Wil je de rest van de content bewaren?]]></key>
+    <key alias="scaleHandlerButtonTitle">Sleep om te vergroten/verkleinen</key>
+    <key alias="areaCreateLabelTitle">Maak Button Label</key>
+    <key alias="areaCreateLabelHelp">Overschrijf het label van de create button van dit Gebied.</key>
+    <key alias="showSizeOptions">Toon vergroot/verklein opties</key>
+    <key alias="addBlockType">Voeg Blok toe</key>
+    <key alias="addBlockGroup">Voeg groep toep</key>
+    <key alias="pickSpecificAllowance">Selecteer groep of Blok</key>
+    <key alias="allowanceMinimum">Zet een minimale vereiste</key>
+    <key alias="areas">Gebieden</key>
+    <key alias="tabAreas">Gebieden</key>
+    <key alias="tabAdvanced">Geadvanceerd</key>
+    <key alias="headlineAllowance">Rechten</key>
+    <key alias="getSampleHeadline">Installeer Voorbeeld Configuratie</key>
+    <key alias="getSampleButton">Installeer</key>
+    <key alias="actionEnterSortMode">Sorteer mode</key>
+    <key alias="actionExitSortMode">Sluit sorteer mode</key>
+    <key alias="areaAliasIsNotUnique">Dit Gebieds' Alias moet uniek zijn ten opzichte van andere Gebieden in dit Blok.</key>
+    <key alias="configureArea">Configureer gebied</key>
+    <key alias="deleteArea">Verwijder gebied</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Wat zijn Inhoudssjablonen?</key>

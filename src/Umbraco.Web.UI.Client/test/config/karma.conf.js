@@ -79,6 +79,9 @@ module.exports = function (config) {
     // CLI --runner-port 9100
     runnerPort: 9100,
 
+    // Add support for new DNS resolution in Node 17+
+    listenAddress: '::',
+
     // enable / disable colors in the output (reporters and logs)
     // CLI --colors --no-colors
     colors: true,

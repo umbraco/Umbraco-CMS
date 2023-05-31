@@ -6,7 +6,7 @@
   </p>
 
   <form
-    name="myForm"
+    name="installerForm"
     class="form-horizontal -no-margin-bottom"
     novalidate
     ng-submit="validateAndForward();"
@@ -165,8 +165,8 @@
         <button class="btn btn-info" ng-click="restart()">Go back</button>
         <button
           class="btn btn-success"
-          ng-disabled="myForm.$invalid || checking"
-          ng-class="{disabled:myForm.$invalid}"
+          ng-disabled="installerForm.$invalid || checking"
+          ng-class="{disabled:installerForm.$invalid}"
         >
           Install
         </button>

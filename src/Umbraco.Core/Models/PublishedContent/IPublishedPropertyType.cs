@@ -52,6 +52,11 @@ public interface IPublishedPropertyType
     PropertyCacheLevel CacheLevel { get; }
 
     /// <summary>
+    ///     Gets the property cache level for Delivery API representation.
+    /// </summary>
+    PropertyCacheLevel DeliveryApiCacheLevel { get; }
+
+    /// <summary>
     ///     Gets the property model CLR type.
     /// </summary>
     /// <remarks>
@@ -109,4 +114,14 @@ public interface IPublishedPropertyType
     ///     <para>The XPath value can be either a string or an XPathNavigator.</para>
     /// </remarks>
     object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+
+    /// <summary>
+    ///     Converts the intermediate value into the object value for Delivery API representation.
+    /// </summary>
+    /// <param name="owner">The published element owning the property.</param>
+    /// <param name="referenceCacheLevel">The reference cache level.</param>
+    /// <param name="inter">The intermediate value.</param>
+    /// <param name="preview">A value indicating whether content should be considered draft.</param>
+    /// <returns>The object value.</returns>
+    object? ConvertInterToDeliveryApiObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 }

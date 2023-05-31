@@ -1,6 +1,6 @@
-﻿<div data-element="editor-header" class="umb-editor-header" ng-class="{'-split-view-active': splitViewOpen === true}">
-    <umb-loader ng-show="loading"></umb-loader>
-    <div class="flex items-center" style="height: 100%;" ng-hide="loading">
+<div data-element="editor-header" class="umb-editor-header" ng-class="{'-split-view-active': splitViewOpen === true}">
+    <umb-loader ng-show="initializing || loading"></umb-loader>
+    <div class="flex items-center" style="height: 100%;" ng-hide="initializing">
 
         <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
             <button type="button" class="umb-editor-header__back" ng-click="goBack()">

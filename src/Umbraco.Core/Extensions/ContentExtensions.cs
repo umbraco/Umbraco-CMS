@@ -269,11 +269,17 @@ public static class ContentExtensions
     /// </summary>
     /// <param name="content"><see cref="IContent" /> to retrieve ancestors for</param>
     /// <returns>An Enumerable list of integer ids</returns>
-    public static IEnumerable<int>? GetAncestorIds(this IContent content) =>
-        content.Path?.Split(Constants.CharArrays.Comma)
+    public static IEnumerable<int>? GetAncestorIds(this IContent content)
+    {
+        if (string.IsNullOrWhiteSpace(content.Path))
+        {
+            return null;
+        }
+
+        return content.Path.Split(Constants.CharArrays.Comma)
             .Where(x => x != Constants.System.RootString && x != content.Id.ToString(CultureInfo.InvariantCulture))
-            .Select(s =>
-                int.Parse(s, CultureInfo.InvariantCulture));
+            .Select(s => int.Parse(s, CultureInfo.InvariantCulture));
+    }
 
     #endregion
 

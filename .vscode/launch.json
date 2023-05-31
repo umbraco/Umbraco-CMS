@@ -8,7 +8,6 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Dotnet build",
             "program": "dotnet",
             "args": ["run"],
             "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",

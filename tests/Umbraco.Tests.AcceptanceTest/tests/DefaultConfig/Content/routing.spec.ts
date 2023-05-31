@@ -11,10 +11,8 @@ test.describe('Routing', () => {
   const grandChildNodeName = "Grandchild";
   const rootDocTypeName = "Test document type";
 
-  test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -23,7 +21,6 @@ test.describe('Routing', () => {
   });
 
   test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.login();
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
     await umbracoApi.languages.ensureCultureNotExists(danishCulture);

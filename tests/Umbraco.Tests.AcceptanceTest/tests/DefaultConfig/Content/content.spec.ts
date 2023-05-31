@@ -10,13 +10,22 @@ import {
 
 test.describe('Content tests', () => {
 
-  test.beforeEach(async ({page, umbracoApi}) => {
-    // TODO: REMOVE THIS WHEN SQLITE IS FIXED
-    // Wait so we don't bombard the API
-    await page.waitForTimeout(1000);
+  test.beforeEach(async ({ page, umbracoApi }, testInfo) => {
+    await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
   });
-  
+
+  const rootDocTypeName = "Test document type";
+  const childDocTypeName = "Child test document type";
+  const firstRootNodeName = "1) Home";
+  const secondRootNodeName = "2) Home";
+  const firstChildNodeName = "1) Child";
+  const secondChildNodeName = "2) Child";
+  const saveNode = "saveNew";
+  const defaultContentAlias = "alias";
+  const homeNodeName = "Home";
+  const aliasText = "text";
+
   async function createSimpleMacro(name, umbracoApi: ApiHelpers){
     const insertMacro = new PartialViewMacroBuilder()
       .withName(name)
@@ -35,11 +44,6 @@ test.describe('Content tests', () => {
   }
 
   test('Copy content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const childDocTypeName = "Child test document type";
-    const firstRootNodeName = "1) Home";
-    const childNodeName = "1) Child";
-    const secondRootNodeName = "2) Home";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -59,10 +63,9 @@ test.describe('Content tests', () => {
 
     const createdRootDocType = await umbracoApi.documentTypes.save(rootDocType);
 
-    // TODO: Make some constants for actions.
     const rootContentNode = new ContentBuilder()
       .withContentTypeAlias(createdRootDocType.alias)
-      .withAction("saveNew")
+      .withAction(saveNode)
       .addVariant()
         .withName(firstRootNodeName)
         .withSave(true)  // We should probably just default to true...
@@ -73,7 +76,7 @@ test.describe('Content tests', () => {
 
     const secondRootNode = new ContentBuilder()
       .withContentTypeAlias(createdRootDocType.alias)
-      .withAction("saveNew")
+      .withAction(saveNode)
       .addVariant()
         .withName(secondRootNodeName)
         .withSave(true)
@@ -84,10 +87,10 @@ test.describe('Content tests', () => {
 
     const childContentNode = new ContentBuilder()
       .withContentTypeAlias(createdChildDocType.alias)
-      .withAction("saveNew")
+      .withAction(saveNode)
       .withParent(savedRootNode.id)
       .addVariant()
-        .withName(childNodeName)
+      .withName(firstChildNodeName)
         .withSave(true)
       .done()
       .build();
@@ -96,7 +99,7 @@ test.describe('Content tests', () => {
 
     await umbracoUi.refreshContentTree();
 
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [firstRootNodeName, childNodeName]), {button: "right", force: true})
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, firstChildNodeName]), {button: "right", force: true})
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.copy))
     await page.locator('.umb-pane [data-element="tree-item-' + secondRootNodeName + '"]').click();
     await page.locator('.umb-dialog-footer > .btn-primary').click();
@@ -107,11 +110,6 @@ test.describe('Content tests', () => {
   });
 
   test('Move content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const childDocTypeName = "Child test document type";
-    const firstRootNodeName = "1) Home";
-    const childNodeName = "1) Child";
-    const secondRootNodeName = "2) Home";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -133,7 +131,7 @@ test.describe('Content tests', () => {
 
     const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(createdRootDocType.alias)
-        .withAction("saveNew")
+      .withAction(saveNode)
         .addVariant()
           .withName(firstRootNodeName)
           .withSave(true)  // We should probably just default to true...
@@ -144,7 +142,7 @@ test.describe('Content tests', () => {
 
     const secondRootNode = new ContentBuilder()
         .withContentTypeAlias(createdRootDocType.alias)
-        .withAction("saveNew")
+      .withAction(saveNode)
         .addVariant()
           .withName(secondRootNodeName)
           .withSave(true)
@@ -155,10 +153,10 @@ test.describe('Content tests', () => {
 
     const childContentNode = new ContentBuilder()
         .withContentTypeAlias(createdChildDocType.alias)
-        .withAction("saveNew")
+      .withAction(saveNode)
         .withParent(savedRootNode.id)
         .addVariant()
-          .withName(childNodeName)
+        .withName(firstChildNodeName)
           .withSave(true)
         .done()
         .build();
@@ -167,7 +165,7 @@ test.describe('Content tests', () => {
 
     await umbracoUi.refreshContentTree();
 
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [firstRootNodeName, childNodeName]), { button: "right", force: true });
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName, firstChildNodeName]), { button: "right", force: true });
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.move))
     await page.locator('.umb-pane [data-element="tree-item-' + secondRootNodeName + '"]').click()
     await page.locator('[key="actions_move"]').click();
@@ -179,11 +177,6 @@ test.describe('Content tests', () => {
   });
 
   test('Sort content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const childDocTypeName = "Child test document type";
-    const rootNodeName = "1) Home";
-    const firstChildNodeName = "1) Child";
-    const secondChildNodeName = "2) Child";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -203,9 +196,9 @@ test.describe('Content tests', () => {
 
     const rootContentNode = new ContentBuilder()
         .withContentTypeAlias(createdRootDocType.alias)
-        .withAction("saveNew")
+        .withAction(saveNode)
         .addVariant()
-          .withName(rootNodeName)
+        .withName(firstRootNodeName)
           .withSave(true)
         .done()
         .build();
@@ -214,7 +207,7 @@ test.describe('Content tests', () => {
     // Add an item under root node
     const firstChildContentNode = new ContentBuilder()
         .withContentTypeAlias(createdChildDocType.alias)
-        .withAction("saveNew")
+        .withAction(saveNode)
         .withParent(createdRootContentNode.id)
         .addVariant()
           .withName(firstChildNodeName)
@@ -226,7 +219,7 @@ test.describe('Content tests', () => {
     // Add a second item under root node
     const secondChildContentNode = new ContentBuilder()
         .withContentTypeAlias(createdChildDocType.alias)
-        .withAction("saveNew")
+        .withAction(saveNode)
         .withParent(createdRootContentNode.id)
         .addVariant()
           .withName(secondChildNodeName)
@@ -236,7 +229,7 @@ test.describe('Content tests', () => {
     await umbracoApi.content.save(secondChildContentNode);
 
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [rootNodeName]), { button: "right", force: true });
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [firstRootNodeName]), { button: "right", force: true });
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction(ConstantHelper.actions.sort));
     // Drag'n'drop second child to be the first one.
     await page.locator('.ui-sortable-handle >> text=' + secondChildNodeName).hover();
@@ -256,9 +249,8 @@ test.describe('Content tests', () => {
   });
 
   test('Rollback content', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
+
     const initialNodeName = "Home node";
-    const newNodeName = "Home";
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -274,12 +266,13 @@ test.describe('Content tests', () => {
         .addVariant()
           .withName(initialNodeName)
           .withSave(true)
+          .withPublish(true)
         .done()
         .build();
     await umbracoApi.content.save(rootContentNode);
 
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [initialNodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [initialNodeName]));
 
     const header = await page.locator('#headerName')
     // Sadly playwright doesn't have a clear method for inputs :( 
@@ -287,26 +280,28 @@ test.describe('Content tests', () => {
     await header.click({ clickCount: 3 })
     await page.keyboard.press('Backspace');
 
-    await umbracoUi.setEditorHeaderName(newNodeName);
-    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+    await umbracoUi.setEditorHeaderName(homeNodeName);
+    await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
     await umbracoUi.isSuccessNotificationVisible();
+    await page.locator('span:has-text("×")').click();
 
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.rollback));
     // Not a very nice selector, but there's sadly no alternative :(
     await page.locator('.-selectable.cursor-pointer').first().click();
-    // Sadly can't use the button by label key here since there's another one in the DOM 
+    // Sadly can't use the button by label key here since there's another one in the DOM
+    const helpText = await page.locator('[key="rollback_diffHelp"]');
+    await expect(helpText).toBeVisible();
     await page.locator('[action="vm.rollback()"]').click();
 
     await umbracoUi.refreshContentTree();
-    await expect(page.locator('.umb-badge >> text=Save')).toBeVisible();
+    await expect(page.locator('.umb-badge >> text=Save')).toHaveCount(2);
     await expect(page.locator('.umb-badge >> text=RollBack')).toBeVisible();
-    const node = await umbracoUi.getTreeItem("content", [initialNodeName])
+    const node = await umbracoUi.getTreeItem(ConstantHelper.sections.content, [initialNodeName])
     await expect(node).toBeVisible();
   });
 
   test('View audit trail', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
+
     const labelName = "Name";
 
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -325,9 +320,9 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType)
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .addVariant()
-        .withName(nodeName)
+      .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -338,7 +333,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem('content', [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Navigate to Info app
     await page.locator(ConstantHelper.contentApps.info).click();
@@ -351,8 +346,7 @@ test.describe('Content tests', () => {
   });
 
   test('Save draft', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
+
     const expected = "Unpublished";
 
     await umbracoApi.content.deleteAllContent();
@@ -366,10 +360,10 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType);
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
-      .withAction("saveNew")
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
+      .withAction(saveNode)
       .addVariant()
-        .withName(nodeName)
+      .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -380,7 +374,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem('content', [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Assert
     await expect(page.locator('[data-element="node-info-status"]').locator('.umb-badge')).toContainText(expected);
@@ -390,8 +384,8 @@ test.describe('Content tests', () => {
   });  
 
   test('Preview draft', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
+
+    
 
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
@@ -404,10 +398,10 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType);
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
-      .withAction("saveNew")
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
+      .withAction(saveNode)
         .addVariant()
-        .withName(nodeName)
+        .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -418,7 +412,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem('content', [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Assert
     await expect(page.locator('[alias="preview"]')).toBeVisible();
@@ -430,8 +424,7 @@ test.describe('Content tests', () => {
   });  
 
   test('Publish draft', async ({ page, umbracoApi, umbracoUi }) => {
-    const rootDocTypeName = "Test document type";
-    const nodeName = "Home";
+
     const expected = "Published";
 
     await umbracoApi.content.deleteAllContent();
@@ -445,9 +438,9 @@ test.describe('Content tests', () => {
     const generatedRootDocType = await umbracoApi.documentTypes.save(rootDocType);
 
     const rootContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedRootDocType["alias"])
+      .withContentTypeAlias(generatedRootDocType[defaultContentAlias])
       .addVariant()
-        .withName(nodeName)
+      .withName(homeNodeName)
         .withSave(true)
       .done()
       .build();
@@ -458,7 +451,7 @@ test.describe('Content tests', () => {
     await umbracoUi.refreshContentTree();
 
     // Access node
-    await umbracoUi.clickElement(umbracoUi.getTreeItem('content', [nodeName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Assert
     await expect(page.locator('[data-element="node-info-status"]').locator('.umb-badge')).toContainText(expected);
@@ -473,6 +466,7 @@ test.describe('Content tests', () => {
     const pickedDocTypeName = 'Picked content document type';
     const pickedDocTypeAlias = AliasHelper.toAlias(pickedDocTypeName);
 
+
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(pickerDocTypeName);
     await umbracoApi.templates.ensureNameNotExists(pickerDocTypeName);
@@ -485,21 +479,21 @@ test.describe('Content tests', () => {
       .withAllowAsRoot(true)
       .addGroup()
       .addTextBoxProperty()
-      .withAlias('text')
+      .withAlias(aliasText)
       .done()
       .done()
       .build();
 
     const generatedType = await  umbracoApi.documentTypes.save(pickedDocType)
     const pickedContentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedType["alias"])
+      .withContentTypeAlias(generatedType[defaultContentAlias])
       .withAction("publishNew")
       .addVariant()
         .withName('Content to pick')
         .withSave(true)
         .withPublish(true)
       .addProperty()
-        .withAlias('text')
+      .withAlias(aliasText)
         .withValue('Acceptance test')
       .done()
       .withSave(true)
@@ -552,8 +546,9 @@ test.describe('Content tests', () => {
 
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
-    await umbracoUi.isSuccessNotificationVisible();
-
+    // Added additional time because it could fail on pipeline because it's not saving fast enough
+    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
+    
     // Assert
     const expectedContent = '<p>Acceptance test</p>'
     await expect(await umbracoApi.content.verifyRenderedContent('/contentpickercontent', expectedContent, true)).toBeTruthy();
@@ -587,7 +582,7 @@ test.describe('Content tests', () => {
       .withDefaultTemplate(alias)
       .addGroup()
         .addRichTextProperty()
-          .withAlias('text')
+        .withAlias(aliasText)
         .done()
       .done()
       .build();
@@ -595,8 +590,8 @@ test.describe('Content tests', () => {
     const generatedDocType = await umbracoApi.documentTypes.save(docType)
       // Might as wel initally create the content here, the less GUI work during the test the better
     const contentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedDocType["alias"])
-      .withAction('saveNew')
+      .withContentTypeAlias(generatedDocType[defaultContentAlias])
+      .withAction(saveNode)
         .addVariant()
           .withName(viewMacroName)
           .withSave(true)
@@ -621,10 +616,10 @@ test.describe('Content tests', () => {
 
     // Enter content
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [viewMacroName]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [viewMacroName]));
 
     // Insert macro
-    await page.locator('#mceu_13-button').click();
+    await page.locator('[title="Insert macro"]').click();
     await page.locator('.umb-card-grid-item', {hasText: viewMacroName}).click();
     // cy.get('.umb-card-grid-item').contains(viewMacroName).click();
 
@@ -633,7 +628,7 @@ test.describe('Content tests', () => {
     await umbracoUi.isSuccessNotificationVisible();
 
     // Ensure that the view gets rendered correctly
-    const expected = `<h1>Acceptance test</h1><p> </p>`;
+    const expected = `<p> </p><h1>Acceptance test</h1><p> </p>`;
     await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
 
     // Cleanup
@@ -663,10 +658,10 @@ test.describe('Content tests', () => {
       .build();
 
     const alias = AliasHelper.toAlias(name);
-    
+
     // Save grid and get the ID
     const dataType = await umbracoApi.dataTypes.save(grid)
-    
+
     // Create a document type using the data type
     const docType = new DocumentTypeBuilder()
       .withName(name)
@@ -682,7 +677,7 @@ test.describe('Content tests', () => {
 
     const generatedDocType = await umbracoApi.documentTypes.save(docType);
     const contentNode = new ContentBuilder()
-      .withContentTypeAlias(generatedDocType["alias"])
+      .withContentTypeAlias(generatedDocType[defaultContentAlias])
       .addVariant()
         .withName(name)
         .withSave(true)
@@ -690,7 +685,7 @@ test.describe('Content tests', () => {
       .build();
 
     await umbracoApi.content.save(contentNode);
-    
+
     // Ugly wait but we have to wait for cache to rebuild
     await page.waitForTimeout(1000);
 
@@ -704,7 +699,7 @@ test.describe('Content tests', () => {
     // Act
     // Enter content
     await umbracoUi.refreshContentTree();
-    await umbracoUi.clickElement(umbracoUi.getTreeItem("content", [name]));
+    await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [name]));
 
     // Click add
     await page.locator(':nth-child(2) > .preview-row > .preview-col > .preview-cell').click(); // Choose 1 column layout.
@@ -719,7 +714,7 @@ test.describe('Content tests', () => {
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
-    
+
     const expected = `
     <div class="umb-grid">
       <div class="grid-section">

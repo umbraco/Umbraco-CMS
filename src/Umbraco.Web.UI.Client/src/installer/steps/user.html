@@ -8,7 +8,7 @@
 
   <form
     class="-no-margin-bottom"
-    name="myForm"
+    name="installerForm"
     novalidate
     ng-submit="validateAndInstall();"
   >
@@ -101,11 +101,14 @@
           <div class="control-group">
             <label class="control-label" for="dbType">Database</label>
             <div class="controls -with-border">
-              <div class="input-readonly-text">
+              <div class="input-readonly-text" ng-if="installer.current.model.customInstallAvailable">
                 <strong>Provider:</strong>
                 {{installer.current.model.quickInstallSettings.displayName}}
                 <br /><strong>Name:</strong>
                 {{installer.current.model.quickInstallSettings.defaultDatabaseName}}
+              </div>
+              <div class="input-readonly-text" ng-if="!installer.current.model.customInstallAvailable">
+                A database has been pre-configured for your installation.
               </div>
             </div>
           </div>
@@ -137,7 +140,7 @@
       </div>
     </div>
 
-    <div class="control-actions" ng-class="{disabled:myForm.$invalid}">
+    <div class="control-actions" ng-class="{disabled:installerForm.$invalid}">
       <div
         class="controls-space-between"
         ng-if="installer.current.model.quickInstallSettings"
@@ -145,13 +148,13 @@
         <button
           ng-if="installer.current.model.quickInstallSettings && installer.current.model.customInstallAvailable"
           class="btn btn-info control-customize"
-          ng-disabled="myForm.$invalid"
+          ng-disabled="installerForm.$invalid"
           ng-click="validateAndForward()"
         >
           Change Database
         </button>
 
-        <button ng-disabled="myForm.$invalid" class="btn btn-success">
+        <button ng-disabled="installerForm.$invalid" class="btn btn-success">
           Install
         </button>
       </div>
@@ -159,7 +162,7 @@
       <button
         ng-if="!installer.current.model.quickInstallSettings"
         class="btn btn-primary control-customize"
-        ng-disabled="myForm.$invalid"
+        ng-disabled="installerForm.$invalid"
         ng-click="validateAndForward()"
       >
         Next

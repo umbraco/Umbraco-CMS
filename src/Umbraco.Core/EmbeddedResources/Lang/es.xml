@@ -2,7 +2,7 @@
 <language alias="es" intName="Spanish" localName="español" lcid="10" culture="es-ES">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Administrar dominios</key>
@@ -190,7 +190,7 @@
     <key alias="childItems" version="7.0">Nodos hijo</key>
     <key alias="target" version="7.0">Destino</key>
     <key alias="scheduledPublishServerTime">Esto se traduce en la siguiente hora en el servidor:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
     <key alias="nestedContentDeleteItem">¿Estás seguro que quieres eliminar este elemento?</key>
     <key alias="nestedContentEditorNotSupported">Propiedad %0% utiliza editor %1% que no está soportado por Nested Content.</key>
     <key alias="addTextBox">Añadir otra caja de texto</key>
@@ -346,6 +346,18 @@
     <key alias="account">Cuenta</key>
     <key alias="selectEditor">Selecciona editor</key>
     <key alias="selectSnippet">Selecciona snippet</key>
+  </area>
+  <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      Para importar un elemento del diccionario, busque el archivo ".udt" en su computadora haciendo clic en el
+      Botón "Importar" (se le pedirá confirmación en la siguiente pantalla)
+    </key>
+    <key alias="itemDoesNotExists">El elemento del diccionario no existe.</key>
+    <key alias="parentDoesNotExists">El elemento principal no existe.</key>
+    <key alias="noItems">No hay elementos del diccionario.</key>
+    <key alias="noItemsInFile">No hay elementos de diccionario en este archivo.</key>
+    <key alias="noItemsFound">No se encontraron elementos del diccionario.</key>
+    <key alias="createNew">Crear elemento de diccionario</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo</key>
@@ -898,7 +910,6 @@
     <key alias="reset">Reiniciar</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Versión actual</key>
     <key alias="diffHelp"><![CDATA[Esto muestra las diferencias entre la versión actual y la versión seleccionada<br /><del>Red</del> el texto de la versión seleccionada no se mostrará. , <ins>el verde significa añadido</ins>]]></key>
     <key alias="documentRolledBack">Se ha recuperado la última versión del documento.</key>
     <key alias="htmlHelp">Esto muestra la versión seleccionada como html, si deseas ver la diferencia entre 2 versiones al mismo tiempo, por favor usa la vista diff</key>

@@ -3,7 +3,7 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
   $scope.majorVersion = Umbraco.Sys.ServerVariables.application.version;
   $scope.passwordPattern = /.*/;
   $scope.installer.current.model.subscribeToNewsLetter = $scope.installer.current.model.subscribeToNewsLetter || false;
-  setTelemetryLevelAndDescription($scope.installer.current.model.telemetryIndex ?? 1);
+  setTelemetryLevelAndDescription($scope.installer.current.model.telemetryIndex ?? 2);
 
   if ($scope.installer.current.model.minNonAlphaNumericLength > 0) {
     var exp = "";
@@ -81,7 +81,7 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
   };
 
   $scope.validateAndForward = function () {
-    if (this.myForm.$valid) {
+    if (this.installerForm.$valid) {
       installerService.forward();
     }
   };

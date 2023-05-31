@@ -29,22 +29,14 @@ public class Language : EntityBase, ILanguage
         _cultureName = cultureName ?? throw new ArgumentNullException(nameof(cultureName));
     }
 
-    [Obsolete(
-        "Use the constructor not requiring global settings and accepting an explicit name instead, scheduled for removal in V11.")]
-    public Language(GlobalSettings globalSettings, string isoCode)
-    {
-        _isoCode = isoCode ?? throw new ArgumentNullException(nameof(isoCode));
-        _cultureName = CultureInfo.GetCultureInfo(isoCode).EnglishName;
-    }
-
-    /// <inheritdoc />
-    [DataMember]
-    public string IsoCode
-    {
-        get => _isoCode;
-        set
+        /// <inheritdoc />
+        [DataMember]
+        public string IsoCode
         {
-            ArgumentNullException.ThrowIfNull(value);
+            get => _isoCode;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
 
             SetPropertyValueAndDetectChanges(value, ref _isoCode!, nameof(IsoCode));
         }
@@ -82,6 +74,7 @@ public class Language : EntityBase, ILanguage
     }
 
     /// <inheritdoc />
+    [Obsolete("This will be replaced by fallback language ISO code in V13.")]
     public int? FallbackLanguageId
     {
         get => _fallbackLanguageId;

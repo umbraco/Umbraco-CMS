@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// <summary>
 ///     Represents the configuration for the nested content value editor.
 /// </summary>
+[Obsolete("Nested content is obsolete, will be removed in V13")]
 public class NestedContentConfiguration
 {
     [ConfigurationField("contentTypes", "Element Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the Element Types to use as models for the items.")]
