@@ -12,18 +12,11 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 		this.#templateWorkspaceContext.load(entityId);
 	}
 
-	@state()
-	private _name?: string | null = '';
-
-	@state()
-	private _content?: string | null = '';
-
 	#templateWorkspaceContext = new UmbTemplateWorkspaceContext(this);
 
 	#routerPath? = '';
 
 	#element = document.createElement('umb-template-workspace-edit');
-	#key = '';
 
 	@state()
 	_routes: UmbRoute[] = [
@@ -31,8 +24,8 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 			path: 'create/:parentKey',
 			component: () => this.#element,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
-				// const parentKey = info.match.params.parentKey;
-				this.#templateWorkspaceContext.createScaffold();
+				const parentKey = info.match.params.parentKey;
+				this.#templateWorkspaceContext.createScaffold(parentKey);
 			},
 		},
 		{

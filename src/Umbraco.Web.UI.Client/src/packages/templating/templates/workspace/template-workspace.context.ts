@@ -122,11 +122,19 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 		}
 	}
 
-	async createScaffold() {
+	async createScaffold(parentId: string | null = null) {
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data as any);
+		this.#data.next({ ...data, id: '', name: '', alias: '', $type: 'TemplateResponseModel' });
+		if (!parentId || parentId === 'root') return;
+		await this.setMasterTemplate(parentId);
+		const RegexString = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
+		const content = this.#data.value?.content ?? '';
+		const masterTemplateName = this.#masterTemplate.value?.name ?? '';
+		const string = content.replace(RegexString, `$1"${masterTemplateName}.cshtml"$3`) ?? '';
+
+		this.setContent(string);
 	}
 
 	public destroy() {
