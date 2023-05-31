@@ -23,6 +23,13 @@
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Extensions.DistributedCacheExtensions</Target>
+    <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
+    <Right>lib/net7.0/Umbraco.Infrastructure.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Core.Migrations.IMigrationPlanExecutor.Execute(Umbraco.Cms.Infrastructure.Migrations.MigrationPlan,System.String)</Target>
     <Left>lib/net7.0/Umbraco.Infrastructure.dll</Left>
