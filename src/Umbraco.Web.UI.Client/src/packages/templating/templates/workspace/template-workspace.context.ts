@@ -93,7 +93,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 			return null;
 		}
 
-		const { data } = await this.repository.requestItem([id]);
+		const { data } = await this.repository.requestItems([id]);
 		if (data) {
 			this.#masterTemplate.next(data[0]);
 			return data[0];
@@ -102,8 +102,6 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	}
 
 	public async save() {
-		console.log('save');
-
 		const template = this.#data.getValue();
 		const isNew = this.getIsNew();
 
@@ -115,7 +113,7 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 			});
 		}
 
-		if (isNew && template?.id) {
+		if (template?.id) {
 			await this.repository.save(template.id, {
 				name: template.name,
 				content: template.content,

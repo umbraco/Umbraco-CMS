@@ -38,6 +38,10 @@ export class UmbTemplateStore extends UmbStoreBase {
 		return this._data.getObservablePart((x) => x.find((y) => y.id === id));
 	}
 
+	items(uniques: string[]) {
+		return this._data.getObservablePart((x) => x.filter((y) => uniques.includes(y.id)));
+	}
+
 	/**
 	 * Removes templates in the store with the given uniques
 	 * @param {string[]} uniques

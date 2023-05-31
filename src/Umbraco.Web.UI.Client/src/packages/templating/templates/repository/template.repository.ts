@@ -1,5 +1,6 @@
 import type {
 	UmbDetailRepository,
+	UmbItemRepository,
 	UmbTreeDataSource,
 	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
@@ -9,6 +10,8 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import {
 	CreateTemplateRequestModel,
 	EntityTreeItemResponseModel,
+	ItemResponseModelBaseModel,
+	TemplateItemResponseModel,
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -16,11 +19,13 @@ import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './t
 import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
 import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
+import { Observable } from 'rxjs';
 
 export class UmbTemplateRepository
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
-		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>
+		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,
+		UmbItemRepository<TemplateItemResponseModel>
 {
 	#init;
 	#host: UmbControllerHostElement;
@@ -146,7 +151,7 @@ export class UmbTemplateRepository
 		return { data, error };
 	}
 
-	async requestItem(id: string[]) {
+	async requestItems(id: string[]) {
 		await this.#init;
 
 		if (!id) {
@@ -154,6 +159,11 @@ export class UmbTemplateRepository
 		}
 		const { data, error } = await this.#detailDataSource.getItem(id);
 		return { data, error };
+	}
+
+	async items(uniques: string[]) {
+		await this.#init;
+		return this.#store?.items(uniques);
 	}
 
 	async byId(id: string) {
