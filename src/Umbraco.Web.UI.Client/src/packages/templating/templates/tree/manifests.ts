@@ -19,9 +19,6 @@ const treeItem: ManifestTreeItem = {
 	conditions: {
 		entityTypes: [TEMPLATE_ROOT_ENTITY_TYPE, TEMPLATE_ENTITY_TYPE],
 	},
-	meta: {
-		icon: 'icon-layout',
-	},
 };
 
 export const manifests = [tree, treeItem];
