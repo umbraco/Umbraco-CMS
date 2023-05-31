@@ -53,11 +53,6 @@
     <Delete Files="$(_UmbracoCmsJsonSchemaReference)" />
   </Target>
 
-  <!-- Remove generated JSON package schema on clean -->
-  <Target Name="RemovePackageSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsPackageSchemaReference)')">
-    <Delete Files="$(_UmbracoCmsPackageSchemaReference)" />
-  </Target>
-
   <!-- Create and pack empty file to add TFM dependency -->
   <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
     <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
@@ -66,8 +61,14 @@
     </ItemGroup>
   </Target>
 
+  <!-- Generate JSON package schema on build (and before copying to project) -->
   <Target Name="GenerateUmbracoPackageSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')">
     <Message Text="Generating $(_UmbracoCmsPackageSchemaReference) because it doesn't exist" Importance="high" />
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\Umbraco.Web.UI.New.Client\dist-cms\umbraco-package-schema.json" DestinationFiles="$(_UmbracoCmsPackageSchemaReference)" />
+    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.New.Client" Command="npm run generate:jsonschema -- --out &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsPackageSchemaReference)&quot; tsconfig.json UmbracoPackage" />
+  </Target>
+
+  <!-- Remove generated JSON package schema on clean -->
+  <Target Name="RemovePackageSchema" AfterTargets="Clean" Condition="Exists('$(_UmbracoCmsPackageSchemaReference)')">
+    <Delete Files="$(_UmbracoCmsPackageSchemaReference)" />
   </Target>
 </Project>
