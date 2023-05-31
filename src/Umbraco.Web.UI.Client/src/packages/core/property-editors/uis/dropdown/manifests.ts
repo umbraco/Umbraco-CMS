@@ -15,12 +15,12 @@ export const manifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'multiple',
 					label: 'Enable multiple choice',
-					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'items',
 					label: 'Add options',
-					propertyEditorUI: 'Umb.PropertyEditorUi.MultipleTextString',
+					propertyEditorUi: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

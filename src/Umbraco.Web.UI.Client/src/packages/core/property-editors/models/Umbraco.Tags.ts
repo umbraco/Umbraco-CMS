@@ -12,13 +12,13 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'group',
 					label: 'Define a tag group',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
+					propertyEditorUi: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
 					alias: 'storageType',
 					label: 'Storage Type',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUi.Tags.StorageType',
+					propertyEditorUi: 'Umb.PropertyEditorUi.Tags.StorageType',
 				},
 			],
 			defaultData: [

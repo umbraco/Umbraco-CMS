@@ -38,7 +38,7 @@ export interface PropertyEditorConfigProperty {
 	label: string;
 	description?: string;
 	alias: string;
-	propertyEditorUI: string;
+	propertyEditorUi: string;
 	config?: Array<DataTypePropertyPresentationModel>;
 }
 

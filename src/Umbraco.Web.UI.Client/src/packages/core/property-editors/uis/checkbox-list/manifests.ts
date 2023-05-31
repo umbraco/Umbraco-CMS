@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'items',
 					label: 'Add option',
 					description: 'Add, remove or sort options for the list.',
-					propertyEditorUI: 'Umb.PropertyEditorUi.MultipleTextString',
+					propertyEditorUi: 'Umb.PropertyEditorUi.MultipleTextString',
 				},
 			],
 		},

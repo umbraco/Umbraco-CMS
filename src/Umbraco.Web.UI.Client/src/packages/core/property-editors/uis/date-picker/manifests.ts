@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorUi = {
 					alias: 'format',
 					label: 'Date format',
 					description: 'If left empty then the format is YYYY-MM-DD',
-					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
+					propertyEditorUi: 'Umb.PropertyEditorUi.TextBox',
 				},
 			],
 			defaultData: [

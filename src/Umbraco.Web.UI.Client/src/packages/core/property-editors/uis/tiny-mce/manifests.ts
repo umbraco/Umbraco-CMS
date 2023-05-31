@@ -16,17 +16,17 @@ const manifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'editor',
 					label: 'Editor',
-					propertyEditorUI: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
+					propertyEditorUi: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
-					propertyEditorUI: 'Umb.PropertyEditorUi.OverlaySize',
+					propertyEditorUi: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 				{
 					alias: 'hideLabel',
 					label: 'Hide Label',
-					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

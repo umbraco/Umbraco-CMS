@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'maxChars',
 					label: 'Maximum allowed characters',
 					description: 'If empty - no character limit',
-					propertyEditorUI: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUi: 'Umb.PropertyEditorUi.Number',
 				},
 			],
 		},

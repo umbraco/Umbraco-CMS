@@ -18,26 +18,26 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Single block mode',
 					description:
 						'When in Single block mode, the output will be BlockListItem<>, instead of BlockListModel.\n\n**NOTE:**\nSingle block mode requires a maximum of one available block, and an amount set to minimum 1 and maximum 1 blocks.',
-					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
 					description:
 						'Live editing in editor overlays for live updated custom views or labels using custom expression.',
-					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'useInlineEditingAsDefault',
 					label: 'Inline editing mode',
 					description: 'Use the inline editor as the default block view.',
-					propertyEditorUI: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUi: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'maxPropertyWidth',
 					label: 'Property editor width',
 					description: 'Optional CSS override, example: 800px or 100%',
-					propertyEditorUI: 'Umb.PropertyEditorUi.TextBox',
+					propertyEditorUi: 'Umb.PropertyEditorUi.TextBox',
 				},
 			],
 		},
