@@ -1,4 +1,3 @@
-import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -23,7 +22,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Dictionary.Edit',
 		name: 'Dictionary Workspace Edit View',
-		loader: () => import('./views/edit/workspace-view-dictionary-edit.element.js'),
+		loader: () => import('./views/editor/workspace-view-dictionary-editor.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Edit',

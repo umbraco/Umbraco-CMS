@@ -1,11 +1,11 @@
 import { UmbLanguageWorkspaceContext } from './language-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { generateRoutePathBuilder } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './language-workspace-edit.element.js';
+import './language-workspace-editor.element.js';
 
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {
@@ -22,7 +22,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 		if (this.#editorElement) {
 			return this.#editorElement;
 		}
-		this.#editorElement = new (await import('./language-workspace-edit.element.js')).default();
+		this.#editorElement = new (await import('./language-workspace-editor.element.js')).default();
 		return this.#editorElement;
 	};
 

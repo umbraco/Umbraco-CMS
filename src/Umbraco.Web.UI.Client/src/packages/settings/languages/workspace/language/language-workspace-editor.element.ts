@@ -1,11 +1,11 @@
 import { UmbLanguageWorkspaceContext } from './language-workspace.context.js';
-import { UUITextStyles , UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-@customElement('umb-language-workspace-edit')
-export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-language-workspace-editor')
+export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: UmbLanguageWorkspaceContext;
 
 	@state()
@@ -93,10 +93,10 @@ export class UmbLanguageWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbLanguageWorkspaceEditElement;
+export default UmbLanguageWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-workspace-edit': UmbLanguageWorkspaceEditElement;
+		'umb-language-workspace-editor': UmbLanguageWorkspaceEditorElement;
 	}
 }

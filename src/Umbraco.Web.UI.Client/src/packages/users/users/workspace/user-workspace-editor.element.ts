@@ -25,8 +25,8 @@ import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-@customElement('umb-user-workspace-edit')
-export class UmbUserWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-user-workspace-editor')
+export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _currentUser?: any;
 
@@ -379,10 +379,10 @@ export class UmbUserWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserWorkspaceEditElement;
+export default UmbUserWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-workspace-edit': UmbUserWorkspaceEditElement;
+		'umb-user-workspace-editor': UmbUserWorkspaceEditorElement;
 	}
 }
