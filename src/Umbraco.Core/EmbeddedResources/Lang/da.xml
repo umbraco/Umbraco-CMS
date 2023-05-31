@@ -607,6 +607,8 @@
     </key>
     <key alias="indexCannotRebuild">Dette index kan ikke genbygges for det ikke har nogen</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">Der blev ikke fundet nogen resultater</key>
+    <key alias="searchResultsFound">Viser %0% - %1% af %2% resultat(er) - Side %3% af %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
