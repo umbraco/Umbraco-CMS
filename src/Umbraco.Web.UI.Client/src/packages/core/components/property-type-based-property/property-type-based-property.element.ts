@@ -11,6 +11,7 @@ import type {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
@@ -92,8 +93,21 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 				(dataType) => {
 					this._dataTypeData = dataType?.values || [];
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
+					// If there is no UI, we will look up the Property editor model to find the default UI alias:
+					if (!this._propertyEditorUiAlias && dataType?.propertyEditorAlias) {
+						//use 'dataType.propertyEditorAlias' to look up the extension in the registry:
+						this.observe(
+							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', dataType.propertyEditorAlias),
+							(extension) => {
+								if (!extension) return;
+								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
+								this.removeControllerByUnique('_observePropertyEditorModel');
+							},
+							'_observePropertyEditorModel'
+						);
+					}
 				},
-				'observeDataType'
+				'_observeDataType'
 			);
 		}
 	}

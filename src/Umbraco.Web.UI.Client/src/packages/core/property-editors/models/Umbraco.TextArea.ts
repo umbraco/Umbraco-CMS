@@ -5,13 +5,14 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Textarea',
 	alias: 'Umbraco.TextArea',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TextArea',
+		settings: {
 			properties: [
 				{
 					alias: 'maxChars',
 					label: 'Maximum allowed characters',
 					description: 'If empty - no character limit',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 			],
 		},
