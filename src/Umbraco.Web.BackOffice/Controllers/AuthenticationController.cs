@@ -624,7 +624,7 @@ public class AuthenticationController : UmbracoApiControllerBase
         await _signInManager.SignOutAsync();
 
         _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out",
-            User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
+            result.Principal.Identity == null ? "UNKNOWN" : result.Principal.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
         var userId = result.Principal.Identity?.GetUserId();
         SignOutSuccessResult args = _userManager.NotifyLogoutSuccess(User, userId);
