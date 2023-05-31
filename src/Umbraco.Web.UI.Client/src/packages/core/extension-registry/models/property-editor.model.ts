@@ -30,6 +30,7 @@ export interface MetaPropertyEditorModel {
 // Config
 export interface PropertyEditorSettings {
 	properties: PropertyEditorConfigProperty[];
+	// default data is kept separate from the properties, to give the ability for Property Editor UI to overwrite default values for the property editor settings.
 	defaultData?: PropertyEditorConfigDefaultData[];
 }
 
