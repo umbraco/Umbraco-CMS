@@ -73,6 +73,7 @@
 
 			// USERS
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
+			"@umbraco-cms/backoffice/css": ["src/shared/css/custom-properties.css"],
 
 			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],
 			"@umbraco-cms/internal/modal": ["src/shared/modal"],

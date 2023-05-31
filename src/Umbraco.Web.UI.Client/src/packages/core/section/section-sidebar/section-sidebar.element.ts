@@ -1,6 +1,6 @@
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from './section-sidebar.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-sidebar')
@@ -26,7 +26,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 		UUITextStyles,
 		css`
 			:host {
-				flex: 0 0 300px;
+				flex: 0 0 var(--umb-section-sidebar-width);
 				background-color: var(--uui-color-surface);
 				height: 100%;
 				border-right: 1px solid var(--uui-color-border);
