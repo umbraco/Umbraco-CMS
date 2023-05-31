@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Multiple Text String',
 	alias: 'Umbraco.MultipleTextString',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.MultipleTextString',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.MultipleTextString',
 		settings: {
 			properties: [
 				{

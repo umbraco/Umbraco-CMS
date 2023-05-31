@@ -5,6 +5,6 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Radio Button List',
 	alias: 'Umbraco.RadioButtonList',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.RadioButtonList',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.RadioButtonList',
 	},
 };

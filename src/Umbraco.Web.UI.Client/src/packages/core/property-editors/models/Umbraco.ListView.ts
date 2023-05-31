@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'List View',
 	alias: 'Umbraco.ListView',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.ListView',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.ListView',
 		settings: {
 			properties: [
 				{

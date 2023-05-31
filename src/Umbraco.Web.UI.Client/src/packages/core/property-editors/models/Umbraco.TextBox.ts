@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Text Box',
 	alias: 'Umbraco.TextBox',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.TextBox',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.TextBox',
 		settings: {
 			properties: [
 				{

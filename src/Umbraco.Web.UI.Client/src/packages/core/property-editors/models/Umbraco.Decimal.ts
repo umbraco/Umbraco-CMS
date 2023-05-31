@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Decimal',
 	alias: 'Umbraco.Decimal',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.Decimal',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.Decimal',
 		settings: {
 			properties: [
 				{

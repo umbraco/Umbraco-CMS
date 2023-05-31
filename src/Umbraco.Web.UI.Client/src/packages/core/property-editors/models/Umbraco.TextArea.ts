@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Textarea',
 	alias: 'Umbraco.TextArea',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.TextArea',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.TextArea',
 		settings: {
 			properties: [
 				{

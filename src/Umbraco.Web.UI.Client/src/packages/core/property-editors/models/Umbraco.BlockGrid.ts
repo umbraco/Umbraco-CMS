@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Block Grid',
 	alias: 'Umbraco.BlockGrid',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.BlockGrid',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.BlockGrid',
 		settings: {
 			properties: [
 				{

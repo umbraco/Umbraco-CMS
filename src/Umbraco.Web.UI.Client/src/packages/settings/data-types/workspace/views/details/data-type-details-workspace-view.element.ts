@@ -73,7 +73,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 						(propertyEditorModel) => {
 							// TODO: show error. We have stored a PropertyEditorModelAlias and can't find the PropertyEditorModel in the registry.
 							if (!propertyEditorModel) return;
-							this._setPropertyEditorUiAlias(propertyEditorModel.meta.defaultUI ?? undefined);
+							this._setPropertyEditorUiAlias(propertyEditorModel.meta.defaultPropertyEditorUiAlias ?? undefined);
 						},
 						'_observePropertyEditorModelForDefaultUI'
 					);

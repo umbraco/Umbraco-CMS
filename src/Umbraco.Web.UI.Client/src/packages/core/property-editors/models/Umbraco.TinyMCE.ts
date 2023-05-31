@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Tiny MCE',
 	alias: 'Umbraco.TinyMCE',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.TinyMCE',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.TinyMCE',
 		settings: {
 			properties: [
 				{

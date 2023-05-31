@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Tags',
 	alias: 'Umbraco.Tags',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.Tags',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.Tags',
 		settings: {
 			properties: [
 				{

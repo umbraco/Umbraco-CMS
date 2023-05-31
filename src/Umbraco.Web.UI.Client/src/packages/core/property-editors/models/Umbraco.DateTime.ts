@@ -6,7 +6,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Date/Time',
 	alias: 'Umbraco.DateTime',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.DatePicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.DatePicker',
 		settings: {
 			properties: [
 				{

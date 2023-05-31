@@ -100,7 +100,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', dataType.propertyEditorAlias),
 							(extension) => {
 								if (!extension) return;
-								this._propertyEditorUiAlias = extension?.meta.defaultUI;
+								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
 								this.removeControllerByUnique('_observePropertyEditorModel');
 							},
 							'_observePropertyEditorModel'

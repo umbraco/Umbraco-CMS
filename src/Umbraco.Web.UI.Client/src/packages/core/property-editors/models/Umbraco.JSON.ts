@@ -5,6 +5,6 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'JSON model',
 	alias: 'Umbraco.JSON',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.JSON',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.JSON',
 	},
 };

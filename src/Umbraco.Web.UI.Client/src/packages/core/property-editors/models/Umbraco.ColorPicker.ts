@@ -5,7 +5,7 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Color Picker',
 	alias: 'Umbraco.ColorPicker',
 	meta: {
-		defaultUI: 'Umb.PropertyEditorUI.ColorPicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUI.ColorPicker',
 		settings: {
 			properties: [
 				{
