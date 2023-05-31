@@ -14,7 +14,9 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Telemetry;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -79,6 +81,7 @@ public static partial class UmbracoBuilderExtensions
         // We need to know in the core services if local logins is denied, so we register the providers with a core friendly interface.
         services.TryAddSingleton<ILocalLoginSettingProvider, BackOfficeExternalLoginProviders>();
         services.TryAddSingleton<IBackOfficeTwoFactorOptions, DefaultBackOfficeTwoFactorOptions>();
+        services.AddTransient<IDetailedTelemetryProvider, ExternalLoginTelemetryProvider>();
 
         return new BackOfficeIdentityBuilder(services);
     }

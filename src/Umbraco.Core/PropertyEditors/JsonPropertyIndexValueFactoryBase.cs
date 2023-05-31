@@ -25,7 +25,8 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         IProperty property,
         string? culture,
         string? segment,
-        bool published)
+        bool published,
+        IEnumerable<string> availableCultures)
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
@@ -43,7 +44,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
                     return result;
                 }
 
-                result.AddRange(Handle(deserializedPropertyValue, property, culture, segment, published));
+                result.AddRange(Handle(deserializedPropertyValue, property, culture, segment, published, availableCultures));
             }
             catch (InvalidCastException)
             {
@@ -62,6 +63,10 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
         return result;
     }
 
+    [Obsolete("Use method overload that has availableCultures, scheduled for removal in v14")]
+    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
+        => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
+
     /// <summary>
     ///  Method to return a list of resume of the content. By default this returns an empty list
     /// </summary>
@@ -75,10 +80,23 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
     /// <summary>
     ///  Method that handle the deserialized object.
     /// </summary>
+    [Obsolete("Use the overload with the availableCultures parameter instead, scheduled for removal in v14")]
     protected abstract IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,
         string? segment,
         bool published);
+
+    /// <summary>
+    ///  Method that handle the deserialized object.
+    /// </summary>
+    protected virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+        TSerialized deserializedPropertyValue,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures) =>
+        Handle(deserializedPropertyValue, property, culture, segment, published);
 }
