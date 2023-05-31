@@ -1,5 +1,5 @@
 import { UmbDocumentTypeRepository } from '../../repository/document-type.repository.js';
-import { html, nothing , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -15,12 +15,17 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	@state()
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
-	async firstUpdated() {
+	public connectedCallback() {
+		super.connectedCallback();
 		// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
 		// TODO: show error
-		if (!this.data?.id) return;
+		if (this.data?.id) {
+			this._retrieveAllowedChildrenOf(this.data.id);
+		}
+	}
 
-		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(this.data.id);
+	private async _retrieveAllowedChildrenOf(id: string) {
+		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(id);
 
 		if (data) {
 			this._allowedDocumentTypes = data;
@@ -41,7 +46,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 
 	render() {
 		return html`
-			<umb-body-layout headline="Headline">
+			<umb-body-layout headline="Create">
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(
