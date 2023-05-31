@@ -192,7 +192,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
         };
 
 
-    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         IEnumerable<IApiContent> DefaultValue() => Array.Empty<IApiContent>();
 

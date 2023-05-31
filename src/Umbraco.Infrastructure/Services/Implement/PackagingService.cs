@@ -116,24 +116,45 @@ public class PackagingService : IPackagingService
 
     public IEnumerable<InstalledPackage> GetAllInstalledPackages()
     {
-        IReadOnlyDictionary<string, string?>? keyValues =
-            _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+        IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
 
-        var installedPackages = new Dictionary<string, InstalledPackage>();
+        var installedPackages = new List<InstalledPackage>();
 
         // Collect the package from the package migration plans
         foreach (PackageMigrationPlan plan in _packageMigrationPlans)
         {
-            if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage? installedPackage))
+            InstalledPackage installedPackage;
+            if (plan.PackageId is not null && installedPackages.FirstOrDefault(x => x.PackageId == plan.PackageId) is InstalledPackage installedPackageById)
             {
-                installedPackage = new InstalledPackage { PackageName = plan.PackageName };
-                installedPackages.Add(plan.PackageName, installedPackage);
+                installedPackage = installedPackageById;
+            }
+            else if (installedPackages.FirstOrDefault(x => x.PackageName == plan.PackageName) is InstalledPackage installedPackageByName)
+            {
+                installedPackage = installedPackageByName;
+
+                // Ensure package ID is set
+                installedPackage.PackageId ??= plan.PackageId;
+            }
+            else
+            {
+                installedPackage = new InstalledPackage
+                {
+                    PackageId = plan.PackageId,
+                    PackageName = plan.PackageName,
+                };
+
+                installedPackages.Add(installedPackage);
+            }
+            
+            if (installedPackage.Version is null &&
+                plan.GetType().Assembly.TryGetInformationalVersion(out string? version))
+            {
+                installedPackage.Version = version;
             }
 
+            // Combine all package migration plans for a package
             var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-            if (keyValues is null || keyValues.TryGetValue(
-                Constants.Conventions.Migrations.KeyValuePrefix + plan.Name,
-                out var currentState) is false)
+            if (keyValues is null || keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var currentState) is false)
             {
                 currentState = null;
             }
@@ -150,26 +171,49 @@ public class PackagingService : IPackagingService
         // Collect and merge the packages from the manifests
         foreach (PackageManifest package in _manifestParser.GetManifests())
         {
-            if (package.PackageName is null)
+            if (package.PackageId is null && package.PackageName is null)
             {
                 continue;
             }
 
-            if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage? installedPackage))
+            InstalledPackage installedPackage;
+            if (package.PackageId is not null && installedPackages.FirstOrDefault(x => x.PackageId == package.PackageId) is InstalledPackage installedPackageById)
             {
-                installedPackage = new InstalledPackage {
+                installedPackage = installedPackageById;
+
+                // Always use package name from manifest
+                installedPackage.PackageName = package.PackageName;
+            }
+            else if (installedPackages.FirstOrDefault(x => x.PackageName == package.PackageName) is InstalledPackage installedPackageByName)
+            {
+                installedPackage = installedPackageByName;
+
+                // Ensure package ID is set
+                installedPackage.PackageId ??= package.PackageId;
+            }
+            else
+            {
+                installedPackage = new InstalledPackage
+                {
+                    PackageId = package.PackageId,
                     PackageName = package.PackageName,
-                    Version = string.IsNullOrEmpty(package.Version) ? "Unknown" : package.Version,
                 };
 
-                installedPackages.Add(package.PackageName, installedPackage);
+                installedPackages.Add(installedPackage);
             }
 
+            // Set additional values
+            installedPackage.AllowPackageTelemetry = package.AllowPackageTelemetry;
             installedPackage.PackageView = package.PackageView;
+
+            if (!string.IsNullOrEmpty(package.Version))
+            {
+                installedPackage.Version = package.Version;
+            }
         }
 
-        // Return all packages with a name in the package.manifest or package migrations
-        return installedPackages.Values;
+        // Return all packages with an ID or name in the package.manifest or package migrations
+        return installedPackages;
     }
 
     #endregion

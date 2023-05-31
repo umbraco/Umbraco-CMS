@@ -1,5 +1,5 @@
 {
+    "id": "UmbracoPackage",
     "name": "UmbracoPackage",
-    "version": "",
     "allowPackageTelemetry": true
 }

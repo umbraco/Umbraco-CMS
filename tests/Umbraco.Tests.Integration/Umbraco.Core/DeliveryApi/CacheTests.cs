@@ -50,7 +50,7 @@ public class CacheTests
         propertyType.SetupGet(p => p.CacheLevel).Returns(cacheLevel);
         propertyType.SetupGet(p => p.DeliveryApiCacheLevel).Returns(cacheLevel);
         propertyType
-            .Setup(p => p.ConvertInterToDeliveryApiObject(It.IsAny<IPublishedElement>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object?>(), It.IsAny<bool>()))
+            .Setup(p => p.ConvertInterToDeliveryApiObject(It.IsAny<IPublishedElement>(), It.IsAny<PropertyCacheLevel>(), It.IsAny<object?>(), It.IsAny<bool>(), It.IsAny<bool>()))
             .Returns(() => $"Delivery API value: {++invocationCount}");
 
         var prop1 = new Property(propertyType.Object, content, publishedSnapshotAccessor.Object);
@@ -68,6 +68,7 @@ public class CacheTests
                 It.IsAny<IPublishedElement>(),
                 It.IsAny<PropertyCacheLevel>(),
                 It.IsAny<object?>(),
+                It.IsAny<bool>(),
                 It.IsAny<bool>()),
             Times.Exactly(expectedConverterHits));
     }

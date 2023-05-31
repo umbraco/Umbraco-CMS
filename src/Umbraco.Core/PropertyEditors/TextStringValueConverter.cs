@@ -62,6 +62,6 @@ public class TextStringValueConverter : PropertyValueConverterBase, IDeliveryApi
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => GetPropertyValueType(propertyType);
 
-    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         => ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
 }

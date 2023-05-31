@@ -279,6 +279,6 @@ public class NestedContentTests
             throw new InvalidOperationException("This method won't be implemented.");
 
         public override object GetDeliveryApiValue(bool expanding, string culture = null, string segment = null) =>
-            PropertyType.ConvertInterToDeliveryApiObject(_owner, ReferenceCacheLevel, InterValue, _preview);
+            PropertyType.ConvertInterToDeliveryApiObject(_owner, ReferenceCacheLevel, InterValue, _preview, false);
     }
 }
