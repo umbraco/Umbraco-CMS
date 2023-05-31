@@ -5,7 +5,7 @@ const inputTypeConfig = {
 	alias: 'inputType',
 	label: 'Input type',
 	description: 'Select input type',
-	propertyEditorUI: 'Umb.PropertyEditorUi.Dropdown',
+	propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 };
 
 export const manifests: Array<ManifestPropertyEditorUi> = [

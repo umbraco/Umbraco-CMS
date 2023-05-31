@@ -72,7 +72,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		});
 	}
 
-	private _handleUIClick(propertyEditorUI: ManifestPropertyEditorUi) {
+	private _handleUIClick(propertyEditorUi: ManifestPropertyEditorUi) {
 		alert('To BE DONE.');
 	}
 

@@ -48,7 +48,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		});
 	}
 
-	private _handleClick(propertyEditorUI: ManifestPropertyEditorUi) {
+	private _handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
 		this._select(propertyEditorUI.alias);
 	}
 

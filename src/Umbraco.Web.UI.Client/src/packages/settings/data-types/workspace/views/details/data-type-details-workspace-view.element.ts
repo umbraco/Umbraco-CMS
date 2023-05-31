@@ -182,7 +182,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		return html`
 			${this._propertyEditorAlias && this._propertyEditorUiAlias
 				? html`
-						<uui-box headline="Config">
+						<uui-box headline="Settings">
 							<umb-property-editor-config
 								property-editor-ui-alias="${this._propertyEditorUiAlias}"
 								.data="${this._data}"></umb-property-editor-config>
