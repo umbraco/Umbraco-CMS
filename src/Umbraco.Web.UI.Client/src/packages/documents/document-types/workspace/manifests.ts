@@ -36,7 +36,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		alias: 'Umb.WorkspaceView.DocumentType.Structure',
 		name: 'Document Type Workspace Structure View',
 		loader: () => import('./views/structure/document-type-workspace-view-structure.element.js'),
-		weight: 100,
+		weight: 800,
 		meta: {
 			label: 'Structure',
 			pathname: 'structure',
@@ -48,13 +48,13 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 	},
 	{
 		type: 'workspaceEditorView',
-		alias: 'Umb.WorkspaceView.DocumentType.Permissions',
-		name: 'Document Type Workspace Permissions View',
-		loader: () => import('./views/details/document-type-workspace-view-details.element.js'),
-		weight: 100,
+		alias: 'Umb.WorkspaceView.DocumentType.Settings',
+		name: 'Document Type Workspace Settings View',
+		loader: () => import('./views/settings/document-type-workspace-view-settings.element.js'),
+		weight: 600,
 		meta: {
-			label: 'Details',
-			pathname: 'details',
+			label: 'Settings',
+			pathname: 'settings',
 			icon: 'umb:settings',
 		},
 		conditions: {
@@ -66,7 +66,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		alias: 'Umb.WorkspaceView.DocumentType.Templates',
 		name: 'Document Type Workspace Templates View',
 		loader: () => import('./views/templates/document-type-workspace-view-templates.element.js'),
-		weight: 100,
+		weight: 400,
 		meta: {
 			label: 'Templates',
 			pathname: 'templates',
