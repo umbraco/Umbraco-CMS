@@ -9,6 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
+[Obsolete("These handlers are rewritten into separate IDistributedCacheHandler implmentations. This class will be removed in Umbraco 13.")]
 public class DistributedCacheBinder :
     INotificationHandler<DictionaryItemDeletedNotification>,
     INotificationHandler<DictionaryItemSavedNotification>,
