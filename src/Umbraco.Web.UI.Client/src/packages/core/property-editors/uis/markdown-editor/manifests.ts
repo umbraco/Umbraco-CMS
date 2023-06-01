@@ -1,34 +1,34 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.MarkdownEditor',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.MarkdownEditor',
 	name: 'Markdown Editor Property Editor UI',
 	loader: () => import('./property-editor-ui-markdown-editor.element.js'),
 	meta: {
 		label: 'Markdown Editor',
-		propertyEditorModel: 'Umbraco.MarkdownEditor',
+		propertyEditorAlias: 'Umbraco.MarkdownEditor',
 		icon: 'umb:code',
 		group: 'pickers',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'preview',
 					label: 'Preview',
 					description: 'Display a live preview',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'defaultValue',
 					label: 'Default value',
 					description: 'If value is blank, the editor will show this',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TextArea',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextArea',
 				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
 					description: 'Select the width of the overlay.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.OverlaySize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 			],
 		},

@@ -1,6 +1,6 @@
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbModalContext,
@@ -23,16 +23,16 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	_dataType?: DataTypeResponseModel;
 
 	@state()
-	private _propertyEditorUIIcon = '';
+	private _propertyEditorUiIcon?: string;
 
 	@state()
-	private _propertyEditorUIName = '';
+	private _propertyEditorUiName?: string;
 
 	@state()
-	private _propertyEditorUiAlias = '';
+	private _propertyEditorUiAlias?: string;
 
 	@state()
-	private _propertyEditorAlias = '';
+	private _propertyEditorAlias?: string;
 
 	@state()
 	private _data: Array<any> = [];
@@ -65,8 +65,23 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 			// TODO: handle if model is not of the type wanted.
 			this._dataType = dataType;
 
-			if (this._dataType.propertyEditorUiAlias !== this._propertyEditorUiAlias) {
-				this._observePropertyEditorUI(this._dataType.propertyEditorUiAlias || undefined);
+			if (!this._dataType.propertyEditorUiAlias) {
+				if (this._dataType.propertyEditorAlias) {
+					// Get the property editor UI alias from the property editor alias:
+					this.observe(
+						umbExtensionsRegistry.getByTypeAndAlias('propertyEditorModel', this._dataType.propertyEditorAlias),
+						(propertyEditorModel) => {
+							// TODO: show error. We have stored a PropertyEditorModelAlias and can't find the PropertyEditorModel in the registry.
+							if (!propertyEditorModel) return;
+							this._setPropertyEditorUiAlias(propertyEditorModel.meta.defaultPropertyEditorUiAlias ?? undefined);
+						},
+						'_observePropertyEditorModelForDefaultUI'
+					);
+				} else {
+					this._setPropertyEditorUiAlias(undefined);
+				}
+			} else {
+				this._setPropertyEditorUiAlias(this._dataType.propertyEditorUiAlias);
 			}
 
 			if (this._dataType.values && this._dataType.values !== this._data) {
@@ -75,22 +90,38 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		});
 	}
 
+	private _setPropertyEditorUiAlias(value: string | undefined) {
+		const oldValue = this._propertyEditorUiAlias;
+		if (oldValue !== value) {
+			this._propertyEditorUiAlias = value;
+			this._observePropertyEditorUI(value || undefined);
+		}
+	}
+
 	private _observePropertyEditorUI(propertyEditorUiAlias?: string) {
-		if (!propertyEditorUiAlias) return;
+		if (!propertyEditorUiAlias) {
+			this._propertyEditorUiName = this._propertyEditorUiIcon = this._propertyEditorUiAlias = undefined;
+			this.removeControllerByUnique('_observePropertyEditorUI');
+			return;
+		}
+
+		// remove the '_observePropertyEditorModelForDefaultUI' controller, as we do not want to observe for default value anymore:
+		this.removeControllerByUnique('_observePropertyEditorModelForDefaultUI');
 
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUI', propertyEditorUiAlias),
+			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUiAlias),
 			(propertyEditorUI) => {
 				// TODO: show error. We have stored a PropertyEditorUIAlias and can't find the PropertyEditorUI in the registry.
 				if (!propertyEditorUI) return;
 
-				this._propertyEditorUIName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
+				this._propertyEditorUiName = propertyEditorUI?.meta.label ?? propertyEditorUI?.name ?? '';
 				this._propertyEditorUiAlias = propertyEditorUI?.alias ?? '';
-				this._propertyEditorUIIcon = propertyEditorUI?.meta.icon ?? '';
-				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorModel ?? '';
+				this._propertyEditorUiIcon = propertyEditorUI?.meta.icon ?? '';
+				this._propertyEditorAlias = propertyEditorUI?.meta.propertyEditorAlias ?? '';
 
 				this._workspaceContext?.setPropertyEditorAlias(this._propertyEditorAlias);
-			}
+			},
+			'_observePropertyEditorUI'
 		);
 	}
 
@@ -107,14 +138,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	}
 
 	private _selectPropertyEditorUI(propertyEditorUiAlias: string | undefined) {
-		if (!this._dataType || this._dataType.propertyEditorUiAlias === propertyEditorUiAlias) return;
 		this._workspaceContext?.setPropertyEditorUiAlias(propertyEditorUiAlias);
-		this._observePropertyEditorUI(propertyEditorUiAlias);
 	}
 
 	render() {
 		return html`
-			<uui-box style="margin-bottom: var(--uui-size-space-5);"> ${this._renderPropertyEditorUI()} </uui-box>
+			<uui-box> ${this._renderPropertyEditorUI()} </uui-box>
 			${this._renderConfig()} </uui-box>
 		`;
 	}
@@ -127,11 +156,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 							<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
 							<umb-ref-property-editor-ui
 								slot="editor"
-								name=${this._propertyEditorUIName}
+								name=${this._propertyEditorUiName}
 								alias=${this._propertyEditorUiAlias}
 								property-editor-model-alias=${this._propertyEditorAlias}
 								border>
-								<uui-icon name="${this._propertyEditorUIIcon}" slot="icon"></uui-icon>
+								<uui-icon name="${this._propertyEditorUiIcon}" slot="icon"></uui-icon>
 								<uui-action-bar slot="actions">
 									<uui-button label="Change" @click=${this._openPropertyEditorUIPicker}></uui-button>
 								</uui-action-bar>
@@ -153,7 +182,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		return html`
 			${this._propertyEditorAlias && this._propertyEditorUiAlias
 				? html`
-						<uui-box headline="Config">
+						<uui-box headline="Settings">
 							<umb-property-editor-config
 								property-editor-ui-alias="${this._propertyEditorUiAlias}"
 								.data="${this._data}"></umb-property-editor-config>
@@ -168,7 +197,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 		`,
 	];

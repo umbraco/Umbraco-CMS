@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbInputDocumentTypePickerElement } from '../../../components/input-document-type-picker/input-document-type-picker.element.js';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -90,10 +90,10 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-box {
-				margin: var(--uui-size-layout-1);
+			:host {
+				display: block;
+				padding: var(--uui-size-layout-1);
 			}
-
 			uui-label,
 			umb-property-editor-ui-number {
 				display: block;

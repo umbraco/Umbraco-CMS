@@ -1,15 +1,15 @@
 import type { MemberGroupDetails } from '../types.js';
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context.js';
-import { UUITextStyles , UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
  * @element umb-member-group-edit-workspace
  * @description - Element for displaying a Member Group Workspace
  */
-@customElement('umb-member-group-workspace-edit')
-export class UmbMemberGroupWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-member-group-workspace-editor')
+export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: UmbWorkspaceMemberGroupContext;
 
 	@state()
@@ -71,10 +71,10 @@ export class UmbMemberGroupWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbMemberGroupWorkspaceEditElement;
+export default UmbMemberGroupWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-member-group-workspace-edit': UmbMemberGroupWorkspaceEditElement;
+		'umb-member-group-workspace-editor': UmbMemberGroupWorkspaceEditorElement;
 	}
 }

@@ -25,7 +25,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 						},
 					},
 					{
-						type: 'propertyEditorUI',
+						type: 'propertyEditorUi',
 						alias: 'My.PropertyEditorUI.Custom',
 						name: 'My Custom Property Editor UI',
 						js: '/App_Plugins/property-editor.js',

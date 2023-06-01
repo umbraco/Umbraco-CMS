@@ -170,10 +170,8 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		UUITextStyles,
 		css`
 			:host {
-				display: flex;
-				flex-direction: column;
-				height: 100%;
-				margin: var(--uui-size-layout-1);
+				display: block;
+				padding: var(--uui-size-layout-1);
 			}
 
 			#dictionary-top-bar {

@@ -15,8 +15,8 @@ export interface UmbDetailRepository<
 	ResponseType = any
 > {
 	createScaffold(parentId: string | null): Promise<UmbRepositoryResponse<CreateRequestType>>;
-	requestById(id: string): Promise<UmbRepositoryResponse<ResponseType>>;
-	byId(id: string): Promise<Observable<ResponseType>>;
+	requestById(id: string): Promise<UmbRepositoryResponse<ResponseType | undefined>>;
+	byId(id: string): Promise<Observable<ResponseType | undefined>>;
 	create(data: CreateRequestType): Promise<UmbRepositoryResponse<CreateResponseType>>;
 	save(id: string, data: UpdateRequestType): Promise<UmbRepositoryErrorResponse>;
 	delete(id: string): Promise<UmbRepositoryErrorResponse>;

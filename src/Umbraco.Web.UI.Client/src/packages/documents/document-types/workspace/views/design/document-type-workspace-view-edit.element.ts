@@ -185,16 +185,17 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	render() {
 		return html`
 			<div id="workspace-tab-bar">${this._routerPath ? this.renderTabsNavigation() : ''}${this.renderActions()}</div>
-
-			<umb-router-slot
-				.routes=${this._routes}
-				@init=${(event: UmbRouterSlotInitEvent) => {
-					this._routerPath = event.target.absoluteRouterPath;
-				}}
-				@change=${(event: UmbRouterSlotChangeEvent) => {
-					this._activePath = event.target.absoluteActiveViewPath || '';
-				}}>
-			</umb-router-slot>
+			<uui-scroll-container>
+				<umb-router-slot
+					.routes=${this._routes}
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotChangeEvent) => {
+						this._activePath = event.target.absoluteActiveViewPath || '';
+					}}>
+				</umb-router-slot>
+			</uui-scroll-container>
 		`;
 	}
 
@@ -202,7 +203,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		UUITextStyles,
 		css`
 			:host {
-				display: block;
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
 				--uui-tab-background: var(--uui-color-surface);
 			}
 

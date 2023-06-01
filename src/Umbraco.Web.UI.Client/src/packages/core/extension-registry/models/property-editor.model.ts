@@ -1,17 +1,18 @@
 import type { UmbPropertyEditorExtensionElement } from '../interfaces/index.js';
+import { DataTypePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestElement, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestPropertyEditorUI extends ManifestElement<UmbPropertyEditorExtensionElement> {
-	type: 'propertyEditorUI';
-	meta: MetaPropertyEditorUI;
+export interface ManifestPropertyEditorUi extends ManifestElement<UmbPropertyEditorExtensionElement> {
+	type: 'propertyEditorUi';
+	meta: MetaPropertyEditorUi;
 }
 
-export interface MetaPropertyEditorUI {
+export interface MetaPropertyEditorUi {
 	label: string;
-	propertyEditorModel: string;
+	propertyEditorAlias: string;
 	icon: string;
 	group: string;
-	config?: PropertyEditorConfig;
+	settings?: PropertyEditorSettings;
 	supportsReadOnly?: boolean;
 }
 
@@ -22,12 +23,14 @@ export interface ManifestPropertyEditorModel extends ManifestBase {
 }
 
 export interface MetaPropertyEditorModel {
-	config?: PropertyEditorConfig;
+	defaultPropertyEditorUiAlias: string;
+	settings?: PropertyEditorSettings;
 }
 
 // Config
-export interface PropertyEditorConfig {
+export interface PropertyEditorSettings {
 	properties: PropertyEditorConfigProperty[];
+	// default data is kept separate from the properties, to give the ability for Property Editor UI to overwrite default values for the property editor settings.
 	defaultData?: PropertyEditorConfigDefaultData[];
 }
 
@@ -35,10 +38,11 @@ export interface PropertyEditorConfigProperty {
 	label: string;
 	description?: string;
 	alias: string;
-	propertyEditorUI: string;
+	propertyEditorUiAlias: string;
+	config?: Array<DataTypePropertyPresentationModel>;
 }
 
 export interface PropertyEditorConfigDefaultData {
 	alias: string;
-	value: any;
+	value: unknown;
 }

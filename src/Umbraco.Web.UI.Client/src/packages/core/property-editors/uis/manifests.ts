@@ -30,9 +30,9 @@ import { manifests as numbers } from './number/manifests.js';
 import { manifest as userPicker } from './user-picker/manifests.js';
 import { manifest as memberPicker } from './member-picker/manifests.js';
 import { manifest as memberGroupPicker } from './member-group-picker/manifests.js';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestPropertyEditorUI> = [
+export const manifests: Array<ManifestPropertyEditorUi> = [
 	colorPicker,
 	datePicker,
 	eyeDropper,
@@ -66,15 +66,15 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 	...collectionView,
 	...tinyMCE,
 	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Number',
+		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.Number',
 		name: 'Number Property Editor UI',
 		loader: () => import('./number/property-editor-ui-number.element.js'),
 		meta: {
 			label: 'Number',
 			icon: 'umb:autofill',
 			group: 'common',
-			propertyEditorModel: 'Umbraco.Integer',
+			propertyEditorAlias: 'Umbraco.Integer',
 		},
 	},
 ];

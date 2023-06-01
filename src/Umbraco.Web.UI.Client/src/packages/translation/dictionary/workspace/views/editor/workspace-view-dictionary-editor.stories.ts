@@ -1,14 +1,14 @@
 import { Meta, Story } from '@storybook/web-components';
-import type { UmbWorkspaceViewDictionaryEditElement } from './workspace-view-dictionary-edit.element.js';
+import type { UmbWorkspaceViewDictionaryEditorElement } from './workspace-view-dictionary-editor.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 //import { data } from '../../../../../core/mocks/data/dictionary.data.js';
-import './workspace-view-dictionary-edit.element.js';
+import './workspace-view-dictionary-editor.element.js';
 //import { UmbWorkspaceDictionaryContext } from '../../workspace-dictionary.context.js';
 
 export default {
 	title: 'Workspaces/Dictionary/Views/Edit',
-	component: 'umb-workspace-view-dictionary-edit',
-	id: 'umb-workspace-view-dictionary-edit',
+	component: 'umb-workspace-view-dictionary-editor',
+	id: 'umb-workspace-view-dictionary-editor',
 	decorators: [
 		(story) => {
 			return html`TODO: make use of mocked workspace context??`;
@@ -19,7 +19,7 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceViewDictionaryEditElement> = () =>
-	html` <umb-workspace-view-dictionary-edit></umb-workspace-view-dictionary-edit>`;
+export const AAAOverview: Story<UmbWorkspaceViewDictionaryEditorElement> = () =>
+	html` <umb-workspace-view-dictionary-editor></umb-workspace-view-dictionary-editor>`;
 
 AAAOverview.storyName = 'Overview';

@@ -1,10 +1,10 @@
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context.js';
-import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-@customElement('umb-dictionary-workspace-edit')
-export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-dictionary-workspace-editor')
+export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name?: string | null = '';
 
@@ -64,10 +64,10 @@ export class UmbDictionaryWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbDictionaryWorkspaceEditElement;
+export default UmbDictionaryWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dictionary-workspace-edit': UmbDictionaryWorkspaceEditElement;
+		'umb-dictionary-workspace-editor': UmbDictionaryWorkspaceEditorElement;
 	}
 }

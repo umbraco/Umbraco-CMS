@@ -1,15 +1,15 @@
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context.js';
-import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
- * @element umb-data-type-workspace-edit-element
+ * @element umb-data-type-workspace-editor
  * @description - Element for displaying the Data Type Workspace edit route.
  */
-@customElement('umb-data-type-workspace-edit-element')
-export class UmbDataTypeWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-data-type-workspace-editor')
+export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 	@property()
 	manifest?: ManifestWorkspace;
 
@@ -73,10 +73,10 @@ export class UmbDataTypeWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbDataTypeWorkspaceEditElement;
+export default UmbDataTypeWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-data-type-workspace-edit-element': UmbDataTypeWorkspaceEditElement;
+		'umb-data-type-workspace-editor': UmbDataTypeWorkspaceEditorElement;
 	}
 }

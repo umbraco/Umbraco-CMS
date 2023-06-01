@@ -1,7 +1,7 @@
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
-import { ActiveVariant , UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { ActiveVariant, UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {

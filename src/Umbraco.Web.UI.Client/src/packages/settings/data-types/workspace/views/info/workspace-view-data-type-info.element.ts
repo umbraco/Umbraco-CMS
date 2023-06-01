@@ -1,6 +1,6 @@
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -65,7 +65,7 @@ export class UmbWorkspaceViewDataTypeInfoElement
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 		`,
 	];
