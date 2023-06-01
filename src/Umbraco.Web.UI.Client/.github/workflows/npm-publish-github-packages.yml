@@ -36,6 +36,7 @@ jobs:
           scope: '@umbraco-cms'
       - run: npm ci
       - run: npm run build:for:npm
+      - run: npm run generate:jsonschema:dist
       - run: npm run wc-analyze
       - run: npm run wc-analyze:vscode
       - name: Version and publish

@@ -135,6 +135,25 @@ export const data: Array<DocumentTypeResponseModel> = [
 				},
 			},
 			{
+				id: '7b',
+				containerId: 'all-properties-group-key',
+				alias: 'datePicker-b',
+				name: 'Date Picker With Time',
+				description: '',
+				dataTypeId: 'dt-datePicker-time',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
 				id: '8',
 				containerId: 'all-properties-group-key',
 				alias: 'email',

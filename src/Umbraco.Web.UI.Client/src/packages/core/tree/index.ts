@@ -1,4 +1,3 @@
-export * from './context-menu/index.js';
 export * from './entity-tree-item/index.js';
 export * from './tree-item/index.js';
 export * from './tree-item-base/index.js';

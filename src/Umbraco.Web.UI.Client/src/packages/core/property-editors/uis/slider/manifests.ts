@@ -1,40 +1,40 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.Slider',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.Slider',
 	name: 'Slider Property Editor UI',
 	loader: () => import('./property-editor-ui-slider.element.js'),
 	meta: {
 		label: 'Slider',
-		propertyEditorModel: 'Umbraco.Slider',
+		propertyEditorAlias: 'Umbraco.Slider',
 		icon: 'umb:navigation-horizontal',
 		group: 'common',
-		config: {
+		settings: {
 			properties: [
 				{
 					alias: 'enableRange',
 					label: 'Enable range',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'initVal1',
 					label: 'Initial value',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'initVal2',
 					label: 'Initial value 2',
 					description: 'Used when range is enabled',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
 					alias: 'step',
 					label: 'Step increments',
 					description: '',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 			],
 			defaultData: [

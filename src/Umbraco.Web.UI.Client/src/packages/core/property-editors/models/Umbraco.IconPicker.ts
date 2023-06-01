@@ -2,9 +2,9 @@ import type { ManifestPropertyEditorModel } from '@umbraco-cms/backoffice/extens
 
 export const manifest: ManifestPropertyEditorModel = {
 	type: 'propertyEditorModel',
-	name: 'JSON model',
-	alias: 'Umbraco.JSON',
+	name: 'Icon Picker',
+	alias: 'Umbraco.IconPicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.JSON',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
 	},
 };

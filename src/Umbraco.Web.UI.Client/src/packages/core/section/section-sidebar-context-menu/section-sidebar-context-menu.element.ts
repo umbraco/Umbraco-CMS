@@ -1,6 +1,6 @@
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '../section-sidebar/index.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-section-sidebar-context-menu')
@@ -99,15 +99,24 @@ export class UmbSectionSidebarContextMenuElement extends UmbLitElement {
 			}
 			#action-modal {
 				position: absolute;
-				left: 300px;
+				left: var(--umb-section-sidebar-width);
 				height: 100%;
 				z-index: 1;
 				top: 0;
-				width: 300px;
+				width: var(--umb-section-sidebar-width);
 				border: none;
 				border-left: 1px solid var(--uui-color-border);
 				border-right: 1px solid var(--uui-color-border);
 				background-color: var(--uui-color-surface);
+			}
+
+			#action-modal h3 {
+				padding: var(--uui-size-4) var(--uui-size-8);
+				margin: 0;
+				min-height: var(--umb-header-layout-height);
+				box-sizing: border-box;
+				display: flex;
+				align-items: center;
 			}
 		`,
 	];

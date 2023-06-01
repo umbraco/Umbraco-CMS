@@ -6,7 +6,7 @@ const classNamePrefix = 'Umb';
 
 const extensions = [
 	{
-		type: 'propertyEditorUI',
+		type: 'propertyEditorUi',
 		path: '../../src/backoffice/shared/property-editors/uis',
 		templatePath: './templates/property-editor-ui',
 	},

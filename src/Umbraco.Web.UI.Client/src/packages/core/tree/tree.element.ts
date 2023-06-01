@@ -1,13 +1,11 @@
 import { UmbTreeContextBase } from './tree.context.js';
-import { html, nothing , customElement, property, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 import './tree-item/tree-item.element.js';
 import './tree-item-base/tree-item-base.element.js';
-import './context-menu/tree-context-menu-page.service.js';
-import './context-menu/tree-context-menu.service.js';
 
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {

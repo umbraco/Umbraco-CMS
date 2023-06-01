@@ -103,7 +103,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> {
 			this._workspaceContext?.setPropertyValue(alias, value, this.#variantId.getValue());
 		}
 	}
-	public setConfig(config: WorkspacePropertyData<ValueType>['config']) {
+	public setConfig(config: WorkspacePropertyData<ValueType>['config'] | undefined) {
 		this._data.update({ config });
 	}
 	public setVariantId(variantId: UmbVariantId | undefined) {

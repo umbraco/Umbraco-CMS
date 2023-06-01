@@ -1,24 +1,24 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: we don't really want this config value to be changed from the UI. We need a way to handle hidden config properties.
 const allowDecimalsConfig = {
 	alias: 'allowDecimals',
 	label: 'Allow decimals',
-	propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+	propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 };
 
-export const manifests: Array<ManifestPropertyEditorUI> = [
+export const manifests: Array<ManifestPropertyEditorUi> = [
 	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Integer',
+		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.Integer',
 		name: 'Integer Property Editor UI',
 		loader: () => import('./property-editor-ui-number.element.js'),
 		meta: {
 			label: 'Integer',
-			propertyEditorModel: 'Umbraco.Integer',
+			propertyEditorAlias: 'Umbraco.Integer',
 			icon: 'umb:autofill',
 			group: 'common',
-			config: {
+			settings: {
 				properties: [allowDecimalsConfig],
 				defaultData: [
 					{
@@ -30,16 +30,16 @@ export const manifests: Array<ManifestPropertyEditorUI> = [
 		},
 	},
 	{
-		type: 'propertyEditorUI',
-		alias: 'Umb.PropertyEditorUI.Decimal',
+		type: 'propertyEditorUi',
+		alias: 'Umb.PropertyEditorUi.Decimal',
 		name: 'Decimal Property Editor UI',
 		loader: () => import('./property-editor-ui-number.element.js'),
 		meta: {
 			label: 'Decimal',
-			propertyEditorModel: 'Umbraco.Decimal',
+			propertyEditorAlias: 'Umbraco.Decimal',
 			icon: 'umb:autofill',
 			group: 'common',
-			config: {
+			settings: {
 				properties: [allowDecimalsConfig],
 				defaultData: [
 					{

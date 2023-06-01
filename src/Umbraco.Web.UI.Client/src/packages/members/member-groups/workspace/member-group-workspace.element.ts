@@ -1,7 +1,7 @@
 import { UmbWorkspaceMemberGroupContext } from './member-group-workspace.context.js';
-import { UmbMemberGroupWorkspaceEditElement } from './member-group-workspace-edit.element.js';
+import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -12,7 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-member-group-workspace')
 export class UmbMemberGroupWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbWorkspaceMemberGroupContext(this);
-	#element = new UmbMemberGroupWorkspaceEditElement();
+	#element = new UmbMemberGroupWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [

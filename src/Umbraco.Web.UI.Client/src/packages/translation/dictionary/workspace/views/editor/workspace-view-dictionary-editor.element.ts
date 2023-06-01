@@ -1,12 +1,12 @@
 import { UmbDictionaryWorkspaceContext } from '../../dictionary-workspace.context.js';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';
-import { UUITextStyles , UUITextareaElement, UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUITextareaElement, UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-@customElement('umb-workspace-view-dictionary-edit')
-export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
+@customElement('umb-workspace-view-dictionary-editor')
+export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
 	private _dictionary?: DictionaryItemResponseModel;
 
@@ -85,10 +85,10 @@ export class UmbWorkspaceViewDictionaryEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbWorkspaceViewDictionaryEditElement;
+export default UmbWorkspaceViewDictionaryEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-view-dictionary-edit': UmbWorkspaceViewDictionaryEditElement;
+		'umb-workspace-view-dictionary-editor': UmbWorkspaceViewDictionaryEditorElement;
 	}
 }

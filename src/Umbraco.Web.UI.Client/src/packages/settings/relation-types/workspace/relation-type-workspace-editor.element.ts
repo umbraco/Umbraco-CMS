@@ -1,15 +1,15 @@
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context.js';
-import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 /**
- * @element umb-relation-type-workspace-edit-element
+ * @element umb-relation-type-workspace-editor
  * @description - Element for displaying a Relation Type Workspace
  */
-@customElement('umb-relation-type-workspace-edit-element')
-export class UmbRelationTypeWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-relation-type-workspace-editor')
+export class UmbRelationTypeWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: UmbRelationTypeWorkspaceContext;
 
 	@state()
@@ -81,10 +81,10 @@ export class UmbRelationTypeWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbRelationTypeWorkspaceEditElement;
+export default UmbRelationTypeWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-relation-type-workspace-edit-element': UmbRelationTypeWorkspaceEditElement;
+		'umb-relation-type-workspace-editor': UmbRelationTypeWorkspaceEditorElement;
 	}
 }

@@ -1,28 +1,28 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.EyeDropper',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.EyeDropper',
 	name: 'Eye Dropper Color Picker Property Editor UI',
 	loader: () => import('./property-editor-ui-eye-dropper.element.js'),
 	meta: {
 		label: 'Eye Dropper Color Picker',
 		icon: 'umb:colorpicker',
 		group: 'pickers',
-		propertyEditorModel: 'Umbraco.ColorPicker.EyeDropper',
-		config: {
+		propertyEditorAlias: 'Umbraco.ColorPicker.EyeDropper',
+		settings: {
 			properties: [
 				{
 					alias: 'showAlpha',
 					label: 'Show alpha',
 					description: 'Allow alpha transparency selection.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 				{
 					alias: 'showPalette',
 					label: 'Show palette',
 					description: 'Show a palette next to the color picker.',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},
