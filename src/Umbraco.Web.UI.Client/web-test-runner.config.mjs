@@ -84,6 +84,8 @@ export default {
 						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
 
 						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
+						"@umbraco-cms/backoffice/current-user": "./src/packages/users/current-user/index.js",
+						"@umbraco-cms/backoffice/users": "./src/packages/users/users/index.js",
 
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},

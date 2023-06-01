@@ -41,6 +41,8 @@
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./data-type": "./dist-cms/packages/settings/data-types/index.js",
 		"./user-group": "./dist-cms/packages/users/user-groups/index.js",
+		"./current-user": "./dist-cms/packages/users/current-user/index.js",
+		"./users/": "./dist-cms/packages/users/users/index.js",
 		"./external/*": "./dist-cms/external/*/index.js"
 	},
 	"files": [
