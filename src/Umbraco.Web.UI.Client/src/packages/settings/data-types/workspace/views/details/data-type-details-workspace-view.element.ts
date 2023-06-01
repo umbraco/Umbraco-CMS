@@ -197,6 +197,11 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		css`
 			:host {
 				display: block;
+				margin: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1);
+			}
+
+			uui-box {
 				padding: var(--uui-size-layout-1);
 			}
 		`,

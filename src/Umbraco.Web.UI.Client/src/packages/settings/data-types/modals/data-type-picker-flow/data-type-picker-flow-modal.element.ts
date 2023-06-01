@@ -4,8 +4,8 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbPropertyEditorUIPickerModalData,
-	UmbPropertyEditorUIPickerModalResult,
+	UmbDataTypePickerFlowModalData,
+	UmbDataTypePickerFlowModalResult,
 	UmbModalHandler,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -18,18 +18,18 @@ interface GroupedItems<T> {
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
+	modalHandler?: UmbModalHandler<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalResult>;
 
 	@property({ type: Object })
-	public get data(): UmbPropertyEditorUIPickerModalData | undefined {
+	public get data(): UmbDataTypePickerFlowModalData | undefined {
 		return this._data;
 	}
-	public set data(value: UmbPropertyEditorUIPickerModalData | undefined) {
+	public set data(value: UmbDataTypePickerFlowModalData | undefined) {
 		this._data = value;
 		this._selection = this.data?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
-	private _data?: UmbPropertyEditorUIPickerModalData | undefined;
+	private _data?: UmbDataTypePickerFlowModalData | undefined;
 
 	@state()
 	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
@@ -47,6 +47,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
+
+	//UMB_DATA_TYPE_PICKER_FLOW_UI_PICKER_MODAL;
 
 	constructor() {
 		super();
@@ -72,8 +74,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		});
 	}
 
-	private _handleUIClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		alert('To BE DONE.');
+	private _handleUiClick(propertyEditorUi: ManifestPropertyEditorUi) {
+		// Open a modal of available data types for the selected Property Editor UI.
 	}
 
 	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
@@ -195,7 +197,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				uis,
 				(propertyEditorUI) => propertyEditorUI.alias,
 				(propertyEditorUI) => html` <li class="item">
-					<button type="button" @click="${() => this._handleUIClick(propertyEditorUI)}">
+					<button type="button" @click="${() => this._handleUiClick(propertyEditorUI)}">
 						<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
 						${propertyEditorUI.meta.label || propertyEditorUI.name}
 					</button>
