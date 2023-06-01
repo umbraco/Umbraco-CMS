@@ -4,9 +4,12 @@ import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
+	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalResult,
 	UmbModalHandler,
+	UmbModalRouteBuilder,
+	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -43,6 +46,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@state()
 	private _submitLabel = 'Select';
 
+	@state()
+	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
+
 	#repository;
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
@@ -53,6 +59,21 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#repository = new UmbDataTypeRepository(this);
+
+		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
+			.addAdditionalPath(':uiAlias')
+			.onSetup((routingInfo) => {
+				return {
+					propertyEditorUiAlias: routingInfo.uiAlias,
+				};
+			})
+			.onSubmit((submitData) => {
+				console.log('got', submitData);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._dataTypePickerModalRouteBuilder = routeBuilder;
+				this.requestUpdate('_dataTypePickerModalRouteBuilder');
+			});
 
 		this.#init();
 	}
@@ -72,10 +93,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			this.#propertyEditorUIs = propertyEditorUIs;
 			this._performFiltering();
 		});
-	}
-
-	private _handleUiClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		// Open a modal of available data types for the selected Property Editor UI.
 	}
 
 	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
@@ -193,16 +210,20 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	private _renderGroupUIs(uis: Array<ManifestPropertyEditorUi>) {
 		return html` <ul id="item-grid">
-			${repeat(
-				uis,
-				(propertyEditorUI) => propertyEditorUI.alias,
-				(propertyEditorUI) => html` <li class="item">
-					<button type="button" @click="${() => this._handleUiClick(propertyEditorUI)}">
-						<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
-						${propertyEditorUI.meta.label || propertyEditorUI.name}
-					</button>
-				</li>`
-			)}
+			${this._dataTypePickerModalRouteBuilder
+				? repeat(
+						uis,
+						(propertyEditorUI) => propertyEditorUI.alias,
+						(propertyEditorUI) => html` <li class="item">
+							<uui-button
+								type="button"
+								href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
+								<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+								${propertyEditorUI.meta.label || propertyEditorUI.name}
+							</uui-button>
+						</li>`
+				  )
+				: ''}
 		</ul>`;
 	}
 
@@ -242,21 +263,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				cursor: pointer;
 			}
 
-			#item-grid .item[selected] button {
-				background: var(--uui-color-selected);
-				color: var(--uui-color-selected-contrast);
-			}
-
-			#item-grid .item button {
-				background: none;
-				border: none;
-				cursor: pointer;
+			#item-grid .item uui-button {
 				padding: var(--uui-size-space-3);
-				display: flex;
-				align-items: center;
-				flex-direction: column;
-				justify-content: center;
-				font-size: 0.8rem;
 				height: 100%;
 				width: 100%;
 				color: var(--uui-color-interactive);

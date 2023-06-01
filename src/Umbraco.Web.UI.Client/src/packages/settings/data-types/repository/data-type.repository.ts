@@ -188,10 +188,10 @@ export class UmbDataTypeRepository
 		return this.#detailStore!.byId(id);
 	}
 
-	async treeItemsByPropertyEditorUiAlias(propertyEditorUiAlias: string) {
+	async byPropertyEditorUiAlias(propertyEditorUiAlias: string) {
 		if (!propertyEditorUiAlias) throw new Error('propertyEditorUiAlias is missing');
 		await this.#init;
-		return this.#treeStore!.withPropertyEditorUiAlias(propertyEditorUiAlias);
+		return this.#detailStore!.withPropertyEditorUiAlias(propertyEditorUiAlias);
 	}
 
 	async create(dataType: CreateDataTypeRequestModel) {

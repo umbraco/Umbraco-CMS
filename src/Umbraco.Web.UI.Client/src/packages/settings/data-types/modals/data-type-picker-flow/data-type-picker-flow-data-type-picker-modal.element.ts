@@ -2,10 +2,9 @@ import { UmbDataTypeRepository } from '../../repository/data-type.repository.js'
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbPropertyEditorUIPickerModalData,
-	UmbPropertyEditorUIPickerModalResult,
 	UmbModalHandler,
 	UmbDataTypePickerFlowDataTypePickerModalData,
+	UmbDataTypePickerFlowDataTypePickerModalResult,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -18,15 +17,11 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	@state()
 	private _dataTypes?: Array<FolderTreeItemResponseModel>;
 
-	@state()
-	private _selection: Array<string> = [];
-
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		if (!this.data) return;
 
-		this._selection = this.data.selection ?? [];
 		this._observeDataTypesOf(this.data.propertyEditorUiAlias);
 	}
 
@@ -35,24 +30,34 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 
 		const dataTypeRepository = new UmbDataTypeRepository(this);
 
+		// TODO: This is a hack to get the data types of a property editor ui alias.
+		// TODO: Make sure filtering works data-type that does not have a property editor ui, but should be using the default property editor UI for those.
 		// TODO: make an end-point just retrieving the data types using a given property editor ui alias.
-		await dataTypeRepository.requestRootTreeItems();
+		const { data } = await dataTypeRepository.requestRootTreeItems();
+
+		if (!data) return;
+
+		await Promise.all(
+			data.items.map((item) => {
+				if (item.id) {
+					return dataTypeRepository.requestById(item.id);
+				}
+				return Promise.resolve();
+			})
+		);
 
 		// TODO: Use the asObservable from above onces end-point has been made.
-		const source = await dataTypeRepository.treeItemsByPropertyEditorUiAlias(propertyEditorUiAlias);
+		const source = await dataTypeRepository.byPropertyEditorUiAlias(propertyEditorUiAlias);
 		this.observe(source, (dataTypes) => {
+			console.log('observe got', dataTypes);
 			this._dataTypes = dataTypes;
 		});
 	}
 
 	private _handleClick(dataType: FolderTreeItemResponseModel) {
 		if (dataType.id) {
-			this._select(dataType.id);
+			this.modalHandler?.submit({ dataTypeId: dataType.id });
 		}
-	}
-
-	private _select(alias: string) {
-		this._selection = [alias];
 	}
 
 	private _close() {
@@ -60,11 +65,10 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	}
 
 	@property({ attribute: false })
-	modalHandler?: UmbModalHandler<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalResult>;
-
-	private _submit() {
-		this.modalHandler?.submit({ selection: this._selection });
-	}
+	modalHandler?: UmbModalHandler<
+		UmbDataTypePickerFlowDataTypePickerModalData,
+		UmbDataTypePickerFlowDataTypePickerModalResult
+	>;
 
 	render() {
 		return html`
@@ -85,7 +89,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 						(dataType) => dataType.id,
 						(dataType) =>
 							dataType.id
-								? html` <li class="item" ?selected=${this._selection.includes(dataType.id)}>
+								? html` <li class="item">
 										<button type="button" @click="${() => this._handleClick(dataType)}">
 											<uui-icon name="${dataType.icon}" class="icon"></uui-icon>
 											${dataType.name}

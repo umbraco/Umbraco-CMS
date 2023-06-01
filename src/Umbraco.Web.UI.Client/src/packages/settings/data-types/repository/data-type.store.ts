@@ -52,4 +52,11 @@ export class UmbDataTypeStore extends UmbStoreBase<DataTypeResponseModel> {
 	remove(uniques: Array<DataTypeResponseModel['id']>) {
 		this._data.remove(uniques);
 	}
+
+	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
+		// TODO: Use a model for the data-type tree items: ^^Most likely it should be parsed to the UmbEntityTreeStore as a generic type.
+		return this._data.getObservablePart((items) =>
+			items.filter((item) => (item as any).propertyEditorUiAlias === propertyEditorUiAlias)
+		);
+	}
 }

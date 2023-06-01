@@ -18,15 +18,6 @@ export class UmbDataTypeTreeStore extends UmbEntityTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
 	}
-
-	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
-		// TODO: Use a model for the data-type tree items: ^^Most likely it should be parsed to the UmbEntityTreeStore as a generic type.
-		return this._data.getObservablePart((item) => {
-			if ((item as any).propertyEditorUiAlias === propertyEditorUiAlias) {
-				return item;
-			}
-		});
-	}
 }
 
 export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
