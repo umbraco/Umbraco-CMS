@@ -46,6 +46,7 @@ public class ManagementApiComposer : IComposer
             .AddLogViewer()
             .AddUsers()
             .AddUserGroups()
+            .AddTours()
             .AddPackages()
             .AddEntities()
             .AddPathFolders()

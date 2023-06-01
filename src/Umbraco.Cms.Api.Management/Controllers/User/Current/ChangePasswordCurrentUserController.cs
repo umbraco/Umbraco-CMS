@@ -9,38 +9,40 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.User;
+namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
 [ApiVersion("1.0")]
-public class ChangePasswordUserController : UserControllerBase
+public class ChangePasswordCurrentUserController : CurrentUserControllerBase
 {
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserService _userService;
     private readonly IUmbracoMapper _mapper;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public ChangePasswordUserController(
+    public ChangePasswordCurrentUserController(
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserService userService,
-        IUmbracoMapper mapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IUmbracoMapper mapper)
     {
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _userService = userService;
         _mapper = mapper;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("change-password/{id:guid}")]
+    [HttpPost("change-password")]
     [MapToApiVersion("1.0")]
     [ProducesErrorResponseType(typeof(ChangePasswordUserResponseModel))]
-    public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
+    public async Task<IActionResult> ChangePassword(ChangePasswordUserRequestModel model)
     {
-        var passwordModel = new ChangeUserPasswordModel
+        Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
+
+        var changeModel = new ChangeUserPasswordModel
         {
             NewPassword = model.NewPassword,
             OldPassword = model.OldPassword,
-            UserKey = id,
+            UserKey = userKey,
         };
 
-        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ChangePasswordAsync(CurrentUserKey(_backOfficeSecurityAccessor), passwordModel);
+        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ChangePasswordAsync(userKey, changeModel);
 
         return response.Success
             ? Ok(_mapper.Map<ChangePasswordUserResponseModel>(response.Result))

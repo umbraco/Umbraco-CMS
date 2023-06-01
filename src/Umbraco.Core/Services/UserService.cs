@@ -1642,6 +1642,26 @@ internal class UserService : RepositoryService, IUserService
         return backOfficeUserStore.GetUsersAsync(keys.ToArray());
     }
 
+    public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey)
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? user = await backOfficeUserStore.GetAsync(userKey);
+        if (user is null)
+        {
+            return Attempt.FailWithStatus<ICollection<IIdentityUserLogin>, UserOperationStatus>(UserOperationStatus.UserNotFound, Array.Empty<IIdentityUserLogin>());
+        }
+
+        ICoreBackOfficeUserManager manager = scope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+
+        Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus> loginsAttempt = await manager.GetLoginsAsync(user);
+
+        return loginsAttempt.Success is false
+            ? Attempt.FailWithStatus<ICollection<IIdentityUserLogin>, UserOperationStatus>(loginsAttempt.Status, Array.Empty<IIdentityUserLogin>())
+            : Attempt.SucceedWithStatus(UserOperationStatus.Success, loginsAttempt.Result);
+    }
+
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
@@ -1898,6 +1918,39 @@ internal class UserService : RepositoryService, IUserService
 
             scope.Complete();
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, IEnumerable<Guid> nodeKeys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        IUser? user = await GetAsync(userKey);
+
+        if (user is null)
+        {
+            throw new InvalidOperationException("No user with that ID");
+        }
+
+        Guid[] keys = nodeKeys.ToArray();
+        if (keys.Length == 0)
+        {
+            return Enumerable.Empty<NodePermissions>();
+        }
+
+        // We don't know what the entity type may be, so we have to get the entire entity :(
+        var idKeyMap = keys.ToDictionary(key => _entityService.Get(key)!.Id);
+
+        EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
+
+        var results = new List<NodePermissions>();
+        foreach (int nodeId in idKeyMap.Keys)
+        {
+            var permissions = permissionCollection.GetAllPermissions(nodeId).ToArray();
+            results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
+        }
+
+        return results;
     }
 
     /// <summary>
