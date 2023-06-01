@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -18,6 +19,7 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly IAuditRepository _auditRepository;
     private readonly ITemplateContentParserService _templateContentParserService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
     public TemplateService(
         ICoreScopeProvider provider,
@@ -27,7 +29,8 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateRepository templateRepository,
         IAuditRepository auditRepository,
         ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IDefaultViewContentProvider defaultViewContentProvider)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _shortStringHelper = shortStringHelper;
@@ -35,6 +38,7 @@ public class TemplateService : RepositoryService, ITemplateService
         _auditRepository = auditRepository;
         _templateContentParserService = templateContentParserService;
         _userIdKeyResolver = userIdKeyResolver;
+        _defaultViewContentProvider = defaultViewContentProvider;
     }
 
     /// <inheritdoc />
@@ -164,6 +168,19 @@ public class TemplateService : RepositoryService, ITemplateService
             IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
             return await Task.FromResult(_templateRepository.Get(query)?.SingleOrDefault());
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<string> GetScaffoldAsync(Guid? masterTemplateKey)
+    {
+        string? masterAlias = null;
+        if (masterTemplateKey is not null)
+        {
+            ITemplate? masterTemplate = await GetAsync(masterTemplateKey.Value);
+            masterAlias = masterTemplate?.Alias;
+        }
+
+        return _defaultViewContentProvider.GetDefaultFileContent(masterAlias);
     }
 
     /// <inheritdoc />
