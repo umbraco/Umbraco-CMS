@@ -10,7 +10,7 @@ export const UMB_DICTIONARY_ITEM_PICKER_MODAL = new UmbModalToken<
 	UmbDictionaryItemPickerModalData,
 	UmbDictionaryItemPickerModalResult
 >(
-	'Umb.Modal.TreePicker',
+	UMB_DICTIONARY_ITEM_PICKER_MODAL_ALIAS,
 	{
 		type: 'sidebar',
 		size: 'small',
