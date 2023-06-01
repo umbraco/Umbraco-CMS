@@ -6,6 +6,8 @@ import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external
 import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import camelCase from 'lodash-es/camelCase.js';
 //import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-template-workspace-editor')
@@ -32,6 +34,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#isNew = false;
 
 	#masterTemplateId: string | null = null;
+
+	private inputQuery$ = new Subject<string>();
 
 	constructor() {
 		super();
@@ -66,13 +70,19 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#templateWorkspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
 			});
+
+			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue) => {
+				console.log(nameInputValue);
+				this.#templateWorkspaceContext?.setName(nameInputValue);
+				if (this.#isNew && !this._alias) this.#templateWorkspaceContext?.setAlias(camelCase(nameInputValue));
+			});
 		});
 	}
 
 	#onNameInput(event: Event) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
-		this.#templateWorkspaceContext?.setName(value);
+		this.inputQuery$.next(value);
 	}
 
 	#onAliasInput(event: Event) {

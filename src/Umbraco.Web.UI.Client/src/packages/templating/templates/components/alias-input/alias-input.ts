@@ -35,12 +35,6 @@ export class UmbTemplateAliasInputElement extends UmbLitElement {
 		}
 	}
 
-	protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		if (_changedProperties.has('value') && this.value === '') {
-			this.isOpen = true;
-		}
-	}
-
 	static styles = [
 		UUITextStyles,
 		css`
