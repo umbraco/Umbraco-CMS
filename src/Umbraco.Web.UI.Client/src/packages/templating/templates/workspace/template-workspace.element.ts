@@ -4,7 +4,7 @@ import { css, html , customElement, state } from '@umbraco-cms/backoffice/extern
 import type { IRoutingInfo, PageComponent, UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './template-workspace-edit.element.js';
+import './template-workspace-editor.element.js';
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {

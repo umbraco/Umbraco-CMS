@@ -8,8 +8,8 @@ import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } f
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 //import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/components';
 
-@customElement('umb-template-workspace-edit')
-export class UmbTemplateWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-template-workspace-editor')
+export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name?: string | null = '';
 
@@ -287,10 +287,10 @@ ${this._content}`;
 	];
 }
 
-export default UmbTemplateWorkspaceEditElement;
+export default UmbTemplateWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-template-workspace-edit': UmbTemplateWorkspaceEditElement;
+		'umb-template-workspace-editor': UmbTemplateWorkspaceEditorElement;
 	}
 }
