@@ -103,14 +103,14 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		});
 	}
 
-	// #openInsertPartialViewSidebar() {
-	// 	this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
-	// 	this.#openModal?.onSubmit().then((value) => {
-	// 		this.#getPartialViewSnippet(value).then(() => {
-	// 			this.#dispatchInsertEvent();
-	// 		});
-	// 	});
-	// }
+	#openInsertPartialViewSidebar() {
+		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		this.#openModal?.onSubmit().then((value) => {
+			this.#getPartialViewSnippet(value).then(() => {
+				this.#dispatchInsertEvent();
+			});
+		});
+	}
 
 	#openInsertDictionaryItemModal() {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
@@ -143,15 +143,17 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 					id="insert-button"
 					label="open insert menu">
 					<ul id="insert-menu" slot="dropdown">
+						<!-- 
+						TODO: uncomment when insert value has endpoint and is properly implemented	
 						<li>
 							<uui-menu-item
 								class="insert-menu-item"
 								target="_blank"
 								label="Value"
 								title="Value"
-								@click=${this.#openInsertValueSidebar}>
+								>
 							</uui-menu-item>
-						</li>
+						</li> -->
 
 						<li>
 							<uui-menu-item

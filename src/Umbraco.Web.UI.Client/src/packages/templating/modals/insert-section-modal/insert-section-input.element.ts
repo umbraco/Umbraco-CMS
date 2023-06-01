@@ -31,10 +31,6 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	@property({ attribute: false })
 	snippetMethod?: (value: string, isMandatory: boolean) => string;
 
-	firstUpdated() {
-		console.log(this.snippetMethod);
-	}
-
 	validate() {
 		if (!this.form) return true;
 

@@ -1,3 +1,4 @@
+import camelCase from 'lodash-es/camelCase.js';
 import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
 import type { UmbCodeEditorElement } from '../../../core/components/code-editor/code-editor.element.js';
@@ -7,8 +8,6 @@ import { css, html, customElement, query, state, nothing } from '@umbraco-cms/ba
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
-import camelCase from 'lodash-es/camelCase.js';
-//import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
@@ -72,7 +71,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			});
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue) => {
-				console.log(nameInputValue);
 				this.#templateWorkspaceContext?.setName(nameInputValue);
 				if (this.#isNew && !this._alias) this.#templateWorkspaceContext?.setAlias(camelCase(nameInputValue));
 			});
@@ -123,8 +121,6 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		if (this._content === null || this._content === undefined) return;
 		const layoutBlockRegex = /(@{[\s\S][^if]*?Layout\s*?=\s*?)("[^"]*?"|null)(;[\s\S]*?})/gi;
 		const masterTemplate = await this.#templateWorkspaceContext?.setMasterTemplate(id);
-
-		//root item selected
 
 		//Reset master template or is did not exist and the declaration exists
 		if (masterTemplate === null && layoutBlockRegex.test(this._content)) {
@@ -194,10 +190,6 @@ ${this._content}`;
 			@input=${this.#onCodeEditorInput}></umb-code-editor>`;
 	}
 
-	#save() {
-		this.#templateWorkspaceContext?.save();
-	}
-
 	render() {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
@@ -207,17 +199,14 @@ ${this._content}`;
 					.value=${this._alias}
 					@change=${this.#onAliasInput}></umb-template-alias-input
 			></uui-input>
-			<uui-button @click=${this.#save} .color=${'danger'} look="primary"
-				>TEMPORARY SAVE BUTTON - REMOVE ME WHEN THE ACTION IS BACK</uui-button
-			>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
 					${this.#renderMasterTemplatePicker()}
 					<div>
 						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
-						<uui-button look="secondary" id="query-builder-button" label="Query builder">
+						<!-- <uui-button look="secondary" id="query-builder-button" label="Query builder">
 							<uui-icon name="umb:wand"></uui-icon>Query builder
-						</uui-button>
+						</uui-button> -->
 						<uui-button
 							look="secondary"
 							id="sections-button"
@@ -259,6 +248,8 @@ ${this._content}`;
 				min-height: calc(100dvh - 300px);
 				margin: var(--uui-size-layout-1);
 				--uui-box-default-padding: 0;
+				/* remove header border bottom as code editor looks better in this box */
+				--uui-color-divider-standalone: transparent;
 			}
 
 			uui-input {
