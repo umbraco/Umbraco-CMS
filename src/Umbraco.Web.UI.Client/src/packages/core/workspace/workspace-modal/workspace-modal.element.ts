@@ -15,8 +15,13 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 		this.modalHandler?.submit();
 	}
 
+	/**
+	 * TODO:
+	 * It seems like the router-slot cannot find the right parent router-slot as the modal element is injected via a slot. and therefor its search through parentNodes would never get to the router-slot cause its DOM existance is not within the slot, thats only the rendering.
+	 * We can fix this by changing the router-slot to use an event to find its parent.
+	 */
 	render() {
-		return html`WORKSPACE MODAL, TBD`;
+		return html`<umb-workspace .entityType=${this.data?.entityType}></umb-workspace>`;
 	}
 
 	static styles: CSSResultGroup = [
