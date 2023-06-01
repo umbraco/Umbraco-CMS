@@ -1,4 +1,4 @@
-import { html, css, nothing , ifDefined , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, nothing, ifDefined, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -124,7 +124,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 			uui-box {
 				margin: var(--uui-size-space-5) 0;

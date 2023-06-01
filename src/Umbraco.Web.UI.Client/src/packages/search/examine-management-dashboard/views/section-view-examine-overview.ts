@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import {
 	HealthStatusModel,
@@ -118,7 +118,7 @@ export class UmbDashboardExamineOverviewElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 
 			uui-box + uui-box {
