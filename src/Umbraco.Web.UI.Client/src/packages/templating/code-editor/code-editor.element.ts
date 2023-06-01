@@ -1,8 +1,8 @@
-import { UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context.js';
+import { UMB_THEME_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/themes';
 import { UmbCodeEditorController } from './code-editor.controller.js';
 import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } from './code-editor.model.js';
 import { CodeEditorTheme } from './code-editor.model.js';
-import { monacoEditorStyles, monacoJumpingCursorHack } from './styles.js';
+import { monacoEditorStyles, monacoJumpingCursorHack } from '@umbraco-cms/backoffice/external/monaco-editor';
 import {
 	css,
 	html,

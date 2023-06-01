@@ -1,4 +1,3 @@
-import * as monaco from 'monaco-editor';
 import {
 	CodeEditorConstructorOptions,
 	CodeEditorSearchOptions,
@@ -10,7 +9,8 @@ import {
 	UmbCodeEditorRange,
 	UmbCodeEditorSelection,
 } from './code-editor.model.js';
-import themes from './themes/index.js';
+import { themes } from './themes/index.js';
+import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/events';
 
 //TODO - consider firing change event on blur
@@ -298,6 +298,7 @@ export class UmbCodeEditorController {
 			},
 		]);
 	}
+
 	/**
 	 * Selects a range of text in the editor.
 	 *
@@ -308,6 +309,7 @@ export class UmbCodeEditorController {
 		if (!this.#editor) throw new Error('Editor object not found');
 		this.#editor.setSelection(range);
 	}
+
 	/**
 	 * Changes the theme of the editor.
 	 *
@@ -319,6 +321,7 @@ export class UmbCodeEditorController {
 		if (!this.#editor) throw new Error('Editor object not found');
 		monaco.editor.setTheme(theme);
 	}
+
 	/**
 	 * Runs callback on change of model content. (for example when typing)
 	 *
@@ -331,6 +334,7 @@ export class UmbCodeEditorController {
 			callback();
 		});
 	}
+
 	/**
 	 * Runs callback on change of model (when the entire model is replaced	)
 	 *

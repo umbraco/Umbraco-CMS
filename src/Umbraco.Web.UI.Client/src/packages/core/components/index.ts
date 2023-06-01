@@ -31,8 +31,3 @@ export * from './ref-property-editor-ui/index.js';
 export * from './table/index.js';
 export * from './tooltip-menu/index.js';
 export * from './variant-selector/index.js';
-
-/**
- * Export the types for the components that are used in the backoffice but are lazy loaded.
- */
-export type { UmbCodeEditorElement } from './code-editor/code-editor.element.js';
