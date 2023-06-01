@@ -1,4 +1,4 @@
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken, UmbPickerModalResult, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
 export type UmbDictionaryItemPickerModalData = UmbTreePickerModalData<EntityTreeItemResponseModel>;
