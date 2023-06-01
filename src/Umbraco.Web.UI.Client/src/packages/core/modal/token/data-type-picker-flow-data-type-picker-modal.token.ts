@@ -6,7 +6,7 @@ export interface UmbDataTypePickerFlowDataTypePickerModalData {
 
 export type UmbDataTypePickerFlowDataTypePickerModalResult = {
 	dataTypeId?: string;
-	createNew?: boolean;
+	createNewWithPropertyEditorUiAlias?: string;
 };
 
 export const UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL = new UmbModalToken<

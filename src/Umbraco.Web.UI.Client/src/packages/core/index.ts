@@ -2,6 +2,7 @@ import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerE
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as propertyActionManifests } from './property-actions/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { UmbStoreExtensionInitializer } from './store/index.js';
 
@@ -37,6 +38,7 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...debugManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
+	...workspaceManifests,
 	...modalManifests,
 ];
 

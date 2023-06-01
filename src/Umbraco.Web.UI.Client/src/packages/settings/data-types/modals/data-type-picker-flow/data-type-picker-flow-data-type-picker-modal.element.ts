@@ -17,12 +17,16 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	@state()
 	private _dataTypes?: Array<FolderTreeItemResponseModel>;
 
+	private _propertyEditorUiAlias!: string;
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		if (!this.data) return;
 
-		this._observeDataTypesOf(this.data.propertyEditorUiAlias);
+		this._propertyEditorUiAlias = this.data.propertyEditorUiAlias;
+
+		this._observeDataTypesOf(this._propertyEditorUiAlias);
 	}
 
 	private async _observeDataTypesOf(propertyEditorUiAlias: string) {
@@ -59,6 +63,10 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 		}
 	}
 
+	private _handleCreate() {
+		this.modalHandler?.submit({ createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias });
+	}
+
 	private _close() {
 		this.modalHandler?.reject();
 	}
@@ -72,7 +80,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	render() {
 		return html`
 			<umb-body-layout headline="Select a configuration">
-				<uui-box> ${this._renderDataTypes()} </uui-box>
+				<uui-box> ${this._renderDataTypes()} ${this._renderCreate()}</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._close}></uui-button>
 				</div>
@@ -98,6 +106,14 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 				  )
 				: ''}
 		</ul>`;
+	}
+	private _renderCreate() {
+		return html`<li class="item">
+			<button type="button" @click="${() => this._handleCreate()}">
+				<uui-icon name="umb:plus" class="icon"></uui-icon>
+				Create new
+			</button>
+		</li>`;
 	}
 
 	static styles = [

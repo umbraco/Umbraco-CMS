@@ -5,6 +5,7 @@ import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
+	UMB_WORKSPACE_MODAL,
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalResult,
 	UmbModalHandler,
@@ -49,6 +50,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	@state()
 	private _dataTypePickerModalRouteBuilder?: UmbModalRouteBuilder;
 
+	private _createDataTypeModal: UmbModalRouteRegistrationController;
+
 	#repository;
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
@@ -68,14 +71,32 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				};
 			})
 			.onSubmit((submitData) => {
-				console.log('got', submitData);
+				if (submitData.dataTypeId) {
+					this._select(submitData.dataTypeId);
+				} else if (submitData.createNewWithPropertyEditorUiAlias) {
+					this._createDataType(submitData.createNewWithPropertyEditorUiAlias);
+				}
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._dataTypePickerModalRouteBuilder = routeBuilder;
 				this.requestUpdate('_dataTypePickerModalRouteBuilder');
 			});
 
+		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(':uiAlias')
+			.onSetup((params) => {
+				return { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } };
+			})
+			.onSubmit((submitData) => {
+				console.log('submitData', submitData);
+			});
+
 		this.#init();
+	}
+
+	private _createDataType(propertyEditorUiAlias: string) {
+		// Open create modal:
+		this._createDataTypeModal.open({ uiAlias: propertyEditorUiAlias });
 	}
 
 	async #init() {
