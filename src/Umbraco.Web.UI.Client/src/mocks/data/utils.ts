@@ -5,7 +5,6 @@ import type {
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
 	DocumentTypeResponseModel,
-	DocumentResponseModel,
 	FileSystemTreeItemPresentationModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
@@ -41,7 +40,7 @@ export const createContentTreeItem = (item: any): ContentTreeItemResponseModel &
 
 // TODO: remove isTrashed type extension when we have found a solution to trashed items
 export const createDocumentTreeItem = (
-	item: DocumentResponseModel
+	item: DocumentTreeItemResponseModel
 ): DocumentTreeItemResponseModel & { isTrashed: boolean } => {
 	return {
 		...createContentTreeItem(item),
