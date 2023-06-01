@@ -12,7 +12,7 @@ import type {
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import {
+import type {
 	CreateTemplateRequestModel,
 	EntityTreeItemResponseModel,
 	ItemResponseModelBaseModel,
