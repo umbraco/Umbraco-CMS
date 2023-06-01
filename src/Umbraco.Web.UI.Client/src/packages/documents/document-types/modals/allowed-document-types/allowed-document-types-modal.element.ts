@@ -1,5 +1,5 @@
 import { UmbDocumentTypeRepository } from '../../repository/document-type.repository.js';
-import { html, nothing , customElement, state , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbAllowedDocumentTypesModalData, UmbAllowedDocumentTypesModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
@@ -15,12 +15,28 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 	@state()
 	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
 
-	async firstUpdated() {
-		// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
-		// TODO: show error
-		if (!this.data?.id) return;
+	@state()
+	private _headline?: string;
 
-		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(this.data.id);
+	public connectedCallback() {
+		super.connectedCallback();
+
+		const parentName = this.data?.parentName;
+		if (parentName) {
+			this._headline = `Create at '${parentName}'`;
+		} else {
+			this._headline = `Create`;
+		}
+		if (this.data?.parentId) {
+			// TODO: Support root aka. id of null? or maybe its an active prop, like 'atRoot'.
+			// TODO: show error
+
+			this._retrieveAllowedChildrenOf(this.data.parentId);
+		}
+	}
+
+	private async _retrieveAllowedChildrenOf(id: string) {
+		const { data } = await this.#documentTypeRepository.requestAllowedChildTypesOf(id);
 
 		if (data) {
 			this._allowedDocumentTypes = data;
@@ -41,7 +57,7 @@ export class UmbAllowedDocumentTypesModalElement extends UmbModalBaseElement<
 
 	render() {
 		return html`
-			<umb-body-layout headline="Headline">
+			<umb-body-layout headline=${this._headline}>
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(
