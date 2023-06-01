@@ -111,6 +111,11 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 				content: template.content,
 				alias: template.alias,
 			});
+			if (this.#masterTemplate.value?.id) {
+				this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
+			} else {
+				this.repository.requestRootTreeItems();
+			}
 		}
 
 		if (template?.id) {

@@ -78,7 +78,6 @@ export class UmbTemplateRepository
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getRootItems();
-
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
@@ -161,9 +160,8 @@ export class UmbTemplateRepository
 		return { data, error };
 	}
 
-	async items(uniques: string[]) {
-		await this.#init;
-		return this.#store?.items(uniques);
+	async items(uniques: string[]): Promise<Observable<ItemResponseModelBaseModel[]>> {
+		throw new Error('items method is not implemented in UmbTemplateRepository');
 	}
 
 	async byId(id: string) {
@@ -190,7 +188,7 @@ export class UmbTemplateRepository
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		//this.#store?.append(template);
+		//this.#store?.append({ ...template, $type: 'EntityTreeItemResponseModel' });
 		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };
@@ -240,7 +238,6 @@ export class UmbTemplateRepository
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
 		this.#store?.remove([id]);
 		this.#treeStore?.removeItem(id);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
