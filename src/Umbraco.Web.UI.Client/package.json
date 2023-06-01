@@ -43,7 +43,6 @@
 		"./user-group": "./dist-cms/packages/users/user-groups/index.js",
 		"./current-user": "./dist-cms/packages/users/current-user/index.js",
 		"./users/": "./dist-cms/packages/users/users/index.js",
-		"./user-section/": "./dist-cms/packages/users/user-section/index.js",
 		"./external/*": "./dist-cms/external/*/index.js"
 	},
 	"files": [
