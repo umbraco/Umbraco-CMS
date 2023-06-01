@@ -104,13 +104,24 @@ public class TemplateService : RepositoryService, ITemplateService
         {
             // file might already be on disk, if so grab the content to avoid overwriting
             template.Content = GetViewContent(template.Alias) ?? template.Content;
-            return await SaveAsync(template, AuditType.New, userKey);
+            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreate(template));
         }
         catch (PathTooLongException ex)
         {
             LoggerFactory.CreateLogger<TemplateService>().LogError(ex, "The template path was too long. Consider making the template alias shorter.");
             return Attempt.FailWithStatus(TemplateOperationStatus.InvalidAlias, template);
         }
+    }
+
+    private TemplateOperationStatus ValidateCreate(ITemplate templateToCreate)
+    {
+        ITemplate? existingTemplate = GetAsync(templateToCreate.Alias).GetAwaiter().GetResult();
+        if (existingTemplate is not null)
+        {
+            return TemplateOperationStatus.DuplicateAlias;
+        }
+
+        return TemplateOperationStatus.Success;
     }
 
     /// <inheritdoc />
@@ -199,9 +210,23 @@ public class TemplateService : RepositoryService, ITemplateService
             AuditType.Save,
             userKey,
             // fail the attempt if the template does not exist within the scope
-            () => _templateRepository.Exists(template.Id)
-                ? TemplateOperationStatus.Success
-                : TemplateOperationStatus.TemplateNotFound);
+            () => ValidateUpdate(template));
+
+    private TemplateOperationStatus ValidateUpdate(ITemplate templateToUpdate)
+    {
+        ITemplate? existingTemplate = GetAsync(templateToUpdate.Alias).GetAwaiter().GetResult();
+        if (existingTemplate is not null && existingTemplate.Key != templateToUpdate.Key)
+        {
+            return TemplateOperationStatus.DuplicateAlias;
+        }
+
+        if (_templateRepository.Exists(templateToUpdate.Id) is false)
+        {
+            return TemplateOperationStatus.TemplateNotFound;
+        }
+
+        return TemplateOperationStatus.Success;
+    }
 
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(ITemplate template, AuditType auditType, Guid userKey, Func<TemplateOperationStatus>? scopeValidator = null)
     {

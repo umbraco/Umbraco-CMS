@@ -5,6 +5,7 @@ public enum TemplateOperationStatus
     Success,
     CancelledByNotification,
     InvalidAlias,
+    DuplicateAlias,
     TemplateNotFound,
     MasterTemplateNotFound
 }
