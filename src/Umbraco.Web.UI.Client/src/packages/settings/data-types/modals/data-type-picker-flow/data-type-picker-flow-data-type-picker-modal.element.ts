@@ -49,7 +49,6 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 		// TODO: Use the asObservable from above onces end-point has been made.
 		const source = await dataTypeRepository.byPropertyEditorUiAlias(propertyEditorUiAlias);
 		this.observe(source, (dataTypes) => {
-			console.log('observe got', dataTypes);
 			this._dataTypes = dataTypes;
 		});
 	}
