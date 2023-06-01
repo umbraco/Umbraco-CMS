@@ -189,6 +189,7 @@ export type { PropertyTypeAppearanceModel } from './models/PropertyTypeAppearanc
 export type { PropertyTypeContainerResponseModelBaseModel } from './models/PropertyTypeContainerResponseModelBaseModel';
 export type { PropertyTypeResponseModelBaseModel } from './models/PropertyTypeResponseModelBaseModel';
 export type { PropertyTypeValidationModel } from './models/PropertyTypeValidationModel';
+export { PublishedStateModel } from './models/PublishedStateModel';
 export type { RecycleBinItemResponseModel } from './models/RecycleBinItemResponseModel';
 export { RedirectStatusModel } from './models/RedirectStatusModel';
 export type { RedirectUrlResponseModel } from './models/RedirectUrlResponseModel';
@@ -277,6 +278,7 @@ export { UserStateModel } from './models/UserStateModel';
 export type { ValueModelBaseModel } from './models/ValueModelBaseModel';
 export type { VariantModelBaseModel } from './models/VariantModelBaseModel';
 export type { VariantResponseModelBaseModel } from './models/VariantResponseModelBaseModel';
+export type { VariantTreeItemModel } from './models/VariantTreeItemModel';
 export type { VersionResponseModel } from './models/VersionResponseModel';
 
 export { AuditLogResource } from './services/AuditLogResource';
