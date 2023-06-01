@@ -56,7 +56,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 							value=${ifDefined(this._language?.name)}
 							@input="${this.#handleInput}"></uui-input>`}
 			</div>
-			<div slot="footer" id="footer">
+			<div slot="footer-info" id="footer-into">
 				<a href="section/settings/workspace/language-root">Languages</a> /
 				${this._isNew ? 'Create' : this._language?.name}
 			</div>
@@ -82,7 +82,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 				align-items: center;
 			}
 
-			#footer {
+			#footer-into {
 				padding: 0 var(--uui-size-layout-1);
 			}
 

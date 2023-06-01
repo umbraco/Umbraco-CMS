@@ -143,7 +143,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 
 	render() {
 		return html`
-			<uui-box style="margin-bottom: var(--uui-size-space-5);"> ${this._renderPropertyEditorUI()} </uui-box>
+			<uui-box> ${this._renderPropertyEditorUI()} </uui-box>
 			${this._renderConfig()} </uui-box>
 		`;
 	}
@@ -197,7 +197,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 		`,
 	];

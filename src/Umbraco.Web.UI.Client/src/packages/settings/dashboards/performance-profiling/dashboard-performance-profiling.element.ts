@@ -1,5 +1,5 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ProfilingResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -93,7 +93,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 
 			uui-toggle {

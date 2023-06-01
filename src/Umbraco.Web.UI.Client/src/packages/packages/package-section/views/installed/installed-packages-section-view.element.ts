@@ -1,6 +1,6 @@
 import { UmbPackageRepository } from '../../../repository/package.repository.js';
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
-import { html, css , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -112,7 +112,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 			uui-box {
 				margin-top: var(--uui-size-space-5);

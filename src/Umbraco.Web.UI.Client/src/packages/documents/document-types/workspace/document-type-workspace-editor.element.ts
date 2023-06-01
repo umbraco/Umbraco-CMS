@@ -1,6 +1,6 @@
 import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context.js';
-import { UUIInputElement, UUIInputEvent , UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -92,7 +92,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 					</uui-input>
 				</div>
 
-				<div slot="footer">
+				<div slot="footer-info">
 					<!-- TODO: Shortcuts Modal? -->
 					<uui-button label="Show keyboard shortcuts">
 						Keyboard Shortcuts

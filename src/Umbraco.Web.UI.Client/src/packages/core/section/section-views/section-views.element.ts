@@ -122,16 +122,18 @@ export class UmbSectionViewsElement extends UmbLitElement {
 		return html`
 			${this._routes.length > 0
 				? html`
-						<div id="header">${this.#renderDashboards()} ${this.#renderViews()}</div>
-						<umb-router-slot
-							.routes=${this._routes}
-							@init=${(event: UmbRouterSlotInitEvent) => {
-								this._routerPath = event.target.absoluteRouterPath;
-							}}
-							@change=${(event: UmbRouterSlotChangeEvent) => {
-								this._activePath = event.target.localActiveViewPath;
-							}}>
-						</umb-router-slot>
+						<umb-body-layout>
+							<div id="header" slot="header">${this.#renderDashboards()} ${this.#renderViews()}</div>
+							<umb-router-slot
+								.routes=${this._routes}
+								@init=${(event: UmbRouterSlotInitEvent) => {
+									this._routerPath = event.target.absoluteRouterPath;
+								}}
+								@change=${(event: UmbRouterSlotChangeEvent) => {
+									this._activePath = event.target.localActiveViewPath;
+								}}>
+							</umb-router-slot>
+						</umb-body-layout>
 				  `
 				: nothing}
 		`;
@@ -175,6 +177,13 @@ export class UmbSectionViewsElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
 			#header {
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-divider-standalone);

@@ -7,14 +7,13 @@ template.innerHTML = `
 			<p>Example of vanilla JS section</p>
 		</uui-box>
 
-		<uui-action-bar slot="footer">
+		<uui-action-bar slot="footer-info">
 			<uui-button look="primary" type="button">Close</uui-button>
 		</uui-action-bar>
 	</umb-body-layout>
 `;
 
 export default class MyPackageViewCustom extends HTMLElement {
-
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
