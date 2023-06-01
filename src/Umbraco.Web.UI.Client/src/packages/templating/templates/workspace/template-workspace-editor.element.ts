@@ -1,8 +1,8 @@
-import camelCase from 'lodash-es/camelCase.js';
 import { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
 import type { UmbCodeEditorElement } from '../../../core/components/code-editor/code-editor.element.js';
 import { UmbTemplateWorkspaceContext } from './template-workspace.context.js';
+import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } from '@umbraco-cms/backoffice/modal';
