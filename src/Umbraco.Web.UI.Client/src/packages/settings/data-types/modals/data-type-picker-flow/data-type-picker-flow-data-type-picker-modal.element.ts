@@ -16,7 +16,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	data?: UmbDataTypePickerFlowDataTypePickerModalData;
 
 	@state()
-	private _dataTypes: Array<FolderTreeItemResponseModel> = [];
+	private _dataTypes?: Array<FolderTreeItemResponseModel>;
 
 	@state()
 	private _selection: Array<string> = [];
@@ -40,9 +40,10 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 
 		// Filter these:
 		//data?.items  by propertyEditorUiAlias
-		dataTypeRepository.byPropertyEditorUiAlias(propertyEditorUiAlias);
-
-		// TODO: make an observable
+		const source = await dataTypeRepository.treeItemsByPropertyEditorUiAlias(propertyEditorUiAlias);
+		this.observe(source, (dataTypes) => {
+			this._dataTypes = dataTypes;
+		});
 	}
 
 	private _handleClick(dataType: FolderTreeItemResponseModel) {
@@ -79,19 +80,21 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 
 	private _renderDataTypes() {
 		return html` <ul id="item-grid">
-			${repeat(
-				this._dataTypes,
-				(dataType) => dataType.id,
-				(dataType) =>
-					dataType.id
-						? html` <li class="item" ?selected=${this._selection.includes(dataType.id)}>
-								<button type="button" @click="${() => this._handleClick(dataType)}">
-									<uui-icon name="${dataType.icon}" class="icon"></uui-icon>
-									${dataType.name}
-								</button>
-						  </li>`
-						: ''
-			)}
+			${this._dataTypes
+				? repeat(
+						this._dataTypes,
+						(dataType) => dataType.id,
+						(dataType) =>
+							dataType.id
+								? html` <li class="item" ?selected=${this._selection.includes(dataType.id)}>
+										<button type="button" @click="${() => this._handleClick(dataType)}">
+											<uui-icon name="${dataType.icon}" class="icon"></uui-icon>
+											${dataType.name}
+										</button>
+								  </li>`
+								: ''
+				  )
+				: ''}
 		</ul>`;
 	}
 

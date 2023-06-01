@@ -71,6 +71,7 @@ export class UmbDataTypeRepository
 		this.#moveSource = new UmbDataTypeMoveServerDataSource(this.#host);
 		this.#copySource = new UmbDataTypeCopyServerDataSource(this.#host);
 
+		// TODO: Make a method that takes the controllers and returns a promise, just to simplify this:
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
@@ -185,6 +186,12 @@ export class UmbDataTypeRepository
 		if (!id) throw new Error('Key is missing');
 		await this.#init;
 		return this.#detailStore!.byId(id);
+	}
+
+	async treeItemsByPropertyEditorUiAlias(propertyEditorUiAlias: string) {
+		if (!propertyEditorUiAlias) throw new Error('propertyEditorUiAlias is missing');
+		await this.#init;
+		return this.#treeStore!.withPropertyEditorUiAlias(propertyEditorUiAlias);
 	}
 
 	async create(dataType: CreateDataTypeRequestModel) {
