@@ -16,7 +16,7 @@ export class UmbTemplateWorkspaceElement extends UmbLitElement {
 
 	#routerPath? = '';
 
-	#element = document.createElement('umb-template-workspace-edit');
+	#element = document.createElement('umb-template-workspace-editor');
 
 	@state()
 	_routes: UmbRoute[] = [

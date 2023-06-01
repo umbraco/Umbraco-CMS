@@ -197,7 +197,9 @@ ${this._content}`;
 					.value=${this._alias}
 					@change=${this.#onAliasInput}></umb-template-alias-input
 			></uui-input>
-			<uui-button @click=${this.#save} .color=${'danger'} look="primary">TEMPORARY SAVE BUTTON</uui-button>
+			<uui-button @click=${this.#save} .color=${'danger'} look="primary"
+				>TEMPORARY SAVE BUTTON - REMOVE ME WHEN THE ACTION IS BACK</uui-button
+			>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
 					${this.#renderMasterTemplatePicker()}
