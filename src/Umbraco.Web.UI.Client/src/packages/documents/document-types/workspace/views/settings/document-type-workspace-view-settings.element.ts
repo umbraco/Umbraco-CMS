@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-document-type-workspace-view-details')
-export class UmbDocumentTypeWorkspaceViewDetailsElement
+@customElement('umb-document-type-workspace-view-settings')
+export class UmbDocumentTypeWorkspaceViewSettingsElement
 	extends UmbLitElement
 	implements UmbWorkspaceEditorViewExtensionElement
 {
@@ -45,7 +45,7 @@ export class UmbDocumentTypeWorkspaceViewDetailsElement
 
 	render() {
 		return html`
-			<uui-box headline="Data configuration">
+			<uui-box headline="Data variations">
 				<umb-workspace-property-layout alias="VaryByCulture" label="Allow vary by culture">
 					<div slot="description">Allow editors to create content of different languages.</div>
 					<div slot="editor">
@@ -105,7 +105,11 @@ export class UmbDocumentTypeWorkspaceViewDetailsElement
 		css`
 			:host {
 				display: block;
-				padding: var(--uui-size-layout-1);
+				margin: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
+			}
+			uui-box {
+				margin-top: var(--uui-size-layout-1);
 			}
 
 			uui-label,
@@ -121,10 +125,10 @@ export class UmbDocumentTypeWorkspaceViewDetailsElement
 	];
 }
 
-export default UmbDocumentTypeWorkspaceViewDetailsElement;
+export default UmbDocumentTypeWorkspaceViewSettingsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-workspace-view-details': UmbDocumentTypeWorkspaceViewDetailsElement;
+		'umb-document-type-workspace-view-settings': UmbDocumentTypeWorkspaceViewSettingsElement;
 	}
 }

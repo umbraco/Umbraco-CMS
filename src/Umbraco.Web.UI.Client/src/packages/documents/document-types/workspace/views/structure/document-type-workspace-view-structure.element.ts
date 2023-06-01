@@ -76,12 +76,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 				</umb-workspace-property-layout>
 			</uui-box>
 			<uui-box headline="Presentation">
-				<umb-workspace-property-layout alias="Root" label="Collection">
-					<div slot="description">
-						Use this document as a collection, displaying its children in a Collection View. This could be a list or a
-						table.
-					</div>
-					<div slot="editor"><uui-toggle label="Present as a Collection"></uui-toggle></div>
+				<umb-workspace-property-layout alias="Root" label="Collection view">
+					<div slot="description">Provides an overview of child content and hides it in the tree.</div>
+					<div slot="editor"><uui-toggle label="Display children in a Collection view"></uui-toggle></div>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;
@@ -92,7 +89,11 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 		css`
 			:host {
 				display: block;
-				padding: var(--uui-size-layout-1);
+				margin: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
+			}
+			uui-box {
+				margin-top: var(--uui-size-layout-1);
 			}
 			uui-label,
 			umb-property-editor-ui-number {

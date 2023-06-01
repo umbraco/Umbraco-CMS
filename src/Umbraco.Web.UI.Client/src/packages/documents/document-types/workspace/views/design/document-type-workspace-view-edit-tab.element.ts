@@ -87,7 +87,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			${repeat(
 				this._groups,
 				(group) => group.name,
-				(group) => html`<uui-box .headline=${group.name || ''}>
+				(group) => html` <uui-box .headline=${group.name || ''}>
 					<umb-document-type-workspace-view-edit-properties
 						container-id=${group.id}
 						container-type="Group"
@@ -103,7 +103,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				padding: var(--uui-size-layout-1);
+				margin: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
+			}
+			uui-box {
+				margin-top: var(--uui-size-layout-1);
 			}
 
 			#add {
