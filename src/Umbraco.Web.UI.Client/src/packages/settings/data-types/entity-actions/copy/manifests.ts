@@ -1,4 +1,4 @@
-import { DATA_TYPE_ENTITY_TYPE } from '../../index.js';
+import { DATA_TYPE_ENTITY_TYPE } from '../../entities.js';
 import { DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/manifests.js';
 import { UmbCopyDataTypeEntityAction } from './copy.action.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
