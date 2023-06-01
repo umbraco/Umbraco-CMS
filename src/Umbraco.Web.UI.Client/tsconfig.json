@@ -26,6 +26,7 @@
 			"@umbraco-cms/backoffice/external/uuid": ["src/external/uuid"],
 			"@umbraco-cms/backoffice/external/lodash": ["src/external/lodash"],
 			"@umbraco-cms/backoffice/external/uui": ["src/external/uui"],
+			"@umbraco-cms/backoffice/external/monaco-editor": ["src/external/monaco-editor"],
 
 			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
 			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],
@@ -68,13 +69,17 @@
 			// Document
 			"@umbraco-cms/backoffice/document": ["src/packages/documents/documents"],
 
-			// DATA TYPES
+			// SETTINGS
 			"@umbraco-cms/backoffice/data-type": ["src/packages/settings/data-types"],
+			"@umbraco-cms/backoffice/themes": ["src/packages/settings/themes"],
 
 			// USERS
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
 			"@umbraco-cms/backoffice/current-user": ["src/packages/users/current-user"],
 			"@umbraco-cms/backoffice/users": ["src/packages/users/users"],
+
+			// TEMPLATING
+			"@umbraco-cms/backoffice/code-editor": ["src/packages/templating/code-editor"],
 
 			"@umbraco-cms/backoffice/css": ["src/shared/css/custom-properties.css"],
 

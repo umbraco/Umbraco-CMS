@@ -40,6 +40,7 @@ export default {
 						'@umbraco-cms/backoffice/external/router-slot': './src/external/router-slot/index.ts',
 						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
 						'@umbraco-cms/backoffice/external/lodash': './src/external/lodash/index.ts',
+						'@umbraco-cms/backoffice/external/monaco-editor': './src/external/monaco-editor/index.ts',
 
 						'@umbraco-cms/backoffice/context-api': './src/libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller-api': './src/libs/controller-api/index.ts',
@@ -82,10 +83,13 @@ export default {
 						'@umbraco-cms/backoffice/document': './src/packages/documents/documents/index.ts',
 
 						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
+						'@umbraco-cms/backoffice/themes': './src/packages/settings/themes/index.ts',
 
 						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
 						"@umbraco-cms/backoffice/current-user": "./src/packages/users/current-user/index.js",
 						"@umbraco-cms/backoffice/users": "./src/packages/users/users/index.js",
+
+						'@umbraco-cms/backoffice/code-editor': './src/packages/templating/code-editor/index.ts',
 
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
