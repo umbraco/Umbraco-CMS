@@ -8,8 +8,14 @@ public interface ITemplateService : IService
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
-    /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
+    /// <returns>An enumerable list of <see cref="ITemplate" />.</returns>
     Task<IEnumerable<ITemplate>> GetAllAsync(params string[] aliases);
+
+    /// <summary>
+    ///     Gets a list of all <see cref="ITemplate" /> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="ITemplate" />.</returns>
+    Task<IEnumerable<ITemplate>> GetAllAsync(Guid[] keys);
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects

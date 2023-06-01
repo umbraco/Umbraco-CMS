@@ -119,6 +119,17 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
+    public Task<IEnumerable<ITemplate>> GetAllAsync(params Guid[] keys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        IQuery<ITemplate> query = Query<ITemplate>().Where(x => keys.Contains(x.Key));
+        IEnumerable<ITemplate> templates = _templateRepository.Get(query).OrderBy(x => x.Name);
+
+        return Task.FromResult(templates);
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<ITemplate>> GetChildrenAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
