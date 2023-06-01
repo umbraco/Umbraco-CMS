@@ -1,5 +1,5 @@
-import { css, html, nothing , repeat , customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUITextStyles , UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing, repeat, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 interface HistoryNode {
@@ -237,7 +237,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 			:host {
 				display: grid;
 				gap: var(--uui-size-layout-1);
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 				grid-template-columns: 1fr 350px;
 			}
 
