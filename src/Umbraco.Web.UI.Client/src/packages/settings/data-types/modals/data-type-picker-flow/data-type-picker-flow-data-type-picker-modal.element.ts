@@ -36,10 +36,9 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 		const dataTypeRepository = new UmbDataTypeRepository(this);
 
 		// TODO: make an end-point just retrieving the data types using a given property editor ui alias.
-		const { data } = await dataTypeRepository.requestRootTreeItems();
+		await dataTypeRepository.requestRootTreeItems();
 
-		// Filter these:
-		//data?.items  by propertyEditorUiAlias
+		// TODO: Use the asObservable from above onces end-point has been made.
 		const source = await dataTypeRepository.treeItemsByPropertyEditorUiAlias(propertyEditorUiAlias);
 		this.observe(source, (dataTypes) => {
 			this._dataTypes = dataTypes;
