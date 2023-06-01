@@ -31,10 +31,10 @@ public sealed class DistributedCache
     }
 
     /// <summary>
-    /// Notifies the distributed cache of specified item invalidation, for a specified <see cref="ICacheRefresher" />.
+    /// Notifies the distributed cache of specified item invalidation, for a specified <see cref="ICacheRefresher{T}" />.
     /// </summary>
     /// <typeparam name="T">The type of the invalidated items.</typeparam>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     /// <param name="getNumericId">A function returning the unique identifier of items.</param>
     /// <param name="instances">The invalidated items.</param>
     /// <remarks>
@@ -57,7 +57,7 @@ public sealed class DistributedCache
     /// <summary>
     /// Notifies the distributed cache of a specified item invalidation, for a specified <see cref="ICacheRefresher" />.
     /// </summary>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     /// <param name="id">The unique identifier of the invalidated item.</param>
     public void Refresh(Guid refresherGuid, int id)
     {
@@ -72,7 +72,22 @@ public sealed class DistributedCache
     /// <summary>
     /// Notifies the distributed cache of a specified item invalidation, for a specified <see cref="ICacheRefresher" />.
     /// </summary>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
+    /// <param name="ids">The unique identifier of the invalidated items.</param>
+    public void Refresh(Guid refresherGuid, params int[] ids)
+    {
+        if (refresherGuid == Guid.Empty || ids is null || ids.Length == 0)
+        {
+            return;
+        }
+
+        _serverMessenger.QueueRefresh(GetRefresherById(refresherGuid), ids);
+    }
+
+    /// <summary>
+    /// Notifies the distributed cache of a specified item invalidation, for a specified <see cref="ICacheRefresher" />.
+    /// </summary>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     /// <param name="id">The unique identifier of the invalidated item.</param>
     public void Refresh(Guid refresherGuid, Guid id)
     {
@@ -88,11 +103,8 @@ public sealed class DistributedCache
     /// Refreshes the distributed cache by payload.
     /// </summary>
     /// <typeparam name="TPayload">The type of the payload.</typeparam>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     /// <param name="payload">The payload.</param>
-    /// <remarks>
-    /// The payload should be an object, or array of objects, NOT a LINQ enumerable of some sort (IEnumerable, query...).
-    /// </remarks>
     public void RefreshByPayload<TPayload>(Guid refresherGuid, TPayload[] payload)
     {
         if (refresherGuid == Guid.Empty || payload is null || payload.Length == 0)
@@ -107,7 +119,7 @@ public sealed class DistributedCache
     /// Refreshes the distributed cache by payload.
     /// </summary>
     /// <typeparam name="TPayload">The type of the payload.</typeparam>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     /// <param name="payloads">The payloads.</param>
     public void RefreshByPayload<TPayload>(Guid refresherGuid, IEnumerable<TPayload> payloads)
         where TPayload : class
@@ -116,7 +128,7 @@ public sealed class DistributedCache
     /// <summary>
     /// Notifies the distributed cache of a global invalidation for a specified <see cref="ICacheRefresher" />.
     /// </summary>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     public void RefreshAll(Guid refresherGuid)
     {
         if (refresherGuid == Guid.Empty)
@@ -130,7 +142,7 @@ public sealed class DistributedCache
     /// <summary>
     /// Notifies the distributed cache of a specified item removal, for a specified <see cref="ICacheRefresher" />.
     /// </summary>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     /// <param name="id">The unique identifier of the removed item.</param>
     public void Remove(Guid refresherGuid, int id)
     {
@@ -143,10 +155,25 @@ public sealed class DistributedCache
     }
 
     /// <summary>
-    /// Notifies the distributed cache of specified item removal, for a specified <see cref="ICacheRefresher" />.
+    /// Notifies the distributed cache of a specified item removal, for a specified <see cref="ICacheRefresher" />.
+    /// </summary>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
+    /// <param name="ids">The unique identifier of the removed items.</param>
+    public void Remove(Guid refresherGuid, params int[] ids)
+    {
+        if (refresherGuid == Guid.Empty || ids is null || ids.Length == 0)
+        {
+            return;
+        }
+
+        _serverMessenger.QueueRemove(GetRefresherById(refresherGuid), ids);
+    }
+
+    /// <summary>
+    /// Notifies the distributed cache of specified item removal, for a specified <see cref="ICacheRefresher{T}" />.
     /// </summary>
     /// <typeparam name="T">The type of the removed items.</typeparam>
-    /// <param name="refresherGuid">The unique identifier of the ICacheRefresher.</param>
+    /// <param name="refresherGuid">The unique identifier of the cache refresher.</param>
     /// <param name="getNumericId">A function returning the unique identifier of items.</param>
     /// <param name="instances">The removed items.</param>
     /// <remarks>

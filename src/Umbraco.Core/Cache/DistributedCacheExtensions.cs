@@ -3,6 +3,7 @@
 
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Extensions;
@@ -24,8 +25,14 @@ public static class DistributedCacheExtensions
     public static void RemoveUserCache(this DistributedCache dc, int userId)
         => dc.Remove(UserCacheRefresher.UniqueId, userId);
 
+    public static void RemoveUserCache(this DistributedCache dc, IEnumerable<IUser> users)
+        => dc.Remove(UserCacheRefresher.UniqueId, users.Select(x => x.Id).ToArray());
+
     public static void RefreshUserCache(this DistributedCache dc, int userId)
         => dc.Refresh(UserCacheRefresher.UniqueId, userId);
+
+    public static void RefreshUserCache(this DistributedCache dc, IEnumerable<IUser> users)
+        => dc.Refresh(UserCacheRefresher.UniqueId, users.Select(x => x.Id).ToArray());
 
     public static void RefreshAllUserCache(this DistributedCache dc)
         => dc.RefreshAll(UserCacheRefresher.UniqueId);
@@ -37,8 +44,14 @@ public static class DistributedCacheExtensions
     public static void RemoveUserGroupCache(this DistributedCache dc, int userId)
         => dc.Remove(UserGroupCacheRefresher.UniqueId, userId);
 
+    public static void RemoveUserGroupCache(this DistributedCache dc, IEnumerable<IUserGroup> userGroups)
+        => dc.Remove(UserGroupCacheRefresher.UniqueId, userGroups.Select(x => x.Id).ToArray());
+
     public static void RefreshUserGroupCache(this DistributedCache dc, int userId)
         => dc.Refresh(UserGroupCacheRefresher.UniqueId, userId);
+
+    public static void RefreshUserGroupCache(this DistributedCache dc, IEnumerable<IUserGroup> userGroups)
+        => dc.Refresh(UserGroupCacheRefresher.UniqueId, userGroups.Select(x => x.Id).ToArray());
 
     public static void RefreshAllUserGroupCache(this DistributedCache dc)
         => dc.RefreshAll(UserGroupCacheRefresher.UniqueId);
@@ -50,8 +63,14 @@ public static class DistributedCacheExtensions
     public static void RefreshTemplateCache(this DistributedCache dc, int templateId)
         => dc.Refresh(TemplateCacheRefresher.UniqueId, templateId);
 
+    public static void RefreshTemplateCache(this DistributedCache dc, IEnumerable<ITemplate> templates)
+        => dc.Refresh(TemplateCacheRefresher.UniqueId, templates.Select(x => x.Id).ToArray());
+
     public static void RemoveTemplateCache(this DistributedCache dc, int templateId)
         => dc.Remove(TemplateCacheRefresher.UniqueId, templateId);
+
+    public static void RemoveTemplateCache(this DistributedCache dc, IEnumerable<ITemplate> templates)
+        => dc.Remove(TemplateCacheRefresher.UniqueId, templates.Select(x => x.Id).ToArray());
 
     #endregion
 
@@ -60,8 +79,14 @@ public static class DistributedCacheExtensions
     public static void RefreshDictionaryCache(this DistributedCache dc, int dictionaryItemId)
         => dc.Refresh(DictionaryCacheRefresher.UniqueId, dictionaryItemId);
 
+    public static void RefreshDictionaryCache(this DistributedCache dc, IEnumerable<IDictionaryItem> dictionaryItems)
+        => dc.Refresh(DictionaryCacheRefresher.UniqueId, dictionaryItems.Select(x => x.Id).ToArray());
+
     public static void RemoveDictionaryCache(this DistributedCache dc, int dictionaryItemId)
         => dc.Remove(DictionaryCacheRefresher.UniqueId, dictionaryItemId);
+
+    public static void RemoveDictionaryCache(this DistributedCache dc, IEnumerable<IDictionaryItem> dictionaryItems)
+        => dc.Remove(DictionaryCacheRefresher.UniqueId, dictionaryItems.Select(x => x.Id).ToArray());
 
     #endregion
 
@@ -129,8 +154,14 @@ public static class DistributedCacheExtensions
     public static void RefreshMemberGroupCache(this DistributedCache dc, int memberGroupId)
         => dc.Refresh(MemberGroupCacheRefresher.UniqueId, memberGroupId);
 
+    public static void RefreshMemberGroupCache(this DistributedCache dc, IEnumerable<IMemberGroup> memberGroups)
+        => dc.Refresh(MemberGroupCacheRefresher.UniqueId, memberGroups.Select(x => x.Id).ToArray());
+
     public static void RemoveMemberGroupCache(this DistributedCache dc, int memberGroupId)
         => dc.Remove(MemberGroupCacheRefresher.UniqueId, memberGroupId);
+
+    public static void RemoveMemberGroupCache(this DistributedCache dc, IEnumerable<IMemberGroup> memberGroups)
+        => dc.Remove(MemberGroupCacheRefresher.UniqueId, memberGroups.Select(x => x.Id).ToArray());
 
     #endregion
 
@@ -253,8 +284,14 @@ public static class DistributedCacheExtensions
     public static void RefreshRelationTypeCache(this DistributedCache dc, int id)
         => dc.Refresh(RelationTypeCacheRefresher.UniqueId, id);
 
+    public static void RefreshRelationTypeCache(this DistributedCache dc, IEnumerable<IRelationType> relationTypes)
+        => dc.Refresh(RelationTypeCacheRefresher.UniqueId, relationTypes.Select(x => x.Id).ToArray());
+
     public static void RemoveRelationTypeCache(this DistributedCache dc, int id)
         => dc.Remove(RelationTypeCacheRefresher.UniqueId, id);
+
+    public static void RemoveRelationTypeCache(this DistributedCache dc, IEnumerable<IRelationType> relationTypes)
+        => dc.Remove(RelationTypeCacheRefresher.UniqueId, relationTypes.Select(x => x.Id).ToArray());
 
     #endregion
 }
