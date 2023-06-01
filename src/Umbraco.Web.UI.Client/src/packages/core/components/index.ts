@@ -5,7 +5,6 @@ export * from './backoffice-notification-container/backoffice-notification-conta
 export * from './body-layout/body-layout.element.js';
 export * from './button-with-dropdown/button-with-dropdown.element.js'; // TODO: delete this and change usage to umb-dropdown
 // export * from './code-block.js';
-export * from './code-editor/code-editor.element.js';
 export * from './data-type/index.js';
 export * from './date-input/index.js';
 export * from './dropdown/index.js';
@@ -32,3 +31,8 @@ export * from './ref-property-editor-ui/index.js';
 export * from './table/index.js';
 export * from './tooltip-menu/index.js';
 export * from './variant-selector/index.js';
+
+/**
+ * Export the types for the components that are used in the backoffice but are lazy loaded.
+ */
+export type { UmbCodeEditorElement } from './code-editor/code-editor.element.js';
