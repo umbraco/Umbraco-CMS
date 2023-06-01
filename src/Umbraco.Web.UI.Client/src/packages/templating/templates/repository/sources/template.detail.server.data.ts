@@ -1,4 +1,3 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	TemplateResponseModel,
 	TemplateResource,
@@ -16,7 +15,7 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbTemplateDetailServerDataSource
-	implements UmbDataSource<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>
+	implements UmbDataSource<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>
 {
 	#host: UmbControllerHostElement;
 
@@ -36,7 +35,19 @@ export class UmbTemplateDetailServerDataSource
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	get(id: string) {
+		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateById({ id }));
+	}
+
+	/**
+	 * Gets template item - you can get name and id from that
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbTemplateDetailServerDataSource
+	 */
+	async getItem(id: string[]) {
+		if (!id) throw new Error('Id is missing');
+		return await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateItem({ id: id }));
 	}
 
 	/**
@@ -46,43 +57,18 @@ export class UmbTemplateDetailServerDataSource
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async createScaffold() {
-		const error = undefined;
-		const data: TemplateResponseModel = {
-			$type: '',
-			id: UmbId.new(),
-			name: '',
-			alias: '',
-			content: '',
-		};
-
-		// TODO: update when backend is updated so we don't have to do two calls
-		/*
-		// TODO: Revisit template models, masterTemplateAlias is not here anymore?
-		const { data: scaffoldData, error: scaffoldError } = await tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTemplateScaffold()
-		);
-		*/
-
-		//error = scaffoldError;
-		//data.content = scaffoldData?.content || '';
-
-		return { data, error };
+		return await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateScaffold());
 	}
 
 	/**
-	 * Inserts a new Template on the server
+	 * Creates a new Template on the server
 	 * @param {Template} template
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async insert(template: CreateTemplateRequestModel) {
 		if (!template) throw new Error('Template is missing');
-
-		return tryExecuteAndNotify(
-			this.#host,
-			tryExecuteAndNotify(this.#host, TemplateResource.postTemplate({ requestBody: template }))
-		);
+		return await tryExecuteAndNotify(this.#host, TemplateResource.postTemplate({ requestBody: template }));
 	}
 
 	/**
@@ -92,9 +78,9 @@ export class UmbTemplateDetailServerDataSource
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async update(id: string, template: UpdateTemplateRequestModel) {
-		if (!id) throw new Error('Id is missing');
+		if (!id) throw new Error('You need to pass template id to update it');
 		if (!template) throw new Error('Template is missing');
-		return tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById({ id, requestBody: template }));
+		return await tryExecuteAndNotify(this.#host, TemplateResource.putTemplateById({ id, requestBody: template }));
 	}
 
 	/**
@@ -104,7 +90,7 @@ export class UmbTemplateDetailServerDataSource
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
 	async delete(id: string) {
-		if (!id) throw new Error('Id is missing');
+		if (!id) throw new Error('You need to pass template id to delete it');
 		return await tryExecuteAndNotify(this.#host, TemplateResource.deleteTemplateById({ id }));
 	}
 }

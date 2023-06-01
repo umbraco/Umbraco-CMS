@@ -19,7 +19,7 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
-
+import '../../components/index.js';
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
 export class UmbLogViewerWorkspaceElement extends UmbLitElement {

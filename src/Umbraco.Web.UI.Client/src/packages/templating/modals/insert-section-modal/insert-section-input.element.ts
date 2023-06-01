@@ -1,4 +1,3 @@
-import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
 import { UUITextStyles , UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html , customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 
@@ -22,6 +21,15 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 
 	@query('uui-checkbox')
 	checkbox?: HTMLFormElement;
+
+	get snippet() {
+		if (!this.snippetMethod) return '';
+		const snippet = this.snippetMethod(this.inputValue as string, this.isMandatory) ?? '';
+		return snippet;
+	}
+
+	@property({ attribute: false })
+	snippetMethod?: (value: string, isMandatory: boolean) => string;
 
 	validate() {
 		if (!this.form) return true;

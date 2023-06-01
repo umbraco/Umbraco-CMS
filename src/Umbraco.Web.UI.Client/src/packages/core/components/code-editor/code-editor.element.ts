@@ -1,6 +1,11 @@
 import { UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context.js';
 import { UmbCodeEditorController } from './code-editor.controller.js';
-import { CodeEditorLanguage, CodeEditorTheme, UmbCodeEditorHost } from './code-editor.model.js';
+import {
+	CodeEditorLanguage,
+	CodeEditorSearchOptions,
+	CodeEditorTheme,
+	UmbCodeEditorHost,
+} from './code-editor.model.js';
 import { monacoEditorStyles, monacoJumpingCursorHack } from './styles.js';
 import {
 	css,
@@ -144,8 +149,8 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	 * @return {*}
 	 * @memberof UmbCodeEditorElement
 	 */
-	find(text: string) {
-		return this.#editor?.find(text);
+	find(text: string, searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{}) {
+		return this.#editor?.find(text, searchOptions);
 	}
 
 	render() {

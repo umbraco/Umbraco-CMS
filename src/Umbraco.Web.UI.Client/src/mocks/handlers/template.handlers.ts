@@ -3,8 +3,8 @@ import { umbTemplateData } from '../data/template.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { CreateTemplateRequestModel, UpdateTemplateRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-// TODO: add schema
 export const handlers = [
+	//#region TREE
 	rest.get(umbracoPath('/tree/template/root'), (req, res, ctx) => {
 		const response = umbTemplateData.getTreeRoot();
 		return res(ctx.status(200), ctx.json(response));
@@ -26,11 +26,25 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 
-	rest.get(umbracoPath('/template/scaffold'), (req, res, ctx) => {
-		const masterTemplateAlias = req.url.searchParams.get('masterTemplateAlias');
-		if (!masterTemplateAlias) return;
+	//#endregion
 
-		const response = umbTemplateData.getScaffold(masterTemplateAlias);
+	//#region TEMPLATE
+
+	rest.get(umbracoPath('/template/scaffold'), (req, res, ctx) => {
+		const response = umbTemplateData.getScaffold();
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	//This handler must come before the /template/:id handler otherwise it hits the wrong handler
+	rest.get(umbracoPath('/template/item'), (req, res, ctx) => {
+		const id = req.url.searchParams.getAll('id');
+		if (!id) return;
+		const response = umbTemplateData.getItems(id);
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.get(umbracoPath('/template/query/settings'), (req, res, ctx) => {
+		const response = umbTemplateData.getTemplateQuerySettings();
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
@@ -58,4 +72,15 @@ export const handlers = [
 		const created = umbTemplateData.create(data);
 		return res(ctx.status(200), ctx.json(created));
 	}),
+
+	rest.delete<UpdateTemplateRequestModel>(umbracoPath('/template/:id'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		const data = await req.json();
+		if (!id) return;
+
+		umbTemplateData.delete([data]);
+		return res(ctx.status(200));
+	}),
+
+	//#endregion
 ];

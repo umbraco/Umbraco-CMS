@@ -98,6 +98,7 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 			:host {
 				display: block;
 				color: var(--uui-color-text);
+				--umb-header-layout-height: 70px;
 			}
 
 			#main {

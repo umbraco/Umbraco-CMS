@@ -59,7 +59,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 				break;
 			}
 			case CodeSnippetType.dictionaryItem: {
-				this.#getDictionaryItemSnippet(value as UmbDictionaryItemPickerModalResult);
+				await this.#getDictionaryItemSnippet(value as UmbDictionaryItemPickerModalResult);
+				this.#dispatchInsertEvent();
+
 				break;
 			}
 			case CodeSnippetType.macro: {
@@ -77,6 +79,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	#getUmbracoFieldValueSnippet = async (value: string) => {
 		this.value = value;
+		this.#dispatchInsertEvent();
 	};
 
 	#getPartialViewSnippet = async (modalResult: UmbPartialViewPickerModalResult) => {
@@ -110,7 +113,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#openInsertDictionaryItemModal() {
-		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
+		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
+			pickableFilter: (item) => item.id !== null,
+		});
 		this.#openModal?.onSubmit().then((value) => {
 			this.#getDictionaryItemSnippet(value).then(() => {
 				this.#dispatchInsertEvent();
@@ -119,7 +124,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#dispatchInsertEvent() {
-		this.dispatchEvent(new CustomEvent('insert', { bubbles: true, cancelable: true, composed: false }));
+		this.dispatchEvent(new CustomEvent('insert', { bubbles: false, cancelable: true, composed: false }));
 	}
 
 	@property()
@@ -138,25 +143,18 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 					id="insert-button"
 					label="open insert menu">
 					<ul id="insert-menu" slot="dropdown">
+						<!-- 
+						TODO: uncomment when insert value has endpoint and is properly implemented	
 						<li>
 							<uui-menu-item
 								class="insert-menu-item"
 								target="_blank"
 								label="Value"
 								title="Value"
-								@click=${this.#openInsertValueSidebar}>
+								>
 							</uui-menu-item>
-						</li>
-						${this.hidePartialView
-							? ''
-							: html` <li>
-									<uui-menu-item
-										class="insert-menu-item"
-										label="Partial view"
-										title="Partial view"
-										@click=${this.#openInsertPartialViewSidebar}>
-									</uui-menu-item>
-							  </li>`}
+						</li> -->
+
 						<li>
 							<uui-menu-item
 								class="insert-menu-item"
@@ -165,18 +163,34 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 								@click=${this.#openInsertDictionaryItemModal}>
 							</uui-menu-item>
 						</li>
-						<li>
+						<!-- <li>
 							<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>
-						</li>
+						</li> -->
 					</ul>
 				</umb-button-with-dropdown>
 			</uui-button-group>
 		`;
 	}
 
+	//TODO: put this back in when partial view is implemented
+	// ${this.hidePartialView
+	// 		? ''
+	// 		: html` <li>
+	// 				<uui-menu-item
+	// 					class="insert-menu-item"
+	// 					label="Partial view"
+	// 					title="Partial view"
+	// 					@click=${this.#openInsertPartialViewSidebar}>
+	// 				</uui-menu-item>
+	// 		  </li>`}
+
 	static styles = [
 		UUITextStyles,
 		css`
+			:host {
+				--umb-header-layout-height: 70px;
+			}
+
 			#insert-menu {
 				margin: 0;
 				padding: 0;

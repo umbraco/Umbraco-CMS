@@ -7,6 +7,7 @@ import {
 	TemplateResponseModel,
 	TemplateScaffoldResponseModel,
 	CreateTemplateRequestModel,
+	TemplateItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
@@ -20,6 +21,11 @@ const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
 		content: dbItem.content,
 	};
 };
+
+const createTemplateItem = (dbItem: TemplateDBItem): TemplateItemResponseModel => ({
+	name: dbItem.name,
+	id: dbItem.id,
+});
 
 export const data: Array<TemplateDBItem> = [
 	{
@@ -72,16 +78,82 @@ export const data: Array<TemplateDBItem> = [
 		content:
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = null;\r\n}',
 	},
+	{
+		$type: '',
+		id: '9a84c0b3-03b4-4dd4-84ac-706740acwerer0f72',
+		isContainer: false,
+		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		name: 'Has Master Template',
+		type: 'template',
+		icon: 'umb:layout',
+		hasChildren: false,
+		alias: 'hasMasterTemplate',
+		content:
+			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Test>\r\n@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;\r\n@{\r\n\tLayout = "some/path/to/a/template.cshtml";\r\n}',
+	},
 ];
 
 export const createTemplateScaffold = (masterTemplateAlias: string) => {
 	return `Template Scaffold Mock for master template: ${masterTemplateAlias}`;
 };
 
+export const templateQuerySettings = {
+	contentTypeAliases: [],
+	properties: [
+		{
+			alias: 'Id',
+			type: 'Integer',
+		},
+		{
+			alias: 'Name',
+			type: 'String',
+		},
+		{
+			alias: 'CreateDate',
+			type: 'DateTime',
+		},
+		{
+			alias: 'UpdateDate',
+			type: 'DateTime',
+		},
+	],
+	operators: [
+		{
+			operator: 'Equals',
+			applicableTypes: ['Integer', 'String'],
+		},
+		{
+			operator: 'NotEquals',
+			applicableTypes: ['Integer', 'String'],
+		},
+		{
+			operator: 'LessThan',
+			applicableTypes: ['Integer', 'DateTime'],
+		},
+		{
+			operator: 'LessThanEqualTo',
+			applicableTypes: ['Integer', 'DateTime'],
+		},
+		{
+			operator: 'GreaterThan',
+			applicableTypes: ['Integer', 'DateTime'],
+		},
+		{
+			operator: 'GreaterThanEqualTo',
+			applicableTypes: ['Integer', 'DateTime'],
+		},
+		{
+			operator: 'Contains',
+			applicableTypes: ['String'],
+		},
+		{
+			operator: 'NotContains',
+			applicableTypes: ['String'],
+		},
+	],
+};
+
 // Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	constructor() {
 		super(data);
@@ -92,11 +164,24 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 		return item ? createTemplate(item) : undefined;
 	}
 
-	getScaffold(masterTemplateAlias: string): TemplateScaffoldResponseModel {
+	getItemById(id: string): TemplateItemResponseModel | null {
+		const item = this.data.find((item) => item.id === id);
+		return item ? createTemplateItem(item) : null;
+	}
+
+	getScaffold(): TemplateScaffoldResponseModel {
 		return {
-			content: `Template Scaffold Mock: Layout = ${masterTemplateAlias || null};`,
+			content:
+				'@using Umbraco.Cms.Web.Common.PublishedModels;\r\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@{\r\n\tLayout = null;\r\n}',
 		};
 	}
+
+	getItems(ids: string[]): TemplateItemResponseModel[] {
+		const items = ids.map((id) => this.getItemById(id)).filter((item) => item !== null) as TemplateItemResponseModel[];
+		return items;
+	}
+
+	getTemplateQuerySettings = () => templateQuerySettings;
 
 	create(templateData: CreateTemplateRequestModel) {
 		const template = {

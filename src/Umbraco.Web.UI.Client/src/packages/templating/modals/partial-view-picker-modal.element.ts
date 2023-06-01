@@ -61,6 +61,7 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 			:host {
 				display: block;
 				color: var(--uui-color-text);
+				--umb-header-layout-height: 70px;
 			}
 
 			#main {
