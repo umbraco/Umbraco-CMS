@@ -1,6 +1,6 @@
 import { UmbDataTypeWorkspaceContext } from '../../data-type-workspace.context.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbModalContext,
@@ -114,7 +114,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 
 	render() {
 		return html`
-			<uui-box style="margin-bottom: var(--uui-size-space-5);"> ${this._renderPropertyEditorUI()} </uui-box>
+			<uui-box> ${this._renderPropertyEditorUI()} </uui-box>
 			${this._renderConfig()} </uui-box>
 		`;
 	}
@@ -168,7 +168,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 		`,
 	];
