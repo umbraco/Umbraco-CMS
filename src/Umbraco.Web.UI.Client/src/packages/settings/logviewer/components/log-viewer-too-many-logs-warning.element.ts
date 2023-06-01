@@ -1,7 +1,7 @@
-import { css, html, LitElement , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-log-viewer-to-many-logs-warning')
-export class UmbLogViewerToManyLogsWarningElement extends LitElement {
+@customElement('umb-log-viewer-too-many-logs-warning')
+export class UmbLogViewerTooManyLogsWarningElement extends LitElement {
 	render() {
 		return html`<uui-box id="to-many-logs-warning">
 			<h3>Unable to view logs</h3>
@@ -21,6 +21,6 @@ export class UmbLogViewerToManyLogsWarningElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-log-viewer-to-many-logs-warning': UmbLogViewerToManyLogsWarningElement;
+		'umb-log-viewer-too-many-logs-warning': UmbLogViewerTooManyLogsWarningElement;
 	}
 }
