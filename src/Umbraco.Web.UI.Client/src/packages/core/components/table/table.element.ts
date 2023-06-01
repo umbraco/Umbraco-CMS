@@ -251,8 +251,7 @@ export class UmbTableElement extends LitElement {
 		UUITextStyles,
 		css`
 			:host {
-				height: 100%;
-				overflow: auto;
+				height: fit-content;
 				padding: var(--uui-size-space-4);
 				padding-top: 0;
 			}
