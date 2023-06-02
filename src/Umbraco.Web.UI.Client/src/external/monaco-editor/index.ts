@@ -1,5 +1,10 @@
 import styles from 'monaco-editor/min/vs/editor/editor.main.css';
 import { css, unsafeCSS } from '@umbraco-cms/backoffice/external/lit';
+import editorWorker from 'web-worker:monaco-editor/esm/vs/editor/editor.worker.js';
+import cssWorker from 'web-worker:monaco-editor/esm/vs/language/css/css.worker.js';
+import htmlWorker from 'web-worker:monaco-editor/esm/vs/language/html/html.worker.js';
+import jsonWorker from 'web-worker:monaco-editor/esm/vs/language/json/json.worker.js';
+import tsWorker from 'web-worker:monaco-editor/esm/vs/language/typescript/ts.worker.js';
 
 export const monacoEditorStyles = css`
 	${unsafeCSS(styles)}
@@ -13,22 +18,26 @@ export const monacoJumpingCursorHack = css`
 	}
 `;
 
-self.MonacoEnvironment = {
-	getWorkerUrl: function (_moduleId, label) {
-		if (label === 'json') {
-			return './vs/language/json.worker.js';
+const initializeWorkers = () => {
+	self.MonacoEnvironment = {
+		getWorker(workerId: string, label: string): Promise<Worker> | Worker {
+			if (label === 'json') {
+				return new jsonWorker();
+			}
+			if (label === 'css' || label === 'scss' || label === 'less') {
+				return new cssWorker();
+			}
+			if (label === 'html' || label === 'handlebars' || label === 'razor') {
+				return new htmlWorker();
+			}
+			if (label === 'typescript' || label === 'javascript') {
+				return new tsWorker();
+			}
+			return new editorWorker();
 		}
-		if (label === 'css' || label === 'scss' || label === 'less') {
-			return './vs/language/css.worker.js';
-		}
-		if (label === 'html' || label === 'handlebars' || label === 'razor') {
-			return './vs/language/html.worker.js';
-		}
-		if (label === 'typescript' || label === 'javascript') {
-			return './vs/language/ts.worker.js';
-		}
-		return './vs/language/editor.worker.js';
-	},
+	};
 };
+
+initializeWorkers();
 
 export * as monaco from 'monaco-editor';
