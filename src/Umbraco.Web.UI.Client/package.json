@@ -27,6 +27,7 @@
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
 		"./id": "./dist-cms/packages/core/id/index.js",
+		"./macro": "./dist-cms/packages/core/macro/index.js",
 		"./menu": "./dist-cms/packages/core/menu/index.js",
 		"./modal": "./dist-cms/packages/core/modal/index.js",
 		"./notification": "./dist-cms/packages/core/notification/index.js",
