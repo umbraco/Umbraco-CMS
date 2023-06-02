@@ -1,7 +1,8 @@
 import esbuild from 'rollup-plugin-esbuild';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import css from "rollup-plugin-import-css";
+import css from 'rollup-plugin-import-css';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 import { readdirSync, lstatSync, rmSync, cpSync, copyFileSync } from 'fs';
 
 /* TODO Temp solution. I can't find a way for rollup to overwrite the external folder that is already created
@@ -55,29 +56,12 @@ const libraries = allowed
 				dir: `./dist-cms/external/${module.name}`,
 				format: 'es',
 			},
-			plugins: [nodeResolve(), commonjs(), css(), esbuild()],
+			plugins: [nodeResolve(), webWorkerLoader({ target: 'browser' }), commonjs(), css(), esbuild({ minify: true, sourceMap: true })],
 		}
 	});
-
-const workerEntryPoints = [
-	'node_modules/monaco-editor/esm/vs/language/json/json.worker.js',
-	'node_modules/monaco-editor/esm/vs/language/css/css.worker.js',
-	'node_modules/monaco-editor/esm/vs/language/html/html.worker.js',
-	'node_modules/monaco-editor/esm/vs/language/typescript/ts.worker.js',
-	'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'
-];
-
 
 /** @type {import('rollup').RollupOptions[]} */
 export default [
 	...libraries,
-	{
-		input: workerEntryPoints,
-		output: {
-			dir: './dist-cms/external/monaco-editor/vs/language',
-			format: 'es'
-		},
-		plugins: [esbuild()]
-	}
 ]
 
