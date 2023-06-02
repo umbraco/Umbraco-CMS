@@ -47,7 +47,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CodeEditor',
 		name: 'Code Editor Modal',
-		loader: () => import('./code-editor/code-editor-modal.element'),
+		loader: () => import('./code-editor/code-editor-modal.element.js'),
 	},
 	{
 		type: 'modal',

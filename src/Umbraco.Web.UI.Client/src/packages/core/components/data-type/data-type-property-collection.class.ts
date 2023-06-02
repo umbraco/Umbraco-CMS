@@ -11,7 +11,7 @@ export class UmbDataTypePropertyCollection extends Array<DataTypePropertyPresent
 	static get [Symbol.species](): ArrayConstructor {
 		return Array;
 	}
-	
+
 	getValueByAlias<T>(alias: string): T | undefined {
 		const property = this.getByAlias(alias);
 
@@ -24,5 +24,23 @@ export class UmbDataTypePropertyCollection extends Array<DataTypePropertyPresent
 
 	getByAlias(alias: string): DataTypePropertyPresentationModel | undefined {
 		return this.find((x) => x.alias === alias);
+	}
+
+	/**
+	 * Convert the underlying array to an object where
+	 * the property value is keyed by its alias
+	 * eg
+	 * `[
+	 *   { 'alias': 'myProperty', 'value': 27 },
+	 *   { 'alias': 'anotherProperty', 'value': 'eleven' },
+	 * ]`
+	 * is returned as
+	 * `{
+	 *   myProperty: 27,
+	 * 	 anotherProperty: 'eleven',
+	 * }`
+	 */
+	toObject(): Record<string, unknown> {
+		return Object.fromEntries(this.map((x) => [x.alias, x.value]));
 	}
 }

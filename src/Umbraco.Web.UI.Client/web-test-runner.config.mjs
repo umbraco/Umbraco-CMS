@@ -48,6 +48,7 @@ export default {
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
 						'@umbraco-cms/backoffice/events': './src/shared/umb-events/index.ts',
+						'@umbraco-cms/backoffice/macros': './src/shared/macros/index.ts',
 						'@umbraco-cms/backoffice/models': './src/shared/models/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/shared/repository/index.ts',
 						'@umbraco-cms/backoffice/resources': './src/shared/resources/index.ts',

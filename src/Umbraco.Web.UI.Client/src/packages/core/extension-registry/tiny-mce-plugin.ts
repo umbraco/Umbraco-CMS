@@ -1,5 +1,5 @@
-import { UmbLitElement } from "@umbraco-cms/internal/lit-element";
 import { DataTypePropertyPresentationModel } from "@umbraco-cms/backoffice/backend-api";
+import { UmbLitElement } from "@umbraco-cms/internal/lit-element";
 
 // TODO => editor property should be typed, but would require libs taking a dependency on TinyMCE, which is not ideal
 export class UmbTinyMcePluginBase {

@@ -35,6 +35,7 @@
 
 			// SHARED
 			"@umbraco-cms/backoffice/events": ["src/shared/umb-events"],
+			"@umbraco-cms/backoffice/macros": ["src/shared/macros"],
 			"@umbraco-cms/backoffice/models": ["src/shared/models"],
 			"@umbraco-cms/backoffice/repository": ["src/shared/repository"],
 			"@umbraco-cms/backoffice/resources": ["src/shared/resources"],

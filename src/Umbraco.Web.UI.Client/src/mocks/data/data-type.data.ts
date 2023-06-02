@@ -1,12 +1,12 @@
-import { UmbEntityTreeData } from './entity-tree.data.js';
-import { UmbEntityData } from './entity.data.js';
-import { createFolderTreeItem } from './utils.js';
 import type {
 	FolderTreeItemResponseModel,
 	DataTypeResponseModel,
 	CreateFolderRequestModel,
 	DataTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbEntityTreeData } from './entity-tree.data.js';
+import { UmbEntityData } from './entity.data.js';
+import { createFolderTreeItem } from './utils.js';
 
 // TODO: investigate why we don't get an type as part of the DataTypeModel
 export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = [

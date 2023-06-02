@@ -4,7 +4,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
 import tinymce, { AstNode, Editor, EditorEvent } from 'tinymce';
 import { firstValueFrom } from 'rxjs';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
@@ -17,6 +16,7 @@ import {
 	ManifestTinyMcePlugin,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
@@ -110,7 +110,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	async #observeCurrentUser() {
 		if (!this.#currentUserStore) return;
 
-		this.observe(this.#currentUserStore.currentUser, (currentUser) => {
+		this.observe(this.#currentUserStore.currentUser, (currentUser: UmbLoggedInUser | undefined) => {
 			this.#currentUser = currentUser;
 		});
 	}

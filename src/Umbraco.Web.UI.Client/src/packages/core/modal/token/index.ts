@@ -1,6 +1,7 @@
 export * from './modal-token.js';
 export * from './allowed-document-types-modal.token.js';
 export * from './change-password-modal.token.js';
+export * from './code-editor-modal.token.js';
 export * from './confirm-modal.token.js';
 export * from './create-dictionary-modal.token.js';
 export * from './create-user-modal.token.js';
