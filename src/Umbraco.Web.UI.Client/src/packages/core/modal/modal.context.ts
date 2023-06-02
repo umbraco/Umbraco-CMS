@@ -15,8 +15,6 @@ export interface UmbModalConfig {
 	size?: UUIModalSidebarSize;
 }
 
-// TODO: we should find a way to easily open a modal without adding custom methods to this context. It would result in a better separation of concerns.
-// TODO: move all layouts into their correct "silo" folders. User picker should live with users etc.
 export class UmbModalContext {
 	host: UmbControllerHostElement;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
