@@ -1920,37 +1920,82 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    /// <inheritdoc />
-    public async Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, IEnumerable<Guid> nodeKeys)
+    /// <inheritdoc/>
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(Guid userKey, IEnumerable<Guid> mediaKeys)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(mediaKeys, UmbracoObjectTypes.Media);
 
+        if (idAttempt.Success is false || idAttempt.Result is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MediaNodeNotFound, Enumerable.Empty<NodePermissions>());
+        }
+
+        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions = await GetPermissionsAsync(userKey, idAttempt.Result);
+        scope.Complete();
+
+        return permissions;
+    }
+
+    /// <inheritdoc/>
+    public async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(Guid userKey, IEnumerable<Guid> contentKeys)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        Attempt<Dictionary<Guid, int>?> idAttempt = CreateIdKeyMap(contentKeys, UmbracoObjectTypes.Document);
+
+        if (idAttempt.Success is false || idAttempt.Result is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.ContentNodeNotFound, Enumerable.Empty<NodePermissions>());
+        }
+
+        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions = await GetPermissionsAsync(userKey, idAttempt.Result);
+        scope.Complete();
+
+        return permissions;
+    }
+
+
+    private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(Guid userKey, Dictionary<Guid, int> nodes)
+    {
         IUser? user = await GetAsync(userKey);
 
         if (user is null)
         {
-            throw new InvalidOperationException("No user with that ID");
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, Enumerable.Empty<NodePermissions>());
         }
 
-        Guid[] keys = nodeKeys.ToArray();
-        if (keys.Length == 0)
-        {
-            return Enumerable.Empty<NodePermissions>();
-        }
-
-        // We don't know what the entity type may be, so we have to get the entire entity :(
-        var idKeyMap = keys.ToDictionary(key => _entityService.Get(key)!.Id);
-
-        EntityPermissionCollection permissionCollection = _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, idKeyMap.Keys.ToArray());
+        EntityPermissionCollection permissionsCollection = _userGroupRepository.GetPermissions(
+            user.Groups.ToArray(),
+            true,
+            nodes.Select(x => x.Value).ToArray());
 
         var results = new List<NodePermissions>();
-        foreach (int nodeId in idKeyMap.Keys)
+        foreach (KeyValuePair<Guid, int> node in nodes)
         {
-            var permissions = permissionCollection.GetAllPermissions(nodeId).ToArray();
-            results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
+            var permissions = permissionsCollection.GetAllPermissions(node.Value).ToArray();
+            results.Add(new NodePermissions { NodeKey = node.Key, Permissions = permissions });
         }
 
-        return results;
+        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.Success, results);
+    }
+
+    private Attempt<Dictionary<Guid, int>?> CreateIdKeyMap(IEnumerable<Guid> nodeKeys, UmbracoObjectTypes objectType)
+    {
+        // We'll return this as a dictionary we can link the id and key again later.
+        Dictionary<Guid, int> idKeys = new();
+
+        foreach (Guid key in nodeKeys)
+        {
+            Attempt<int> idAttempt = _entityService.GetId(key, objectType);
+            if (idAttempt.Success is false)
+            {
+                return Attempt.Fail<Dictionary<Guid, int>?>(null);
+            }
+
+            idKeys[key] = idAttempt.Result;
+        }
+
+        return Attempt.Succeed<Dictionary<Guid, int>?>(idKeys);
     }
 
     /// <summary>

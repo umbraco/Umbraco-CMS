@@ -204,12 +204,20 @@ public interface IUserService : IMembershipUserService
     void DeleteSectionFromAllUserGroups(string sectionAlias);
 
     /// <summary>
-    /// Get explicitly assigned permissions for a user and node keys.
+    /// Get explicitly assigned content permissions for a user and node keys.
     /// </summary>
     /// <param name="userKey">Key of user to retrieve permissions for. </param>
-    /// <param name="nodeKeys">The keys of the nodes to get permissions for.</param>
-    /// <returns>An enumerable list of <see cref="NodePermissions"/>.</returns>
-    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(Guid userKey, IEnumerable<Guid> nodeKeys);
+    /// <param name="mediaKeys">The keys of the media to get permissions for.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>, and an enumerable of permissions.</returns>
+    Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetMediaPermissionsAsync(Guid userKey, IEnumerable<Guid> mediaKeys);
+
+    /// <summary>
+    /// Get explicitly assigned media permissions for a user and node keys.
+    /// </summary>
+    /// <param name="userKey">Key of user to retrieve permissions for. </param>
+    /// <param name="contentKeys">The keys of the content to get permissions for.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserOperationStatus"/>, and an enumerable of permissions.</returns>
+    Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetDocumentPermissionsAsync(Guid userKey, IEnumerable<Guid> contentKeys);
 
     /// <summary>
     ///     Get explicitly assigned permissions for a user and optional node ids
