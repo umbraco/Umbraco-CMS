@@ -26,10 +26,6 @@ export class UmbBodyLayoutElement extends LitElement {
 	@property()
 	public headline = '';
 
-	/*
-	@property({ type: Boolean, attribute: 'no-scroll' })
-	public noScroll = false;
-*/
 	@state()
 	private _headerSlotHasChildren = false;
 
@@ -79,16 +75,12 @@ export class UmbBodyLayoutElement extends LitElement {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 			</div>
-			${
-				//this.noScroll
-				//? html`<slot></slot>`
-				//:
-				html`
-					<uui-scroll-container id="main">
-						<slot></slot>
-					</uui-scroll-container>
-				`
-			}
+
+			<!-- This div should be changed for the uui-scroll-container when it gets updated -->
+			<div id="main">
+				<slot></slot>
+			</div>
+
 			<slot name="footer"></slot>
 			<umb-footer-layout style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
 				<slot
@@ -117,14 +109,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				flex-direction: column;
 			}
 
-			/*
-			:host([no-scroll]) slot:not([name]) {
-				position: relative;
-				display: block;
-				height: 100%;
-			}
-			*/
-
 			#header {
 				display: flex;
 				align-items: center;
@@ -149,6 +133,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				display: flex;
 				flex: 1;
 				flex-direction: column;
+				overflow-y: auto;
 			}
 		`,
 	];
