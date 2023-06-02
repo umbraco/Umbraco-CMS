@@ -20,7 +20,7 @@ export class UmbBodyLayoutElement extends LitElement {
 	 * Renders a headline in the header.
 	 * @public
 	 * @type {string}
-	 * @attr
+	 * @attr {string} clear-header - renders the header without background and borders.
 	 * @default ''
 	 */
 	@property()
@@ -118,6 +118,11 @@ export class UmbBodyLayoutElement extends LitElement {
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
 				box-sizing: border-box;
+			}
+
+			:host([clear-header]) #header {
+				background-color: transparent;
+				border-color: transparent;
 			}
 
 			#headline {
