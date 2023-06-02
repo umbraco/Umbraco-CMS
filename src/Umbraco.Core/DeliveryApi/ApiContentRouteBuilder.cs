@@ -61,7 +61,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        if (content.IsPublished() is false)
+        if (content.IsPublished(culture) is false)
         {
             return $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
         }
