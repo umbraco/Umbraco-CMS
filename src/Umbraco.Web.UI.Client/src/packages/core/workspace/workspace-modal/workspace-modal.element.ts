@@ -29,7 +29,7 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				width: 400px;
+				height: 100%;
 			}
 		`,
 	];
