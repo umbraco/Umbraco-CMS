@@ -78,6 +78,9 @@ stages:
           - script: npm run build:for:cms
             displayName: Run New Backoffice Build
             workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: npm run build
+            displayName: Run Login Build
+            workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
