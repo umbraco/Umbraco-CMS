@@ -7,19 +7,3 @@ interface ImportMetaEnv {
 	VITE_MSW_QUIET: 'on' | 'off';
 	VITE_UMBRACO_EXTENSION_MOCKS: 'on' | 'off';
 }
-
-declare module 'worker!*' {
-	class WebWorker extends Worker {
-		constructor();
-	}
-
-	export default WebWorker;
-}
-
-declare module 'web-worker:*' {
-	class WebWorker extends Worker {
-		constructor();
-	}
-
-	export default WebWorker;
-}

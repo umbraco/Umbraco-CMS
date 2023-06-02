@@ -56,7 +56,7 @@ const libraries = allowed
 				dir: `./dist-cms/external/${module.name}`,
 				format: 'es',
 			},
-			plugins: [nodeResolve(), webWorkerLoader({ target: 'browser' }), commonjs(), css(), esbuild({ minify: true, sourceMap: true })],
+			plugins: [nodeResolve(), webWorkerLoader({ target: 'browser', pattern: /^(.+)\?worker$/ }), commonjs(), css(), esbuild({ minify: true, sourceMap: true })],
 		}
 	});
 

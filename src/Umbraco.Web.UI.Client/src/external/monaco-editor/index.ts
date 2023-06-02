@@ -1,10 +1,10 @@
 import styles from 'monaco-editor/min/vs/editor/editor.main.css';
 import { css, unsafeCSS } from '@umbraco-cms/backoffice/external/lit';
-import editorWorker from 'web-worker:monaco-editor/esm/vs/editor/editor.worker.js';
-import cssWorker from 'web-worker:monaco-editor/esm/vs/language/css/css.worker.js';
-import htmlWorker from 'web-worker:monaco-editor/esm/vs/language/html/html.worker.js';
-import jsonWorker from 'web-worker:monaco-editor/esm/vs/language/json/json.worker.js';
-import tsWorker from 'web-worker:monaco-editor/esm/vs/language/typescript/ts.worker.js';
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker.js?worker';
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker.js?worker';
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker.js?worker';
+import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker.js?worker';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker.js?worker';
 
 export const monacoEditorStyles = css`
 	${unsafeCSS(styles)}
