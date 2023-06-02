@@ -33,6 +33,14 @@ export abstract class UmbWorkspaceContext<T, EntityType extends UmbEntityBase>
 		this.#isNew.next(isNew);
 	}
 
+	protected saveComplete(data: EntityType) {
+		// TODO: Should we make a Event class for this=?
+		this.host.dispatchEvent(new CustomEvent('workspace-submit', { composed: true, bubbles: true, detail: { data } }));
+
+		// If it went well, then its not new anymore?.
+		this.setIsNew(false);
+	}
+
 	abstract getEntityId(): string | undefined; // COnsider if this should go away now that we have getUnique()
 	abstract getEntityType(): string; // TODO: consider of this should be on the repository because a repo is responsible for one entity type
 	abstract getData(): EntityType | undefined;

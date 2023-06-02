@@ -95,8 +95,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	}
 
 	private _createDataType(propertyEditorUiAlias: string) {
+		// TODO: Could be nice with a more pretty way to prepend to the URL:
 		// Open create modal:
-		this._createDataTypeModal.open({ uiAlias: propertyEditorUiAlias });
+		this._createDataTypeModal.open({ uiAlias: propertyEditorUiAlias }, 'create/null');
 	}
 
 	async #init() {
