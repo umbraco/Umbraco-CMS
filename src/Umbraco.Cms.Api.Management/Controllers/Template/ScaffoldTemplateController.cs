@@ -11,16 +11,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template;
 [ApiVersion("1.0")]
 public class ScaffoldTemplateController : TemplateControllerBase
 {
-    private readonly IDefaultViewContentProvider _defaultViewContentProvider;
     private readonly ITemplateService _templateService;
 
-    public ScaffoldTemplateController(
-        IDefaultViewContentProvider defaultViewContentProvider,
-        ITemplateService templateService)
-    {
-        _defaultViewContentProvider = defaultViewContentProvider;
-        _templateService = templateService;
-    }
+    public ScaffoldTemplateController(ITemplateService templateService) => _templateService = templateService;
 
     [HttpGet("scaffold")]
     [MapToApiVersion("1.0")]
