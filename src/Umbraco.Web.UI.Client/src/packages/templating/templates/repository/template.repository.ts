@@ -1,3 +1,7 @@
+import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
+import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store.js';
+import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
+import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
 import type {
 	UmbDetailRepository,
 	UmbItemRepository,
@@ -15,11 +19,7 @@ import {
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store.js';
-import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
-import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
-import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
-import { Observable } from 'rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbTemplateRepository
 	implements

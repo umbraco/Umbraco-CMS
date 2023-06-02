@@ -40,6 +40,7 @@ export default {
 						'@umbraco-cms/backoffice/external/router-slot': './src/external/router-slot/index.ts',
 						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
 						'@umbraco-cms/backoffice/external/lodash': './src/external/lodash/index.ts',
+						'@umbraco-cms/backoffice/external/tinymce': './src/external/tinymce/index.ts',
 
 						'@umbraco-cms/backoffice/context-api': './src/libs/context-api/index.ts',
 						'@umbraco-cms/backoffice/controller-api': './src/libs/controller-api/index.ts',
