@@ -1,4 +1,4 @@
-import '../confirm/confirm-modal.element';
+import '../confirm/confirm-modal.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
 import { html } from 'lit';

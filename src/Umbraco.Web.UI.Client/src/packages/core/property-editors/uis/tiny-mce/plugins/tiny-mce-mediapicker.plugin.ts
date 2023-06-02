@@ -1,5 +1,5 @@
-import type { UmbLoggedInUser } from '../../../../../users/current-user/types';
-import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../../../../users/current-user/current-user.store';
+import type { UmbLoggedInUser } from '../../../../../users/current-user/types.js';
+import { UmbCurrentUserStore, UMB_CURRENT_USER_STORE_CONTEXT_TOKEN } from '../../../../../users/current-user/current-user.store.js';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UmbMediaTreePickerModalResult, UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';

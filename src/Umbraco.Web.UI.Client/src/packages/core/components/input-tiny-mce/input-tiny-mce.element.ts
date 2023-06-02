@@ -7,9 +7,9 @@ import { firstValueFrom } from 'rxjs';
 import {
 	UmbCurrentUserStore,
 	UMB_CURRENT_USER_STORE_CONTEXT_TOKEN,
-} from '../../../users/current-user/current-user.store';
-import type { UmbLoggedInUser } from '../../../users/current-user/types';
-import { availableLanguages } from './input-tiny-mce.languages';
+} from '../../../users/current-user/current-user.store.js';
+import type { UmbLoggedInUser } from '../../../users/current-user/types.js';
+import { availableLanguages } from './input-tiny-mce.languages.js';
 import {
 	TinyMcePluginArguments,
 	UmbTinyMcePluginBase,

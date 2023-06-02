@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement } from './property-editor-ui-tiny-mce-maximagesize-configuration.element';
+import { UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement } from './property-editor-ui-tiny-mce-maximagesize-configuration.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUITinyMceMaxImSizeConfigurationElement', () => {

@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUITinyMceDimensionsConfigurationElement } from './property-editor-ui-tiny-mce-dimensions-configuration.element';
+import { UmbPropertyEditorUITinyMceDimensionsConfigurationElement } from './property-editor-ui-tiny-mce-dimensions-configuration.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUITinyMceDimensionsConfigurationElement', () => {

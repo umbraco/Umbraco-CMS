@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/web-components';
-import { umbDataTypeData } from '../../../../../../../shared/mocks/data/data-type.data';
+import { umbDataTypeData } from '../../../../../mocks/data/data-type.data.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	DataTypeResponseModel,

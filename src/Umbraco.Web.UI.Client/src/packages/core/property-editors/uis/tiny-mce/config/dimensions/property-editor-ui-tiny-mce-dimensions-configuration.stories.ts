@@ -1,9 +1,8 @@
 import { Meta } from '@storybook/web-components';
-import { html } from 'lit-html';
-
-import './property-editor-ui-tiny-mce-dimensions-configuration.element';
-import { umbDataTypeData } from '../../../../../../../shared/mocks/data/data-type.data';
+import './property-editor-ui-tiny-mce-dimensions-configuration.element.js';
+import { umbDataTypeData } from '../../../../../../../mocks/data/data-type.data.js';
 import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as DataTypeResponseModel;
 

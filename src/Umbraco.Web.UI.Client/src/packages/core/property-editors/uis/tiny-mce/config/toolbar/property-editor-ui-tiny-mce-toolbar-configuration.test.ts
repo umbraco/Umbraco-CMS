@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
+import { UmbPropertyEditorUITinyMceToolbarConfigurationElement } from './property-editor-ui-tiny-mce-toolbar-configuration.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-import { UmbPropertyEditorUITinyMceToolbarConfigurationElement } from './property-editor-ui-tiny-mce-toolbar-configuration.element';
 
 describe('UmbPropertyEditorUITinyMceToolbarConfigurationElement', () => {
   let element: UmbPropertyEditorUITinyMceToolbarConfigurationElement;

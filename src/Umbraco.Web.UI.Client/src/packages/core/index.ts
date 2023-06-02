@@ -2,7 +2,7 @@ import { UmbBackofficeNotificationContainerElement, UmbBackofficeModalContainerE
 import { manifests as debugManifests } from './debug/manifests.js';
 import { manifests as propertyActionManifests } from './property-actions/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
-import { manifests as tinyMcePluginManifests } from './property-editors/uis/tiny-mce/plugins/manifests'; 
+import { manifests as tinyMcePluginManifests } from './property-editors/uis/tiny-mce/plugins/manifests.js'; 
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { UmbStoreExtensionInitializer } from './store/index.js';
 
@@ -21,6 +21,7 @@ export * from './entity-action/index.js';
 export * from './entity-bulk-action/index.js';
 export * from './extension-registry/index.js';
 export * from './id/index.js';
+export * from './macro/index.js';
 export * from './menu/index.js';
 export * from './modal/index.js';
 export * from './notification/index.js';

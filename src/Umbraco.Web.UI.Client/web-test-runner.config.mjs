@@ -48,7 +48,6 @@ export default {
 						'@umbraco-cms/backoffice/observable-api': './src/libs/observable-api/index.ts',
 
 						'@umbraco-cms/backoffice/events': './src/shared/umb-events/index.ts',
-						'@umbraco-cms/backoffice/macros': './src/shared/macros/index.ts',
 						'@umbraco-cms/backoffice/models': './src/shared/models/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/shared/repository/index.ts',
 						'@umbraco-cms/backoffice/resources': './src/shared/resources/index.ts',
@@ -68,6 +67,7 @@ export default {
 						'@umbraco-cms/backoffice/entity-bulk-action': './src/packages/core/entity-bulk-action/index.ts',
 						'@umbraco-cms/backoffice/extension-registry': './src/packages/core/extension-registry/index.ts',
 						'@umbraco-cms/backoffice/id': './src/packages/core/id/index.ts',
+						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',
 						'@umbraco-cms/backoffice/menu': './src/packages/core/menu/index.ts',
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',

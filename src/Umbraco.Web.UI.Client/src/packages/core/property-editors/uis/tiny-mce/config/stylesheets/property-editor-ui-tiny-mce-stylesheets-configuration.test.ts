@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUITinyMceStylesheetsConfigurationElement } from './property-editor-ui-tiny-mce-stylesheets-configuration.element';
+import { UmbPropertyEditorUITinyMceStylesheetsConfigurationElement } from './property-editor-ui-tiny-mce-stylesheets-configuration.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUITinyMceStylesheetsConfigurationElement', () => {
