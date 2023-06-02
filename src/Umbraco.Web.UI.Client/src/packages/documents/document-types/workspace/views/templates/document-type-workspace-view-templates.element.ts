@@ -1,10 +1,9 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
-import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-templates')
@@ -35,13 +34,11 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 			(defaultTemplateId) => (this._defaultTemplateId = defaultTemplateId)
 		);
 		this.observe(this.#workspaceContext.allowedTemplateIds, (allowedTemplateIds) => {
-			console.log('allowedTemplateIds', allowedTemplateIds);
 			this._allowedTemplateIds = allowedTemplateIds;
 		});
 	}
 
 	#templateInputChange(e: CustomEvent) {
-		console.log('change', e);
 		// save new allowed ids
 		const input = e.target as UmbInputTemplateElement;
 		const idsWithoutRoot = input.selectedIds.filter((id) => id !== null) as Array<string>;
@@ -68,7 +65,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 
 			#templates {

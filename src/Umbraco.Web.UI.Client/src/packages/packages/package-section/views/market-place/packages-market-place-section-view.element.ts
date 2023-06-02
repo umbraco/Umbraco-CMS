@@ -1,5 +1,4 @@
-import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 

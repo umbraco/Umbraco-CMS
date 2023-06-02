@@ -1,8 +1,6 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UUIComboboxElement, UUIInputElement } from '@umbraco-ui/uui';
-import { getUmbracoFieldSnippet } from '../utils';
+import { getUmbracoFieldSnippet } from '../utils.js';
+import { UUITextStyles , UUIComboboxElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
 @customElement('umb-insert-value-sidebar')
@@ -100,6 +98,7 @@ export default class UmbInsertValueSidebarElement extends UmbModalBaseElement<ob
 			:host {
 				display: block;
 				color: var(--uui-color-text);
+				--umb-header-layout-height: 70px;
 			}
 
 			#main {

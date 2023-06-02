@@ -1,13 +1,13 @@
-import { DATA_TYPE_ROOT_ENTITY_TYPE } from '..';
-import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data';
-import { UmbDataTypeMoveServerDataSource } from './sources/data-type-move.server.data';
-import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store';
-import { UmbDataTypeServerDataSource } from './sources/data-type.server.data';
-import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store';
-import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data';
-import { UmbDataTypeItemServerDataSource } from './sources/data-type-item.server.data';
-import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDataTypeItemStore } from './data-type-item.store';
-import { UmbDataTypeCopyServerDataSource } from './sources/data-type-copy.server.data';
+import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entities.js';
+import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data.js';
+import { UmbDataTypeMoveServerDataSource } from './sources/data-type-move.server.data.js';
+import { UmbDataTypeStore, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN } from './data-type.store.js';
+import { UmbDataTypeServerDataSource } from './sources/data-type.server.data.js';
+import { UmbDataTypeTreeStore, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './data-type.tree.store.js';
+import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data.js';
+import { UmbDataTypeItemServerDataSource } from './sources/data-type-item.server.data.js';
+import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDataTypeItemStore } from './data-type-item.store.js';
+import { UmbDataTypeCopyServerDataSource } from './sources/data-type-copy.server.data.js';
 import type {
 	UmbTreeRepository,
 	UmbDetailRepository,

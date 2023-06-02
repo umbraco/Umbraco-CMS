@@ -1,13 +1,12 @@
-import { html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import type { UUIModalSidebarSize } from '@umbraco-ui/uui';
-import { UmbInputMultiUrlPickerElement } from '../../../components/input-multi-url-picker/input-multi-url-picker.element';
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../components/workspace-property/workspace-property.context';
+import { html , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
+import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
+import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypePropertyCollection } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-multi-url-picker
@@ -26,7 +25,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 		this._hideAnchor = config.getValueByAlias('hideAnchor');
 		this._ignoreUserStartNodes = config.getValueByAlias('ignoreUserStartNodes');
 		this._minNumber = config.getValueByAlias('minNumber');
-		this._maxNumber = config.getValueByAlias('maxNumber');	
+		this._maxNumber = config.getValueByAlias('maxNumber');
 	}
 
 	@state()
@@ -64,12 +63,12 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	}
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputMultiUrlPickerElement).urls;
+		this.value = (event.target as UmbInputMultiUrlElement).urls;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
-		return html`<umb-input-multi-url-picker
+		return html`<umb-input-multi-url
 			.alias="${this._alias}"
 			.variantId="${this._propertyVariantId}"
 			@change="${this._onChange}"
@@ -78,7 +77,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 			.ignoreUserStartNodes=${this._ignoreUserStartNodes}
 			.max=${this._maxNumber}
 			.min=${this._minNumber}
-			.urls="${this.value}"></umb-input-multi-url-picker>`;
+			.urls="${this.value}"></umb-input-multi-url>`;
 	}
 
 	static styles = [UUITextStyles];

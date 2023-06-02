@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview.element';
-import './views/health-check-overview.element';
+import type { UmbDashboardHealthCheckOverviewElement } from './views/health-check-overview.element.js';
+import './views/health-check-overview.element.js';
 
-import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element';
-import './views/health-check-group.element';
+import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
+import './views/health-check-group.element.js';
 
 export default {
 	title: 'Dashboards/Health Check',

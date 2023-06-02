@@ -42,10 +42,9 @@
 				"local-rules/no-direct-api-import": "warn",
 				"local-rules/prefer-import-aliases": "error",
 				"local-rules/enforce-element-suffix-on-element-class-name": "error",
-				"local-rules/prefer-umbraco-cms-imports": "error",
-				"local-rules/no-external-imports": "error",
 				"local-rules/umb-class-prefix": "error",
 				"local-rules/prefer-static-styles-last": "warn",
+				"local-rules/ensure-relative-import-use-js-extension": "error",
 				"@typescript-eslint/no-non-null-assertion": "off"
 			},
 			"settings": {

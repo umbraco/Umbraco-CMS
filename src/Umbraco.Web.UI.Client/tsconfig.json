@@ -18,47 +18,72 @@
 		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"paths": {
-			"@umbraco-cms/backoffice/backend-api": ["libs/backend-api"],
-			"@umbraco-cms/backoffice/content-type": ["libs/content-type"],
-			"@umbraco-cms/backoffice/context-api": ["libs/context-api"],
-			"@umbraco-cms/backoffice/controller-api": ["libs/controller-api"],
-			"@umbraco-cms/backoffice/css": ["libs/css/custom-properties.css"],
-			"@umbraco-cms/backoffice/data-type": ["libs/data-type"],
-			"@umbraco-cms/backoffice/element-api": ["libs/element-api"],
-			"@umbraco-cms/backoffice/entity-action": ["libs/entity-action"],
-			"@umbraco-cms/backoffice/events": ["libs/umb-events"],
-			"@umbraco-cms/backoffice/extension-api": ["libs/extension-api"],
-			"@umbraco-cms/backoffice/extension-registry": ["libs/extension-registry"],
-			"@umbraco-cms/backoffice/macro": ["libs/macro"],
-			"@umbraco-cms/backoffice/modal": ["libs/modal"],
-			"@umbraco-cms/backoffice/models": ["libs/models"],
-			"@umbraco-cms/backoffice/notification": ["libs/notification"],
-			"@umbraco-cms/backoffice/observable-api": ["libs/observable-api"],
-			"@umbraco-cms/backoffice/property-editor": ["libs/property-editor"],
-			"@umbraco-cms/backoffice/repository": ["libs/repository"],
-			"@umbraco-cms/backoffice/resources": ["libs/resources"],
-			"@umbraco-cms/backoffice/router": ["libs/router"],
-			"@umbraco-cms/backoffice/sorter": ["libs/sorter"],
-			"@umbraco-cms/backoffice/store": ["libs/store"],
-			"@umbraco-cms/backoffice/utils": ["libs/utils"],
-			"@umbraco-cms/backoffice/workspace": ["libs/workspace"],
-			"@umbraco-cms/backoffice/picker-input": ["libs/picker-input"],
-			"@umbraco-cms/backoffice/id": ["libs/id"],
-			"@umbraco-cms/backoffice/collection": ["libs/collection"],
-			"@umbraco-cms/backoffice/tree": ["libs/tree"],
-			"@umbraco-cms/backoffice/section": ["libs/section"],
-			"@umbraco-cms/backoffice/variant": ["libs/variant"],
+			"@umbraco-cms/backoffice/external/lit": ["src/external/lit"],
+			"@umbraco-cms/backoffice/external/openid": ["src/external/openid"],
+			"@umbraco-cms/backoffice/backend-api": ["src/external/backend-api"],
+			"@umbraco-cms/backoffice/external/rxjs": ["src/external/rxjs"],
+			"@umbraco-cms/backoffice/external/router-slot": ["src/external/router-slot"],
+			"@umbraco-cms/backoffice/external/uuid": ["src/external/uuid"],
+			"@umbraco-cms/backoffice/external/lodash": ["src/external/lodash"],
+			"@umbraco-cms/backoffice/external/uui": ["src/external/uui"],
 
-			"@umbraco-cms/backoffice/core/components": ["src/packages/core/components"],
+			"@umbraco-cms/backoffice/context-api": ["src/libs/context-api"],
+			"@umbraco-cms/backoffice/controller-api": ["src/libs/controller-api"],
+			"@umbraco-cms/backoffice/element-api": ["src/libs/element-api"],
+			"@umbraco-cms/backoffice/extension-api": ["src/libs/extension-api"],
+			"@umbraco-cms/backoffice/observable-api": ["src/libs/observable-api"],
+
+			// SHARED
+			"@umbraco-cms/backoffice/events": ["src/shared/umb-events"],
+			"@umbraco-cms/backoffice/models": ["src/shared/models"],
+			"@umbraco-cms/backoffice/repository": ["src/shared/repository"],
+			"@umbraco-cms/backoffice/resources": ["src/shared/resources"],
+			"@umbraco-cms/backoffice/router": ["src/shared/router"],
+			"@umbraco-cms/backoffice/utils": ["src/shared/utils"],
+			"@umbraco-cms/backoffice/icon": ["src/shared/icon-registry"],
+
+			// CORE
+			"@umbraco-cms/backoffice/action": ["src/packages/core/action"],
+			"@umbraco-cms/backoffice/collection": ["src/packages/core/collection"],
+			"@umbraco-cms/backoffice/components": ["src/packages/core/components"],
+			"@umbraco-cms/backoffice/content-type": ["src/packages/core/content-type"],
+			"@umbraco-cms/backoffice/debug": ["src/packages/core/debug"],
+			"@umbraco-cms/backoffice/entity-action": ["src/packages/core/entity-action"],
+			"@umbraco-cms/backoffice/entity-bulk-action": ["src/packages/core/entity-bulk-action"],
+			"@umbraco-cms/backoffice/extension-registry": ["src/packages/core/extension-registry"],
+			"@umbraco-cms/backoffice/id": ["src/packages/core/id"],
+			"@umbraco-cms/backoffice/menu": ["src/packages/core/menu"],
+			"@umbraco-cms/backoffice/modal": ["src/packages/core/modal"],
+			"@umbraco-cms/backoffice/notification": ["src/packages/core/notification"],
+			"@umbraco-cms/backoffice/picker-input": ["src/packages/core/picker-input"],
+			"@umbraco-cms/backoffice/section": ["src/packages/core/section"],
+			"@umbraco-cms/backoffice/sorter": ["src/packages/core/sorter"],
+			"@umbraco-cms/backoffice/store": ["src/packages/core/store"],
+			"@umbraco-cms/backoffice/tree": ["src/packages/core/tree"],
+			"@umbraco-cms/backoffice/variant": ["src/packages/core/variant"],
+			"@umbraco-cms/backoffice/workspace": ["src/packages/core/workspace"],
+			"@umbraco-cms/backoffice/property-editor": ["src/packages/core/property-editor"],
+
+			// DOCUMENT MANAGEMENT
+			// Document
+			"@umbraco-cms/backoffice/document": ["src/packages/documents/documents"],
+
+			// DATA TYPES
+			"@umbraco-cms/backoffice/data-type": ["src/packages/settings/data-types"],
+
+			// USERS
 			"@umbraco-cms/backoffice/user-group": ["src/packages/users/user-groups"],
+			"@umbraco-cms/backoffice/current-user": ["src/packages/users/current-user"],
+			"@umbraco-cms/backoffice/users": ["src/packages/users/users"],
+
+			"@umbraco-cms/backoffice/css": ["src/shared/css/custom-properties.css"],
 
 			"@umbraco-cms/internal/lit-element": ["src/shared/lit-element"],
 			"@umbraco-cms/internal/modal": ["src/shared/modal"],
-			"@umbraco-cms/internal/router": ["src/shared/router"],
 			"@umbraco-cms/internal/test-utils": ["utils/test-utils.ts"]
 		}
 	},
-	"include": ["src/**/*.ts", "apps/**/*.ts", "libs/**/*.ts", "e2e/**/*.ts", "index.ts"],
+	"include": ["src/**/*.ts", "apps/**/*.ts", "e2e/**/*.ts", "index.ts"],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"

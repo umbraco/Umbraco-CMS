@@ -1,1 +1,1 @@
-import './donut-chart';
+import './donut-chart/index.js';

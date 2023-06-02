@@ -1,4 +1,4 @@
-import type { UmbRelationTypeTreeDataSource } from '.';
+import type { UmbRelationTypeTreeDataSource } from './index.js';
 import { RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

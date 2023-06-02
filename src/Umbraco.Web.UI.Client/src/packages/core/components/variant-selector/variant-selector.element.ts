@@ -1,13 +1,10 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
-import { ifDefined } from 'lit/directives/if-defined.js';
+import { UUITextStyles , UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbWorkspaceVariantContext,
 	UMB_WORKSPACE_VARIANT_CONTEXT_TOKEN,
-} from '../workspace/workspace-variant/workspace-variant.context';
-import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+	ActiveVariant,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
 

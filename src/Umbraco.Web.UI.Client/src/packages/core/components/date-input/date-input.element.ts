@@ -1,10 +1,6 @@
-import { css, html } from 'lit';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { FormControlMixin } from '@umbraco-ui/uui-base/lib/mixins';
-import type { UUIInputEvent } from '@umbraco-ui/uui';
-import { UmbConfigRepository } from '../../repositories/config/config.repository';
+import { UmbConfigRepository } from '../../repositories/config/config.repository.js';
+import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles, FormControlMixin, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-date-input')

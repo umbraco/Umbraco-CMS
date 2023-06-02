@@ -6,9 +6,9 @@ const path = pathModule.default;
 const getDirName = path.dirname;
 const glob = globModule.default;
 
-const moduleDirectory = 'src/shared/icon-registry/';
-const iconsSVGDirectory = `${moduleDirectory}svgs/`;
-const iconsOutputDirectory = `public-assets/icons/`;
+const moduleDirectory = 'src/shared/icon-registry';
+const iconsSVGDirectory = `${moduleDirectory}/svgs`;
+const iconsOutputDirectory = `${moduleDirectory}/icons`;
 
 const run = async () => {
 	const icons = await collectIcons();
@@ -17,25 +17,36 @@ const run = async () => {
 };
 
 const collectIcons = async () => {
-	const iconPaths = await glob(`${iconsSVGDirectory}icon-*.svg`);
+	const iconPaths = await glob(`${iconsSVGDirectory}/icon-*.svg`);
 
 	let icons = [];
 
 	iconPaths.forEach((path) => {
 		const rawData = readFileSync(path);
 		const svg = rawData.toString();
-		const SVGFileName = path.substring(iconsSVGDirectory.length);
+		const pattern = /\/([^/]+)\.svg$/;
+
+		const match = path.match(pattern);
+
+		if (!match) {
+			console.log('No match found.');
+			return;
+		}
+
+		const SVGFileName = match[1];
 		const iconFileName = SVGFileName.replace('.svg', '');
 		const iconName = iconFileName.replace('icon-', '').replace('.svg', '');
 
-		icons.push({
+		const icon = {
 			src: path,
 			SVGFileName,
 			iconFileName,
 			name: iconName,
 			svg,
-			output: `${iconsOutputDirectory}/${iconFileName}`,
-		});
+			output: `${iconsOutputDirectory}/${iconFileName}.js`,
+		};
+
+		icons.push(icon);
 	});
 
 	return icons;
@@ -45,7 +56,7 @@ const outputIcons = (icons) => {
 	icons.forEach((icon) => {
 		const content = 'export default `' + icon.svg + '`;';
 
-		writeFileWithDir(`${icon.output}.js`, content, (err) => {
+		writeFileWithDir(`${icon.output}`, content, (err) => {
 			if (err) {
 				// eslint-disable-next-line no-undef
 				console.log(err);
@@ -58,12 +69,13 @@ const outputIcons = (icons) => {
 };
 
 const generateJSON = (icons) => {
-	const JSONPath = `${iconsOutputDirectory}icons.json`;
+	const JSONPath = `${iconsOutputDirectory}/icons.json`;
 
 	const iconDescriptors = icons.map((icon) => {
+		console.log(icon);
 		return {
 			name: `umb:${icon.name}`,
-			path: `icons/${icon.iconFileName}.js`,
+			path: `./icons/${icon.iconFileName}.js`,
 		};
 	});
 

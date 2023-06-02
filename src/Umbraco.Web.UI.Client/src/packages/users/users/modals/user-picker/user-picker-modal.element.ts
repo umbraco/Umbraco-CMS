@@ -1,7 +1,6 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbUserRepository } from '../../repository/user.repository';
+import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserPickerModalData, UmbUserPickerModalResult } from '@umbraco-cms/backoffice/modal';
 import { createExtensionClass } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -67,7 +66,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 								label=${user.name}
 								selectable
 								@selected=${() => this.#selectionManager.select(user.id!)}
-								@unselected=${() => this.#selectionManager.deselect(user.id!)}
+								@deselected=${() => this.#selectionManager.deselect(user.id!)}
 								?selected=${this.#selectionManager.isSelected(user.id!)}>
 								<uui-avatar slot="icon" name=${user.name}></uui-avatar>
 							</uui-menu-item>

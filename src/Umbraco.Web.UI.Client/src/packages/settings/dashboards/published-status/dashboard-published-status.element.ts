@@ -1,7 +1,5 @@
-import { UUIButtonState } from '@umbraco-ui/uui';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { UUIButtonState, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -191,7 +189,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 
 			uui-box + uui-box {

@@ -1,11 +1,8 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-dashboard-members-welcome')
 export class UmbDashboardMembersWelcomeElement extends LitElement {
-	
-
 	render() {
 		return html`
 			<uui-box>
@@ -17,13 +14,13 @@ export class UmbDashboardMembersWelcomeElement extends LitElement {
 			</uui-box>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 		`,
 	];

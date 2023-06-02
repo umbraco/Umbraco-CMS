@@ -6,12 +6,16 @@ export const plugins: PluginOption[] = [
 	viteStaticCopy({
 		targets: [
 			{
-				src: 'public-assets/icons/*.js',
+				src: 'src/shared/icon-registry/icons/*.js',
 				dest: 'icons',
 			},
 			{
 				src: 'public-assets/App_Plugins/*.js',
 				dest: 'App_Plugins',
+			},
+			{
+				src: 'src/assets/*.svg',
+				dest: 'umbraco/backoffice/assets',
 			},
 		],
 	}),

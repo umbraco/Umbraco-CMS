@@ -1,5 +1,5 @@
-import { UmbTagServerDataSource } from './sources/tag.server.data';
-import { UmbTagStore, UMB_TAG_STORE_CONTEXT_TOKEN } from './tag.store';
+import { UmbTagServerDataSource } from './sources/tag.server.data.js';
+import { UmbTagStore, UMB_TAG_STORE_CONTEXT_TOKEN } from './tag.store.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 

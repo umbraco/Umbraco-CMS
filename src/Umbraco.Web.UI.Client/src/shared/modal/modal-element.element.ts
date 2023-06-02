@@ -1,4 +1,4 @@
-import { property } from 'lit/decorators.js';
+import { property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalHandler } from '@umbraco-cms/backoffice/modal';
 import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';

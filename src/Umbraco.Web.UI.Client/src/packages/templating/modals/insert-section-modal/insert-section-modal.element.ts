@@ -1,14 +1,15 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, queryAll, state } from 'lit/decorators.js';
-import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests';
-import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils';
-import UmbInsertSectionCheckboxElement from './insert-section-input.element';
-import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
+import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests.js';
+import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 
+import './insert-section-input.element.js';
+// eslint-disable-next-line local-rules/ensure-relative-import-use-js-extension
+import type { UmbInsertSectionCheckboxElement } from './insert-section-input.element';
 
-export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken(
+export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken<object, InsertSectionModalModalResult>(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
 	{
 		type: 'sidebar',
@@ -35,7 +36,6 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 	snippet = '';
 
 	#chooseSection(event: Event) {
-		event.stopPropagation();
 		const target = event.target as UmbInsertSectionCheckboxElement;
 		const checkboxes = Array.from(this.checkboxes);
 		if (checkboxes.every((checkbox) => checkbox.checked === false)) {
@@ -44,7 +44,7 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 		}
 		if (target.checked) {
 			this.selectedCheckbox = target;
-			this.snippet = this.snippetMethods[checkboxes.indexOf(target)](target?.inputValue as string, target?.isMandatory);
+			this.snippet = this.selectedCheckbox.snippet ?? '';
 			checkboxes.forEach((checkbox) => {
 				if (checkbox !== target) {
 					checkbox.checked = false;
@@ -64,21 +64,31 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 	}
 
 	#submit() {
-		if (this.selectedCheckbox?.validate()) this.modalHandler?.submit({ value: this.snippet ?? '' });
+		const value = this.selectedCheckbox?.snippet;
+		if (this.selectedCheckbox?.validate()) this.modalHandler?.submit({ value: value ?? '' });
 	}
 
 	render() {
 		return html`
 			<umb-body-layout headline="Insert">
 				<div id="main">
-					<uui-box @change=${this.#chooseSection}>
-						<umb-insert-section-checkbox label="Render child template" checked>
+					<uui-box>
+						<umb-insert-section-checkbox
+							@change=${this.#chooseSection}
+							label="Render child template"
+							checked
+							.snippetMethod=${getRenderBodySnippet}>
 							<p slot="description">
 								Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.
 							</p>
 						</umb-insert-section-checkbox>
 
-						<umb-insert-section-checkbox label="Render a named section" show-mandatory show-input>
+						<umb-insert-section-checkbox
+							@change=${this.#chooseSection}
+							label="Render a named section"
+							show-mandatory
+							show-input
+							.snippetMethod=${getRenderSectionSnippet}>
 							<p slot="description">
 								Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.
 								This renders an area of a child template which is wrapped in a corresponding
@@ -86,7 +96,11 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 							</p>
 						</umb-insert-section-checkbox>
 
-						<umb-insert-section-checkbox label="Define a named section" show-input>
+						<umb-insert-section-checkbox
+							@change=${this.#chooseSection}
+							label="Define a named section"
+							show-input
+							.snippetMethod=${getAddSectionSnippet}>
 							<p slot="description">
 								Defines a part of your template as a named section by wrapping it in <code>@section { ... }</code>. This
 								can be rendered in a specific area of the parent of this template, by using <code>@RenderSection</code>.
@@ -108,6 +122,7 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 			:host {
 				display: block;
 				color: var(--uui-color-text);
+				--umb-header-layout-height: 70px;
 			}
 
 			#main {

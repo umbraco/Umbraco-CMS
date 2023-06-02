@@ -1,15 +1,14 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbMemberTypeWorkspaceEditElement } from './member-type-workspace-edit.element';
-import { UmbMemberTypeWorkspaceContext } from './member-type-workspace.context';
+import { UmbMemberTypeWorkspaceEditorElement } from './member-type-workspace-editor.element.js';
+import { UmbMemberTypeWorkspaceContext } from './member-type-workspace.context.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-member-type-workspace')
 export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbMemberTypeWorkspaceContext(this);
-	#element = new UmbMemberTypeWorkspaceEditElement();
+	#element = new UmbMemberTypeWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [

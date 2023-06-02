@@ -1,13 +1,12 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import './document-type-workspace-view-edit-properties.element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+
+import './document-type-workspace-view-edit-properties.element.js';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
@@ -88,7 +87,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			${repeat(
 				this._groups,
 				(group) => group.name,
-				(group) => html`<uui-box .headline=${group.name || ''}>
+				(group) => html` <uui-box .headline=${group.name || ''}>
 					<umb-document-type-workspace-view-edit-properties
 						container-id=${group.id}
 						container-type="Group"
@@ -102,12 +101,18 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-box {
+			:host {
+				display: block;
 				margin: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
+			}
+			uui-box {
+				margin-top: var(--uui-size-layout-1);
 			}
 
 			#add {
 				width: 100%;
+				margin-top: var(--uui-size-layout-1);
 			}
 		`,
 	];

@@ -5,7 +5,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.UserGroupPicker',
 		name: 'User Group Picker Modal',
-		loader: () => import('./user-group-picker/user-group-picker-modal.element'),
+		loader: () => import('./user-group-picker/user-group-picker-modal.element.js'),
 	},
 ];
 

@@ -1,1 +1,1 @@
-export * from './table.element';
+export * from './table.element.js';

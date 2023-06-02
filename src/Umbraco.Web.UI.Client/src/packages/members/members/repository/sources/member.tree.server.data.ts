@@ -1,4 +1,4 @@
-import { MemberTreeDataSource } from '.';
+import { MemberTreeDataSource } from './index.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**

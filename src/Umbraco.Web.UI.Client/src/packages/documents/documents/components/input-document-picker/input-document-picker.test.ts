@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbInputDocumentPickerElement } from './input-document-picker.element';
+import { UmbInputDocumentPickerElement } from './input-document-picker.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputDocumentPickerElement', () => {
 	let element: UmbInputDocumentPickerElement;

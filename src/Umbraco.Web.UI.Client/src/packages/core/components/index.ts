@@ -1,83 +1,34 @@
-import { manifests as debugManifests } from './debug/manifests';
-
 // TODO: we need to figure out what components should be available for extensions and load them upfront
 // TODO: we need to move these files into their respective folders/silos. We then need a way for a silo to globally register a component
-import './body-layout/body-layout.element';
-import './footer-layout/footer-layout.element';
-
-// TODO: delete these two and change usage to umb-dropdown
-import './button-with-dropdown/button-with-dropdown.element';
-import './tooltip-menu/tooltip-menu.element';
-
-import './dropdown/dropdown.element';
-import './code-block/code-block.element';
-import './debug/debug.element';
-import './empty-state/empty-state.element';
-import './extension-slot/extension-slot.element';
-import './table/table.element';
-
-import './entity-action/entity-action-list.element';
-import './entity-action/entity-action.element';
-
-import './entity-bulk-action/entity-bulk-action.element';
-
-import '../../../apps/backoffice/components/backoffice-header.element';
-import '../../../apps/backoffice/components/backoffice-main.element';
-import './backoffice-modal-container/backoffice-modal-container.element';
-import './backoffice-notification-container/backoffice-notification-container.element';
-
-import './collection/collection.element';
-import './collection/collection-toolbar.element';
-import './collection/collection-selection-actions.element';
-import './input-checkbox-list/input-checkbox-list.element';
-import './date-input/date-input.element';
-
-import './input-color-picker/input-color-picker.element';
-import './input-eye-dropper/input-eye-dropper.element';
-import './input-multi-url-picker/input-multi-url-picker.element';
-import './input-slider/input-slider.element';
+export * from './backoffice-modal-container/backoffice-modal-container.element.js';
+export * from './backoffice-notification-container/backoffice-notification-container.element.js';
+export * from './body-layout/body-layout.element.js';
+export * from './button-with-dropdown/button-with-dropdown.element.js'; // TODO: delete this and change usage to umb-dropdown
+// export * from './code-block.js';
+export * from './data-type/index.js';
+export * from './date-input/index.js';
+export * from './dropdown/index.js';
+export * from './empty-state/index.js';
+export * from './entity-actions-bundle/index.js';
+export * from './extension-slot/index.js';
+export * from './footer-layout/index.js';
+export * from './header-app/index.js';
+export * from './history/index.js';
+export * from './input-checkbox-list/index.js';
+export * from './input-color-picker/index.js';
+export * from './input-eye-dropper/index.js';
+export * from './input-list-base/index.js';
+export * from './input-multi-url/index.js';
 import './input-tiny-mce/input-tiny-mce.element';
-import './input-toggle/input-toggle.element';
-import './input-upload-field/input-upload-field.element';
-
-import './property-type-based-property/property-type-based-property.element';
-
-import './ref-property-editor-ui/ref-property-editor-ui.element';
-import './property-editor-config/property-editor-config.element';
-
-import './section/section-main/section-main.element';
-import './section/section-sidebar/section-sidebar.element';
-import './section/section.element';
-
-import './tree/tree.element';
-import './tree/entity-tree-item/entity-tree-item.element';
-import './tree/tree-menu-item/tree-menu-item.element';
-
-import './menu/menu-item-base/menu-item-base.element';
-
-import './variantable-property/variantable-property.element';
-import './property-creator/property-creator.element';
-
-import './header-app/header-app-button.element';
-
-import './history/history-list.element';
-import './history/history-item.element';
-
-import './workspace/workspace-action/workspace-action.element';
-import './workspace/workspace-editor/workspace-editor.element';
-import './workspace/workspace-footer/workspace-footer.element';
-import './workspace/workspace-action-menu/workspace-action-menu.element';
-import './workspace/workspace-variant/workspace-variant.element';
-import './workspace-property/workspace-property.element';
-
-import './variant-selector/variant-selector.element';
-
-import './code-editor';
-
-export * from './table';
-export * from './tree/tree.element';
-export * from './code-editor';
-
-export * from './store';
-
-export const manifests = [...debugManifests];
+export * from './input-number-range/index.js';
+export * from './input-radio-button-list/index.js';
+export * from './input-section/index.js';
+export * from './input-slider/index.js';
+export * from './input-toggle/index.js';
+export * from './input-upload-field/index.js';
+export * from './property-editor-config/index.js';
+export * from './property-type-based-property/index.js';
+export * from './ref-property-editor-ui/index.js';
+export * from './table/index.js';
+export * from './tooltip-menu/index.js';
+export * from './variant-selector/index.js';

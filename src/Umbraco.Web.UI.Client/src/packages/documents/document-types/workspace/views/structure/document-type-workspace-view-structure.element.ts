@@ -1,11 +1,10 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import type { UUIToggleElement } from '@umbraco-ui/uui';
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
-import type { UmbInputDocumentTypePickerElement } from '../../../components/input-document-type-picker/input-document-type-picker.element';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbInputDocumentTypePickerElement } from '../../../components/input-document-type-picker/input-document-type-picker.element.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-structure')
@@ -38,7 +37,6 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 			this._allowedContentTypeIDs = allowedContentTypes
 				?.map((x) => x.id)
 				.filter((x) => x !== undefined) as Array<string>;
-			console.log('this._allowedContentTypeIDs', this._allowedContentTypeIDs);
 		});
 	}
 
@@ -78,12 +76,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 				</umb-workspace-property-layout>
 			</uui-box>
 			<uui-box headline="Presentation">
-				<umb-workspace-property-layout alias="Root" label="Collection">
-					<div slot="description">
-						Use this document as a collection, displaying its children in a Collection View. This could be a list or a
-						table.
-					</div>
-					<div slot="editor"><uui-toggle label="Present as a Collection"></uui-toggle></div>
+				<umb-workspace-property-layout alias="Root" label="Collection view">
+					<div slot="description">Provides an overview of child content and hides it in the tree.</div>
+					<div slot="editor"><uui-toggle label="Display children in a Collection view"></uui-toggle></div>
 				</umb-workspace-property-layout>
 			</uui-box>
 		`;
@@ -92,10 +87,14 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 	static styles = [
 		UUITextStyles,
 		css`
-			uui-box {
+			:host {
+				display: block;
 				margin: var(--uui-size-layout-1);
+				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
 			}
-
+			uui-box {
+				margin-top: var(--uui-size-layout-1);
+			}
 			uui-label,
 			umb-property-editor-ui-number {
 				display: block;

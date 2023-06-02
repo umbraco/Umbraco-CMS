@@ -1,11 +1,10 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state } from 'lit/decorators.js';
-import { UmbUserCollectionContext } from '../../user-collection.context';
+import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import {
 	UmbUserGroupStore,
 	UMB_USER_GROUP_STORE_CONTEXT_TOKEN,
-} from '../../../../user-groups/repository/user-group.store';
+} from '../../../../user-groups/repository/user-group.store.js';
+import { css, html , customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbTableElement,
 	UmbTableColumn,
@@ -14,14 +13,14 @@ import {
 	UmbTableSelectedEvent,
 	UmbTableConfig,
 	UmbTableOrderedEvent,
-} from '@umbraco-cms/backoffice/core/components';
+} from '@umbraco-cms/backoffice/components';
 import type { UserGroupEntity } from '@umbraco-cms/backoffice/user-group';
 import { UMB_COLLECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-import './column-layouts/name/user-table-name-column-layout.element';
-import './column-layouts/status/user-table-status-column-layout.element';
+import './column-layouts/name/user-table-name-column-layout.element.js';
+import './column-layouts/status/user-table-status-column-layout.element.js';
 
 @customElement('umb-user-collection-table-view')
 export class UmbUserCollectionTableViewElement extends UmbLitElement {

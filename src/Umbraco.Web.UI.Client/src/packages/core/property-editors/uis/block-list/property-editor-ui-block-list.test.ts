@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element';
+import { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIBlockListElement', () => {

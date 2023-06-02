@@ -8,7 +8,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.LanguageRoot',
 	name: 'Language Root Workspace',
-	loader: () => import('./language-root-workspace.element'),
+	loader: () => import('./language-root-workspace.element.js'),
 	meta: {
 		entityType: 'language-root',
 	},

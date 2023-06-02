@@ -1,6 +1,5 @@
-import { html, css, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { html, css, nothing , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import type { SearchResultResponseModel } from '@umbraco-cms/backoffice/backend-api';
 

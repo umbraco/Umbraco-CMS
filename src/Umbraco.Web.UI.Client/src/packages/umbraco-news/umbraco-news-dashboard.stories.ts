@@ -1,9 +1,9 @@
-import './umbraco-news-dashboard.element';
+import './umbraco-news-dashboard.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbUmbracoNewsDashboardElement } from './umbraco-news-dashboard.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbUmbracoNewsDashboardElement } from './umbraco-news-dashboard.element';
 
 export default {
 	title: 'Dashboards/Umbraco News',

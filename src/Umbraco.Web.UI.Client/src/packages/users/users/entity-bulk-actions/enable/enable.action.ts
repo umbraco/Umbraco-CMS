@@ -1,5 +1,5 @@
-import { UmbUserRepository } from '../../repository/user.repository';
-import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbEnableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {
@@ -8,7 +8,6 @@ export class UmbEnableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUs
 	}
 
 	async execute() {
-		//TODO: Implement
-		alert('Bulk enable is not implemented yet');
+		await this.repository?.enable(this.selection);
 	}
 }

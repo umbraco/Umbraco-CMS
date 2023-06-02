@@ -1,14 +1,14 @@
-import { css, html, LitElement, nothing } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, LitElement, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-body-layout
  * @description Layout element to arrange elements in a body layout. A general layout for most views.
  * @slot icon - Slot for icon
  * @slot name - Slot for name
- * @slot footer - Slot for workspace footer
- * @slot actions - Slot for workspace footer actions
+ * @slot footer - Slot for footer element
+ * @slot footer-info - Slot for info in the footer
+ * @slot actions - Slot for actions in the footer
  * @slot default - slot for main content
  * @export
  * @class UmbBodyLayout
@@ -16,8 +16,6 @@ import { customElement, property, state } from 'lit/decorators.js';
  */
 @customElement('umb-body-layout')
 export class UmbBodyLayoutElement extends LitElement {
-	
-
 	/**
 	 * Renders a headline in the header.
 	 * @public
@@ -28,6 +26,10 @@ export class UmbBodyLayoutElement extends LitElement {
 	@property()
 	public headline = '';
 
+	/*
+	@property({ type: Boolean, attribute: 'no-scroll' })
+	public noScroll = false;
+*/
 	@state()
 	private _headerSlotHasChildren = false;
 
@@ -77,12 +79,20 @@ export class UmbBodyLayoutElement extends LitElement {
 						this._actionsMenuSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
 			</div>
-			<uui-scroll-container id="main">
-				<slot></slot>
-			</uui-scroll-container>
+			${
+				//this.noScroll
+				//? html`<slot></slot>`
+				//:
+				html`
+					<uui-scroll-container id="main">
+						<slot></slot>
+					</uui-scroll-container>
+				`
+			}
+			<slot name="footer"></slot>
 			<umb-footer-layout style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
 				<slot
-					name="footer"
+					name="footer-info"
 					@slotchange=${(e: Event) => {
 						this._footerSlotHasChildren = this.#hasNodes(e);
 					}}></slot>
@@ -95,7 +105,7 @@ export class UmbBodyLayoutElement extends LitElement {
 			</umb-footer-layout>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -106,6 +116,14 @@ export class UmbBodyLayoutElement extends LitElement {
 				height: 100%;
 				flex-direction: column;
 			}
+
+			/*
+			:host([no-scroll]) slot:not([name]) {
+				position: relative;
+				display: block;
+				height: 100%;
+			}
+			*/
 
 			#header {
 				display: flex;

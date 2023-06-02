@@ -1,4 +1,4 @@
-import type { MediaDetails } from '../../';
+import type { MediaDetails } from '../../index.js';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

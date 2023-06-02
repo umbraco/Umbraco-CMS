@@ -1,5 +1,6 @@
 import { Meta } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUITinyMceElement } from './property-editor-ui-tiny-mce.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-tiny-mce.element';
 import { umbDataTypeData } from '../../../../../shared/mocks/data/data-type.data';

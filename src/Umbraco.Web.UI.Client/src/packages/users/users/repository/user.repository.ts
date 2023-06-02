@@ -3,20 +3,25 @@ import {
 	UmbUserDetailDataSource,
 	UmbUserDetailRepository,
 	UmbUserSetGroupDataSource,
-} from '../types';
-import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store';
-import { UmbUserServerDataSource } from './sources/user.server.data';
-import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data';
-import { UmbUserItemServerDataSource } from './sources/user-item.server.data';
-import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store';
-import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data';
+} from '../types.js';
+
+import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store.js';
+import { UmbUserServerDataSource } from './sources/user.server.data.js';
+import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data.js';
+import { UmbUserItemServerDataSource } from './sources/user-item.server.data.js';
+import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store.js';
+import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
+import { UmbUserEnableServerDataSource } from './sources/user-enable.server.data.js';
+import { UmbUserDisableServerDataSource } from './sources/user-disable.server.data.js';
+import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data.js';
+
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbCollectionDataSource,
 	UmbCollectionRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
 } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateUserRequestModel,
 	InviteUserRequestModel,
@@ -39,6 +44,11 @@ export class UmbUserRepository
 	#itemStore?: UmbUserItemStore;
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
 
+	//ACTIONS
+	#enableSource: UmbUserEnableServerDataSource;
+	#disableSource: UmbUserDisableServerDataSource;
+	#unlockSource: UmbUserUnlockServerDataSource;
+
 	#collectionSource: UmbCollectionDataSource<UserResponseModel>;
 
 	#notificationContext?: UmbNotificationContext;
@@ -48,6 +58,9 @@ export class UmbUserRepository
 
 		this.#detailSource = new UmbUserServerDataSource(this.#host);
 		this.#collectionSource = new UmbUserCollectionServerDataSource(this.#host);
+		this.#enableSource = new UmbUserEnableServerDataSource(this.#host);
+		this.#disableSource = new UmbUserDisableServerDataSource(this.#host);
+		this.#unlockSource = new UmbUserUnlockServerDataSource(this.#host);
 		this.#itemSource = new UmbUserItemServerDataSource(this.#host);
 		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.#host);
 
@@ -199,12 +212,36 @@ export class UmbUserRepository
 	async enable(ids: Array<string>) {
 		if (ids.length === 0) throw new Error('User ids are missing');
 
-		const { data, error } = await this.#detailSource.enable({ userIds: ids });
+		const { error } = await this.#enableSource.enable(ids);
+
+		if (!error) {
+			//TODO: UPDATE STORE
+			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} enabled` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
 	}
 
 	async disable(ids: Array<string>) {
 		if (ids.length === 0) throw new Error('User ids are missing');
 
-		const { data, error } = await this.#detailSource.disable({ userIds: ids });
+		const { error } = await this.#disableSource.disable(ids);
+
+		if (!error) {
+			//TODO: UPDATE STORE
+			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} disabled` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+	}
+
+	async unlock(ids: Array<string>) {
+		if (ids.length === 0) throw new Error('User ids are missing');
+
+		const { error } = await this.#unlockSource.unlock(ids);
+
+		if (!error) {
+			//TODO: UPDATE STORE
+			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} unlocked` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
 	}
 }

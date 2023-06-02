@@ -1,4 +1,4 @@
-import { UmbDictionaryRepository } from '../repository/dictionary.repository';
+import { UmbDictionaryRepository } from '../repository/dictionary.repository.js';
 import { UmbEntityWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

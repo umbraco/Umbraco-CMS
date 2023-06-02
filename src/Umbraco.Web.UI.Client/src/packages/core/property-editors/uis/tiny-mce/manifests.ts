@@ -1,28 +1,33 @@
-import { manifests as configuration } from './config/manifests';
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as configuration } from './config/manifests.js';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.TinyMCE',
+const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.TinyMCE',
 	name: 'Rich Text Editor Property Editor UI',
-	loader: () => import('./property-editor-ui-tiny-mce.element'),
+	loader: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
-		propertyEditorModel: 'Umbraco.TinyMCE',
+		propertyEditorAlias: 'Umbraco.TinyMCE',
 		icon: 'umb:browser-window',
 		group: 'richText',
-		config: {
+		settings: {
 			properties: [
+				{
+					alias: 'editor',
+					label: 'Editor',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE.Configuration',
+				},
 				{
 					alias: 'overlaySize',
 					label: 'Overlay Size',
 					description: 'Select the width of the overlay (link picker)',
-					propertyEditorUI: 'Umb.PropertyEditorUI.OverlaySize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
 				},
 				{
 					alias: 'hideLabel',
 					label: 'Hide Label',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

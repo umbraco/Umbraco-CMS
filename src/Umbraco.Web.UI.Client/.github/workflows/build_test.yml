@@ -37,7 +37,7 @@ jobs:
     - run: npm ci --no-audit --no-fund --prefer-offline
     - run: npm run lint
     - run: npm run build
-    # - run: npm run build:libs
+    - run: npm run generate:jsonschema:dist
     - run: sudo npx playwright install-deps
     - run: npm test
     - name: Upload Code Coverage reports

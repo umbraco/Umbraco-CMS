@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
-import { UmbCodeEditorElement } from './code-editor.element';
-import { CodeEditorLanguage, CodeEditorTheme } from './code-editor.model';
+import { UmbCodeEditorElement } from './code-editor.element.js';
+import { CodeEditorLanguage, CodeEditorTheme } from './code-editor.model.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const meta: Meta<UmbCodeEditorElement> = {
 	title: 'Components/Code Editor',
@@ -109,8 +109,8 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 	!!!!!! ???? ,,  -- ---
 
 	"Smartypants, double quotes" and 'single quotes'`,
-	typescript: `import { UmbTemplateRepository } from '../repository/template.repository';
-	import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context';
+	typescript: `import { UmbTemplateRepository } from '../repository/template.repository.js';
+	import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context.js';
 	import { createObservablePart, UmbDeepState } from '@umbraco-cms/observable-api';
 	import { TemplateModel } from '@umbraco-cms/backend-api';
 	import { UmbControllerHostElement } from '@umbraco-cms/controller';

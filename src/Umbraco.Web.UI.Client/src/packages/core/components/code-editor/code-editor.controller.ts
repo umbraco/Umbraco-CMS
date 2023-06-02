@@ -9,8 +9,8 @@ import {
 	UmbCodeEditorHost,
 	UmbCodeEditorRange,
 	UmbCodeEditorSelection,
-} from './code-editor.model';
-import themes from './themes';
+} from './code-editor.model.js';
+import themes from './themes/index.js';
 import { UmbChangeEvent, UmbInputEvent } from '@umbraco-cms/backoffice/events';
 
 //TODO - consider firing change event on blur

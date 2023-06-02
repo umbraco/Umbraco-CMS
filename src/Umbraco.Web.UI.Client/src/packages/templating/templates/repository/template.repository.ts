@@ -1,10 +1,6 @@
-import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data';
-import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data';
-import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store';
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store';
 import type {
-	UmbDataSource,
 	UmbDetailRepository,
+	UmbItemRepository,
 	UmbTreeDataSource,
 	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
@@ -14,20 +10,28 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import {
 	CreateTemplateRequestModel,
 	EntityTreeItemResponseModel,
+	ItemResponseModelBaseModel,
+	TemplateItemResponseModel,
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store.js';
+import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
+import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
+import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
+import { Observable } from 'rxjs';
 
 export class UmbTemplateRepository
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
-		UmbDetailRepository<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>
+		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,
+		UmbItemRepository<TemplateItemResponseModel>
 {
 	#init;
 	#host: UmbControllerHostElement;
 
 	#treeDataSource: UmbTreeDataSource<EntityTreeItemResponseModel>;
-	#detailDataSource: UmbDataSource<CreateTemplateRequestModel, any, UpdateTemplateRequestModel, TemplateResponseModel>;
+	#detailDataSource: UmbTemplateDetailServerDataSource;
 
 	#treeStore?: UmbTemplateTreeStore;
 	#store?: UmbTemplateStore;
@@ -37,7 +41,6 @@ export class UmbTemplateRepository
 	constructor(host: UmbControllerHostElement) {
 		this.#host = host;
 
-		// TODO: figure out how spin up get the correct data source
 		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this.#host);
 		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this.#host);
 
@@ -56,7 +59,7 @@ export class UmbTemplateRepository
 		]);
 	}
 
-	// TREE:
+	//#region TREE:
 	async requestTreeRoot() {
 		await this.#init;
 
@@ -75,7 +78,6 @@ export class UmbTemplateRepository
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getRootItems();
-
 		if (data) {
 			this.#treeStore?.appendItems(data.items);
 		}
@@ -122,13 +124,13 @@ export class UmbTemplateRepository
 		await this.#init;
 		return this.#treeStore!.items(ids);
 	}
+	//#endregion
 
-	// DETAILS:
+	//#region DETAILS:
 
-	async createScaffold(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
+	async createScaffold() {
 		await this.#init;
-		return this.#detailDataSource.createScaffold(parentId);
+		return this.#detailDataSource.createScaffold();
 	}
 
 	async requestById(id: string) {
@@ -147,6 +149,21 @@ export class UmbTemplateRepository
 
 		return { data, error };
 	}
+
+	async requestItems(id: string[]) {
+		await this.#init;
+
+		if (!id) {
+			throw new Error('Id is missing');
+		}
+		const { data, error } = await this.#detailDataSource.getItem(id);
+		return { data, error };
+	}
+
+	async items(uniques: string[]): Promise<Observable<ItemResponseModelBaseModel[]>> {
+		throw new Error('items method is not implemented in UmbTemplateRepository');
+	}
+
 	async byId(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this.#init;
@@ -155,10 +172,10 @@ export class UmbTemplateRepository
 
 	// Could potentially be general methods:
 
-	async create(template: TemplateResponseModel) {
+	async create(template: CreateTemplateRequestModel) {
 		await this.#init;
 
-		if (!template || !template.id) {
+		if (!template) {
 			throw new Error('Template is missing');
 		}
 
@@ -171,7 +188,7 @@ export class UmbTemplateRepository
 
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
-		this.#store?.append(template);
+		//this.#store?.append({ ...template, $type: 'EntityTreeItemResponseModel' });
 		// TODO: Update tree store with the new item? or ask tree to request the new item?
 
 		return { error };
@@ -221,7 +238,6 @@ export class UmbTemplateRepository
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
 		this.#store?.remove([id]);
 		this.#treeStore?.removeItem(id);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}

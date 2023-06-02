@@ -1,8 +1,7 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html, LitElement, svg } from 'lit';
-import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
-import { clamp } from 'lodash-es';
-import { UmbDonutSliceElement } from './donut-slice.element';
+import { UmbDonutSliceElement } from './donut-slice.element.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, LitElement, svg , customElement, property, query, queryAssignedElements, state } from '@umbraco-cms/backoffice/external/lit';
+import { clamp } from '@umbraco-cms/backoffice/external/lodash';
 
 export interface Circle {
 	color: string;
@@ -29,8 +28,6 @@ export class UmbDonutChartElement extends LitElement {
 	static percentToDegrees(percent: number): number {
 		return percent * 3.6;
 	}
-
-	
 
 	/**
 	 * Circle radius in pixels
@@ -269,7 +266,7 @@ export class UmbDonutChartElement extends LitElement {
 			</div>
 			<slot @slotchange=${this.#printCircles} @slice-update=${this.#printCircles}></slot>`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`

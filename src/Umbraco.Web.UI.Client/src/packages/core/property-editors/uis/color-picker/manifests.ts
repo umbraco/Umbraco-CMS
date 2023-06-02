@@ -1,13 +1,13 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.ColorPicker',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.ColorPicker',
 	name: 'Color Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-color-picker.element'),
+	loader: () => import('./property-editor-ui-color-picker.element.js'),
 	meta: {
 		label: 'Color Picker',
-		propertyEditorModel: 'Umbraco.ColorPicker',
+		propertyEditorAlias: 'Umbraco.ColorPicker',
 		icon: 'umb:colorpicker',
 		group: 'pickers',
 	},

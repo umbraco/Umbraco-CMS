@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbDocumentWorkspaceElement } from './document-workspace.element';
+import { UmbDocumentWorkspaceElement } from './document-workspace.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbDocumentWorkspaceElement', () => {

@@ -5,7 +5,8 @@ export const manifest: ManifestPropertyEditorModel = {
 	name: 'Tiny MCE',
 	alias: 'Umbraco.TinyMCE',
 	meta: {
-		config: {
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
+		settings: {
 			properties: [
 				{
 					alias: 'toolbar',
@@ -29,18 +30,18 @@ export const manifest: ManifestPropertyEditorModel = {
 					alias: 'maxImageSize',
 					label: 'Maximum size for inserted images',
 					description: 'Maximum width or height - enter 0 to disable resizing',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
+					propertyEditorUi: 'Umb.PropertyEditorUI.TinyMCE.MaxImageSizeConfiguration',
 				},
 				{
 					alias: 'mediaParentId',
 					label: 'Image Upload Folder',
 					description: 'Choose the upload location of pasted images',
-					propertyEditorUI: 'Umb.PropertyEditorUI.TreePicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 				},
 				{
 					alias: 'ignoreUserStartNodes',
 					label: 'Ignore User Start Nodes',
-					propertyEditorUI: 'Umb.PropertyEditorUI.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

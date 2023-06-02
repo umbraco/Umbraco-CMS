@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUILabelElement } from './property-editor-ui-label.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUILabelElement } from './property-editor-ui-label.element';
-import './property-editor-ui-label.element';
+import './property-editor-ui-label.element.js';
 
 export default {
 	title: 'Property Editor UIs/Label',

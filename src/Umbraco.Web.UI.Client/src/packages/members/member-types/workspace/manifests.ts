@@ -8,7 +8,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.MemberType',
 	name: 'Member Type Workspace',
-	loader: () => import('./member-type-workspace.element'),
+	loader: () => import('./member-type-workspace.element.js'),
 	meta: {
 		entityType: 'member-type',
 	},

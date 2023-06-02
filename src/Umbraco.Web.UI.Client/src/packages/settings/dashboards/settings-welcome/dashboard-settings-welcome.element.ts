@@ -1,11 +1,8 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-dashboard-settings-welcome')
 export class UmbDashboardSettingsWelcomeElement extends LitElement {
-	
-
 	render() {
 		return html`
 			<section id="settings-dashboard">
@@ -88,7 +85,7 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 			</section>
 		`;
 	}
-	
+
 	static styles = [
 		UUITextStyles,
 		css`
@@ -96,7 +93,7 @@ export class UmbDashboardSettingsWelcomeElement extends LitElement {
 				display: grid;
 				grid-gap: var(--uui-size-7);
 				grid-template-columns: repeat(3, 1fr);
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 
 			@media (max-width: 1200px) {

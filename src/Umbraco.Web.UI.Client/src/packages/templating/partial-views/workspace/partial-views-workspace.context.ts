@@ -1,4 +1,4 @@
-import { UmbTemplateRepository } from '../repository/partial-views.repository';
+import { UmbTemplateRepository } from '../repository/partial-views.repository.js';
 import { createObservablePart, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

@@ -1,6 +1,6 @@
-import { UmbMemberGroupRepository } from './member-group.repository';
-import { UmbMemberGroupStore } from './member-group.store';
-import { UmbMemberGroupTreeStore } from './member-group.tree.store';
+import { UmbMemberGroupRepository } from './member-group.repository.js';
+import { UmbMemberGroupStore } from './member-group.store.js';
+import { UmbMemberGroupTreeStore } from './member-group.tree.store.js';
 import type { ManifestStore, ManifestTreeStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const MEMBER_GROUP_REPOSITORY_ALIAS = 'Umb.Repository.MemberGroup';

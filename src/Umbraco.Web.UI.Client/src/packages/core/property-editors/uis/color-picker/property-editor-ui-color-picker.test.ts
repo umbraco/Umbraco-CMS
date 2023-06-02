@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUIColorPickerElement } from './property-editor-ui-color-picker.element';
+import { UmbPropertyEditorUIColorPickerElement } from './property-editor-ui-color-picker.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIColorPickerElement', () => {

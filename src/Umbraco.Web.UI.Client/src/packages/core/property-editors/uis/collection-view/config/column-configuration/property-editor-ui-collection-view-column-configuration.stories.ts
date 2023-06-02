@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
+import type { UmbPropertyEditorUICollectionViewColumnConfigurationElement } from './property-editor-ui-collection-view-column-configuration.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import type { UmbPropertyEditorUICollectionViewColumnConfigurationElement } from './property-editor-ui-collection-view-column-configuration.element';
-import './property-editor-ui-collection-view-column-configuration.element';
+import './property-editor-ui-collection-view-column-configuration.element.js';
 
 export default {
 	title: 'Property Editor UIs/Collection View Column Configuration',

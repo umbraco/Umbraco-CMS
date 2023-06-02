@@ -1,9 +1,6 @@
-import { css, html } from 'lit';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context';
+import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import { css, html , customElement, property, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -12,9 +9,8 @@ import {
 	PropertyTypeResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_MODAL_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
-import './document-type-workspace-view-edit-property.element';
-import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/context-api';
-
+import './document-type-workspace-view-edit-property.element.js';
+import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
 	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeResponseModel) => {
 		return element.getAttribute('data-umb-property-id') === model.id;
@@ -105,14 +101,18 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		const property = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!property) return;
 
+		// TODO: Figure out how we from this location can get into the routeable modal..
+		/*
 		// Take id and parse to modal:
-		console.log('property id:', property.id!);
+		console.log('property id:', property.id!, property);
 
+		// TODO: route modal..
 		const modalHandler = this.#modalContext?.open(UMB_PROPERTY_SETTINGS_MODAL);
 
 		modalHandler?.onSubmit().then((result) => {
 			console.log(result);
 		});
+		*/
 	}
 
 	render() {

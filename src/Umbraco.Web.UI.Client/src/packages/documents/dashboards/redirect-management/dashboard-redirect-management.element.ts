@@ -1,7 +1,10 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, nothing } from 'lit';
-import { customElement, state, query, property } from 'lit/decorators.js';
-import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-ui/uui';
+import {
+	UUITextStyles,
+	UUIButtonState,
+	UUIPaginationElement,
+	UUIPaginationEvent,
+} from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
@@ -269,7 +272,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				margin: var(--uui-size-layout-1);
+				padding: var(--uui-size-layout-1);
 			}
 
 			.actions {

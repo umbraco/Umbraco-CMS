@@ -19,17 +19,16 @@ import {
 	FetchRequestor,
 	LocalStorageBackend,
 	RedirectRequestHandler,
-} from '@openid/appauth';
-import { AuthorizationRequest } from '@openid/appauth/built/authorization_request';
-import { AuthorizationNotifier } from '@openid/appauth/built/authorization_request_handler';
-import { AuthorizationServiceConfiguration } from '@openid/appauth/built/authorization_service_configuration';
-import {
+	AuthorizationRequest,
+	AuthorizationNotifier,
+	AuthorizationServiceConfiguration,
 	GRANT_TYPE_AUTHORIZATION_CODE,
 	GRANT_TYPE_REFRESH_TOKEN,
 	TokenRequest,
-} from '@openid/appauth/built/token_request';
-import { TokenResponse } from '@openid/appauth/built/token_response';
-import { LocationLike, StringMap } from '@openid/appauth/built/types';
+	TokenResponse,
+	LocationLike,
+	StringMap,
+} from '@umbraco-cms/backoffice/external/openid';
 
 const requestor = new FetchRequestor();
 

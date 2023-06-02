@@ -12,7 +12,7 @@ export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataType
  * @extends {UmbStoreBase}
  * @description - Data Store for Template Details
  */
-export class UmbDataTypeStore extends UmbStoreBase {
+export class UmbDataTypeStore extends UmbStoreBase<DataTypeResponseModel> {
 	/**
 	 * Creates an instance of UmbDataTypeStore.
 	 * @param {UmbControllerHostElement} host

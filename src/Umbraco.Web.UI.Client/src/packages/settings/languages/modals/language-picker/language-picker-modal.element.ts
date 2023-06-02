@@ -1,8 +1,6 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
-import { UmbLanguageRepository } from '../../repository/language.repository';
+import { UmbLanguageRepository } from '../../repository/language.repository.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html , customElement, state , repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
@@ -57,7 +55,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 							label=${item.name ?? ''}
 							selectable
 							@selected=${() => this.#selectionManager.select(item.isoCode!)}
-							@unselected=${() => this.#selectionManager.deselect(item.isoCode!)}
+							@deselected=${() => this.#selectionManager.deselect(item.isoCode!)}
 							?selected=${this.#selectionManager.isSelected(item.isoCode!)}>
 							<uui-icon slot="icon" name="umb:globe"></uui-icon>
 						</uui-menu-item>

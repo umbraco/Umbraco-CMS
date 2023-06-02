@@ -1,6 +1,5 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, nothing } from 'lit';
-import { customElement, state, query, property } from 'lit/decorators.js';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, nothing , customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalContext,
 	UMB_MODAL_CONTEXT_TOKEN,
@@ -14,8 +13,8 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-import './modal-views/fields-viewer.element';
-import './modal-views/fields-settings.element';
+import './modal-views/fields-viewer.element.js';
+import './modal-views/fields-settings.element.js';
 
 interface ExposedSearchResultField {
 	name?: string | null;

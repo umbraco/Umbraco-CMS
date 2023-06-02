@@ -1,13 +1,13 @@
-import type { ManifestPropertyEditorUI } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: ManifestPropertyEditorUI = {
-	type: 'propertyEditorUI',
-	alias: 'Umb.PropertyEditorUI.MultipleTextString',
+export const manifest: ManifestPropertyEditorUi = {
+	type: 'propertyEditorUi',
+	alias: 'Umb.PropertyEditorUi.MultipleTextString',
 	name: 'Multiple Text String Property Editor UI',
-	loader: () => import('./property-editor-ui-multiple-text-string.element'),
+	loader: () => import('./property-editor-ui-multiple-text-string.element.js'),
 	meta: {
 		label: 'Multiple Text String',
-		propertyEditorModel: 'Umbraco.MultipleTextString',
+		propertyEditorAlias: 'Umbraco.MultipleTextString',
 		icon: 'umb:ordered-list',
 		group: '',
 		supportsReadOnly: true,

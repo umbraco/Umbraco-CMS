@@ -1,6 +1,6 @@
-import { DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE, DATA_TYPE_ROOT_ENTITY_TYPE } from '../..';
-import { DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/manifests';
-import { UmbCreateDataTypeEntityAction } from './create.action';
+import { DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE, DATA_TYPE_ROOT_ENTITY_TYPE } from '../../entities.js';
+import { DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { UmbCreateDataTypeEntityAction } from './create.action.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -23,7 +23,7 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.DataTypeCreateOptions',
 		name: 'Data Type Create Options Modal',
-		loader: () => import('./modal/data-type-create-options-modal.element'),
+		loader: () => import('./modal/data-type-create-options-modal.element.js'),
 	},
 ];
 

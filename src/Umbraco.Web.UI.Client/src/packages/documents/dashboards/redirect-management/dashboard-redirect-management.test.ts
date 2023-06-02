@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
-import { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element';
+import { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbDashboardRedirectManagement', () => {

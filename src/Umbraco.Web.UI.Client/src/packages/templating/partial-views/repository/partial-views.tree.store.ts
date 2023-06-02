@@ -1,4 +1,4 @@
-import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN_ALIAS } from '../config';
+import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN_ALIAS } from '../config.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/store';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
