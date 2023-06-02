@@ -1,4 +1,13 @@
-import { css, html, LitElement, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	LitElement,
+	nothing,
+	customElement,
+	property,
+	state,
+	query,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -23,8 +32,14 @@ export class UmbBodyLayoutElement extends LitElement {
 	 * @attr {string} clear-header - renders the header without background and borders.
 	 * @default ''
 	 */
+
+	@query('#main') scrollContainer?: HTMLElement;
+
 	@property()
 	public headline = '';
+
+	@property({ type: Boolean, reflect: true, attribute: 'scroll-shadow' })
+	public scrollShadow = false;
 
 	@state()
 	private _headerSlotHasChildren = false;
@@ -43,6 +58,25 @@ export class UmbBodyLayoutElement extends LitElement {
 
 	#hasNodes = (e: Event) => {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
+	};
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		if (this.scrollShadow) {
+			requestAnimationFrame(() => {
+				this.scrollContainer?.addEventListener('scroll', this.#onScroll);
+			});
+		}
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.scrollContainer?.removeEventListener('scroll', this.#onScroll);
+	}
+
+	#onScroll = () => {
+		if (!this.scrollContainer) return;
+		this.toggleAttribute('scrolling', this.scrollContainer.scrollTop > 0);
 	};
 
 	render() {
@@ -118,11 +152,19 @@ export class UmbBodyLayoutElement extends LitElement {
 				background-color: var(--uui-color-surface);
 				border-bottom: 1px solid var(--uui-color-border);
 				box-sizing: border-box;
+				z-index: 1;
+				transition: box-shadow 150ms ease-in-out;
+				box-shadow: 0 0px -5px 5px rgba(0, 0, 0, 0);
 			}
 
 			:host([clear-header]) #header {
 				background-color: transparent;
 				border-color: transparent;
+			}
+
+			:host([scrolling]) #header {
+				/* This should be using the uui-shadows but for now they are too drastic for this use case */
+				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.3);
 			}
 
 			#headline {
