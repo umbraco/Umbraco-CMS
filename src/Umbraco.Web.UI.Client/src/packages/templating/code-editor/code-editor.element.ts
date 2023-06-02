@@ -1,12 +1,8 @@
-import { UMB_THEME_CONTEXT_TOKEN } from '../../../settings/themes/theme.context.js';
+import { UMB_THEME_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/themes';
 import { UmbCodeEditorController } from './code-editor.controller.js';
-import {
-	CodeEditorLanguage,
-	CodeEditorSearchOptions,
-	CodeEditorTheme,
-	UmbCodeEditorHost,
-} from './code-editor.model.js';
-import { monacoEditorStyles, monacoJumpingCursorHack } from './styles.js';
+import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } from './code-editor.model.js';
+import { CodeEditorTheme } from './code-editor.model.js';
+import { monacoEditorStyles, monacoJumpingCursorHack } from '@umbraco-cms/backoffice/external/monaco-editor';
 import {
 	css,
 	html,
@@ -18,6 +14,7 @@ import {
 	property,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
 /**
  * A custom element that renders a code editor. Code editor is based on the Monaco Editor library.
  * The element will listen to the theme context and update the theme accordingly.
@@ -133,6 +130,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 				return CodeEditorTheme.Light;
 		}
 	}
+
 	/**
 	 * Inserts text at the current cursor position.
 	 *
@@ -142,6 +140,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	insert(text: string) {
 		this.#editor?.insert(text);
 	}
+
 	/**
 	 * Finds all occurrence of the given string or matches the given regular expression.
 	 *

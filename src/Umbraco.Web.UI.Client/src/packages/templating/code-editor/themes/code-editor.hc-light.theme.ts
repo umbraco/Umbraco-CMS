@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor';
+import type { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 
 export const UmbCodeEditorThemeHighContrastLight: monaco.editor.IStandaloneThemeData = {
 	base: 'vs',

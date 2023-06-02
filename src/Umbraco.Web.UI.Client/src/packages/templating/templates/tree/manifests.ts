@@ -1,4 +1,4 @@
-import { TEMPLATE_ENTITY_TYPE, TEMPLATE_ROOT_ENTITY_TYPE } from '../index.js';
+import { TEMPLATE_ENTITY_TYPE, TEMPLATE_ROOT_ENTITY_TYPE } from '../entities.js';
 import { TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
