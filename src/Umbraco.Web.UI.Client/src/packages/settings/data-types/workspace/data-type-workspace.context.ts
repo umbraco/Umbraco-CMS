@@ -12,11 +12,17 @@ export class UmbDataTypeWorkspaceContext
 	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
+	#preset?: Partial<DataTypeResponseModel>;
+
 	name = this.#data.getObservablePart((data) => data?.name);
 	id = this.#data.getObservablePart((data) => data?.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDataTypeRepository(host));
+	}
+
+	public setPreset(preset: Partial<DataTypeResponseModel>) {
+		this.#preset = preset;
 	}
 
 	async load(id: string) {
@@ -28,7 +34,10 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async createScaffold(parentId: string | null) {
-		const { data } = await this.repository.createScaffold(parentId);
+		let { data } = await this.repository.createScaffold(parentId);
+		if (this.#preset) {
+			data = { ...data, ...this.#preset };
+		}
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
@@ -80,8 +89,8 @@ export class UmbDataTypeWorkspaceContext
 		} else {
 			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+
+		this.saveComplete(this.#data.value);
 	}
 
 	async delete(id: string) {
