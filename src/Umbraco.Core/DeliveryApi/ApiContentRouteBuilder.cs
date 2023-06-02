@@ -74,9 +74,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
-            contentPath = content.IsPublished()
-                ? _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content?.GetRouteById(content.Id, culture) ?? contentPath
-                : content.Key.ToString("D");
+            contentPath = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content?.GetRouteById(content.Id, culture) ?? contentPath;
         }
 
         // if the content path has still not been resolved as a valid path, the content is un-routable in this culture
