@@ -171,14 +171,13 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 				this.host,
 				umbExtensionsRegistry.getByTypeAndAlias('modal', modalAlias),
 				async (manifest) => {
+					this.#removeInnerElement();
 					if (manifest) {
 						const innerElement = await this.#createInnerElement(manifest, data);
 						if (innerElement) {
 							this.#appendInnerElement(innerElement);
-							return;
 						}
 					}
-					this.#removeInnerElement();
 				}
 			);
 		}
