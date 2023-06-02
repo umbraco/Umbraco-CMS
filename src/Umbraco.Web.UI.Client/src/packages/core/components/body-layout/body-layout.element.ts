@@ -165,7 +165,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				border-color: transparent;
 			}
 
-			:host([scrolling]) #header {
+			:host([scroll-shadow][scrolling]) #header {
 				/* This should be using the uui-shadows but for now they are too drastic for this use case */
 				box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.3);
 			}
