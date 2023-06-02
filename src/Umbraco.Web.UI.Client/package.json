@@ -163,6 +163,7 @@
 		"rollup-plugin-esbuild": "^5.0.0",
 		"rollup-plugin-import-css": "^3.2.1",
 		"rollup-plugin-url": "^3.0.1",
+		"rollup-plugin-web-worker-loader": "^1.6.1",
 		"storybook": "7.0.18",
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.6",
