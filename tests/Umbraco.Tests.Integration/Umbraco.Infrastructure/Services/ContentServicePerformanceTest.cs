@@ -262,7 +262,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     public void CreateTestData()
     {
-        var template = TemplateBuilder.CreateTextPageTemplate();
+        var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         FileService.SaveTemplate(template);
 
         // Create and Save ContentType "textpage" -> ContentType.Id

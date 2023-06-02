@@ -547,7 +547,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         var fileService = FileService;
 
         // kill default test data
-        fileService.DeleteTemplate("Textpage");
+        fileService.DeleteTemplate("defaultTemplate");
 
         // Act
         var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
