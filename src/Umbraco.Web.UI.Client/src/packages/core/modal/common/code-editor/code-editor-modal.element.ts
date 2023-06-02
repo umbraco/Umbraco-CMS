@@ -27,7 +27,7 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 			return;
 		}
 
-		this.data.content = this._codeEditor?.code ?? '';
+		this.data.content = this._codeEditor?.code ?? '';		
 	}
 
 	render() {

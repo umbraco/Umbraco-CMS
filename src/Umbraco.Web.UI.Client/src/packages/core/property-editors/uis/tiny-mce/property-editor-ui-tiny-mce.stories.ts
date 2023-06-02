@@ -1,10 +1,10 @@
 import { Meta } from '@storybook/web-components';
-import type { UmbPropertyEditorUITinyMceElement } from './property-editor-ui-tiny-mce.element.js';
+import { umbDataTypeData } from '../../../../../../../shared/mocks/data/data-type.data';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-
-import './property-editor-ui-tiny-mce.element';
-import { umbDataTypeData } from '../../../../../shared/mocks/data/data-type.data';
-import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	DataTypeResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import './property-editor-ui-tiny-mce.element.js';
 
 const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as DataTypeResponseModel;
 
