@@ -186,13 +186,6 @@ export class UmbModalHandlerClass<ModalData extends object = object, ModalResult
 
 	#appendInnerElement(element: HTMLElement) {
 		this.#modalRouterElement.appendChild(element);
-		/*this.#modalRouterElement.routes = [
-			{
-				path: '',
-				component: element,
-			},
-		];
-		this.#modalRouterElement.render();*/
 		this.#innerElement.next(element);
 	}
 
