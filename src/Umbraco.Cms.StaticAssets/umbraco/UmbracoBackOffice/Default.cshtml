@@ -1,13 +1,15 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <base href="/umbraco/" />
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="backoffice/assets/favicon.svg" />
+    <base href="/umbraco/" />
+    <link rel="icon" type="image/svg+xml" href="~/umbraco/backoffice/assets/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Umbraco</title>
-    <link rel="stylesheet" href="backoffice/css/umb-css.css"/>
-    <link rel="stylesheet" href="backoffice/css/uui-css.css"/>
+    <link rel="stylesheet" href="~/umbraco/backoffice/css/umb-css.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" asp-append-version="true"/>
     <script type="importmap">
         {
             "imports": {
@@ -62,7 +64,7 @@
             }
         }
     </script>
-    <script type="module" src="backoffice/apps/app/app.element.js"></script>
+    <script type="module" src="~/umbraco/backoffice/apps/app/app.element.js" asp-append-version="true"></script>
 </head>
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
     <umb-app></umb-app>
