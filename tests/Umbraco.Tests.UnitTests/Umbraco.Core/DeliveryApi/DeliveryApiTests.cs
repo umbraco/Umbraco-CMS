@@ -115,6 +115,7 @@ public class DeliveryApiTests
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor? variationContextAccessor = null,
         IPublishedSnapshotAccessor? publishedSnapshotAccessor = null,
+        IRequestPreviewService? requestPreviewService = null,
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null)
     {
         if (requestHandlerSettingsMonitor == null)
@@ -129,6 +130,7 @@ public class DeliveryApiTests
             globalSettings,
             variationContextAccessor ?? Mock.Of<IVariationContextAccessor>(),
             publishedSnapshotAccessor ?? Mock.Of<IPublishedSnapshotAccessor>(),
-            requestHandlerSettingsMonitor);
+            requestPreviewService ?? Mock.Of<IRequestPreviewService>(),
+        requestHandlerSettingsMonitor);
     }
 }

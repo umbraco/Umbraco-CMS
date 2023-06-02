@@ -14,6 +14,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly GlobalSettings _globalSettings;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+    private readonly IRequestPreviewService _requestPreviewService;
     private RequestHandlerSettings _requestSettings;
 
     public ApiContentRouteBuilder(
@@ -21,11 +22,13 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor variationContextAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IRequestPreviewService requestPreviewService,
         IOptionsMonitor<RequestHandlerSettings> requestSettings)
     {
         _publishedUrlProvider = publishedUrlProvider;
         _variationContextAccessor = variationContextAccessor;
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
+        _requestPreviewService = requestPreviewService;
         _globalSettings = globalSettings.Value;
         _requestSettings = requestSettings.CurrentValue;
         requestSettings.OnChange(settings => _requestSettings = settings);
@@ -61,9 +64,10 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        if (content.IsPublished(culture) is false)
+        var isPreview = _requestPreviewService.IsPreview();
+        if (isPreview && content.IsPublished(culture) is false)
         {
-            return $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
+            return ContentPreviewPath(content);
         }
 
         // grab the content path from the URL provider
@@ -78,10 +82,18 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         }
 
         // if the content path has still not been resolved as a valid path, the content is un-routable in this culture
-        return IsInvalidContentPath(contentPath)
-            ? null
-            : contentPath;
+        // - unless we are routing for preview
+        if (IsInvalidContentPath(contentPath))
+        {
+            return isPreview
+                ? ContentPreviewPath(content)
+                : null;
+        }
+
+        return contentPath;
     }
+
+    private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
     private static bool IsInvalidContentPath(string path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
 }
