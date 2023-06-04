@@ -76,10 +76,7 @@ public class ScopedNotificationPublisher : IScopedNotificationPublisher
         {
             if (completed)
             {
-                foreach (INotification notification in _notificationOnScopeCompleted)
-                {
-                    _eventAggregator.Publish(notification);
-                }
+                _eventAggregator.Publish(_notificationOnScopeCompleted);
             }
         }
         finally
