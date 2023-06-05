@@ -297,6 +297,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				display: flex;
 				flex-direction: column;
 				padding: var(--uui-size-layout-1);
+				padding-top: var(--uui-size-1);
 			}
 
 			uui-table {
