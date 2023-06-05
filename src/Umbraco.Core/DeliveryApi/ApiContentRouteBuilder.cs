@@ -41,7 +41,9 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
             throw new ArgumentException("Content locations can only be built from Content items.", nameof(content));
         }
 
-        var contentPath = GetContentPath(content, culture);
+        var isPreview = _requestPreviewService.IsPreview();
+
+        var contentPath = GetContentPath(content, culture, isPreview);
         if (contentPath == null)
         {
             return null;
@@ -49,7 +51,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
         contentPath = contentPath.EnsureStartsWith("/");
 
-        IPublishedContent root = content.Root();
+        IPublishedContent root = GetRoot(content, isPreview);
         var rootPath = root.UrlSegment(_variationContextAccessor, culture) ?? string.Empty;
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
@@ -60,11 +62,10 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         return new ApiContentRoute(contentPath, new ApiContentStartItem(root.Key, rootPath));
     }
 
-    private string? GetContentPath(IPublishedContent content, string? culture)
+    private string? GetContentPath(IPublishedContent content, string? culture, bool isPreview)
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        var isPreview = _requestPreviewService.IsPreview();
         if (isPreview && content.IsPublished(culture) is false)
         {
             return ContentPreviewPath(content);
@@ -96,4 +97,21 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
     private static bool IsInvalidContentPath(string path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
+
+    private IPublishedContent GetRoot(IPublishedContent content, bool isPreview)
+    {
+        if (isPreview is false)
+        {
+            return content.Root();
+        }
+
+        // in very edge case scenarios during preview, content.Root() does not map to the root.
+        // we'll code our way around it for the time being.
+        return _publishedSnapshotAccessor
+                   .GetRequiredPublishedSnapshot()
+                   .Content?
+                   .GetAtRoot(true)
+                   .FirstOrDefault(root => root.IsAncestorOrSelf(content))
+               ?? content.Root();
+    }
 }
