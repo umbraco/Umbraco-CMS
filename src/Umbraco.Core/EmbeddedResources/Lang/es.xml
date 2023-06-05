@@ -2,7 +2,7 @@
 <language alias="es" intName="Spanish" localName="español" lcid="10" culture="es-ES">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Administrar dominios</key>
@@ -70,6 +70,10 @@
     <key alias="translate">Permitir acceso para traducir un nodo</key>
     <key alias="update">Permitir acceso para guardar un nodo</key>
     <key alias="createblueprint">Permitir acceso para crear una Plantilla de Contenido</key>
+  </area>
+  <area alias="apps">
+    <key alias="umbContent">Contenido</key>
+    <key alias="umbInfo">Información</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permiso denegado.</key>
@@ -186,7 +190,7 @@
     <key alias="childItems" version="7.0">Nodos hijo</key>
     <key alias="target" version="7.0">Destino</key>
     <key alias="scheduledPublishServerTime">Esto se traduce en la siguiente hora en el servidor:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
     <key alias="nestedContentDeleteItem">¿Estás seguro que quieres eliminar este elemento?</key>
     <key alias="nestedContentEditorNotSupported">Propiedad %0% utiliza editor %1% que no está soportado por Nested Content.</key>
     <key alias="addTextBox">Añadir otra caja de texto</key>
@@ -327,6 +331,7 @@
     <key alias="selectMember">Selecciona miembro</key>
     <key alias="selectMemberGroup">Selecciona grupo de miembros</key>
     <key alias="selectNode">Selecciona nodo</key>
+    <key alias="selectLanguages">Seleccionar idiomas</key>
     <key alias="selectSections">Selecciona secciones</key>
     <key alias="selectUsers">Selecciona usuarios</key>
     <key alias="noIconsFound">No se encontraron iconos</key>
@@ -341,6 +346,18 @@
     <key alias="account">Cuenta</key>
     <key alias="selectEditor">Selecciona editor</key>
     <key alias="selectSnippet">Selecciona snippet</key>
+  </area>
+  <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      Para importar un elemento del diccionario, busque el archivo ".udt" en su computadora haciendo clic en el
+      Botón "Importar" (se le pedirá confirmación en la siguiente pantalla)
+    </key>
+    <key alias="itemDoesNotExists">El elemento del diccionario no existe.</key>
+    <key alias="parentDoesNotExists">El elemento principal no existe.</key>
+    <key alias="noItems">No hay elementos del diccionario.</key>
+    <key alias="noItemsInFile">No hay elementos de diccionario en este archivo.</key>
+    <key alias="noItemsFound">No se encontraron elementos del diccionario.</key>
+    <key alias="createNew">Crear elemento de diccionario</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description">Editar las diferentes versiones lingüísticas para la entrada en el diccionario '% 0%' debajo</key>
@@ -601,7 +618,7 @@
     <key alias="databaseUpgradeDone"><![CDATA[La base de datos ha sido actualizada a la versión 0%.<br />Pincha en <strong>Próximo</strong> para continuar. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[La base de datos está actualizada. Pincha en <strong>próximo</strong> para continuar con el asistente de configuración]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>La contraseña del usuario por defecto debe ser cambiada</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>El usuario por defecto ha sido deshabilitado o ha perdido el acceso a Umbraco!</strong></p><p>Pincha en <b>Próximo</b> para continuar.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>El usuario por defecto ha sido deshabilitado o ha perdido el acceso a Umbraco!</strong></p><p>Pincha en <strong>Próximo</strong> para continuar.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>¡La contraseña del usuario por defecto ha sido cambiada desde que se instaló!</strong></p><p>No hay que realizar ninguna tarea más. Pulsa <strong>Siguiente</strong> para proseguir.]]></key>
     <key alias="defaultUserPasswordChanged">¡La contraseña se ha cambiado!</key>
     <key alias="greatStart">Ten un buen comienzo, visita nuestros videos de introducción</key>
@@ -893,7 +910,6 @@
     <key alias="reset">Reiniciar</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Versión actual</key>
     <key alias="diffHelp"><![CDATA[Esto muestra las diferencias entre la versión actual y la versión seleccionada<br /><del>Red</del> el texto de la versión seleccionada no se mostrará. , <ins>el verde significa añadido</ins>]]></key>
     <key alias="documentRolledBack">Se ha recuperado la última versión del documento.</key>
     <key alias="htmlHelp">Esto muestra la versión seleccionada como html, si deseas ver la diferencia entre 2 versiones al mismo tiempo, por favor usa la vista diff</key>
@@ -1173,6 +1189,24 @@
     <key alias="showOnMemberProfile">Mostrar en perfil de miembro</key>
     <key alias="tabHasNoSortOrder">pestaña no tiene orden</key>
   </area>
+  <area alias="languages">
+    <key alias="addLanguage">Agregar idioma</key>
+    <key alias="culture">Código ISO</key>
+    <key alias="mandatoryLanguage">Idioma obligatorio</key>
+    <key alias="mandatoryLanguageHelp">
+      Las propiedades en este idioma deben completarse antes de que se pueda publicar el nodo.
+    </key>
+    <key alias="defaultLanguage">Idioma predeterminado</key>
+    <key alias="defaultLanguageHelp">Un sitio de Umbraco solo puede tener un conjunto de idiomas predeterminado.</key>
+    <key alias="changingDefaultLanguageWarning">Cambiar el idioma predeterminado puede provocar que falte el contenido predeterminado.</key>
+    <key alias="fallsbackToLabel">Vuelve a caer</key>
+    <key alias="noFallbackLanguageOption">Sin lenguaje alternativo</key>
+    <key alias="fallbackLanguageDescription">
+      Para permitir que el contenido multilingüe retroceda a otro idioma si no está presente en el idioma solicitado, selecciónelo aquí.
+    </key>
+    <key alias="fallbackLanguage">Idioma de retroceso</key>
+    <key alias="none">ninguno</key>
+  </area>
   <area alias="modelsBuilder">
     <key alias="buildingModels">Construyendo modelos</key>
     <key alias="waitingMessage">esto puede llevar un rato, no te preocupes</key>
@@ -1260,6 +1294,7 @@
     <key alias="memberRoles">Roles</key>
     <key alias="memberTypes">Tipos de miembros</key>
     <key alias="documentTypes">Tipos de documento</key>
+	<key alias="relationTypes">Tipos de relaciones</key>
     <key alias="packager">Paquetes</key>
     <key alias="packages">Paquetes</key>
     <key alias="partialViews">Vistas Parciales</key>
@@ -1271,7 +1306,9 @@
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Hojas de estilo</key>
     <key alias="templates">Plantillas</key>
+	<key alias="logViewer">Visor de registro</key>
     <key alias="users">Usuarios</key>
+    <key alias="settingsGroup">Ajustes</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Existe una nueva actualización</key>
@@ -1338,6 +1375,8 @@
     <key alias="permissionsGranularHelp">Establecer permisos para nodos específicos</key>
     <key alias="profile">Perfil</key>
     <key alias="searchAllChildren">Buscar en todos los hijos</key>
+    <key alias="languagesHelp">Limite los idiomas a los que los usuarios tienen acceso para editar</key>
+    <key alias="allowAccessToAllLanguages">Permitir el acceso a todos los idiomas</key>
     <key alias="sectionsHelp">Añadir secciones para dar acceso a usuarios</key>
     <key alias="selectUserGroups">Seleccionar grupos de usuarios</key>
     <key alias="noStartNode">Nodo de inicio no seleccionado</key>

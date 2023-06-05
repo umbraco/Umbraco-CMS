@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -305,10 +305,10 @@ namespace Umbraco.Cms.Core.Strings
             return text;
         }
 
-        private static string RemoveSurrogatePairs(string text)
+        private string RemoveSurrogatePairs(string text)
         {
-            var input = text.ToCharArray();
-            var output = new char[input.Length];
+            var input = text.AsSpan();
+            Span<char> output = input.Length <= 1024 ? stackalloc char[input.Length] : new char[text.Length];
             var opos = 0;
 
             for (var ipos = 0; ipos < input.Length; ipos++)
@@ -325,7 +325,7 @@ namespace Umbraco.Cms.Core.Strings
                 }
             }
 
-            return new string(output, 0, opos);
+            return new string(output);
         }
 
         // here was a subtle, ascii-optimized version of the cleaning code, and I was
@@ -347,7 +347,8 @@ namespace Umbraco.Cms.Core.Strings
 
             // it's faster to use an array than a StringBuilder
             var ilen = input.Length;
-            var output = new char[ilen * 2]; // twice the length should be OK in all cases
+            var totalSize = ilen * 2;
+            Span<char> output = totalSize <= 1024 ? stackalloc char[totalSize] : new char[totalSize]; // twice the length should be OK in all cases
 
             for (var i = 0; i < ilen; i++)
             {
@@ -479,11 +480,11 @@ namespace Umbraco.Cms.Core.Strings
                     throw new Exception("Invalid state.");
             }
 
-            return new string(output, 0, opos);
+            return new string(output.Slice(0, opos));
         }
 
         // note: supports surrogate pairs in input string
-        internal void CopyTerm(string input, int ipos, char[] output, ref int opos, int len, CleanStringType caseType, string culture, bool isAcronym)
+        internal void CopyTerm(string input, int ipos, Span<char> output, ref int opos, int len, CleanStringType caseType, string culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
             CultureInfo cultureInfo = string.IsNullOrEmpty(culture) ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(culture);
@@ -509,19 +510,19 @@ namespace Umbraco.Cms.Core.Strings
                 //case CleanStringType.LowerCase:
                 //case CleanStringType.UpperCase:
                 case CleanStringType.Unchanged:
-                    term.CopyTo(0, output, opos, len);
+                    term.CopyTo(output.Slice(opos, len));
                     opos += len;
                     break;
 
                 case CleanStringType.LowerCase:
                     term = term.ToLower(cultureInfo);
-                    term.CopyTo(0, output, opos, term.Length);
+                    term.CopyTo(output.Slice(opos, term.Length));
                     opos += term.Length;
                     break;
 
                 case CleanStringType.UpperCase:
                     term = term.ToUpper(cultureInfo);
-                    term.CopyTo(0, output, opos, term.Length);
+                    term.CopyTo(output.Slice(opos, term.Length));
                     opos += term.Length;
                     break;
 
@@ -532,7 +533,7 @@ namespace Umbraco.Cms.Core.Strings
                     {
                         s = term.Substring(ipos, 2);
                         s = opos == 0 ? s.ToLower(cultureInfo) : s.ToUpper(cultureInfo);
-                        s.CopyTo(0, output, opos, s.Length);
+                        s.CopyTo(output.Slice(opos, s.Length));
                         opos += s.Length;
                         i++; // surrogate pair len is 2
                     }
@@ -543,7 +544,7 @@ namespace Umbraco.Cms.Core.Strings
                     if (len > i)
                     {
                         term = term.Substring(i).ToLower(cultureInfo);
-                        term.CopyTo(0, output, opos, term.Length);
+                        term.CopyTo(output.Slice(opos, term.Length));
                         opos += term.Length;
                     }
                     break;
@@ -555,7 +556,7 @@ namespace Umbraco.Cms.Core.Strings
                     {
                         s = term.Substring(ipos, 2);
                         s = s.ToUpper(cultureInfo);
-                        s.CopyTo(0, output, opos, s.Length);
+                        s.CopyTo(output.Slice(opos, s.Length));
                         opos += s.Length;
                         i++; // surrogate pair len is 2
                     }
@@ -566,7 +567,7 @@ namespace Umbraco.Cms.Core.Strings
                     if (len > i)
                     {
                         term = term.Substring(i).ToLower(cultureInfo);
-                        term.CopyTo(0, output, opos, term.Length);
+                        term.CopyTo(output.Slice(opos, term.Length));
                         opos += term.Length;
                     }
                     break;
@@ -578,7 +579,7 @@ namespace Umbraco.Cms.Core.Strings
                     {
                         s = term.Substring(ipos, 2);
                         s = opos == 0 ? s : s.ToUpper(cultureInfo);
-                        s.CopyTo(0, output, opos, s.Length);
+                        s.CopyTo(output.Slice(opos, s.Length));
                         opos += s.Length;
                         i++; // surrogate pair len is 2
                     }
@@ -589,7 +590,7 @@ namespace Umbraco.Cms.Core.Strings
                     if (len > i)
                     {
                         term = term.Substring(i);
-                        term.CopyTo(0, output, opos, term.Length);
+                        term.CopyTo(output.Slice(opos, term.Length));
                         opos += term.Length;
                     }
                     break;

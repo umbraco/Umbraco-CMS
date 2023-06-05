@@ -2,13 +2,14 @@
 <language alias="de" intName="German (DE)" localName="Deutsch (DE)" lcid="7" culture="de-DE">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Kulturen und Hostnamen</key>
     <key alias="auditTrail">Protokoll</key>
     <key alias="browse">Durchsuchen</key>
     <key alias="changeDocType">Dokumenttyp ändern</key>
+    <key alias="changeDataType">Datentyp ändern</key>
     <key alias="copy">Kopieren</key>
     <key alias="create">Neu</key>
     <key alias="export">Exportieren</key>
@@ -16,6 +17,8 @@
     <key alias="createGroup">Neue Gruppe</key>
     <key alias="delete">Entfernen</key>
     <key alias="disable">Deaktivieren</key>
+    <key alias="editContent">Inhalt bearbeiten</key>
+    <key alias="editSettings">Einstellungen bearbeiten</key>
     <key alias="emptyrecyclebin">Papierkorb leeren</key>
     <key alias="enable">Aktivieren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
@@ -30,13 +33,18 @@
     <key alias="unpublish">Veröffentlichung zurücknehmen</key>
     <key alias="refreshNode">Aktualisieren</key>
     <key alias="republish">Erneut veröffentlichen</key>
+    <key alias="remove">Entfernen</key>
     <key alias="rename" version="7.3.0">Umbenennen</key>
     <key alias="restore" version="7.3.0">Wiederherstellen</key>
     <key alias="chooseWhereToCopy">Wähle worunter kopiert werden soll</key>
     <key alias="chooseWhereToMove">Wähle worunter verschoben werden soll</key>
+    <key alias="chooseWhereToImport">Wähle wohin importiert werden soll</key>
+    <key alias="infiniteEditorChooseWhereToCopy">Wähle wohin die ausgewählten Elemente kopiert werden soll</key>
+    <key alias="infiniteEditorChooseWhereToMove">Wähle wohin die ausgewählten Elemente verschoben werden soll</key>
     <key alias="toInTheTreeStructureBelow">in der Baumstrukture</key>
     <key alias="wasMovedTo">wurde verschoben nach</key>
     <key alias="wasCopiedTo">wurde kopiert nach</key>
+    <key alias="wasDeleted">wurde gelöscht</key>
     <key alias="rights">Berechtigungen</key>
     <key alias="rollback">Zurücksetzen</key>
     <key alias="sendtopublish">Zur Veröffentlichung einreichen</key>
@@ -76,6 +84,7 @@
     <key alias="translate">Erlaube Übersetzung</key>
     <key alias="update">Erlaube Sichern von Änderungen</key>
     <key alias="createblueprint">Erlaube Anlegen von Inhaltsvorlagen</key>
+    <key alias="notify">Erlaube das Einrichten von Benachrichtungen für Inhalte</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Inhalt</key>
@@ -84,6 +93,7 @@
   <area alias="assignDomain">
     <key alias="permissionDenied">Erlaubnis verweigert.</key>
     <key alias="addNew">Neue Domain hinzufügen</key>
+    <key alias="addCurrent">Aktuelle Domain hinzufügen</key>
     <key alias="remove">entfernen</key>
     <key alias="invalidNode">Ungültiges Element.</key>
     <key alias="invalidDomain">Format der Domain ungültig.</key>
@@ -100,7 +110,8 @@
      Außerdem werden Pfade mit erstem URL-Segment unterstützt z. B.: "example.com/en" or "/en".]]></key>
     <key alias="inherit">Vererben</key>
     <key alias="setLanguage">Kultur</key>
-    <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
+    <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. 
+    Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
     <key alias="setDomains">Domainen</key>
   </area>
   <area alias="buttons">
@@ -145,10 +156,11 @@
     <key alias="deleteTag">TAG entfernen</key>
     <key alias="confirmActionCancel">Abbrechen</key>
     <key alias="confirmActionConfirm">Bestätigen</key>
+    <key alias="morePublishingOptions">Mehr Veröffentlichungs Optionen</key>
+    <key alias="submitChanges">Senden</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Anzeigen als</key>
-    <!--???-->
     <key alias="delete">Inhalt gelöscht</key>
     <key alias="unpublish">Inhalt unveröffentlicht</key>
     <key alias="unpublishvariant">Inhalt unveröffentlicht für Sprache: %0% </key>
@@ -162,6 +174,9 @@
     <key alias="sendtopublish">Veröffentlichung für Inhalt angefordert</key>
     <key alias="sendtopublishvariant">Veröffentlichung für Inhalt angefordert in Sprache: %0%</key>
     <key alias="sort">Unterknoten wurden sortiert von Benutzer</key>
+    <key alias="custom">%0%</key>
+    <key alias="contentversionpreventcleanup">Versionsbereinigung deaktiviert für Version: %0%</key>
+    <key alias="contentversionenablecleanup">Versionsbereinigung aktiviert für Version: %0%</key>
     <key alias="smallCopy">Kopieren</key>
     <key alias="smallPublish">Veröffentlichen</key>
     <key alias="smallPublishVariant">Veröffentlichen</key>
@@ -175,6 +190,9 @@
     <key alias="smallSendToPublish">Veröffentlichung anfordern</key>
     <key alias="smallSendToPublishVariant">Veröffentlichung anfordern</key>
     <key alias="smallSort">Sortieren</key>
+    <key alias="smallCustom">Benutzerdefiniert</key>
+    <key alias="smallContentVersionPreventCleanup">Speichern</key>
+    <key alias="smallContentVersionEnableCleanup">Speichern</key>
     <key alias="historyIncludingVariants">Verlauf (alle Variationen)</key>
   </area>
   <area alias="codefile">
@@ -214,8 +232,12 @@
     <key alias="noMediaLink">Dieses Media-Element hat keinen Link</key>
     <key alias="noProperties">Diesem Element kann kein Inhalt zugewiesen werden</key>
     <key alias="otherElements">Eigenschaften</key>
-    <key alias="parentNotPublished">Dieses Dokument ist veröffentlicht aber nicht sichtbar, da das übergeordnete Dokument '%0%' nicht publiziert ist</key>
-    <key alias="parentCultureNotPublished">Diese Kultur wurde veröffentlicht, aber wird nicht angezeigt, weil sie auf dem Oberknoten '%0%' unveröffentlicht ist</key>
+    <key alias="parentNotPublished">Dieses Dokument ist veröffentlicht aber nicht sichtbar, 
+      da das übergeordnete Dokument '%0%' nicht publiziert ist
+    </key>
+    <key alias="parentCultureNotPublished">Diese Kultur wurde veröffentlicht, aber wird nicht angezeigt, 
+      weil sie auf dem Oberknoten '%0%' unveröffentlicht ist
+    </key>
     <key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
     <key alias="getUrlException">Der URL wurde nicht gefunden</key>
     <key alias="routeError">Dieses Dokument wurde veröffentlicht, aber sein URL würde mit Inhalt %0% kollidieren</key>
@@ -225,24 +247,21 @@
     <key alias="publishedPendingChanges">Veröffentlicht (Änderungen bereit)</key>
     <key alias="publishStatus">Publikationsstatus</key>
     <key alias="publishDescendantsHelp">
-      <![CDATA[
-    Wähle <em>Veröffentlichen mit Unterknoten</em> zum Veröffentlichen <strong>der gewählten Sprache</strong>
-    samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]>
-    </key>
+      <![CDATA[Wähle <em>Veröffentlichen mit Unterknoten</em> zum Veröffentlichen <strong>der gewählten Sprache</strong> samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]></key>
     <key alias="publishDescendantsWithVariantsHelp">
-      <![CDATA[
-    Wähle <em>Veröffentlichen mit Unterknoten</em> zum Veröffentlichen <strong>der gewählten Sprache</strong>
-    samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]>
-    </key>
+      <![CDATA[Wähle <em>Veröffentlichen mit Unterknoten</em> zum Veröffentlichen <strong>der gewählten Sprache</strong> samt aller Unterknoten der selben Sprache, um ihren Inhalt öffentlich verfügbar zu machen.]]></key>
     <key alias="releaseDate">Veröffentlichen am</key>
     <key alias="unpublishDate">Veröffentlichung widerrufen am</key>
     <key alias="removeDate">Datum entfernen</key>
     <key alias="setDate">Datum wählen</key>
     <key alias="sortDone">Sortierung abgeschlossen</key>
-    <key alias="sortHelp">Um die Dokumente zu sortieren, ziehen Sie sie einfach an die gewünschte Position. Sie können mehrere Zeilen markieren indem Sie die Umschalttaste ("Shift") oder die Steuerungstaste ("Strg") gedrückt halten</key>
+    <key alias="sortHelp">Um die Dokumente zu sortieren, ziehen Sie sie einfach an die gewünschte Position. 
+      Sie können mehrere Zeilen markieren indem Sie die Umschalttaste ("Shift") oder die Steuerungstaste ("Strg") gedrückt halten
+    </key>
     <key alias="statistics">Statistiken</key>
     <key alias="titleOptional">Titel (optional)</key>
     <key alias="altTextOptional">Alternativtext (optional)</key>
+    <key alias="captionTextOptional">Beschriftung (optional)</key>
     <key alias="type">Typ</key>
     <key alias="unpublish">Veröffentlichung widerrufen</key>
     <key alias="unpublished">Entwurf</key>
@@ -250,6 +269,8 @@
     <key alias="updateDate">Zuletzt bearbeitet am</key>
     <key alias="updateDateDesc" version="7.0">Letzter Änderungszeitpunkt des Dokuments</key>
     <key alias="uploadClear">Datei entfernen</key>
+    <key alias="uploadClearImageContext">Klicke hier um das das Bild vom Medienelement zu entfernen.</key>
+    <key alias="uploadClearFileContext">Klicke hier um das das Bild vom Medienelement zu entfernen.</key>
     <key alias="urls">Link zum Dokument</key>
     <key alias="memberof">Mitglied der Gruppe(n)</key>
     <key alias="notmemberof">Kein Mitglied der Gruppe(n)</key>
@@ -257,29 +278,55 @@
     <key alias="target" version="7.0">Ziel</key>
     <key alias="scheduledPublishServerTime">Dies führt zur folgenden Zeit auf dem Server:</key>
     <key alias="scheduledPublishDocumentation">
-      <![CDATA[
-    	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>
-    ]]>
-    </key>
+      <![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>]]></key>
     <key alias="nestedContentDeleteItem">Wollen Sie dieses Element wirklich entfernen?</key>
-    <key alias="nestedContentEditorNotSupported">Eigenschaft %0% verwendet Editor %1%, welcher nicht von Nested Content unterstützt wird.</key>
-    <key alias="nestedContentNoContentTypes">Es wurden keine Dokument-(Inhalts-)Typen für diese Eigenschaft definiert.</key>
+    <key alias="nestedContentDeleteAllItems">Sicher das Sie alle Elemente entfernen wollen?</key>
+    <key alias="nestedContentEditorNotSupported">Eigenschaft %0% verwendet Editor %1%, 
+      welcher nicht von Nested Content unterstützt wird.
+    </key>
+    <key alias="nestedContentNoContentTypes">Keine Dokument-Typen für diese Eigenschaft konfiguriert.</key>
+    <key alias="nestedContentAddElementType">Elementtyp hinzufügen</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">Elementtype auswählen</key>
+    <key alias="nestedContentGroupHelpText">Wählen Sie die Gruppe aus von der die Eigenschaften angezeigt werden soll. Sollte der Wert leer sein
+      wird die erste Gruppe des Elementtypen verwendet.
+    </key>
+    <key alias="nestedContentTemplateHelpTextPart1">Geben Sie eine Angular Anweisung an um den Namen für das jweilige Element
+      zu bestimmen. Verwende
+    </key>
+    <key alias="nestedContentTemplateHelpTextPart2">um den Index des Elements anzuzeigen.</key>
+    <key alias="nestedContentNoGroups">Das ausgewählte Element verfügt nicht über unterstützte Gruppen. (Tabs werden von diesem Editor nicht unterstützt, entweder Sie ändern diese zu Gruppen oder Sie verwenden den Block List Editor.</key>
     <key alias="addTextBox">Füge ein weiteres Textfeld hinzu</key>
     <key alias="removeTextBox">Entferne dieses Textfeld</key>
     <key alias="contentRoot">Inhalt-Basis</key>
     <key alias="includeUnpublished">Inklusive Entwürfen: veröffentliche auch unveröffentlichte Elemente.</key>
-    <key alias="isSensitiveValue">Dieser Wert ist verborgen. Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.</key>
+    <key alias="isSensitiveValue">Dieser Wert ist verborgen. 
+      Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.
+    </key>
     <key alias="isSensitiveValue_short">Dieser Wert ist verborgen.</key>
     <key alias="languagesToPublish">Welche Sprache möchten Sie veröffentlichen?</key>
     <key alias="languagesToSendForApproval">Welche Sprachen möchten Sie zur Freigabe schicken?</key>
     <key alias="languagesToSchedule">Welche Sprachen möchten Sie zu einer bestimmten Zeit veröffentlichen?</key>
-    <key alias="languagesToUnpublish">Wählen Sie die Sprachen, deren Veröffentlichung zurück genommen werden soll. Das Zurücknehmen der Veröffentlichung einer Pflichtsprache betrifft alle Sprachen.</key>
+    <key alias="languagesToUnpublish">Wählen Sie die Sprachen, deren Veröffentlichung zurück genommen werden soll. 
+      Das Zurücknehmen der Veröffentlichung einer Pflichtsprache betrifft alle Sprachen.
+    </key>
+    <key alias="variantsWillBeSaved">Alle neuen Variationen werden gespeichert.</key>
+    <key alias="variantsToPublish">Welche Variationen wollen Sie veröffentlichen?</key>
+    <key alias="variantsToSave">Wählen Sie welche Variation gespeichert werden soll.</key>
+    <key alias="publishRequiresVariants">Folgende Variationen werden benötigt um das Element veröffentlichen zu können: </key>
+    <key alias="notReadyToPublish">Wir sind für Veröffentlichungen bereit</key>
     <key alias="readyToPublish">Bereit zu Veröffentlichen?</key>
     <key alias="readyToSave">Bereit zu Sichern?</key>
+    <key alias="resetFocalPoint">Fokus zurücksetzten.</key>
     <key alias="sendForApproval">Freigabe anfordern</key>
     <key alias="schedulePublishHelp">Wählen Sie Datum und Uhrzeit für die Veröffentlichung bzw. deren Rücknahme.</key>
     <key alias="createEmpty">Neues Element anlegen</key>
     <key alias="createFromClipboard">Aus der Zwischenablage einfügen</key>
+    <key alias="nodeIsInTrash">Dieses Element befindet sich im Papierkorb.</key>
+    <key alias="variantSaveNotAllowed">Speichern ist nicht erlaubt.</key>
+    <key alias="variantPublishNotAllowed">Veröffentlichen ist nicht erlaubt.</key>
+    <key alias="variantSendForApprovalNotAllowed">Zur Genehmigung senden ist nicht erlaubt.</key>
+    <key alias="variantScheduleNotAllowed">Plannung ist nicht erlaubt</key>
+    <key alias="variantUnpublishNotAllowed">Veröffentlichung zurücknehmen ist nicht erlaubt.</key>
   </area>
     <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>]]></key>
@@ -288,22 +335,46 @@
     <key alias="createdBlueprintHeading">Inhaltsvorlage erzeugt</key>
     <key alias="createdBlueprintMessage">Inhaltsvorlage von '%0%' wurde erzeugt</key>
     <key alias="duplicateBlueprintMessage">Eine gleichnamige Inhaltsvorlage ist bereits vorhanden</key>
-    <key alias="blueprintDescription">Eine Inhaltsvorlage ist vordefinierter Inhalt, den ein Redakteur als Basis für neuen Inhalt verwenden kann</key>
+    <key alias="blueprintDescription">Eine Inhaltsvorlage ist vordefinierter Inhalt, 
+      den ein Redakteur als Basis für neuen Inhalt verwenden kann
+    </key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Für Upload klicken</key>
     <key alias="orClickHereToUpload">oder klicken Sie hier um eine Datei zu wählen</key>
     <key alias="disallowedFileType">Dieser Dateityp darf nicht hochgeladen werden</key>
+    
+    <key alias="invalidFileName">Diese Datei kann nicht hochgeladen werden wil der Dateiname ungültig ist.</key><key alias="disallowedMediaType">Diese Datei kann nicht hochgeladen werden, der Medienttype mit dem Alias '%0%' ist hier nicht erlaubt.</key>
     <key alias="maxFileSize">Max. Dateigröße ist</key>
     <key alias="mediaRoot">Media-Basis</key>
     <key alias="moveToSameFolderFailed">Eltern- und Ziel-Verzeichnis dürfen nicht übereinstimmen</key>
     <key alias="createFolderFailed">Unter Element Id %0% konnte kein Verzeichnis angelegt werden</key>
     <key alias="renameFolderFailed">Das Verzeichnis mit Id %0% konnte nicht umbenannt werden</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Wählen Sie Dateien aus und ziehen Sie diese in diesen Bereich</key>
+    <key alias="uploadNotAllowed">Hochladen ist in diesem Bereich nicht erlaubt.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Neues Mitglied anlegen</key>
     <key alias="allMembers">Alle Mitglieder</key>
+    <key alias="duplicateMemberLogin">Ein Mitglied mit diesem Login existiert bereits.</key>
     <key alias="memberGroupNoProperties">Mitgliedsgruppen haben keine weiteren editierbaren Eigenschaften.</key>
+    <key alias="memberHasGroup">Das Mitglied ist bereits in der Gruppe '%0%'</key>
+    <key alias="memberHasPassword">Das Mitglied hat bereits ein Passwort</key>
+    <key alias="memberLockoutNotEnabled">Sperren ist nicht aktiviert für dieses Mitglied.</key>
+    <key alias="memberNotInGroup">Das Mitglied ist nicht in der Gruppe '%0%'</key>
+    <key alias="2fa">Zwei-Faktor-Authentifizierung</key>
+  </area>
+  <area alias="contentType">
+    <key alias="copyFailed">Kopieren des Dokumenttyps fehlgeschlagen</key>
+    <key alias="moveFailed">Bewegen des Dokumenttyps fehlgeschlagen</key>
+  </area>
+  <area alias="mediaType">
+    <key alias="copyFailed">Kopieren des Medienttyps fehlgeschlagen</key>
+    <key alias="moveFailed">Bewegen des Medienttyps fehlgeschlagen</key>
+    <key alias="autoPickMediaType">Automatische auswahl.</key>
+  </area>
+  <area alias="memberType">
+    <key alias="copyFailed">Kopieren des Mitgliedtyps fehlgeschlagen</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">An welcher Stellen wollen Sie das Element erstellen</key>
@@ -311,13 +382,44 @@
     <key alias="createContentBlueprint">Wählen Sie einen Dokumenttyp für eine Inhaltsvorlage</key>
     <key alias="enterFolderName">Geben Sie einen Verzeichnisnamen ein</key>
     <key alias="updateData">Wählen Sie einen Namen und einen Typ</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[Es stehen keine erlaubten Dokumenttypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.]]></key>
-    <key alias="noDocumentTypesWithNoSettingsAccess">Die im Inhaltsbaum ausgewählte Seite erlaubt keine Unterseiten.</key>
+    <key alias="noDocumentTypes" version="7.0">
+      <![CDATA[Es stehen keine erlaubten Dokumenttypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.]]></key>
+    <key alias="noDocumentTypesAtRoot">
+      <![CDATA[Es stehen keine erlaubten Dokumenttypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.]]></key>
+    <key alias="noDocumentTypesWithNoSettingsAccess">Die im Inhaltsbaum ausgewählte Seite 
+      erlaubt keine Unterseiten.
+    </key>
     <key alias="noDocumentTypesEditPermissions">Bearbeitungsrechte für diesen Dokumenttyp</key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[Es stehen keine erlaubten Medientypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Medientypen") aktivieren.]]></key>
-    <key alias="noMediaTypesWithNoSettingsAccess">Das im Strukturbaum ausgewählte Medienelement erlaubt keine untergeordneten Elemente.</key>
+    <key alias="noDocumentTypesCreateNew">Neuen Dokumenttypen erstellen</key>
+    <key alias="noDocumentTypesAllowedAtRoot">
+      <![CDATA[Keine Dokumenttypen vorhanden welche hier eingefügt werden dürfen. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[Es stehen keine erlaubten Medientypen zur Verfügung. 
+      Sie müssen diese in den Einstellungen (unter "Medientypen") aktivieren.]]></key>
+    <key alias="noMediaTypesWithNoSettingsAccess">Das im Strukturbaum ausgewählte Medienelement 
+      erlaubt keine untergeordneten Elemente.
+    </key>
     <key alias="noMediaTypesEditPermissions">Bearbeitungsrechte für diesen Medientyp</key>
     <key alias="documentTypeWithoutTemplate">Dokumenttyp ohne Vorlage</key>
+    <key alias="documentTypeWithTemplate">Dokumenttyp mit Template</key>
+    <key alias="documentTypeWithTemplateDescription">Die Definition für eine Inhaltsseite welche von einem
+      Redakteur im Inhaltsbaum angelgt werden können und direkt über die URL aufgerufen werden kann.
+    </key>
+    <key alias="documentType">Dokumenttype</key>
+    <key alias="documentTypeDescription">Die Definition für eine Inhaltsseite welche von einem
+      Redakteur im Inhaltsbaum angelgt werden können und direkt über die URL aufgerufen werden kann.
+    </key>
+    <key alias="elementType">Elementtyp</key>
+    <key alias="elementTypeDescription">Definiert die Vorlage für sich wiederholende Eigenschaften, zum Beispiel, in einer 'Block
+      List' oder im 'Nested Content' Editor.
+    </key>
+    <key alias="composition">Komposition</key>
+    <key alias="compositionDescription">Definiert eine wiederverwendbare Komposition von Eigenschaften welche in anderen
+      Dokumenttypen wiederverwendet werden können.
+    </key>
+    <key alias="folder">Ordner</key>
+    <key alias="folderDescription">Werden benützt um Dokumenttypen, Komposition und Elementtypen in diesem
+      Dokumenttypbaums zu organisieren.
+    </key>
     <key alias="newFolder">Neues Verzeichnis</key>
     <key alias="newDataType">Neuer Datentyp</key>
     <key alias="newJavascriptFile">Neue JavaScript-Datei</key>
@@ -342,11 +444,17 @@
     <key alias="stay">Bleiben</key>
     <key alias="discardChanges">Änderungen verwerfen</key>
     <key alias="unsavedChanges">Es gibt ungesicherte Änderungen</key>
-    <key alias="unsavedChangesWarning">Wollen Sie diese Seite wirklich verlassen? - es gibt ungesicherte Änderungen</key>
+    <key alias="unsavedChangesWarning">Wollen Sie diese Seite wirklich verlassen? 
+      - es gibt ungesicherte Änderungen
+    </key>
     <key alias="confirmListViewPublish">Veröffentlichen macht die ausgewählten Elemente auf der Website sichtbar.</key>
-    <key alias="confirmListViewUnpublish">Aufheben der Veröffentlichung entfernt die ausgewählten Elemente und ihre Unterknoten von der Website.</key>
+    <key alias="confirmListViewUnpublish">Aufheben der Veröffentlichung entfernt die ausgewählten Elemente 
+      und ihre Unterknoten von der Website.
+    </key>
     <key alias="confirmUnpublish">Aufheben der Veröffentlichung entfernt diese Seite und ihre Unterseiten von der Website.</key>
-    <key alias="doctypeChangeWarning">Es gibt ungesicherte Änderungen. Ändern des Dokumenttyps macht diese rückgängig.</key>
+    <key alias="doctypeChangeWarning">Es gibt ungesicherte Änderungen. 
+      Ändern des Dokumenttyps macht diese rückgängig.
+    </key>
   </area>
   <area alias="bulk">
     <key alias="done">Fertig</key>
@@ -378,12 +486,16 @@
     <key alias="anchorInsert">Name</key>
     <key alias="closeThisWindow">Fenster schließen</key>
     <key alias="confirmdelete">Wollen Sie dies wirklich entfernen</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Sicher das Sie <strong>%0%</strong> von <strong>%1%</strong> Elementen löschen wollen?]]></key>
     <key alias="confirmdisable">Wollen Sie folgendes wirklich deaktivieren</key>
+    <key alias="confirmremove">Sicher das Sie es entfernen wollen?</key>
+    <key alias="confirmremoveusageof"><![CDATA[Sicher das Sie die Verwendung von <strong>%0%</strong> entfernen wollen?]]></key>
     <key alias="confirmlogout">Sind Sie sich wirklich abmelden?</key>
     <key alias="confirmSure">Sind Sie sicher?</key>
     <key alias="cut">Ausschneiden</key>
     <key alias="editdictionary">Wörterbucheintrag bearbeiten</key>
     <key alias="editlanguage">Sprache bearbeiten</key>
+    <key alias="editSelectedMedia">Ausgewähltes Medien</key>
     <key alias="insertAnchor">Anker einfügen</key>
     <key alias="insertCharacter">Zeichen einfügen</key>
     <key alias="insertgraphicheadline">Grafische Überschrift einfügen</key>
@@ -393,7 +505,8 @@
     <key alias="inserttable">Tabelle einfügen</key>
     <key alias="languagedeletewarning">Dies entfernt die Sprache</key>
     <key alias="languageChangeWarning">
-      Die Kultur-Variante einer Sprache zu ändern ist möglicherweise eine aufwendige Operation und führt zum Erneuern von Inhalts-Zwischenspeicher und Such-Index.</key>
+      Die Kultur-Variante einer Sprache zu ändern ist möglicherweise eine aufwendige Operation und führt zum Erneuern von Inhalts-Zwischenspeicher und Such-Index.
+    </key>
     <key alias="lastEdited">Zuletzt bearbeitet</key>
     <key alias="link">Verknüpfung</key>
     <key alias="linkinternal">Anker:</key>
@@ -405,16 +518,25 @@
     <key alias="permissionsSet">Berechtigungen vergeben für</key>
     <key alias="permissionsSetForGroup">Berechtigungen vergeben für %0% für Benutzer-Gruppe %1%</key>
     <key alias="permissionsHelp">Wählen Sie die Benutzer-Gruppe, deren Berechtigungen Sie setzen möchten</key>
-    <key alias="recycleBinDeleting">Der Papierkorb wird geleert. Bitte warten Sie und schließen Sie das Fenster erst, wenn der Vorgang abgeschlossen ist.</key>
+    <key alias="recycleBinDeleting">Der Papierkorb wird geleert. 
+      Bitte warten Sie und schließen Sie das Fenster erst, wenn der Vorgang abgeschlossen ist.
+    </key>
     <key alias="recycleBinIsEmpty">Der Papierkorb ist leer</key>
     <key alias="recycleBinWarning">Wenn Sie den Papierkorb leeren, werden die enthaltenen Elemente endgültig gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</key>
-    <key alias="regexSearchError">Der Webservice von &lt;a target='_blank' rel='noopener' href='http://regexlib.com'&gt;regexlib.com&lt;/a&gt; ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.</key>
-    <key alias="regexSearchHelp">Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'URL' oder ähnlich.</key>
+    <key alias="regexSearchError">
+      Der Webservice von &lt;a target='_blank' rel='noopener' href='http://regexlib.com'&gt;regexlib.com&lt;/a&gt; ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.</key>
+    <key alias="regexSearchHelp">
+      Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'URL' oder ähnlich.
+    </key>
     <key alias="removeMacro">Macro entfernen</key>
     <key alias="requiredField">Pflichtfeld</key>
     <key alias="sitereindexed">Die Website-Index wurd neu erstellt</key>
-    <key alias="siterepublished">Der Zwischenspeicher der Website wurde aktualisiert und alle veröffentlichten Inhalte sind jetzt auf dem neuesten Stand. Bisher unveröffentliche Inhalte wurden dabei nicht veröffentlicht.</key>
-    <key alias="siterepublishHelp">Der Zwischenspeicher der Website wird aktualisiert und der veröffentlichte Inhalt auf den neuesten Stand gebracht. Unveröffentlichte Inhalte bleiben dabei weiterhin unveröffentlicht.</key>
+    <key alias="siterepublished">Der Zwischenspeicher der Website wurde aktualisiert und alle veröffentlichten Inhalte sind jetzt auf dem neuesten Stand. 
+      Bisher unveröffentliche Inhalte wurden dabei nicht veröffentlicht.
+    </key>
+    <key alias="siterepublishHelp">Der Zwischenspeicher der Website wird aktualisiert und der veröffentlichte Inhalt auf den neuesten Stand gebracht. 
+      Unveröffentlichte Inhalte bleiben dabei weiterhin unveröffentlicht.
+    </key>
     <key alias="tableColumns">Anzahl der Spalten</key>
     <key alias="tableRows">Anzahl der Zeilen</key>
     <key alias="thumbnailimageclickfororiginal">Für Originalgröße auf die Abbildung klicken</key>
@@ -428,6 +550,7 @@
     <key alias="linkToMedia">Medien-Link</key>
     <key alias="selectContentStartNode">Inhalts-Startknoten wählen</key>
     <key alias="selectMedia">Medienelement wählen</key>
+    <key alias="selectMediaType">Medientype wählen</key>
     <key alias="selectIcon">Bildzeichen wählen</key>
     <key alias="selectItem">Element wählen</key>
     <key alias="selectLink">Link wählen</key>
@@ -437,8 +560,11 @@
     <key alias="selectMediaStartNode">Medien-Startknoten wählen</key>
     <key alias="selectMember">Mitglied wählen</key>
     <key alias="selectMemberGroup">Mitgliedergruppe wählen</key>
+    <key alias="selectMemberType">Membertype wählen</key>
     <key alias="selectNode">Knoten wählen</key>
     <key alias="selectSections">Bereich wählen</key>
+    <key alias="selectLanguages">Sprachen wählen</key>
+    <key alias="selectUser">Benutzer wählen</key>
     <key alias="selectUsers">Benutzer wählen</key>
     <key alias="noIconsFound">Keine Bildzeichen gefunden</key>
     <key alias="noMacroParams">Für dieses Makro gibt es keine Parameter</key>
@@ -451,42 +577,50 @@
     <key alias="unLinkYour">Trennen Sie Ihr</key>
     <key alias="account">Konto</key>
     <key alias="selectEditor">Editor wählen</key>
+    <key alias="selectEditorConfiguration">Konfiguration wählen</key>
     <key alias="selectSnippet">Kode-Vorlage wählen</key>
-    <key alias="variantdeletewarning">
-      Dies wird den Knoten und all seine Sprachen entfernen.
+    <key alias="variantdeletewarning">Dies wird den Knoten und all seine Sprachen entfernen.
       Wenn Sie nur eine Sprache entfernen wollen, wählen Sie diese und setzen sie auf unveröffentlicht.
     </key>
+    <key alias="propertyuserpickerremovewarning"><![CDATA[Dies entfernt den User <strong>%0%</strong>.]]></key>
+    <key alias="userremovewarning"><![CDATA[Dies entfernt den User <strong>%0%</strong> von der <strong>%1%</strong> Gruppe]]></key>
+    <key alias="yesRemove">Ja, entfernen</key>
+    <key alias="deleteLayout">Sie löschen das Layout</key>
+    <key alias="deletingALayout">Bearbeiten des layout resultiert im Verlust der aller Daten für bestehenden Inhalt basierend auf dieser Konfiruation.</key>
   </area>
   <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      Um einen Eintrag zu importieren, suchen sie die ".udt" Datei auf ihren Computer durch Klicken des
+      "Import" Knopfes. (Sie werden für Ihre Zustimmung im nächsten Schritt gefragt)
+    </key>
+    <key alias="itemDoesNotExists">Wörterbuch Eintrag existiert nicht.</key>
+    <key alias="parentDoesNotExists">Eltern Element existiert nicht.</key>
     <key alias="noItems">Es gibt keine Einträge im Wörterbuch.</key>
+    <key alias="noItemsInFile">Keine Wörterbuch Einträge in dieser Datei gefunden.</key>
+    <key alias="noItemsFound">Keine Wörterbuch Einträge gefunden.</key>
+    <key alias="createNew">Eintrag erstellen</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">
-      <![CDATA[
+    <key alias="description"><![CDATA[
     Bearbeiten Sie nachfolgend die verschiedenen Sprachversionen für den Wörterbucheintrag '<em>%0%</em>'.
-    <br/>Unter dem links angezeigten Menüpunkt 'Sprachen' können Sie weitere hinzufügen.
-   ]]>
-    </key>
+    <br/>Unter dem links angezeigten Menüpunkt 'Sprachen' können Sie weitere hinzufügen.]]></key>
     <key alias="displayName">Name der Kultur</key>
-    <key alias="changeKeyError">
-      <![CDATA[
+    <key alias="changeKeyError"><![CDATA[
       Der Wert '%0%' ist bereits vorhanden.
-   ]]>
-    </key>
+   ]]></key>
     <key alias="overviewTitle">Wörterbuch Übersicht</key>
   </area>
   <area alias="examineManagement">
     <key alias="configuredSearchers"><![CDATA[<em>Sucher</em> einrichten ]]></key>
     <key alias="configuredSearchersDescription">
       <![CDATA[
-    Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)
-     ]]>
-    </key>
+    Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)]]></key>
     <key alias="fieldValues">Feldwerte</key>
     <key alias="healthStatus">Gesundheitsstatus</key>
     <key alias="healthStatusDescription">Der Gesundheitsstatus und Lesbarkeit des Indizes.</key>
     <key alias="indexers">Indizierer</key>
     <key alias="indexInfo">Indexinformationen</key>
+    <key alias="contentInIndex">Inhalt des Indexes</key>
     <key alias="indexInfoDescription">Zeigt die Eigenschaften des Indizes</key>
     <key alias="manageIndexes">Examine Index-Verwaltung</key>
     <key alias="manageIndexesDescription">
@@ -498,12 +632,18 @@
       Dies erzeugt den Index neu.<br />
       Abhängig von der Inhaltsmenge Ihrer <em>Website</em> kann das eingie Zeit dauern.<br />
       Es wird davon abgeraten, einen Index einer <em>Website</em> während hoher Auslastung- oder Inhaltbearbeitungszeiten zu erneuern.
-     ]]>
-    </key>
+     ]]></key>
     <key alias="searchers">Sucher</key>
     <key alias="searchDescription">Durchsuche den Index und betrachte die Ergebnisse</key>
     <key alias="tools">Werkzeuge</key>
     <key alias="toolsDescription">Werkzeuge zur Indexverwaltung</key>
+    <key alias="fields">Felder</key>
+    <key alias="indexCannotRead">Der Index kann nicht gelesen werden und wird deshalb neu erstellt.</key>
+    <key alias="processIsTakingLonger">Der Prozess dauert länger als erwartet, checken Sie die Umbraco Logs um zu sehen ob
+      Fehler passiert sind.
+    </key>
+    <key alias="indexCannotRebuild">Der Index kann nicht rebuilded werden weil er nicht zugewissen wurde.</key>
+    <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Benutzername eingeben</key>
@@ -524,6 +664,9 @@
     <key alias="anchor">#value oder ?key=value</key>
     <key alias="enterAlias">Bitte einen Alias eingeben...</key>
     <key alias="generatingAlias">Alias erzeugen...</key>
+    <key alias="a11yCreateItem">Element erstellen</key>
+    <key alias="a11yEdit">Bearbeiten</key>
+    <key alias="a11yName">Benennen</key>
   </area>
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Angepasste Listenansicht erstellen</key>
@@ -536,6 +679,7 @@
     <key alias="folderWasRenamed">%0% wurde umbenannt in %1%</key>
   </area>
   <area alias="editdatatype">
+  <key alias="canChangePropertyEditorHelp">Ändern des Editors in einem Datatyps mit gespeicherten Werten ist nicht erlaubt. Um es zu erlauben müssen Sie die Umbraco:CMS:DataTypes:CanBeChanged Einstellung in der appsettings.json ändern.</key>
     <key alias="addPrevalue">Neuer Vorgabewert</key>
     <key alias="dataBaseDatatype">Feldtyp in der Datenbank</key>
     <key alias="guid">Datentyp-GUID</key>
@@ -550,14 +694,25 @@
     <key alias="selectFolder">Wählen Sie das Verzeichnis aus der untenstehenden Baumstruktur, in das</key>
     <key alias="inTheTree">verschoben werden soll.</key>
     <key alias="wasMoved">wurde verschoben in</key>
+    <key alias="hasReferencesDeleteConsequence">
+      <![CDATA[Löschen von <strong>%0%</strong> wird die Eigenschaften und Daten von folgenden Element löschen]]></key>
+    <key alias="acceptDeleteConsequence">Ich verstehe das diese Aktion Eigenschaften und Daten basierend auf diesem 
+      DataTyps löschen wird.
+    </key>
   </area>
   <area alias="errorHandling">
-    <key alias="errorButDataWasSaved">Ihre Daten wurden gespeichert. Bevor Sie diese Seite jedoch veröffentlichen können, müssen Sie die folgenden Korrekturen vornehmen:</key>
-    <key alias="errorChangingProviderPassword">Der aktuelle Mitgliedschaftsanbieter erlaubt keine Kennwortänderung (EnablePasswordRetrieval muss auf "true" gesetzt sein)</key>
+    <key alias="errorButDataWasSaved">Ihre Daten wurden gespeichert. 
+      Bevor Sie diese Seite jedoch veröffentlichen können, müssen Sie die folgenden Korrekturen vornehmen:
+    </key>
+    <key alias="errorChangingProviderPassword">Der aktuelle Mitgliedschaftsanbieter erlaubt keine Kennwortänderung 
+      (EnablePasswordRetrieval muss auf "true" gesetzt sein)
+    </key>
     <key alias="errorExistsWithoutTab">'%0%' ist bereits vorhanden</key>
     <key alias="errorHeader">Bitte prüfen und korrigieren:</key>
     <key alias="errorHeaderWithoutTab">Bitte prüfen und korrigieren:</key>
-    <key alias="errorInPasswordFormat">Für das Kennwort ist eine Mindestlänge von %0% Zeichen vorgesehen, wovon mindestens %1% Sonderzeichen (nicht alphanumerisch) sein müssen</key>
+    <key alias="errorInPasswordFormat">Für das Kennwort ist eine Mindestlänge von %0% Zeichen vorgesehen, 
+      wovon mindestens %1% Sonderzeichen (nicht alphanumerisch) sein müssen
+    </key>
     <key alias="errorIntegerWithoutTab">'%0%' muss eine Zahl sein</key>
     <key alias="errorMandatory">'%0%' (in Registerkarte '%1%') ist ein Pflichtfeld</key>
     <key alias="errorMandatoryWithoutTab">'%0%' ist ein Pflichtfeld</key>
@@ -565,20 +720,27 @@
     <key alias="errorRegExpWithoutTab">'%0%' hat ein falsches Format</key>
   </area>
   <area alias="errors">
+    <key alias="defaultError">Ein unbekannter Fehler ist passiert.</key>
+    <key alias="concurrencyError">Optimistic concurrency Fehler, Objekte wurde geändert.</key>
     <key alias="receivedErrorFromServer">Der Server hat einen Fehler gemeldet</key>
     <key alias="dissallowedMediaType">Dieser Dateityp wird durch die Systemeinstellungen blockiert</key>
-    <key alias="codemirroriewarning">ACHTUNG! Obwohl CodeMirror in den Einstellungen aktiviert ist, bleibt das Modul wegen mangelnder Stabilität in Internet Explorer deaktiviert.</key>
+    <key alias="codemirroriewarning">ACHTUNG! Obwohl CodeMirror in den Einstellungen aktiviert ist, 
+      bleibt das Modul wegen mangelnder Stabilität in Internet Explorer deaktiviert.
+    </key>
     <key alias="contentTypeAliasAndNameNotNull">Bitte geben Sie die Bezeichnung und den Alias des neuen Dokumenttyps ein.</key>
     <key alias="filePermissionsError">Es besteht ein Problem mit den Lese-/Schreibrechten auf eine Datei oder einen Ordner</key>
     <key alias="macroErrorLoadingPartialView">Fehler beim Laden einer "Partial View Kodedatei" (Datei: %0%)</key>
     <key alias="missingTitle">Bitte geben Sie einen Titel ein</key>
     <key alias="missingType">Bitte wählen Sie einen Typ</key>
-    <key alias="pictureResizeBiggerThanOrg">Soll die Abbildung wirklich über die Originalgröße hinaus vergrößert werden?</key>
+    <key alias="pictureResizeBiggerThanOrg">Soll die Abbildung wirklich über die 
+      Originalgröße hinaus vergrößert werden?
+    </key>
     <key alias="startNodeDoesNotExists">Startelement gelöscht, bitte kontaktieren Sie den System-Administrator.</key>
     <key alias="stylesMustMarkBeforeSelect">Bitte markieren Sie den gewünschten Text, bevor Sie einen Stil auswählen</key>
     <key alias="stylesNoStylesOnPage">Keine aktiven Stile vorhanden</key>
     <key alias="tableColMergeLeft">Bitte platzieren Sie den Mauszeiger in die erste der zusammenzuführenden Zellen</key>
     <key alias="tableSplitNotSplittable">Sie können keine Zelle trennen, die nicht zuvor aus mehreren zusammengeführt wurde.</key>
+    <key alias="propertyHasErrors">Die Eigenschaft ist nicht valide</key>
   </area>
   <area alias="general">
     <key alias="options">Optionen</key>
@@ -597,16 +759,18 @@
     <key alias="cellMargin">Zellabstand</key>
     <key alias="choose">Auswählen</key>
     <key alias="close">Schließen</key>
+    <key alias="clear">Leeren</key>
     <key alias="closewindow">Fenster schließen</key>
+    <key alias="closepane">Fenster Pane</key>
     <key alias="comment">Kommentar</key>
     <key alias="confirm">bestätigen</key>
     <key alias="constrain">Beschneiden</key>
-    <!--???-->
     <key alias="constrainProportions">Seitenverhältnis beibehalten</key>
     <key alias="content">Inhalt</key>
     <key alias="continue">Weiter</key>
     <key alias="copy">Kopieren</key>
     <key alias="create">Neu</key>
+    <key alias="cropSection">Ausschnitte Bereich</key>
     <key alias="database">Datenbank</key>
     <key alias="date">Datum</key>
     <key alias="default">Standard</key>
@@ -616,6 +780,7 @@
     <key alias="design">Design</key>
     <key alias="dictionary">Wörterbuch</key>
     <key alias="dimensions">Abmessungen</key>
+    <key alias="discard">Verwerfen</key>
     <key alias="down">nach unten</key>
     <key alias="download">Herunterladen</key>
     <key alias="edit">Bearbeiten</key>
@@ -628,6 +793,8 @@
     <key alias="first">Erste(s)</key>
     <key alias="general">Allgemein</key>
     <key alias="groups">Gruppen</key>
+    <key alias="groups">Gruppe</key>
+    <key alias="generic">Generisch</key>
     <key alias="group">Gruppe</key>
     <key alias="height">Höhe</key>
     <key alias="help">Hilfe</key>
@@ -636,6 +803,7 @@
     <key alias="icon">Bildzeichen</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
+    <key alias="excludeFromSubFolders">Nur in diesem Ordner suchen</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Innerer Abstand</key>
     <key alias="insert">Einfügen</key>
@@ -654,18 +822,19 @@
     <key alias="logout">Abmelden</key>
     <key alias="macro">Makro</key>
     <key alias="mandatory">Pflichtfeld</key>
+    <key alias="media">Medien</key>
     <key alias="message">Nachricht</key>
     <key alias="move">Verschieben</key>
     <key alias="name">Name</key>
     <key alias="new">Neu</key>
     <key alias="next">Weiter</key>
     <key alias="no">Nein</key>
+    <key alias="nodeName">Knoten Name</key>
     <key alias="of">von</key>
     <key alias="off">Aus</key>
     <key alias="ok">Ok</key>
     <key alias="open">Öffnen</key>
     <key alias="on">An</key>
-    <!--???-->
     <key alias="or">oder</key>
     <key alias="orderBy">Sortieren nach</key>
     <key alias="password">Kennwort</key>
@@ -673,6 +842,7 @@
     <key alias="pleasewait">Einen Moment bitte...</key>
     <key alias="previous">Zurück</key>
     <key alias="properties">Eigenschaften</key>
+    <key alias="readMore">Mehr erfahren</key>
     <key alias="rebuild">Erneuern</key>
     <key alias="reciept">E-Mail-Empfänger für die Formulardaten</key>
     <key alias="recycleBin">Papierkorb</key>
@@ -680,6 +850,7 @@
     <key alias="reload">Neu laden</key>
     <key alias="remaining">Verbleibend</key>
     <key alias="remove">Entfernen</key>
+    <key alias="revert">Rückgängig</key>
     <key alias="rename">Umbenennen</key>
     <key alias="renew">Erneuern</key>
     <key alias="required" version="7.0">Pflichtangabe</key>
@@ -687,18 +858,22 @@
     <key alias="retry">Wiederholen</key>
     <key alias="rights">Berechtigungen</key>
     <key alias="scheduledPublishing">Geplantes Veröffentlichen</key>
+    <key alias="umbracoInfo">Umbraco Information</key>
     <key alias="search">Suchen</key>
     <key alias="searchNoResult">Leider können wir nicht finden, wonach Sie suchen.</key>
     <key alias="noItemsInList">Es wurden keine Elemente hinzugefügt</key>
     <key alias="server">Server</key>
     <key alias="settings">Einstellungen</key>
+    <key alias="shared">Geteilt</key>
     <key alias="show">Anzeigen</key>
     <key alias="showPageOnSend">Seite beim Senden anzeigen</key>
     <key alias="size">Größe</key>
     <key alias="sort">Sortieren</key>
     <key alias="status">Status</key>
     <key alias="submit">Senden</key>
+    <key alias="success">Erfolt</key>
     <key alias="type">Typ</key>
+    <key alias="typeName">Typ Name</key>
     <key alias="typeToSearch">Durchsuchen ...</key>
     <key alias="under">unter</key>
     <key alias="up">nach oben</key>
@@ -708,6 +883,7 @@
     <key alias="url">URL</key>
     <key alias="user">Benutzer</key>
     <key alias="username">Benutzername</key>
+    <key alias="validate">Validieren</key>
     <key alias="value">Wert</key>
     <key alias="view">Ansicht</key>
     <key alias="welcome">Willkommen ...</key>
@@ -720,17 +896,24 @@
     <key alias="preview">Vorschau</key>
     <key alias="changePassword">Kennwort ändern</key>
     <key alias="to">nach</key>
-    <!--???-->
     <key alias="listView">Listenansicht</key>
     <key alias="saving">Sichern läuft...</key>
     <key alias="current">Aktuelle(s)</key>
     <key alias="embed">Eingebettet</key>
     <key alias="selected">ausgewählt</key>
+    <key alias="other">Anderes</key>
+    <key alias="articles">Artikel</key>
+    <key alias="videos">Videos</key>
+    <key alias="avatar">Avatar für</key>
+    <key alias="header">Kopf</key>
+    <key alias="systemField">System Feld</key>
+    <key alias="lastUpdated">Zuletzt geändert</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blau</key>
   </area>
   <area alias="shortcuts">
+    <key alias="addTab">Tab hinzufügen</key>
     <key alias="addGroup">Neue Gruppe</key>
     <key alias="addProperty">Neue Eigenschaft</key>
     <key alias="addEditor">Editor hinzufügen</key>
@@ -765,14 +948,17 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Mit dieser Datenbank kann leider keine Verbindung hergestellt werden.</key>
+    <key alias="databaseErrorWebConfig">Appsettings.json Datei konnte nicht gespeichert werden. Bitte ändern Sie die Datei
+      manuell.
+    </key>
     <key alias="databaseFound">Die Datenbank ist erreichbar und wurde identifiziert als</key>
     <key alias="databaseHeader">Datenbank</key>
     <key alias="databaseInstall">
       <![CDATA[
     Klicken Sie auf <strong>Installieren</strong>, um die Datenbank für Umbraco %0% einzurichten.
-    ]]>
-    </key>
-    <key alias="databaseInstallDone">Die Datenbank wurde für Umbraco %0% konfiguriert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
+    ]]></key>
+    <key alias="databaseInstallDone">Die Datenbank wurde für Umbraco %0% konfiguriert. 
+      Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
     <key alias="databaseText">Um diesen Schritt abzuschließen, müssen Sie die notwendigen Informationen zur Datenbankverbindung angeben.&lt;br /&gt;Bitte kontaktieren Sie Ihren Provider bzw. Server-Administrator für weitere Informationen.</key>
     <key alias="databaseUpgrade">
       <![CDATA[
@@ -1159,6 +1345,7 @@
     Bitte deinstallieren Sie also mit Vorsicht. Falls Sie unsicher sind, kontaktieren Sie den Autor des Pakets.]]>
     </key>
     <key alias="packageVersion">Paketversion</key>
+    <key alias="verifiedToWorkOnUmbracoCloud">Bestätigt auf Umbraco Cloud zu funktioneren</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Einfügen mit Formatierung (Nicht empfohlen)</key>
@@ -1243,6 +1430,22 @@
     <key alias="pickedTrashedItem">Sie haben ein entferntes oder im Papierkorb befindliches Medienelement ausgewählt</key>
     <key alias="pickedTrashedItems">Sie haben entfernte oder im Papierkorb befindliche medienelemente ausgewählt</key>
     <key alias="trashed">Verworfen</key>
+    <key alias="openMedia">Medien öffnen</key>
+    <key alias="changeMedia">Medientyp ändern</key>
+    <key alias="editMediaEntryLabel">Ändere %0% auf %1%</key>
+    <key alias="confirmCancelMediaEntryCreationHeadline">Erstellen abbrechen?</key>
+    <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Sind Sie sich sicher das Sie das Erstellen abbrechen wollen?]]></key>
+    <key alias="confirmCancelMediaEntryHasChanges">Sie haben Änderungen an diesem Inhalt vorgenommen. Sind Sie sich sicher das Sie
+      diese verwerfen wollen?
+    </key>
+    <key alias="confirmRemoveAllMediaEntryMessage">Alle Medien löschen?</key>
+    <key alias="tabClipboard">Clipboard</key>
+    <key alias="notAllowed">Nicht erlaubt</key>
+    <key alias="openMediaPicker">Medienpicker öffnen</key>
+  </area>
+  <area alias="propertyEditorPicker">
+    <key alias="title">Wählen Sie einen Editor</key>
+    <key alias="openPropertyEditorPicker">Editor auswählen</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">Externen Link eingeben</key>
@@ -1257,16 +1460,24 @@
     <key alias="reset">Zurücksetzen</key>
     <key alias="updateEditCrop">Fertig</key>
     <key alias="undoEditCrop">Rückgängig machen</key>
+    <key alias="customCrop">Benutzer definiert</key>
   </area>
   <area alias="rollback">
+    <key alias="changes">Änderungen</key>
+    <key alias="created">Erstellt</key>
     <key alias="headline">Wählen Sie eine Version, um diese mit der aktuellen zu vergleichen</key>
     <key alias="currentVersion">Aktuelle Version</key>
     <key alias="diffHelp">Zeigt die Unterschiede zwischen der aktuellen und der ausgewählten Version an.&lt;br /&gt;Text in &lt;del&gt;rot&lt;/del&gt; fehlen in der ausgewählten Version, &lt;ins&gt;grün&lt;/ins&gt; markierter Text wurde hinzugefügt.</key>
+    <key alias="noDiff">Keine Unterschiede zwischen den beiden Versionen gefunden.</key>
     <key alias="documentRolledBack">Dokument wurde zurückgesetzt</key>
     <key alias="htmlHelp">Zeigt die ausgewählte Version als HTML an. Wenn Sie sich die Unterschiede zwischen zwei Versionen anzeigen lassen wollen, benutzen Sie bitte die Vergleichsansicht.</key>
     <key alias="rollbackTo">Zurücksetzen auf</key>
     <key alias="selectVersion">Version auswählen</key>
     <key alias="view">Ansicht</key>
+    <key alias="pagination"><![CDATA[Zeige Versionen von %0% zu %1% von %2% Versionen]]></key>
+    <key alias="versions">Versionen</key>
+    <key alias="currentDraftVersion">Aktulle Bearbeitungs Version</key>
+    <key alias="currentPublishedVersion">Aktulle veröffentlichte Version</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Skript bearbeiten</key>
@@ -1282,7 +1493,12 @@
     <key alias="users">Benutzer</key>
   </area>
   <area alias="help">
+    <key alias="tours">Touren</key>
     <key alias="theBestUmbracoVideoTutorials">Die besten Umbraco-Video-Tutorials</key>
+    <key alias="umbracoForum">Besuche our.umbraco.com</key>
+    <key alias="umbracoTv">Besuche umbraco.tv</key>
+    <key alias="umbracoLearningBase">Schaue gratis Tutorials</key>
+    <key alias="umbracoLearningBaseDescription">von Umbraco Learning Base</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardvorlage</key>
@@ -1627,6 +1843,12 @@
       falls die angefragte Sprache nicht verfügbar ist, wählen Sie diese Option hier aus.
     </key>
     <key alias="fallbackLanguage">Ersatzsprache</key>
+    <key alias="none">Keine</key>
+    <key alias="invariantPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> wird zwischen Sprachen und Segmenten geteilt.]]></key>
+    <key alias="invariantCulturePropertyUnlockHelp"><![CDATA[<strong>%0%</strong> wird zwischen allen Sprachen geteilt.]]></key>
+    <key alias="invariantSegmentPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> wird zwischen allen Segmenten geteilt.]]></key>
+    <key alias="invariantLanguageProperty">Geteilt: Sprachen</key>
+    <key alias="invariantSegmentProperty">Geteilt: Segmente</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Parameter hinzufügen</key>
@@ -1759,7 +1981,10 @@
     <key alias="createDate">Benutzer angelegt</key>
     <key alias="changePassword">Kennwort ändern</key>
     <key alias="changePhoto">Foto ändern</key>
+    <key alias="emailRequired">Benötigt - geben Sie eine Email Adresse für diesen User an</key>
     <key alias="newPassword">Neues Kennwort</key>
+    <key alias="newPasswordFormatLengthTip">Noch %0% Zeichen benötigt!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Es sollten mindestens %0% Sonderzeichen verwendet werden.</key>
     <key alias="noLockouts">wurde nicht ausgeschlossen</key>
     <key alias="noPasswordChange">Das Kennwort wurde nicht geändert</key>
     <key alias="confirmNewPassword">Neues Kennwort (Bestätigung)</key>
@@ -1954,8 +2179,8 @@
     <key alias="stateInactive">Nicht aktiv</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
     <key alias="sortNameDescending">Name (Z-A)</key>
-    <key alias="sortCreateDateAscending">Newest</key>
-    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortCreateDateAscending">Oldest</key>
+    <key alias="sortCreateDateDescending">Newest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
   </area>
   <area alias="validation">
@@ -2105,5 +2330,60 @@
   <area alias="logViewer">
     <key alias="selectAllLogLevelFilters">Wählen Sie Alle</key>
     <key alias="deselectAllLogLevelFilters">Alle abwählen</key>
+  </area>
+  <area alias="formsDashboard">
+    <key alias="formsHeadline">Umbraco Forms</key>
+    <key alias="formsDescription">Erstellen Sie Formulare mithilfe einer intuitiven Benutzeroberfläche. Von einfachen Kontaktformularen
+      die Email verschicken bis hin zu komplexen Fragebögen die mit einem CRM System verbunden sind. Ihre Kunden werden es lieben!
+    </key>
+  </area>
+  <area alias="contentTemplatesDashboard">
+    <key alias="whatHeadline">Was sind Inhaltsvorlagen?</key>
+    <key alias="whatDescription">Inhaltsvorlagen sind vordefinierte Inhalte die ausgewählt werden können 
+      wenn Sie einen neuen Inhaltsknoten anlegen wollen.
+    </key>
+    <key alias="createHeadline">Wie erstelle ich eine Inhaltsvorlage?</key>
+    <key alias="createDescription">
+      <![CDATA[
+            <p>Es gibt zwei Möglichkeiten eine Inhaltsvorlage zu erstellen:</p>
+            <ul>
+                <li>Rechtsklicken Sie einen Inhaltsknoten und wählen Sie "Inhaltsvorlage erstellen" aus.</li>
+                <li>Rechtsklicken Sie den Inhaltsvorlagen-Baum und wählen Sie den Dokumententypen aus für den Sie eine Vorlage erstellen wollen.</li>
+            </ul>
+            <p>Wenn Sie einen Namen vergen haben können Reakteure diese als Vorlage für neue Seiten benutzen.</p>
+        ]]>
+    </key>
+    <key alias="manageHeadline">Wie verwalte ich eine Inhaltsvorlage?</key>
+    <key alias="manageDescription">Sie können Inhaltsvorlagen bearbeiten und löschen in dem Sie im Inhaltsvorlage-Baum die gewünschte
+      Vorlage auswählen. Außerdem können Sie auch direkt den Dokumenttypen bearbeiten oder löschen auf dem die Vorlage basiert
+    </key>
+  </area>
+  <area alias="preview">
+    <key alias="endLabel">Beenden</key>
+    <key alias="endTitle">Vorschau beenden</key>
+    <key alias="openWebsiteLabel">Website Vorschau</key>
+    <key alias="openWebsiteTitle">Website in Vorschaumodus öffnen</key>
+    <key alias="returnToPreviewHeadline">Websitevorschau anzeigen?</key>
+    <key alias="returnToPreviewDescription">Sie haben den Vorschaumodus beendet, wollen Sie ihn erneut öffnen um
+      gespeicherte Version der Website anzusehen?
+    </key>
+    <key alias="returnToPreviewAcceptButton">Vorschau der letzten Version anzeigen</key>
+    <key alias="returnToPreviewDeclineButton">Veröffentlichte Version anzeigen</key>
+    <key alias="viewPublishedContentHeadline">Veröffentlichte Version anzeigen?</key>
+    <key alias="viewPublishedContentDescription">Sie befinden sich im Vorschaumodus, wollen Sie ihn verlassen um die letzte
+      veröffentlichte Version ihrer Website zu sehen?
+    </key>
+    <key alias="viewPublishedContentAcceptButton">Veröffentlichte Version anzeigen</key>
+    <key alias="viewPublishedContentDeclineButton">Im Vorschaumodus bleiben</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Ornder erstellen</key>
+    <key alias="FileWritingForPackages">Dateien durch Packages erstellen lassen</key>
+    <key alias="FileWriting">Dateien schreiben</key>
+    <key alias="MediaFolderCreation">Medien Ordner stellen</key>
+  </area>  
+  <area alias="treeSearch">
+    <key alias="searchResult">Element zurückgegeben</key>
+    <key alias="searchResults">Elemente zurückgegeben</key>
   </area>
 </language>

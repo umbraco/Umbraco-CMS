@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -21,7 +22,6 @@ using Umbraco.Cms.Infrastructure.Packaging;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
@@ -260,6 +260,11 @@ public class DictionaryController : BackOfficeNotificationsController
             return ValidationProblem(_localizedTextService.Localize("dictionary", "itemDoesNotExists"));
         }
 
+        if(dictionaryItem.ParentId == null && move.ParentId == Constants.System.Root)
+        {
+            return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
+        }
+
         IDictionaryItem? parent = _localizationService.GetDictionaryItemById(move.ParentId);
         if (parent == null)
         {
@@ -274,6 +279,11 @@ public class DictionaryController : BackOfficeNotificationsController
         }
         else
         {
+            if (dictionaryItem.ParentId == parent.Key)
+            {
+                return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
+            }
+
             dictionaryItem.ParentId = parent.Key;
             if (dictionaryItem.Key == parent.ParentId)
             {
@@ -308,8 +318,8 @@ public class DictionaryController : BackOfficeNotificationsController
             return ValidationProblem("Dictionary item does not exist");
         }
 
-        CultureInfo? userCulture =
-            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings);
+        var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        CultureInfo? userCulture = currentUser?.GetUserCulture(_localizedTextService, _globalSettings);
 
         if (dictionary.NameIsDirty)
         {
@@ -330,9 +340,15 @@ public class DictionaryController : BackOfficeNotificationsController
             dictionaryItem.ItemKey = dictionary.Name!;
         }
 
+        var allowedLanguageIds = currentUser?.CalculateAllowedLanguageIds(_localizationService);
+        var allowedLanguageIdHashSet =allowedLanguageIds is null ? new HashSet<int>() : new HashSet<int>(allowedLanguageIds);
+
         foreach (DictionaryTranslationSave translation in dictionary.Translations)
         {
-            _localizationService.AddOrUpdateDictionaryValue(dictionaryItem, _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+            if (allowedLanguageIdHashSet.Contains(translation.LanguageId))
+            {
+                _localizationService.AddOrUpdateDictionaryValue(dictionaryItem, _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+            }
         }
 
         try

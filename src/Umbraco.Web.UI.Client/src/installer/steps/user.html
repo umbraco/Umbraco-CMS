@@ -1,88 +1,172 @@
 <div ng-controller="Umbraco.Install.UserController">
   <h1>Install Umbraco</h1>
 
-  <p>Enter your name, email and password to install Umbraco with its default settings, alternatively you can customize
-    your installation</p>
+  <p>
+    Enter credentials for the default administrator user and choose the level of
+    consent for telemetry data of your Umbraco installation.
+  </p>
 
-  <form name="myForm" class="form-horizontal" novalidate ng-submit="validateAndInstall();">
-
-    <div class="row">
-      <div class="span8">
-        <div class="pull-right">
-          <div class="control-group">
-            <label class="control-label" for="name">Name</label>
-            <div class="controls">
-              <input type="text" id="name" name="name" placeholder="Full name" required
-                ng-model="installer.current.model.name" />
-            </div>
+  <form
+    class="-no-margin-bottom"
+    name="installerForm"
+    novalidate
+    ng-submit="validateAndInstall();"
+  >
+    <div class="installer-cols">
+      <div class="installer-col user-col">
+        <div class="control-group">
+          <label class="control-label" for="name">Name</label>
+          <div class="controls">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Full name"
+              required
+              ng-model="installer.current.model.name"
+            />
           </div>
+        </div>
 
-          <div class="control-group">
-            <label class="control-label" for="email">Email</label>
-            <div class="controls">
-              <input type="email" id="email" name="email" placeholder="you@example.com" val-email required
-                ng-model="installer.current.model.email" />
-              <small class="inline-help">Your email will be used as your login</small>
-            </div>
+        <div class="control-group">
+          <label class="control-label" for="email">Email</label>
+          <div class="controls">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+              val-email
+              required
+              ng-model="installer.current.model.email"
+            />
+            <small class="inline-help"
+              >Your email will be used as your login</small
+            >
           </div>
+        </div>
 
-          <div class="control-group">
-            <label class="control-label" for="password">Password</label>
-            <div class="controls">
-              <!-- why isn't this masked: https://www.nngroup.com/articles/stop-password-masking/ -->
-              <input type="text" name="installer.current.model.password"
-                ng-minlength="{{installer.current.model.minCharLength}}" ng-pattern="passwordPattern" autocorrect="off"
-                autocapitalize="off" autocomplete="off" required ng-model="installer.current.model.password"
-                id="password" />
-              <small class="inline-help">At least {{installer.current.model.minCharLength}} characters long</small>
+        <div class="control-group">
+          <label class="control-label" for="password">Password</label>
+          <div class="controls">
+            <!-- why isn't this masked: https://www.nngroup.com/articles/stop-password-masking/ -->
+            <input
+              type="text"
+              name="installer.current.model.password"
+              ng-minlength="{{installer.current.model.minCharLength}}"
+              ng-pattern="passwordPattern"
+              autocorrect="off"
+              autocapitalize="off"
+              autocomplete="off"
+              required
+              ng-model="installer.current.model.password"
+              id="password"
+              spellcheck="false"
+            />
+            <small class="inline-help"
+              >At least {{installer.current.model.minCharLength}} characters
+              long</small
+            >
 
-              <small ng-if="installer.current.model.minNonAlphaNumericLength > 0" class="inline-help">
-                At least {{installer.current.model.minNonAlphaNumericLength}}
-                symbol{{installer.current.model.minNonAlphaNumericLength > 1 ? 's' : ''}}
-              </small>
-            </div>
+            <small
+              ng-if="installer.current.model.minNonAlphaNumericLength > 0"
+              class="inline-help"
+            >
+              At least {{installer.current.model.minNonAlphaNumericLength}}
+              symbol{{installer.current.model.minNonAlphaNumericLength > 1 ? 's'
+              : ''}}
+            </small>
           </div>
+        </div>
 
+        <div class="control-group">
+          <div class="controls">
+            <label>
+              <input
+                type="checkbox"
+                id="subscribeToNewsLetter"
+                name="subscribeToNewsLetter"
+                ng-model="installer.current.model.subscribeToNewsLetter"
+              />
+              Keep me updated on Umbraco Versions, Security Bulletins and
+              Community News
+            </label>
+          </div>
+        </div>
+
+        <div
+          ng-if="installer.current.model.quickInstallSettings"
+          style="margin-top: auto"
+        >
           <div class="control-group">
-            <label class="control-label">Telemetry</label>
-            <div class="controls">
-              <div id="consentSliderWrapper">
-                <div id="consentSlider"></div>
-
-                <umb-tooltip ng-if="consentTooltip.show" event="consentTooltip.event">
-                  <div ng-bind-html="consentTooltip.description"></div>
-                </umb-tooltip>
+            <label class="control-label" for="dbType">Database</label>
+            <div class="controls -with-border">
+              <div class="input-readonly-text" ng-if="installer.current.model.customInstallAvailable">
+                <strong>Provider:</strong>
+                {{installer.current.model.quickInstallSettings.displayName}}
+                <br /><strong>Name:</strong>
+                {{installer.current.model.quickInstallSettings.defaultDatabaseName}}
+              </div>
+              <div class="input-readonly-text" ng-if="!installer.current.model.customInstallAvailable">
+                A database has been pre-configured for your installation.
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="control-group">
-            <div class="controls">
-              <label>
-                <input type="checkbox" id="subscribeToNewsLetter" name="subscribeToNewsLetter"
-                  ng-model="installer.current.model.subscribeToNewsLetter" />
-                Keep me updated on Umbraco Versions, Security Bulletins and Community News
-              </label>
+      <div class="installer-col telemetry-col">
+        <div class="control-group">
+          <label class="control-label">
+            Consent for telemetry data
+            <br /><small>
+              This can be changed later in the Settings panel.
+            </small>
+          </label>
+          <div class="controls">
+            <div id="consentSliderWrapper">
+              <div id="consentSlider" class="umb-range-slider"></div>
             </div>
           </div>
-
-          <div class="control-group" ng-class="{disabled:myForm.$invalid}">
-            <div class="controls">
-              <input ng-if="installer.current.model.quickInstallAvailable" type="submit" ng-disabled="myForm.$invalid"
-                value="Install" class="btn btn-success" />
-              <button
-                ng-if="installer.current.model.quickInstallAvailable && installer.current.model.customInstallAvailable"
-                class="btn btn-info control-customize" ng-disabled="myForm.$invalid"
-                ng-click="validateAndForward()">Customize</button>
-
-              <button ng-if="!installer.current.model.quickInstallAvailable" class="btn btn-primary control-customize"
-                ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Next</button>
-            </div>
-          </div>
-
+          <p>
+            <small>
+              In order to improve Umbraco and add new functionality based on as
+              relevant information as possible, we would like to collect system-
+              and usage information from your installation.
+            </small>
+          </p>
+          <p><small ng-bind-html="telemetryDescription"></small></p>
         </div>
       </div>
     </div>
-  </form>
 
+    <div class="control-actions" ng-class="{disabled:installerForm.$invalid}">
+      <div
+        class="controls-space-between"
+        ng-if="installer.current.model.quickInstallSettings"
+      >
+        <button
+          ng-if="installer.current.model.quickInstallSettings && installer.current.model.customInstallAvailable"
+          class="btn btn-info control-customize"
+          ng-disabled="installerForm.$invalid"
+          ng-click="validateAndForward()"
+        >
+          Change Database
+        </button>
+
+        <button ng-disabled="installerForm.$invalid" class="btn btn-success">
+          Install
+        </button>
+      </div>
+
+      <button
+        ng-if="!installer.current.model.quickInstallSettings"
+        class="btn btn-primary control-customize"
+        ng-disabled="installerForm.$invalid"
+        ng-click="validateAndForward()"
+      >
+        Next
+      </button>
+    </div>
+  </form>
 </div>

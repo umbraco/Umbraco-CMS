@@ -1,18 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <PackageId>Umbraco.Cms.Persistence.Sqlite</PackageId>
-    <Title>Umbraco.Cms.Persistence.Sqlite</Title>
+    <Title>Umbraco CMS - Persistence - SQLite</Title>
     <Description>Adds support for SQLite to Umbraco CMS.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
+    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>

@@ -1,21 +1,23 @@
-﻿.umb-color-picker {
+.umb-color-picker {
 
     .sp-replacer {
         display: inline-flex;
-        margin-right: 18px;
+        margin-right: 12px;
         height: 32px;
+        padding: 5px;
 
         &.sp-light {
             background-color: @white; 
         }
 
-        .sp-preview {
-            margin: 5px;
-            height: auto;
-        }
-
         .sp-dd {
             line-height: 2rem;
         }
+    }
+}
+
+.umb-color-picker[readonly] {
+    .sp-replacer {
+        cursor: not-allowed;
     }
 }

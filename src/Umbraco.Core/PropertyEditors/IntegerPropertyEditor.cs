@@ -11,14 +11,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     EditorType.PropertyValue | EditorType.MacroParameter,
     "Numeric",
     "integer",
-    ValueType = ValueTypes.Integer)]
+    ValueType = ValueTypes.Integer,
+    ValueEditorIsReusable = true)]
 public class IntegerPropertyEditor : DataEditor
 {
     public IntegerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()

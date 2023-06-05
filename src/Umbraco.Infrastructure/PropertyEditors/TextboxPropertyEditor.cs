@@ -2,10 +2,10 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     EditorType.PropertyValue | EditorType.MacroParameter,
     "Textbox",
     "textbox",
-    Group = Constants.PropertyEditors.Groups.Common)]
+    Group = Constants.PropertyEditors.Groups.Common,
+    ValueEditorIsReusable = true)]
 public class TextboxPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -43,6 +44,7 @@ public class TextboxPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

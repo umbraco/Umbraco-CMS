@@ -69,7 +69,7 @@
 
     function ToggleDirective(localizationService, eventsService, $timeout) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, el, attrs, ctrl) {
 
             scope.displayLabelOn = "";
             scope.displayLabelOff = "";
@@ -82,7 +82,7 @@
                 // Must wait until the current digest cycle is finished before we emit this event on init, 
                 // otherwise other property editors might not yet be ready to receive the event
                 $timeout(function () {
-                    eventsService.emit("toggleValue", { value: scope.checked });
+                    eventsService.emit("toggleValue", { value: scope.checked, inputId: scope.inputId });
                 }, 100);
             }
 
@@ -114,12 +114,22 @@
 
             }
 
-            scope.click = function() {
+            scope.click = function($event) {
+                if (scope.readonly) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    return;
+                }
+
                 if (scope.onClick) {
-                    eventsService.emit("toggleValue", { value: !scope.checked });
+                    eventsService.emit("toggleValue", { value: !scope.checked, inputId: scope.inputId });
                     scope.onClick();
                 }
             };
+
+            attrs.$observe('readonly', (value) => {
+                scope.readonly = value !== undefined;
+            });
 
             onInit();
         }

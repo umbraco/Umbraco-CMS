@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -274,6 +273,49 @@ public class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void EntityService_Can_Get_Paged_Trashed_Content_Children()
+    {
+        var contentType = ContentTypeService.Get("umbTextpage");
+
+        var root = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(root);
+        var toDelete = new List<IContent>();
+        for (var i = 0; i < 10; i++)
+        {
+            var c1 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+            ContentService.Save(c1);
+
+            if (i % 2 == 0)
+            {
+                toDelete.Add(c1);
+            }
+
+            for (var j = 0; j < 5; j++)
+            {
+                var c2 = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
+                ContentService.Save(c2);
+            }
+        }
+
+        foreach (var content in toDelete)
+        {
+            ContentService.MoveToRecycleBin(content);
+        }
+
+        // get paged entities at recycle bin root
+        var entities = EntityService
+            .GetPagedTrashedChildren(Constants.System.RecycleBinContent, UmbracoObjectTypes.Document, 0, 1000, out var total)
+            .Select(x => x.Id)
+            .ToArray();
+
+        Assert.True(total > 0);
+        foreach (var c in toDelete)
+        {
+            Assert.IsTrue(entities.Contains(c.Id));
+        }
+    }
+
+    [Test]
     public void EntityService_Can_Get_Paged_Content_Descendants_With_Search()
     {
         var contentType = ContentTypeService.Get("umbTextpage");
@@ -449,6 +491,50 @@ public class EntityServiceTests : UmbracoIntegrationTest
         foreach (var media in toDelete)
         {
             Assert.IsFalse(entities.Contains(media.Id));
+        }
+    }
+
+    [Test]
+    public void EntityService_Can_Get_Paged_Trashed_Media_Children()
+    {
+        var folderType = MediaTypeService.Get(1031);
+        var imageMediaType = MediaTypeService.Get(1032);
+
+        var root = MediaBuilder.CreateMediaFolder(folderType, -1);
+        MediaService.Save(root);
+        var toDelete = new List<IMedia>();
+        for (var i = 0; i < 10; i++)
+        {
+            var c1 = MediaBuilder.CreateMediaImage(imageMediaType, root.Id);
+            MediaService.Save(c1);
+
+            if (i % 2 == 0)
+            {
+                toDelete.Add(c1);
+            }
+
+            for (var j = 0; j < 5; j++)
+            {
+                var c2 = MediaBuilder.CreateMediaImage(imageMediaType, c1.Id);
+                MediaService.Save(c2);
+            }
+        }
+
+        foreach (var content in toDelete)
+        {
+            MediaService.MoveToRecycleBin(content);
+        }
+
+        // get paged entities at recycle bin root
+        var entities = EntityService
+            .GetPagedTrashedChildren(Constants.System.RecycleBinMedia, UmbracoObjectTypes.Media, 0, 1000, out var total)
+            .Select(x => x.Id)
+            .ToArray();
+
+        Assert.True(total > 0);
+        foreach (var media in toDelete)
+        {
+            Assert.IsTrue(entities.Contains(media.Id));
         }
     }
 

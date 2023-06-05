@@ -13,6 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
+    [Obsolete("Will be replace with a new step with the new backoffice")]
     [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall, "DatabaseUpgrade", 12, "")]
     public class DatabaseUpgradeStep : InstallSetupStep<object>
     {
@@ -47,7 +48,6 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 _logger.LogInformation("Running 'Upgrade' service");
 
                 var plan = new UmbracoPlan(_umbracoVersion);
-                plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
 
                 DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
 

@@ -177,13 +177,13 @@ namespace Umbraco.Cms.Core.Services
             => CreateMemberWithIdentity(username, email, username, string.Empty, memberTypeAlias);
 
         public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved)
-            => CreateMemberWithIdentity(username, email, string.Empty, string.Empty, memberTypeAlias, isApproved);
+            => CreateMemberWithIdentity(username, email, username, string.Empty, memberTypeAlias, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
-            => CreateMemberWithIdentity(username, email, string.Empty, string.Empty, memberTypeAlias);
+            => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
-            => CreateMemberWithIdentity(username, string.Empty, name, string.Empty, memberTypeAlias, isApproved);
+            => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias, isApproved);
 
         /// <summary>
         /// Creates and persists a Member
@@ -728,11 +728,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Save
 
-        /// <inheritdoc />
-        [Obsolete("This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
-        public void SetLastLogin(string username, DateTime date)
-        {
-        }
+        public void SetLastLogin(string username, DateTime date) => throw new NotImplementedException();
 
         /// <inheritdoc />
         public void Save(IMember member)

@@ -6,7 +6,7 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
     $scope.dbs = $scope.installer.current.model.databases;
     window.dbs = $scope.dbs;
 
-    $scope.providerNames = _.chain(dbs)
+    $scope.providerNames = _.chain(window.dbs)
         .map('providerName')
         .filter(x => x)
         .uniq()
@@ -16,7 +16,7 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
         $scope.selectedDbMeta = $scope.dbs[0];
     }
 
-    $scope.$watch('selectedDbMeta', function(newValue, oldValue) {
+    $scope.$watch('selectedDbMeta', function(newValue) {
       $scope.installer.current.model.integratedAuth = false;
       $scope.installer.current.model.databaseProviderMetadataId = newValue.id;
       $scope.installer.current.model.providerName = newValue.providerName;
@@ -29,7 +29,7 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
 
 
     $scope.validateAndForward = function() {
-        if (!$scope.checking && this.myForm.$valid)
+        if (!$scope.checking && this.installerForm.$valid)
         {
             $scope.checking = true;
             $scope.invalidDbDns = false;

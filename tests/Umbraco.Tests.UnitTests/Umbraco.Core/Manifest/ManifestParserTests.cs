@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -47,7 +46,8 @@ public class ManifestParserTests
             new JsonNetSerializer(),
             Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
-            Mock.Of<IDataValueEditorFactory>());
+            Mock.Of<IDataValueEditorFactory>(),
+            Mock.Of<IManifestFileProviderFactory>());
     }
 
     private ManifestParser _parser;
@@ -504,5 +504,62 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         var manifest = _parser.ParseManifest(json);
 
         Assert.IsFalse(manifest.AllowPackageTelemetry);
+    }
+
+    [Test]
+    public void CanParseManifest_ParameterEditors_SupportsReadOnly()
+    {
+        const string json = @"{'parameterEditors': [
+    {
+        alias: 'parameter1',
+        name: 'My Parameter',
+        view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
+        supportsReadOnly: true
+    }]}";
+
+
+        var manifest = _parser.ParseManifest(json);
+        Assert.IsTrue(manifest.ParameterEditors.FirstOrDefault().SupportsReadOnly);
+    }
+
+    [Test]
+    public void CanParseManifest_PropertyEditors_SupportsReadOnly()
+    {
+        const string json = @"{'propertyEditors': [
+    {
+        alias: 'Test.Test1',
+        name: 'Test 1',
+        supportsReadOnly: true,
+        editor: {
+            view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
+            valueType: 'int',
+            hideLabel: true,
+            validation: {
+                'required': true,
+                'Regex': '\\d*'
+            }
+        },
+        prevalues: {
+                fields: [
+                    {
+                        label: 'Some config 1',
+                        key: 'key1',
+                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
+                        validation: {
+                            required: true
+                        }
+                    },
+                    {
+                        label: 'Some config 2',
+                        key: 'key2',
+                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
+                    }
+                ]
+            }
+    }]}";
+
+
+        var manifest = _parser.ParseManifest(json);
+        Assert.IsTrue(manifest.PropertyEditors.FirstOrDefault().SupportsReadOnly);
     }
 }

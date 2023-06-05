@@ -1,15 +1,24 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions;
 
 /// <summary>
-///     This action is invoked upon modifying the notification of a content
+///     This action is invoked upon modifying the notification of a content.
 /// </summary>
 public class ActionNotify : IAction
 {
-    /// <inheritdoc />
-    public char Letter => 'N';
+    /// <inheritdoc cref="IAction.ActionLetter"/>
+    public const char ActionLetter = 'N';
+
+    /// <inheritdoc cref="IAction.ActionAlias"/>
+    public const string ActionAlias = "notify";
+
+    /// <inheritdoc/>
+    public char Letter => ActionLetter;
+
+    /// <inheritdoc/>
+    public string Alias => ActionAlias;
 
     /// <inheritdoc />
     public bool ShowInNotifier => false;
@@ -19,9 +28,6 @@ public class ActionNotify : IAction
 
     /// <inheritdoc />
     public string Icon => "icon-megaphone";
-
-    /// <inheritdoc />
-    public string Alias => "notify";
 
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.ContentCategory;

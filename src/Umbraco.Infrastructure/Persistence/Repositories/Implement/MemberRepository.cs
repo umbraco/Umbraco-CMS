@@ -202,13 +202,6 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         return Database.ExecuteScalar<int>(fullSql);
     }
 
-    /// <inheritdoc />
-    [Obsolete(
-        "This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
-    public void SetLastLogin(string username, DateTime date)
-    {
-    }
-
     /// <summary>
     ///     Gets paged member results.
     /// </summary>
@@ -285,6 +278,36 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         if (ordering.OrderBy.InvariantEquals("contentTypeAlias"))
         {
             return SqlSyntax.GetFieldName<ContentTypeDto>(x => x.Alias);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("failedPasswordAttempts"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.FailedPasswordAttempts);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("approved"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.IsApproved);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lockedOut"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.IsLockedOut);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lastLockoutDate"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.LastLockoutDate);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lastLoginDate"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.LastLoginDate);
+        }
+
+        if (ordering.OrderBy.InvariantEquals("lastPasswordChangeDate"))
+        {
+            return SqlSyntax.GetFieldName<MemberDto>(x => x.LastPasswordChangeDate);
         }
 
         return base.ApplySystemOrdering(ref sql, ordering);
@@ -490,8 +513,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
     protected override string GetBaseWhereClause() // TODO: can we kill / refactor this?
-        =>
-            "umbracoNode.id = @id";
+        => "umbracoNode.id = @id";
 
     // TODO: document/understand that one
     protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData() =>
@@ -526,6 +548,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData +
             " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion +
             " WHERE nodeId = @id)",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLoginToken} WHERE externalLoginId = (SELECT id FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = (SELECT uniqueId from {Constants.DatabaseSchema.Tables.Node} where id = @id))",
+            $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE userOrMemberKey = (SELECT uniqueId from {Constants.DatabaseSchema.Tables.Node} where id = @id)",
             "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
             "DELETE FROM cmsMember WHERE nodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",

@@ -6,10 +6,10 @@ using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
@@ -40,21 +40,11 @@ public class ReportSiteTask : RecurringHostedServiceBase
     {
     }
 
-    [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
-    public ReportSiteTask(
-        ILogger<ReportSiteTask> logger,
-        IUmbracoVersion umbracoVersion,
-        IOptions<GlobalSettings> globalSettings)
-        : this(logger, StaticServiceProvider.Instance.GetRequiredService<ITelemetryService>())
-    {
-    }
-
-    /// <summary>
-    ///     Runs the background task to send the anonymous ID
-    ///     to telemetry service
-    /// </summary>
-    public override async Task PerformExecuteAsync(object? state)
-    {
+        /// <summary>
+        /// Runs the background task to send the anonymous ID
+        /// to telemetry service
+        /// </summary>
+        public override async Task PerformExecuteAsync(object? state){
         if (_runtimeState.Level is not RuntimeLevel.Run)
         {
             // We probably haven't installed yet, so we can't get telemetry.

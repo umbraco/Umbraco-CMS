@@ -12,26 +12,29 @@
                         class="btn-reset umb-block-list__block--create-button"
                         ng-click="vm.requestShowCreate($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
-                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
+                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)"
+                        ng-if="!vm.singleBlockMode"
+                        ng-show="!vm.readonly">
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
                         <umb-icon icon="icon-add" class="icon"></umb-icon>
                     </div>
                 </button>
 
-                <umb-block-list-row block-editor-api="vm.blockEditorApi"
-                                    layout="layout"
-                                    index="$index">
+                <umb-block-list-row 
+                    block-editor-api="vm.blockEditorApi"
+                    layout="layout"
+                    index="$index">
                 </umb-block-list-row>
 
             </div>
         </div>
 
-        <div class="umb-block-list__actions" ng-if="vm.loading !== true">
+        <div class="umb-block-list__actions" ng-if="vm.loading !== true && !vm.singleBlockMode">
             <button
-                    id="{{vm.model.alias}}"
+                    id="button_{{vm.model.alias}}"
                     type="button"
                     class="btn-reset umb-block-list__create-button umb-outline"
-                    ng-disabled="vm.availableBlockTypes.length === 0"
+                    ng-disabled="vm.availableBlockTypes.length === 0 || vm.readonly"
                     ng-click="vm.requestShowCreate(vm.layout.length, $event)">
                 <localize ng-if="vm.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
                 <localize ng-if="vm.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
@@ -39,7 +42,7 @@
             <button type="button"
                     class="btn-reset umb-block-list__clipboard-button umb-outline"
                     ng-class="{'--jump': vm.jumpClipboardButton}"
-                    ng-disabled="vm.clipboardItems.length === 0"
+                    ng-disabled="vm.clipboardItems.length === 0 || vm.readonly"
                     ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
                     localize="title"
                     title="@blockEditor_tabClipboard">

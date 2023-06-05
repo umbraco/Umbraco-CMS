@@ -60,14 +60,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         _contentTypeId = contentType.Id;
         _properties = properties ?? throw new ArgumentNullException(nameof(properties));
         _properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
-
-        // track all property types on this content type, these can never change during the lifetime of this single instance
-        // there is no real extra memory overhead of doing this since these property types are already cached on this object via the
-        // properties already.
-        AllPropertyTypes = new List<IPropertyType>(contentType.CompositionPropertyTypes);
     }
-
-    internal IReadOnlyList<IPropertyType> AllPropertyTypes { get; }
 
     [IgnoreDataMember]
     public ISimpleContentType ContentType { get; private set; }
@@ -146,7 +139,6 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         base.PerformDeepClone(clone);
 
         var clonedContent = (ContentBase)clone;
-
         // Need to manually clone this since it's not settable
         clonedContent.ContentType = ContentType;
 

@@ -83,18 +83,19 @@ public static class StringExtensions
             return fileName;
         }
 
-        var lastIndex = fileName.LastIndexOf('.');
+        var spanFileName = fileName.AsSpan();
+        var lastIndex = spanFileName.LastIndexOf('.');
         if (lastIndex > 0)
         {
-            var ext = fileName.Substring(lastIndex);
+            var ext = spanFileName[lastIndex..];
 
             // file extensions cannot contain whitespace
-            if (ext.Contains(" "))
+            if (ext.Contains(' '))
             {
                 return fileName;
             }
 
-            return string.Format("{0}", fileName.Substring(0, fileName.IndexOf(ext, StringComparison.Ordinal)));
+            return new string(spanFileName[..lastIndex]);
         }
 
         return fileName;
@@ -129,8 +130,7 @@ public static class StringExtensions
         }
 
         input = input.Trim();
-        return (input.StartsWith("{") && input.EndsWith("}"))
-               || (input.StartsWith("[") && input.EndsWith("]"));
+        return (input[0] is '[' && input[^1] is ']') || (input[0] is '{' && input[^1] is '}');
     }
 
     public static bool DetectIsEmptyJson(this string input) =>
@@ -418,8 +418,9 @@ public static class StringExtensions
     ///     empty, or consists only of white-space characters, otherwise
     ///     returns <see langword="false" />.
     /// </returns>
-    public static bool IsNullOrWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value);
-
+    public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? value) => string.IsNullOrWhiteSpace(value);
+    
+    [return: NotNullIfNotNull("defaultValue")]
     public static string? IfNullOrWhiteSpace(this string? str, string? defaultValue) =>
         str.IsNullOrWhiteSpace() ? defaultValue : str;
 
@@ -1039,14 +1040,15 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(text));
         }
 
-        var pos = text.IndexOf(search, StringComparison.InvariantCulture);
+        ReadOnlySpan<char> spanText = text.AsSpan();
+        var pos = spanText.IndexOf(search, StringComparison.InvariantCulture);
 
         if (pos < 0)
         {
             return text;
         }
 
-        return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        return string.Concat(spanText[..pos], replace.AsSpan(), spanText[(pos + search.Length)..]);
     }
 
     /// <summary>
@@ -1239,7 +1241,7 @@ public static class StringExtensions
     /// <summary>
     ///     Turns an null-or-whitespace string into a null string.
     /// </summary>
-    public static string? NullOrWhiteSpaceAsNull(this string text)
+    public static string? NullOrWhiteSpaceAsNull(this string? text)
         => string.IsNullOrWhiteSpace(text) ? null : text;
 
     /// <summary>
@@ -1325,12 +1327,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
-    // From: http://stackoverflow.com/a/35046453/5018
-    public static bool IsFullPath(this string path) =>
-        string.IsNullOrWhiteSpace(path) == false
-        && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
-        && Path.IsPathRooted(path)
-        && Path.GetPathRoot(path)?.Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
+    public static bool IsFullPath(this string path) => Path.IsPathFullyQualified(path);
 
     // FORMAT STRINGS
 

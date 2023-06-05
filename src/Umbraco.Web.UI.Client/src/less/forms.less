@@ -22,6 +22,11 @@ label.control-label, .control-label {
   font-size: 14px;
 }
 
+label.control-label[disabled], .control-label[disabled] {
+  color: @gray-5;
+  pointer-events: none;
+}
+
 
 .umb-status-label{
     color: @gray-3 !important;
@@ -477,16 +482,27 @@ textarea[class*="span"],
 // Disabled and read-only inputs
 input[disabled],
 select[disabled],
-textarea[disabled],
-input[readonly],
-select[readonly],
-textarea[readonly] {
+textarea[disabled] {
   cursor: not-allowed;
   background-color: @inputDisabledBackground;
 }
+
 // Explicitly reset the colors here
-input[type="radio"][disabled],
-input[type="checkbox"][disabled],
+input[type="radio"][readonly],
+input[type="checkbox"][readonly] {
+  background-color: transparent;
+}
+
+// READONLY STATE
+// --------------
+
+// Disabled and read-only inputs
+input[readonly],
+select[readonly],
+textarea[readonly] {
+  border-color: @inputReadonlyBorderColor;
+}
+// Explicitly reset the colors here
 input[type="radio"][readonly],
 input[type="checkbox"][readonly] {
   background-color: transparent;
@@ -559,11 +575,6 @@ input[type="checkbox"][readonly] {
 
 div.help {
     margin-top: 5px;
-}
-
-
-table.domains .help-inline {
-    color:@red;
 }
 
 // INPUT GROUPS
@@ -787,6 +798,9 @@ legend + .control-group {
     width: (@horizontalComponentOffset - 20);
     padding-top: 5px;
     text-align: right;
+    &[disabled] {
+      color: @gray-5;
+    }
   }
   // Move over all input controls and content
   .controls {

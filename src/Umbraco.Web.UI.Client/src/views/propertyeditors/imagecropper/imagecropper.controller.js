@@ -140,6 +140,8 @@ angular.module('umbraco')
              * @param {any} targetCrop
              */
             function crop(targetCrop) {
+                if ($scope.readonly) return;
+
                 if (!$scope.currentCrop) {
                     // clone the crop so we can discard the changes
                     $scope.currentCrop = Utilities.copy(targetCrop);
@@ -234,9 +236,8 @@ angular.module('umbraco')
                 if (property.value && property.value.src) {
 
                     if (thumbnail === true) {
-                        return property.value.src + "?width=500";
-                    }
-                    else {
+                        return mediaHelper.getThumbnailFromPath(property.value.src);
+                    } else {
                         return property.value.src;
                     }
 

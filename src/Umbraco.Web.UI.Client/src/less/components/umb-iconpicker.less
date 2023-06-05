@@ -1,18 +1,18 @@
 .umb-iconpicker {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 0.25rem;
     margin: 0;
 }
 
 .umb-iconpicker-item {
     display: flex;
     flex-direction: row;
-    flex: 0 0 14.28%;
     justify-content: center;
     align-items: center;
     margin-bottom: 0;
     overflow: hidden;
+    border: 1px solid transparent;
 }
 
 .umb-iconpicker-item button {
@@ -41,7 +41,7 @@
 
 .umb-iconpicker-item.-selected {
     background: @gray-10;
-    border: solid 1px @ui-active;
+    border-color: @ui-active;
     border-radius: @baseBorderRadius;
     box-sizing: border-box;
 }

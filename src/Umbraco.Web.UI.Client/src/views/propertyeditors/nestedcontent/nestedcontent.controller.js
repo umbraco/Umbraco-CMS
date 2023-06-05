@@ -65,11 +65,13 @@
             }
         });
 
-    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
+    function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $attrs) {
 
         const vm = this;
-        
+
         var model = $scope.$parent.$parent.model;
+
+        vm.readonly = false;
 
         var contentTypeAliases = [];
         _.each(model.config.contentTypes, function (contentType) {
@@ -77,9 +79,20 @@
         });
 
         _.each(model.config.contentTypes, function (contentType) {
-            contentType.nameExp = !!contentType.nameTemplate
+            contentType.nameExp = contentType.nameTemplate
                 ? $interpolate(contentType.nameTemplate)
                 : undefined;
+        });
+
+        $attrs.$observe('readonly', value => {
+            vm.readonly = value !== undefined;
+
+            vm.allowRemove = !vm.readonly;
+            vm.allowAdd = !vm.readonly;
+
+            vm.sortableOptions.disabled = vm.readonly;
+
+            removeAllEntriesAction.isDisabled = vm.readonly;
         });
 
         vm.nodes = [];
@@ -90,9 +103,6 @@
 
         vm.minItems = model.config.minItems || 0;
         vm.maxItems = model.config.maxItems || 0;
-
-        if (vm.maxItems === 0)
-            vm.maxItems = 1000;
 
         vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;
         vm.expandsOnLoad = Object.toBoolean(model.config.expandsOnLoad)
@@ -154,7 +164,7 @@
             isDisabled: true,
             useLegacyIcon: false
         };
-        
+
         function removeAllEntries() {
 
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
@@ -173,7 +183,7 @@
                 });
             });
         }
-        
+
         // helper to force the current form into the dirty state
         function setDirty() {
             if (vm.umbProperty) {
@@ -191,9 +201,17 @@
             validate();
         };
 
+        vm.maxItemsExceeded = function () {
+            return vm.maxItems !== 0 && vm.nodes.length > vm.maxItems;
+        }
+
+        vm.maxItemsReached = function () {
+            return vm.maxItems !== 0 && vm.nodes.length >= vm.maxItems;
+        }
+
         vm.openNodeTypePicker = function ($event) {
 
-            if (vm.nodes.length >= vm.maxItems) {
+            if (vm.maxItemsReached()) {
                 return;
             }
 
@@ -406,6 +424,7 @@
             opacity: 0.7,
             tolerance: "pointer",
             scroll: true,
+            disabled: vm.readOnly,
             start: function (ev, ui) {
                 updateModel();
                 // Yea, yea, we shouldn't modify the dom, sue me
@@ -517,7 +536,6 @@
             storageUpdate();
         });
         var notSupported = [
-            "Umbraco.Tags",
             "Umbraco.UploadField",
             "Umbraco.ImageCropper",
             "Umbraco.BlockList"
@@ -612,7 +630,7 @@
             // Enforce min items if we only have one scaffold type
             var modelWasChanged = false;
             if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                for (var ii = vm.nodes.length; ii < model.config.minItems; ii++) {
                     addNode(vm.scaffolds[0].contentTypeAlias);
                 }
                 modelWasChanged = true;
@@ -728,7 +746,7 @@
 
         function updatePropertyActionStates() {
             copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
-            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
+            removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled || vm.readonly;
         }
 
         var propertyActions = [
@@ -754,7 +772,7 @@
                 $scope.nestedContentForm.minCount.$setValidity("minCount", true);
             }
 
-            if (vm.nodes.length > vm.maxItems) {
+            if (vm.maxItemsExceeded()) {
                 $scope.nestedContentForm.maxCount.$setValidity("maxCount", false);
             }
             else {

@@ -95,6 +95,12 @@ public class UmbRegisterController : SurfaceController
         {
             model.UsernameIsEmail = usernameIsEmail.ToString() == "True";
         }
+
+        if (RouteData.Values.TryGetValue(nameof(RegisterModel.AutomaticLogIn), out var automaticLogin) &&
+            automaticLogin != null)
+        {
+            model.AutomaticLogIn = automaticLogin.ToString() == "True";
+        }
     }
 
     private void AddErrors(IdentityResult result)
@@ -109,9 +115,8 @@ public class UmbRegisterController : SurfaceController
     ///     Registers a new member.
     /// </summary>
     /// <param name="model">Register member model.</param>
-    /// <param name="logMemberIn">Flag for whether to log the member in upon successful registration.</param>
     /// <returns>Result of registration operation.</returns>
-    private async Task<IdentityResult> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true)
+    private async Task<IdentityResult> RegisterMemberAsync(RegisterModel model)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -149,7 +154,7 @@ public class UmbRegisterController : SurfaceController
 
             _memberService.Save(member);
 
-            if (logMemberIn)
+            if (model.AutomaticLogIn)
             {
                 await _memberSignInManager.SignInAsync(identityUser, false);
             }

@@ -1,5 +1,5 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState', 'assetsService', 'eventsService', 'tourService', 'localStorageService', 'navigationService', 'localizationService',
+window.app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState', 'assetsService', 'eventsService', 'tourService', 'localStorageService', 'navigationService', 'localizationService',
     function ($rootScope, $route, $location, $cookies, urlHelper, appState, assetsService, eventsService, tourService, localStorageService, navigationService, localizationService) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
@@ -63,7 +63,6 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
             appState.setGlobalState("isReady", true);
             //send the ready event with the included returnToPath,returnToSearch data
             eventsService.emit("app.ready", data);
-            returnToPath = null, returnToSearch = null;
         }
 
         var currentRouteParams = null;
@@ -76,13 +75,14 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
 
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
-            var toRetain = currentRouteParams ? navigationService.retainQueryStrings(currentRouteParams.params, current.params) : null;
-            currentRouteParams = Utilities.copy(current);
+            var toRetain = currentRouteParams ? navigationService.retainQueryStrings(currentRouteParams, current.params) : null;
 
             //if toRetain is not null it means that there are missing query strings and we need to update the current params
             if (toRetain) {
                 $route.updateParams(toRetain);
-                currentRouteParams ? currentRouteParams.params = toRetain : currentRouteParams = { params: toRetain };
+                currentRouteParams = toRetain;
+            } else {
+                currentRouteParams = Utilities.copy(current.params);
             }
 
             var deployConfig = Umbraco.Sys.ServerVariables.deploy;
@@ -118,8 +118,15 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
                 event.preventDefault();
                 var returnPath = null;
                 if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                  // Check if a ReturnUrl is present on the querystring and redirect to it if set
+                  var queryStrings = urlHelper.getQueryStringParams();
+                  if (typeof queryStrings.ReturnUrl !== 'undefined' && queryStrings.ReturnUrl.length > 0) {
+                    returnPath = queryStrings.ReturnUrl;
+                  }
+                  else {
                     //Set the current path before redirecting so we know where to redirect back to
-                    returnPath = encodeURIComponent(window.location.href.replace(window.location.origin,''));
+                    returnPath = encodeURIComponent(window.location.href.replace(window.location.origin, ''));                    
+                  }
                 }
                 $location.path(rejection.path)
                 if (returnPath) {
@@ -133,31 +140,31 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
         //global state query strings without force re-loading views.
         //We can then detect if it's a location change that should force a route or not programatically.
         $rootScope.$on('$routeUpdate', function (event, next) {
-            if (!currentRouteParams || !currentRouteParams.params) {
+            if (!currentRouteParams) {
                 //if there is no current route then always route which is done with reload
                 $route.reload();
             } else {
-                var toRetain = navigationService.retainQueryStrings(currentRouteParams.params, next.params);
+                var toRetain = navigationService.retainQueryStrings(currentRouteParams, next.params);
                 //if toRetain is not null it means that there are missing query strings and we need to update the current params.
                 if (toRetain) {
                     $route.updateParams(toRetain);
                 }
                 //check if the location being changed is only due to global/state query strings which means the location change
                 //isn't actually going to cause a route change.
-                if (navigationService.isRouteChangingNavigation(currentRouteParams.pathParams, next.pathParams)) {
+                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
                     //The location change will cause a route change, continue the route if the query strings haven't been updated.
                     $route.reload();
                 } else {
                     //navigation is not changing but we should update the currentRouteParams to include all current parameters
                     if (toRetain) {
-                        currentRouteParams.params = toRetain;
+                        currentRouteParams = toRetain;
                     } else {
-                        currentRouteParams.params = Utilities.copy(next.params);
+                        currentRouteParams = Utilities.copy(next.params);
                     }
                     //always clear the 'sr' query string (soft redirect) if it exists
-                    if (currentRouteParams.params.sr) {
-                        currentRouteParams.params.sr = null;
-                        $route.updateParams(currentRouteParams.params);
+                    if (currentRouteParams.sr) {
+                        currentRouteParams.sr = null;
+                        $route.updateParams(currentRouteParams);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Extensions;
@@ -9,16 +10,6 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ConfigurationExtensions
 {
-    /// <summary>
-    /// The DataDirectory name.
-    /// </summary>
-    internal const string DataDirectoryName = "DataDirectory";
-
-    /// <summary>
-    /// The DataDirectory placeholder.
-    /// </summary>
-    internal const string DataDirectoryPlaceholder = "|DataDirectory|";
-
     /// <summary>
     /// The postfix used to identify a connection string provider setting.
     /// </summary>
@@ -75,10 +66,10 @@ public static class ConfigurationExtensions
         if (!string.IsNullOrEmpty(connectionString))
         {
             // Replace data directory
-            string? dataDirectory = AppDomain.CurrentDomain.GetData(DataDirectoryName)?.ToString();
+            string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
             if (!string.IsNullOrEmpty(dataDirectory))
             {
-                connectionString = connectionString.Replace(DataDirectoryPlaceholder, dataDirectory);
+                connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
             }
 
             // Get provider name
@@ -101,4 +92,6 @@ public static class ConfigurationExtensions
     /// </returns>
     public static RuntimeMode GetRuntimeMode(this IConfiguration configuration)
         => configuration.GetValue<RuntimeMode>(Constants.Configuration.ConfigRuntimeMode);
+
+    public static ModelsMode GetModelsMode(this IConfiguration configuration) => (configuration.GetSection(Constants.Configuration.ConfigModelsBuilder).Get<ModelsBuilderSettings>() ?? new ModelsBuilderSettings()).ModelsMode;
 }

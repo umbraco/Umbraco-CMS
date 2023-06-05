@@ -1,12 +1,13 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
@@ -265,7 +266,9 @@ public class ContentControllerTests
             Mock.Of<IJsonSerializer>(),
             Mock.Of<ICoreScopeProvider>(),
             Mock.Of<IAuthorizationService>(),
-            Mock.Of<IContentVersionService>());
+            Mock.Of<IContentVersionService>(),
+            Mock.Of<ICultureImpactFactory>(),
+            new OptionsWrapper<ContentSettings>(new ContentSettings()));
 
         return controller;
     }

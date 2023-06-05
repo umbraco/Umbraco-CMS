@@ -1,11 +1,11 @@
-﻿(function () {
+(function () {
   "use strict";
 
   function AnalyticsController($q, analyticResource, localizationService, notificationsService) {
 
     let sliderRef = null;
 
-    var vm = this;
+    const vm = this;
     vm.getConsentLevel = getConsentLevel;
     vm.getAllConsentLevels = getAllConsentLevels;
     vm.saveConsentLevel = saveConsentLevel;
@@ -24,6 +24,7 @@
           "min": 1,
           "max": 3
         },
+        behaviour: 'smooth-steps-tap',
         pips: {
           mode: 'values',
           density: 50,
@@ -60,6 +61,7 @@
       }
 
     });
+
     function setup(slider) {
       sliderRef = slider;
     }
@@ -69,11 +71,13 @@
         vm.consentLevel = response;
       })
     }
+
     function getAllConsentLevels(){
       return analyticResource.getAllConsentLevels().then(function (response) {
         vm.consentLevels = response;
       })
     }
+
     function saveConsentLevel(){
       analyticResource.saveConsentLevel(vm.sliderVal);
       localizationService.localize("analytics_analyticsLevelSavedSuccess").then(function(value) {
@@ -82,14 +86,14 @@
     }
 
     function sliderChange(values) {
-      const result = Number(values[0]);
-      vm.sliderVal = vm.consentLevels[result - 1];
+      const result = Math.round(Number(values[0]) - 1);
+      vm.sliderVal = vm.consentLevels[result];
     }
 
     function calculateStartPositionForSlider(){
       let startPosition = vm.consentLevels.indexOf(vm.consentLevel) + 1;
-      if(startPosition === 0){
-        return 2;// Default start value
+      if (startPosition === 0) {
+         return 2;// Default start value
       }
       return startPosition;
     }

@@ -20,13 +20,14 @@ public sealed class InternalPublishedContent : IPublishedContent
         Path = string.Empty;
         ContentType = contentType;
         Properties = Enumerable.Empty<IPublishedProperty>();
+        Name = string.Empty;
     }
 
     public Guid Version { get; set; }
 
     public int ParentId { get; set; }
 
-    public IEnumerable<int>? ChildIds { get; set; }
+    public IEnumerable<int> ChildIds { get; set; } = Enumerable.Empty<int>();
 
     public int Id { get; set; }
 
@@ -45,7 +46,7 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public int SortOrder { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ??= GetCultures();
 
@@ -71,9 +72,9 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public bool IsPublished(string? culture = null) => true;
 
-    public IEnumerable<IPublishedContent>? Children { get; set; }
+    public IEnumerable<IPublishedContent> Children { get; set; } = Enumerable.Empty<IPublishedContent>();
 
-    public IEnumerable<IPublishedContent>? ChildrenForAllCultures => Children;
+    public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
     public IPublishedContentType ContentType { get; set; }
 

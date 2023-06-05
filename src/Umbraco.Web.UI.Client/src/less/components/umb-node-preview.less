@@ -7,7 +7,8 @@
 }
 
 .umb-editor-wrapper .umb-node-preview {
-    .umb-property-editor--limit-width();
+  word-break: break-word;
+  .umb-property-editor--limit-width();
 }
 
 .umb-node-preview:last-of-type {
@@ -105,6 +106,15 @@
     color: @ui-action-discreet-type-hover;
     border-color: @ui-action-discreet-border-hover;
     text-decoration: none;
+}
+
+.umb-node-preview-add:disabled {
+    cursor: not-allowed;
+
+    &:hover {
+        border-color: @ui-action-discreet-border;
+        color: @ui-action-discreet-type;
+    }
 }
 
 .umb-editor-wrapper .umb-node-preview-add {

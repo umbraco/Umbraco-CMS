@@ -6,12 +6,12 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "membergrouppicker",
     ValueType = ValueTypes.Text,
     Group = Constants.PropertyEditors.Groups.People,
-    Icon = Constants.Icons.MemberGroup)]
+    Icon = Constants.Icons.MemberGroup,
+    ValueEditorIsReusable = true)]
 public class MemberGroupPickerPropertyEditor : DataEditor
 {
     public MemberGroupPickerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 }

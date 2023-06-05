@@ -2,7 +2,7 @@
 <language alias="pl" intName="Polish" localName="polski" lcid="21" culture="pl-PL">
   <creator>
     <name>The Umbraco community</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assigndomain">Zarządzanie hostami</key>
@@ -184,7 +184,7 @@
     <key alias="childItems" version="7.0">Elementy dzieci</key>
     <key alias="target" version="7.0">Cel</key>
     <key alias="scheduledPublishServerTime">Oznacza to następującą godzinę na serwerze:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Co to oznacza?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Co to oznacza?</a>]]></key>
     <key alias="nestedContentDeleteItem">Czy na pewno chcesz usunąć ten element?</key>
     <key alias="nestedContentEditorNotSupported">Właściwość %0% używa edytora %1%, który nie jest wspierany przez Nested Content.</key>
     <key alias="addTextBox">Dodaj kolejne pole tekstowe</key>
@@ -881,7 +881,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="reset">Resetuj</key>
   </area>
   <area alias="rollback">
-    <key alias="currentVersion">Aktualna wersja</key>
     <key alias="diffHelp"><![CDATA[Tu pokazane są różnice pomiędzy bieżącą oraz wybraną wersją <br/><del>Czerwony</del> tekst nie będzie pokazany w wybranej wersji, <ins>zielony tekst został dodany</ins>]]></key>
     <key alias="documentRolledBack">Dokument został przywrócony</key>
     <key alias="htmlHelp">Tu widać wybraną wersję jako html, jeżeli chcesz zobaczyć różnicę pomiędzy 2 wersjami w tym samym czasie, użyj podglądu różnic</key>

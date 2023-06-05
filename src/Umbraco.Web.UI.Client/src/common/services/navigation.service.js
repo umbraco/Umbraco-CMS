@@ -220,7 +220,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
          * utility to clear the querystring/search params while maintaining a known list of parameters that should be maintained throughout the app
          */
         clearSearch: function (toRetain) {
-            var toRetain = _.union(retainedQueryStrings, toRetain);
+            toRetain = _.union(retainedQueryStrings, toRetain);
             var currentSearch = $location.search();
             $location.search('');
 

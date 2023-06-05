@@ -57,6 +57,8 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
             localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
     }
 
+    public int GetCount() => _memberTypeService.Count();
+
     /// <summary>
     ///     Gets the member type a given id
     /// </summary>
@@ -172,6 +174,21 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
         return Ok(result);
     }
 
+    /// <summary>
+    ///     Returns where a particular composition has been used
+    ///     This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request
+    ///     body
+    /// </summary>
+    /// <param name="contentTypeId"></param>
+    /// <returns></returns>
+    public IActionResult GetWhereCompositionIsUsedInMemberTypes(int contentTypeId)
+    {
+        var result =
+            PerformGetWhereCompositionIsUsedInContentTypes(contentTypeId, UmbracoObjectTypes.MemberType).Value?
+                .Select(x => new { contentType = x });
+        return Ok(result);
+    }
+
     public MemberTypeDisplay? GetEmpty()
     {
         var ct = new MemberType(_shortStringHelper, -1)
@@ -182,17 +199,6 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
         MemberTypeDisplay? dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(ct);
         return dto;
     }
-
-
-    /// <summary>
-    ///     Returns all member types
-    /// </summary>
-    [Obsolete(
-        "Use MemberTypeQueryController.GetAllTypes instead as it only requires AuthorizationPolicies.TreeAccessMembersOrMemberTypes and not both this and AuthorizationPolicies.TreeAccessMemberTypes")]
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
-    public IEnumerable<ContentTypeBasic> GetAllTypes() =>
-        _memberTypeService.GetAll()
-            .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>).WhereNotNull();
 
     public ActionResult<MemberTypeDisplay?> PostSave(MemberTypeSave contentTypeSave)
     {

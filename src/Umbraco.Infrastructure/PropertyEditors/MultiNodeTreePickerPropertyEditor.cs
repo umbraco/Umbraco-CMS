@@ -2,13 +2,13 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -18,7 +18,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "contentpicker",
     ValueType = ValueTypes.Text,
     Group = Constants.PropertyEditors.Groups.Pickers,
-    Icon = "icon-page-add")]
+    Icon = "icon-page-add",
+    ValueEditorIsReusable = true)]
 public class MultiNodeTreePickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -41,6 +42,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>

@@ -88,55 +88,83 @@ Use this directive to render a button with a dropdown of alternative actions.
 @param {string=} direction Set the direction of the dropdown ("up", "down").
 @param {string=} float Set the float of the dropdown. ("left", "right").
 **/
-
 (function () {
-    'use strict';
+  'use strict';
 
-    function ButtonGroupDirective() {
+  function ButtonGroupDirective() {
 
-        function link(scope) {
+    function controller($scope) {
+      $scope.toggleStyle = null;
+      $scope.blockElement = false;
 
-            scope.dropdown = {
-                isOpen: false
-            };
+      var buttonStyle = $scope.buttonStyle;
+      if (buttonStyle) {
+        // Make it possible to pass in multiple styles
+        if (buttonStyle.startsWith("[") && buttonStyle.endsWith("]")) {
+          // when using an attr it will always be a string so we need to remove square brackets and turn it into and array
+          var withoutBrackets = buttonStyle.replace(/[\[\]']+/g, '');
+          // split array by , + make sure to catch whitespaces
+          var array = withoutBrackets.split(/\s?,\s?/g);
 
-            scope.toggleDropdown = function() {
-                scope.dropdown.isOpen = !scope.dropdown.isOpen;
-            };
-
-            scope.closeDropdown = function() {
-                scope.dropdown.isOpen = false;
-            };
-
-            scope.executeMenuItem = function(subButton) {
-                subButton.handler();
-                scope.closeDropdown();
-            };
-
+          Utilities.forEach(array, item => {
+            if (item === "block") {
+              $scope.blockElement = true;
+            } else {
+              $scope.toggleStyle = ($scope.toggleStyle ? $scope.toggleStyle + " " : "") + "btn-" + item;
+            }
+          });
+        } else {
+          if (buttonStyle === "block") {
+            $scope.blockElement = true;
+          } else {
+            $scope.toggleStyle = "btn-" + buttonStyle;
+          }
         }
-
-        var directive = {
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/buttons/umb-button-group.html',
-            scope: {
-                defaultButton: "=",
-                subButtons: "=",
-                state: "=?",
-                direction: "@?",
-                float: "@?",
-                buttonStyle: "@?",
-                size: "@?",
-                icon: "@?",
-                label: "@?",
-                labelKey: "@?"
-            },
-            link: link
-        };
-
-        return directive;
+      }
     }
 
-    angular.module('umbraco.directives').directive('umbButtonGroup', ButtonGroupDirective);
+    function link(scope) {
+      scope.dropdown = {
+        isOpen: false
+      };
 
+      scope.toggleDropdown = function () {
+        scope.dropdown.isOpen = !scope.dropdown.isOpen;
+      };
+
+      scope.closeDropdown = function () {
+        scope.dropdown.isOpen = false;
+      };
+
+      scope.executeMenuItem = function (subButton) {
+        subButton.handler();
+        scope.closeDropdown();
+      };
+    }
+
+    var directive = {
+      restrict: 'E',
+      replace: true,
+      templateUrl: 'views/components/buttons/umb-button-group.html',
+      controller: controller,
+      scope: {
+        defaultButton: "=",
+        subButtons: "=",
+        state: "=?",
+        direction: "@?",
+        float: "@?",
+        buttonStyle: "@?",
+        size: "@?",
+        icon: "@?",
+        label: "@?",
+        labelKey: "@?",
+        disabled: "<?"
+      },
+      link: link
+    };
+
+    return directive;
+  }
+
+  angular.module('umbraco.directives').directive('umbButtonGroup', ButtonGroupDirective);
 })();

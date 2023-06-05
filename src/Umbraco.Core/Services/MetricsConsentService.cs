@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -60,7 +60,7 @@ public class MetricsConsentService : IMetricsConsentService
         if (analyticsLevelString is null ||
             Enum.TryParse(analyticsLevelString, out TelemetryLevel analyticsLevel) is false)
         {
-            return TelemetryLevel.Basic;
+            return TelemetryLevel.Detailed;
         }
 
         return analyticsLevel;

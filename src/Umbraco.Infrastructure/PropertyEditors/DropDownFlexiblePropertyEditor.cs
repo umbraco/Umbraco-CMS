@@ -2,10 +2,10 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -14,7 +14,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     "Dropdown",
     "dropdownFlexible",
     Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-indent")]
+    Icon = "icon-indent",
+    ValueEditorIsReusable = true)]
 public class DropDownFlexiblePropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;
@@ -45,6 +46,7 @@ public class DropDownFlexiblePropertyEditor : DataEditor
         _textService = textService;
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     protected override IDataValueEditor CreateValueEditor() =>

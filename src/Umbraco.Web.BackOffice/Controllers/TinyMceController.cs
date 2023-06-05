@@ -45,7 +45,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
     {
         // Create an unique folder path to help with concurrent users to avoid filename clash
         var imageTempPath =
-            _hostingEnvironment.MapPathWebRoot(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid());
+            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempImageUploads + "/" + Guid.NewGuid());
 
         // Ensure image temp path exists
         if (Directory.Exists(imageTempPath) == false)
@@ -81,7 +81,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
         }
 
         var newFilePath = imageTempPath + Path.DirectorySeparatorChar + safeFileName;
-        var relativeNewFilePath = _ioHelper.GetRelativePath(newFilePath);
+        var relativeNewFilePath = GetRelativePath(newFilePath);
 
         await using (FileStream stream = System.IO.File.Create(newFilePath))
         {
@@ -89,5 +89,18 @@ public class TinyMceController : UmbracoAuthorizedApiController
         }
 
         return Ok(new { tmpLocation = relativeNewFilePath });
+    }
+
+    // Use private method istead of _ioHelper.GetRelativePath as that is relative for the webroot and not the content root.
+    private string GetRelativePath(string path)
+    {
+        if (path.IsFullPath())
+        {
+            var rootDirectory = _hostingEnvironment.MapPathContentRoot("~");
+            var relativePath = _ioHelper.PathStartsWith(path, rootDirectory) ? path[rootDirectory.Length..] : path;
+            path = relativePath;
+        }
+
+        return PathUtility.EnsurePathIsApplicationRootPrefixed(path);
     }
 }

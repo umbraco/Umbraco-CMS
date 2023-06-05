@@ -1,6 +1,4 @@
-using System;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -16,7 +14,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Persistence.Sqlite;
@@ -26,9 +23,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Website.Controllers;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
@@ -254,6 +249,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// </summary>
         protected virtual void ConfigureTestServices(IServiceCollection services)
         {
+
         }
 
         protected void Configure(IApplicationBuilder app)

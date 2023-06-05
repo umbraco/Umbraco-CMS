@@ -2,7 +2,7 @@
 <language alias="cs" intName="Czech" localName="česky" lcid="5" culture="cs-CZ">
   <creator>
     <name>Umbraco komunita</name>
-    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://docs.umbraco.com/umbraco-cms/extending/language-files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Kultura a názvy hostitelů</key>
@@ -254,7 +254,7 @@
     <key alias="childItems" version="7.0">Podřízené položky</key>
     <key alias="target" version="7.0">Cíl</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
@@ -781,8 +781,8 @@
     <key alias="databaseUpgradeDone"><![CDATA[Vaše databáze byla povýšená na konečnou verzi %0%.<br />Stiskněte <strong>Následující</strong> pro pokračování. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Vaše současná databáze je aktuální!. Klikněte na <strong>následující</strong>, pro pokračování konfiguračního průvodce]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Heslo výchozího uživatele musí být změněno!</strong>]]></key>
-    <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
-    <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <strong>Následující</strong> pro pokračování.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <strong>Následující</strong> pro pokračování.]]></key>
     <key alias="defaultUserPasswordChanged">Heslo je změněno!</key>
     <key alias="greatStart">Mějte skvělý start, sledujte naše uváděcí videa</key>
     <key alias="None">Není nainstalováno.</key>
@@ -797,7 +797,7 @@
     <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Vaše nastavení oprávnění může být problém!</strong>
       <br/><br />
       Můžete provozovat Umbraco bez potíží, ale nebudete smět vytvářet složky a instalovat balíčky, které jsou doporučené pro plné využívání všech možností umbraca.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Vaše nastavení oprívnění není připraveno pro umbraco!</strong>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Vaše nastavení oprívnění není připraveno pro Umbraco!</strong>
           <br /><br />
           Abyste mohli Umbraco provozovat, budete muset aktualizovat Vaše nastavení oprávnění.]]></key>
     <key alias="permissionsPerfect"><![CDATA[<strong>Vaše nastavení oprávnění je dokonalé!</strong><br /><br />
@@ -838,7 +838,7 @@
     <key alias="step3">Krok 3/5: Ověřování oprávnění k souborům</key>
     <key alias="step4">Krok 4/5: Kontrola zabezpečení umbraca</key>
     <key alias="step5">Krok 5/5: Umbraco je připraveno a můžete začít</key>
-    <key alias="thankYou">Děkujeme, že jeste si vybrali umbraco</key>
+    <key alias="thankYou">Děkujeme, že jeste si vybrali Umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Prohlédněte si svůj nový web</h3>
     Nainstalovali jste Runway, tak proč se nepodívat, jak Váš nový web vypadá.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Další pomoc a informace</h3>
@@ -1194,7 +1194,6 @@
   </area>
   <area alias="rollback">
     <key alias="headline">Vyberte verzi, kterou chcete porovnat s aktuální verzí</key>
-    <key alias="currentVersion">Současná verze</key>
     <key alias="diffHelp"><![CDATA[Tohle ukazuje rozdíly mezi současnou verzi a vybranou verzi<br /><del>Červený</del> text nebude ve vybrané verzi zobrazen, <ins>zelený znamená přidaný</ins>].]]></key>
     <key alias="documentRolledBack">Dokument byl vrácen na starší verzi</key>
     <key alias="htmlHelp">Tohle zobrazuje vybranou verzi jako html, jestliže chcete vidět rozdíly mezi 2 verzemi najednou, použijte rozdílové zobrazení</key>
@@ -1379,7 +1378,7 @@
     <key alias="insertMacroDesc">
       Makro je konfigurovatelná součást, která je skvělá pro opakovaně použitelné části návrhu, kde potřebujete předat parametry, jako jsou galerie, formuláře a seznamy.
     </key>
-    <key alias="insertPageField">Vložit pole stránky umbraco</key>
+    <key alias="insertPageField">Vložit pole stránky Umbraco</key>
     <key alias="insertPageFieldDesc">Zobrazuje hodnotu pojmenovaného pole z aktuální stránky s možnostmi upravit hodnotu nebo alternativní hodnoty.</key>
     <key alias="insertPartialView">Částečná šablona</key>
     <key alias="insertPartialViewDesc">
@@ -1870,8 +1869,8 @@
     <key alias="stateInactive">Neaktivní</key>
     <key alias="sortNameAscending">Jméno (A-Z)</key>
     <key alias="sortNameDescending">Jméno (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nejnovější</key>
-    <key alias="sortCreateDateDescending">Nejstarší</key>
+    <key alias="sortCreateDateAscending">Nejstarší</key>
+    <key alias="sortCreateDateDescending">Nejnovější</key>
     <key alias="sortLastLoginDateDescending">Poslední přihlášení</key>
     <key alias="noUserGroupsAdded">Nebyly přidány žádné skupiny uživatelů</key>
   </area>
@@ -1957,7 +1956,7 @@
     <key alias="checkGroup">Zkontrolovat skupinu</key>
     <key alias="helpText">
       <![CDATA[
-        <p>Kontrola vyhodnocuje různé oblasti vašeho webu z hlediska nastavení osvědčených postupů, konfigurace, potenciálních problémů atd. Problémy lze snadno vyřešit stisknutím tlačítka. Můžete přidat své vlastní kontroly, podívejte se na <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">dokumentaci pro více informací</a> o vlastních kontrolách.</p>
+        <p>Kontrola vyhodnocuje různé oblasti vašeho webu z hlediska nastavení osvědčených postupů, konfigurace, potenciálních problémů atd. Problémy lze snadno vyřešit stisknutím tlačítka. Můžete přidat své vlastní kontroly, podívejte se na <a href="https://docs.umbraco.com/umbraco-cms/extending/health-check" target="_blank" rel="noopener" class="btn-link -underline">dokumentaci pro více informací</a> o vlastních kontrolách.</p>
         ]]>
     </key>
   </area>
@@ -2132,7 +2131,7 @@
     <key alias="performanceProfiling">Profilování výkonu</key>
     <key alias="performanceProfilingDescription">
       <![CDATA[
-                <p> Umbraco aktuálně běží v režimu ladění. To znamená, že můžete použít vestavěný profiler výkonu k vyhodnocení výkonu při vykreslování stránek. </p> <p> Pokud chcete aktivovat profiler pro konkrétní vykreslení stránky, jednoduše při požadavku na stránku jednoduše přidejte <b>umbDebug=true</b> do URL.</p> <p> Pokud chcete, aby byl profiler ve výchozím nastavení aktivován pro všechna vykreslení stránky, můžete použít přepínač níže. Ve vašem prohlížeči nastaví soubor cookie, který automaticky aktivuje profiler. Jinými slovy, profiler bude ve výchozím nastavení aktivní pouze ve <i> vašem </i> prohlížeči, ne v ostatních. </p>
+                <p> Umbraco aktuálně běží v režimu ladění. To znamená, že můžete použít vestavěný profiler výkonu k vyhodnocení výkonu při vykreslování stránek. </p> <p> Pokud chcete aktivovat profiler pro konkrétní vykreslení stránky, jednoduše při požadavku na stránku jednoduše přidejte <strong>umbDebug=true</strong> do URL.</p> <p> Pokud chcete, aby byl profiler ve výchozím nastavení aktivován pro všechna vykreslení stránky, můžete použít přepínač níže. Ve vašem prohlížeči nastaví soubor cookie, který automaticky aktivuje profiler. Jinými slovy, profiler bude ve výchozím nastavení aktivní pouze ve <em> vašem </em> prohlížeči, ne v ostatních. </p>
         ]]>
     </key>
     <key alias="activateByDefault">Ve výchozím stavu aktivovat profiler</key>
@@ -2153,7 +2152,7 @@
     <key alias="more">Zjistit více</key>
     <key alias="bulletPointOne">
       <![CDATA[
-            Další informace o práci s položkami naleznete v části Nastavení <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">v sekci Dokumentace</a> v Our Umbraco
+            Další informace o práci s položkami naleznete v části Nastavení <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections" target="_blank" rel="noopener">v sekci Dokumentace</a> v Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">

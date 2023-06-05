@@ -59,6 +59,7 @@ internal class ContentPropertyBasicMapper<TDestination>
         dest.Alias = property.Alias;
         dest.PropertyEditor = editor;
         dest.Editor = editor.Alias;
+        dest.SupportsReadOnly = editor.SupportsReadOnly;
         dest.DataTypeKey = property.PropertyType!.DataTypeKey;
 
         // if there's a set of property aliases specified, we will check if the current property's value should be mapped.

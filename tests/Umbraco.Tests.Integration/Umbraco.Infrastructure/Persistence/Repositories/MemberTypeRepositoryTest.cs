@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -45,8 +44,11 @@ public class MemberTypeRepositoryTest : UmbracoIntegrationTest
 
             var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
+            // if there are any standard properties, they all get added to a single group
+            var expectedGroupCount = standardProps.Count > 0 ? 2 : 1;
+
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.PropertyGroups.Count, Is.EqualTo(2));
+            Assert.That(sut.PropertyGroups.Count, Is.EqualTo(expectedGroupCount));
             Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
             Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
@@ -228,111 +230,25 @@ public class MemberTypeRepositoryTest : UmbracoIntegrationTest
     [Test]
     public void Bug_Changing_Built_In_Member_Type_Property_Type_Aliases_Results_In_Exception()
     {
-        var stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
-
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
-        {
-            var repository = CreateRepository(provider);
-
-            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType("mtype");
-
-            // created without the stub properties
-            Assert.AreEqual(1, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3, memberType.PropertyTypes.Count());
-
-            // saving *new* member type adds the stub properties
-            repository.Save(memberType);
-
-            // saving has added (and saved) the stub properties
-            Assert.AreEqual(2, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
-
-            foreach (var stub in stubs)
-            {
-                var prop = memberType.PropertyTypes.First(x => x.Alias == stub.Key);
-                prop.Alias += "__0000";
-            }
-
-            // saving *existing* member type does *not* ensure stub properties
-            repository.Save(memberType);
-
-            // therefore, nothing has changed
-            Assert.AreEqual(2, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
-
-            // fetching ensures that the stub properties are there
-            memberType = repository.Get("mtype");
-            Assert.IsNotNull(memberType);
-
-            Assert.AreEqual(2, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3 + (stubs.Count * 2), memberType.PropertyTypes.Count());
-        }
+        // This test was initially deleted but that broke the build as it was marked as a breaking change
+        // https://github.com/umbraco/Umbraco-CMS/pull/14060
+        // Easiest fix for now is to leave the test and just don't do anything
     }
 
     [Test]
     public void Built_In_Member_Type_Properties_Are_Automatically_Added_When_Creating()
     {
-        var stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
-
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
-        {
-            var repository = CreateRepository(provider);
-
-            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-
-            // created without the stub properties
-            Assert.AreEqual(1, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3, memberType.PropertyTypes.Count());
-
-            // saving *new* member type adds the stub properties
-            repository.Save(memberType);
-
-            // saving has added (and saved) the stub properties
-            Assert.AreEqual(2, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
-
-            // getting with stub properties
-            memberType = repository.Get(memberType.Id);
-
-            Assert.AreEqual(2, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
-        }
+        // This test was initially deleted but that broke the build as it was marked as a breaking change
+        // https://github.com/umbraco/Umbraco-CMS/pull/14060
+        // Easiest fix for now is to leave the test and just don't do anything
     }
 
     [Test]
     public void Built_In_Member_Type_Properties_Missing_Are_Automatically_Added_When_Creating()
     {
-        var stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
-
-        var provider = ScopeProvider;
-        using (provider.CreateScope())
-        {
-            var repository = CreateRepository(provider);
-
-            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-
-            // created without the stub properties
-            Assert.AreEqual(1, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3, memberType.PropertyTypes.Count());
-
-            // add one stub property, others are still missing
-            memberType.AddPropertyType(stubs.First().Value, Constants.Conventions.Member.StandardPropertiesGroupAlias, Constants.Conventions.Member.StandardPropertiesGroupName);
-
-            // saving *new* member type adds the (missing) stub properties
-            repository.Save(memberType);
-
-            // saving has added (and saved) the (missing) stub properties
-            Assert.AreEqual(2, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
-
-            // getting with stub properties
-            memberType = repository.Get(memberType.Id);
-
-            Assert.AreEqual(2, memberType.PropertyGroups.Count);
-            Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
-        }
+        // This test was initially deleted but that broke the build as it was marked as a breaking change
+        // https://github.com/umbraco/Umbraco-CMS/pull/14060
+        // Easiest fix for now is to leave the test and just don't do anything
     }
 
     // This is to show that new properties are created for each member type - there was a bug before

@@ -1,8 +1,11 @@
 using System.Globalization;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
@@ -29,6 +32,7 @@ public class UserMapDefinition : IMapDefinition
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ILocalizedTextService _textService;
     private readonly IUserService _userService;
+    private readonly ILocalizationService _localizationService;
 
     public UserMapDefinition(
         ILocalizedTextService textService,
@@ -40,7 +44,8 @@ public class UserMapDefinition : IMapDefinition
         IOptions<GlobalSettings> globalSettings,
         MediaFileManager mediaFileManager,
         IShortStringHelper shortStringHelper,
-        IImageUrlGenerator imageUrlGenerator)
+        IImageUrlGenerator imageUrlGenerator,
+        ILocalizationService localizationService)
     {
         _sectionService = sectionService;
         _entityService = entityService;
@@ -52,6 +57,34 @@ public class UserMapDefinition : IMapDefinition
         _mediaFileManager = mediaFileManager;
         _shortStringHelper = shortStringHelper;
         _imageUrlGenerator = imageUrlGenerator;
+        _localizationService = localizationService;
+    }
+
+    [Obsolete("Please use constructor that takes an ILocalizationService instead")]
+    public UserMapDefinition(
+        ILocalizedTextService textService,
+        IUserService userService,
+        IEntityService entityService,
+        ISectionService sectionService,
+        AppCaches appCaches,
+        ActionCollection actions,
+        IOptions<GlobalSettings> globalSettings,
+        MediaFileManager mediaFileManager,
+        IShortStringHelper shortStringHelper,
+        IImageUrlGenerator imageUrlGenerator)
+    : this(
+        textService,
+        userService,
+        entityService,
+        sectionService,
+        appCaches,
+        actions,
+        globalSettings,
+        mediaFileManager,
+        shortStringHelper,
+        imageUrlGenerator,
+        StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+    {
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
@@ -101,6 +134,7 @@ public class UserMapDefinition : IMapDefinition
         target.Name = source.Name;
         target.Permissions = source.DefaultPermissions;
         target.Key = source.Key;
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
         var id = GetIntId(source.Id);
         if (id > 0)
@@ -114,6 +148,15 @@ public class UserMapDefinition : IMapDefinition
             foreach (var section in source.Sections)
             {
                 target.AddAllowedSection(section);
+            }
+        }
+
+        target.ClearAllowedLanguages();
+        if (source.AllowedLanguages is not null)
+        {
+            foreach (var language in source.AllowedLanguages)
+            {
+                target.AddAllowedLanguage(language);
             }
         }
     }
@@ -211,7 +254,7 @@ public class UserMapDefinition : IMapDefinition
         }
     }
 
-    // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Sections
+        // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Languages -Sections
     // Umbraco.Code.MapAll -Notifications -Udi -Trashed -AdditionalData -IsSystemUserGroup
     private void Map(IReadOnlyUserGroup source, UserGroupBasic target, MapperContext context)
     {
@@ -222,11 +265,12 @@ public class UserMapDefinition : IMapDefinition
         target.ParentId = -1;
         target.Path = "-1," + source.Id;
         target.IsSystemUserGroup = source.IsSystemUserGroup();
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
-        MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+        MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
     }
 
-    // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications
+    // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Languages -Sections -Notifications
     // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -IsSystemUserGroup
     private void Map(IUserGroup source, UserGroupBasic target, MapperContext context)
     {
@@ -239,8 +283,9 @@ public class UserMapDefinition : IMapDefinition
         target.Path = "-1," + source.Id;
         target.UserCount = source.UserCount;
         target.IsSystemUserGroup = source.IsSystemUserGroup();
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
-        MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+        MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
     }
 
     // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -AssignedPermissions
@@ -262,7 +307,7 @@ public class UserMapDefinition : IMapDefinition
         }
     }
 
-    // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications -Udi
+    // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Languages -Sections -Notifications -Udi
     // Umbraco.Code.MapAll -Trashed -AdditionalData -Users -AssignedPermissions
     private void Map(IUserGroup source, UserGroupDisplay target, MapperContext context)
     {
@@ -276,8 +321,9 @@ public class UserMapDefinition : IMapDefinition
         target.Path = "-1," + source.Id;
         target.UserCount = source.UserCount;
         target.IsSystemUserGroup = source.IsSystemUserGroup();
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
-        MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+        MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 
         // Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
         // this will cause an N+1 and we'll need to change how this works.
@@ -394,6 +440,7 @@ public class UserMapDefinition : IMapDefinition
     private void Map(IUser source, UserDetail target, MapperContext context)
     {
         target.AllowedSections = source.AllowedSections;
+        target.AllowedLanguageIds = source.CalculateAllowedLanguageIds(_localizationService);
         target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
         target.Email = source.Email;
@@ -410,12 +457,21 @@ public class UserMapDefinition : IMapDefinition
     }
 
     // helpers
-    private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
+    private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<int> sourceAllowedLanguages, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
     {
-        IEnumerable<ISection> allSections = _sectionService.GetSections();
-        target.Sections = context
-            .MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias)))
-            .WhereNotNull();
+        var allLanguages = _localizationService.GetAllLanguages();
+        var applicableLanguages = Enumerable.Empty<ILanguage>();
+
+
+        if (sourceAllowedLanguages.Any())
+        {
+            applicableLanguages = allLanguages.Where(x => sourceAllowedLanguages.Contains(x.Id));
+        }
+
+        target.Languages = context.MapEnumerable<ILanguage, ContentEditing.Language>(applicableLanguages).WhereNotNull();
+
+        var allSections = _sectionService.GetSections();
+        target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias))).WhereNotNull();
 
         if (sourceStartMediaId > 0)
         {
