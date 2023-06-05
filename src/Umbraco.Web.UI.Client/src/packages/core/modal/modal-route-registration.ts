@@ -1,5 +1,5 @@
 import { UmbModalContext } from './modal-handler.js';
-import { UmbModalConfig, UmbModalManagerContext } from './modal.context.js';
+import { UmbModalConfig, UmbModalManagerContext } from './modal-manager.context.js';
 import { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
