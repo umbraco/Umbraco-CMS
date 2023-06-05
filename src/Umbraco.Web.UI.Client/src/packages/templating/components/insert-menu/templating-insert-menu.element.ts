@@ -6,14 +6,14 @@ import {
 	CodeSnippetType,
 	UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_MODAL,
 } from '../../modals/insert-choose-type-sidebar.element.js';
-import { customElement, property , css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbDictionaryItemPickerModalResult,
-	UmbModalContext,
+	UmbModalManagerContext,
 	UmbModalHandler,
 	UmbModalToken,
 	UmbPartialViewPickerModalResult,
@@ -33,7 +33,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	@property()
 	value = '';
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	#openModal?: UmbModalHandler;
 
@@ -41,7 +41,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -143,8 +143,8 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 					id="insert-button"
 					label="open insert menu">
 					<ul id="insert-menu" slot="dropdown">
-						<!-- 
-						TODO: uncomment when insert value has endpoint and is properly implemented	
+						<!--
+						TODO: uncomment when insert value has endpoint and is properly implemented
 						<li>
 							<uui-menu-item
 								class="insert-menu-item"

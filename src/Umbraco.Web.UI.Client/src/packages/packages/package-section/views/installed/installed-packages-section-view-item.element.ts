@@ -1,7 +1,11 @@
-import { html, css, nothing , ifDefined , customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPackageView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -40,7 +44,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	private _packageView?: ManifestPackageView;
 
 	#notificationContext?: UmbNotificationContext;
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -48,7 +52,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 			this.#notificationContext = instance;
 		});
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

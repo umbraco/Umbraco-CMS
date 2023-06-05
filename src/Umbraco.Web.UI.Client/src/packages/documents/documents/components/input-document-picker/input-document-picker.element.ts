@@ -3,8 +3,8 @@ import type { UmbDocumentTreeStore } from '../../repository/document.tree.store.
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
 	UMB_DOCUMENT_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
@@ -71,7 +71,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 	@state()
 	private _items?: Array<DocumentTreeItemResponseModel>;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 	private _documentStore?: UmbDocumentTreeStore;
 	private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 
@@ -93,7 +93,7 @@ export class UmbInputDocumentPickerElement extends FormControlMixin(UmbLitElemen
 			this._documentStore = instance;
 			this._observePickedDocuments();
 		});
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}

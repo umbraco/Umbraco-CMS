@@ -1,6 +1,10 @@
 import { UUIButtonState, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -22,12 +26,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	@state()
 	private _buttonStateCollect: UUIButtonState = undefined;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}

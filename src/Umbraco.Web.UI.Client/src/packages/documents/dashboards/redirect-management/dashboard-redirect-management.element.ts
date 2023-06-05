@@ -5,7 +5,11 @@ import {
 	UUIPaginationEvent,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CONFIRM_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	RedirectManagementResource,
@@ -43,11 +47,11 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	@query('uui-pagination')
 	private _pagination?: UUIPaginationElement;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (_instance) => {
 			this._modalContext = _instance;
 		});
 	}

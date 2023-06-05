@@ -15,7 +15,7 @@ export interface UmbModalConfig {
 	size?: UUIModalSidebarSize;
 }
 
-export class UmbModalContext {
+export class UmbModalManagerContext {
 	host: UmbControllerHostElement;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
 	#modals = new BehaviorSubject(<Array<UmbModalHandler>>[]);
@@ -85,4 +85,4 @@ export class UmbModalContext {
 	}
 }
 
-export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');
+export const UMB_MODAL_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbModalManagerContext>('UmbModalManagerContext');

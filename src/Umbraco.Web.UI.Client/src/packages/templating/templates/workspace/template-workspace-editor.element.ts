@@ -5,7 +5,11 @@ import type { UmbTemplateWorkspaceContext } from './template-workspace.context.j
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_MODAL_CONTEXT_TOKEN, UMB_TEMPLATE_PICKER_MODAL, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_TEMPLATE_PICKER_MODAL,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -39,7 +43,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 
@@ -101,7 +105,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		this._codeEditor?.insert(value);
 	}
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);

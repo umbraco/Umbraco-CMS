@@ -1,12 +1,12 @@
 import { DATA_TYPE_REPOSITORY_ALIAS } from '../../../repository/manifests.js';
 import { UmbDataTypeCreateOptionsModalData } from './index.js';
-import { html , customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UmbModalContext,
+	UmbModalManagerContext,
 	UmbModalHandler,
 	UMB_FOLDER_MODAL,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -18,11 +18,11 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 	@property({ type: Object })
 	data?: UmbDataTypeCreateOptionsModalData;
 
-	#modalContext?: UmbModalContext;
+	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

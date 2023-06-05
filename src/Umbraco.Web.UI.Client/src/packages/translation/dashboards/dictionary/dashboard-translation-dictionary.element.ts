@@ -4,7 +4,11 @@ import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/e
 import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalContext, UMB_MODAL_CONTEXT_TOKEN, UMB_CREATE_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_CREATE_DICTIONARY_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-dashboard-translation-dictionary')
@@ -21,7 +25,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#repo!: UmbDictionaryRepository;
 
-	#modalContext!: UmbModalContext;
+	#modalContext!: UmbModalManagerContext;
 
 	#tableItems: Array<UmbTableItem> = [];
 
@@ -32,7 +36,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbContextConsumerController(this, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

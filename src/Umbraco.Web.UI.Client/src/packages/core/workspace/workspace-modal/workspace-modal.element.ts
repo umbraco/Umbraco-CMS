@@ -21,6 +21,10 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 		this.modalHandler?.submit(event.detail);
 	};
 
+	/**
+	 * TODO: Consider if this binding and events integration is the right for communicating back the modal handler. Or if we should go with some Context API. like a Modal Context API.
+	 *
+	 */
 	render() {
 		return html`<umb-workspace
 			.entityType=${this.data?.entityType}

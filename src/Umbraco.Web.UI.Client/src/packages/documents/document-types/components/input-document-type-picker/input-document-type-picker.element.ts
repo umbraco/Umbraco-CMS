@@ -6,8 +6,8 @@ import { css, html, nothing, ifDefined, customElement, property, state } from '@
 import { UUITextStyles, FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { DocumentTypeResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
@@ -38,7 +38,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 	@state()
 	private _items?: Array<DocumentTypeResponseModel>;
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 	private _documentTypeStore?: UmbDocumentTypeTreeStore;
 	private _pickedItemsObserver?: UmbObserverController<EntityTreeItemResponseModel[]>;
 
@@ -48,7 +48,7 @@ export class UmbInputDocumentTypePickerElement extends FormControlMixin(UmbLitEl
 			this._documentTypeStore = instance;
 			this._observePickedDocuments();
 		});
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}

@@ -1,10 +1,10 @@
 import { UMB_MODAL_TEMPLATING_INSERT_FIELD_SIDEBAR_ALIAS } from './manifests.js';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html , customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 import {
-	UMB_MODAL_CONTEXT_TOKEN,
-	UmbModalContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
 	UmbModalToken,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalHandler,
@@ -44,11 +44,11 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this.modalHandler?.reject();
 	}
 
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -155,10 +155,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		`,
 	];
 }
-
-
-
-
 
 declare global {
 	interface HTMLElementTagNameMap {

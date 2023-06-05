@@ -1,5 +1,5 @@
 import { UmbModalHandler } from './modal-handler.js';
-import { UmbModalConfig, UmbModalContext } from './modal.context.js';
+import { UmbModalConfig, UmbModalManagerContext } from './modal.context.js';
 import { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
@@ -109,7 +109,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#modalHandler = undefined;
 	};
 
-	routeSetup(router: IRouterSlot, modalContext: UmbModalContext, params: Params) {
+	routeSetup(router: IRouterSlot, modalContext: UmbModalManagerContext, params: Params) {
 		// If already open, don't do anything:
 		if (this.active) return;
 

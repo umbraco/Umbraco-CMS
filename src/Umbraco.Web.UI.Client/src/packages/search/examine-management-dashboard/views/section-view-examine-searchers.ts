@@ -1,8 +1,8 @@
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing , customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UmbModalContext,
-	UMB_MODAL_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_EXAMINE_FIELDS_SETTINGS_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import {
@@ -23,7 +23,7 @@ interface ExposedSearchResultField {
 
 @customElement('umb-dashboard-examine-searcher')
 export class UmbDashboardExamineSearcherElement extends UmbLitElement {
-	private _modalContext?: UmbModalContext;
+	private _modalContext?: UmbModalManagerContext;
 
 	@property()
 	searcherName!: string;
@@ -42,7 +42,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
 	}

@@ -1,5 +1,5 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import { css, html , customElement, property, state , repeat , ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
@@ -8,7 +8,7 @@ import {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_MODAL_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UMB_PROPERTY_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
 import './document-type-workspace-view-edit-property.element.js';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
@@ -80,7 +80,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	@state()
 	_propertyStructure: Array<PropertyTypeResponseModelBaseModel> = [];
 
-	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
+	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 
 	constructor() {
 		super();
@@ -90,7 +90,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure
 			);
 		});
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
 			this.#propertySorter.setModel(this._propertyStructure);

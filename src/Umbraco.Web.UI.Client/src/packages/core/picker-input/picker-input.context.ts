@@ -2,8 +2,8 @@ import { UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backo
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UMB_CONFIRM_MODAL,
-	UMB_MODAL_CONTEXT_TOKEN,
-	UmbModalContext,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
 	UmbModalToken,
 	UmbPickerModalData,
 } from '@umbraco-cms/backoffice/modal';
@@ -17,7 +17,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
-	public modalContext?: UmbModalContext;
+	public modalManager?: UmbModalManagerContext;
 
 	public pickableFilter?: (item: ItemType) => boolean = () => true;
 
@@ -50,8 +50,8 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 		this.#init = Promise.all([
 			this.#itemManager.init,
-			new UmbContextConsumerController(this.host, UMB_MODAL_CONTEXT_TOKEN, (instance) => {
-				this.modalContext = instance;
+			new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+				this.modalManager = instance;
 			}).asPromise(),
 		]);
 	}
@@ -66,9 +66,9 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
 	openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
-		if (!this.modalContext) throw new Error('Modal context is not initialized');
+		if (!this.modalManager) throw new Error('Modal manager context is not initialized');
 
-		const modalHandler = this.modalContext.open(this.modalAlias, {
+		const modalHandler = this.modalManager.open(this.modalAlias, {
 			multiple: this.max === 1 ? false : true,
 			selection: [...this.getSelection()],
 			pickableFilter: this.pickableFilter,
@@ -90,7 +90,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
-		const modalHandler = this.modalContext?.open(UMB_CONFIRM_MODAL, {
+		const modalHandler = this.modalManager?.open(UMB_CONFIRM_MODAL, {
 			color: 'danger',
 			headline: `Remove ${item.name}?`,
 			content: 'Are you sure you want to remove this item',
