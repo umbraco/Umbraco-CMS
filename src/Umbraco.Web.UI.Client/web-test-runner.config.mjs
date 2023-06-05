@@ -81,13 +81,20 @@ export default {
 						'@umbraco-cms/backoffice/property-editor': './src/packages/core/property-editor/index.ts',
 
 						'@umbraco-cms/backoffice/document': './src/packages/documents/documents/index.ts',
+						'@umbraco-cms/backoffice/document-blueprints': './src/packages/documents/document-blueprints/index.ts',
+						'@umbraco-cms/backoffice/document-types': './src/packages/documents/document-types/index.ts',
+						'@umbraco-cms/backoffice/media/media': './src/packages/media/media/index.ts',
+						'@umbraco-cms/backoffice/media/media-types': './src/packages/media/media-types/index.ts',
+						'@umbraco-cms/backoffice/member': './src/packages/members/members/index.ts',
+						'@umbraco-cms/backoffice/member-groups': './src/packages/members/member-groups/index.ts',
+						'@umbraco-cms/backoffice/member-types': './src/packages/members/member-types/index.ts',
 
 						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
 						'@umbraco-cms/backoffice/themes': './src/packages/settings/themes/index.ts',
 
 						'@umbraco-cms/backoffice/user-group': './src/packages/users/user-groups/index.ts',
-						"@umbraco-cms/backoffice/current-user": "./src/packages/users/current-user/index.ts",
-						"@umbraco-cms/backoffice/users": "./src/packages/users/users/index.ts",
+						'@umbraco-cms/backoffice/current-user': './src/packages/users/current-user/index.ts',
+						'@umbraco-cms/backoffice/users': './src/packages/users/users/index.ts',
 
 						'@umbraco-cms/backoffice/code-editor': './src/packages/templating/code-editor/index.ts',
 

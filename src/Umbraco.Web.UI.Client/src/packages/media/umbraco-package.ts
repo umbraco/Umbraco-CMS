@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Media Management Entry Point',
 		alias: 'Umb.EntryPoint.MediaManagement',
 		type: 'entryPoint',
-		loader: () => import('./index.js'),
+		loader: () => import('./package-entry-point.js'),
 	},
 ];
