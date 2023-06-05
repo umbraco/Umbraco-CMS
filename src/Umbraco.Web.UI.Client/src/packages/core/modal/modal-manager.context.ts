@@ -1,4 +1,4 @@
-import { UmbModalContext, UmbModalContextClass } from './modal-handler.js';
+import { UmbModalContext, UmbModalContextClass } from './modal-context.js';
 import type { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
