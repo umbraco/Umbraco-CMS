@@ -107,6 +107,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		this.modalElement.appendChild(this.#modalRouterElement);
 		this.#observeModal(modalAlias.toString(), combinedData);
 
+		// Note, We are doing the Typing dance here because of the way we are correcting the submit method attribute type.
 		new UmbContextProviderController(
 			host,
 			UMB_MODAL_CONTEXT_TOKEN,
@@ -193,11 +194,6 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 			this.#modalRouterElement.removeChild(innerElement);
 			this.#innerElement.next(undefined);
 		}
-	}
-
-	public destroy() {
-		super.destroy();
-		// TODO: Make sure to clean up..
 	}
 }
 
