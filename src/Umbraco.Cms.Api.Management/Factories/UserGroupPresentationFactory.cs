@@ -233,7 +233,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             }
 
             target.StartMediaId = mediaId;
-        }else
+        }
+        else
         {
             target.StartMediaId = null;
         }
