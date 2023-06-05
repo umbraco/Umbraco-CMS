@@ -44,19 +44,19 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 export class UmbModalContextClass<ModalData extends object = object, ModalResult = unknown> {
 	#host: UmbControllerHostElement;
 
-	private _submitPromise: Promise<ModalResult>;
-	private _submitResolver?: (value: ModalResult) => void;
-	private _submitRejecter?: () => void;
+	#submitPromise: Promise<ModalResult>;
+	#submitResolver?: (value: ModalResult) => void;
+	#submitRejecter?: () => void;
 
-	public modalElement: UUIModalDialogElement | UUIModalSidebarElement;
+	public readonly modalElement: UUIModalDialogElement | UUIModalSidebarElement;
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
 
 	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
 	public readonly innerElement = this.#innerElement.asObservable();
 
-	public key: string;
-	public type: UmbModalType = 'dialog';
-	public size: UUIModalSidebarSize = 'small';
+	public readonly key: string;
+	public readonly type: UmbModalType = 'dialog';
+	public readonly size: UUIModalSidebarSize = 'small';
 
 	constructor(
 		host: UmbControllerHostElement,
@@ -80,14 +80,14 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 		const combinedData = { ...defaultData, ...data } as ModalData;
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
-		this._submitPromise = new Promise((resolve, reject) => {
-			this._submitResolver = resolve;
-			this._submitRejecter = reject;
+		this.#submitPromise = new Promise((resolve, reject) => {
+			this.#submitResolver = resolve;
+			this.#submitRejecter = reject;
 		});
 
 		this.modalElement = this.#createContainerElement();
 		this.modalElement.addEventListener('close', () => {
-			this._submitRejecter?.();
+			this.#submitRejecter?.();
 		});
 
 		/**
@@ -148,7 +148,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 
 	// note, this methods is private  argument is not defined correctly here, but requires to be fix by appending the OptionalSubmitArgumentIfUndefined type when newing up this class.
 	private submit(result?: ModalResult) {
-		this._submitResolver?.(result as ModalResult);
+		this.#submitResolver?.(result as ModalResult);
 		this.modalElement.close();
 	}
 
@@ -157,7 +157,7 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 	}
 
 	public onSubmit(): Promise<ModalResult> {
-		return this._submitPromise;
+		return this.#submitPromise;
 	}
 
 	/* TODO: modals being part of the extension registry now means that a modal element can change over time.
