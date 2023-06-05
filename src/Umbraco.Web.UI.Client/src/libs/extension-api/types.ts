@@ -71,6 +71,10 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
  */
 export interface ManifestClass<ClassType = unknown>
 	extends ManifestWithLoader<{ default: ClassConstructor<ClassType> }> {
+	
+	/**
+	 * @TJS-ignore
+	 */
 	readonly CLASS_TYPE?: ClassType;
 
 	/**
@@ -97,6 +101,10 @@ export interface ManifestClassWithClassConstructor<T = unknown> extends Manifest
 
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	extends ManifestWithLoader<{ default: ClassConstructor<ElementType> } | Omit<object, 'default'>> {
+
+	/**
+	 * @TJS-ignore
+	 */
 	readonly ELEMENT_TYPE?: ElementType;
 
 	/**
