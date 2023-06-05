@@ -1,3 +1,3 @@
-export { AstNode, Editor } from 'tinymce';
-export type { EditorEvent } from 'tinymce';
-export { default as tinymce } from 'tinymce';
+import tinymce from 'tinymce';
+import type { EditorEvent, Editor, AstNode } from 'tinymce';
+export { tinymce, Editor, AstNode, EditorEvent };

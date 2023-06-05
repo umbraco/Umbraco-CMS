@@ -204,7 +204,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 
 		this.#setLanguage(tinyConfig);
-
 		tinymce.init(tinyConfig);
 	}
 

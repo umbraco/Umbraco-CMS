@@ -29,6 +29,7 @@ const destDir = 'public/tinymce';
 const tinyAssets = {
 	source: 'node_modules/tinymce',
 	globs: [
+		'/tinymce.min.js',
 		'/license.txt',
 		'/icons/default/icons.min.js',
 		'/models/dom/model.min.js',
