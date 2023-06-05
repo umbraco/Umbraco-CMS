@@ -1,4 +1,4 @@
-import type { UmbPackage } from '../types.js';
+import type { UmbPackage } from '../../types.js';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
