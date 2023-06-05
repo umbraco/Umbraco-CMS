@@ -30,6 +30,11 @@ public interface INotificationAsyncHandler<in TNotification> : INotificationHand
     /// <returns>
     /// A <see cref="Task" /> representing the asynchronous operation.
     /// </returns>
-    Task HandleAsync(IEnumerable<TNotification> notifications, CancellationToken cancellationToken)
-        => Task.WhenAll(notifications.Select(x => HandleAsync(x, cancellationToken)));
+    async Task HandleAsync(IEnumerable<TNotification> notifications, CancellationToken cancellationToken)
+    {
+        foreach (TNotification notification in notifications)
+        {
+            await HandleAsync(notification, cancellationToken);
+        }
+    }
 }
