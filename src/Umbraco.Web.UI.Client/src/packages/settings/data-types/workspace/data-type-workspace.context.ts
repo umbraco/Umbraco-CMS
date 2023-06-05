@@ -12,17 +12,11 @@ export class UmbDataTypeWorkspaceContext
 	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	#preset?: Partial<DataTypeResponseModel>;
-
 	name = this.#data.getObservablePart((data) => data?.name);
 	id = this.#data.getObservablePart((data) => data?.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, new UmbDataTypeRepository(host));
-	}
-
-	public setPreset(preset: Partial<DataTypeResponseModel>) {
-		this.#preset = preset;
 	}
 
 	async load(id: string) {
@@ -35,8 +29,8 @@ export class UmbDataTypeWorkspaceContext
 
 	async createScaffold(parentId: string | null) {
 		let { data } = await this.repository.createScaffold(parentId);
-		if (this.#preset) {
-			data = { ...data, ...this.#preset };
+		if (this.modalContext) {
+			data = { ...data, ...this.modalContext.data.preset };
 		}
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.

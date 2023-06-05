@@ -162,7 +162,6 @@ export class UmbModalContextClass<ModalData extends object = object, ModalResult
 
 		if (innerElement) {
 			innerElement.data = this.data;
-			//innerElement.observable = this.#dataObservable;
 			innerElement.modalHandler = this;
 			innerElement.manifest = manifest;
 		}

@@ -8,14 +8,10 @@ export class UmbWorkspaceElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
 	entityType = '';
 
-	@property({ type: Object, attribute: false })
-	preset?: Record<string, unknown>;
-
 	render() {
 		if (!this.entityType) return nothing;
 		return html`<umb-extension-slot
 			type="workspace"
-			.props=${{ preset: this.preset }}
 			.filter=${(manifest: ManifestWorkspace) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
 	}
 

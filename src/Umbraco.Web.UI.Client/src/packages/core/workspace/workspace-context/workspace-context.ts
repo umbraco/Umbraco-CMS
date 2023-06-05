@@ -1,9 +1,10 @@
 import { UmbEntityWorkspaceContextInterface } from './workspace-entity-context.interface.js';
-import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 /*
 
@@ -13,8 +14,11 @@ If so we need to align on a interface that all of these implements. otherwise co
 export abstract class UmbWorkspaceContext<T, EntityType extends UmbEntityBase>
 	implements UmbEntityWorkspaceContextInterface<EntityType>
 {
-	public host: UmbControllerHostElement;
-	public repository: T;
+	public readonly host: UmbControllerHostElement;
+	public readonly repository: T;
+
+	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique.
+	public readonly modalContext?: UmbModalContext<{ preset: object }>;
 
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
@@ -23,6 +27,9 @@ export abstract class UmbWorkspaceContext<T, EntityType extends UmbEntityBase>
 		this.host = host;
 		this.repository = repository;
 		new UmbContextProviderController(host, UMB_ENTITY_WORKSPACE_CONTEXT, this);
+		new UmbContextConsumerController(host, UMB_MODAL_CONTEXT_TOKEN, (context) => {
+			(this.modalContext as UmbModalContext) = context;
+		});
 	}
 
 	getIsNew() {
@@ -34,11 +41,16 @@ export abstract class UmbWorkspaceContext<T, EntityType extends UmbEntityBase>
 	}
 
 	protected saveComplete(data: EntityType) {
-		// TODO: Should we make a Event class for this=?
-		this.host.dispatchEvent(new CustomEvent('workspace-submit', { composed: true, bubbles: true, detail: { data } }));
+		if (this.modalContext) {
+			this.submitModal(data);
+		} else {
+			// No need to have UI changing to "not new" if we are in a modal.
+			this.setIsNew(false);
+		}
+	}
 
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+	protected submitModal(data: EntityType) {
+		this.modalContext?.submit(data);
 	}
 
 	abstract getEntityId(): string | undefined; // COnsider if this should go away now that we have getUnique()
