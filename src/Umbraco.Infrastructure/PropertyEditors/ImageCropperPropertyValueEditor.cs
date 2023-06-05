@@ -24,6 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IMediaService _mediaService;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private ContentSettings _contentSettings;
@@ -37,13 +38,15 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        IDataTypeService dataTypeService)
+        IDataTypeService dataTypeService,
+        IMediaService mediaService)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _contentSettings = contentSettings.CurrentValue;
         _dataTypeService = dataTypeService;
+        _mediaService = mediaService;
         contentSettings.OnChange(x => _contentSettings = x);
     }
 
@@ -173,7 +176,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         // process the file
-        var filepath = editorJson == null ? null : ProcessFile(file, cuid, puid);
+        var filepath = editorJson == null ? null : ProcessFile(file, _mediaService.GetById(editorValue.ContentKey)!, puid);
 
         // remove all temp files
         foreach (ContentPropertyFile f in uploads)
@@ -221,7 +224,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             new JsonSerializerSettings { Formatting = Formatting.None, NullValueHandling = NullValueHandling.Ignore });
     }
 
-    private string? ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
+    private string? ProcessFile(ContentPropertyFile file, IContentBase content, Guid puid)
     {
         // process the file
         // no file, invalid file, reject change
@@ -232,7 +235,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         // get the filepath
         // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
+        var filepath = _mediaFileManager.GetMediaPath(file.FileName, content, puid); // fs-relative path
 
         using (FileStream filestream = File.OpenRead(file.TempFilePath))
         {

@@ -4,11 +4,13 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -18,6 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class FileUploadPropertyValueEditor : DataValueEditor
 {
     private readonly MediaFileManager _mediaFileManager;
+    private readonly IMediaService _mediaService;
     private ContentSettings _contentSettings;
 
     public FileUploadPropertyValueEditor(
@@ -27,10 +30,12 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         IShortStringHelper shortStringHelper,
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        IMediaService mediaService)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
+        _mediaService = mediaService;
         _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
         contentSettings.OnChange(x => _contentSettings = x);
     }
@@ -108,7 +113,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         }
 
         // process the file
-        var filepath = editorFile == null ? null : ProcessFile(file, editorValue.DataTypeConfiguration, cuid, puid);
+        var filepath = editorFile == null ? null : ProcessFile(file, editorValue.DataTypeConfiguration, _mediaService.GetById(editorValue.ContentKey)!, puid);
 
         // remove all temp files
         foreach (ContentPropertyFile f in uploads)
@@ -131,7 +136,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
         return filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
     }
 
-    private string? ProcessFile(ContentPropertyFile file, object? dataTypeConfiguration, Guid cuid, Guid puid)
+    private string? ProcessFile(ContentPropertyFile file, object? dataTypeConfiguration, IContentBase content, Guid puid)
     {
         // process the file
         // no file, invalid file, reject change
@@ -143,7 +148,7 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         // get the filepath
         // in case we are using the old path scheme, try to re-use numbers (bah...)
-        var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
+        var filepath = _mediaFileManager.GetMediaPath(file.FileName, content, puid); // fs-relative path
 
         using (FileStream filestream = File.OpenRead(file.TempFilePath))
         {

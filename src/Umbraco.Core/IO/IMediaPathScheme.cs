@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models;
+
 namespace Umbraco.Cms.Core.IO;
 
 /// <summary>
@@ -5,6 +7,16 @@ namespace Umbraco.Cms.Core.IO;
 /// </summary>
 public interface IMediaPathScheme
 {
+    /// <summary>
+    ///     Gets a media file path.
+    /// </summary>
+    /// <param name="fileManager">The media filesystem.</param>
+    /// <param name="content">The (content, media) item.</param>
+    /// <param name="propertyGuid">The property type unique identifier.</param>
+    /// <param name="filename">The file name.</param>
+    /// <returns>The filesystem-relative complete file path.</returns>
+    string GetFilePath(MediaFileManager fileManager, IContentBase content, Guid propertyGuid, string filename);
+
     /// <summary>
     ///     Gets a media file path.
     /// </summary>

@@ -26,9 +26,26 @@ public class ContentPropertyData
     public object? DataTypeConfiguration { get; }
 
     /// <summary>
+    ///     Gets or sets the content owning the property.
+    /// </summary>
+    public IContentBase? Content { get; set; }
+
+    /// <summary>
     ///     Gets or sets the unique identifier of the content owning the property.
     /// </summary>
-    public Guid ContentKey { get; set; }
+    public Guid ContentKey
+    {
+        get => Content?.Key ?? Guid.Empty;
+        set
+        {
+            if (Content == null)
+            {
+                return;
+            }
+
+            Content.Key = value;
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the unique identifier of the property type.

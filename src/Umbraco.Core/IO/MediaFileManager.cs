@@ -94,11 +94,11 @@ public sealed class MediaFileManager
     ///     Gets the file path of a media file.
     /// </summary>
     /// <param name="filename">The file name.</param>
-    /// <param name="cuid">The unique identifier of the content/media owning the file.</param>
+    /// <param name="content">The content/media owning the file.</param>
     /// <param name="puid">The unique identifier of the property type owning the file.</param>
     /// <returns>The filesystem-relative path to the media file.</returns>
     /// <remarks>With the old media path scheme, this CREATES a new media path each time it is invoked.</remarks>
-    public string GetMediaPath(string? filename, Guid cuid, Guid puid)
+    public string GetMediaPath(string? filename, IContentBase content, Guid puid)
     {
         filename = Path.GetFileName(filename);
         if (filename == null)
@@ -108,7 +108,7 @@ public sealed class MediaFileManager
 
         filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
 
-        return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
+        return _mediaPathScheme.GetFilePath(this, content, puid, filename);
     }
 
     #endregion
@@ -199,7 +199,7 @@ public sealed class MediaFileManager
         }
 
         // get the filepath, store the data
-        var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
+        var filepath = GetMediaPath(filename, content, propertyType.Key);
         FileSystem.AddFile(filepath, filestream);
         return filepath;
     }
@@ -243,7 +243,7 @@ public sealed class MediaFileManager
 
         // get the filepath
         var filename = Path.GetFileName(sourcepath);
-        var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
+        var filepath = GetMediaPath(filename, content, propertyType.Key);
         FileSystem.CopyFile(sourcepath, filepath);
         return filepath;
     }

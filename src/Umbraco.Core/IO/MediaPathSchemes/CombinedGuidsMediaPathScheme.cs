@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models;
+
 namespace Umbraco.Cms.Core.IO.MediaPathSchemes;
 
 /// <summary>
@@ -8,6 +10,10 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes;
 /// </remarks>
 public class CombinedGuidsMediaPathScheme : IMediaPathScheme
 {
+    /// <inheritdoc />
+    public string GetFilePath(MediaFileManager fileManager, IContentBase content, Guid propertyGuid, string filename) =>
+        GetFilePath(fileManager, content.Key, propertyGuid, filename);
+
     /// <inheritdoc />
     public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename)
     {

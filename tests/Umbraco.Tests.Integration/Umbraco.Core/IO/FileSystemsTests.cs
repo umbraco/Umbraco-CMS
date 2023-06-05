@@ -7,6 +7,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -36,7 +38,11 @@ public class FileSystemsTests : UmbracoIntegrationTest
     {
         var mediaFileManager = GetRequiredService<MediaFileManager>();
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
-        var virtualPath = mediaFileManager.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
+        var content = new ContentBuilder()
+            .WithId(0)
+            .WithKey(Guid.NewGuid())
+            .Build();
+        var virtualPath = mediaFileManager.GetMediaPath("file.txt", content, Guid.NewGuid());
         mediaFileManager.FileSystem.AddFile(virtualPath, memoryStream);
 
         // ~/media/1234/file.txt exists

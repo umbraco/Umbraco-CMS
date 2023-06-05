@@ -136,7 +136,7 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
             // create the property data for the property editor
             var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType?.Configuration)
             {
-                ContentKey = contentItem.PersistedContent!.Key,
+                Content = contentItem.PersistedContent,
                 PropertyTypeKey = property.PropertyType.Key,
                 Files = files
             };
