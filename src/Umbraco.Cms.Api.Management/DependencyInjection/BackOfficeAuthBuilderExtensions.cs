@@ -173,7 +173,7 @@ public static class BackOfficeAuthBuilderExtensions
             });
         }
 
-        options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
+        options.AddPolicy($"New{AuthorizationPolicies.BackOfficeAccess}", policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.RequireAuthenticatedUser();
