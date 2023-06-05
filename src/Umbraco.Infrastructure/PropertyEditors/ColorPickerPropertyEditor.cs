@@ -45,6 +45,9 @@ public class ColorPickerPropertyEditor : DataEditor
         SupportsReadOnly = true;
     }
 
+    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
+
+
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new ColorPickerConfigurationEditor(_ioHelper, _jsonSerializer, _editorConfigurationParser);

@@ -7,7 +7,7 @@ public class RedirectUrlDashboard : IDashboard
 {
     public string Alias => "contentRedirectManager";
 
-    public string[] Sections => new[] { "content" };
+    public string[] Sections => new[] { Constants.Applications.Content };
 
     public string View => "views/dashboard/content/redirecturls.html";
 

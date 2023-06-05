@@ -174,6 +174,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return false;
     }
 
+    public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
+    {
+        IEnumerable<string> items = db.Fetch<string>($"select sql from sqlite_master where type = 'table' and name = '{tableName}'")
+            .Where(x => x.Contains($"CONSTRAINT {primaryKeyName} PRIMARY KEY"));
+
+        return items.Any();
+    }
+
     public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
@@ -326,7 +334,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     {
         IEnumerable<string> tables = GetTablesInSchema(db);
 
-        db.OpenSharedConnection();
+        db.BeginTransaction();
         foreach (var table in tables)
         {
             DbCommand? cmd = db.CreateCommand(db.Connection, CommandType.Text, $"PRAGMA table_info({table})");
@@ -341,6 +349,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
                 yield return new ColumnInfo(table, columnName, ordinal, notNull, type);
             }
         }
+
+        db.CompleteTransaction();
     }
 
     /// <inheritdoc />

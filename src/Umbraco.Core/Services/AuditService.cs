@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -10,6 +12,8 @@ namespace Umbraco.Cms.Core.Services.Implement;
 public sealed class AuditService : RepositoryService, IAuditService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
+    private readonly IUserService _userService;
+    private readonly IEntityRepository _entityRepository;
     private readonly IAuditRepository _auditRepository;
     private readonly Lazy<bool> _isAvailable;
 
@@ -18,12 +22,34 @@ public sealed class AuditService : RepositoryService, IAuditService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IAuditRepository auditRepository,
-        IAuditEntryRepository auditEntryRepository)
+        IAuditEntryRepository auditEntryRepository,
+        IUserService userService,
+        IEntityRepository entityRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditRepository = auditRepository;
         _auditEntryRepository = auditEntryRepository;
+        _userService = userService;
+        _entityRepository = entityRepository;
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
+    }
+
+    [Obsolete("Use constructor that also takes IUserService & IEntityRepository instead, scheduled for removal in v13")]
+    public AuditService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditRepository auditRepository,
+        IAuditEntryRepository auditEntryRepository)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            auditRepository,
+            auditEntryRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IEntityRepository>())
+    {
     }
 
     public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)

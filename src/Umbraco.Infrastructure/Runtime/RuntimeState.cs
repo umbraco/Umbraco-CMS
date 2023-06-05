@@ -34,7 +34,6 @@ public class RuntimeState : IRuntimeState
 
     /// <summary>
     /// The initial <see cref="RuntimeState"/>
-    /// The initial <see cref="RuntimeState"/>
     /// </summary>
     public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
 
@@ -216,7 +215,7 @@ public class RuntimeState : IRuntimeState
                         _logger.LogDebug("Could not connect to database.");
                     }
 
-                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory.ProviderName))
+                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.Install;

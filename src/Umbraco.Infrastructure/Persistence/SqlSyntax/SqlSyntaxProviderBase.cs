@@ -209,6 +209,8 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public abstract bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
+    public virtual bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName) => throw new NotImplementedException();
+
     public virtual string GetFieldNameForUpdate<TDto>(
         Expression<Func<TDto, object?>> fieldSelector,
         string? tableAlias = null) => this.GetFieldName(fieldSelector, tableAlias);

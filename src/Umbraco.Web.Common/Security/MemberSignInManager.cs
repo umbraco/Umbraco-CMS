@@ -129,7 +129,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     /// <summary>
     ///     Custom ExternalLoginSignInAsync overload for handling external sign in with auto-linking
     /// </summary>
-    public async Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false)
+    public virtual async Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo, bool isPersistent, bool bypassTwoFactor = false)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // to be able to deal with auto-linking and reduce duplicate lookups

@@ -154,6 +154,11 @@
   position: absolute;
 }
 
+// FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed
+.tox .tox-collection__item:not(.tox-collection__item--state-disabled) .tox-collection__item-label {
+  line-height: 1 !important;
+}
+
 .mce-menu {
     border-radius: 3px;
 }

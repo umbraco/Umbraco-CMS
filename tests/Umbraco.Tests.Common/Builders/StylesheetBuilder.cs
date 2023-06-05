@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Tests.Common.Builders;
 public class StylesheetBuilder
     : BuilderBase<Stylesheet>
 {
-    private string _content;
     private string _path;
+    private string _content;
 
     public StylesheetBuilder WithPath(string path)
     {

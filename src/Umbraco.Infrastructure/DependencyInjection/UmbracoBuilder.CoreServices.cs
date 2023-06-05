@@ -7,6 +7,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DeliveryApi.Accessors;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
@@ -36,6 +38,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
@@ -218,6 +221,20 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
         builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
+
+        builder.AddPropertyIndexValueFactories();
+
+        builder.AddDeliveryApiCoreServices();
+
+        return builder;
+    }
+
+    public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
+        builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
+
         return builder;
     }
 
@@ -396,6 +413,29 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
             .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddDeliveryApiCoreServices(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddSingleton<IApiElementBuilder, ApiElementBuilder>();
+        builder.Services.AddSingleton<IApiContentBuilder, ApiContentBuilder>();
+        builder.Services.AddSingleton<IApiContentResponseBuilder, ApiContentResponseBuilder>();
+        builder.Services.AddSingleton<IApiMediaBuilder, ApiMediaBuilder>();
+        builder.Services.AddSingleton<IApiContentNameProvider, ApiContentNameProvider>();
+        builder.Services.AddSingleton<IOutputExpansionStrategyAccessor, NoopOutputExpansionStrategyAccessor>();
+        builder.Services.AddSingleton<IRequestStartItemProviderAccessor, NoopRequestStartItemProviderAccessor>();
+        builder.Services.AddSingleton<IRequestCultureService, NoopRequestCultureService>();
+        builder.Services.AddSingleton<IRequestRoutingService, NoopRequestRoutingService>();
+        builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
+        builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
+        builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
+        builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
+        builder.Services.AddSingleton<IApiMediaUrlProvider, ApiMediaUrlProvider>();
+        builder.Services.AddSingleton<IApiContentRouteBuilder, ApiContentRouteBuilder>();
+        builder.Services.AddSingleton<IApiPublishedContentCache, ApiPublishedContentCache>();
+        builder.Services.AddSingleton<IApiRichTextParser, ApiRichTextParser>();
 
         return builder;
     }

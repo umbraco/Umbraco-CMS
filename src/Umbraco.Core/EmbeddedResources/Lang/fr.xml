@@ -1251,7 +1251,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="rollback">
     <key alias="headline">Sélectionnez une version à comparer avec la version actuelle</key>
-    <key alias="currentVersion">Version actuelle</key>
     <key alias="diffHelp"><![CDATA[Ceci affiche les différences entre la version actuelle et la version choisie<br />Le texte en <del>Rouge</del> signifie qu'il a été supprimé de la version choisie, <ins>vert signifie ajouté</ins>]]></key>
     <key alias="documentRolledBack">Le document a été restauré à une version antérieure</key>
     <key alias="htmlHelp">Ceci affiche la version choisie en tant que HTML, si vous souhaitez voir les différences entre les deux versions en même temps, utilisez la vue différentielle</key>
@@ -1911,8 +1910,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="stateInactive">Inactif</key>
     <key alias="sortNameAscending">Nom (A-Z)</key>
     <key alias="sortNameDescending">Nom (Z-A)</key>
-    <key alias="sortCreateDateAscending">Plus récent</key>
-    <key alias="sortCreateDateDescending">Plus ancien</key>
+    <key alias="sortCreateDateAscending">Plus ancien</key>
+    <key alias="sortCreateDateDescending">Plus récent</key>
     <key alias="sortLastLoginDateDescending">Dernière connexion</key>
   </area>
   <area alias="validation">

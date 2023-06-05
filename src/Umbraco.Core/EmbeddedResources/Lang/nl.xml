@@ -2059,8 +2059,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="stateInactive">Inactief</key>
     <key alias="sortNameAscending">Naam (A-Z)</key>
     <key alias="sortNameDescending">Naam (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nieuwste</key>
-    <key alias="sortCreateDateDescending">Oudste</key>
+    <key alias="sortCreateDateAscending">Oudste</key>
+    <key alias="sortCreateDateDescending">Nieuwste</key>
     <key alias="sortLastLoginDateDescending">Laatste login</key>
     <key alias="noUserGroupsAdded">Er zijn geen gebruikersgroepen toegevoegd</key>
   </area>
@@ -2546,10 +2546,33 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="tabBlock">Blokken</key>
     <key alias="tabBlockTypeSettings">Instellingen</key>
     <key alias="allowBlockInAreasHelp">Maak dit blok standaard beschikbaar binnen de gebieden van andere blokken (behalve wanneer expliciete rechten zijn gezet voor deze gebieden).</key>
+    <key alias="areaAllowedBlocksEmpty">Indien leeg kunnen alle blokken toegestaand in gebieden worden toegevoegd. </key>
+    <key alias="areasLayoutColumns">Grid Kolommen voor Gebieden.</key>
+    <key alias="areasLayoutColumnsHelp">Definiëer hoeveel kolommen beschikbaar zijn in gebiede. Indien niet gedefinieerd wordt het aantal kolommen gedefinieerd voor de gehele lay-out gebruikt.</key>
+    <key alias="areasConfigurations">Gebieden</key>
+    <key alias="areasConfigurationsHelp">Om het nesten van blokken binnen-in dit blok toe te staan, definieer een of meer gebieden voor blokken om binnenin te nesten. Gebieden volgen hun eigen lay-out welke gedefinieerd is bij de Grid Kolommen voor Gebieden. Elk Gebied kolombreedte can worden gewijzigd door het gebruik van de schaal in de hoek rechtsonderin </key>
+    <key alias="invalidDropPosition"><![CDATA[<strong>%0%</strong> is niet toegestaan op deze locatie.]]></key>
+    <key alias="defaultLayoutStylesheet">Standaard lay-out stylesheet</key>
+    <key alias="confirmPasteDisallowedNestedBlockHeadline">Niet-toegestane content is geweigerd</key>
+    <key alias="confirmPasteDisallowedNestedBlockMessage">
+      <![CDATA[De toegevoegde content bevat niet-toegestaande content, welke niet is aangemaakt. Wil je de rest van de content bewaren?]]></key>
+    <key alias="scaleHandlerButtonTitle">Sleep om te vergroten/verkleinen</key>
+    <key alias="areaCreateLabelTitle">Maak Button Label</key>
+    <key alias="areaCreateLabelHelp">Overschrijf het label van de create button van dit Gebied.</key>
+    <key alias="showSizeOptions">Toon vergroot/verklein opties</key>
+    <key alias="addBlockType">Voeg Blok toe</key>
+    <key alias="addBlockGroup">Voeg groep toep</key>
+    <key alias="pickSpecificAllowance">Selecteer groep of Blok</key>
+    <key alias="allowanceMinimum">Zet een minimale vereiste</key>
     <key alias="areas">Gebieden</key>
     <key alias="tabAreas">Gebieden</key>
     <key alias="tabAdvanced">Geadvanceerd</key>
     <key alias="headlineAllowance">Rechten</key>
+    <key alias="getSampleHeadline">Installeer Voorbeeld Configuratie</key>
+    <key alias="getSampleButton">Installeer</key>
+    <key alias="actionEnterSortMode">Sorteer mode</key>
+    <key alias="actionExitSortMode">Sluit sorteer mode</key>
+    <key alias="areaAliasIsNotUnique">Dit Gebieds' Alias moet uniek zijn ten opzichte van andere Gebieden in dit Blok.</key>
     <key alias="configureArea">Configureer gebied</key>
     <key alias="deleteArea">Verwijder gebied</key>
   </area>

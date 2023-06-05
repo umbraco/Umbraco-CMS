@@ -20,18 +20,6 @@
 
 .umb-block-grid__layout-item {
     position: relative;
-    &:hover {
-
-        > ng-form > .umb-block-grid__block--context {
-            z-index: 4;
-        }
-
-        > ng-form > .umb-block-grid__block--inline-create-button, 
-        > ng-form > .umb-block-grid__block--validation-border,
-        > ng-form > .umb-block-grid__block--actions {
-            z-index: 3;
-        }
-    }
 }
 
 .umb-block-grid__block--validation-border {
@@ -95,18 +83,13 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
 
         &::after {
             display: var(--umb-block-grid--block-ui-display, block);
-            animation: umb-block-grid__block__border-pulse 400ms ease-in-out alternate infinite;
-            @keyframes umb-block-grid__block__border-pulse {
-                0%   { border-color: rgba(@blueDark, 1); }
-                100% { border-color: rgba(@blueDark, 0.66); }
-            }
+            border-color: @blueDark;
         }
     }
     &.--active {
         &::after {
             display: block;
             border-color: @pinkLight;
-            animation: none;
         }
         
         > .umb-block-grid__block--context {
@@ -196,6 +179,7 @@ ng-form.ng-invalid-val-server-match-content > .umb-block-grid__block:not(.--acti
         }
         &:not(.--scale-mode) {
             > .umb-block-grid__block--actions {
+                z-index: 4;
                 opacity: var(--umb-block-grid--block-ui-opacity);
             }
     
@@ -223,15 +207,16 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
 
 .umb-block-grid__block--context {
     position: absolute;
-    top: -21px;
+    bottom: 100%;
     right: -1px;
+    max-width: 100%;
     font-size: 12px;
     z-index: 4;
     display: var(--umb-block-grid--block-ui-display, flex);
     justify-content: end;
 
     /** prevent interaction with inline-create button just beneath the context-bar: */
-    ::after {
+    &::after {
         content: '';
         position: absolute;
         top: 100%;
@@ -243,34 +228,62 @@ ng-form.ng-invalid > .umb-block-grid__block:not(.--active) > .umb-block-grid__bl
     .__context-bar {
         padding: 0 9px;
         padding-top: 1px;
-        background-color: #3544B1;
+        background-color: @blueDark;
         color: white;
         border-top: rgba(255, 255, 255, .7) 1px solid;
         border-left: rgba(255, 255, 255, .7) 1px solid;
         border-right: rgba(255, 255, 255, .7) 1px solid;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
-        display: inline-block;
+        display: inline-flex;
+        box-sizing: border-box;
+
+        max-width: 100%;
+        white-space: nowrap;
+
+        /* Ensure that the bar is visually connected with the border **/
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 1px;
+            border-top: 1px solid @blueDark;
+            box-sizing: border-box;
+            background: none;
+        }
+        &::after {
+            content: '';
+            position: absolute;
+            right: 1px;
+            bottom: -2px;
+            height: 2px;
+            width: 2px;
+            border-top: 1px solid @blueDark;
+            border-right: 1px solid @blueDark;
+            box-sizing: border-box;
+            background: none;
+        }
+
         .action {
             color: currentColor;
             font-size: 12px;
+            line-height: inherit;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .__divider {
-            display: inline-block;
             margin: 0 3px;
         }
         .__label {
-            display: inline-flex;
             align-items: center;
             padding: 0;
             font-weight: 700;
             user-select: none;
-    
-            .icon {
-                font-size: 22px;
-                margin-right: 5px;
-                display: inline-block;
-            }
+
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 }

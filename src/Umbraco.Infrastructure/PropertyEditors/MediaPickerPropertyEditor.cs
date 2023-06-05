@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Icon = Constants.Icons.MediaImage,
     IsDeprecated = false,
     ValueEditorIsReusable = true)]
+[Obsolete("Please use the MediaPicker3 instead, will be removed in V13")]
 public class MediaPickerPropertyEditor : DataEditor
 {
     private readonly IEditorConfigurationParser _editorConfigurationParser;

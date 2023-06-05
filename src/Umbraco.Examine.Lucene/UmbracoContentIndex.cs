@@ -72,7 +72,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
             ValueSetValidationResult validationResult = ValueSetValidator.Validate(v);
 
             return validationResult.Status;
-        }).ToList();
+        }).ToArray();
 
         var hasDeletes = false;
         var hasUpdates = false;
@@ -86,7 +86,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
                     hasUpdates = true;
 
                     //these are the valid ones, so just index them all at once
-                    base.PerformIndexItems(group.ToList(), onComplete);
+                    base.PerformIndexItems(group.ToArray(), onComplete);
                     break;
                 case ValueSetValidationStatus.Failed:
                     // don't index anything that is invalid

@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         private bool IsBrandNewInstall =>
             _connectionStrings.CurrentValue.IsConnectionStringConfigured() == false ||
             _databaseBuilder.IsDatabaseConfigured == false ||
-            (_databaseBuilder.CanConnectToDatabase == false && _databaseProviderMetadata.CanForceCreateDatabase(_umbracoDatabaseFactory.SqlContext.SqlSyntax.DbProvider)) ||
+            (_databaseBuilder.CanConnectToDatabase == false && _databaseProviderMetadata.CanForceCreateDatabase(_umbracoDatabaseFactory)) ||
             _databaseBuilder.IsUmbracoInstalled() == false;
     }
 }

@@ -1,71 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.get_ForceLeft</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.get_ForceRight</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.set_ForceLeft(System.Boolean)</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Models.Blocks.BlockGridItem.set_ForceRight(System.Boolean)</Target>
+    <DiagnosticId>CP0005</DiagnosticId>
+    <Target>M:Umbraco.Cms.Core.Models.PublishedContent.PublishedPropertyBase.GetDeliveryApiValue(System.Boolean,System.String,System.String)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Deploy.IDataTypeConfigurationConnector.FromArtifact(Umbraco.Cms.Core.Models.IDataType,System.String,Umbraco.Cms.Core.Deploy.IContextCache)</Target>
+    <Target>M:Umbraco.Cms.Core.Models.PublishedContent.IPublishedProperty.GetDeliveryApiValue(System.Boolean,System.String,System.String)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Deploy.IDataTypeConfigurationConnector.ToArtifact(Umbraco.Cms.Core.Models.IDataType,System.Collections.Generic.ICollection{Umbraco.Cms.Core.Deploy.ArtifactDependency},Umbraco.Cms.Core.Deploy.IContextCache)</Target>
+    <Target>M:Umbraco.Cms.Core.Models.PublishedContent.IPublishedPropertyType.ConvertInterToDeliveryApiObject(Umbraco.Cms.Core.Models.PublishedContent.IPublishedElement,Umbraco.Cms.Core.PropertyEditors.PropertyCacheLevel,System.Object,System.Boolean)</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Deploy.IServiceConnector.GetArtifact(System.Object,Umbraco.Cms.Core.Deploy.IContextCache)</Target>
+    <Target>P:Umbraco.Cms.Core.Models.PublishedContent.IPublishedPropertyType.DeliveryApiCacheLevel</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0006</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Deploy.IServiceConnector.GetArtifact(Umbraco.Cms.Core.Udi,Umbraco.Cms.Core.Deploy.IContextCache)</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0006</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Deploy.IValueConnector.FromArtifact(System.String,Umbraco.Cms.Core.Models.IPropertyType,System.Object,Umbraco.Cms.Core.Deploy.IContextCache)</Target>
-    <Left>lib/net7.0/Umbraco.Core.dll</Left>
-    <Right>lib/net7.0/Umbraco.Core.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0006</DiagnosticId>
-    <Target>M:Umbraco.Cms.Core.Deploy.IValueConnector.ToArtifact(System.Object,Umbraco.Cms.Core.Models.IPropertyType,System.Collections.Generic.ICollection{Umbraco.Cms.Core.Deploy.ArtifactDependency},Umbraco.Cms.Core.Deploy.IContextCache)</Target>
+    <Target>P:Umbraco.Cms.Core.Scoping.ICoreScope.Locks</Target>
     <Left>lib/net7.0/Umbraco.Core.dll</Left>
     <Right>lib/net7.0/Umbraco.Core.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

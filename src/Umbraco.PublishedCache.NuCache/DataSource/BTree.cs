@@ -22,10 +22,6 @@ public class BTree
             // default is 4096, min 2^9 = 512, max 2^16 = 64K
             FileBlockSize = GetBlockSize(settings),
 
-            // HACK: Forces FileOptions to be WriteThrough here: https://github.com/mamift/CSharpTest.Net.Collections/blob/9f93733b3af7ee0e2de353e822ff54d908209b0b/src/CSharpTest.Net.Collections/IO/TransactedCompoundFile.cs#L316-L327,
-            // as the reflection uses otherwise will failed in .NET Core as the "_handle" field in FileStream is renamed to "_fileHandle".
-            StoragePerformance = StoragePerformance.CommitToDisk,
-
             // other options?
         };
 

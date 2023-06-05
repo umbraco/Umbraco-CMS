@@ -4,7 +4,6 @@ import {MediaBuilder, MediaFileBuilder, StylesheetBuilder} from "@umbraco/json-m
 import {BlockListDataTypeBuilder} from "@umbraco/json-models-builders/dist/lib/builders/dataTypes";
 
 test.describe('BlockListEditorDataType', () => {
-  const documentName = 'DocumentName'
   const blockListName = 'BlockListTest';
   const elementName = 'TestElement';
   
@@ -13,13 +12,11 @@ test.describe('BlockListEditorDataType', () => {
   test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
     await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
-    await umbracoApi.documentTypes.ensureNameNotExists(documentName);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
     await umbracoApi.documentTypes.ensureNameNotExists(elementName);
   });
   
   test.afterEach(async({page, umbracoApi, umbracoUi}) => {
-    await umbracoApi.documentTypes.ensureNameNotExists(documentName);
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
     await umbracoApi.documentTypes.ensureNameNotExists(elementName);
   })
@@ -152,7 +149,10 @@ test.describe('BlockListEditorDataType', () => {
     await expect(page.locator('[block-config-model="block"]')).toHaveCount(1);
   });  
 
-  test('can edit a block list editor', async ({page, umbracoApi, umbracoUi}) => {
+  test('can edit a block list editor', async ({page, umbracoApi, umbracoUi}, testInfo) => {
+    // We need to increase the timeout because the test is taking too long to end
+    await testInfo.slow()
+    
     const elementNameTwo = 'SecondElement';
     const elementTwoAlias = AliasHelper.toAlias(elementNameTwo);
     const stylesheetName = 'TestStyleSheet';
@@ -160,7 +160,7 @@ test.describe('BlockListEditorDataType', () => {
     const imageName = "Umbraco";
     const umbracoFileValue = {"src": "Umbraco.png"};
     const fileName = "Umbraco.png";
-    const path = fileName;
+    const path = 'mediaLibrary/' + fileName;
     const mimeType = "image/png";
 
     await umbracoApi.documentTypes.ensureNameNotExists(elementNameTwo);

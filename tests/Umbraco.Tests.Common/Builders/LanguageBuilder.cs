@@ -95,6 +95,7 @@ public class LanguageBuilder<TParent>
         return this;
     }
 
+    [Obsolete("This will be replaced in V13 by a corresponding method accepting language ISO code instead of language ID.")]
     public LanguageBuilder<TParent> WithFallbackLanguageId(int fallbackLanguageId)
     {
         _fallbackLanguageId = fallbackLanguageId;

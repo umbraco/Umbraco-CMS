@@ -16,8 +16,8 @@ public class DomainService : RepositoryService, IDomainService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDomainRepository domainRepository)
-        : base(provider, loggerFactory, eventMessagesFactory) =>
-        _domainRepository = domainRepository;
+        : base(provider, loggerFactory, eventMessagesFactory)
+        => _domainRepository = domainRepository;
 
     public bool Exists(string domainName)
     {
@@ -43,8 +43,7 @@ public class DomainService : RepositoryService, IDomainService
             _domainRepository.Delete(domain);
             scope.Complete();
 
-            scope.Notifications.Publish(
-                new DomainDeletedNotification(domain, eventMessages).WithStateFrom(deletingNotification));
+            scope.Notifications.Publish(new DomainDeletedNotification(domain, eventMessages).WithStateFrom(deletingNotification));
         }
 
         return OperationResult.Attempt.Succeed(eventMessages);
@@ -97,8 +96,50 @@ public class DomainService : RepositoryService, IDomainService
 
             _domainRepository.Save(domainEntity);
             scope.Complete();
-            scope.Notifications.Publish(
-                new DomainSavedNotification(domainEntity, eventMessages).WithStateFrom(savingNotification));
+
+            scope.Notifications.Publish(new DomainSavedNotification(domainEntity, eventMessages).WithStateFrom(savingNotification));
+        }
+
+        return OperationResult.Attempt.Succeed(eventMessages);
+    }
+
+    public Attempt<OperationResult?> Sort(IEnumerable<IDomain> items)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        IDomain[] domains = items.ToArray();
+        if (domains.Length == 0)
+        {
+            return OperationResult.Attempt.NoOperation(eventMessages);
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var savingNotification = new DomainSavingNotification(domains, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return OperationResult.Attempt.Cancel(eventMessages);
+            }
+
+            scope.WriteLock(Constants.Locks.Domains);
+
+            int sortOrder = 0;
+            foreach (IDomain domain in domains)
+            {
+                // If the current sort order equals that of the domain we don't need to update it, so just increment the sort order and continue
+                if (domain.SortOrder == sortOrder)
+                {
+                    sortOrder++;
+                    continue;
+                }
+
+                domain.SortOrder = sortOrder++;
+                _domainRepository.Save(domain);
+            }
+
+            scope.Complete();
+            scope.Notifications.Publish(new DomainSavedNotification(domains, eventMessages).WithStateFrom(savingNotification));
         }
 
         return OperationResult.Attempt.Succeed(eventMessages);

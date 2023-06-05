@@ -337,7 +337,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         string controllerName,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         FormMethod method)
         => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object?>(), method);
 
@@ -348,7 +348,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         string controllerName,
-        object additionalRouteVals)
+        object? additionalRouteVals = null)
         => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object?>());
 
     /// <summary>
@@ -358,7 +358,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         string controllerName,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes,
         FormMethod method) =>
         html.BeginUmbracoForm(
@@ -375,7 +375,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         string controllerName,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes) =>
         html.BeginUmbracoForm(
             action,
@@ -483,7 +483,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         Type surfaceType,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         FormMethod method) =>
         html.BeginUmbracoForm(
             action,
@@ -499,21 +499,21 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         Type surfaceType,
-        object additionalRouteVals) =>
+        object? additionalRouteVals = null) =>
         html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object?>());
 
     /// <summary>
     ///     Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
     /// </summary>
     /// <typeparam name="T">The <see cref="SurfaceController" /> type</typeparam>
-    public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action, object additionalRouteVals, FormMethod method)
+    public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action, object? additionalRouteVals, FormMethod method)
         where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, method);
 
     /// <summary>
     ///     Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
     /// </summary>
     /// <typeparam name="T">The <see cref="SurfaceController" /> type</typeparam>
-    public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action, object additionalRouteVals)
+    public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action, object? additionalRouteVals = null)
         where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals);
 
     /// <summary>
@@ -523,7 +523,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         Type surfaceType,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes) =>
         html.BeginUmbracoForm(
             action,
@@ -538,7 +538,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         Type surfaceType,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes,
         FormMethod method) =>
         html.BeginUmbracoForm(
@@ -555,7 +555,7 @@ public static class HtmlHelperRenderExtensions
         this IHtmlHelper html,
         string action,
         Type surfaceType,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes,
         FormMethod method,
         bool? antiforgery) =>
@@ -574,7 +574,7 @@ public static class HtmlHelperRenderExtensions
     public static MvcForm BeginUmbracoForm<T>(
         this IHtmlHelper html,
         string action,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes,
         FormMethod method)
         where T : SurfaceController =>
@@ -587,7 +587,7 @@ public static class HtmlHelperRenderExtensions
     public static MvcForm BeginUmbracoForm<T>(
         this IHtmlHelper html,
         string action,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes,
         FormMethod method,
         bool? antiforgery)
@@ -600,7 +600,7 @@ public static class HtmlHelperRenderExtensions
     public static MvcForm BeginUmbracoForm<T>(
         this IHtmlHelper html,
         string action,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         object htmlAttributes)
         where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
 
@@ -690,7 +690,7 @@ public static class HtmlHelperRenderExtensions
     public static MvcForm BeginUmbracoForm<T>(
         this IHtmlHelper html,
         string action,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         IDictionary<string, object?> htmlAttributes,
         FormMethod method)
         where T : SurfaceController =>
@@ -703,7 +703,7 @@ public static class HtmlHelperRenderExtensions
     public static MvcForm BeginUmbracoForm<T>(
         this IHtmlHelper html,
         string action,
-        object additionalRouteVals,
+        object? additionalRouteVals,
         IDictionary<string, object?> htmlAttributes)
         where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
 
@@ -766,6 +766,12 @@ public static class HtmlHelperRenderExtensions
                 "Value can't be empty or consist only of white-space characters.",
                 nameof(controllerName));
         }
+
+        // Create a new form context in order to ensure client validation is set properly when adding multiple forms in a page. More context in PR #13914.
+        html.ViewContext.FormContext = new FormContext
+        {
+            CanRenderAtEndOfForm = true
+        };
 
         IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
         IUmbracoContext umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();

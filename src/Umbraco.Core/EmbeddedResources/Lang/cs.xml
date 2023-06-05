@@ -1194,7 +1194,6 @@
   </area>
   <area alias="rollback">
     <key alias="headline">Vyberte verzi, kterou chcete porovnat s aktuální verzí</key>
-    <key alias="currentVersion">Současná verze</key>
     <key alias="diffHelp"><![CDATA[Tohle ukazuje rozdíly mezi současnou verzi a vybranou verzi<br /><del>Červený</del> text nebude ve vybrané verzi zobrazen, <ins>zelený znamená přidaný</ins>].]]></key>
     <key alias="documentRolledBack">Dokument byl vrácen na starší verzi</key>
     <key alias="htmlHelp">Tohle zobrazuje vybranou verzi jako html, jestliže chcete vidět rozdíly mezi 2 verzemi najednou, použijte rozdílové zobrazení</key>
@@ -1870,8 +1869,8 @@
     <key alias="stateInactive">Neaktivní</key>
     <key alias="sortNameAscending">Jméno (A-Z)</key>
     <key alias="sortNameDescending">Jméno (Z-A)</key>
-    <key alias="sortCreateDateAscending">Nejnovější</key>
-    <key alias="sortCreateDateDescending">Nejstarší</key>
+    <key alias="sortCreateDateAscending">Nejstarší</key>
+    <key alias="sortCreateDateDescending">Nejnovější</key>
     <key alias="sortLastLoginDateDescending">Poslední přihlášení</key>
     <key alias="noUserGroupsAdded">Nebyly přidány žádné skupiny uživatelů</key>
   </area>

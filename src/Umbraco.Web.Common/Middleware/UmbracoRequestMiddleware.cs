@@ -187,7 +187,8 @@ public class UmbracoRequestMiddleware : IMiddleware
 
         if (_umbracoRequestPaths.IsBackOfficeRequest(absPath)
             || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}") ?? false)
-            || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}") ?? false))
+            || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}") ?? false)
+            || _runtimeState.EnableInstaller())
         {
             LazyInitializer.EnsureInitialized(ref s_firstBackOfficeRequest, ref s_firstBackOfficeReqestFlag,
                 ref s_firstBackOfficeRequestLocker, () =>

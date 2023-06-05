@@ -41,13 +41,22 @@ public sealed class FrontEndRoutes : IAreaRoutes
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-        if (_runtimeState.Level != RuntimeLevel.Run)
+        switch (_runtimeState.Level)
         {
-            return;
+            case RuntimeLevel.Install:
+            case RuntimeLevel.Upgrade:
+            case RuntimeLevel.Run:
+
+                AutoRouteSurfaceControllers(endpoints);
+                AutoRouteFrontEndApiControllers(endpoints);
+                break;
+            case RuntimeLevel.BootFailed:
+            case RuntimeLevel.Unknown:
+            case RuntimeLevel.Boot:
+                break;
         }
 
-        AutoRouteSurfaceControllers(endpoints);
-        AutoRouteFrontEndApiControllers(endpoints);
+
     }
 
     /// <summary>

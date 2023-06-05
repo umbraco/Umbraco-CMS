@@ -91,6 +91,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
 
         return new SearchResults
         {
+            PageSize = pageSize,
             TotalRecords = results.TotalItemCount,
             Results = results.Select(x => new SearchResult
             {

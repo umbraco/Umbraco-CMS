@@ -1,13 +1,14 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -34,7 +35,11 @@ public class NestedContentTests
         var localizationService = Mock.Of<ILocalizationService>();
 
         PropertyEditorCollection editors = null;
-        var editor = new NestedContentPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
+        var editor = new NestedContentPropertyEditor(
+            Mock.Of<IDataValueEditorFactory>(),
+            Mock.Of<IIOHelper>(),
+            Mock.Of<IEditorConfigurationParser>(),
+            Mock.Of<INestedContentPropertyIndexValueFactory>());
         editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
 
         var serializer = new ConfigurationEditorJsonSerializer();
@@ -117,8 +122,8 @@ public class NestedContentTests
 
         var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
         {
-            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
-            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
+            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IApiElementBuilder>()),
+            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog, Mock.Of<IApiElementBuilder>()),
         });
 
         var factory =
@@ -272,5 +277,8 @@ public class NestedContentTests
 
         public override object GetXPathValue(string culture = null, string? segment = null) =>
             throw new InvalidOperationException("This method won't be implemented.");
+
+        public override object GetDeliveryApiValue(bool expanding, string culture = null, string segment = null) =>
+            PropertyType.ConvertInterToDeliveryApiObject(_owner, ReferenceCacheLevel, InterValue, _preview);
     }
 }

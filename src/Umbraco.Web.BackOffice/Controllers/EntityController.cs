@@ -1,8 +1,11 @@
 using System.Collections.Concurrent;
 using System.Dynamic;
 using System.Globalization;
+using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Security.Cryptography;
+using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -15,6 +18,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -511,6 +515,15 @@ public class EntityController : UmbracoAuthorizedJsonController
         return Ok(returnUrl);
     }
 
+    /// <summary>
+    ///     Gets an entity by a xpath query - OBSOLETE
+    /// </summary>
+    /// <param name="query"></param>
+    /// <param name="nodeContextId"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    [Obsolete("This will be removed in Umbraco 13. Use GetByXPath instead")]
+    public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type) => GetByXPath(query, nodeContextId, null, type);
 
     /// <summary>
     ///     Gets an entity by a xpath query
@@ -518,19 +531,16 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="query"></param>
     /// <param name="nodeContextId"></param>
     /// <param name="type"></param>
+    /// <param name="parentId"></param>
     /// <returns></returns>
-    public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
+    public ActionResult<EntityBasic?>? GetByXPath(string query, int nodeContextId, int? parentId, UmbracoEntityTypes type)
     {
-        // TODO: Rename this!!! It's misleading, it should be GetByXPath
-
-
         if (type != UmbracoEntityTypes.Document)
         {
             throw new ArgumentException("Get by query is only compatible with entities of type Document");
         }
 
-
-        var q = ParseXPathQuery(query, nodeContextId);
+        var q = ParseXPathQuery(query, nodeContextId, parentId);
         IPublishedContent? node = _publishedContentQuery.ContentSingleAtXPath(q);
 
         if (node == null)
@@ -542,10 +552,11 @@ public class EntityController : UmbracoAuthorizedJsonController
     }
 
     // PP: Work in progress on the query parser
-    private string ParseXPathQuery(string query, int id) =>
+    private string ParseXPathQuery(string query, int id, int? parentId) =>
         UmbracoXPathPathSyntaxParser.ParseXPathQuery(
             query,
             id,
+            parentId,
             nodeid =>
             {
                 IEntitySlim? ent = _entityService.Get(nodeid);
@@ -568,7 +579,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     [HttpGet]
     public UrlAndAnchors GetUrlAndAnchors(int id, string? culture = "*")
     {
-        culture ??= ClientCulture();
+        culture = culture is null or "*" ? ClientCulture() : culture;
 
         var url = _publishedUrlProvider.GetUrl(id, culture: culture);
         IEnumerable<string> anchorValues = _contentService.GetAnchorValuesFromRTEs(id, culture);
@@ -745,7 +756,11 @@ public class EntityController : UmbracoAuthorizedJsonController
             {
                 return new PagedResult<EntityBasic>(0, 0, 0);
             }
-
+            //adding multiple conditions ,considering id,key & name as filter param
+            //for id as int
+            int.TryParse(filter, out int filterAsIntId);
+            //for key as Guid
+            Guid.TryParse(filter, out Guid filterAsGuid);
             // else proceed as usual
             entities = _entityService.GetPagedChildren(
                 id,
@@ -755,7 +770,9 @@ public class EntityController : UmbracoAuthorizedJsonController
                 out long totalRecords,
                 filter.IsNullOrWhiteSpace()
                     ? null
-                    : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
+                    : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)
+                      || x.Id == filterAsIntId
+                      || x.Key == filterAsGuid),
                 Ordering.By(orderBy, orderDirection));
 
 
