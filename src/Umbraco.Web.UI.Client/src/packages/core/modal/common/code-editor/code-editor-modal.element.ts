@@ -1,7 +1,7 @@
 import { customElement, query } from 'lit/decorators.js';
 import { css, html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbCodeEditorElement as UmbCodeEditor } from '../../../components/code-editor/code-editor.element.js';
+import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbCodeEditorModalData, UmbCodeEditorModalResult } from '@umbraco-cms/backoffice/modal';
 import { UmbInputEvent } from '@umbraco-cms/backoffice/events';
@@ -10,7 +10,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/internal/modal';
 @customElement('umb-code-editor-modal')
 export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditorModalData, UmbCodeEditorModalResult> {
 	@query('umb-code-editor')
-	_codeEditor?: UmbCodeEditor;
+	_codeEditor?: UmbCodeEditorElement;
 
 	#handleConfirm() {
 		this.modalHandler?.submit({ content: this.data?.content ?? '' });
