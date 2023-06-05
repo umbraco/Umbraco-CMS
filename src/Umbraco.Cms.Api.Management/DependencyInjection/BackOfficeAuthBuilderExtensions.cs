@@ -173,11 +173,16 @@ public static class BackOfficeAuthBuilderExtensions
             });
         }
 
+        options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.RequireAuthenticatedUser();
+        });
         // NOTE: these are ONLY sample policies that allow us to test the new management APIs
         AddPolicy(AuthorizationPolicies.SectionAccessContent, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content);
         AddPolicy(AuthorizationPolicies.SectionAccessForContentTree, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content);
         AddPolicy(AuthorizationPolicies.SectionAccessForMediaTree, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Media);
         AddPolicy(AuthorizationPolicies.SectionAccessMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Media);
         AddPolicy(AuthorizationPolicies.SectionAccessContentOrMedia, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Content, Constants.Applications.Media);
-    }
+       }
 }

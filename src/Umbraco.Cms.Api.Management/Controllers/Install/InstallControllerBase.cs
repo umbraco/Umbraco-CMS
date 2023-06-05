@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.Routing;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
 
+[AllowAnonymous]
 [ApiController]
 [VersionedApiBackOfficeRoute("install")]
 [ApiExplorerSettings(GroupName = "Install")]
