@@ -8,9 +8,9 @@ public class UserResponseModel : UserPresentationBase, INamedEntityPresentationM
 
     public string? LanguageIsoCode { get; set; }
 
-    public SortedSet<Guid> ContentStartNodeIds { get; set; } = new();
+    public ISet<Guid> ContentStartNodeIds { get; set; } = new HashSet<Guid>();
 
-    public SortedSet<Guid> MediaStartNodeIds { get; set; } = new();
+    public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
 
     public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();
 
