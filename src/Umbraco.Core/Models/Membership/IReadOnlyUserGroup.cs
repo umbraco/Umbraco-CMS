@@ -33,7 +33,7 @@ public interface IReadOnlyUserGroup
     ///     flexible permissions structure in the future.
     /// </remarks>
     IEnumerable<string>? Permissions { get; set; }
-
+    ISet<string> PermissionNames { get; }
     IEnumerable<string> AllowedSections { get; }
 
     IEnumerable<int> AllowedLanguages => Enumerable.Empty<int>();
